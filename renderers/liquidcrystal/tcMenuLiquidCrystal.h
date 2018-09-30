@@ -3,6 +3,12 @@
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
+/**
+ * LiquidCrystalIO renderer that renders menus onto this type of display. This file is a plugin file and should not
+ * be directly edited, it will be replaced each time the project is built. If you want to edit this file in place,
+ * make sure to rename it first.
+ */
+
 #ifndef _TCMENU_LIQUID_CRYSTAL_H
 #define _TCMENU_LIQUID_CRYSTAL_H
 

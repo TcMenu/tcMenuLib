@@ -1,3 +1,6 @@
 .DS_Store
 .development
 .vscode
+examples/simpleMenuUno/*.h
+examples/simpleMenuUno/*.cpp
+
