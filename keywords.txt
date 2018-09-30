@@ -1,0 +1,45 @@
+#######################################
+# Syntax Coloring Map For tcMenu
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+MenuManager	KEYWORD1
+AnalogMenuItem	KEYWORD1
+EnumMenuItem	KEYWORD1
+BooleanMenuItem	KEYWORD1
+TextMenuItem	KEYWORD1
+SubMenuItem	KEYWORD1
+BackMenuItem	KEYWORD1
+RemoteConnector	KEYWORD1
+ConnectorListener	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+getBoolean	KEYWORD2
+setBoolean	KEYWORD2
+getCurrentValue	KEYWORD2
+setCurrentValue	KEYWORD2
+getTextValue	KEYWORD2
+setTextValue	KEYWORD2
+load	KEYWORD2
+save	KEYWORD2
+isChanged	KEYWORD2
+setChanged	KEYWORD2
+isSendRemoteNeeded	KEYWORD2
+setSendRemoteNeeded	KEYWORD2
+isActive	KEYWORD2
+setActive	KEYWORD2
+
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+menuMgr	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
