@@ -50,7 +50,7 @@ void MenuManager::valueChanged(int value) {
 		}
 	}
 	else {
-		renderer->activeIndexChanged(value / switches.getMenuDivisor());
+		renderer->activeIndexChanged(value);
 	}
 }
 
@@ -77,7 +77,7 @@ MenuItem* MenuManager::findCurrentActive() {
 
 void MenuManager::changePrecisionForType(MenuItem* item) {
 	if (isMenuBoolean(item->getMenuType())) {
-		switches.changeEncoderPrecision(item->getMaximumValue(), 1);
+		switches.changeEncoderPrecision(item->getMaximumValue(), !((BooleanMenuItem*)item)->getBoolean());
 	}
 	else {
 		switches.changeEncoderPrecision(item->getMaximumValue(), ((ValueMenuItem*)item)->getCurrentValue());

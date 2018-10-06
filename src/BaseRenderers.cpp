@@ -49,8 +49,8 @@ void BaseMenuRenderer::activeIndexChanged(uint8_t index) {
 }
 
 void BaseMenuRenderer::resetToDefault() {
+	currentEditor = NULL;
 	prepareNewSubmenu(menuMgr.getRoot());
-	setupForEditing(NULL);
 	ticksToReset = 255;
 }
 
@@ -115,11 +115,11 @@ void BaseMenuRenderer::menuValueAnalog(AnalogMenuItem* item, MenuDrawJustificati
 	}
 	else if (divisor > 10) {
 		// so we can display as decimal, work out the nearest highest unit for 2dp, 3dp and 4dp.
-		int fractMax = (divisor > 1000) ? divisor = 10000 : (divisor >= 100) ? 1000 : 100;
+		int fractMax = (divisor > 1000) ? divisor = 10000 : (divisor > 100) ? 1000 : 100;
 
 		// when divisor is greater than 10 we need to deal with both parts using itoa
 		int whole = calcVal / divisor;
-		uint8_t fraction = abs((calcVal % divisor)) * (fractMax / divisor);
+		uint16_t fraction = abs((calcVal % divisor)) * (fractMax / divisor);
 
 		itoa(whole, itoaBuf, 10);
 		uint8_t decPart = strlen(itoaBuf);
@@ -232,7 +232,22 @@ void BaseMenuRenderer::giveBackDisplay() {
 	redrawMode = MENUDRAW_COMPLETE_REDRAW;
 }
 
+void recurseResetMenu(MenuItem* currentMenu) {
+	while(currentMenu != NULL) {
+		if(currentMenu->getMenuType() == MENUTYPE_SUB_VALUE) {
+			recurseResetMenu(((SubMenuItem*)currentMenu)->getChild());
+		}
+		currentMenu->setActive(false);
+		currentMenu->setEditing(false);
+
+		currentMenu = currentMenu->getNext();
+	}
+}
+
 void BaseMenuRenderer::prepareNewSubmenu(MenuItem* newItems) {
+	// clear down all menu active and edit states before chaning menu
+	recurseResetMenu(menuMgr.getRoot());
+
 	menuAltered();
 	currentRoot = newItems;
 	currentRoot->setActive(true);
@@ -248,7 +263,9 @@ void BaseMenuRenderer::setupForEditing(MenuItem* item) {
 	}
 
 	// basically clear down editor state
-	if(item == NULL) return;
+	if(item == NULL) {
+		return;
+	}
 
 	MenuType ty = item->getMenuType();
 	// these are the only types we can edit with a rotary encoder & LCD.
@@ -279,7 +296,7 @@ int BaseMenuRenderer::offsetOfCurrentActive() {
 	uint8_t i = 0;
 	MenuItem* itm = currentRoot;
 	while (itm != NULL) {
-		if (itm->isActive()) {
+		if (itm->isActive() || itm->isEditing()) {
 			return i;
 		}
 		i++;
@@ -298,8 +315,9 @@ void BaseMenuRenderer::setCurrentEditor(MenuItem* toEdit) {
 
 	if (currentEditor != NULL) {
 		currentEditor->setEditing(false);
+		currentEditor->setActive(true);
 		currentEditor = NULL;
-		menuMgr.setItemsInCurrentMenu(itemCount(currentRoot) - 1);
+		menuMgr.setItemsInCurrentMenu(itemCount(currentRoot) - 1, offsetOfCurrentActive());
 		redrawRequirement(MENUDRAW_EDITOR_CHANGE);
 	}
 

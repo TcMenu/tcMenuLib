@@ -25,7 +25,7 @@ public:
 	void initForUpDownOk(MenuRenderer* renderer, MenuItem* root, uint8_t upPin, uint8_t downPin, uint8_t okPin);
 	void valueChanged(int value);
 	void onMenuSelect(bool held);
-	void setItemsInCurrentMenu(int size) { switches.changeEncoderPrecision(size * switches.getMenuDivisor(), 0); }
+	void setItemsInCurrentMenu(int size, int offs = 0) { switches.changeEncoderPrecision(size, offs); }
 	void changePrecisionForType(MenuItem* item);
 
 	/**
