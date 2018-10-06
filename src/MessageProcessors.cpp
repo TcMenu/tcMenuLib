@@ -80,11 +80,14 @@ void ValueChangeMessageProcessor::fieldRx(FieldAndValue* field) {
 				valItem->setCurrentValue(newValue); // for absolutes, assume other system did checking.
 			}
 			else {
+				// get the delta and current values.
 				int deltaVal = atoi(field->value);
 				long existingVal = valItem->getCurrentValue();
 
-				if((existingVal < deltaVal) || ((existingVal + deltaVal) > valItem->getMaximumValue()) ) return; // prevent overflow
+				// prevent an underflow or overflow situation.
+				if((deltaVal < 0 && existingVal < abs(deltaVal)) || (deltaVal > 0 && (existingVal + deltaVal) > valItem->getMaximumValue()) ) return;
 
+				// we must be good to go if we get here, write it..
 				valItem->setCurrentValue(existingVal + deltaVal);
 			}
 		}
