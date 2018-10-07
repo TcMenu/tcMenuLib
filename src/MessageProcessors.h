@@ -10,58 +10,18 @@
 
 #include <Arduino.h>
 #include "tcMenu.h"
-#include "RemoteConnector.h"
 
-class ValueChangeMessageProcessor : public MessageProcessor {
-private:
-	MenuItem* item;
-	int parentId;
-	ChangeType changeType;
-	int changeValue;
-public:
-	ValueChangeMessageProcessor(MessageProcessor* next) {
-		this->next = next;
-		this->msgType = MSG_CHANGE_INT;
-		initialise();
-	}
-	virtual ~ValueChangeMessageProcessor() {;}
-	virtual void initialise();
-	virtual void fieldRx(FieldAndValue* field);
-	virtual void onComplete();
-
+union MessageProcessorInfo {
+	struct {
+		MenuItem* item;
+		int parentId;
+		int changeValue;
+		ChangeType changeType;
+	} value;
+	struct {
+		uint8_t major, minor;
+		ApiPlatform platform;
+	} join;
 };
-
-class JoinMessageProcessor : public MessageProcessor {
-private:
-	uint8_t major, minor;
-	ApiPlatform platform;
-public:
-	JoinMessageProcessor(MessageProcessor* next) {
-		this->next = next;
-		this->msgType = MSG_JOIN;
-		initialise();
-	}
-	virtual ~JoinMessageProcessor() {;}
-	virtual void initialise();
-	virtual void fieldRx(FieldAndValue* field);
-	virtual void onComplete();
-	virtual bool requiresBootstrap() {return true;}
-
-};
-
-class HeartbeatProcessor : public MessageProcessor {
-public:
-	HeartbeatProcessor(MessageProcessor* next) {
-		this->next = next;
-		this->msgType = MSG_HEARTBEAT;
-		initialise();
-	}
-	virtual ~HeartbeatProcessor() {;}
-	virtual void initialise() {;}
-	virtual void fieldRx(FieldAndValue*) {;}
-	virtual void onComplete();
-};
-
-extern JoinMessageProcessor rootProcessor;
 
 #endif /* _TCMENU_MESSAGEPROCESSORS_H_ */

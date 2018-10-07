@@ -114,6 +114,7 @@ enum Flags : byte {
 /**
  * As we don't have RTTI we need a way of identifying each menu item. Any value below 100 is based
  * on ValueMenuItem and can therefore be edited, otherwise it cannot be edited on the device.
+ * MenuItems less than 100 are based on ValueMenuItem and can be edited on device.
  */
 enum MenuType : byte {
 	MENUTYPE_INT_VALUE = 1,      // AnalogMenuItem
@@ -121,7 +122,8 @@ enum MenuType : byte {
 	MENUTYPE_BOOLEAN_VALUE = 3,  // BooleanMenuItem
 	MENUTYPE_SUB_VALUE = 100,    // SubMenuItem
 	MENUTYPE_BACK_VALUE = 101,   // BackMenuItem
-	MENUTYPE_TEXT_VALUE = 102    // TextMenuItem
+	MENUTYPE_REMOTE_VALUE = 102, // RemoteMenuItem
+	MENUTYPE_TEXT_VALUE = 103    // TextMenuItem
 };
 
 /**

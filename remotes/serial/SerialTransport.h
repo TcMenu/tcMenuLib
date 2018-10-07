@@ -44,6 +44,7 @@ public:
 	SerialTagValServer();
 	void begin(Stream* portStream, const char* namePgm);
 	void runLoop();
+	TagValueRemoteConnector* getRemoteConnector() {return &connector;}
 };
 
 extern SerialTagValServer serialServer;

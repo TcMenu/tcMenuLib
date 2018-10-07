@@ -11,6 +11,7 @@
 #include <Arduino.h>
 #include "RemoteTypes.h"
 #include "MenuItems.h"
+#include "MessageProcessors.h"
 
 #define TAG_VAL_PROTOCOL 0x01
 #define START_OF_MESSAGE 0x01
@@ -79,45 +80,47 @@ private:
 	bool processValuePart();
 };
 
-/**
- * Instead of each type of message processing being hardwired into the connector, the custom processing
- * required for each message in instead handled by a message processor.
- */
-class MessageProcessor {
-protected:
+class TagValueRemoteConnector; // forward reference
+
+struct MsgHandler {
+	void (*fieldUpdateFn)(TagValueRemoteConnector*, FieldAndValue*, MessageProcessorInfo*);
 	uint16_t msgType;
-	MessageProcessor* next;
-public:
-	virtual void initialise() = 0;
-	virtual void fieldRx(FieldAndValue* field) = 0;
-	virtual void onComplete() = 0;
-	virtual bool requiresBootstrap() {return false;}
-
-	// private list functions, to allow making a linked list of these.
-
-	MessageProcessor* getNext() { return next; }
-	MessageProcessor* findProcessorForType(uint16_t msgType) {
-		MessageProcessor* proc = this;
-		while(proc && proc->msgType != msgType) {
-			proc = proc->getNext();
-		}
-		return proc;
-	}
 };
 
-#define FLAG_CURRENTLY_CONNECTED 1
-#define FLAG_BOOTSTRAP_MODE 2
-#define FLAG_WRITING_MSGS 3
+class CombinedMessageProcessor {
+private:
+	MessageProcessorInfo val;
+	MsgHandler* handlers;
+	int noOfHandlers;
+
+	MsgHandler* currHandler;
+public:
+	CombinedMessageProcessor(MsgHandler handlers[], int noOfHandlers); 
+	void newMsg(uint16_t msgType);
+	void fieldUpdate(TagValueRemoteConnector* connector, FieldAndValue* field);	
+};
+
+extern CombinedMessageProcessor defaultMsgProcessor;
+
+
+#define FLAG_CURRENTLY_CONNECTED 0
+#define FLAG_BOOTSTRAP_MODE 1
+#define FLAG_WRITING_MSGS 2
 
 class TagValueRemoteConnector {
 private:
 	const char* localNamePgm;
 	uint16_t ticksLastSend;
 	uint16_t ticksLastRead;
+	CombinedMessageProcessor* processor;
+	TagValueTransport* transport;
 	uint8_t flags;
 	uint8_t remoteNo;
-	MessageProcessor* processor;
-	TagValueTransport* transport;
+	
+	// the remote connection details take 16 bytes
+	char remoteName[8];
+	uint8_t remoteMajorVer, remoteMinorVer;
+	ApiPlatform remotePlatform;
 
 	// for bootstrapping
 	MenuItem* bootMenuPtr;
@@ -142,6 +145,15 @@ public:
 	void tick();
 
 	void initiateBootstrap(MenuItem* firstItem);
+
+	uint8_t getRemoteNo() {return remoteNo;}
+	const char* getRemoteName() {return remoteName;}
+	uint8_t getRemoteMajorVer() {return remoteMajorVer;}
+	uint8_t getRemoteMinorVer() {return remoteMinorVer;}
+	ApiPlatform getRemotePlatform() {return remotePlatform;}
+	bool isConnected() { return bitRead(flags, FLAG_CURRENTLY_CONNECTED); }
+	void setRemoteName(const char* name);
+	void setRemoteConnected(uint8_t major, uint8_t minor, ApiPlatform platform);
 private:
 	void encodeBaseMenuFields(int parentId, MenuItem* item);
 	void nextBootstrap();
@@ -149,7 +161,6 @@ private:
 	void dealWithHeartbeating();
 	void setBootstrapMode(bool mode) { bitWrite(flags, FLAG_BOOTSTRAP_MODE, mode); }
 	void setConnected(bool mode) { bitWrite(flags, FLAG_CURRENTLY_CONNECTED, mode); }
-	bool isConnected() { return bitRead(flags, FLAG_CURRENTLY_CONNECTED); }
 	bool isBootstrapMode() { return bitRead(flags, FLAG_BOOTSTRAP_MODE); }
 };
 

@@ -4,6 +4,7 @@
  */
 
 #include <tcMenu.h>
+#include "RemoteMenuItem.h"
 #include "BaseRenderers.h"
 
 BaseMenuRenderer* BaseMenuRenderer::INSTANCE;
@@ -83,6 +84,9 @@ void BaseMenuRenderer::menuValueToText(MenuItem* item,	MenuDrawJustification jus
 		break;
 	case MENUTYPE_TEXT_VALUE:
 		menuValueText((TextMenuItem*)item, justification);
+		break;
+	case MENUTYPE_REMOTE_VALUE:
+		menuValueRemote((RemoteMenuItem*)item, justification);
 		break;
 	default:
 		strcpy(buffer, "???");
@@ -221,6 +225,10 @@ void BaseMenuRenderer::menuValueText(TextMenuItem* item, MenuDrawJustification j
 		int cpy = bufferSize - count;
 		strcpy(buffer + cpy, item->getTextValue());
 	}
+}
+
+void BaseMenuRenderer::menuValueRemote(RemoteMenuItem* item, MenuDrawJustification justification) {	
+	item->getCurrentState((justification == JUSTIFY_TEXT_LEFT) ? buffer : &buffer[1], bufferSize - 1);
 }
 
 void BaseMenuRenderer::takeOverDisplay(RendererCallbackFn displayFn) {

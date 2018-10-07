@@ -123,6 +123,8 @@ public:
 	virtual void initialise() { }
 };
 
+class RemoteMenuItem; // forward reference.
+
 /**
  * This class provides the base functionality that will be required by most implementations
  * of renderer, you can extend this class to provide the core functionality.
@@ -196,6 +198,7 @@ private:
 	void menuValueSub(SubMenuItem* item, MenuDrawJustification justification);
 	void menuValueBack(BackMenuItem* item, MenuDrawJustification justification);
 	void menuValueText(TextMenuItem* item, MenuDrawJustification justification);
+	void menuValueRemote(RemoteMenuItem* item, MenuDrawJustification justification);
 };
 
 /** Counts the number of items from this menu item to the end of the list */

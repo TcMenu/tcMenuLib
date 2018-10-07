@@ -23,8 +23,20 @@ TagValueRemoteConnector::TagValueRemoteConnector(TagValueTransport* transport, u
 	this->remoteNo = remoteNo;
 	this->ticksLastRead = this->ticksLastSend = 0xffff;
 	this->flags = 0;
-	this->processor = NULL;
+	this->processor = &defaultMsgProcessor;
 	this->bootMenuPtr = preSubMenuBootPtr = NULL;
+}
+
+void TagValueRemoteConnector::setRemoteName(const char* name) {
+	strncpy(remoteName, name, sizeof remoteName);
+	remoteName[sizeof(remoteName)-1]=0;
+}
+
+void TagValueRemoteConnector::setRemoteConnected(uint8_t major, uint8_t minor, ApiPlatform platform) {
+	remoteMajorVer = major;
+	remoteMinorVer = minor;
+	remotePlatform = platform;
+	initiateBootstrap(menuMgr.getRoot());
 }
 
 void TagValueRemoteConnector::tick() {
@@ -37,23 +49,15 @@ void TagValueRemoteConnector::tick() {
 	FieldAndValue* field = transport->fieldIfAvailable();
 	switch(field->fieldType) {
 	case FVAL_NEW_MSG:
-		processor = rootProcessor.findProcessorForType(field->msgType);
-		if(processor) processor->initialise();
+		processor->newMsg(field->msgType);
 		break;
 	case FVAL_FIELD:
-		if(processor) processor->fieldRx(field);
-		break;
 	case FVAL_END_MSG:
-		if(processor) {
-			processor->onComplete();
-			if(processor->requiresBootstrap()) initiateBootstrap(menuMgr.getRoot());
-		}
-		processor = NULL;
+		processor->fieldUpdate(this, field);
 		ticksLastRead = 0;
 		break;
 	case FVAL_ERROR_PROTO:
 		TagValueTransport::commsNotify(COMMS_ERR_WRONG_PROTOCOL);
-		processor = NULL;
 		break;
 	default: // not ready for processing yet.
 		break;
@@ -72,13 +76,11 @@ void TagValueRemoteConnector::dealWithHeartbeating() {
 	if(ticksLastRead > (HEARTBEAT_INTERVAL_TICKS * 3)) {
 		if(isConnected()) {
 			setConnected(false);
-			processor = NULL;
 			TagValueTransport::commsNotify(COMMS_DISCONNECTED1);
 			transport->close();
 		}
 	} else if(!isConnected()){
 		encodeJoinP(localNamePgm);
-		processor = NULL;
 		setConnected(true);
 		TagValueTransport::commsNotify(COMMS_CONNECTED1);
 	}
@@ -234,7 +236,6 @@ void TagValueRemoteConnector::encodeTextMenu(int parentId, TextMenuItem* item) {
 	}
 	else TagValueTransport::commsNotify(COMMS_ERR_WRITE_NOT_CONNECTED);
 }
-
 
 void TagValueRemoteConnector::encodeEnumMenu(int parentId, EnumMenuItem* item) {
 	if(transport->connected()) {
@@ -487,4 +488,29 @@ FieldAndValue* TagValueTransport::fieldIfAvailable() {
 		contProcessing = contProcessing && readAvailable();
 	}
 	return &currentField;
+}
+
+CombinedMessageProcessor::CombinedMessageProcessor(MsgHandler handlers[], int noOfHandlers) {
+	this->handlers = handlers;
+	this->noOfHandlers = noOfHandlers;
+	this->currHandler = NULL;
+}
+
+void CombinedMessageProcessor::newMsg(uint16_t msgType) {
+	currHandler = NULL;
+	for(int i=0;i<noOfHandlers;++i) {
+		if(handlers[i].msgType == msgType) {
+			currHandler = &handlers[i];
+		}
+	}
+
+	if(currHandler != NULL) {
+		memset(&val, 0, sizeof val);
+	}
+}
+
+void CombinedMessageProcessor::fieldUpdate(TagValueRemoteConnector* connector, FieldAndValue* field) {
+	if(currHandler != NULL) {
+		currHandler->fieldUpdateFn(connector, field, &val);
+	}
 }
