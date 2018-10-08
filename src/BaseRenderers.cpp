@@ -3,7 +3,8 @@
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
-#include <tcMenu.h>
+#include "tcMenu.h"
+#include "tcUtil.h"
 #include "RemoteMenuItem.h"
 #include "BaseRenderers.h"
 
@@ -88,23 +89,14 @@ void BaseMenuRenderer::menuValueToText(MenuItem* item,	MenuDrawJustification jus
 	case MENUTYPE_REMOTE_VALUE:
 		menuValueRemote((RemoteMenuItem*)item, justification);
 		break;
+	case MENUTYPE_FLOAT_VALUE:
+		menuValueFloat((FloatMenuItem*)item, justification);
+		break;
 	default:
 		strcpy(buffer, "???");
 		break;
 	}
 
-}
-
-void zeropaditoa(int range, int value, char* buff) {
-	uint8_t pos = 0;
-	do {
-		range = range / 10;
-		buff[pos] = (value / range) + '0';
-		value = value % range;
-		++pos;
-	} while(range > 1);
-
-	buff[pos]=0;
 }
 
 void BaseMenuRenderer::menuValueAnalog(AnalogMenuItem* item, MenuDrawJustification justification) {
@@ -126,9 +118,8 @@ void BaseMenuRenderer::menuValueAnalog(AnalogMenuItem* item, MenuDrawJustificati
 		uint16_t fraction = abs((calcVal % divisor)) * (fractMax / divisor);
 
 		itoa(whole, itoaBuf, 10);
-		uint8_t decPart = strlen(itoaBuf);
-		itoaBuf[decPart] = '.';
-		zeropaditoa(fractMax, fraction, &itoaBuf[decPart + 1]);
+		appendChar(itoaBuf, '.', sizeof itoaBuf);
+		fastltoa_mv(itoaBuf, fraction, fractMax, true, sizeof itoaBuf);
 	}
 	else {
 		// an efficient optimisation for fractions < 10.
@@ -213,6 +204,27 @@ void BaseMenuRenderer::menuValueBack(__attribute((unused)) BackMenuItem* item, M
 	}
 	else {
 		strcpy_P(buffer + (bufferSize - 6), BACK_MENU_NAME);
+	}
+}
+
+void BaseMenuRenderer::menuValueFloat(FloatMenuItem* item, MenuDrawJustification justification) {
+	char sz[20];
+	sz[0]=0;
+	ltoa((long)item->getFloatValue(), sz, 10);
+	appendChar(sz, '.', sizeof sz);
+	
+	long dpDivisor = dpToDivisor(item->getDecimalPlaces());
+	long whole = item->getFloatValue();
+	long fract = abs((item->getFloatValue() - whole) * dpDivisor);
+	fastltoa_mv(sz, fract, dpDivisor, true, sizeof sz);
+
+	if(justification == JUSTIFY_TEXT_LEFT) {
+		strcpy(buffer, sz);
+	}
+	else {
+		uint8_t count = strlen(sz);
+		int cpy = bufferSize - count;
+		strcpy(buffer + cpy, sz);
 	}
 }
 
@@ -349,15 +361,6 @@ void BaseMenuRenderer::setCurrentEditor(MenuItem* toEdit) {
 void BaseMenuRenderer::setFirstWidget(TitleWidget* widget) {
 	this->firstWidget = widget;
 	this->redrawMode = MENUDRAW_COMPLETE_REDRAW;
-}
-
-uint8_t itemCount(MenuItem* item) {
-	uint8_t count = 0;
-	while (item) {
-		++count;
-		item = item->getNext();
-	}
-	return count;
 }
 
 TitleWidget::TitleWidget(const uint8_t ** icons, uint8_t width, uint8_t height, TitleWidget* next) {

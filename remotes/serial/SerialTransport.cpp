@@ -12,7 +12,7 @@
 #include "SerialTransport.h"
 #include "tcMenu.h"
 
-SerialTagValServer serialServer;
+SerialTagValServer remoteServer;
 
 SerialTagValueTransport::SerialTagValueTransport() : TagValueTransport() {
 	this->serialPort = NULL;
@@ -26,7 +26,7 @@ void SerialTagValueTransport::close() {
 void SerialTagValServer::begin(Stream* portStream, const char* namePgm) {
 	serPort.setStream(portStream);
 	connector.setName(namePgm);
-	taskManager.scheduleFixedRate(TICK_INTERVAL, []{serialServer.runLoop();}, TIME_MILLIS);
+	taskManager.scheduleFixedRate(TICK_INTERVAL, []{remoteServer.runLoop();}, TIME_MILLIS);
 }
 
 SerialTagValServer::SerialTagValServer() : connector(&serPort, 0) {

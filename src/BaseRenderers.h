@@ -199,6 +199,7 @@ private:
 	void menuValueBack(BackMenuItem* item, MenuDrawJustification justification);
 	void menuValueText(TextMenuItem* item, MenuDrawJustification justification);
 	void menuValueRemote(RemoteMenuItem* item, MenuDrawJustification justification);
+	void menuValueFloat(FloatMenuItem* item, MenuDrawJustification justification);
 };
 
 /** Counts the number of items from this menu item to the end of the list */

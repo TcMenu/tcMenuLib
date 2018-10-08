@@ -12,7 +12,7 @@
 #include <EthernetTransport.h>
 #include <TaskManager.h>
 
-EthernetTagValServer ethTagValServer = EthernetTagValServer();
+EthernetTagValServer remoteServer = EthernetTagValServer();
 
 EthernetTagValTransport::EthernetTagValTransport() {
 }

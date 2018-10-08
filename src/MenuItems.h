@@ -96,6 +96,17 @@ struct TextMenuInfo {
 	MenuCallbackFn callback;
 };
 
+/**
+ * The information block for a floating point menu component. DO NOT move these imtes without considering AnyMenuInfo!!!
+ */
+struct FloatMenuInfo {
+	char name[NAME_SIZE_T];
+	uint16_t id;
+	uint16_t eeprom;
+	uint16_t numDecimalPlaces;
+	MenuCallbackFn callback;
+};
+
 /** 
  * Each menu item can be in the following states.
  */
@@ -123,7 +134,8 @@ enum MenuType : byte {
 	MENUTYPE_SUB_VALUE = 100,    // SubMenuItem
 	MENUTYPE_BACK_VALUE = 101,   // BackMenuItem
 	MENUTYPE_REMOTE_VALUE = 102, // RemoteMenuItem
-	MENUTYPE_TEXT_VALUE = 103    // TextMenuItem
+	MENUTYPE_FLOAT_VALUE = 103,  // FloatMenuItem
+	MENUTYPE_TEXT_VALUE = 104    // TextMenuItem
 };
 
 /**
@@ -297,5 +309,21 @@ public:
 	void setTextValue(const char* text);
 	const char* getTextValue() { return menuText; }
 };
+
+/**
+ * TextMenuItem is for situations where text modified at runtime must be shown, for showing
+ * a series of text values from PROGMEM storage use EnumMenuItem instead.
+ */
+class FloatMenuItem : public MenuItem {
+private:
+	float currValue;
+public:
+	FloatMenuItem(const FloatMenuInfo* info, MenuItem* next) : MenuItem(MENUTYPE_FLOAT_VALUE, (const AnyMenuInfo*)info, next) { currValue = 0; }
+	int getDecimalPlaces() { return (int) pgm_read_word_near(&((FloatMenuInfo*)info)->numDecimalPlaces);}
+
+	void setFloatValue(float newVal);
+	float getFloatValue() { return currValue; }
+};
+
 #endif
 

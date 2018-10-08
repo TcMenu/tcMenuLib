@@ -42,10 +42,10 @@ public:
 	EthernetTagValServer();
 	void begin(EthernetServer* server, const char* namePgm);
 	EthernetTagValTransport* getTransport() { return &transport; }
-	TagValueRemoteConnector* getConnector() { return &connector; }
+	TagValueRemoteConnector* getRemoteConnector(int num) { return &connector; }
 	void runLoop();
 };
 
-extern EthernetTagValServer ethTagValServer;
+extern EthernetTagValServer remoteServer;
 
 #endif /* _TCMENU_ETHERNETTRANSPORT_H_ */

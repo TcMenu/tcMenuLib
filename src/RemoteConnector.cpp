@@ -9,9 +9,11 @@
 #include <Arduino.h>
 #include "RemoteConnector.h"
 #include "MenuItems.h"
+#include "RemoteMenuItem.h"
 #include "TaskManager.h"
 #include "tcMenu.h"
 #include "MessageProcessors.h"
+#include "tcUtil.h"
 
 const PROGMEM char EMPTYNAME[] = "Device";
 
@@ -157,6 +159,12 @@ void TagValueRemoteConnector::nextBootstrap() {
 	case MENUTYPE_TEXT_VALUE:
 		encodeTextMenu(parentId, (TextMenuItem*)bootMenuPtr);
 		break;
+	case MENUTYPE_REMOTE_VALUE:
+		encodeRemoteMenu(parentId, (RemoteMenuItem*)bootMenuPtr);
+		break;
+	case MENUTYPE_FLOAT_VALUE:
+		encodeFloatMenu(parentId, (FloatMenuItem*)bootMenuPtr);
+		break;
 	default:
 		break;
 	}
@@ -237,6 +245,44 @@ void TagValueRemoteConnector::encodeTextMenu(int parentId, TextMenuItem* item) {
 	else TagValueTransport::commsNotify(COMMS_ERR_WRITE_NOT_CONNECTED);
 }
 
+void TagValueRemoteConnector::encodeRemoteMenu(int parentId, RemoteMenuItem* item) {
+	if(transport->connected()) {
+		transport->startMsg(MSG_BOOT_REMOTE);
+		encodeBaseMenuFields(parentId, item);
+		transport->writeFieldInt(FIELD_REMOTE_NO, item->getRemoteNum());
+		char sz[20];
+		item->getCurrentState(sz, sizeof sz);
+		transport->writeField(FIELD_CURRENT_VAL, sz);
+		transport->endMsg();
+		ticksLastSend = 0;
+	}
+	else TagValueTransport::commsNotify(COMMS_ERR_WRITE_NOT_CONNECTED);
+}
+
+void writeFloatValueToTransport(TagValueTransport* transport, FloatMenuItem* item) {
+	char sz[20];
+	sz[0]=0;
+	ltoa((long)item->getFloatValue(), sz, 10);
+	appendChar(sz, '.', sizeof sz);
+	
+	long whole = item->getFloatValue();
+	long fract = abs((item->getFloatValue() - whole) * 1000000L);
+	fastltoa_mv(sz, fract, 1000000L, true, sizeof sz);
+	transport->writeField(FIELD_CURRENT_VAL, sz);
+}
+
+void TagValueRemoteConnector::encodeFloatMenu(int parentId, FloatMenuItem* item) {
+	if(transport->connected()) {
+		transport->startMsg(MSG_BOOT_FLOAT);
+		encodeBaseMenuFields(parentId, item);
+		transport->writeFieldInt(FIELD_FLOAT_DP, item->getDecimalPlaces());
+		writeFloatValueToTransport(transport, item);
+		transport->endMsg();
+		ticksLastSend = 0;
+	}
+	else TagValueTransport::commsNotify(COMMS_ERR_WRITE_NOT_CONNECTED);
+}
+
 void TagValueRemoteConnector::encodeEnumMenu(int parentId, EnumMenuItem* item) {
 	if(transport->connected()) {
 		transport->startMsg(MSG_BOOT_ENUM);
@@ -276,6 +322,12 @@ void TagValueRemoteConnector::encodeSubMenu(int parentId, SubMenuItem* item) {
 	else TagValueTransport::commsNotify(COMMS_ERR_WRITE_NOT_CONNECTED);
 }
 
+void writeRemoteValueToTransport(TagValueTransport* transport, RemoteMenuItem* item) {
+	char sz[20];
+	item->getCurrentState(sz, sizeof sz);
+	transport->writeField(FIELD_CURRENT_VAL, sz);
+}
+
 void TagValueRemoteConnector::encodeChangeValue(int parentId, MenuItem* theItem) {
 	if(transport->connected()) {
 		transport->startMsg(MSG_CHANGE_INT);
@@ -290,6 +342,12 @@ void TagValueRemoteConnector::encodeChangeValue(int parentId, MenuItem* theItem)
 			break;
 		case MENUTYPE_TEXT_VALUE:
 			transport->writeField(FIELD_CURRENT_VAL, ((TextMenuItem*)theItem)->getTextValue());
+			break;
+		case MENUTYPE_REMOTE_VALUE: 
+			writeRemoteValueToTransport(transport, (RemoteMenuItem*)theItem);
+			break;
+		case MENUTYPE_FLOAT_VALUE:
+			writeFloatValueToTransport(transport, (FloatMenuItem*)theItem);
 			break;
 		default:
 			break;

@@ -51,6 +51,8 @@
 #define MSG_BOOT_ENUM msgFieldToWord('B', 'E')
 #define MSG_BOOT_BOOL msgFieldToWord('B', 'B')
 #define MSG_BOOT_TEXT msgFieldToWord('B','T')
+#define MSG_BOOT_FLOAT msgFieldToWord('B','F')
+#define MSG_BOOT_REMOTE msgFieldToWord('B','R')
 #define MSG_CHANGE_INT msgFieldToWord('V', 'C')
 
 /*
@@ -74,6 +76,8 @@
 #define FIELD_NO_CHOICES  msgFieldToWord('N', 'C')
 #define FIELD_CHANGE_TYPE msgFieldToWord('T', 'C')
 #define FIELD_MAX_LEN     msgFieldToWord('M', 'L')
+#define FIELD_REMOTE_NO   msgFieldToWord('R', 'N')
+#define FIELD_FLOAT_DP    msgFieldToWord('F', 'D')
 
 #define FIELD_PREPEND_CHOICE 'C'
 

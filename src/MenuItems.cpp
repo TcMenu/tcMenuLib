@@ -46,3 +46,10 @@ void TextMenuItem::setTextValue(const char* text) {
 	setChanged(true);
 	triggerCallback();
 }
+
+void FloatMenuItem::setFloatValue(float newVal) {
+	this->currValue = newVal;
+	setSendRemoteNeededAll(true);
+	setChanged(true);
+	triggerCallback();
+}
