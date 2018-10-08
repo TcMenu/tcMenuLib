@@ -7,6 +7,10 @@
  * LiquidCrystalIO renderer that renders menus onto this type of display. This file is a plugin file and should not
  * be directly edited, it will be replaced each time the project is built. If you want to edit this file in place,
  * make sure to rename it first.
+ * 
+ * LIBRARY REQUIREMENT
+ * This renderer is designed for use with this library: https://github.com/davetcc/LiquidCrystalIO
+
  */
 
 #ifndef _TCMENU_LIQUID_CRYSTAL_H
