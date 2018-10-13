@@ -141,6 +141,7 @@ public:
 	void encodeTextMenu(int parentId, TextMenuItem* item);
 	void encodeEnumMenu(int parentId, EnumMenuItem* item);
 	void encodeRemoteMenu(int parentId, RemoteMenuItem* item);
+	void encodeActionMenu(int parentId, ActionMenuItem* item);
 	void encodeFloatMenu(int parentId, FloatMenuItem* item);
 	void encodeChangeValue(int parentId, MenuItem* theItem);
 

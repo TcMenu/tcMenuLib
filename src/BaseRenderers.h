@@ -83,7 +83,7 @@ public:
 	/**
 	 * Sets the current editor, only one item can be edited at once.
 	 */
-	virtual void setCurrentEditor(MenuItem* editItem) = 0;
+	virtual void onSelectPressed(MenuItem* editItem) = 0;
 
 	/**
 	 * Renderers work out which submenu is current.
@@ -119,7 +119,7 @@ public:
 	virtual void activeIndexChanged(__attribute__((unused)) uint8_t ignored) {  }
 	virtual MenuItem* getCurrentSubMenu() { return NULL; }
 	virtual MenuItem* getCurrentEditor() { return NULL; }
-	virtual void setCurrentEditor(__attribute__((unused)) MenuItem* ignored) { }
+	virtual void onSelectPressed(__attribute__((unused)) MenuItem* ignored) { }
 	virtual void initialise() { }
 };
 
@@ -149,7 +149,7 @@ public:
 	virtual MenuItem* getCurrentEditor() { return currentEditor; }
 	virtual MenuItem* getCurrentSubMenu() { return currentRoot; }
 	virtual void activeIndexChanged(uint8_t index);
-	virtual void setCurrentEditor(MenuItem* editor);
+	virtual void onSelectPressed(MenuItem* editor);
 
 	void setFirstWidget(TitleWidget* widget);
 
@@ -195,7 +195,7 @@ private:
 	void menuValueAnalog(AnalogMenuItem* item, MenuDrawJustification justification);
 	void menuValueEnum(EnumMenuItem* item, MenuDrawJustification justification);
 	void menuValueBool(BooleanMenuItem* item, MenuDrawJustification justification);
-	void menuValueSub(SubMenuItem* item, MenuDrawJustification justification);
+	void menuValueExec(MenuItem* item, MenuDrawJustification justification);
 	void menuValueBack(BackMenuItem* item, MenuDrawJustification justification);
 	void menuValueText(TextMenuItem* item, MenuDrawJustification justification);
 	void menuValueRemote(RemoteMenuItem* item, MenuDrawJustification justification);

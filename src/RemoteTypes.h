@@ -47,6 +47,7 @@
 #define MSG_HEARTBEAT msgFieldToWord('H','B')
 #define MSG_BOOTSTRAP msgFieldToWord('B','S')
 #define MSG_BOOT_ANALOG msgFieldToWord('B','A')
+#define MSG_BOOT_ACTION msgFieldToWord('B', 'C')
 #define MSG_BOOT_SUBMENU msgFieldToWord('B', 'M')
 #define MSG_BOOT_ENUM msgFieldToWord('B', 'E')
 #define MSG_BOOT_BOOL msgFieldToWord('B', 'B')
@@ -54,6 +55,7 @@
 #define MSG_BOOT_FLOAT msgFieldToWord('B','F')
 #define MSG_BOOT_REMOTE msgFieldToWord('B','R')
 #define MSG_CHANGE_INT msgFieldToWord('V', 'C')
+#define MSG_CHANGE_TRIGGER msgFieldToWord('V', 'T')
 
 /*
  * Fields names that can be used in messages. Again each type is a two digit ID represented as a word

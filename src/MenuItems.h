@@ -135,7 +135,8 @@ enum MenuType : byte {
 	MENUTYPE_BACK_VALUE = 101,   // BackMenuItem
 	MENUTYPE_REMOTE_VALUE = 102, // RemoteMenuItem
 	MENUTYPE_FLOAT_VALUE = 103,  // FloatMenuItem
-	MENUTYPE_TEXT_VALUE = 104    // TextMenuItem
+	MENUTYPE_TEXT_VALUE = 104,   // TextMenuItem
+	MENUTYPE_ACTION_VALUE = 105  // ActionMenuItem
 };
 
 /**
@@ -166,7 +167,7 @@ public:
 	uint16_t getEepromPosition() { return pgm_read_word_near(&info->eepromAddr); }
 	/** returns the menu type as one of the above menu type enumeration */
 	MenuType getMenuType() { return menuType; }
-	/** returns the event callback associated with this item */
+	/** triggers the event callback associated with this item */
 	void triggerCallback();
 
 	/** set the item to be changed, this lets the renderer know it needs painting */
@@ -325,5 +326,15 @@ public:
 	float getFloatValue() { return currValue; }
 };
 
-#endif
 
+/**
+ * ActionMenuItem is for situations where you want an action to take place when the item is selected.
+ * This will call the callback function when the OK button is pressed, or remotely triggered by
+ * sending a suitable trigger command through the API.
+ */
+class ActionMenuItem : public MenuItem {
+public:
+	ActionMenuItem(const AnyMenuInfo* info, MenuItem* next) : MenuItem(MENUTYPE_ACTION_VALUE, info, next) {;}
+};
+
+#endif

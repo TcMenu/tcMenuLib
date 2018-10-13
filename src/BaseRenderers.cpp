@@ -78,7 +78,8 @@ void BaseMenuRenderer::menuValueToText(MenuItem* item,	MenuDrawJustification jus
 		menuValueBool((BooleanMenuItem*)item, justification);
 		break;
 	case MENUTYPE_SUB_VALUE:
-		menuValueSub((SubMenuItem*)item, justification);
+	case MENUTYPE_ACTION_VALUE:
+		menuValueExec((SubMenuItem*)item, justification);
 		break;
 	case MENUTYPE_BACK_VALUE:
 		menuValueBack((BackMenuItem*)item, justification);
@@ -189,7 +190,7 @@ void BaseMenuRenderer::menuValueBool(BooleanMenuItem* item, MenuDrawJustificatio
 	}
 }
 
-void BaseMenuRenderer::menuValueSub(__attribute((unused)) SubMenuItem* item, MenuDrawJustification justification) {
+void BaseMenuRenderer::menuValueExec(__attribute((unused)) MenuItem* item, MenuDrawJustification justification) {
 	if(justification == JUSTIFY_TEXT_LEFT) {
 		strcpy_P(buffer, SUB_STR);
 	}
@@ -288,11 +289,20 @@ void BaseMenuRenderer::setupForEditing(MenuItem* item) {
 	}
 
 	MenuType ty = item->getMenuType();
-	// these are the only types we can edit with a rotary encoder & LCD.
-	if ((ty == MENUTYPE_ENUM_VALUE || ty == MENUTYPE_INT_VALUE || ty == MENUTYPE_BOOLEAN_VALUE) && !item->isReadOnly()) {
+	
+	// short circuit read only, cannot be edited.
+	if(item->isReadOnly()) return;
+
+	if ((ty == MENUTYPE_ENUM_VALUE || ty == MENUTYPE_INT_VALUE)) {
+		// these are the only types we can edit with a rotary encoder & LCD.
 		currentEditor = item;
 		currentEditor->setEditing(true);
 		menuMgr.changePrecisionForType(currentEditor);
+	}
+	else if(ty == MENUTYPE_BOOLEAN_VALUE) {
+		// we don't actually edit boolean items, just toggle them instead
+		BooleanMenuItem* boolItem = (BooleanMenuItem*)item;
+		boolItem->setBoolean(!boolItem->getBoolean());
 	}
 }
 
@@ -326,11 +336,12 @@ int BaseMenuRenderer::offsetOfCurrentActive() {
 	return 0;
 }
 
-void BaseMenuRenderer::setCurrentEditor(MenuItem* toEdit) {
+void BaseMenuRenderer::onSelectPressed(MenuItem* toEdit) {
 	if(renderCallback) {
 		// we dont handle click events when the display is taken over
 		// instead we tell the custom renderer that we've had a click
 		renderCallback(true);
+		return;
 	}
 
 	if (currentEditor != NULL) {
@@ -349,6 +360,9 @@ void BaseMenuRenderer::setCurrentEditor(MenuItem* toEdit) {
 		else if (toEdit->getMenuType() == MENUTYPE_BACK_VALUE) {
 			toEdit->setActive(false);
 			prepareNewSubmenu(menuMgr.getRoot());
+		}
+		else if(toEdit->getMenuType() == MENUTYPE_ACTION_VALUE) {
+			toEdit->triggerCallback();
 		}
 		else {
 			setupForEditing(toEdit);

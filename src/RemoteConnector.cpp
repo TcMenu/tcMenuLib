@@ -165,6 +165,9 @@ void TagValueRemoteConnector::nextBootstrap() {
 	case MENUTYPE_FLOAT_VALUE:
 		encodeFloatMenu(parentId, (FloatMenuItem*)bootMenuPtr);
 		break;
+	case MENUTYPE_ACTION_VALUE:
+		encodeActionMenu(parentId, (ActionMenuItem*)bootMenuPtr);
+		break;
 	default:
 		break;
 	}
@@ -321,6 +324,17 @@ void TagValueRemoteConnector::encodeSubMenu(int parentId, SubMenuItem* item) {
 	}
 	else TagValueTransport::commsNotify(COMMS_ERR_WRITE_NOT_CONNECTED);
 }
+
+void TagValueRemoteConnector::encodeActionMenu(int parentId, ActionMenuItem* item) {
+	if(transport->connected()) {
+		transport->startMsg(MSG_BOOT_ACTION);
+		encodeBaseMenuFields(parentId, item);
+		transport->endMsg();
+		ticksLastSend = 0;
+	}
+	else TagValueTransport::commsNotify(COMMS_ERR_WRITE_NOT_CONNECTED);
+}
+
 
 void writeRemoteValueToTransport(TagValueTransport* transport, RemoteMenuItem* item) {
 	char sz[20];

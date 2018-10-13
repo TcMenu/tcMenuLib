@@ -39,30 +39,35 @@ bool isMenuEditable(MenuItem* item) {
 	return (ty == MENUTYPE_ENUM_VALUE || ty == MENUTYPE_INT_VALUE || ty == MENUTYPE_BOOLEAN_VALUE) && !item->isReadOnly();
 }
 
+/**
+ * Called when the rotary encoder value has changed, if we are editing this changes the value in the current editor, if we are
+ * showing menu items, it changes the index of the active item (renderer will move into display if needed).
+ */
 void MenuManager::valueChanged(int value) {
 	MenuItem* currentEditor = renderer->getCurrentEditor();
-	if (currentEditor) {
-		if (isMenuBoolean(currentEditor->getMenuType())) {
-			((BooleanMenuItem*)currentEditor)->setBoolean(value != 0);
-		}
-		else if (isMenuEditable(currentEditor)) {
-			((ValueMenuItem*)currentEditor)->setCurrentValue(value);
-		}
+	if (currentEditor && isMenuEditable(currentEditor)) {
+		((ValueMenuItem*)currentEditor)->setCurrentValue(value);
 	}
 	else {
 		renderer->activeIndexChanged(value);
 	}
 }
 
+/**
+ * Called when the button on the encoder (OK button) is pressed. Most of this is left to the renderer to decide.
+ */
 void MenuManager::onMenuSelect(__attribute__((unused)) bool held) {
 	if (renderer->getCurrentEditor() != NULL) {
-		renderer->setCurrentEditor(NULL);
+		renderer->onSelectPressed(NULL);
 	}
 	else {
-		renderer->setCurrentEditor(findCurrentActive());
+		renderer->onSelectPressed(findCurrentActive());
 	}
 }
 
+/**
+ * Finds teh currently active menu item with the selected SubMenuItem
+ */
 MenuItem* MenuManager::findCurrentActive() {
 	MenuItem* itm = renderer->getCurrentSubMenu();
 	while (itm != NULL) {
@@ -76,12 +81,7 @@ MenuItem* MenuManager::findCurrentActive() {
 }
 
 void MenuManager::changePrecisionForType(MenuItem* item) {
-	if (isMenuBoolean(item->getMenuType())) {
-		switches.changeEncoderPrecision(item->getMaximumValue(), !((BooleanMenuItem*)item)->getBoolean());
-	}
-	else {
-		switches.changeEncoderPrecision(item->getMaximumValue(), ((ValueMenuItem*)item)->getCurrentValue());
-	}
+	switches.changeEncoderPrecision(item->getMaximumValue(), ((ValueMenuItem*)item)->getCurrentValue());
 }
 
 void loadRecursively(EepromAbstraction& eeprom, MenuItem* nextMenuItem) {

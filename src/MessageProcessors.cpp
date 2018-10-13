@@ -58,6 +58,10 @@ MenuItem* findItem(MenuItem* itm, uint16_t id) {
 
 void fieldUpdateValueMsg(TagValueRemoteConnector* /*unused*/, FieldAndValue* field, MessageProcessorInfo* info) {
 	if(field->fieldType == FVAL_END_MSG) {
+		// if this is an action item, we trigger the callback to occur just before ending.
+		if(info->value.item != NULL && info->value.item->getMenuType() == MENUTYPE_ACTION_VALUE) {
+			info->value.item->triggerCallback();
+		}
 		return;
 	}
 	
