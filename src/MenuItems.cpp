@@ -23,33 +23,48 @@ void MenuItem::setSendRemoteNeeded(uint8_t remoteNo, bool needed) {
 	bitWrite(flags, remoteNo, needed);
 }
 
-void MenuItem::setSendRemoteNeededAll(bool needed) {
-	if(needed) {
-		flags = flags | MENUITEM_ALL_REMOTES;
-	}
-	else {
-		flags = flags & (~MENUITEM_ALL_REMOTES);
-	}
+void MenuItem::setSendRemoteNeededAll() {
+	flags = flags | MENUITEM_ALL_REMOTES;
 }
 
 void MenuItem::triggerCallback() {
-	MenuCallbackFn fn = pgm_read_ptr_near(&info->callback);
+	MenuCallbackFn fn = (MenuCallbackFn) pgm_read_ptr_near(&info->callback);
 	if(fn != NULL) {
 		fn(getId());
 	}
 }
 
 void TextMenuItem::setTextValue(const char* text) {
-	setSendRemoteNeededAll(strncmp(menuText, text, textLength()));
+	// skip if they are the same
+	if(strncmp(menuText, text, textLength()) == 0) return;
+
 	strncpy(menuText, text, textLength());
 	menuText[textLength() - 1] = 0;
+	setChanged(true);
+	setSendRemoteNeededAll();
+	triggerCallback();
+}
+
+bool isSame(float d1, float d2) {
+	float result = abs(d1 - d2);
+	return result < 0.0000001;
+}
+
+void FloatMenuItem::setFloatValue(float newVal) {
+	if(isSame(newVal, currValue)) return;
+	
+	this->currValue = newVal;
+	setSendRemoteNeededAll();
 	setChanged(true);
 	triggerCallback();
 }
 
-void FloatMenuItem::setFloatValue(float newVal) {
-	this->currValue = newVal;
-	setSendRemoteNeededAll(true);
+void ValueMenuItem::setCurrentValue(uint16_t val) {
+	if(val == currentValue) return;
+	
 	setChanged(true);
+	setSendRemoteNeededAll();
+	currentValue = val;
 	triggerCallback();
+
 }

@@ -103,7 +103,7 @@ void BaseMenuRenderer::menuValueToText(MenuItem* item,	MenuDrawJustification jus
 void BaseMenuRenderer::menuValueAnalog(AnalogMenuItem* item, MenuDrawJustification justification) {
 	char itoaBuf[12];
 
-	int32_t calcVal = ((int32_t)item->getCurrentValue()) + ((int32_t)item->getOffset());
+	int16_t calcVal = ((int16_t)item->getCurrentValue()) + ((int16_t)item->getOffset());
 	int divisor = item->getDivisor();
 
 	if (divisor < 2) {

@@ -9,7 +9,7 @@
  * make sure to rename it first.
  */
 
-#include <EthernetTransport.h>
+#include "EthernetTransport.h"
 #include <TaskManager.h>
 
 EthernetTagValServer remoteServer = EthernetTagValServer();
@@ -57,7 +57,7 @@ EthernetTagValServer::EthernetTagValServer() : connector(&transport, 0) {
 void EthernetTagValServer::begin(EthernetServer* server, const char* namePgm) {
 	this->server = server;
 	this->connector.setName(namePgm);
-	taskManager.scheduleFixedRate(TICK_INTERVAL, []{ethTagValServer.runLoop();}, TIME_MILLIS);
+	taskManager.scheduleFixedRate(TICK_INTERVAL, []{remoteServer.runLoop();}, TIME_MILLIS);
 }
 
 void EthernetTagValTransport::close() {

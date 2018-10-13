@@ -95,8 +95,9 @@ void loadRecursively(EepromAbstraction& eeprom, MenuItem* nextMenuItem) {
 		else if(nextMenuItem->getMenuType() == MENUTYPE_TEXT_VALUE) {
 			TextMenuItem* textItem = (TextMenuItem*) nextMenuItem;
 			eeprom.readIntoMemArray((uint8_t*) textItem->getTextValue(), textItem->getEepromPosition(), textItem->getMaximumValue());
-			textItem->setSendRemoteNeededAll(true);
+			textItem->setSendRemoteNeededAll();
 			textItem->setChanged(true);
+			textItem->triggerCallback();
 		}
 		else if(nextMenuItem->getMenuType() == MENUTYPE_INT_VALUE) {
 			AnalogMenuItem* intItem = (AnalogMenuItem*)nextMenuItem;

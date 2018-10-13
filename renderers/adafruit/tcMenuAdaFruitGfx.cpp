@@ -12,7 +12,7 @@
  * This library requires the AdaGfx library along with a suitable driver.
  */
 
-#include <tcMenuAdaFruitGfx.h>
+#include "tcMenuAdaFruitGfx.h"
 
 //#define DEBUG_GFX
 

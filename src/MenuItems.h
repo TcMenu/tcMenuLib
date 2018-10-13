@@ -177,7 +177,7 @@ public:
 	/** returns if the menu item needs to be sent remotely */
 	bool isSendRemoteNeeded(uint8_t remoteNo);
 	/** set the flag indicating that a remote refresh is needed for all remotes - default */
-	void setSendRemoteNeededAll(bool needed);
+	void setSendRemoteNeededAll();
 	/** set the flag indicating that a remote refresh is needed for a specific remote */
 	void setSendRemoteNeeded(uint8_t remoteNo, bool needed);
 
@@ -219,12 +219,7 @@ protected:
 	}
 public:
 	/** Sets the integer current value to a new value, and marks the menu changed */
-	void setCurrentValue(uint16_t val) {
-		setChanged(true);
-		setSendRemoteNeededAll(currentValue != val);
-		currentValue = val;
-		triggerCallback();
-	}
+	void setCurrentValue(uint16_t val);
 
 	/** gets the current value */
 	uint16_t getCurrentValue() { return currentValue; }

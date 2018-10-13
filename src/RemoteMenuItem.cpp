@@ -11,7 +11,7 @@ RemoteMenuItem* RemoteMenuItem::FIRST_INSTANCE;
 
 void remoteItemUpdateLoop() {
     RemoteMenuItem::FIRST_INSTANCE->setChanged(true);
-    RemoteMenuItem::FIRST_INSTANCE->setSendRemoteNeededAll(true);
+    RemoteMenuItem::FIRST_INSTANCE->setSendRemoteNeededAll();
 }
 
 RemoteMenuItem::RemoteMenuItem(const RemoteMenuInfo *pgmMenuInfo, TagValueRemoteConnector* connector, MenuItem* next) : MenuItem(MENUTYPE_REMOTE_VALUE, (const AnyMenuInfo*)pgmMenuInfo, next) {
