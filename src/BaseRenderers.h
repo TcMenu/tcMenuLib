@@ -127,7 +127,11 @@ class RemoteMenuItem; // forward reference.
 
 /**
  * This class provides the base functionality that will be required by most implementations
- * of renderer, you can extend this class to provide the core functionality.
+ * of renderer, you can extend this class to add new renderers, it proivides much of the
+ * core functionality that's needed by a renderer.
+ * 
+ * Renderers work in a similar way to a game loop, the render method is repeatedly called
+ * and in this loop any rendering or event callbacks should be handled. 
  */
 class BaseMenuRenderer : public MenuRenderer {
 protected:
@@ -142,15 +146,55 @@ protected:
 	MenuItem* currentEditor;
 
 public:
+	/**
+	 * constructs the renderer with a given buffer size 
+	 * @param bufferSize size of text buffer to create
+	 */
 	BaseMenuRenderer(int bufferSize);
+	
+	/** 
+	 * Destructs the class removing the allocated buffer
+	 */
 	virtual ~BaseMenuRenderer() {delete buffer;}
+	
+	/**
+	 * Initialise the render setting up tasks
+	 */
 	virtual void initialise();
+
+	/**
+	 * This is the rendering call that must be implemented by subclasses. Generally
+	 * it is called a few times a second, and should render the menu, if changes are
+	 * detected
+	 */
 	virtual void render() = 0;
+
+	/**
+	 * Get the current MenuItem that is being edited (or null)
+	 */
 	virtual MenuItem* getCurrentEditor() { return currentEditor; }
+
+	/** 
+	 * Get the current sub menu that is being rendered
+	 */
 	virtual MenuItem* getCurrentSubMenu() { return currentRoot; }
+
+	/**
+	 * Used to indicate that the active index has changed, this is used to move
+	 * the offset of the menu.
+	 * @param index the index offset needed to show the active menu item
+	 */
 	virtual void activeIndexChanged(uint8_t index);
+
+	/**
+	 * When select is pressed this method works out what action to take
+	 * @param editor the current editor
+	 */
 	virtual void onSelectPressed(MenuItem* editor);
 
+	/**
+	 * For menu systems that support title widgets, this will allow the first widget.
+	 * @param the first widget in a chain of widgets linked by next pointer.
 	void setFirstWidget(TitleWidget* widget);
 
 	/**
@@ -180,15 +224,57 @@ public:
 	static BaseMenuRenderer* INSTANCE;
 
 protected:
+	/**
+	 * Convert a menu item into a textual representation in the buffer
+	 * @param item the menu item
+	 * @param justification use either JUSTIFY_TEXT_LEFT or JUSTIFY_TEXT_RIGHT
+	 */
 	void menuValueToText(MenuItem* item, MenuDrawJustification justification);
+
+	/**
+	 * Internal method that handles each ticks
+	 */
 	void handleTicks();
+
+	/**
+	 * Sets the type of redraw that is needed
+	 * @param state the required redraw
+	 */
 	void redrawRequirement(MenuRedrawState state) { if (state > redrawMode) redrawMode = state; }
+	
+	/**
+	 * Used to reset the display to it's default state, root menu, nothing being edited
+	 */
 	void resetToDefault();
+
+	/**
+	 * Used to set up a new submenu for display on the renderer
+	 * @param newItems the new submenu
+	 */
 	void prepareNewSubmenu(MenuItem* newItems);
+
+	/**
+	 * Find the item at a given position in the current submenu
+	 * @param pos the integer offset
+	 */
 	MenuItem* getItemAtPosition(uint8_t pos);
+
+	/**
+	 * set up an item to be edited
+	 * @param toEdit the item to edited
+	 */
 	void setupForEditing(MenuItem* toEdit);
+
+	/**
+	 * Find the offset of the currently active item
+	 */
 	int offsetOfCurrentActive();
+
+	/**
+	 * set up a countdown to default back to the submenu
+	 */
 	void countdownToDefaulting();
+	
 	void findFirstVisible();
 
 private:

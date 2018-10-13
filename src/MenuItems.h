@@ -8,10 +8,13 @@
 
 #include <EepromAbstraction.h>
 
+/** the size of each name in program memory */
 #define NAME_SIZE_T 20
 
+/** the value that represents no call back */
 #define NO_CALLBACK NULL
 
+/** The definition of a callback from a menu item */
 typedef void (*MenuCallbackFn)(int id);
 
 /**
@@ -19,10 +22,15 @@ typedef void (*MenuCallbackFn)(int id);
  * in place of a specific one.
  */
 struct AnyMenuInfo {
+	/** the name given to this menu item */
 	char name[NAME_SIZE_T];
+	/** the identifier for this menu */
 	uint16_t id;
+	/** eeprom address for this item or -1 if not stored */
 	uint16_t eepromAddr;
+	/** maximum value that this type can store */
 	uint16_t maxValue;
+	/** the callback function */
 	MenuCallbackFn callback;
 };
 

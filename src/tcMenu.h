@@ -12,19 +12,58 @@
 #include "BaseRenderers.h"
 #include "EepromAbstraction.h"
 
+/**
+ * The menu manager is responsible for managing a set of menu items, and is configured with a renderer and input
+ * capability in order to present the menu. Remotes generally also the the menu manager to find out about the
+ * overall structure
+ */
 class MenuManager {
 private:
 	MenuItem* rootMenu;
 	MenuRenderer* renderer;
 public:
 	/**
-	 * Handle the various types of input
+	 * Initialise the menu manager to use a hardware rotary encoder
+	 * @param renderer the renderer used for drawing
+	 * @param root the first menu item
+	 * @param encoderPinA encoder A pin
+	 * @param encorerPinB encoder B pin
+	 * @param encoderButton the OK button
 	 */
 	void initForEncoder(MenuRenderer* renderer, MenuItem* root, uint8_t encoderPinA, uint8_t encoderPinB, uint8_t encoderButton);
+	/**
+	 * Initialise for up down and OK button, instead of using hardware changeEncoderPrecision
+	 * @param renderer the renderer used for drawing
+	 * @param root the first menu item
+	 * @param upPin the button on up
+	 * @param downPin the button for down
+	 * @param okPin the button for OK.
+	 */
 	void initForUpDownOk(MenuRenderer* renderer, MenuItem* root, uint8_t upPin, uint8_t downPin, uint8_t okPin);
+
+	/** 
+	 * called when the rotary encoder has moved to a new position to update the menu
+	 * @param value the new changed value
+	 */
 	void valueChanged(int value);
+
+	/**
+	 * Called when the OK button has been pressed
+	 * @param held if the button is held down
+	 */
 	void onMenuSelect(bool held);
+
+	/**
+	 * Sets the number of items and offset of the items in the current menu
+	 * @param size the number of items
+	 * @param offs the offset within the items
+	 */
 	void setItemsInCurrentMenu(int size, int offs = 0) { switches.changeEncoderPrecision(size, offs); }
+
+	/** 
+	 * Used to change the precision of the encoder given a new menu item for editing
+	 * @param item the item being edited
+	 */
 	void changePrecisionForType(MenuItem* item);
 
 	/**

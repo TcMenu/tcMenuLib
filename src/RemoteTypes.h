@@ -39,23 +39,30 @@
  */
 #define UNKNOWN_MSG_TYPE 0x0000
 
-/*
- * Message Types are defined below, each type is a two digit ID represented as a word.
- */
-
+/** Message type definition for Join message */
 #define MSG_JOIN msgFieldToWord('N','J')
+/** Message type definition for heartbeat message */
 #define MSG_HEARTBEAT msgFieldToWord('H','B')
+/** Message type definition for Bootstrap message */
 #define MSG_BOOTSTRAP msgFieldToWord('B','S')
+/** Message type definition for Analog item bootstrap message */
 #define MSG_BOOT_ANALOG msgFieldToWord('B','A')
+/** Message type definition for ACtion item bootstap message */
 #define MSG_BOOT_ACTION msgFieldToWord('B', 'C')
+/** Message type definition for sub menu bootstrap message */
 #define MSG_BOOT_SUBMENU msgFieldToWord('B', 'M')
+/** Message type definition for enum bootstrap message */
 #define MSG_BOOT_ENUM msgFieldToWord('B', 'E')
+/** Message type definition for boolean bootstrap message */
 #define MSG_BOOT_BOOL msgFieldToWord('B', 'B')
+/** Message type definition for text boostrap message */
 #define MSG_BOOT_TEXT msgFieldToWord('B','T')
+/** Message type definition for floating point bootstrap message */
 #define MSG_BOOT_FLOAT msgFieldToWord('B','F')
+/** Message type definition for remote status bootstrap message */
 #define MSG_BOOT_REMOTE msgFieldToWord('B','R')
+/** Message type definition for value change message */
 #define MSG_CHANGE_INT msgFieldToWord('V', 'C')
-#define MSG_CHANGE_TRIGGER msgFieldToWord('V', 'T')
 
 /*
  * Fields names that can be used in messages. Again each type is a two digit ID represented as a word
