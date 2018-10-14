@@ -11,6 +11,18 @@
 #include <Arduino.h>
 #include "tcMenu.h"
 
+/**
+ * @file MessageProcessors.h
+ * 
+ * Contains the message processors that are used to process incoming messages.
+ */
+
+/**
+ * Message processors need to store some state while they are working through the fields
+ * of a message, this union keeps state between a message starting processing and ending
+ * It can be added to with additional unions. It is essentially stored globally so size
+ * is an issue.
+ */
 union MessageProcessorInfo {
 	struct {
 		MenuItem* item;

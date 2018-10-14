@@ -11,6 +11,13 @@
 #include <RemoteConnector.h>
 
 /**
+ * @file RemoteMenuItem.h
+ * 
+ * This file contains the extra types needed for remote menu items, they are not in the main MenuItems.h header because
+ * they require all the remote headers be included.
+ */
+
+/**
  * The information block for a floating point menu component. DO NOT move these imtes without considering AnyMenuInfo!!!
  */
 struct RemoteMenuInfo {

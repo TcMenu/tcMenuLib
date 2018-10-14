@@ -1,8 +1,11 @@
 /*
  * Copyright (c) 2018 https://www.thecoderscorner.com (Nutricherry LTD).
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
- *
- * RemoteTypes.h - contains the definitions of each message and field.
+ */
+/**
+ * @file RemoteTypes.h
+ * 
+ * contains the definitions of each message and field.
  */
 
 #ifndef _TCMENU_REMOTETYPES_H_
@@ -63,10 +66,6 @@
 #define MSG_BOOT_REMOTE msgFieldToWord('B','R')
 /** Message type definition for value change message */
 #define MSG_CHANGE_INT msgFieldToWord('V', 'C')
-
-/*
- * Fields names that can be used in messages. Again each type is a two digit ID represented as a word
- */
 
 #define FIELD_MSG_TYPE    msgFieldToWord('M', 'T')
 #define FIELD_MSG_NAME    msgFieldToWord('N', 'M')

@@ -9,6 +9,12 @@
 #include <Arduino.h>
 
 /**
+ * @file tcUtil.h
+ * 
+ * A series of utilities that used thoughout tcMenu
+ */
+
+/**
  * appends a character at the end of the string, if there is space according to len
  */
 void appendChar(char* str, char val, int len);

@@ -8,12 +8,21 @@
 
 #include "tcMenu.h"
 
+/**
+ * @file BaseRenderers.h
+ * This file contains the common code for rendering onto displays, making it much easier to implement
+ * a renderer.
+ */
+
 /** the frequency at which the screen is redrawn (only if needed). */
 #define SCREEN_DRAW_INTERVAL 250
 /** the number of ticks the menu should reset to defaults after not being used */
 #define TICKS_BEFORE_DEFAULTING 120
 
-/** Should you wish to take over the rendering, function of this type is needed */
+/**
+ *  Used to take over rendering for a period of time. Normally one calls renderer.takeOverDisplay(..) 
+ * with a reference to a function meeting this spec. 
+ */
 typedef void (*RendererCallbackFn)(bool userClicked);
 
 /**
