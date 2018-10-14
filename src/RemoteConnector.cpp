@@ -291,7 +291,7 @@ void TagValueRemoteConnector::encodeEnumMenu(int parentId, EnumMenuItem* item) {
 		transport->startMsg(MSG_BOOT_ENUM);
 		encodeBaseMenuFields(parentId, item);
 		transport->writeFieldInt(FIELD_CURRENT_VAL, item->getCurrentValue());
-		uint8_t noChoices = item->getMaximumValue();
+		uint8_t noChoices = item->getMaximumValue() + 1;
 		transport->writeFieldInt(FIELD_NO_CHOICES, noChoices);
 		for(uint8_t i=0;i<noChoices;++i) {
 			uint16_t choiceKey = msgFieldToWord(FIELD_PREPEND_CHOICE, 'A' + i);

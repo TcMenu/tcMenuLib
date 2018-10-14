@@ -204,6 +204,7 @@ public:
 	/**
 	 * For menu systems that support title widgets, this will allow the first widget.
 	 * @param the first widget in a chain of widgets linked by next pointer.
+	 */
 	void setFirstWidget(TitleWidget* widget);
 
 	/**

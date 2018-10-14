@@ -33,6 +33,7 @@ public:
 	 * @param encoderButton the OK button
 	 */
 	void initForEncoder(MenuRenderer* renderer, MenuItem* root, uint8_t encoderPinA, uint8_t encoderPinB, uint8_t encoderButton);
+	
 	/**
 	 * Initialise for up down and OK button, instead of using hardware changeEncoderPrecision
 	 * @param renderer the renderer used for drawing
