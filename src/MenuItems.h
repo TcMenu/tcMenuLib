@@ -3,6 +3,17 @@
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
+/**
+ * @file MenuItems.h
+ * 
+ * In TcMenu, MenuItem storage is shared between program memory and RAM. Usually each MenuItem has associated Info block and
+ * within the InfoBlock, the first fields must be in the same order as AnyMenuInfo. The most commonly used menu items are
+ * defined within this file. Each menu item also has a menu item type that is used during rendering and remote communication
+ * to determine what it actually is.
+ * 
+ * Most of the editable menu items can stored to EEPROM, including AnalogMenuItem, EnumMenuItem, BooleanMenuItem and TextMenuItem
+ */
+
 #ifndef _MENUITEMS_h
 #define _MENUITEMS_h
 
@@ -18,11 +29,11 @@
 typedef void (*MenuCallbackFn)(int id);
 
 /**
- * Every single info structure must have these fields in this order. Therefore it is always save to use this structure
- * in place of a specific one.
+ * Every single info structure must have these fields in this order. They are always stored in program memory.
+ * It is always safe to use this structure in place of a specific one. This is indeed how the core MenuItem class works.
  */
 struct AnyMenuInfo {
-	/** the name given to this menu item */
+	/** the name given to this menu item */ 
 	char name[NAME_SIZE_T];
 	/** the identifier for this menu */
 	uint16_t id;
@@ -35,34 +46,72 @@ struct AnyMenuInfo {
 };
 
 /**
- * The information block stored in program memory for analog items. DO NOT move these items without considering AnyMenuInfo!!!
+ * The information block stored in program memory for analog items. Analog items represent a 16 bit
+ * unsigned editable value. It can be made negative by applying an offset, and accuracy in decimal 
+ * places set by the divisor. 
+ * 
+ * Note: These items must remain in this order, as MenuItem relies upon it.
  */
 struct AnalogMenuInfo {
+	/** the name given to this menu item */ 
 	char name[NAME_SIZE_T];
+	/** the identifier for this menu */
 	uint16_t id;
+	/** eeprom address for this item or -1 if not stored */
 	uint16_t eepromAddr;
+	/** maximum value that this type can store */
 	uint16_t maxValue;
+	/** the callback function */
 	MenuCallbackFn callback;
+
+	/**
+	 * A 16 bit offset that can be either positive or negative, this will be added to the current value 
+	 * before display
+	 */
 	int16_t offset;
+	/**
+	 * A divisor that is used to reduce the currentValue by means of division:
+	 * 0 or 1 : no division
+	 * 2 thru 10 : single decimal place using optimised rendering
+	 * above 10 : turned to decimal and displayed to correct number of DP.
+	 */
 	uint16_t divisor;
+	/**
+	 * An optional unit name to be presented after the the value. For example V for volts, dB for decibel.
+	 */
 	char unitName[5];
 };
 
 /**
- * The information block stored in program memory for enumeration items. DO NOT move these items without considering AnyMenuInfo!!!
+ * The information block stored in program memory for enumeration items. Enumeration items are somewhat
+ * like a comboBox or choice, they have a predetermined set of options, the current value represents the
+ * index of the chosen one.
+ * 
+ * Note: These items must remain in this order, as MenuItem relies upon it.
  */
 struct EnumMenuInfo {
+	/** the name given to this menu item */ 
 	char name[NAME_SIZE_T];
+	/** the identifier for this menu */
 	uint16_t id;
+	/** eeprom address for this item or -1 if not stored */
 	uint16_t eepromAddr;
-	uint16_t noOfItems;
+	/** the number of items in the below array. */
+	uint16_t maxValue;
+	/** the callback function */
 	MenuCallbackFn callback;
+
+	/**
+	 * An array of pointers to char arrys. Each one represents a possible choice, for example:
+	 * 
+	 *     const char enumText1[] PROGMEM = "Option 1";
+     *     const char* const minfoTextStrs[] PROGMEM = { enumText1 };
+	 */
 	const char * const *menuItems;
 };
 
-
 /**
- * These are the names for true / false that can be used in a menu item.
+ * These are the names for true / false that can be used in a boolean menu item.
  */
 enum BooleanNaming : byte {
 	NAMING_TRUE_FALSE = 0,
@@ -71,47 +120,80 @@ enum BooleanNaming : byte {
 };
 
 /**
-* The information block stored in program memory for boolean items. DO NOT move these items without considering AnyMenuInfo!!!
+* The information block stored in program memory for boolean items. Boolean items hold either true or
+* false only. The text used to represent those value can be changed by chaning the BooleanNaming parameter.
+* 
+* Note: These items must remain in this order, as MenuItem relies upon it.
 */
 struct BooleanMenuInfo {
+	/** the name given to this menu item */ 
 	char name[NAME_SIZE_T];
+	/** the identifier for this menu */
 	uint16_t id;
+	/** eeprom address for this item or -1 if not stored */
 	uint16_t eepromAddr;
-	uint16_t maxValue; // always 1, needed for consistency with other structs
+	/** maximum value that this type can store - always 1 */
+	uint16_t maxValue;
+	/** the callback function */
 	MenuCallbackFn callback;
+
+	/**
+	 * Defines the text that will be used to represent the boolean in this item
+	 * @see BooleanNaming
+	 */
 	BooleanNaming naming;
 };
 
 /**
- * The information block for a submenu stored in program memory. DO NOT move these items without considering AnyMenuInfo!!!
+ * The information block for a submenu stored in program memory. Sub menus can contain other menu items
+ * as children and render as another menu below this menu.
+ * 
+ * Note: These items must remain in this order, as MenuItem relies upon it.
  */
 struct SubMenuInfo {
+	/** the name given to this menu item */ 
 	char name[NAME_SIZE_T];
+	/** the identifier for this menu */
 	uint16_t id;
-	uint16_t eeprom;
-	uint16_t maxValue;// always 0, needed for consistency with other structs
-	MenuCallbackFn callback; // not used, for consistency with other structs
-};
-
-/**
- * The information block for a text menu component. DO NOT move these items without considering AnyMenuInfo!!!
- */
-struct TextMenuInfo {
-	char name[NAME_SIZE_T];
-	uint16_t id;
-	uint16_t eeprom;
-	uint16_t maxLength;
+	/** Not used for submenus. */
+	uint16_t eepromAddr;
+	/** maximum value that this type can store - always 0 */
+	uint16_t maxValue;
+	/** the callback function - not used for submenu's */
 	MenuCallbackFn callback;
 };
 
 /**
- * The information block for a floating point menu component. DO NOT move these imtes without considering AnyMenuInfo!!!
+ * The information block for a text menu component. This component stores a text representation that can be
+ * modified, and is up to a certain length defined in maxValue.
+ */
+struct TextMenuInfo {
+	/** the name given to this menu item */ 
+	char name[NAME_SIZE_T];
+	/** the identifier for this menu */
+	uint16_t id;
+	/** eeprom address for this item or -1 if not stored */
+	uint16_t eepromAddr;
+	/** maximum number of characters allowed */
+	uint16_t maxValue;
+	/** the callback function */
+	MenuCallbackFn callback;
+};
+
+/**
+ * The information block for a floating point menu component. Floating point items are not editable, they are
+ * generally to relay status information.
  */
 struct FloatMenuInfo {
+	/** the name given to this menu item */ 
 	char name[NAME_SIZE_T];
+	/** the identifier for this menu */
 	uint16_t id;
-	uint16_t eeprom;
+	/** eeprom address for this item or -1 if not stored */
+	uint16_t eepromAddr;
+	/** The number of decimal places to render to */
 	uint16_t numDecimalPlaces;
+	/** The callback function */
 	MenuCallbackFn callback;
 };
 
@@ -136,15 +218,24 @@ enum Flags : byte {
  * MenuItems less than 100 are based on ValueMenuItem and can be edited on device.
  */
 enum MenuType : byte {
-	MENUTYPE_INT_VALUE = 1,      // AnalogMenuItem
-	MENUTYPE_ENUM_VALUE = 2,     // EnumMenuItem
-	MENUTYPE_BOOLEAN_VALUE = 3,  // BooleanMenuItem
-	MENUTYPE_SUB_VALUE = 100,    // SubMenuItem
-	MENUTYPE_BACK_VALUE = 101,   // BackMenuItem
-	MENUTYPE_REMOTE_VALUE = 102, // RemoteMenuItem
-	MENUTYPE_FLOAT_VALUE = 103,  // FloatMenuItem
-	MENUTYPE_TEXT_VALUE = 104,   // TextMenuItem
-	MENUTYPE_ACTION_VALUE = 105  // ActionMenuItem
+	/** item is of type AnalogMenuItem */
+	MENUTYPE_INT_VALUE = 1, 
+	/** item is of type EnumMenuItem */
+	MENUTYPE_ENUM_VALUE = 2,
+	/** item is of type BooleanMenuItem */
+	MENUTYPE_BOOLEAN_VALUE = 3,
+	/** item is of type SubMenuItem */
+	MENUTYPE_SUB_VALUE = 100,
+	/** item is of type BackMenuItem */
+	MENUTYPE_BACK_VALUE = 101,
+	/** item is of type RemoteMenuItem */
+	MENUTYPE_REMOTE_VALUE = 102,
+	/** item is of type FloatMenuItem */
+	MENUTYPE_FLOAT_VALUE = 103,
+	/** item is of type TextMenuItem */
+	MENUTYPE_TEXT_VALUE = 104,
+	/** item is of type ActionMenuItem */
+	MENUTYPE_ACTION_VALUE = 105
 };
 
 /**
@@ -156,6 +247,10 @@ enum MenuType : byte {
  * This is the base class of all menu items, containing functionality to hold the current state of the menu
  * and determine which is the next menu in the chain. It also defines a few functions that all implementations
  * implement.
+ * 
+ * As there is limited memory on the device, most of the static information is stored in a paired AnyMenuInfo
+ * structure, saving quite a lot of RAM, also each menu item is in a chain, where getNext() will returned the
+ * next available item. NULL represents the end of the chain.
  */
 class MenuItem {
 protected:
@@ -215,7 +310,8 @@ protected:
 };
 
 /** 
- * Represents an item that has a 16 bit unsigned integer backing it, and an info structure in program memory.
+ * Represents an item that has a 16 bit unsigned integer backing it, never directly used, this class is
+ * essentially abstract.
  */
 class ValueMenuItem : public MenuItem {
 protected:
@@ -234,98 +330,208 @@ public:
 };
 
 /**
- * The implementation of MenuItem for storing numbers. Goes with it's AnalogMenuInfo
- * counterpart.
+ * An item that can represent a numeric value, integer, or decimal. On an 8bit Arduino this value is a
+ * 16 bit unsigned integer value. We can make it appear negative by giving a negative offset. We make
+ * it appear decimal by giving it a divisor. If the divisor were 2, we'd increment in halves. If the
+ * offset point were -100, unit dB and divisor 2, the first value would be -50.0dB and the next would be
+ * -49.5dB and so on.
+ * @see AnalogMenuInfo
  */
 class AnalogMenuItem : public ValueMenuItem {
 public:
+	/**
+	 * Create an instance of the class
+	 * 
+	 * @param info an AnalogMenuInfo structure
+	 * @param defaultVal the default starting value
+	 * @param next the next menu in the chain if there is one, or NULL.
+	 */
 	AnalogMenuItem(const AnalogMenuInfo* info, uint16_t defaultVal, MenuItem* next = NULL) : ValueMenuItem(MENUTYPE_INT_VALUE, (const AnyMenuInfo*)info, defaultVal, next) {;}
 
+	/** Returns the offset from the MenuInfo structure */
 	int getOffset() { return (int) pgm_read_word_near(&((AnalogMenuInfo*)info)->offset);}
+	/** Returns the divisor from the menu info structure */
 	uint16_t getDivisor() { return (uint16_t) pgm_read_word_near(&((AnalogMenuInfo*)info)->divisor);}
+	/** Returns the length of the unit name */
 	int unitNameLength() {return (int) strlen_P(((AnalogMenuInfo*)info)->unitName);}
+	/** copies the unit name into the provided buffer */
 	void copyUnitToBuffer(char* unitBuff) { strcpy_P(unitBuff, ((AnalogMenuInfo*)info)->unitName);}
+	/** gets the unit name pointer - note in progmem */
 	const char* getUnitNamePgm() { return ((AnalogMenuInfo*)info)->unitName; }
 };
 
 /**
- * The implmentation of MenuItem for a list of choices, where only one can be chosen.
- * Goes with its EnumMenuInfo counterpart.
+ * An item that can represent a known series of values, somewhat like a combo box. We provide a list
+ * of choices and only one of those choices can be active at once. The choice is a zero based integer
+ * with the first choice being 0 and so on.
+ * @see EnumMenuInfo
  */
 class EnumMenuItem : public ValueMenuItem {
 public:
+	/**
+	 * Create an instance of the class
+	 * 
+	 * @param info an EnumMenuInfo structure
+	 * @param defaultVal the default starting value
+	 * @param next the next menu in the chain if there is one, or NULL.
+	 */
 	EnumMenuItem(const EnumMenuInfo *info, uint8_t defaultVal, MenuItem* next = NULL) : ValueMenuItem(MENUTYPE_ENUM_VALUE, (const AnyMenuInfo*)info, defaultVal, next) {;}
 
+	/**
+	 * Copies one of the enum strings into a buffer
+	 * @param buffer the buffer to copy into
+	 * @param idx the index of choice to copy
+	 */ 
 	void copyEnumStrToBuffer(char* buffer, int idx) {
 		char** itemPtr = ((char**)pgm_read_ptr_near(&((EnumMenuInfo*)info)->menuItems) + idx);
 		char* itemLoc = (char *)pgm_read_ptr_near(itemPtr);
 		strcpy_P(buffer, itemLoc);
 	}
 
+	/**
+	 * Returns the length of an enumeration string with given index
+	 * @param idx the index to get the length for
+	 */
 	int getLengthOfEnumStr(int idx) {
 		char** itemPtr = ((char**)pgm_read_ptr_near(&((EnumMenuInfo*)info)->menuItems) + idx);
 		char* itemLoc = (char *)pgm_read_ptr_near(itemPtr);
 		return strlen_P(itemLoc);
 	}
 
+	/**
+	 * returns an entries progmem position - note in program memory
+	 * @param idx the index to get the progmem pointer for
+	 */
 	const char* getEntryPgm(int idx) { return ((char*)pgm_read_ptr_near((char**)pgm_read_ptr_near(&((EnumMenuInfo*)info)->menuItems) + idx)); }
 };
 
 /**
- * The implemenation of MenuItem for boolean, where it is true or false.
+ * An item that can represent only two states, true or false. Can be configured to show as ON/OFF, TRUE/FALSE or
+ * YES/NO as required.
+ * @see BooleanMenuInfo
  */
 class BooleanMenuItem : public ValueMenuItem {
 public:
+	/**
+	 * Create an instance of the class
+	 * 
+	 * @param info a BooleanMenuInfo structure
+	 * @param defaultVal the default starting value
+	 * @param next the next menu in the chain if there is one, or NULL.
+	 */
 	BooleanMenuItem(const BooleanMenuInfo* info, bool defaultVal, MenuItem* next = NULL) : ValueMenuItem(MENUTYPE_BOOLEAN_VALUE, (const AnyMenuInfo*)info, defaultVal, next) {;}
+
+	/**
+	 * returns the boolean naming for this item, EG: how the value should be rendered 
+	 */
 	BooleanNaming getBooleanNaming() { return (BooleanNaming)pgm_read_byte_near(&((BooleanMenuInfo*)info)->naming); }
 
+	/** return the boolean value currently stored */
 	bool getBoolean() {return currentValue != 0;}
+	/** set the boolean value currently stored */
 	void setBoolean(bool b) {setCurrentValue(b);}
 };
 
 /**
- * The implementation of a Menuitem that can contain more menu items as children.
+ * The implementation of a Menuitem that can contain more menu items as children. 
  */
 class SubMenuItem : public MenuItem {
 private:
 	MenuItem* child;
 public:
+	/**
+	 * Create an instance of the class
+	 * 
+	 * @param info a SubMenuInfo structure
+	 * @param child the first child item - (normally a BackMenuItem)
+	 * @param next the next menu in the chain if there is one, or NULL.
+	 */
 	SubMenuItem(const SubMenuInfo* info, MenuItem* child, MenuItem* next) : MenuItem(MENUTYPE_SUB_VALUE, (const AnyMenuInfo*)info, next) {this->child = child;}
+
+	/**
+	 * return the first child item
+	 */
 	MenuItem* getChild() { return child; }
 };
 
+/**
+ * Back menu item pairs with an associated SubMenuItem, it only exists in the embedded domain - not the API.
+ * This type is always the first item in a series of items for a submenu. It provides the functionality required
+ * to get back to root.
+ * 
+ * For example
+ * 
+ * 		SubMenu.getChild() -> Back Menu Item -> Sub Menu Item 1 ...
+ */
 class BackMenuItem : public MenuItem {
 public:
+	/**
+	 * Create an instance of the class
+	 * 
+	 * @param nextChild the next menu in the chain if there is one, or NULL.
+	 * @param parentInfo the parent AnyMenuInfo block to be used for name etc.
+	 */
 	BackMenuItem(MenuItem* nextChild, const AnyMenuInfo* parentInfo) : MenuItem(MENUTYPE_BACK_VALUE, parentInfo, nextChild) {;}
 };
 
 /**
- * TextMenuItem is for situations where text modified at runtime must be shown, for showing
- * a series of text values from PROGMEM storage use EnumMenuItem instead.
+ * An item that can represent a text value that is held in RAM, and therefore change at runtime. In the info block we
+ * just say how long we want the string to be. Choose the smallest size possible, it's allocated in RAM!
+ * @see TextMenuInfo
  */
 class TextMenuItem : public MenuItem {
 private:
 	char *menuText;
 public:
+	/**
+	 * Create an instance of the class
+	 * 
+	 * @param info a TextMenuInfo structure
+	 * @param next the next menu in the chain if there is one, or NULL.
+	 */
 	TextMenuItem(const TextMenuInfo* textInfo, MenuItem* next) : MenuItem(MENUTYPE_TEXT_VALUE, (const AnyMenuInfo*)textInfo, next) { menuText = new char[textLength()]; menuText[0] = 0; }
 	uint8_t textLength() { return getMaximumValue(); }
 
+	/**
+	 * Copies the text into the internal buffer.
+	 * @param text the text to be copied.
+	 */
 	void setTextValue(const char* text);
+
+	/** returns the text value in the internal buffer */
 	const char* getTextValue() { return menuText; }
 };
 
 /**
- * TextMenuItem is for situations where text modified at runtime must be shown, for showing
- * a series of text values from PROGMEM storage use EnumMenuItem instead.
+ * FloatMenuItem is for situations where absolute accuracy of the value is not important, for example showing
+ * a calculated value from some sensors.
+ * @see FloatMenuInfo
  */
 class FloatMenuItem : public MenuItem {
 private:
 	float currValue;
 public:
+	/**
+	 * Create an instance of the class
+	 * 
+	 * @param info a FloatMenuInfo structure
+	 * @param next the next menu in the chain if there is one, or NULL.
+	 */
 	FloatMenuItem(const FloatMenuInfo* info, MenuItem* next) : MenuItem(MENUTYPE_FLOAT_VALUE, (const AnyMenuInfo*)info, next) { currValue = 0; }
+
+	/**
+	 * return the number of decimal places to display for this value
+	 */
 	int getDecimalPlaces() { return (int) pgm_read_word_near(&((FloatMenuInfo*)info)->numDecimalPlaces);}
 
+	/**
+	 * Set the floating point value and mark as changed
+	 */
 	void setFloatValue(float newVal);
+
+	/**
+	 * Get the current floating point value
+	 */
 	float getFloatValue() { return currValue; }
 };
 
@@ -337,6 +543,12 @@ public:
  */
 class ActionMenuItem : public MenuItem {
 public:
+	/**
+	 * Create an instance of the class
+	 * 
+	 * @param info a AnyMenuInfo structure
+	 * @param next the next menu in the chain if there is one, or NULL.
+	 */
 	ActionMenuItem(const AnyMenuInfo* info, MenuItem* next) : MenuItem(MENUTYPE_ACTION_VALUE, info, next) {;}
 };
 
