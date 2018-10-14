@@ -1,19 +1,15 @@
 # TcMenu library for Arduino platform.
 
-## IMPORTANT NOTE
-
-Please continue to use TcMenu repo, this version is not yet ready for prime time **
-
 ## Installation
 
-Install by unzipping into the Arduino/libraries directory and rename the folder to tcMenu.
+Install by unzipping into the Arduino/libraries directory and rename the folder to tcMenu. You can also get the full package with generator UI and examples, see next section.
 
 ## Summary
 
 TcMenu is a menu library for the Arduino platform, that supports different displays, remote control using a simple protocol over Ethernet and Serial, a 
 Java API and rotary encoder or switch input. Target platform is anything from Arduino Uno upward. Tested on ATMEGA328 (Uno), Mega2560 and SAMD (MKR1300).
 
-This is the Arduino library part of the package, it also comes with a Java designer and Java API. These are available from:
+This is the Arduino library part of the package, it also comes with a Java designer and Java API. You can get the whole lot packaged from the URL below
 
 * [TcMenuAPI, Designer UI and Example UI](https://github.com/davetcc/tcMenu)
 
