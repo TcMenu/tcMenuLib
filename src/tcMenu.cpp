@@ -144,7 +144,7 @@ void saveRecursively(EepromAbstraction& eeprom, MenuItem* nextMenuItem) {
 		}
 		else if(nextMenuItem->getMenuType() == MENUTYPE_BOOLEAN_VALUE) {
 			BooleanMenuItem* valItem = (BooleanMenuItem*)nextMenuItem;
-			eeprom.write16(valItem->getEepromPosition(), valItem->getCurrentValue());
+			eeprom.write8(valItem->getEepromPosition(), valItem->getCurrentValue());
 		}
 		nextMenuItem = nextMenuItem->getNext();
 	}

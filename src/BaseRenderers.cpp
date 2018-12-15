@@ -245,12 +245,14 @@ void BaseMenuRenderer::menuValueRemote(RemoteMenuItem* item, MenuDrawJustificati
 }
 
 void BaseMenuRenderer::takeOverDisplay(RendererCallbackFn displayFn) {
+	// when we set this, we are stopping tcMenu rendering and letting this take over
 	renderCallback = displayFn;
 }
 
 void BaseMenuRenderer::giveBackDisplay() {
+	// clear off the rendering callback.
 	renderCallback = NULL;
-	redrawMode = MENUDRAW_COMPLETE_REDRAW;
+	prepareNewSubmenu(currentRoot);
 }
 
 void recurseResetMenu(MenuItem* currentMenu) {
