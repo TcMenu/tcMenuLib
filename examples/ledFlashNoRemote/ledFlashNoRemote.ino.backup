@@ -1,0 +1,17 @@
+#include "ledFlashNoRemote.h"
+#include <EepromAbstraction.h>
+
+AvrEeprom eeprom;
+
+void setup() {
+    setupMenu();
+    menuMgr.load(eeprom);
+}
+
+void loop() {
+    taskManager.runLoop();
+}
+
+void CALLBACK_FUNCTION onLedChange(int id) {
+    digitalWrite(LED_BUILTIN, menuA0Volts.getBoolean());
+}
