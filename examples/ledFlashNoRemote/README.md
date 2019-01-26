@@ -1,8 +1,8 @@
 ## TcMenu Example: Control the built in LED with the Menu
 
-This example assumes a configuration with a LCD 20x4 display and a rotary encoder. It assumes the LCD display is connected exactly as per DFRobot spec. It assumes you have a rotary encoder connected on pins 2 & 3, with the push button on pin 10. It could easily be reconfigured to 16x2 using the tcMenu designer UI.
+This example assumes a configuration with a LCD 16x2 display and a rotary encoder. It assumes the LCD display is connected exactly as per DFRobot spec. It assumes you have a rotary encoder connected on pins 2 & 3, with the push button on pin 10. It could easily be reconfigured to 20x4 using the tcMenu designer UI.
 
-This example has two menu items, one that changes the status of the built in LED, and another that shows the analog voltage on the A0 pin.
+This example has three menu items, one that changes the status of the built in LED, another that shows the analog voltage on the A0 pin, and lastly an action item to save changes to EEPROM.
 
 I've assumed this will be built on either an Uno or MEGA boards, but should work equally well on any other Arduino board with only minor changes.
 

@@ -2,7 +2,7 @@
 
 This is a very simple menu with an example of how to configure remote control over the USB serial interface. Ethernet control is equally easy to use. Just create an ethernet instance as usual setting up IP address and MAC address and choose ethernet instead of serial in the code generator.
 
-You can for example use the Java API or the protocol to communicate with your Arduino from another device.
+In order to connect using the Java API there are two possibilities, either build the example JavaFX UI that's in the main tcMenu repository, or work with the tcMenu API directly. See [https://github.com/davetcc/tcMenu]
 
 We'll soon be writing an API in C# that is fairly much inline with the Java API. This will give even more options for using tcMenu remotely.
 
