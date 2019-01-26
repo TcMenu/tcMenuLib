@@ -12,7 +12,11 @@ This is the Arduino library part of the package, it also comes with a Java desig
 
 ## Installation
 
-This is the native library that goes along with tcMenu. It's in a separate repository because of the way that Arduino libraries need to be packaged. Install by unzipping into the Arduino/libraries directory and rename the folder to tcMenu. You can also get the full package with generator UI and examples, see below.
+This is the native library that goes along with tcMenu. It's in a separate repository because of the way that Arduino libraries need to be packaged. Install by unzipping into the Arduino/libraries directory and rename the folder to tcMenu. You can also get the full package with generator UI and examples, see below. This library depends upon:
+
+* IoAbstraction [https://github.com/davetcc/IoAbstraction] in all cases.
+* LiquidCrystalIO fork [https://github.com/davetcc/LiquidCrystalIO] that supports task manager when using the LiquidCrystal support.
+* Adafruit_GFX if you are using the Adafruit graphics driver.
 
 ## Package structure and installation:
 
