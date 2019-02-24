@@ -11,18 +11,12 @@
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
 
-#include<IoAbstraction.h>
-#include<Wire.h>
-#include<tcMenu.h>
-
-#include "tcMenuLiquidCrystal.h"
+#include <tcMenu.h>
+#include <LiquidCrystalIO.h>
 #include "RemoteConnector.h"
+#include "tcMenuLiquidCrystal.h"
 
-// all export definitions
-#define ENCODER_PIN_A 2
-#define ENCODER_PIN_B 3
-#define ENCODER_PIN_OK A3
-
+// all define statements needed
 #define LCD_RS 8
 #define LCD_EN 9
 #define LCD_D4 4
@@ -31,19 +25,23 @@
 #define LCD_D7 7
 #define LCD_WIDTH 16
 #define LCD_HEIGHT 2
+#define LCD_BACKLIGHT 10
 #define LCD_PWM_PIN -1
+#define ENCODER_PIN_A 2
+#define ENCODER_PIN_B 3
+#define ENCODER_PIN_OK A3
+
+// all variables that need exporting
 extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
-
 extern const char applicationName[];
-
 
 // all menu item forward references.
 extern ActionMenuItem menuSaveLEDState;
 extern AnalogMenuItem menuA0Volts;
 extern BooleanMenuItem menuBuiltInLED;
 
-// all callback functions must have this define on them, it is what the menu designer looks for.
+// Callback functions always follow this pattern: void CALLBACK_FUNCTION myCallback();
 #define CALLBACK_FUNCTION
 
 void CALLBACK_FUNCTION onLedChange(int id);

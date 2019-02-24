@@ -1,0 +1,72 @@
+{
+    "version": "1.00",
+    "projectName": "C:\\Users\\dave\\Documents\\Arduino\\libraries\\tcMenu\\examples\\analogDfRobot\\analogDfRobot.emf",
+    "author": "dave",
+    "lastEdited": {
+        "seconds": 1551022894,
+        "nanos": 735942900
+    },
+    "items": [
+        {
+            "parentId": 0,
+            "type": "analogItem",
+            "item": {
+                "maxValue": 1024,
+                "offset": 0,
+                "divisor": 1,
+                "unitName": "",
+                "name": "Value A0",
+                "id": 1,
+                "eepromAddress": -1,
+                "readOnly": false
+            }
+        },
+        {
+            "parentId": 0,
+            "type": "subMenu",
+            "item": {
+                "name": "LED States",
+                "id": 2,
+                "eepromAddress": -1,
+                "readOnly": false
+            }
+        },
+        {
+            "parentId": 2,
+            "type": "boolItem",
+            "item": {
+                "naming": "ON_OFF",
+                "name": "LED 1",
+                "id": 3,
+                "eepromAddress": 2,
+                "functionName": "onLed1",
+                "readOnly": false
+            }
+        },
+        {
+            "parentId": 2,
+            "type": "boolItem",
+            "item": {
+                "naming": "ON_OFF",
+                "name": "LED 2",
+                "id": 4,
+                "eepromAddress": 3,
+                "functionName": "onLed2",
+                "readOnly": false
+            }
+        }
+    ],
+    "codeOptions": {
+        "embeddedPlatform": "ARDUINO",
+        "lastDisplayUuid": "bcd5fe34-9e9f-4fcb-9edf-f4e3caca0674",
+        "lastInputUuid": "7daa6a81-dd09-422e-b83c-bda5045abaef",
+        "lastRemoteUuid": "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb",
+        "lastProperties": [
+            {
+                "name": "DEVICE_NAME",
+                "latestValue": "New Device",
+                "subsystem": "REMOTE"
+            }
+        ]
+    }
+}

@@ -28,7 +28,7 @@ void setup() {
     setupMenu();
 
     // here we use the EEPROM to load back the last set of values.
-    //menuMgr.load(eeprom);
+    menuMgr.load(eeprom);
 
 }
 

@@ -11,22 +11,12 @@
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
 
-#include<IoAbstraction.h>
-#include<Wire.h>
-#include<tcMenu.h>
-
-#include <Wire.h>
-#include "tcMenuLiquidCrystal.h"
-#include <IoAbstractionWire.h>
+#include <tcMenu.h>
+#include <LiquidCrystalIO.h>
 #include "RemoteConnector.h"
+#include "tcMenuLiquidCrystal.h"
 
-// all export definitions
-extern IoAbstractionRef io23017;
-#define ENCODER_PIN_A 6
-#define ENCODER_PIN_B 7
-#define ENCODER_PIN_OK 5
-
-extern IoAbstractionRef io23017;
+// all define statements needed
 #define LCD_RS 8
 #define LCD_EN 9
 #define LCD_D4 10
@@ -35,13 +25,17 @@ extern IoAbstractionRef io23017;
 #define LCD_D7 13
 #define LCD_WIDTH 20
 #define LCD_HEIGHT 4
+#define LCD_BACKLIGHT -1
 #define LCD_PWM_PIN 5
-#define LCD_I2C_ADDR 0x20
+#define ENCODER_PIN_A 6
+#define ENCODER_PIN_B 7
+#define ENCODER_PIN_OK 5
+
+// all variables that need exporting
 extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
-
+extern IoAbstractionRef io23017;
 extern const char applicationName[];
-
 
 // all menu item forward references.
 extern TextMenuItem menuText;
@@ -53,7 +47,7 @@ extern SubMenuItem menuSettings;
 extern EnumMenuItem menuFood;
 extern ActionMenuItem menuTakeDisplay;
 
-// all callback functions must have this define on them, it is what the menu designer looks for.
+// Callback functions always follow this pattern: void CALLBACK_FUNCTION myCallback();
 #define CALLBACK_FUNCTION
 
 void CALLBACK_FUNCTION onTakeOverDisplay(int id);

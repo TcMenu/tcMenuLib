@@ -9,16 +9,16 @@
  */
 
 #include <tcMenu.h>
-#include "ledFlashNoRemote.h"
+#include "ledFlashNoRemote_menu.h"
 
 // Global variable declarations
 
 LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7, ioUsingArduino());
 LiquidCrystalRenderer renderer(lcd, LCD_WIDTH, LCD_HEIGHT);
-
 const char PROGMEM applicationName[] = "LedBuiltIn";
 
 // Global Menu Item declarations
+
 const PROGMEM AnyMenuInfo minfoSaveLEDState = { "Save LED state", 3, 0xffff, 0, onSaveState };
 ActionMenuItem menuSaveLEDState(&minfoSaveLEDState, NULL);
 const PROGMEM AnalogMenuInfo minfoA0Volts = { "A0Volts", 2, 0xffff, 1024, NO_CALLBACK, 0, 200, "V" };
@@ -27,10 +27,12 @@ const PROGMEM BooleanMenuInfo minfoBuiltInLED = { "BuiltIn LED", 1, 2, 1, onLedC
 BooleanMenuItem menuBuiltInLED(&minfoBuiltInLED, false, &menuA0Volts);
 
 // Set up code
+
 void setupMenu() {
+    lcd.begin(LCD_WIDTH, LCD_HEIGHT);
+    lcd.configureBacklightPin(LCD_BACKLIGHT);
+    lcd.backlight();
     switches.initialise(ioUsingArduino(), true);
     menuMgr.initForEncoder(&renderer, &menuBuiltInLED, ENCODER_PIN_A, ENCODER_PIN_B, ENCODER_PIN_OK);
-    lcd.begin(LCD_WIDTH, LCD_HEIGHT);
-
 }
 

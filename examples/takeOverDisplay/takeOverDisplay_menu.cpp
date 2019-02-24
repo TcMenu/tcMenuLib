@@ -9,16 +9,16 @@
  */
 
 #include <tcMenu.h>
-#include "takeOverDisplay.h"
+#include "takeOverDisplay_menu.h"
 
 // Global variable declarations
 
 LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7, io23017);
 LiquidCrystalRenderer renderer(lcd, LCD_WIDTH, LCD_HEIGHT);
-
-const char PROGMEM applicationName[] = "LedBuiltIn";
+const char PROGMEM applicationName[] = "TakeDisplay";
 
 // Global Menu Item declarations
+
 const PROGMEM TextMenuInfo minfoText = { "Text", 7, 0xffff, 10, NO_CALLBACK };
 TextMenuItem menuText(&minfoText, NULL);
 const PROGMEM AnyMenuInfo minfoSaveSettings = { "Save Settings", 6, 0xffff, 0, onSaveSettings };
@@ -40,12 +40,12 @@ const PROGMEM AnyMenuInfo minfoTakeDisplay = { "Take display", 1, 0xffff, 0, onT
 ActionMenuItem menuTakeDisplay(&minfoTakeDisplay, &menuFood);
 
 // Set up code
+
 void setupMenu() {
-    switches.initialise(io23017, true);
-    menuMgr.initForEncoder(&renderer, &menuTakeDisplay, ENCODER_PIN_A, ENCODER_PIN_B, ENCODER_PIN_OK);
     lcd.begin(LCD_WIDTH, LCD_HEIGHT);
-	pinMode(LCD_PWM_PIN, OUTPUT);
-	analogWrite(LCD_PWM_PIN, 10);
-
+    lcd.print("hello");
+    pinMode(LCD_PWM_PIN, OUTPUT);
+    analogWrite(LCD_PWM_PIN, 10);
+    //switches.initialise(io23017, true);
+    //menuMgr.initForEncoder(&renderer, &menuTakeDisplay, ENCODER_PIN_A, ENCODER_PIN_B, ENCODER_PIN_OK);
 }
-

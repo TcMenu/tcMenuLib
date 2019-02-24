@@ -3,4 +3,5 @@
 .vscode
 examples/simpleMenuUno/*.h
 examples/simpleMenuUno/*.cpp
+vs-readme.txt
 

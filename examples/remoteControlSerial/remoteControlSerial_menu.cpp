@@ -9,16 +9,16 @@
  */
 
 #include <tcMenu.h>
-#include "remoteControlSerial.h"
+#include "remoteControlSerial_menu.h"
 
 // Global variable declarations
 
-LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7, ioUsingArduino());
-LiquidCrystalRenderer renderer(lcd, LCD_WIDTH, LCD_HEIGHT);
-
+LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
+LiquidCrystalRenderer renderer(lcd, 16, 2);
 const char PROGMEM applicationName[] = "Serial Test";
 
 // Global Menu Item declarations
+
 const PROGMEM AnyMenuInfo minfoPushMe = { "Push Me", 6, 0xffff, 0, onPushMe };
 ActionMenuItem menuPushMe(&minfoPushMe, NULL);
 const char enumStrFood_0[] PROGMEM = "Pizza";
@@ -37,11 +37,13 @@ const PROGMEM AnalogMenuInfo minfoA0Voltage = { "A0 Voltage", 1, 0xffff, 1024, N
 AnalogMenuItem menuA0Voltage(&minfoA0Voltage, 0, &menuA1Voltage);
 
 // Set up code
+
 void setupMenu() {
+    lcd.begin(16, 2);
+    lcd.configureBacklightPin(10);
+    lcd.backlight();
     switches.initialise(ioUsingArduino(), true);
     menuMgr.initForEncoder(&renderer, &menuA0Voltage, ENCODER_PIN_A, ENCODER_PIN_B, ENCODER_PIN_OK);
-    lcd.begin(LCD_WIDTH, LCD_HEIGHT);
-
     remoteServer.begin(&Serial, applicationName);
 }
 
