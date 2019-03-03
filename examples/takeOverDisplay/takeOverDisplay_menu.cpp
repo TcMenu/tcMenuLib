@@ -13,7 +13,7 @@
 
 // Global variable declarations
 
-LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7, io23017);
+LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
 LiquidCrystalRenderer renderer(lcd, LCD_WIDTH, LCD_HEIGHT);
 const char PROGMEM applicationName[] = "TakeDisplay";
 
@@ -42,10 +42,9 @@ ActionMenuItem menuTakeDisplay(&minfoTakeDisplay, &menuFood);
 // Set up code
 
 void setupMenu() {
+    lcd.setIoAbstraction(io23017);
     lcd.begin(LCD_WIDTH, LCD_HEIGHT);
-    lcd.print("hello");
-    pinMode(LCD_PWM_PIN, OUTPUT);
-    analogWrite(LCD_PWM_PIN, 10);
-    //switches.initialise(io23017, true);
-    //menuMgr.initForEncoder(&renderer, &menuTakeDisplay, ENCODER_PIN_A, ENCODER_PIN_B, ENCODER_PIN_OK);
+    switches.initialise(io23017, true);
+    menuMgr.initForEncoder(&renderer, &menuTakeDisplay, ENCODER_PIN_A, ENCODER_PIN_B, ENCODER_PIN_OK);
 }
+

@@ -26,7 +26,7 @@
 #define LCD_WIDTH 20
 #define LCD_HEIGHT 4
 #define LCD_BACKLIGHT -1
-#define LCD_PWM_PIN 5
+#define LCD_PWM_PIN -1
 #define ENCODER_PIN_A 6
 #define ENCODER_PIN_B 7
 #define ENCODER_PIN_OK 5
