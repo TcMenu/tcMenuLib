@@ -67,8 +67,9 @@ void LiquidCrystalRenderer::renderMenuItem(uint8_t row, MenuItem* item) {
 	memset(buffer, 32, bufferSize);
 	buffer[bufferSize] = 0;
 
-	// looks nasty but efficiently avoids the 0 at the end of string.
 	buffer[0] = item->isEditing() ? '=' : (item->isActive() ? '>' : ' ');
+    uint8_t finalPos = item->copyNameToBuffer(buffer, 1, bufferSize);
+    buffer[finalPos] = 32;
 
 	menuValueToText(item, JUSTIFY_TEXT_RIGHT);
 	lcd->print(buffer);

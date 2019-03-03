@@ -12,14 +12,14 @@
 #define MENU_GENERATED_CODE_H
 
 #include <tcMenu.h>
-#include "tcMenuLiquidCrystal.h"
 #include <LiquidCrystalIO.h>
 #include <IoAbstraction.h>
 #include <DfRobotInputAbstraction.h>
 #include "RemoteConnector.h"
+#include "tcMenuLiquidCrystal.h"
 
 // all define statements needed
-
+#define TCMENU_USING_PROGMEM true
 
 // all variables that need exporting
 extern LiquidCrystal lcd;

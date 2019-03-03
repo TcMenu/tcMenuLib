@@ -68,7 +68,7 @@ void LiquidCrystalRenderer::renderMenuItem(uint8_t row, MenuItem* item) {
 	buffer[bufferSize] = 0;
 
 	buffer[0] = item->isEditing() ? '=' : (item->isActive() ? '>' : ' ');
-    uint8_t finalPos = item->copyNameToBuffer(buffer, 1, sizeof(buffer));
+    uint8_t finalPos = item->copyNameToBuffer(buffer, 1, bufferSize);
     buffer[finalPos] = 32;
 
 	menuValueToText(item, JUSTIFY_TEXT_RIGHT);

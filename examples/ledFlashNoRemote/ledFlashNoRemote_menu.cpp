@@ -13,7 +13,7 @@
 
 // Global variable declarations
 
-LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7, ioUsingArduino());
+LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
 LiquidCrystalRenderer renderer(lcd, LCD_WIDTH, LCD_HEIGHT);
 const char PROGMEM applicationName[] = "LedBuiltIn";
 
@@ -29,6 +29,7 @@ BooleanMenuItem menuBuiltInLED(&minfoBuiltInLED, false, &menuA0Volts);
 // Set up code
 
 void setupMenu() {
+    lcd.setIoAbstraction(ioUsingArduino());
     lcd.begin(LCD_WIDTH, LCD_HEIGHT);
     lcd.configureBacklightPin(LCD_BACKLIGHT);
     lcd.backlight();

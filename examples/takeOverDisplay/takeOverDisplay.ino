@@ -48,7 +48,7 @@ void CALLBACK_FUNCTION onFoodChoice(int id) {
     // copy the enum text for the current value
     char enumStr[20];
     int enumVal = menuFood.getCurrentValue();
-    menuFood.copyEnumStrToBuffer(enumStr, enumVal);
+    menuFood.copyEnumStrToBuffer(enumStr, sizeof(enumStr), enumVal);
     
     // and put it into a text menu item
     menuText.setTextValue(enumStr);

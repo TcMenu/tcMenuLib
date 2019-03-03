@@ -17,6 +17,7 @@
 #include "tcMenuLiquidCrystal.h"
 
 // all define statements needed
+#define TCMENU_USING_PROGMEM true
 #define LCD_RS 8
 #define LCD_EN 9
 #define LCD_D4 10
