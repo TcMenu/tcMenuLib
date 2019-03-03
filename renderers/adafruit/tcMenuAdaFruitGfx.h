@@ -18,10 +18,11 @@
 #define _TCMENU_TCMENUADAFRUITGFX_H_
 
 #include "tcMenu.h"
+#include "tcUtil.h"
 #include "BaseRenderers.h"
 #include <Adafruit_GFX.h>
 
-const uint8_t editingIcon[] PROGMEM = {
+const uint8_t editingIcon[] PGM_TCM = {
 		0b11111111,0b11111111,
 		0b01100000,0b00000000,
 		0b00011000,0b00000000,
@@ -36,7 +37,7 @@ const uint8_t editingIcon[] PROGMEM = {
 		0b11111111,0b11111111
 };
 
-const uint8_t activeIcon[] PROGMEM = {
+const uint8_t activeIcon[] PGM_TCM = {
 		0b00000000,0b01100000,
 		0b00000000,0b00110000,
 		0b00000000,0b00011000,

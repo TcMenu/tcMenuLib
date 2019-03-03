@@ -12,12 +12,13 @@
 #define MENU_GENERATED_CODE_H
 
 #include <tcMenu.h>
-#include "tcMenuLiquidCrystal.h"
 #include <LiquidCrystalIO.h>
 #include "SerialTransport.h"
 #include <RemoteConnector.h>
+#include "tcMenuLiquidCrystal.h"
 
 // all define statements needed
+#define TCMENU_USING_PROGMEM true
 #define ENCODER_PIN_A 2
 #define ENCODER_PIN_B 3
 #define ENCODER_PIN_OK A3

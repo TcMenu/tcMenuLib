@@ -149,22 +149,23 @@ void BaseMenuRenderer::menuValueAnalog(AnalogMenuItem* item, MenuDrawJustificati
 
 void BaseMenuRenderer::menuValueEnum(EnumMenuItem* item, MenuDrawJustification justification) {
 	if(justification == JUSTIFY_TEXT_LEFT) {
-		item->copyEnumStrToBuffer(buffer, item->getCurrentValue());
+		item->copyEnumStrToBuffer(buffer, bufferSize,item->getCurrentValue());
 	}
 	else {
 		uint8_t count = item->getLengthOfEnumStr(item->getCurrentValue());
-		item->copyEnumStrToBuffer(buffer + (bufferSize - count), item->getCurrentValue());
+        if(count > bufferSize) count = bufferSize;
+		item->copyEnumStrToBuffer(buffer + (bufferSize - count), bufferSize, item->getCurrentValue());
 	}
 }
 
-const char ON_STR[] PROGMEM   = "ON";
-const char OFF_STR[] PROGMEM  = "OFF";
-const char YES_STR[] PROGMEM  = "YES";
-const char NO_STR[] PROGMEM   = " NO";
-const char TRUE_STR[] PROGMEM = " TRUE";
-const char FALSE_STR[] PROGMEM= "FALSE";
-const char SUB_STR[] PROGMEM  = "->>>";
-const char BACK_MENU_NAME[] PROGMEM  = "[Back]";
+const char ON_STR[] PGM_TCM   = "ON";
+const char OFF_STR[] PGM_TCM  = "OFF";
+const char YES_STR[] PGM_TCM  = "YES";
+const char NO_STR[] PGM_TCM   = " NO";
+const char TRUE_STR[] PGM_TCM = " TRUE";
+const char FALSE_STR[] PGM_TCM= "FALSE";
+const char SUB_STR[] PGM_TCM  = "->>>";
+const char BACK_MENU_NAME[] PGM_TCM  = "[Back]";
 
 void BaseMenuRenderer::menuValueBool(BooleanMenuItem* item, MenuDrawJustification justification) {
 	BooleanNaming naming = item->getBooleanNaming();
@@ -182,29 +183,30 @@ void BaseMenuRenderer::menuValueBool(BooleanMenuItem* item, MenuDrawJustificatio
 	}
 
 	if(justification == JUSTIFY_TEXT_LEFT) {
-		strcpy_P(buffer, val);
+		safeProgCpy(buffer, val, bufferSize);
 	}
 	else {
-		uint8_t len = strlen_P(val);
-		strcpy_P(buffer + (bufferSize - len), val);
+		uint8_t len = safeProgStrLen(val);
+        if(len > bufferSize) len = bufferSize;
+		safeProgCpy(buffer + (bufferSize - len), val, bufferSize);
 	}
 }
 
 void BaseMenuRenderer::menuValueExec(__attribute((unused)) MenuItem* item, MenuDrawJustification justification) {
 	if(justification == JUSTIFY_TEXT_LEFT) {
-		strcpy_P(buffer, SUB_STR);
+		safeProgCpy(buffer, SUB_STR, bufferSize);
 	}
 	else {
-		strcpy_P(buffer + (bufferSize - 4), SUB_STR);
+		safeProgCpy(buffer + (bufferSize - 4), SUB_STR, bufferSize);
 	}
 }
 
 void BaseMenuRenderer::menuValueBack(__attribute((unused)) BackMenuItem* item, MenuDrawJustification justification) {
 	if(justification == JUSTIFY_TEXT_LEFT) {
-		strcpy_P(buffer, BACK_MENU_NAME);
+		safeProgCpy(buffer, BACK_MENU_NAME, bufferSize);
 	}
 	else {
-		strcpy_P(buffer + (bufferSize - 6), BACK_MENU_NAME);
+		safeProgCpy(buffer + (bufferSize - 6), BACK_MENU_NAME, bufferSize);
 	}
 }
 

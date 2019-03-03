@@ -102,7 +102,8 @@ enum ChangeType: byte {
  */
 enum ApiPlatform : byte {
 	PLATFORM_ARDUINO_8BIT = 0,
-	PLATFORM_JAVA_API = 1
+	PLATFORM_JAVA_API = 1,
+    PLATFORM_ARDUINO_32BIT = 2
 };
 
 #endif /* _TCMENU_REMOTETYPES_H_ */

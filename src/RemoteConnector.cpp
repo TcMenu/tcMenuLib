@@ -15,7 +15,9 @@
 #include "MessageProcessors.h"
 #include "tcUtil.h"
 
-const PROGMEM char EMPTYNAME[] = "Device";
+const char PGM_TCM EMPTYNAME[] = "Device";
+const char PGM_TCM pmemBootStartText[] = "START";
+const char PGM_TCM pmemBootEndText[] = "END";
 
 CommsCallbackFn TagValueTransport::notificationFn = NULL;
 
@@ -82,7 +84,7 @@ void TagValueRemoteConnector::dealWithHeartbeating() {
 			transport->close();
 		}
 	} else if(!isConnected()){
-		encodeJoinP(localNamePgm);
+		encodeJoin(localNamePgm);
 		setConnected(true);
 		TagValueTransport::commsNotify(COMMS_CONNECTED1);
 	}
@@ -180,25 +182,24 @@ void TagValueRemoteConnector::nextBootstrap() {
 	}
 }
 
-void TagValueRemoteConnector::encodeJoinP(const char* localName) {
+void TagValueRemoteConnector::encodeJoin(const char* localName) {
 	if(transport->connected()) {
 		transport->startMsg(MSG_JOIN);
-		transport->writeFieldP(FIELD_MSG_NAME, localName);
+        char szName[20];
+        safeProgCpy(szName, localName, sizeof(szName));
+		transport->writeField(FIELD_MSG_NAME, szName);
 		transport->writeFieldInt(FIELD_VERSION, API_VERSION);
-		transport->writeFieldInt(FIELD_PLATFORM, PLATFORM_ARDUINO_8BIT);
+		transport->writeFieldInt(FIELD_PLATFORM, TCMENU_DEFINED_PLATFORM);
 		transport->endMsg();
 		ticksLastSend = 0;
 	}
 	else TagValueTransport::commsNotify(COMMS_ERR_WRITE_NOT_CONNECTED);
 }
 
-const char PROGMEM pmemBootStartText[] = "START";
-const char PROGMEM pmemBootEndText[] = "END";
-
 void TagValueRemoteConnector::encodeBootstrap(bool isComplete) {
 	if(transport->connected()) {
 		transport->startMsg(MSG_BOOTSTRAP);
-		transport->writeFieldP(FIELD_BOOT_TYPE, isComplete ?  pmemBootEndText : pmemBootStartText);
+		transport->writeField(FIELD_BOOT_TYPE, potentialProgramMemory(isComplete ?  pmemBootEndText : pmemBootStartText));
 		transport->endMsg();
 		ticksLastSend = 0;
 	}
@@ -215,17 +216,21 @@ void TagValueRemoteConnector::encodeHeartbeat() {
 }
 
 void TagValueRemoteConnector::encodeBaseMenuFields(int parentId, MenuItem* item) {
-		transport->writeFieldInt(FIELD_PARENT, parentId);
-		transport->writeFieldInt(FIELD_ID,item->getId());
-		transport->writeFieldInt(FIELD_READONLY, item->isReadOnly());
-		transport->writeFieldP(FIELD_MSG_NAME, item->getNamePgm());
+    transport->writeFieldInt(FIELD_PARENT, parentId);
+    transport->writeFieldInt(FIELD_ID,item->getId());
+    transport->writeFieldInt(FIELD_READONLY, item->isReadOnly());
+    char sz[20];
+    item->copyNameToBuffer(sz, sizeof(sz));
+    transport->writeField(FIELD_MSG_NAME, sz);
 }
 
 void TagValueRemoteConnector::encodeAnalogItem(int parentId, AnalogMenuItem* item) {
 	if(transport->connected()) {
 		transport->startMsg(MSG_BOOT_ANALOG);
 		encodeBaseMenuFields(parentId, item);
-		transport->writeFieldP(FIELD_ANALOG_UNIT, item->getUnitNamePgm());
+        char sz[10];
+        item->copyUnitToBuffer(sz);
+		transport->writeField(FIELD_ANALOG_UNIT, sz);
 		transport->writeFieldInt(FIELD_ANALOG_MAX, item->getMaximumValue());
 		transport->writeFieldInt(FIELD_ANALOG_OFF, item->getOffset());
 		transport->writeFieldInt(FIELD_ANALOG_DIV, item->getDivisor());
@@ -295,7 +300,9 @@ void TagValueRemoteConnector::encodeEnumMenu(int parentId, EnumMenuItem* item) {
 		transport->writeFieldInt(FIELD_NO_CHOICES, noChoices);
 		for(uint8_t i=0;i<noChoices;++i) {
 			uint16_t choiceKey = msgFieldToWord(FIELD_PREPEND_CHOICE, 'A' + i);
-			transport->writeFieldP(choiceKey, (const char *)item->getEntryPgm(i));
+            char szChoice[20];
+            item->copyEnumStrToBuffer(szChoice, sizeof(szChoice), i);
+			transport->writeField(choiceKey, szChoice);
 		}
 		transport->endMsg();
 		ticksLastSend = 0;
@@ -405,22 +412,6 @@ void TagValueTransport::writeField(uint16_t field, const char* value) {
 	sz[3] = 0;
 	writeStr(sz);
 	writeStr(value);
-	writeChar('|');
-}
-
-void TagValueTransport::writeFieldP(uint16_t field, const char* value) {
-	char sz[4];
-	sz[0] = field >> 8;
-	sz[1] = field & 0xff;
-	sz[2] = '=';
-	sz[3] = 0;
-	writeStr(sz);
-
-	while(char val = pgm_read_byte_near(value)) {
-		writeChar(val);
-		++value;
-	}
-
 	writeChar('|');
 }
 

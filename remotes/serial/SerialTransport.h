@@ -55,7 +55,7 @@ public:
 	/**
 	 * Begins serial communication on the given port. You must call begin on the stream first.
 	 * @param portStream the stream upon which to communicate, it must be already opened.
-	 * @param namePgm the local name of the application in PROGMEM
+	 * @param namePgm the local name of the application (may be program memory  on AVR use safeCopyStr)
 	 */ 
 	void begin(Stream* portStream, const char* namePgm);
 	/**

@@ -21,13 +21,13 @@ RemoteMenuItem::RemoteMenuItem(const RemoteMenuInfo *pgmMenuInfo, TagValueRemote
     if(registerTask) taskManager.scheduleFixedRate(10, remoteItemUpdateLoop, TIME_SECONDS);
 }
 
-const char NO_LINK_STR[] PROGMEM = "No Link";
+const char NO_LINK_STR[] PGM_TCM = "No Link";
 
 void RemoteMenuItem::getCurrentState(char *szBuf, uint8_t len) {
     szBuf[0]=0;
 
     if(!connector->isConnected()) {
-        strcpy_P(szBuf, NO_LINK_STR);
+        safeProgCpy(szBuf, NO_LINK_STR, len);
     }
     else {
         strcat(szBuf, connector->getRemoteName());

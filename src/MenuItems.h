@@ -17,7 +17,7 @@
 #ifndef _MENUITEMS_h
 #define _MENUITEMS_h
 
-#include <EepromAbstraction.h>
+#include "tcUtil.h"
 
 /** the size of each name in program memory */
 #define NAME_SIZE_T 20
@@ -104,8 +104,10 @@ struct EnumMenuInfo {
 	/**
 	 * An array of pointers to char arrys. Each one represents a possible choice, for example:
 	 * 
-	 *     const char enumText1[] PROGMEM = "Option 1";
-     *     const char* const minfoTextStrs[] PROGMEM = { enumText1 };
+	 *     const char enumText1[] = "Option 1";
+     *     const char* const minfoTextStrs[] = { enumText1 };
+     * 
+     * Note that on AVR arch. they must be in progam memory
 	 */
 	const char * const *menuItems;
 };
@@ -260,14 +262,27 @@ protected:
 	const AnyMenuInfo *info;
 public:
 
-	/** Gets hold of the name pointer - caution this is in PROGMEM */
-	const char* getNamePgm() { return info->name; }
+    /**
+     * Copies the name into the provided buffer starting at position 0.
+     * @param sz the buffer space
+     * @param size the size of sz, generally obtained using sizeof
+     */
+	uint8_t copyNameToBuffer(char* sz, uint8_t size) { return copyNameToBuffer(sz, 0, size);}
+
+	/** 
+     * Copies the name info the provided buffer starting at the specified 
+     * position.
+     * @param sz the buffer space
+     * @param offset the offset to start at relative to the buffer
+     * @param size the size of sz, generally obtained using sizeof
+     * */
+	uint8_t copyNameToBuffer(char* sz, uint8_t offset, uint8_t size);
 	/** Retrieves the ID from the info block */
-	uint16_t getId() { return pgm_read_word_near(&info->id); }
+	uint16_t getId() { return get_info_uint(&info->id); }
 	/** Retrieves the maximum value for this menu type */
-	uint16_t getMaximumValue() { return pgm_read_word_near(&info->maxValue); }
+	uint16_t getMaximumValue() { return get_info_uint(&info->maxValue); }
 	/** Retrieves the eeprom storage position for this menu (or 0xffff if not applicable) */
-	uint16_t getEepromPosition() { return pgm_read_word_near(&info->eepromAddr); }
+	uint16_t getEepromPosition() { return get_info_uint(&info->eepromAddr); }
 	/** returns the menu type as one of the above menu type enumeration */
 	MenuType getMenuType() { return menuType; }
 	/** triggers the event callback associated with this item */
@@ -349,15 +364,13 @@ public:
 	AnalogMenuItem(const AnalogMenuInfo* info, uint16_t defaultVal, MenuItem* next = NULL) : ValueMenuItem(MENUTYPE_INT_VALUE, (const AnyMenuInfo*)info, defaultVal, next) {;}
 
 	/** Returns the offset from the MenuInfo structure */
-	int getOffset() { return (int) pgm_read_word_near(&((AnalogMenuInfo*)info)->offset);}
+	int getOffset() { return get_info_int(&((AnalogMenuInfo*)info)->offset);}
 	/** Returns the divisor from the menu info structure */
-	uint16_t getDivisor() { return (uint16_t) pgm_read_word_near(&((AnalogMenuInfo*)info)->divisor);}
+	uint16_t getDivisor() { return get_info_uint(&((AnalogMenuInfo*)info)->divisor);}
 	/** Returns the length of the unit name */
 	int unitNameLength() {return (int) strlen_P(((AnalogMenuInfo*)info)->unitName);}
 	/** copies the unit name into the provided buffer */
-	void copyUnitToBuffer(char* unitBuff) { strcpy_P(unitBuff, ((AnalogMenuInfo*)info)->unitName);}
-	/** gets the unit name pointer - note in progmem */
-	const char* getUnitNamePgm() { return ((AnalogMenuInfo*)info)->unitName; }
+	void copyUnitToBuffer(char* unitBuff) { safeProgCpy(unitBuff, ((AnalogMenuInfo*)info)->unitName, 5);}
 };
 
 /**
@@ -382,27 +395,13 @@ public:
 	 * @param buffer the buffer to copy into
 	 * @param idx the index of choice to copy
 	 */ 
-	void copyEnumStrToBuffer(char* buffer, int idx) {
-		char** itemPtr = ((char**)pgm_read_ptr_near(&((EnumMenuInfo*)info)->menuItems) + idx);
-		char* itemLoc = (char *)pgm_read_ptr_near(itemPtr);
-		strcpy_P(buffer, itemLoc);
-	}
+	void copyEnumStrToBuffer(char* buffer, int size, int idx);
 
 	/**
 	 * Returns the length of an enumeration string with given index
 	 * @param idx the index to get the length for
 	 */
-	int getLengthOfEnumStr(int idx) {
-		char** itemPtr = ((char**)pgm_read_ptr_near(&((EnumMenuInfo*)info)->menuItems) + idx);
-		char* itemLoc = (char *)pgm_read_ptr_near(itemPtr);
-		return strlen_P(itemLoc);
-	}
-
-	/**
-	 * returns an entries progmem position - note in program memory
-	 * @param idx the index to get the progmem pointer for
-	 */
-	const char* getEntryPgm(int idx) { return ((char*)pgm_read_ptr_near((char**)pgm_read_ptr_near(&((EnumMenuInfo*)info)->menuItems) + idx)); }
+	int getLengthOfEnumStr(int idx);
 };
 
 /**
@@ -424,7 +423,7 @@ public:
 	/**
 	 * returns the boolean naming for this item, EG: how the value should be rendered 
 	 */
-	BooleanNaming getBooleanNaming() { return (BooleanNaming)pgm_read_byte_near(&((BooleanMenuInfo*)info)->naming); }
+	BooleanNaming getBooleanNaming() { return (BooleanNaming)get_info_char(&((BooleanMenuInfo*)info)->naming); }
 
 	/** return the boolean value currently stored */
 	bool getBoolean() {return currentValue != 0;}
@@ -522,7 +521,7 @@ public:
 	/**
 	 * return the number of decimal places to display for this value
 	 */
-	int getDecimalPlaces() { return (int) pgm_read_word_near(&((FloatMenuInfo*)info)->numDecimalPlaces);}
+	int getDecimalPlaces() { return get_info_int(&((FloatMenuInfo*)info)->numDecimalPlaces);}
 
 	/**
 	 * Set the floating point value and mark as changed

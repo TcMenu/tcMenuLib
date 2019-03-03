@@ -38,7 +38,7 @@ private:
 public:
     RemoteMenuItem(const RemoteMenuInfo *pgmMenuInfo, TagValueRemoteConnector* connector, MenuItem* next);
     void getCurrentState(char* szBuf, uint8_t len);
-	int getRemoteNum() { return (int) pgm_read_word_near(&((RemoteMenuInfo*)info)->remoteNum);}
+	int getRemoteNum() { return get_info_int(&((RemoteMenuInfo*)info)->remoteNum);}
 
 	/** allow the associated task to access the item update loop */
     friend void remoteItemUpdateLoop();

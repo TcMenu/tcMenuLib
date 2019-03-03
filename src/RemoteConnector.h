@@ -88,7 +88,6 @@ public:
 
 	void startMsg(uint16_t msgType);
 	void writeField(uint16_t field, const char* value);
-	void writeFieldP(uint16_t field, const char* value);
 	void writeFieldInt(uint16_t field, int value);
 	void endMsg();
 	FieldAndValue* fieldIfAvailable();
@@ -189,8 +188,8 @@ public:
 	TagValueRemoteConnector(TagValueTransport* transport, uint8_t remoteNo);
 
 	/**
-	 * Sets the name of this connector, string must be in PROGMEM
-	 * @param namePgm string containing name in progmem
+	 * Sets the name of this connector, on AVR in program memory
+	 * @param namePgm string containing name (AVR in program memory)
 	 */
 	void setName(const char* namePgm) {localNamePgm = namePgm;}
 
@@ -208,7 +207,7 @@ public:
 	 * Encode a join message onto the wire, giving local name
 	 * @param localName the name to send in the join message
 	 */
-	void encodeJoinP(const char* localName);
+	void encodeJoin(const char* localName);
 
 	/**
 	 * Encode a bootstrap message indicating we are sending state

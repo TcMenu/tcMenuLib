@@ -29,7 +29,7 @@ typedef void (*RendererCallbackFn)(bool userClicked);
  * Title widgets allow for drawing small graphics in the title area, for example connectivity status
  * of the wifi network, if a remote connection to the menu is active. They are in a linked list so
  * as to make storage as efficient as possible. Chain them together using the constructor or setNext().
- * Image icons should be declared in PROGMEM.
+ * Image icons should be declared using PGM_TCM rather than prog mem to be compatible with all boards.
  * 
  * Thread / interrupt safety: get/setCurrentState & isChanged can be called from threads / interrupts
  * 

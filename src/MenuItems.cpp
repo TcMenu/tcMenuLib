@@ -28,11 +28,46 @@ void MenuItem::setSendRemoteNeededAll() {
 }
 
 void MenuItem::triggerCallback() {
-	MenuCallbackFn fn = (MenuCallbackFn) pgm_read_ptr_near(&info->callback);
+	MenuCallbackFn fn = get_info_callback(&info->callback);
+
 	if(fn != NULL) {
 		fn(getId());
 	}
 }
+
+uint8_t MenuItem::copyNameToBuffer(char* buf, uint8_t offset, uint8_t size) {
+	const char* name = info->name;
+    uint8_t ret = safeProgCpy(buf + offset, name, size - offset);
+    return ret + offset;
+}
+
+#ifdef __AVR__
+
+void EnumMenuItem::copyEnumStrToBuffer(char* buffer, int size, int idx) {
+    copy_info_ptr_ptr_array(buffer, &((EnumMenuInfo*)info)->menuItems, size, idx);
+}
+
+int EnumMenuItem::getLengthOfEnumStr(int idx) {
+    return get_info_len_ptr_ptr_array(&((EnumMenuInfo*)info)->menuItems, idx);
+}
+
+#else 
+
+void EnumMenuItem::copyEnumStrToBuffer(char* buffer, int size, int idx) {
+    EnumMenuInfo* enumInfo = (EnumMenuInfo*)info;
+    const char * const* choices = enumInfo->menuItems;
+    const char * choice = choices[idx];
+    strncpy(buffer, choice, size);
+}
+
+int EnumMenuItem::getLengthOfEnumStr(int idx) {
+    EnumMenuInfo* enumInfo = (EnumMenuInfo*)info;
+    const char * const* choices = enumInfo->menuItems;
+    const char * choice = choices[idx];
+    strlen(choice);
+}
+
+#endif
 
 void TextMenuItem::setTextValue(const char* text) {
 	// skip if they are the same

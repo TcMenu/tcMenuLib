@@ -44,10 +44,10 @@ Coord textExtents(Adafruit_GFX* gfx, const char* text, int16_t x, int16_t y) {
 
 void AdaFruitGfxMenuRenderer::renderTitleArea() {
 	if(currentRoot == menuMgr.getRoot()) {
-		strcpy(buffer, applicationName);
+		safeProgCpy(buffer, applicationName, bufferSize);
 	}
 	else {
-		strcpy_P(buffer, currentRoot->getNamePgm());
+		currentRoot->copyNameToBuffer(buffer, bufferSize);
 	}
 	graphics->setTextSize(4);
 	Coord extents = textExtents(graphics, buffer, 5, 5);
@@ -154,7 +154,7 @@ void AdaFruitGfxMenuRenderer::renderMenuItem(int yPos, int menuHeight, MenuItem*
 		graphics->setTextColor(REGULAR_MENU_COLOR);
 	}
 	graphics->setCursor(25, yPos + 4);
-	strcpy_P(buffer, item->getNamePgm());
+	item->copyNameToBuffer(buffer, bufferSize);
 	graphics->print(buffer);
 
 	menuValueToText(item, JUSTIFY_TEXT_LEFT);

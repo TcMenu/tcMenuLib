@@ -69,12 +69,6 @@ void LiquidCrystalRenderer::renderMenuItem(uint8_t row, MenuItem* item) {
 
 	// looks nasty but efficiently avoids the 0 at the end of string.
 	buffer[0] = item->isEditing() ? '=' : (item->isActive() ? '>' : ' ');
-	const char* name = item->getNamePgm();
-	char* buf = buffer;
-	while (char nm = pgm_read_byte_near(name)) {
-		*(++buf) = nm;
-		++name;
-	}
 
 	menuValueToText(item, JUSTIFY_TEXT_RIGHT);
 	lcd->print(buffer);

@@ -53,3 +53,20 @@ uint8_t itemCount(MenuItem* item) {
 	}
 	return count;
 }
+
+#ifdef __AVR__
+char szGlobalBuffer[16];
+#endif
+
+uint8_t safeProgCpy(char* dst, const char* pgmSrc, uint8_t size) {
+    uint8_t pos = 0;
+    char nm = get_info_char(pgmSrc);
+    while (nm && pos < size) {
+		dst[pos] = nm;
+		++pgmSrc;
+        ++pos;
+        nm = get_info_char(pgmSrc);
+    }
+    dst[pos] = 0;
+    return pos;
+}
