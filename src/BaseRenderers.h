@@ -42,16 +42,21 @@ private:
 	volatile bool changed;
 	uint8_t width;
 	uint8_t height;
+	uint8_t maxStateIcons;
 	TitleWidget* next;
 public:
 	/** Construct a widget with its icons and size */
-	TitleWidget(const uint8_t** icons, uint8_t width, uint8_t height, TitleWidget* next = NULL);
+	TitleWidget(const uint8_t** icons, uint8_t maxStateIcons, uint8_t width, uint8_t height, TitleWidget* next = NULL);
 	/** Get the current state that the widget represents */
 	uint8_t getCurrentState() {return currentState;}
 	/** gets the current icon data */
 	const uint8_t* getCurrentIcon() {return iconData[currentState]; changed = false;}
 	/** sets the current state of the widget, there must be an icon for this value */
-	void setCurrentState(uint8_t state) {this->currentState = state;this->changed = true;}
+	void setCurrentState(uint8_t state) {
+		if (state >= maxStateIcons) return; // protect against wrong mem access
+		this->currentState = state;
+		this->changed = true;
+	}
 	/** checks if the widget has changed since last drawn. */
 	bool isChanged() {return this->changed;}
 	/** gets the width of all the images */

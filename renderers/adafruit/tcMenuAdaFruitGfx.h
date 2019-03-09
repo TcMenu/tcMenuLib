@@ -79,6 +79,10 @@ inline void makePadding(MenuPadding& padding, int top, int right, int bottom, in
  * Holds the graphical configuration of how to render a menu based on AdaGfx.
  */
 struct AdaColorGfxMenuConfig {
+	AdaColorGfxMenuConfig() {
+		memset(this, 0, sizeof(AdaColorGfxMenuConfig));
+	}
+
 	uint32_t bgTitleColor;
 	uint32_t fgTitleColor;
 	MenuPadding titlePadding;
