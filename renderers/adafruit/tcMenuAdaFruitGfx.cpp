@@ -20,25 +20,21 @@ extern const char applicationName[];
 
 int drawingCount = 0;
 
-AdaFruitGfxMenuRenderer::AdaFruitGfxMenuRenderer(Adafruit_GFX* graphics, int xSize, int ySize, uint8_t sizeBuffer) : BaseMenuRenderer(sizeBuffer) {
+AdaFruitGfxMenuRenderer::AdaFruitGfxMenuRenderer(Adafruit_GFX* graphics, AdaColorGfxMenuConfig* gfxConfig, int xSize, int ySize, 
+												 uint8_t sizeBuffer) : BaseMenuRenderer(sizeBuffer) {
 	this->graphics = graphics;
 	this->xSize = xSize;
 	this->ySize = ySize;
-	this->titleHeight = 30;
+	this->gfxConfig = gfxConfig;
 }
 
 AdaFruitGfxMenuRenderer::~AdaFruitGfxMenuRenderer() {
 }
 
-typedef uint32_t Coord;
-#define MakeCoord(x, y) ((((long)x)<<16)|y)
-#define CoordX(c) (c>>16)
-#define CoordY(c) (c&0xff)
-
-Coord textExtents(Adafruit_GFX* gfx, const char* text, int16_t x, int16_t y) {
+Coord AdaFruitGfxMenuRenderer::textExtents(const char* text, int16_t x, int16_t y) {
 	int16_t x1, y1;
 	uint16_t w, h;
-	gfx->getTextBounds((char*)text, x, y, &x1, &y1, &w, &h);
+	graphics->getTextBounds((char*)text, x, y, &x1, &y1, &w, &h);
 	return MakeCoord(w, h);
 }
 
@@ -49,27 +45,36 @@ void AdaFruitGfxMenuRenderer::renderTitleArea() {
 	else {
 		currentRoot->copyNameToBuffer(buffer, bufferSize);
 	}
-	graphics->setTextSize(4);
-	Coord extents = textExtents(graphics, buffer, 5, 5);
-	titleHeight = CoordY(extents) + 15;
-	graphics->fillRect(0, 0, xSize, CoordY(extents) + 10, MENU_TITLE_BG);
-	graphics->setCursor(5, 5);
-	graphics->setTextColor(MENU_TITLE_COLOR);
+	graphics->setFont(gfxConfig->titleFont);
+	graphics->setTextSize(gfxConfig->titleFontMagnification);
+
+	int fontYStart = gfxConfig->titlePadding.top;
+	Coord extents = textExtents(buffer, 0, 50);
+	titleHeight = CoordY(extents) + gfxConfig->titlePadding.top + gfxConfig->titlePadding.bottom;
+	if (gfxConfig->titleFont) {
+		fontYStart = titleHeight - (gfxConfig->titlePadding.bottom + 6);
+	}
+	graphics->fillRect(0, 0, xSize, titleHeight, gfxConfig->bgTitleColor);
+	graphics->setTextColor(gfxConfig->fgTitleColor);
+	graphics->setCursor(gfxConfig->titlePadding.left, fontYStart);
 	graphics->print(buffer);
+	titleHeight += gfxConfig->titleBottomMargin;
 }
 
 void AdaFruitGfxMenuRenderer::renderWidgets(bool forceDraw) {
 	TitleWidget* widget = firstWidget;
-	int xPos = xSize - 10;
+	int xPos = xSize - gfxConfig->widgetPadding.right;
 	while(widget) {
-		xPos -= (widget->getWidth() + 5);
+		xPos -= widget->getWidth();
 
 		if(widget->isChanged() || forceDraw) {
 			int iconY = (titleHeight - widget->getHeight()) / 2;
-			graphics->drawBitmap(xPos, iconY, widget->getCurrentIcon(), widget->getWidth(), widget->getHeight(), MENU_TITLE_COLOR, MENU_TITLE_BG);
+			graphics->drawBitmap(xPos, iconY, widget->getCurrentIcon(), widget->getWidth(), widget->getHeight(), gfxConfig->widgetColor, 
+								 gfxConfig->bgTitleColor);
 		}
 
 		widget = widget->getNext();
+		xPos -= gfxConfig->widgetPadding.left;
 	}
 }
 
@@ -80,7 +85,7 @@ void AdaFruitGfxMenuRenderer::render() {
 	countdownToDefaulting();
 
 	if (locRedrawMode == MENUDRAW_COMPLETE_REDRAW) {
-		graphics->fillScreen(BACKGROUND_COLOR);
+		graphics->fillScreen(gfxConfig->bgItemColor);
 		taskManager.yieldForMicros(0);
 		renderTitleArea();
 		renderWidgets(true);
@@ -90,9 +95,10 @@ void AdaFruitGfxMenuRenderer::render() {
 		renderWidgets(false);
 	}
 
-	graphics->setTextSize(2);
-	Coord coord = textExtents(graphics, "Aaygj", 20, 20);
-	int menuHeight = CoordY(coord) + 10;
+	graphics->setFont(gfxConfig->itemFont);
+	graphics->setTextSize(gfxConfig->itemFontMagnification);
+	Coord coord = textExtents("Aaygj", gfxConfig->itemPadding.left, 20);
+	int menuHeight = CoordY(coord) + gfxConfig->itemPadding.top + gfxConfig->itemPadding.bottom;
 	int maxItemsY = ((ySize-titleHeight) / menuHeight);
 
 	MenuItem* item = currentRoot;
@@ -124,11 +130,14 @@ void AdaFruitGfxMenuRenderer::render() {
 	}
 
 #ifdef DEBUG_GFX
+#define BACKGROUND_DEBUG RGB(0, 0, 0)
+#define COLOR_DEBUG RGB(200, 200, 200)
+
 	// when debug graphics are on we draw a total count rendered to the bottom of the display
-	graphics->setTextColor(REGULAR_MENU_COLOR);
+	graphics->setTextColor(COLOR_DEBUG);
 	graphics->setCursor(200, 220);
 	graphics->setTextSize(2);
-	graphics->fillRect(200, 220, 80, 20, BACKGROUND_COLOR);
+	graphics->fillRect(200, 220, 80, 20, BACKGROUND_DEBUG);
 	itoa(drawingCount, buffer, 10);
 	graphics->print(buffer);
 #endif
@@ -140,26 +149,29 @@ void AdaFruitGfxMenuRenderer::renderMenuItem(int yPos, int menuHeight, MenuItem*
 	item->setChanged(false); // we are drawing the item so it's no longer changed.
 
 	if(item->isEditing()) {
-		graphics->setTextColor(EDITOR_MENU_COLOR);
-		graphics->fillRect(0, yPos, xSize, menuHeight, EDITOR_BACKGROUND_COLOR);
-		graphics->drawBitmap(3, yPos + 4, editingIcon, 16, 12, EDITOR_MENU_COLOR);
+		graphics->setTextColor(gfxConfig->fgSelectColor);
+		graphics->fillRect(0, yPos, xSize, menuHeight, gfxConfig->bgSelectColor);
+		graphics->drawBitmap(gfxConfig->itemPadding.left, yPos + gfxConfig->itemPadding.top, editingIcon, 16, 12, gfxConfig->fgSelectColor);
 	}
 	else if(item->isActive()) {
-		graphics->setTextColor(ACTIVE_MENU_COLOR);
-		graphics->fillRect(0, yPos, xSize, menuHeight, ACTIVE_BACKGROUND_COLOR);
-		graphics->drawBitmap(3, yPos + 4, activeIcon, 16, 12, ACTIVE_MENU_COLOR);
+		graphics->setTextColor(gfxConfig->fgSelectColor);
+		graphics->fillRect(0, yPos, xSize, menuHeight, gfxConfig->bgSelectColor);
+		graphics->drawBitmap(gfxConfig->itemPadding.left, yPos + gfxConfig->itemPadding.top, activeIcon, 16, 12, gfxConfig->fgSelectColor);
 	}
 	else {
-		graphics->fillRect(0, yPos, xSize, menuHeight, BACKGROUND_COLOR);
-		graphics->setTextColor(REGULAR_MENU_COLOR);
+		graphics->fillRect(0, yPos, xSize, menuHeight, gfxConfig->bgItemColor);
+		graphics->setTextColor(gfxConfig->fgItemColor);
 	}
-	graphics->setCursor(25, yPos + 4);
+
+	int textPos = gfxConfig->itemPadding.left + 16 + gfxConfig->itemPadding.left;
+	
+	graphics->setCursor(textPos, yPos + gfxConfig->itemPadding.top);
 	item->copyNameToBuffer(buffer, bufferSize);
 	graphics->print(buffer);
 
 	menuValueToText(item, JUSTIFY_TEXT_LEFT);
-	Coord coord = textExtents(graphics, buffer, 25, yPos);
-	int16_t right = xSize - (CoordX(coord) + 10);
-	graphics->setCursor(right, yPos + 4);
+	Coord coord = textExtents(buffer, textPos, yPos);
+	int16_t right = xSize - (CoordX(coord) + gfxConfig->itemPadding.right);
+	graphics->setCursor(right, yPos + gfxConfig->itemPadding.top);
  	graphics->print(buffer);
  }

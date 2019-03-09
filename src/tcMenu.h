@@ -44,6 +44,13 @@ public:
 	 */
 	void initForUpDownOk(MenuRenderer* renderer, MenuItem* root, uint8_t upPin, uint8_t downPin, uint8_t okPin);
 
+	/**
+	 * Initialise in situations where local input is not needed.
+	 * @param renderer the renderer used for drawing
+	 * @param root the first menu item
+	 */
+	void initWithoutInput(MenuRenderer* renderer, MenuItem* root);
+
 	/** 
 	 * called when the rotary encoder has moved to a new position to update the menu
 	 * @param value the new changed value

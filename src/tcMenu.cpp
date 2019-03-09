@@ -17,7 +17,6 @@ void MenuManager::initForUpDownOk(MenuRenderer* renderer, MenuItem* root, uint8_
 	setupUpDownButtonEncoder(pinUp, pinDown, [](int value) {menuMgr.valueChanged(value); });
 
 	renderer->initialise();
-
 }
 
 void MenuManager::initForEncoder(MenuRenderer* renderer,  MenuItem* root, uint8_t encoderPinA, uint8_t encoderPinB, uint8_t encoderButton) {
@@ -26,6 +25,13 @@ void MenuManager::initForEncoder(MenuRenderer* renderer,  MenuItem* root, uint8_
 
 	switches.addSwitch(encoderButton, [](__attribute__((unused)) uint8_t key, bool held) {menuMgr.onMenuSelect(held); });
 	setupRotaryEncoderWithInterrupt(encoderPinA, encoderPinB, [](int value) {menuMgr.valueChanged(value); });
+
+	renderer->initialise();
+}
+
+void MenuManager::initWithoutInput(MenuRenderer* renderer, MenuItem* root) {
+	this->renderer = renderer;
+	this->rootMenu = root;
 
 	renderer->initialise();
 }
