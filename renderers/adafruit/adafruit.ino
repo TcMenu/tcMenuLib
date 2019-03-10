@@ -1,3 +1,5 @@
+// This sketch is for testing of the adafruit renderer only, it is not intended as an example
+// This just assembles enough components to get rendering working.
 
 #include <tcMenu.h>
 #include <Adafruit_ILI9341.h>
@@ -8,7 +10,7 @@
 Adafruit_ILI9341 gfx(6, 7);
 AdaColorGfxMenuConfig config;
 
-AdaFruitGfxMenuRenderer renderer(&gfx, &config, 320, 240);
+AdaFruitGfxMenuRenderer renderer(320, 240);
 const char applicationName[] = "Graphics Test";
 
 void prepareGfxConfig() {
@@ -32,6 +34,7 @@ void prepareGfxConfig() {
 	config.titleFontMagnification = 1;
 	config.itemFontMagnification = 1;
 }
+
 const uint8_t iconWifiNotConnected[] PROGMEM = {
 	0b00000001, 0b10000000,
 	0b00000110, 0b01100000,
@@ -154,17 +157,27 @@ AnalogMenuItem menuVolume(&minfoVolume, 0, &menuChannel);
 
 
 void setup() {
+	while (Serial);
+	Serial.begin(115200);
 	Serial.print("Testing adafruit driver");
 	Serial.println(applicationName);
+
+	// either one as needed for testing..
+	//prepareDefaultGfxConfig(config);
 	prepareGfxConfig();
+
 	gfx.begin();
 	gfx.setRotation(3);
+	gfx.print("hello");
+
+	renderer.setGraphicsDevice(&gfx, &config);
 	menuMgr.initWithoutInput(&renderer, &menuVolume);
 	menuVolume.setActive(true);
 	renderer.setFirstWidget(&wifiWidget);
 
 	taskManager.scheduleFixedRate(5, [] {
 		renderer.onSelectPressed(&menuVolume);
+		menuVolume.setCurrentValue(menuVolume.getCurrentValue() + 1);
 
 		int wifiState = wifiWidget.getCurrentState() + 1;
 		if (wifiState == 5) wifiState = 0;

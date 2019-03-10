@@ -20,14 +20,6 @@ extern const char applicationName[];
 
 int drawingCount = 0;
 
-AdaFruitGfxMenuRenderer::AdaFruitGfxMenuRenderer(Adafruit_GFX* graphics, AdaColorGfxMenuConfig* gfxConfig, int xSize, int ySize, 
-												 uint8_t sizeBuffer) : BaseMenuRenderer(sizeBuffer) {
-	this->graphics = graphics;
-	this->xSize = xSize;
-	this->ySize = ySize;
-	this->gfxConfig = gfxConfig;
-}
-
 AdaFruitGfxMenuRenderer::~AdaFruitGfxMenuRenderer() {
 }
 
@@ -78,6 +70,8 @@ void AdaFruitGfxMenuRenderer::renderWidgets(bool forceDraw) {
 }
 
 void AdaFruitGfxMenuRenderer::render() {
+	if (graphics == NULL) return;
+
 	uint8_t locRedrawMode = redrawMode;
 	redrawMode = MENUDRAW_NO_CHANGE;
 
@@ -178,3 +172,25 @@ void AdaFruitGfxMenuRenderer::renderMenuItem(int yPos, int menuHeight, MenuItem*
 	graphics->setCursor(right, drawingPositionY);
  	graphics->print(buffer);
  }
+
+void prepareDefaultGfxConfig(AdaColorGfxMenuConfig& config) {
+	makePadding(config.titlePadding, 5, 5, 20, 5);
+	makePadding(config.itemPadding, 5, 5, 3, 5);
+	makePadding(config.widgetPadding, 5, 10, 0, 5);
+
+	config.bgTitleColor = RGB(255, 255, 0);
+	config.fgTitleColor = RGB(0, 0, 0);
+	config.titleFont = NULL;
+	config.titleBottomMargin = 10;
+
+	config.bgItemColor = RGB(0, 0, 0);
+	config.fgItemColor = RGB(222, 222, 222);
+	config.itemFont = NULL;
+
+	config.bgSelectColor = RGB(0, 0, 200);
+	config.fgSelectColor = RGB(255, 255, 255);
+	config.widgetColor = RGB(30, 30, 30);
+
+	config.titleFontMagnification = 4;
+	config.itemFontMagnification = 2;
+}

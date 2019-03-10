@@ -95,7 +95,7 @@ void FloatMenuItem::setFloatValue(float newVal) {
 }
 
 void ValueMenuItem::setCurrentValue(uint16_t val) {
-	if(val == currentValue) return;
+	if(val == currentValue || val > getMaximumValue()) return;
 	
 	setChanged(true);
 	setSendRemoteNeededAll();

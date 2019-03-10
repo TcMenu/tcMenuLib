@@ -63,11 +63,19 @@ const uint8_t activeIcon[] PGM_TCM = {
  */
 struct MenuPadding {
 	uint16_t top: 4;
+	uint16_t right : 4;
 	uint16_t bottom: 4;
-	uint16_t right: 4;
 	uint16_t left: 4;
 };
 
+/**
+ * Populate a padding structure with values using the same form as HTML, top, right, bottom, left.
+ * @param padding reference type of padding
+ * @param top the top value
+ * @param right the right value
+ * @param bottom the bottom value
+ * @param left the left value
+ */
 inline void makePadding(MenuPadding& padding, int top, int right, int bottom, int left) {
 	padding.top = top; 
 	padding.right = right; 
@@ -79,10 +87,6 @@ inline void makePadding(MenuPadding& padding, int top, int right, int bottom, in
  * Holds the graphical configuration of how to render a menu based on AdaGfx.
  */
 struct AdaColorGfxMenuConfig {
-	AdaColorGfxMenuConfig() {
-		memset(this, 0, sizeof(AdaColorGfxMenuConfig));
-	}
-
 	uint32_t bgTitleColor;
 	uint32_t fgTitleColor;
 	MenuPadding titlePadding;
@@ -104,6 +108,11 @@ struct AdaColorGfxMenuConfig {
 	uint8_t itemFontMagnification;
 };
 
+/**
+ * Prepares the default graphics configuration in terms of colours and fonts.
+ */
+void prepareDefaultGfxConfig(AdaColorGfxMenuConfig& config);
+
 typedef uint32_t Coord;
 #define MakeCoord(x, y) ((((long)x)<<16)|y)
 #define CoordX(c) (c>>16)
@@ -121,7 +130,18 @@ private:
 	int16_t xSize, ySize;
 	int16_t titleHeight;
 public:
-	AdaFruitGfxMenuRenderer(Adafruit_GFX* graphics, AdaColorGfxMenuConfig *gfxConfig, int xSize, int ySize, uint8_t bufferSize = 20);
+	AdaFruitGfxMenuRenderer(int xSize, int ySize, uint8_t bufferSize = 20) : BaseMenuRenderer(bufferSize) {
+		this->xSize = xSize;
+		this->ySize = ySize;
+		this->graphics = NULL;
+		this->gfxConfig = NULL;
+	}
+
+	void setGraphicsDevice(Adafruit_GFX* graphics, AdaColorGfxMenuConfig *gfxConfig) {
+		this->graphics = graphics;
+		this->gfxConfig = gfxConfig;
+	}
+
 	virtual ~AdaFruitGfxMenuRenderer();
 	virtual void render();
 private:
