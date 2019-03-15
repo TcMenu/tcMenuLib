@@ -16,9 +16,51 @@
 
 //#define DEBUG_GFX
 
+const uint8_t defEditingIcon[] PGM_TCM = {
+		0b11111111,0b11111111,
+		0b01111111,0b11111111,
+		0b00011100,0b00000000,
+		0b00000111,0b00000000,
+		0b00000001,0b1100000,
+		0b00000000,0b00111000,
+		0b00000000,0b00111000,
+		0b00000001,0b11000000,
+		0b00000111,0b00000000,
+		0b00011100,0b00000000,
+		0b01111111,0b11111111,
+		0b11111111,0b11111111
+};
+
+const uint8_t defActiveIcon[] PGM_TCM = {
+		0b00000000,0b11100000,
+		0b00000000,0b11110000,
+		0b00000000,0b11111000,
+		0b00000000,0b11111100,
+		0b00000000,0b11111110,
+		0b11111111,0b11111111,
+		0b11111111,0b11111111,
+		0b00000000,0b11111110,
+		0b00000000,0b11111100,
+		0b00000000,0b11111000,
+		0b00000000,0b11110000,
+		0b00000000,0b11100000
+};
+
 extern const char applicationName[];
 
 int drawingCount = 0;
+
+void AdaFruitGfxMenuRenderer::setGraphicsDevice(Adafruit_GFX* graphics, AdaColorGfxMenuConfig *gfxConfig) {
+	this->graphics = graphics;
+	this->gfxConfig = gfxConfig;
+	
+	if (gfxConfig->editIcon == NULL || gfxConfig->activeIcon == NULL) {
+		gfxConfig->editIcon = defEditingIcon;
+		gfxConfig->activeIcon = defActiveIcon;
+		gfxConfig->editIconWidth = 16;
+		gfxConfig->editIconHeight = 12;
+	}
+}
 
 AdaFruitGfxMenuRenderer::~AdaFruitGfxMenuRenderer() {
 }
@@ -139,24 +181,27 @@ void AdaFruitGfxMenuRenderer::render() {
 void AdaFruitGfxMenuRenderer::renderMenuItem(int yPos, int menuHeight, MenuItem* item) {
 	drawingCount++;
 
+	int icoWid = gfxConfig->editIconWidth;
+	int icoHei = gfxConfig->editIconHeight;
+
 	item->setChanged(false); // we are drawing the item so it's no longer changed.
 
 	if(item->isEditing()) {
 		graphics->setTextColor(gfxConfig->fgSelectColor);
 		graphics->fillRect(0, yPos, xSize, menuHeight, gfxConfig->bgSelectColor);
-		graphics->drawBitmap(gfxConfig->itemPadding.left, yPos + ((menuHeight - 12) / 2), editingIcon, 16, 12, gfxConfig->fgSelectColor);
+		graphics->drawBitmap(gfxConfig->itemPadding.left, yPos + ((menuHeight - icoHei) / 2), gfxConfig->editIcon, icoWid, icoHei, gfxConfig->fgSelectColor);
 	}
 	else if(item->isActive()) {
 		graphics->setTextColor(gfxConfig->fgSelectColor);
 		graphics->fillRect(0, yPos, xSize, menuHeight, gfxConfig->bgSelectColor);
-		graphics->drawBitmap(gfxConfig->itemPadding.left, yPos + ((menuHeight - 12) / 2), activeIcon, 16, 12, gfxConfig->fgSelectColor);
+		graphics->drawBitmap(gfxConfig->itemPadding.left, yPos + ((menuHeight - icoHei) / 2), gfxConfig->activeIcon, icoWid, icoHei, gfxConfig->fgSelectColor);
 	}
 	else {
 		graphics->fillRect(0, yPos, xSize, menuHeight, gfxConfig->bgItemColor);
 		graphics->setTextColor(gfxConfig->fgItemColor);
 	}
 
-	int textPos = gfxConfig->itemPadding.left + 16 + gfxConfig->itemPadding.left;
+	int textPos = gfxConfig->itemPadding.left + icoWid + gfxConfig->itemPadding.left;
 	
 	int drawingPositionY = yPos + gfxConfig->itemPadding.top;
 	if (gfxConfig->itemFont) {

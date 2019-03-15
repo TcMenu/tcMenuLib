@@ -25,36 +25,6 @@
 
 extern const char applicationName[];
 
-const uint8_t editingIcon[] PGM_TCM = {
-		0b11111111,0b11111111,
-		0b01111111,0b11111111,
-		0b00011100,0b00000000,
-		0b00000111,0b00000000,
-		0b00000001,0b1100000,
-		0b00000000,0b00111000,
-		0b00000000,0b00111000,
-		0b00000001,0b11000000,
-		0b00000111,0b00000000,
-		0b00011100,0b00000000,
-		0b01111111,0b11111111,
-		0b11111111,0b11111111
-};
-
-const uint8_t activeIcon[] PGM_TCM = {
-		0b00000000,0b11100000,
-		0b00000000,0b11110000,
-		0b00000000,0b11111000,
-		0b00000000,0b11111100,
-		0b00000000,0b11111110,
-		0b11111111,0b11111111,
-		0b11111111,0b11111111,
-		0b00000000,0b11111110,
-		0b00000000,0b11111100,
-		0b00000000,0b11111000,
-		0b00000000,0b11110000,
-		0b00000000,0b11100000
-};
-
 #define RGB(r, g, b) (uint16_t)( ((r>>3)<<11) | ((r>>2)<<5) | (b>>3) )
 
 /**
@@ -103,9 +73,15 @@ struct AdaColorGfxMenuConfig {
 	uint32_t widgetColor;
 	MenuPadding widgetPadding;
 
+	const uint8_t* activeIcon;
+	const uint8_t* editIcon;
+	uint8_t editIconWidth;
+	uint8_t editIconHeight;
+		
 	uint8_t titleBottomMargin;
 	uint8_t titleFontMagnification;
 	uint8_t itemFontMagnification;
+
 };
 
 /**
@@ -137,10 +113,7 @@ public:
 		this->gfxConfig = NULL;
 	}
 
-	void setGraphicsDevice(Adafruit_GFX* graphics, AdaColorGfxMenuConfig *gfxConfig) {
-		this->graphics = graphics;
-		this->gfxConfig = gfxConfig;
-	}
+	void setGraphicsDevice(Adafruit_GFX* graphics, AdaColorGfxMenuConfig *gfxConfig);
 
 	virtual ~AdaFruitGfxMenuRenderer();
 	virtual void render();

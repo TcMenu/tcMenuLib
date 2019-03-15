@@ -13,6 +13,29 @@ AdaColorGfxMenuConfig config;
 AdaFruitGfxMenuRenderer renderer(320, 240);
 const char applicationName[] = "Graphics Test";
 
+const uint8_t myEditingIcon[] PGM_TCM = {
+		0b00000000,
+		0b01111110,
+		0b01111110,
+		0b00000000,
+		0b00000000,
+		0b01111110,
+		0b01111110,
+		0b00000000,
+};
+const uint8_t myActiveIcon[] PGM_TCM = {
+		0b11000000,
+		0b11110000,
+		0b11111100,
+		0b11111111,
+		0b11111111,
+		0b11111100,
+		0b11111100,
+		0b11110000,
+};
+
+
+
 void prepareGfxConfig() {
 	makePadding(config.titlePadding, 5, 5, 20, 5);
 	makePadding(config.itemPadding, 5, 5, 3, 5);
@@ -33,6 +56,11 @@ void prepareGfxConfig() {
 
 	config.titleFontMagnification = 1;
 	config.itemFontMagnification = 1;
+
+	config.editIcon = myEditingIcon;
+	config.activeIcon = myActiveIcon;
+	config.editIconWidth = 8;
+	config.editIconHeight = 8;
 }
 
 const uint8_t iconWifiNotConnected[] PROGMEM = {
