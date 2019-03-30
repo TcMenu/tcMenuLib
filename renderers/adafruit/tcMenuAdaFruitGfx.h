@@ -22,77 +22,15 @@
 #include <BaseRenderers.h>
 #include <Adafruit_GFX.h>
 #include <gfxfont.h>
+#include <GfxMenuConfig.h>
 
 extern const char applicationName[];
 
-#define RGB(r, g, b) (uint16_t)( ((r>>3)<<11) | ((r>>2)<<5) | (b>>3) )
-
 /**
- * Defines padding for menu rendering when using the standard AdaGfx renderer. Each
- * position can hold the value 0..15
- */
-struct MenuPadding {
-	uint16_t top: 4;
-	uint16_t right : 4;
-	uint16_t bottom: 4;
-	uint16_t left: 4;
-};
-
-/**
- * Populate a padding structure with values using the same form as HTML, top, right, bottom, left.
- * @param padding reference type of padding
- * @param top the top value
- * @param right the right value
- * @param bottom the bottom value
- * @param left the left value
- */
-inline void makePadding(MenuPadding& padding, int top, int right, int bottom, int left) {
-	padding.top = top; 
-	padding.right = right; 
-	padding.bottom = bottom; 
-	padding.left = left;
-}
-
-/**
- * Holds the graphical configuration of how to render a menu based on AdaGfx.
- */
-struct AdaColorGfxMenuConfig {
-	uint32_t bgTitleColor;
-	uint32_t fgTitleColor;
-	MenuPadding titlePadding;
-	const GFXfont* titleFont;
-
-	uint32_t bgItemColor;
-	uint32_t fgItemColor;
-	MenuPadding itemPadding;
-	const GFXfont* itemFont;
-
-	uint32_t bgSelectColor;
-	uint32_t fgSelectColor;
-
-	uint32_t widgetColor;
-	MenuPadding widgetPadding;
-
-	const uint8_t* activeIcon;
-	const uint8_t* editIcon;
-	uint8_t editIconWidth;
-	uint8_t editIconHeight;
-		
-	uint8_t titleBottomMargin;
-	uint8_t titleFontMagnification;
-	uint8_t itemFontMagnification;
-
-};
-
-/**
- * Prepares the default graphics configuration in terms of colours and fonts.
- */
-void prepareDefaultGfxConfig(AdaColorGfxMenuConfig& config);
-
-typedef uint32_t Coord;
-#define MakeCoord(x, y) ((((long)x)<<16)|y)
-#define CoordX(c) (c>>16)
-#define CoordY(c) (c&0xffff)
+ * a standard menu render configuration that describes how to renderer each item and the title.
+ * Specialised for Adafruit_GFX fonts.
+ */ 
+typedef struct ColorGfxMenuConfig<const GFXfont*> AdaColorGfxMenuConfig;
 
 /**
  * A basic renderer that can use the AdaFruit_GFX library to render information onto a suitable
@@ -123,5 +61,10 @@ private:
 	void renderWidgets(bool forceDraw);
 	Coord textExtents(const char* text, int16_t x, int16_t y);
 };
+
+/**
+ * The default graphics configuration for Ada GFX that needs no fonts
+ */
+void prepareAdaColorDefaultGfxConfig(AdaColorGfxMenuConfig* config);
 
 #endif /* _TCMENU_TCMENUADAFRUITGFX_H_ */

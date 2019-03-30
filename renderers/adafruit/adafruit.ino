@@ -191,8 +191,8 @@ void setup() {
 	Serial.println(applicationName);
 
 	// either one as needed for testing..
-	//prepareDefaultGfxConfig(config);
-	prepareGfxConfig();
+	prepareAdaColorDefaultGfxConfig(&config);
+	//prepareGfxConfig();
 
 	gfx.begin();
 	gfx.setRotation(3);

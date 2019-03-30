@@ -64,6 +64,7 @@ public:
         lineFlushed = false;
         int dataLen = strlen(data);
         if(!conn || (linePosition + dataLen) >= sizeof(lineBuffer)) {
+            serdebugF3("error write P,L=", linePosition, dataLen);
             errorOccurred = true;
             return 0;
         }
@@ -74,7 +75,6 @@ public:
 
 	uint8_t readByte() override {
         if(!readAvailable()) {
-            errorOccurred = true;
             return 0;
         }
 
@@ -122,6 +122,7 @@ public:
 
     int getLastWriteBufferChar() {
         if(linePosition == 0) return 0;
+        serdebugF3("getlastwrite ", linePosition, (char)lineBuffer[linePosition-1]);
         return lineBuffer[linePosition-1];
     }
 };
@@ -164,8 +165,8 @@ public:
 
 testF(RemoteFixture, testConnectingAndJoining) {
     transport.setConnected(true);
-    waitForMessageOnTransport("joinMessageEmb");
-    transport.setReadBuffer("joinMessageApi");
+    waitForMessageOnTransport("MT=NJ|NM=UnitTest|VE=100|PF=0|~");
+    transport.setReadBuffer("MT=NJ|NM=remo|VE=105|PF=1|~");
     waitForEmptyReadBuffer();
     
     assertEqual("remo", remoteConnector.getRemoteName());

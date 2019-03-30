@@ -20,13 +20,16 @@
  */
 void appendChar(char* str, char val, int len);
 
+/**
+ * used with the below ltoa functions, pass this in padChar when not padded.
+ */
 #define NOT_PADDED 0
 
 /**
  * A fast long to ascii function that more feature complete than the standard library. 
  * Supports zero padding and maximum number of decimal places. This version always
- * starts at position 0 in the provided buffer. The other two versions below support
- * appending instead.
+ * starts at position 0 in the provided buffer and goes up to position len always leaving
+ * space for a terminator. The other two versions below support appending instead.
  * 
  * @param str the buffer to be output to
  * @param val the value to be converted
@@ -41,6 +44,7 @@ void ltoaClrBuff(char* str, long val, uint8_t dp, char padChar, int len);
  * Supports zero padding and the largest actual value to use normally a power of 10.
  * Absolute largest value displayable is 1000000000 - 1. NOTE that this function will
  * append at the end of the current string. Use ltoaClrBuff to start at position 0.
+ * This call will not exceed the length provided and will properly terminate the string.
  * 
  * @param str the buffer to be appended to
  * @param val the value to be converted
@@ -54,7 +58,8 @@ void fastltoa_mv(char* str, long val, long divisor, char padChar, int len);
  * A fast long to ascii function that more feature complete than the standard library. 
  * Supports zero padding and the number of decimal places to use. Maximum number of
  * decimal places is 9. NOTE that this function will append at the end of the current
- * string. Use ltoaClrBuff to start at position 0.
+ * string and will not exceed the length provided, it will also properly terminate the
+ * string. Use ltoaClrBuff to start at position 0 in the buffer.
  * 
  * @param str the buffer to be appended to
  * @param val the value to be converted
