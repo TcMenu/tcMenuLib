@@ -14,21 +14,24 @@
 #include "tcMenu.h"
 #include "MessageProcessors.h"
 #include "tcUtil.h"
+#include <IoLogging.h>
 
 const char PGM_TCM EMPTYNAME[] = "Device";
 const char PGM_TCM pmemBootStartText[] = "START";
 const char PGM_TCM pmemBootEndText[] = "END";
 
-CommsCallbackFn TagValueTransport::notificationFn = NULL;
+CommsCallbackFn TagValueTransport::notificationFn;
 
-TagValueRemoteConnector::TagValueRemoteConnector(TagValueTransport* transport, uint8_t remoteNo) {
-	this->transport = transport;
+
+TagValueRemoteConnector::TagValueRemoteConnector() {
+	this->transport = NULL;
+	this->processor = NULL;
+	this->bootMenuPtr = preSubMenuBootPtr = NULL;
+    this->remoteName[0] = 0;
 	this->localNamePgm = EMPTYNAME;
-	this->remoteNo = remoteNo;
+	this->remoteNo = 0;
 	this->ticksLastRead = this->ticksLastSend = 0xffff;
 	this->flags = 0;
-	this->processor = &defaultMsgProcessor;
-	this->bootMenuPtr = preSubMenuBootPtr = NULL;
 }
 
 void TagValueRemoteConnector::setRemoteName(const char* name) {
@@ -275,7 +278,7 @@ void writeFloatValueToTransport(TagValueTransport* transport, FloatMenuItem* ite
 	
 	long whole = item->getFloatValue();
 	long fract = abs((item->getFloatValue() - whole) * 1000000L);
-	fastltoa_mv(sz, fract, 1000000L, true, sizeof sz);
+	fastltoa_mv(sz, fract, 1000000L, '0', sizeof sz);
 	transport->writeField(FIELD_CURRENT_VAL, sz);
 }
 

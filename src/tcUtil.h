@@ -20,12 +20,49 @@
  */
 void appendChar(char* str, char val, int len);
 
+#define NOT_PADDED 0
+
 /**
- * A fast int to ascii function with some limitations. Supports zero padding and number of places to start. only
- * if there's space according to len.
+ * A fast long to ascii function that more feature complete than the standard library. 
+ * Supports zero padding and maximum number of decimal places. This version always
+ * starts at position 0 in the provided buffer. The other two versions below support
+ * appending instead.
+ * 
+ * @param str the buffer to be output to
+ * @param val the value to be converted
+ * @param divisor the power of 10 largest value (eg 10000, 1000000L etc)
+ * @param padChar the character to pad with (or NOT_PADDED which is 0)
+ * @param len the length of the buffer passed in, it will not be exceeded.
  */
-void fastltoa_mv(char* str, long val, long divisor, bool zeroPad, int len);
-void fastltoa(char* str, long val, uint8_t dp, bool zeroPad, int len);
+void ltoaClrBuff(char* str, long val, uint8_t dp, char padChar, int len);
+
+/**
+ * A fast long to ascii function that more feature complete than the standard library. 
+ * Supports zero padding and the largest actual value to use normally a power of 10.
+ * Absolute largest value displayable is 1000000000 - 1. NOTE that this function will
+ * append at the end of the current string. Use ltoaClrBuff to start at position 0.
+ * 
+ * @param str the buffer to be appended to
+ * @param val the value to be converted
+ * @param divisor the power of 10 largest value (eg 10000, 1000000L etc)
+ * @param padChar the character to pad with (or NOT_PADDED which is 0)
+ * @param len the length of the buffer passed in, it will not be exceeded.
+ */
+void fastltoa_mv(char* str, long val, long divisor, char padChar, int len);
+
+/**
+ * A fast long to ascii function that more feature complete than the standard library. 
+ * Supports zero padding and the number of decimal places to use. Maximum number of
+ * decimal places is 9. NOTE that this function will append at the end of the current
+ * string. Use ltoaClrBuff to start at position 0.
+ * 
+ * @param str the buffer to be appended to
+ * @param val the value to be converted
+ * @param dp the number of decimal places allowed
+ * @param padChar the character to pad with (or NOT_PADDED which is 0)
+ * @param len the length of the buffer passed in, it will not be exceeded.
+ */
+void fastltoa(char* str, long val, uint8_t dp, char padChar, int len);
 
 class MenuItem; // forward reference.
 

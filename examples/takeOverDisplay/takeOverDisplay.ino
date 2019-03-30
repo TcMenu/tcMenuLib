@@ -44,7 +44,7 @@ void loop() {
 // When the food choice option is changed on the menu, this function is called, it takes
 // the value from menuFood and renders it as text in the menuText text item.
 //
-void CALLBACK_FUNCTION onFoodChoice(int id) {
+void CALLBACK_FUNCTION onFoodChoice(int /*id*/) {
     // copy the enum text for the current value
     char enumStr[20];
     int enumVal = menuFood.getCurrentValue();
@@ -61,9 +61,10 @@ int counter = 0;
 // this is the function called by the renderer every 1/5 second once the display is
 // taken over, we pass this function to takeOverDisplay below.
 //
-void myDisplayFunction(bool clicked) {
+void myDisplayFunction(unsigned int encoderValue, bool clicked) {
     // we initialise the display on the first call.
     if(counter == 0) {
+        switches.changeEncoderPrecision(999, 50);
         lcd.clear();
         lcd.print("We have the display!");
     }
@@ -72,11 +73,17 @@ void myDisplayFunction(bool clicked) {
     // When the button is clicked, we give back to the menu..
     if(clicked) {
         renderer.giveBackDisplay();
+        counter = 0;
     }
     else {
+        char buffer[5];
         // otherwise update the counter.
         lcd.setCursor(0, 1);
-        lcd.print(++counter);
+        ltoaClrBuff(buffer, ++counter, 4, ' ', sizeof(buffer));
+        lcd.print(buffer);
+        lcd.setCursor(12, 1);
+        ltoaClrBuff(buffer, encoderValue, 4, '0', sizeof(buffer));
+        lcd.print(buffer);
     }
 }
 
@@ -84,7 +91,7 @@ void myDisplayFunction(bool clicked) {
 // We have an option on the menu to take over the display, this function is called when that
 // option is chosen.
 //
-void CALLBACK_FUNCTION onTakeOverDisplay(int id) {
+void CALLBACK_FUNCTION onTakeOverDisplay(int /*id*/) {
     // in order to take over rendering onto the display we just request the display
     // at which point tcMenu will stop rendering until the display is "given back".
     // Don't forget that LiquidCrystalIO uses task manager and things can be happening
@@ -100,6 +107,6 @@ void CALLBACK_FUNCTION onTakeOverDisplay(int id) {
 // look at using a power down detection circuit to do this. For more info see below link.
 // https://www.thecoderscorner.com/electronics/microcontrollers/psu-control/detecting-power-loss-in-powersupply/
 //
-void CALLBACK_FUNCTION onSaveSettings(int id) {
+void CALLBACK_FUNCTION onSaveSettings(int /*id*/) {
     menuMgr.save(eeprom);
 }

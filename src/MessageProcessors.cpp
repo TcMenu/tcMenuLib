@@ -7,25 +7,17 @@
 #include "RemoteConnector.h"
 #include "MessageProcessors.h"
 
-void fieldUpdateJoinMsg(TagValueRemoteConnector* connector, FieldAndValue* field, MessageProcessorInfo* info);
-void fieldUpdateValueMsg(TagValueRemoteConnector* connector, FieldAndValue* field, MessageProcessorInfo* info);
-
 /**
  * An array of message handlers, where each one is a function that can process that type of message and a message type.
- * Messages are received a field at a time, so each time the function is called a new field will be available, when thecoderscorner
+ * Messages are received a field at a time, so each time the function is called a new field will be available, when the
  * last field is processed the end indicator will be set.
  * @See TagValueRemoteConnector
  */
+
 MsgHandler msgHandlers[] = {
 	{ fieldUpdateValueMsg, MSG_CHANGE_INT }, 
 	{ fieldUpdateJoinMsg, MSG_JOIN }
 };
-
-/**
- * The default message processor can process both value change and field updated messages, it is easy to extend with
- * other data aquisition types.
- */
-CombinedMessageProcessor defaultMsgProcessor(msgHandlers, 2);
 
 void fieldUpdateJoinMsg(TagValueRemoteConnector* connector, FieldAndValue* field, MessageProcessorInfo* info) {
 	if(field->fieldType == FVAL_END_MSG) {
@@ -80,7 +72,11 @@ void fieldUpdateValueMsg(TagValueRemoteConnector* /*unused*/, FieldAndValue* fie
 		else {
 			sub = menuMgr.getRoot();
 		}
-		info->value.item = findItem(sub, id);
+        
+		MenuItem* foundItem = findItem(sub, id);
+        if(foundItem != NULL && !foundItem->isReadOnly()) {
+            info->value.item = foundItem;
+        }
 		break;
 	}
 	case FIELD_CURRENT_VAL:

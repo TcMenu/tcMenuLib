@@ -7,6 +7,7 @@
 #define _BASE_RENDERERS_H_
 
 #include "tcMenu.h"
+#include <TaskManager.h>
 
 /**
  * @file BaseRenderers.h
@@ -20,10 +21,14 @@
 #define TICKS_BEFORE_DEFAULTING 120
 
 /**
- *  Used to take over rendering for a period of time. Normally one calls renderer.takeOverDisplay(..) 
- * with a reference to a function meeting this spec. 
+ * Used to take over rendering for a period of time. Normally one calls renderer.takeOverDisplay(..) 
+ * with a reference to a function meeting this spec. Whenever the callback occurs the current value
+ * of the rotary encoder is provided along with the state of the menu select switch.
+ * 
+ * @param currentValue is the current value of the rotary encoder
+ * @param userClicked if the user clicked the select button
  */
-typedef void (*RendererCallbackFn)(bool userClicked);
+typedef void (*RendererCallbackFn)(unsigned int currentValue, bool userClicked);
 
 /**
  * Title widgets allow for drawing small graphics in the title area, for example connectivity status
@@ -130,11 +135,11 @@ enum MenuDrawJustification: byte {
  */
 class NoRenderer : public MenuRenderer {
 public:
-	virtual void activeIndexChanged(__attribute__((unused)) uint8_t ignored) {  }
-	virtual MenuItem* getCurrentSubMenu() { return NULL; }
-	virtual MenuItem* getCurrentEditor() { return NULL; }
-	virtual void onSelectPressed(__attribute__((unused)) MenuItem* ignored) { }
-	virtual void initialise() { }
+	void activeIndexChanged(__attribute__((unused)) uint8_t ignored) override {  }
+	MenuItem* getCurrentSubMenu() override { return NULL; }
+	MenuItem* getCurrentEditor() override { return NULL; }
+	void onSelectPressed(__attribute__((unused)) MenuItem* ignored) override { }
+	void initialise() override { }
 };
 
 class RemoteMenuItem; // forward reference.
@@ -147,7 +152,7 @@ class RemoteMenuItem; // forward reference.
  * Renderers work in a similar way to a game loop, the render method is repeatedly called
  * and in this loop any rendering or event callbacks should be handled. 
  */
-class BaseMenuRenderer : public MenuRenderer {
+class BaseMenuRenderer : public MenuRenderer, Executable {
 protected:
 	char* buffer;
 	uint8_t bufferSize;
@@ -175,6 +180,11 @@ public:
 	 * Initialise the render setting up tasks
 	 */
 	virtual void initialise();
+
+    /**
+     * Called by taskManager when we are scheduled
+     */
+    virtual void exec();
 
 	/**
 	 * This is the rendering call that must be implemented by subclasses. Generally
@@ -235,9 +245,6 @@ public:
 	 * Returns a pointer to the rendering callback
 	 */
 	RendererCallbackFn getRenderingCallback() { return renderCallback; }
-
-	static BaseMenuRenderer* INSTANCE;
-
 protected:
 	/**
 	 * Convert a menu item into a textual representation in the buffer

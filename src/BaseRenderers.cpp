@@ -8,18 +8,6 @@
 #include "RemoteMenuItem.h"
 #include "BaseRenderers.h"
 
-BaseMenuRenderer* BaseMenuRenderer::INSTANCE;
-
-void doRender() {
-	RendererCallbackFn callbackFn = BaseMenuRenderer::INSTANCE->getRenderingCallback();
-	if(callbackFn) {
-		callbackFn(false);
-	}
-	else {
-		BaseMenuRenderer::INSTANCE->render();
-	}
-}
-
 BaseMenuRenderer::BaseMenuRenderer(int bufferSize) {
 	buffer = new char[bufferSize + 1]; // add one to allow for the trailing 0.
 	this->bufferSize = bufferSize;
@@ -32,22 +20,34 @@ BaseMenuRenderer::BaseMenuRenderer(int bufferSize) {
 }
 
 void BaseMenuRenderer::initialise() {
-	INSTANCE = this;
 	ticksToReset = 0;
 	renderCallback = NULL;
 	redrawMode = MENUDRAW_COMPLETE_REDRAW;
 
 	resetToDefault();
 
-	taskManager.scheduleFixedRate(SCREEN_DRAW_INTERVAL, doRender);
+	taskManager.scheduleFixedRate(SCREEN_DRAW_INTERVAL, this);
+}
+
+void BaseMenuRenderer::exec() {
+	if(getRenderingCallback()) {
+        RotaryEncoder* encoder = switches.getEncoder();
+		renderCallback((encoder != NULL) ? encoder->getCurrentReading() : 0, false);
+	}
+	else {
+		render();
+	}
 }
 
 void BaseMenuRenderer::activeIndexChanged(uint8_t index) {
-	MenuItem* currentActive = menuMgr.findCurrentActive();
-	currentActive->setActive(false);
-	currentActive = getItemAtPosition(index);
-	currentActive->setActive(true);
-	menuAltered();
+    // we only change the active index / edit state if we own the display
+    if(!getRenderingCallback()) {
+        MenuItem* currentActive = menuMgr.findCurrentActive();
+        currentActive->setActive(false);
+        currentActive = getItemAtPosition(index);
+        currentActive->setActive(true);
+        menuAltered();
+    }
 }
 
 void BaseMenuRenderer::resetToDefault() {
@@ -120,7 +120,7 @@ void BaseMenuRenderer::menuValueAnalog(AnalogMenuItem* item, MenuDrawJustificati
 
 		itoa(whole, itoaBuf, 10);
 		appendChar(itoaBuf, '.', sizeof itoaBuf);
-		fastltoa_mv(itoaBuf, fraction, fractMax, true, sizeof itoaBuf);
+		fastltoa_mv(itoaBuf, fraction, fractMax, '0', sizeof itoaBuf);
 	}
 	else {
 		// an efficient optimisation for fractions < 10.
@@ -219,7 +219,7 @@ void BaseMenuRenderer::menuValueFloat(FloatMenuItem* item, MenuDrawJustification
 	long dpDivisor = dpToDivisor(item->getDecimalPlaces());
 	long whole = item->getFloatValue();
 	long fract = abs((item->getFloatValue() - whole) * dpDivisor);
-	fastltoa_mv(sz, fract, dpDivisor, true, sizeof sz);
+	fastltoa_mv(sz, fract, dpDivisor, '0', sizeof sz);
 
 	if(justification == JUSTIFY_TEXT_LEFT) {
 		strcpy(buffer, sz);
@@ -310,7 +310,6 @@ void BaseMenuRenderer::setupForEditing(MenuItem* item) {
 	}
 }
 
-
 MenuItem* BaseMenuRenderer::getItemAtPosition(uint8_t pos) {
 	uint8_t i = 0;
 	MenuItem* itm = currentRoot;
@@ -344,10 +343,13 @@ void BaseMenuRenderer::onSelectPressed(MenuItem* toEdit) {
 	if(renderCallback) {
 		// we dont handle click events when the display is taken over
 		// instead we tell the custom renderer that we've had a click
-		renderCallback(true);
+        RotaryEncoder* encoder = switches.getEncoder();
+		renderCallback((encoder != NULL) ? encoder->getCurrentReading() : 0, true);
 		return;
 	}
 
+    // if we are already editing an item then we need to stop editing
+    // that item once it has been selected with a click again.
 	if (currentEditor != NULL) {
 		currentEditor->setEditing(false);
 		currentEditor->setActive(true);
@@ -356,6 +358,8 @@ void BaseMenuRenderer::onSelectPressed(MenuItem* toEdit) {
 		redrawRequirement(MENUDRAW_EDITOR_CHANGE);
 	}
 
+    // if there's a new item specified in toEdit, it means we need to change
+    // the current editor (if it's possible to edit that value)
 	if(toEdit != NULL) {
 		if (toEdit->getMenuType() == MENUTYPE_SUB_VALUE) {
 			toEdit->setActive(false);

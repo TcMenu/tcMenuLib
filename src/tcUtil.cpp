@@ -18,14 +18,30 @@ void appendChar(char* str, char val, int len) {
 }
 
 long dpToDivisor(int dp) {
-    return (dp==7) ? 10000000L : (dp == 6) ? 1000000L : (dp == 5) ? 100000 : (dp == 4) ? 10000 : (dp == 3) ? 1000 : (dp == 2) ? 100 : 10;
+    switch(dp) {
+        case 8: return 100000000L;
+        case 7: return 10000000L;
+        case 6: return 1000000L;
+        case 5: return 100000;
+        case 4: return 10000;
+        case 3: return 1000;
+        case 2: return 100;
+        case 1: return 10;
+        default:
+        case 9: return 1000000000L;
+    }
 }
 
-void fastltoa(char* str, long val, uint8_t dp, bool zeroPad, int len) {
-    fastltoa_mv(str, val, dpToDivisor(dp), zeroPad, len);
+void ltoaClrBuff(char* str, long val, uint8_t dp, char padChar, int len) {
+    str[0]=0;
+    fastltoa_mv(str, val, dpToDivisor(dp), padChar, len);
 }
 
-void fastltoa_mv(char* str, long val, long divisor, bool zeroPad, int len) {
+void fastltoa(char* str, long val, uint8_t dp, char padChar, int len) {
+    fastltoa_mv(str, val, dpToDivisor(dp), padChar, len);
+}
+
+void fastltoa_mv(char* str, long val, long divisor, char padChar, int len) {
     int i=0;
     len -=2;
     divisor /= 10;
@@ -33,10 +49,12 @@ void fastltoa_mv(char* str, long val, long divisor, bool zeroPad, int len) {
     while(str[i] && i < len) ++i; 
 
     bool hadNonZeroChar = false;
+    bool zeroPad = padChar != 0;
 
     while(divisor > 9 && i < len) {
         str[i] = (char)((val / divisor) + '0');
         hadNonZeroChar |= (str[i] != '0');
+        if(zeroPad && !hadNonZeroChar) str[i] = padChar;
         if(zeroPad || hadNonZeroChar) ++i;
         val %= divisor;
         divisor /= 10;

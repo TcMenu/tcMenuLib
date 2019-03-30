@@ -62,7 +62,7 @@ enum CommsNotificationType : byte {
 	COMMS_DISCONNECTED3,
 	/** one of the connections had a write error */
 	COMMS_ERR_WRITE_NOT_CONNECTED = 100,
-	/** one of the connections have a protocol problem */
+	/** one of the connections had a protocol problem */
 	COMMS_ERR_WRONG_PROTOCOL,
 
 };
@@ -109,50 +109,6 @@ private:
 	bool processValuePart();
 };
 
-class TagValueRemoteConnector; // forward reference
-
-/**
- * The definition of a message handler, used to extend the capabilities of TagVal to support more messages.
- */
-struct MsgHandler {
-	/** A function that will process the message, a field at a time */
-	void (*fieldUpdateFn)(TagValueRemoteConnector*, FieldAndValue*, MessageProcessorInfo*);
-	/** the type of message the above function can process. */
-	uint16_t msgType;
-};
-
-/**
- * This message processor is responsible for handling messages coming off the wire and processing them into
- * usable events by the rest of the system.
- */
-class CombinedMessageProcessor {
-private:
-	MessageProcessorInfo val;
-	MsgHandler* handlers;
-	int noOfHandlers;
-
-	MsgHandler* currHandler;
-public:
-	/**
-	 * Consructor takes an array of processors and the number of processors in the array.
-	 */
-	CombinedMessageProcessor(MsgHandler handlers[], int noOfHandlers); 
-	/**
-	 * Whenever there is a new message, this will be called, to re-initialise the internal state
-	 */
-	void newMsg(uint16_t msgType);
-	/**
-	 * Called whenever a field has been processed in the current message, after a call to newMsg
-	 */
-	void fieldUpdate(TagValueRemoteConnector* connector, FieldAndValue* field);	
-};
-
-/**
- * This is the default message processor for tcMenu
- */
-extern CombinedMessageProcessor defaultMsgProcessor;
-
-
 #define FLAG_CURRENTLY_CONNECTED 0
 #define FLAG_BOOTSTRAP_MODE 1
 #define FLAG_WRITING_MSGS 2
@@ -185,13 +141,22 @@ public:
 	 * @param transport the actual underlying transport
 	 * @param remoteNo the index of this connector, 0 based.
 	 */
-	TagValueRemoteConnector(TagValueTransport* transport, uint8_t remoteNo);
+	TagValueRemoteConnector();
 
-	/**
-	 * Sets the name of this connector, on AVR in program memory
-	 * @param namePgm string containing name (AVR in program memory)
-	 */
-	void setName(const char* namePgm) {localNamePgm = namePgm;}
+    /**
+     * Initialises the connector with a specific transport that can send and recevie data, a message processor that can
+     * process incoming message, the remote number that should be used and it's name.
+     * @param transport a class that implements TagValueTransport for sending and receving data.
+     * @param processor a linked list of processors that can process incoming messages.
+     * @param localNamePgm the name of this local device (in program memory on AVR).
+     * @param remoteNo indicates the remote number associated with this connector (defaults to 0)
+     */
+    void initialise(TagValueTransport* transport, CombinedMessageProcessor* processor, const char* localNamePgm, uint8_t remoteNo = 0) {
+       	this->processor = processor;
+        this->transport = transport;
+        this->remoteNo = remoteNo;
+        this->localNamePgm = localNamePgm;
+    }
 
 	/**
 	 * Indicates if the underlying transport is functionality
@@ -352,11 +317,5 @@ private:
 	void setConnected(bool mode) { bitWrite(flags, FLAG_CURRENTLY_CONNECTED, mode); }
 	bool isBootstrapMode() { return bitRead(flags, FLAG_BOOTSTRAP_MODE); }
 };
-
-#define serdebug(x) //
-#define serdebug2(x, y) //
-
-//#define serdebug(x) Serial.println(x);
-//#define serdebug2(x1, x2) Serial.print(x1); Serial.println(x2);
 
 #endif /* _TCMENU_REMOTECONNECTOR_H_ */

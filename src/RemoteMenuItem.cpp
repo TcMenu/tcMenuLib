@@ -32,9 +32,9 @@ void RemoteMenuItem::getCurrentState(char *szBuf, uint8_t len) {
     else {
         strcat(szBuf, connector->getRemoteName());
         appendChar(szBuf, ' ', len);
-        fastltoa(szBuf, connector->getRemoteMajorVer(), 2, false, len);
+        fastltoa(szBuf, connector->getRemoteMajorVer(), 2, NOT_PADDED, len);
         appendChar(szBuf, '.', len);
-        fastltoa(szBuf, connector->getRemoteMinorVer(), 2, false, len);
+        fastltoa(szBuf, connector->getRemoteMinorVer(), 2, NOT_PADDED, len);
         appendChar(szBuf, ' ', len);
         appendChar(szBuf, connector->getRemotePlatform() == PLATFORM_JAVA_API ? 'J' : 'A', len);
     }
