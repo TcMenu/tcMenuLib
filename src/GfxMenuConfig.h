@@ -3,7 +3,16 @@
 
 #include <tcUtil.h>
 
-#define RGB(r, g, b) (uint16_t)( ((r>>3)<<11) | ((r>>2)<<5) | (b>>3) )
+/**
+ * @file GfxMenuConfig.h
+ * 
+ * This file contains the base drawing configuration structures and helper methods for
+ * drawing onto graphical screens, be it mono or colour. Also there's some additional
+ * structures for describing colours, coordinates and padding.
+ */
+
+#define RGB(r, g, b) (uint16_t)( ((r>>3)<<11) | ((g>>2)<<5) | (b>>3) )
+
 
 /**
  * Defines padding for menu rendering when using the standard AdaGfx renderer. Each
@@ -89,6 +98,10 @@ template<typename FONTPTR> struct ColorGfxMenuConfig {
 
 };
 
+/**
+ * This is an internal method, used by display specific plugins. Prefer to use the
+ * mehtod shipped with the plugin.
+ */
 void prepareDefaultGfxConfig(ColorGfxMenuConfig<void*>* config);
 
 typedef uint32_t Coord;

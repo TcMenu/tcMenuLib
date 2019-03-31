@@ -41,14 +41,21 @@ uint8_t MenuItem::copyNameToBuffer(char* buf, uint8_t offset, uint8_t size) {
     return ret + offset;
 }
 
+// on avr boards we store all info structures in progmem, so we need this code to
+// pull the enum structures out of progmem. Otherwise we just read it out normally
+
 #ifdef __AVR__
 
 void EnumMenuItem::copyEnumStrToBuffer(char* buffer, int size, int idx) {
-    copy_info_ptr_ptr_array(buffer, &((EnumMenuInfo*)info)->menuItems, size, idx);
+    char** itemPtr = ((char**)pgm_read_ptr_near(&((EnumMenuInfo*)info)->menuItems) + idx);
+    char* itemLoc = (char *)pgm_read_ptr_near(itemPtr);
+    safeProgCpy(buffer, itemLoc, size);
 }
 
 int EnumMenuItem::getLengthOfEnumStr(int idx) {
-    return get_info_len_ptr_ptr_array(&((EnumMenuInfo*)info)->menuItems, idx);
+    char** itemPtr = ((char**)pgm_read_ptr_near(&((EnumMenuInfo*)info)->menuItems) + idx);
+    char* itemLoc = (char *)pgm_read_ptr_near(itemPtr);
+    return strlen_P(itemLoc);
 }
 
 #else 
@@ -64,7 +71,7 @@ int EnumMenuItem::getLengthOfEnumStr(int idx) {
     EnumMenuInfo* enumInfo = (EnumMenuInfo*)info;
     const char * const* choices = enumInfo->menuItems;
     const char * choice = choices[idx];
-    strlen(choice);
+    return strlen(choice);
 }
 
 #endif

@@ -27,6 +27,10 @@ class FieldAndValue; // forward reference
  * It can be added to with additional unions. It is essentially stored globally so size
  * is an issue. If you need to extend the messages that can be processed, you'll probably
  * also need to store some state. This is the ideal place to store such state in the union.
+ * 
+ * This union structure exists once per remote connection, and given that only one message
+ * on a remote connection can be processed at once, it can be a union. It is cleared at
+ * the start of each process.
  */
 union MessageProcessorInfo {
 	struct {
@@ -43,7 +47,10 @@ union MessageProcessorInfo {
 
 /**
  * Each incoming message needs to have a MsgHandler associated with it. It maps the message type
- * to a function that can process the message fields as they arrive.
+ * to a function that can process the message fields as they arrive. It will be called every time
+ * there is a new field on a message, it should at a minimum be able to process the field updates 
+ * end check for the end of the message.
+ * @see FieldAndValue
  */
 struct MsgHandler {
 	/** A function that will process the message, a field at a time */
@@ -72,7 +79,11 @@ void fieldUpdateValueMsg(TagValueRemoteConnector* connector, FieldAndValue* fiel
 
 /**
  * This message processor is responsible for handling messages coming off the wire and processing them into
- * usable events by the rest of the system.
+ * usable events by the rest of the system. Usually, the message processor actually handles the event in 
+ * full.
+ * 
+ * When a new message arrives, this class attempts to find a suitable processor function (or ignore if we
+ * can't process), then each field in the message is passed to the function to processed.
  */
 class CombinedMessageProcessor {
 private:

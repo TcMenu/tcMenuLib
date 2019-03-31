@@ -102,16 +102,6 @@ inline char* potentialProgramMemory(const char *x) {
     safeProgCpy(szGlobalBuffer, x, 16);
     return szGlobalBuffer;
 }
-inline void copy_info_ptr_ptr_array(char* buffer, const char* const** ptr, int size, int idx) {
-    char** itemPtr = ((char**)pgm_read_ptr_near(ptr) + idx);
-    char* itemLoc = (char *)pgm_read_ptr_near(itemPtr);
-    safeProgCpy(buffer, itemLoc, size);
-}
-inline int get_info_len_ptr_ptr_array(const char* const** ptr, int idx) {
-    char** itemPtr = ((char**)pgm_read_ptr_near(ptr) + idx);
-    char* itemLoc = (char *)pgm_read_ptr_near(itemPtr);
-    return strlen_P(itemLoc);
-}
 #define get_info_char(x) ((char) pgm_read_byte_near(x)) 
 #define get_info_int(x) ((int)pgm_read_word_near(x))
 #define get_info_uint(x) ((unsigned int)pgm_read_word_near(x))

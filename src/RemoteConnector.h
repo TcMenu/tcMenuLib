@@ -25,16 +25,39 @@
  */
 
 /**
- * Internal class used by the message processors, that shows the current state of the input parser.
+ * This enum describes the various states that a field and value object can be in. Field and value is
+ * basically a simple state machine that remembers where the incoming communication was up to last time
+ * around, so it can be processed asynchronously.
+ * @see FieldAndValue
  */
 enum FieldValueType : byte {
-	FVAL_NEW_MSG, FVAL_END_MSG, FVAL_FIELD, FVAL_ERROR_PROTO,
-	// below are internal only states, and should not be acted upon.
-	FVAL_PROCESSING, FVAL_PROCESSING_WAITEQ, FVAL_PROCESSING_VALUE, FVAL_PROCESSING_AWAITINGMSG, FVAL_PROCESSING_PROTOCOL
+    /** a new message has arrived */
+	FVAL_NEW_MSG,
+    /** the end of the present message has been located */
+    FVAL_END_MSG, 
+    /** a new field on the message has been found */
+    FVAL_FIELD, 
+    /** there has been an error while reading the message */
+    FVAL_ERROR_PROTO,
+	/** waiting for a field key */
+	FVAL_PROCESSING, 
+    /** waiting for the = sign following the key */
+    FVAL_PROCESSING_WAITEQ, 
+    /** waiting for the value after finding the equals sign */
+    FVAL_PROCESSING_VALUE, 
+    /** waiting for a new message */
+    FVAL_PROCESSING_AWAITINGMSG, 
+    /** waiting to find the protocol type */
+    FVAL_PROCESSING_PROTOCOL
 };
 
 /** 
- * Internal class used by the message processors, that shows the current state of the input parser.
+ * This class describes the ongoing processing of an incoming message. In the embedded domain where we
+ * are essentially single threaded and even on 32 bit fairly memory constrained, there needs to be a
+ * minimalist way to process incoming events. This class processes data asynchronously by reading in
+ * a byte at a time and slowly updating it's state. It has many states, but more generally the states
+ * containing the word PROCESSING mean that there is nothing yet ready for use, these will never be
+ * passed externally to a message processor.
  */
 struct FieldAndValue {
 	FieldValueType fieldType;
@@ -68,7 +91,8 @@ enum CommsNotificationType : byte {
 };
 
 /**
- * A callback function that will receive information about comms channels.
+ * A callback function that will receive information about comms channels. This is registered as a 
+ * static on the TagValueTransport object, and will receive updates for all remote tag value connections.
  */
 typedef void (*CommsCallbackFn)(CommsNotificationType);
 
