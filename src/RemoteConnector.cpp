@@ -20,8 +20,18 @@ const char PGM_TCM EMPTYNAME[] = "Device";
 const char PGM_TCM pmemBootStartText[] = "START";
 const char PGM_TCM pmemBootEndText[] = "END";
 
-CommsCallbackFn TagValueTransport::notificationFn;
-
+#ifdef IO_LOGGING_DEBUG
+// utility function to write out a debug line with the message type attached.
+inline void serdebugMsgHdr(const char* tx, int remoteNo, uint16_t msgType) {
+    char sz[3];
+    sz[0] = msgType>>8;
+    sz[1] = msgType & 0xff;
+    sz[2] = 0;
+    serdebug3(tx, remoteNo, sz);
+}
+#else
+#define serdebugMsgHdr(x, y, z)
+#endif
 
 TagValueRemoteConnector::TagValueRemoteConnector() {
 	this->transport = NULL;
@@ -32,6 +42,7 @@ TagValueRemoteConnector::TagValueRemoteConnector() {
 	this->remoteNo = 0;
 	this->ticksLastRead = this->ticksLastSend = 0xffff;
 	this->flags = 0;
+    this->commsCallback = NULL;
 }
 
 void TagValueRemoteConnector::setRemoteName(const char* name) {
@@ -46,10 +57,20 @@ void TagValueRemoteConnector::setRemoteConnected(uint8_t major, uint8_t minor, A
 	initiateBootstrap(menuMgr.getRoot());
 }
 
+void TagValueRemoteConnector::commsNotify(uint16_t err) {
+    if(commsCallback != NULL) {
+        CommunicationInfo info;
+        info.remoteNo = remoteNo;
+        info.connected = isConnected();
+        info.errorMode = err;
+        commsCallback(info);
+    }
+}
+
 void TagValueRemoteConnector::tick() {
 	dealWithHeartbeating();
 
-	if(isConnected()) {
+	if(isConnected() && transport->connected()) {
 		performAnyWrites();
 	}
 
@@ -60,11 +81,12 @@ void TagValueRemoteConnector::tick() {
 		break;
 	case FVAL_FIELD:
 	case FVAL_END_MSG:
+        serdebugMsgHdr("Msg In: ", remoteNo, field->msgType);
 		processor->fieldUpdate(this, field);
 		ticksLastRead = 0;
 		break;
 	case FVAL_ERROR_PROTO:
-		TagValueTransport::commsNotify(COMMS_ERR_WRONG_PROTOCOL);
+		commsNotify(COMMSERR_PROTOCOL_ERROR);
 		break;
 	default: // not ready for processing yet.
 		break;
@@ -75,23 +97,24 @@ void TagValueRemoteConnector::dealWithHeartbeating() {
 	++ticksLastRead;
 	++ticksLastSend;
 
-	if(ticksLastSend > HEARTBEAT_INTERVAL_TICKS) {
-		serdebug("sending hb");
-		if(transport->available()) encodeHeartbeat();
-	}
-
 	if(ticksLastRead > (HEARTBEAT_INTERVAL_TICKS * 3)) {
 		if(isConnected()) {
+         	serdebugF3("Remote disconnected (rNo, ticks): ", remoteNo, ticksLastSend);
 			setConnected(false);
-			TagValueTransport::commsNotify(COMMS_DISCONNECTED1);
 			transport->close();
 		}
-	} else if(!isConnected()){
+	} else if(!isConnected() && transport->connected()) {
+       	serdebugF2("Remote connected: ", remoteNo);
 		encodeJoin(localNamePgm);
 		setConnected(true);
-		TagValueTransport::commsNotify(COMMS_CONNECTED1);
 	}
 
+	if(ticksLastSend > HEARTBEAT_INTERVAL_TICKS) {
+		if(isConnected() && transport->available()) {
+         	serdebugF3("Sending HB (rNo, ticks) : ", remoteNo, ticksLastSend);
+            encodeHeartbeat();
+        }
+	}
 }
 
 void TagValueRemoteConnector::performAnyWrites() {
@@ -128,6 +151,7 @@ void TagValueRemoteConnector::performAnyWrites() {
 void TagValueRemoteConnector::initiateBootstrap(MenuItem* firstItem) {
 	if(isBootstrapMode()) return; // already booting.
 
+    serdebugF2("Starting bootstrap mode", remoteNo);
 	bootMenuPtr = firstItem;
 	preSubMenuBootPtr = NULL;
 	encodeBootstrap(false);
@@ -136,6 +160,7 @@ void TagValueRemoteConnector::initiateBootstrap(MenuItem* firstItem) {
 
 void TagValueRemoteConnector::nextBootstrap() {
 	if(!bootMenuPtr) {
+        serdebugF2("Finishing bootstrap mode", remoteNo);
 		setBootstrapMode(false);
 		encodeBootstrap(true);
 		preSubMenuBootPtr = NULL;
@@ -186,36 +211,38 @@ void TagValueRemoteConnector::nextBootstrap() {
 }
 
 void TagValueRemoteConnector::encodeJoin(const char* localName) {
-	if(transport->connected()) {
-		transport->startMsg(MSG_JOIN);
-        char szName[20];
-        safeProgCpy(szName, localName, sizeof(szName));
-		transport->writeField(FIELD_MSG_NAME, szName);
-		transport->writeFieldInt(FIELD_VERSION, API_VERSION);
-		transport->writeFieldInt(FIELD_PLATFORM, TCMENU_DEFINED_PLATFORM);
-		transport->endMsg();
-		ticksLastSend = 0;
-	}
-	else TagValueTransport::commsNotify(COMMS_ERR_WRITE_NOT_CONNECTED);
+	if(!prepareWriteMsg(MSG_JOIN)) return;
+    char szName[20];
+    safeProgCpy(szName, localName, sizeof(szName));
+    transport->writeField(FIELD_MSG_NAME, szName);
+    transport->writeFieldInt(FIELD_VERSION, API_VERSION);
+    transport->writeFieldInt(FIELD_PLATFORM, TCMENU_DEFINED_PLATFORM);
+    transport->endMsg();
+    serdebugF3("Join message send: ", szName, TCMENU_DEFINED_PLATFORM);
 }
 
 void TagValueRemoteConnector::encodeBootstrap(bool isComplete) {
-	if(transport->connected()) {
-		transport->startMsg(MSG_BOOTSTRAP);
-		transport->writeField(FIELD_BOOT_TYPE, potentialProgramMemory(isComplete ?  pmemBootEndText : pmemBootStartText));
-		transport->endMsg();
-		ticksLastSend = 0;
-	}
-	else TagValueTransport::commsNotify(COMMS_ERR_WRITE_NOT_CONNECTED);
+	if(!prepareWriteMsg(MSG_BOOTSTRAP)) return;
+    transport->writeField(FIELD_BOOT_TYPE, potentialProgramMemory(isComplete ?  pmemBootEndText : pmemBootStartText));
+    transport->endMsg();
 }
 
 void TagValueRemoteConnector::encodeHeartbeat() {
-	if(transport->connected()) {
-		transport->startMsg(MSG_HEARTBEAT);
-		transport->endMsg();
-		ticksLastSend = 0;
-	}
-	else TagValueTransport::commsNotify(COMMS_ERR_WRITE_NOT_CONNECTED);
+	if(!prepareWriteMsg(MSG_HEARTBEAT)) return;
+    transport->endMsg();
+}
+
+bool TagValueRemoteConnector::prepareWriteMsg(uint16_t msgType) {
+    if(!transport->connected()) {
+        serdebugMsgHdr("Wr Err ", remoteNo, msgType);
+        commsNotify(COMMSERR_WRITE_NOT_CONNECTED);
+        setConnected(false); // we are immediately not connected in this case.
+        return false;
+    }
+    transport->startMsg(msgType);
+    ticksLastSend = 0;
+    serdebugMsgHdr("Msg Out ", remoteNo, msgType);
+    return true;
 }
 
 void TagValueRemoteConnector::encodeBaseMenuFields(int parentId, MenuItem* item) {
@@ -228,46 +255,34 @@ void TagValueRemoteConnector::encodeBaseMenuFields(int parentId, MenuItem* item)
 }
 
 void TagValueRemoteConnector::encodeAnalogItem(int parentId, AnalogMenuItem* item) {
-	if(transport->connected()) {
-		transport->startMsg(MSG_BOOT_ANALOG);
-		encodeBaseMenuFields(parentId, item);
-        char sz[10];
-        item->copyUnitToBuffer(sz);
-		transport->writeField(FIELD_ANALOG_UNIT, sz);
-		transport->writeFieldInt(FIELD_ANALOG_MAX, item->getMaximumValue());
-		transport->writeFieldInt(FIELD_ANALOG_OFF, item->getOffset());
-		transport->writeFieldInt(FIELD_ANALOG_DIV, item->getDivisor());
-		transport->writeFieldInt(FIELD_CURRENT_VAL, item->getCurrentValue());
-		transport->endMsg();
-		ticksLastSend = 0;
-	}
-	else TagValueTransport::commsNotify(COMMS_ERR_WRITE_NOT_CONNECTED);
+	if(!prepareWriteMsg(MSG_BOOT_ANALOG)) return;
+    encodeBaseMenuFields(parentId, item);
+    char sz[10];
+    item->copyUnitToBuffer(sz);
+    transport->writeField(FIELD_ANALOG_UNIT, sz);
+    transport->writeFieldInt(FIELD_ANALOG_MAX, item->getMaximumValue());
+    transport->writeFieldInt(FIELD_ANALOG_OFF, item->getOffset());
+    transport->writeFieldInt(FIELD_ANALOG_DIV, item->getDivisor());
+    transport->writeFieldInt(FIELD_CURRENT_VAL, item->getCurrentValue());
+    transport->endMsg();
 }
 
 void TagValueRemoteConnector::encodeTextMenu(int parentId, TextMenuItem* item) {
-	if(transport->connected()) {
-		transport->startMsg(MSG_BOOT_TEXT);
-		encodeBaseMenuFields(parentId, item);
-		transport->writeFieldInt(FIELD_MAX_LEN, item->textLength());
-		transport->writeField(FIELD_CURRENT_VAL, item->getTextValue());
-		transport->endMsg();
-		ticksLastSend = 0;
-	}
-	else TagValueTransport::commsNotify(COMMS_ERR_WRITE_NOT_CONNECTED);
+	if(!prepareWriteMsg(MSG_BOOT_TEXT)) return;
+    encodeBaseMenuFields(parentId, item);
+    transport->writeFieldInt(FIELD_MAX_LEN, item->textLength());
+    transport->writeField(FIELD_CURRENT_VAL, item->getTextValue());
+    transport->endMsg();
 }
 
 void TagValueRemoteConnector::encodeRemoteMenu(int parentId, RemoteMenuItem* item) {
-	if(transport->connected()) {
-		transport->startMsg(MSG_BOOT_REMOTE);
-		encodeBaseMenuFields(parentId, item);
-		transport->writeFieldInt(FIELD_REMOTE_NO, item->getRemoteNum());
-		char sz[20];
-		item->getCurrentState(sz, sizeof sz);
-		transport->writeField(FIELD_CURRENT_VAL, sz);
-		transport->endMsg();
-		ticksLastSend = 0;
-	}
-	else TagValueTransport::commsNotify(COMMS_ERR_WRITE_NOT_CONNECTED);
+	if(!prepareWriteMsg(MSG_BOOT_REMOTE)) return;
+    encodeBaseMenuFields(parentId, item);
+    transport->writeFieldInt(FIELD_REMOTE_NO, item->getRemoteNum());
+    char sz[20];
+    item->getCurrentState(sz, sizeof sz);
+    transport->writeField(FIELD_CURRENT_VAL, sz);
+    transport->endMsg();
 }
 
 void writeFloatValueToTransport(TagValueTransport* transport, FloatMenuItem* item) {
@@ -283,68 +298,47 @@ void writeFloatValueToTransport(TagValueTransport* transport, FloatMenuItem* ite
 }
 
 void TagValueRemoteConnector::encodeFloatMenu(int parentId, FloatMenuItem* item) {
-	if(transport->connected()) {
-		transport->startMsg(MSG_BOOT_FLOAT);
-		encodeBaseMenuFields(parentId, item);
-		transport->writeFieldInt(FIELD_FLOAT_DP, item->getDecimalPlaces());
-		writeFloatValueToTransport(transport, item);
-		transport->endMsg();
-		ticksLastSend = 0;
-	}
-	else TagValueTransport::commsNotify(COMMS_ERR_WRITE_NOT_CONNECTED);
+	if(!prepareWriteMsg(MSG_BOOT_FLOAT)) return;
+    encodeBaseMenuFields(parentId, item);
+    transport->writeFieldInt(FIELD_FLOAT_DP, item->getDecimalPlaces());
+    writeFloatValueToTransport(transport, item);
+    transport->endMsg();
 }
 
 void TagValueRemoteConnector::encodeEnumMenu(int parentId, EnumMenuItem* item) {
-	if(transport->connected()) {
-		transport->startMsg(MSG_BOOT_ENUM);
-		encodeBaseMenuFields(parentId, item);
-		transport->writeFieldInt(FIELD_CURRENT_VAL, item->getCurrentValue());
-		uint8_t noChoices = item->getMaximumValue() + 1;
-		transport->writeFieldInt(FIELD_NO_CHOICES, noChoices);
-		for(uint8_t i=0;i<noChoices;++i) {
-			uint16_t choiceKey = msgFieldToWord(FIELD_PREPEND_CHOICE, 'A' + i);
-            char szChoice[20];
-            item->copyEnumStrToBuffer(szChoice, sizeof(szChoice), i);
-			transport->writeField(choiceKey, szChoice);
-		}
-		transport->endMsg();
-		ticksLastSend = 0;
-	}
-	else TagValueTransport::commsNotify(COMMS_ERR_WRITE_NOT_CONNECTED);
+	if(!prepareWriteMsg(MSG_BOOT_ENUM)) return;
+    encodeBaseMenuFields(parentId, item);
+    transport->writeFieldInt(FIELD_CURRENT_VAL, item->getCurrentValue());
+    uint8_t noChoices = item->getMaximumValue() + 1;
+    transport->writeFieldInt(FIELD_NO_CHOICES, noChoices);
+    for(uint8_t i=0;i<noChoices;++i) {
+        uint16_t choiceKey = msgFieldToWord(FIELD_PREPEND_CHOICE, 'A' + i);
+        char szChoice[20];
+        item->copyEnumStrToBuffer(szChoice, sizeof(szChoice), i);
+        transport->writeField(choiceKey, szChoice);
+    }
+    transport->endMsg();
 }
 
 void TagValueRemoteConnector::encodeBooleanMenu(int parentId, BooleanMenuItem* item) {
-	if(transport->connected()) {
-		transport->startMsg(MSG_BOOT_BOOL);
-		encodeBaseMenuFields(parentId, item);
-		transport->writeFieldInt(FIELD_CURRENT_VAL, item->getCurrentValue());
-		transport->writeFieldInt(FIELD_BOOL_NAMING, item->getBooleanNaming());
-		transport->endMsg();
-		ticksLastSend = 0;
-	}
-	else TagValueTransport::commsNotify(COMMS_ERR_WRITE_NOT_CONNECTED);
+	if(!prepareWriteMsg(MSG_BOOT_BOOL)) return;
+    encodeBaseMenuFields(parentId, item);
+    transport->writeFieldInt(FIELD_CURRENT_VAL, item->getCurrentValue());
+    transport->writeFieldInt(FIELD_BOOL_NAMING, item->getBooleanNaming());
+    transport->endMsg();
 }
 
 void TagValueRemoteConnector::encodeSubMenu(int parentId, SubMenuItem* item) {
-	if(transport->connected()) {
-		transport->startMsg(MSG_BOOT_SUBMENU);
-		encodeBaseMenuFields(parentId, item);
-		transport->endMsg();
-		ticksLastSend = 0;
-	}
-	else TagValueTransport::commsNotify(COMMS_ERR_WRITE_NOT_CONNECTED);
+	if(!prepareWriteMsg(MSG_BOOT_SUBMENU)) return;
+    encodeBaseMenuFields(parentId, item);
+    transport->endMsg();
 }
 
 void TagValueRemoteConnector::encodeActionMenu(int parentId, ActionMenuItem* item) {
-	if(transport->connected()) {
-		transport->startMsg(MSG_BOOT_ACTION);
-		encodeBaseMenuFields(parentId, item);
-		transport->endMsg();
-		ticksLastSend = 0;
-	}
-	else TagValueTransport::commsNotify(COMMS_ERR_WRITE_NOT_CONNECTED);
+	if(!prepareWriteMsg(MSG_BOOT_ACTION)) return;
+    encodeBaseMenuFields(parentId, item);
+    transport->endMsg();
 }
-
 
 void writeRemoteValueToTransport(TagValueTransport* transport, RemoteMenuItem* item) {
 	char sz[20];
@@ -353,33 +347,29 @@ void writeRemoteValueToTransport(TagValueTransport* transport, RemoteMenuItem* i
 }
 
 void TagValueRemoteConnector::encodeChangeValue(int parentId, MenuItem* theItem) {
-	if(transport->connected()) {
-		transport->startMsg(MSG_CHANGE_INT);
-		transport->writeFieldInt(FIELD_PARENT, parentId);
-		transport->writeFieldInt(FIELD_ID, theItem->getId());
-		transport->writeFieldInt(FIELD_CHANGE_TYPE, CHANGE_ABSOLUTE); // menu host always sends absolute!
-		switch(theItem->getMenuType()) {
-		case MENUTYPE_ENUM_VALUE:
-		case MENUTYPE_INT_VALUE:
-		case MENUTYPE_BOOLEAN_VALUE:
-			transport->writeFieldInt(FIELD_CURRENT_VAL, ((ValueMenuItem*)theItem)->getCurrentValue());
-			break;
-		case MENUTYPE_TEXT_VALUE:
-			transport->writeField(FIELD_CURRENT_VAL, ((TextMenuItem*)theItem)->getTextValue());
-			break;
-		case MENUTYPE_REMOTE_VALUE: 
-			writeRemoteValueToTransport(transport, (RemoteMenuItem*)theItem);
-			break;
-		case MENUTYPE_FLOAT_VALUE:
-			writeFloatValueToTransport(transport, (FloatMenuItem*)theItem);
-			break;
-		default:
-			break;
-		}
-		transport->endMsg();
-		ticksLastSend = 0;
-	}
-	else TagValueTransport::commsNotify(COMMS_ERR_WRITE_NOT_CONNECTED);
+	if(!prepareWriteMsg(MSG_CHANGE_INT)) return;
+    transport->writeFieldInt(FIELD_PARENT, parentId);
+    transport->writeFieldInt(FIELD_ID, theItem->getId());
+    transport->writeFieldInt(FIELD_CHANGE_TYPE, CHANGE_ABSOLUTE); // menu host always sends absolute!
+    switch(theItem->getMenuType()) {
+    case MENUTYPE_ENUM_VALUE:
+    case MENUTYPE_INT_VALUE:
+    case MENUTYPE_BOOLEAN_VALUE:
+        transport->writeFieldInt(FIELD_CURRENT_VAL, ((ValueMenuItem*)theItem)->getCurrentValue());
+        break;
+    case MENUTYPE_TEXT_VALUE:
+        transport->writeField(FIELD_CURRENT_VAL, ((TextMenuItem*)theItem)->getTextValue());
+        break;
+    case MENUTYPE_REMOTE_VALUE: 
+        writeRemoteValueToTransport(transport, (RemoteMenuItem*)theItem);
+        break;
+    case MENUTYPE_FLOAT_VALUE:
+        writeFloatValueToTransport(transport, (FloatMenuItem*)theItem);
+        break;
+    default:
+        break;
+    }
+    transport->endMsg();
 }
 
 //
@@ -502,6 +492,12 @@ bool TagValueTransport::processValuePart() {
 }
 
 FieldAndValue* TagValueTransport::fieldIfAvailable() {
+    // don't start processing below when not connected or available
+    if(!connected()) {
+        clearFieldStatus(FVAL_PROCESSING_AWAITINGMSG);
+        return &currentField;
+    } 
+
 	bool contProcessing = true;
 	while(contProcessing) {
 		switch(currentField.fieldType) {

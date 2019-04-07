@@ -13,7 +13,6 @@
 
 #define RGB(r, g, b) (uint16_t)( ((r>>3)<<11) | ((g>>2)<<5) | (b>>3) )
 
-
 /**
  * Defines padding for menu rendering when using the standard AdaGfx renderer. Each
  * position can hold the value 0..15
@@ -40,34 +39,8 @@ inline void makePadding(MenuPadding& padding, int top, int right, int bottom, in
 	padding.left = left;
 }
 
-enum MonoDrawMode: byte { DRAWM_NORMAL, DRAWM_INVERSE, DRAWM_HORIZLINE };
-
 /**
- * Provides graphical configuration on how to render to a monochrome bit mapped display. If you don't
- * intend to customise this initially call the factory method provided with your renderer.
- */
-template<typename FONTPTR> struct MonoGfxMenuConfig {
-	MenuPadding titlePadding;
-	FONTPTR titleFont;
-	MenuPadding itemPadding;
-	FONTPTR itemFont;
-
-    MonoDrawMode titleDrawMode;
-    MonoDrawMode selectDrawMode;
-
-    // icons that represent the selected and editing states.
-	const uint8_t* activeIcon;
-	const uint8_t* editIcon;
-	uint8_t editIconWidth;
-	uint8_t editIconHeight;
-		
-	uint8_t titleBottomMargin;
-	uint8_t titleFontMagnification;
-	uint8_t itemFontMagnification;
-};
-
-/**
- * Holds the graphical configuration of how to render a menu onto a colour display. If you don't intend
+ * Holds the graphical configuration of how to render a menu onto a both mono and colour displays. If you don't intend
  * to override this initially just call the factory method provided with your renderer.
  */
 template<typename FONTPTR> struct ColorGfxMenuConfig {
@@ -83,7 +56,6 @@ template<typename FONTPTR> struct ColorGfxMenuConfig {
 
 	uint32_t bgSelectColor;
 	uint32_t fgSelectColor;
-
 	uint32_t widgetColor;
 	MenuPadding widgetPadding;
 
@@ -95,7 +67,6 @@ template<typename FONTPTR> struct ColorGfxMenuConfig {
 	uint8_t titleBottomMargin;
 	uint8_t titleFontMagnification;
 	uint8_t itemFontMagnification;
-
 };
 
 /**

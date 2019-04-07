@@ -10,7 +10,8 @@
  */
 
 #include "SerialTransport.h"
-#include "tcMenu.h"
+#include <tcMenu.h>
+#include <MessageProcessors.h>
 
 SerialTagValServer remoteServer;
 
@@ -25,11 +26,11 @@ void SerialTagValueTransport::close() {
 
 void SerialTagValServer::begin(Stream* portStream, const char* namePgm) {
 	serPort.setStream(portStream);
-	connector.setName(namePgm);
+    connector.initialise(&serPort, &messageProcessor, namePgm, 0);
 	taskManager.scheduleFixedRate(TICK_INTERVAL, []{remoteServer.runLoop();}, TIME_MILLIS);
 }
 
-SerialTagValServer::SerialTagValServer() : connector(&serPort, 0) {
+SerialTagValServer::SerialTagValServer() : messageProcessor(msgHandlers, MSG_HANDLERS_SIZE) {
 }
 
 void SerialTagValServer::runLoop() {

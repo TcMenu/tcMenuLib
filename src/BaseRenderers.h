@@ -135,6 +135,7 @@ enum MenuDrawJustification: byte {
  */
 class NoRenderer : public MenuRenderer {
 public:
+    ~NoRenderer() override { }
 	void activeIndexChanged(__attribute__((unused)) uint8_t ignored) override {  }
 	MenuItem* getCurrentSubMenu() override { return NULL; }
 	MenuItem* getCurrentEditor() override { return NULL; }
@@ -156,10 +157,10 @@ class BaseMenuRenderer : public MenuRenderer, Executable {
 protected:
 	char* buffer;
 	uint8_t bufferSize;
-	TitleWidget* firstWidget;
 	uint8_t ticksToReset;
-	MenuRedrawState redrawMode;
 	uint8_t lastOffset;
+	MenuRedrawState redrawMode;
+	TitleWidget* firstWidget;
 	RendererCallbackFn renderCallback;
 	MenuItem* currentRoot;
 	MenuItem* currentEditor;

@@ -70,31 +70,24 @@ struct FieldAndValue {
 /**
  * This is used by the notification callback to indicate the latest state of a connection.
  */
-enum CommsNotificationType : byte {
-	/** connection 1 is now connected */
-	COMMS_CONNECTED1 = 1,
-	/** connection 2 is now connected */
-	COMMS_CONNECTED2,
-	/** connection 3 is now connected */
-	COMMS_CONNECTED3,
-	/** connection 1 is now disconnected */
-	COMMS_DISCONNECTED1 = 50,
-	/** connection 2 is now disconnected */
-	COMMS_DISCONNECTED2,
-	/** connection 3 is now disconnected */
-	COMMS_DISCONNECTED3,
-	/** one of the connections had a write error */
-	COMMS_ERR_WRITE_NOT_CONNECTED = 100,
-	/** one of the connections had a protocol problem */
-	COMMS_ERR_WRONG_PROTOCOL,
 
+#define COMMSERR_OK 0
+#define COMMSERR_WRITE_NOT_CONNECTED 1
+#define COMMSERR_PROTOCOL_ERROR 2
+#define COMMSERR_CONNECTED 3
+#define COMMSERR_DISCONNECTED 4
+
+struct CommunicationInfo {
+    uint16_t remoteNo: 4;
+    uint16_t connected: 1;
+    uint16_t errorMode: 8;
 };
 
 /**
  * A callback function that will receive information about comms channels. This is registered as a 
  * static on the TagValueTransport object, and will receive updates for all remote tag value connections.
  */
-typedef void (*CommsCallbackFn)(CommsNotificationType);
+typedef void (*CommsCallbackFn)(CommunicationInfo);
 
 /**
  * The definition of a transport that can send and receive information remotely using the TagVal protocol.
@@ -103,12 +96,9 @@ typedef void (*CommsCallbackFn)(CommsNotificationType);
 class TagValueTransport {
 protected:
 	FieldAndValue currentField;
-	static CommsCallbackFn notificationFn;
 public:
 	TagValueTransport();
 	virtual ~TagValueTransport() {}
-	static void commsNotify(CommsNotificationType notifyType) { if(notificationFn) notificationFn(notifyType);}
-	static void setNoificationFn(CommsCallbackFn l) { notificationFn = l; }
 
 	void startMsg(uint16_t msgType);
 	void writeField(uint16_t field, const char* value);
@@ -147,10 +137,9 @@ private:
 	uint16_t ticksLastSend;
 	uint16_t ticksLastRead;
 	CombinedMessageProcessor* processor;
-	TagValueTransport* transport;
-	uint8_t flags;
-	uint8_t remoteNo;
-	
+	TagValueTransport* transport;	
+    CommsCallbackFn commsCallback;
+
 	// the remote connection details take 16 bytes
 	char remoteName[8];
 	uint8_t remoteMajorVer, remoteMinorVer;
@@ -159,6 +148,9 @@ private:
 	// for bootstrapping
 	MenuItem* bootMenuPtr;
 	MenuItem* preSubMenuBootPtr;
+
+	uint8_t flags;
+	uint8_t remoteNo;
 public:
 	/**
 	 * Construct an instance/
@@ -181,6 +173,12 @@ public:
         this->remoteNo = remoteNo;
         this->localNamePgm = localNamePgm;
     }
+
+    /** 
+     * If you want to be informed of communication events for this remote, pass a function
+     * that takes a CommunicationInfo structure as its parameter.
+     */
+    void setCommsNotificationCallback(CommsCallbackFn callback) { this->commsCallback = callback; }
 
 	/**
 	 * Indicates if the underlying transport is functionality
@@ -332,13 +330,31 @@ public:
 	 * Sets the remote connection state, again only used by message processor.
 	 */
 	void setRemoteConnected(uint8_t major, uint8_t minor, ApiPlatform platform);
+
+    /**
+     * Notify any listeners of a communication event on this remote, usually used
+     * by message processors to indicate an issue 
+     * @param commsEventType an error usually defined in RemoteConnector.h
+     */
+    void commsNotify(uint16_t commsEventType);
 private:
 	void encodeBaseMenuFields(int parentId, MenuItem* item);
+    bool prepareWriteMsg(uint16_t msgType);
 	void nextBootstrap();
 	void performAnyWrites();
 	void dealWithHeartbeating();
 	void setBootstrapMode(bool mode) { bitWrite(flags, FLAG_BOOTSTRAP_MODE, mode); }
-	void setConnected(bool mode) { bitWrite(flags, FLAG_CURRENTLY_CONNECTED, mode); }
+    /**
+     * Sets the connection state for this remote connection. Does not close the underlying transport.
+     * Note that is will also notify the callback of the latest state.
+     * 
+     * @param conn the new connection state
+     */
+	void setConnected(bool conn) { 
+        bitWrite(flags, FLAG_CURRENTLY_CONNECTED, conn); 
+        commsNotify(conn ? COMMSERR_CONNECTED : COMMSERR_DISCONNECTED);
+    }
+
 	bool isBootstrapMode() { return bitRead(flags, FLAG_BOOTSTRAP_MODE); }
 };
 

@@ -21,12 +21,15 @@ MsgHandler msgHandlers[] = {
 
 void fieldUpdateJoinMsg(TagValueRemoteConnector* connector, FieldAndValue* field, MessageProcessorInfo* info) {
 	if(field->fieldType == FVAL_END_MSG) {
+        serdebug2("Join from ", info->join.platform);
+        serdebugF3("Remote version was ", info->join.major, info->join.minor);
 		connector->setRemoteConnected(info->join.major, info->join.minor, info->join.platform);
 		return;
 	}
 
 	switch(field->field) {
 	case FIELD_MSG_NAME:
+        serdebug2("Join device ", field->value);
 		connector->setRemoteName(field->value);
 		break;
 	case FIELD_VERSION: {
@@ -76,6 +79,10 @@ void fieldUpdateValueMsg(TagValueRemoteConnector* /*unused*/, FieldAndValue* fie
 		MenuItem* foundItem = findItem(sub, id);
         if(foundItem != NULL && !foundItem->isReadOnly()) {
             info->value.item = foundItem;
+            serdebugF2("ValChange for ID ", foundItem->getId());
+        }
+        else {
+            serdebugF("Bad ID on valchange msg");
         }
 		break;
 	}
@@ -97,14 +104,19 @@ void fieldUpdateValueMsg(TagValueRemoteConnector* /*unused*/, FieldAndValue* fie
 				// we must be good to go if we get here, write it..
 				valItem->setCurrentValue(existingVal + deltaVal);
 			}
+            serdebugF2("Int change: ", valItem->getCurrentValue());
 		}
 		else if(info->value.item != NULL && info->value.item->getMenuType() == MENUTYPE_BOOLEAN_VALUE) {
 			// booleans are always absolute
-			((BooleanMenuItem*)info->value.item)->setBoolean(atoi(field->value));
+            BooleanMenuItem* boolItem = reinterpret_cast<BooleanMenuItem*>(info->value.item);
+			boolItem->setBoolean(atoi(field->value));
+            serdebugF2("Bool change: ", boolItem->getBoolean());
 		}
 		else if(info->value.item != NULL && info->value.item->getMenuType() == MENUTYPE_TEXT_VALUE) {
 			// text is always absolute
-			((TextMenuItem*)info->value.item)->setTextValue(field->value);
+            TextMenuItem* textItem = reinterpret_cast<TextMenuItem*>(info->value.item);
+			textItem->setTextValue(field->value);
+            serdebugF2("Text change: ", textItem->getTextValue());
 		}
 		break;
 	case FIELD_CHANGE_TYPE:

@@ -15,7 +15,8 @@
 #define _TCMENU_SERIALTRANSPORT_H_
 
 #include <Arduino.h>
-#include "RemoteConnector.h"
+#include <RemoteConnector.h>
+#include <MessageProcessors.h>
 
 /**
  * Serial transport is an implementation of TagValueTransport that works over a serial port
@@ -49,22 +50,27 @@ class SerialTagValServer {
 private:
 	SerialTagValueTransport serPort;
 	TagValueRemoteConnector connector;
+    CombinedMessageProcessor messageProcessor;
 public:
 	/** Empty constructor - configured in begin */
 	SerialTagValServer();
 	/**
 	 * Begins serial communication on the given port. You must call begin on the stream first.
 	 * @param portStream the stream upon which to communicate, it must be already opened.
-	 * @param namePgm the local name of the application (may be program memory  on AVR use safeCopyStr)
+	 * @param namePgm the local name of the application (may be program memory on AVR use safeCopyStr)
 	 */ 
 	void begin(Stream* portStream, const char* namePgm);
+
 	/**
 	 * Arranged internally don't call yourself.
 	 */ 
 	void runLoop();
 
-	/** returns the remote connector associated with the connection */
+	/** @return the remote connector associated with the connection */
 	TagValueRemoteConnector* getRemoteConnector(int /*num*/) {return &connector;}
+
+    /** @return the transport that's associated with the connection */
+    SerialTagValueTransport* getTransport(int /*num*/) {return &serPort;} 
 };
 
 /**
