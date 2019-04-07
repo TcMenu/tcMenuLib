@@ -1,7 +1,5 @@
 ## Use a DF robot board to control the menu system
 
-To expediate the release, this example will now be in the next version of tcMenu
-
 This example assumes you've got an Uno / MEGA with the DF robot board.
 
 It uses a the switches that are connected to analog 0 and tries to keep as much in line with the DF robot spec as possible.
