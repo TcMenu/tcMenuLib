@@ -71,7 +71,7 @@ template<typename FONTPTR> struct ColorGfxMenuConfig {
 
 /**
  * This is an internal method, used by display specific plugins. Prefer to use the
- * mehtod shipped with the plugin.
+ * mehtod shipped with the plugin. This is for higher resolution colour displays.
  */
 void prepareDefaultGfxConfig(ColorGfxMenuConfig<void*>* config);
 

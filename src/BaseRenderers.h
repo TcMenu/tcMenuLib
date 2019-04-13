@@ -42,7 +42,7 @@ typedef void (*RendererCallbackFn)(unsigned int currentValue, bool userClicked);
  */
 class TitleWidget {
 private:
-	const uint8_t **iconData;
+	const uint8_t* const* iconData;
 	volatile uint8_t currentState;
 	volatile bool changed;
 	uint8_t width;
@@ -51,11 +51,18 @@ private:
 	TitleWidget* next;
 public:
 	/** Construct a widget with its icons and size */
-	TitleWidget(const uint8_t** icons, uint8_t maxStateIcons, uint8_t width, uint8_t height, TitleWidget* next = NULL);
+	TitleWidget(const uint8_t* const* icons, uint8_t maxStateIcons, uint8_t width, uint8_t height, TitleWidget* next = NULL);
 	/** Get the current state that the widget represents */
 	uint8_t getCurrentState() {return currentState;}
 	/** gets the current icon data */
-	const uint8_t* getCurrentIcon() {return iconData[currentState]; changed = false;}
+	const uint8_t* getCurrentIcon() {
+        changed = false;
+#ifdef __AVR__
+        return pgm_read_ptr(&iconData[currentState]);
+#else
+        return iconData[currentState];
+#endif
+    }
 	/** sets the current state of the widget, there must be an icon for this value */
 	void setCurrentState(uint8_t state) {
 		if (state >= maxStateIcons) return; // protect against wrong mem access

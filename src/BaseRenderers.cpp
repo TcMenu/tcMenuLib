@@ -385,7 +385,7 @@ void BaseMenuRenderer::setFirstWidget(TitleWidget* widget) {
 	this->redrawMode = MENUDRAW_COMPLETE_REDRAW;
 }
 
-TitleWidget::TitleWidget(const uint8_t ** icons, uint8_t maxStateIcons, uint8_t width, uint8_t height, TitleWidget* next) {
+TitleWidget::TitleWidget(const uint8_t * const* icons, uint8_t maxStateIcons, uint8_t width, uint8_t height, TitleWidget* next) {
 	this->iconData = icons;
 	this->maxStateIcons = maxStateIcons;
 	this->width = width;
