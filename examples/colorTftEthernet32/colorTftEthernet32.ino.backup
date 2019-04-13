@@ -1,35 +1,22 @@
 #include "colorTftEthernet32_menu.h"
 #include <IoAbstractionWire.h>
-#include <EepromAbstractionWire.h>
-#include <AnalogDeviceAbstraction.h>
 #include <Fonts/FreeSans18pt7b.h>
 #include <Fonts/FreeSans9pt7b.h>
 
 /*
  * Shows how to use adagraphics with a TFT panel and an ethernet module.
  * This is a 32 bit example, which by default targets 32 bit devices.
- * Assumed board for this is a SAMD based MKR board.
  * 
  * For more details see the README.md file in this directory.
  */
 
 // we set up a TFT display first using the exact graphics variable used in the designer.
 Adafruit_ILI9341 gfx(6, 7);
-
-// we also want to customise the colours and menu spacing. So we create this config object too
-// which we initialise during the setup method.
 AdaColorGfxMenuConfig colorConfig;
 
-// We also store/restore state from an i2c EEPROM chip
-I2cAt24Eeprom eeprom(0x50, PAGESIZE_AT24C128);
 
 // then we setup the IO expander that the also set up in the designer for input.
 IoAbstractionRef io8574 = ioFrom8574(0x20, 0); // on addr 0x20 and interrupt pin 0
-
-// and we create an analog device with enhanced range because we are using a 32bit board.
-ArduinoAnalogDevice analogDevice(12, 10);
-
-float fractionsPerUnit;
 
 //
 // here we provide a completely custom configuration of color and spacing
@@ -76,52 +63,26 @@ void setup() {
     // we used an i2c device (io8574) so must initialise wire too
     Wire.begin();
 
-    // and set up the dac on the 32 bit board.
-    analogDevice.initPin(A0, DIR_OUT);
-    analogDevice.initPin(A1, DIR_IN);
-    fractionsPerUnit = ((float)analogDevice.getMaximumRange(DIR_OUT, A0)) / 5.0;
-
-    // we have our own graphics configuration. it must be initialised
-    // before calling setupMenu..
     prepareCustomConfiguration();
 
-    // set up the menu
+    // and lastly set up the menu
     setupMenu();
 
-    // and then load back the previous state
     menuMgr.load(eeprom);
-
-    taskManager.scheduleFixedRate(250, [] {
-        float a1Value = analogDevice.getCurrentValue(A1);
-        menuVoltA1.setFloatValue(a1Value / fractionsPerUnit);
-    });
 }
 
 void loop() {
     taskManager.runLoop();
 }
 
-void writeToDac() {
-    float volts = menuVoltage.getCurrentValue() / 2.0;
-    float curr = menuCurrent.getCurrentValue() / 100.0;
-    float total = volts * curr;
-    analogDevice.setCurrentValue(A0, (unsigned int)total);
-    menuVoltA0.setFloatValue(total);
-}
-
 void CALLBACK_FUNCTION onVoltageChange(int id) {
-    writeToDac();
+    // TODO - your menu change code
 }
 
 void CALLBACK_FUNCTION onCurrentChange(int id) {
-    writeToDac();
+    // TODO - your menu change code
 }
 
 void CALLBACK_FUNCTION onLimitMode(int id) {
     // TODO - your menu change code
-}
-
-void CALLBACK_FUNCTION onSaveRom(int id) {
-    // save out the state, in a real system we could detect power down for this.
-    menuMgr.save(eeprom);
 }

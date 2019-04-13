@@ -37,6 +37,7 @@ extern FloatMenuItem menuVoltA1;
 extern FloatMenuItem menuVoltA0;
 extern BackMenuItem menuBackStatus;
 extern SubMenuItem menuStatus;
+extern ActionMenuItem menuSaveAll;
 extern RemoteMenuItem menuRemote;
 extern BooleanMenuItem menuPwrDelay;
 extern BackMenuItem menuBackSettings;
@@ -51,6 +52,7 @@ extern AnalogMenuItem menuVoltage;
 void CALLBACK_FUNCTION onVoltageChange(int id);
 void CALLBACK_FUNCTION onCurrentChange(int id);
 void CALLBACK_FUNCTION onLimitMode(int id);
+void CALLBACK_FUNCTION onSaveRom(int id);
 
 void setupMenu();
 
