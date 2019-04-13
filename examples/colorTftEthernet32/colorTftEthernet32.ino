@@ -13,6 +13,13 @@
  * For more details see the README.md file in this directory.
  */
 
+// we are going to allow control of the menu over local area network
+// so therefore must configure ethernet..
+byte mac[] = {
+  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
+};
+IPAddress ip(192, 168, 0, 96);
+
 // we set up a TFT display first using the exact graphics variable used in the designer.
 Adafruit_ILI9341 gfx(6, 7);
 
@@ -69,6 +76,9 @@ void prepareCustomConfiguration() {
 }
 
 void setup() {
+    // spin up the Ethernet library
+    Ethernet.begin(mac, ip);
+
     // we are responsible for setting up the initial graphics
     gfx.begin();
     gfx.setRotation(3);
@@ -79,7 +89,7 @@ void setup() {
     // and set up the dac on the 32 bit board.
     analogDevice.initPin(A0, DIR_OUT);
     analogDevice.initPin(A1, DIR_IN);
-    fractionsPerUnit = ((float)analogDevice.getMaximumRange(DIR_OUT, A0)) / 5.0;
+    fractionsPerUnit = ((float)analogDevice.getMaximumRange(DIR_IN, A1)) / 5.0;
 
     // we have our own graphics configuration. it must be initialised
     // before calling setupMenu..
