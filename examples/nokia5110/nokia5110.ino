@@ -44,6 +44,8 @@ void setup() {
     // and start up the internet to allow remote control of the menu.
     Ethernet.begin(mac, ip);
 
+    addWidgetToTitleArea();
+
     // initialise the menu
     setupMenu();
 
@@ -69,7 +71,7 @@ void loop() {
 }
 
 //
-// These methods are called back when the menu changes, see in the designer
+// These three methods are called back when the menu changes, see in the designer
 // where we define these menu items.
 //
 
@@ -86,4 +88,52 @@ void CALLBACK_FUNCTION onLivingRoomLight(int /*id*/) {
 void CALLBACK_FUNCTION onKitchenLight(int /*id*/) {
     Serial.print("Kitchen light is now ");
     Serial.println(menuKitchen.getCurrentValue());
+}
+
+//
+// Here we define a widget that is rendered in the title area, it shows if there is
+// a remote connection. First we declare the bitmaps, then the widget, and then
+// put the widget in the renderer.
+//
+
+const uint8_t iconConnectionNone[] PROGMEM = {
+	0b01111111,
+	0b01100011,
+	0b01010101,
+	0b01001001,
+	0b01010101,
+	0b01100011,
+	0b01111111,
+};
+
+const uint8_t iconConnected[] PROGMEM = {
+	0b01111111,
+	0b01000001,
+	0b01000001,
+	0b01000001,
+	0b01000001,
+	0b01001001,
+	0b01111111,
+};
+
+// here is the definition of the actual widget, where we assign the above bitmaps to the widget.
+const uint8_t* const iconsConnection[] PROGMEM = { iconConnectionNone, iconConnected };
+TitleWidget connectedWidget(iconsConnection, 2, 8, 7);
+
+//
+// below we ask the remote connector to inform us of any changes in connection state. This is
+// the callback we pass.
+//
+void onCommsChange(CommunicationInfo info) {
+    if(info.remoteNo == 0) {
+        connectedWidget.setCurrentState(info.connected ? 1 : 0);
+    }
+}
+
+void addWidgetToTitleArea() {
+    // first register for changes in connection state in the Ethernet connection.
+    remoteServer.getRemoteConnector(0)->setCommsNotificationCallback(onCommsChange);
+
+    // and give the renderer our widget.
+    renderer.setFirstWidget(&connectedWidget);
 }
