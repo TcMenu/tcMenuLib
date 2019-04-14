@@ -1,10 +1,6 @@
-## Shows how to use Serial remote control with a simple menu
+## Adafruit_GFX Arduino menu example for 5110 buffered display
 
-This is a very simple menu with an example of how to configure remote control over the USB serial interface. Ethernet control is equally easy to use. Just create an ethernet instance as usual setting up IP address and MAC address and choose ethernet instead of serial in the code generator.
-
-In order to connect using the Java API there are two possibilities, either use the connector UI that's shipped with TcMenu, or work with the tcMenu API directly. See [https://github.com/davetcc/tcMenu]
-
-We'll soon be writing an API in C# that is fairly much inline with the Java API. This will give even more options for using tcMenu remotely.
+This is a very simple menu with an example of how to use tcmenu with a monochrome Adafruit_GFX buffered display. It simulates a lighting control system.
 
 The files that are in this example:
 

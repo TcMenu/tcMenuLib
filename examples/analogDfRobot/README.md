@@ -1,4 +1,4 @@
-## Use a DF robot board to control the menu system
+## Simple arduino menu on DfRobot shield
 
 This example assumes you've got an Uno / MEGA with the DF robot board.
 
