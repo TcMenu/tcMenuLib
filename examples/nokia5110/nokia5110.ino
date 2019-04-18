@@ -2,8 +2,9 @@
  * Shows how to use adagraphics with a mono buffered panel and an ethernet
  * module.This is an 8 bit example, which by default targets the mega 2560.
  * For ethernet control it uses UIPEthernet library instead of Ethernet2.
- * Be careful using in production boards as UIP is GPL. Fine for small
- * home projects. TcMenu has an Apache license.
+ * Be careful using UIP in production boards as it is GPL. Fine for small
+ * home projects. TcMenu has an Apache license but UIP does not. Prefer
+ * Ethernet2 for production boards as it is LGPL.
  * 
  * For more details see the README.md file in this directory.
  */
@@ -68,6 +69,9 @@ void loop() {
     // all sketches using task manager must call this very frequently and
     // never use delay(). See IoAbstraction.
     taskManager.runLoop();
+    
+    // When using the UIP ethernet driver we must call maintain frequently
+    Ethernet.maintain();
 }
 
 //
@@ -128,6 +132,8 @@ void onCommsChange(CommunicationInfo info) {
     if(info.remoteNo == 0) {
         connectedWidget.setCurrentState(info.connected ? 1 : 0);
     }
+    // this relies on logging in IoAbstraction's ioLogging.h, to turn it on visit the file for instructions.
+    serdebugF4("Comms notify (rNo, con, enum)", info.remoteNo, info.connected, info.errorMode);
 }
 
 void addWidgetToTitleArea() {

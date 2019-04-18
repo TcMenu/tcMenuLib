@@ -43,7 +43,7 @@ void loop() {
 // When the push me (action item) is pressed, this method is called back.
 // It purely inverts the current state of the built in LED.
 //
-void CALLBACK_FUNCTION onPushMe(int id) {
+void CALLBACK_FUNCTION onPushMe(int /*id*/) {
     bool ledCurrent = digitalRead(LED_BUILTIN);
     digitalWrite(LED_BUILTIN, !ledCurrent);
 }

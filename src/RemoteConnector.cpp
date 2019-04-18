@@ -74,14 +74,23 @@ void TagValueRemoteConnector::tick() {
 		performAnyWrites();
 	}
 
+    // field if available is kind of like a state machine. Due to limited memory
+    // on some AVR's and problems with the size of virtual tables, it cannot be
+    // implemented as a series of classes that implement an interface.
+    //
+    // Every tick we call the method and it processes whatever data is available
+    // on the socket turning it into a message a field at a time.
 	FieldAndValue* field = transport->fieldIfAvailable();
 	switch(field->fieldType) {
 	case FVAL_NEW_MSG:
+        serdebugMsgHdr("Msg In S: ", remoteNo, field->msgType);
 		processor->newMsg(field->msgType);
 		break;
 	case FVAL_FIELD:
+		processor->fieldUpdate(this, field);
+        break;
 	case FVAL_END_MSG:
-        serdebugMsgHdr("Msg In: ", remoteNo, field->msgType);
+        serdebugMsgHdr("Msg In E: ", remoteNo, field->msgType);
 		processor->fieldUpdate(this, field);
 		ticksLastRead = 0;
 		break;
@@ -101,10 +110,12 @@ void TagValueRemoteConnector::dealWithHeartbeating() {
 		if(isConnected()) {
          	serdebugF3("Remote disconnected (rNo, ticks): ", remoteNo, ticksLastSend);
 			setConnected(false);
+            setBootstrapComplete(false);
 			transport->close();
 		}
 	} else if(!isConnected() && transport->connected()) {
        	serdebugF2("Remote connected: ", remoteNo);
+        encodeHeartbeat();
 		encodeJoin(localNamePgm);
 		setConnected(true);
 	}
@@ -121,7 +132,7 @@ void TagValueRemoteConnector::performAnyWrites() {
 	if(isBootstrapMode()) {
 		nextBootstrap();
 	}
-	else {
+	else if(isBootstrapComplete()) {
 		if(bootMenuPtr == NULL) bootMenuPtr = menuMgr.getRoot();
 
 		// we loop here until either we've gone through the structure or something has changed
@@ -134,6 +145,7 @@ void TagValueRemoteConnector::performAnyWrites() {
 			}
 			else if(bootMenuPtr->isSendRemoteNeeded(remoteNo)) {
 				bootMenuPtr->setSendRemoteNeeded(remoteNo, false);
+serdebugF2("in write new value", bootMenuPtr->getId());
 				encodeChangeValue(parentId, bootMenuPtr);
 				return; // exit once something is written
 			}
@@ -156,12 +168,14 @@ void TagValueRemoteConnector::initiateBootstrap(MenuItem* firstItem) {
 	preSubMenuBootPtr = NULL;
 	encodeBootstrap(false);
 	setBootstrapMode(true);
+    setBootstrapComplete(false);
 }
 
 void TagValueRemoteConnector::nextBootstrap() {
 	if(!bootMenuPtr) {
         serdebugF2("Finishing bootstrap mode", remoteNo);
 		setBootstrapMode(false);
+        setBootstrapComplete(true);
 		encodeBootstrap(true);
 		preSubMenuBootPtr = NULL;
 		return;
@@ -229,6 +243,8 @@ void TagValueRemoteConnector::encodeBootstrap(bool isComplete) {
 
 void TagValueRemoteConnector::encodeHeartbeat() {
 	if(!prepareWriteMsg(MSG_HEARTBEAT)) return;
+    transport->writeFieldInt(FIELD_HB_INTERVAL, HEARTBEAT_INTERVAL);
+    transport->writeFieldLong(FIELD_HB_MILLISEC, millis());
     transport->endMsg();
 }
 
@@ -236,6 +252,7 @@ bool TagValueRemoteConnector::prepareWriteMsg(uint16_t msgType) {
     if(!transport->connected()) {
         serdebugMsgHdr("Wr Err ", remoteNo, msgType);
         commsNotify(COMMSERR_WRITE_NOT_CONNECTED);
+        setBootstrapComplete(false);
         setConnected(false); // we are immediately not connected in this case.
         return false;
     }
@@ -416,6 +433,18 @@ void TagValueTransport::writeFieldInt(uint16_t field, int value) {
 	sz[3] = 0;
 	writeStr(sz);
 	itoa(value, sz, 10);
+	writeStr(sz);
+	writeChar('|');
+}
+
+void TagValueTransport::writeFieldLong(uint16_t field, long value) {
+	char sz[12];
+	sz[0] = field >> 8;
+	sz[1] = field & 0xff;
+	sz[2] = '=';
+	sz[3] = 0;
+	writeStr(sz);
+	ltoa(value, sz, 10);
 	writeStr(sz);
 	writeChar('|');
 }

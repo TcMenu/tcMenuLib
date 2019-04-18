@@ -16,7 +16,10 @@
 #define TAG_VAL_PROTOCOL 0x01
 #define START_OF_MESSAGE 0x01
 #define TICK_INTERVAL 20
-#define HEARTBEAT_INTERVAL_TICKS (10000 / TICK_INTERVAL)
+#define HEARTBEAT_INTERVAL 2500
+// when debugging you can increase the heartbeat time to reduce disconnects (below gives 90 seconds)
+//#define HEARTBEAT_INTERVAL 30000
+#define HEARTBEAT_INTERVAL_TICKS (HEARTBEAT_INTERVAL / TICK_INTERVAL)
 
 /**
  * @file RemoteConnector.h
@@ -103,6 +106,7 @@ public:
 	void startMsg(uint16_t msgType);
 	void writeField(uint16_t field, const char* value);
 	void writeFieldInt(uint16_t field, int value);
+    void writeFieldLong(uint16_t field, long value);
 	void endMsg();
 	FieldAndValue* fieldIfAvailable();
 	void clearFieldStatus(FieldValueType ty = FVAL_PROCESSING);
@@ -126,6 +130,7 @@ private:
 #define FLAG_CURRENTLY_CONNECTED 0
 #define FLAG_BOOTSTRAP_MODE 1
 #define FLAG_WRITING_MSGS 2
+#define FLAG_BOOTSTRAP_COMPLETE 3
 
 /**
  * The remote connector is what we would normally interact with when dealing with a remote. It provides functionality
@@ -343,7 +348,6 @@ private:
 	void nextBootstrap();
 	void performAnyWrites();
 	void dealWithHeartbeating();
-	void setBootstrapMode(bool mode) { bitWrite(flags, FLAG_BOOTSTRAP_MODE, mode); }
     /**
      * Sets the connection state for this remote connection. Does not close the underlying transport.
      * Note that is will also notify the callback of the latest state.
@@ -356,6 +360,10 @@ private:
     }
 
 	bool isBootstrapMode() { return bitRead(flags, FLAG_BOOTSTRAP_MODE); }
+	void setBootstrapMode(bool mode) { bitWrite(flags, FLAG_BOOTSTRAP_MODE, mode); }
+
+	bool isBootstrapComplete() { return bitRead(flags, FLAG_BOOTSTRAP_COMPLETE); }
+	void setBootstrapComplete(bool mode) { bitWrite(flags, FLAG_BOOTSTRAP_COMPLETE, mode); }
 };
 
 #endif /* _TCMENU_REMOTECONNECTOR_H_ */
