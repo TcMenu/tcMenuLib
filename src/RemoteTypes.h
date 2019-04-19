@@ -75,6 +75,7 @@
 #define FIELD_HB_INTERVAL msgFieldToWord('H', 'I')
 #define FIELD_HB_MILLISEC msgFieldToWord('H', 'M')
 #define FIELD_ID          msgFieldToWord('I', 'D')
+#define FIELD_EEPROM      msgFieldToWord('I', 'E')
 #define FIELD_READONLY    msgFieldToWord('R', 'O')
 #define FIELD_PARENT      msgFieldToWord('P', 'I')
 #define FIELD_ANALOG_MAX  msgFieldToWord('A', 'M')
