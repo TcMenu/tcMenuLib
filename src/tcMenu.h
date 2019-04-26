@@ -29,7 +29,7 @@ public:
 	 * @param root the first menu item
 	 * @param encoderPinA encoder A pin
 	 * @param encorerPinB encoder B pin
-	 * @param encoderButton the OK button
+	 * @param encoderButton the OK button for the menu select / edit action
 	 */
 	void initForEncoder(MenuRenderer* renderer, MenuItem* root, uint8_t encoderPinA, uint8_t encoderPinB, uint8_t encoderButton);
 	
@@ -39,12 +39,19 @@ public:
 	 * @param root the first menu item
 	 * @param upPin the button on up
 	 * @param downPin the button for down
-	 * @param okPin the button for OK.
+	 * @param okPin the OK button for the menu select / edit action
 	 */
 	void initForUpDownOk(MenuRenderer* renderer, MenuItem* root, uint8_t upPin, uint8_t downPin, uint8_t okPin);
 
 	/**
-	 * Initialise in situations where local input is not needed.
+	 * Initialise in situations where local input is not needed or where a custom type of input is needed
+     * that is not one of the common types.
+     * 
+     * In the case of custom input make sure that:
+     * 
+     * 1. something will call `menuMgr.onMenuSelect(bool held)` when the select button is pressed
+     * 2. something will call `menuMgr.valueChanged(int value)` when the current value goes up / down.
+     * 
 	 * @param renderer the renderer used for drawing
 	 * @param root the first menu item
 	 */
