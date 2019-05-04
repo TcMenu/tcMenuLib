@@ -111,6 +111,11 @@ public:
 	 */
 	virtual void onSelectPressed(MenuItem* editItem) = 0;
 
+    /**
+     * Indicates to the renderer that select  has been held in
+     */
+    virtual void onHold() = 0;
+
 	/**
 	 * Renderers work out which submenu is current.
 	 * @returns the current sub menu
@@ -143,11 +148,12 @@ enum MenuDrawJustification: byte {
 class NoRenderer : public MenuRenderer {
 public:
     ~NoRenderer() override { }
-	void activeIndexChanged(__attribute__((unused)) uint8_t ignored) override {  }
+	void activeIndexChanged(uint8_t /*ignored*/) override {  }
 	MenuItem* getCurrentSubMenu() override { return NULL; }
 	MenuItem* getCurrentEditor() override { return NULL; }
-	void onSelectPressed(__attribute__((unused)) MenuItem* ignored) override { }
+	void onSelectPressed(MenuItem* /*ignored*/) override { }
 	void initialise() override { }
+    void onHold() override { }
 };
 
 class RemoteMenuItem; // forward reference.
@@ -224,6 +230,11 @@ public:
 	 */
 	virtual void onSelectPressed(MenuItem* editor);
 
+    /**
+     * When the select button is held in, the action is defined here
+     */
+    void onHold() override;
+
 	/**
 	 * For menu systems that support title widgets, this will allow the first widget.
 	 * @param the first widget in a chain of widgets linked by next pointer.
@@ -254,6 +265,11 @@ public:
 	 */
 	RendererCallbackFn getRenderingCallback() { return renderCallback; }
 protected:
+    /**
+     * Gets the parent of the current menu.
+     * @return the parent for the current root.
+     */
+    MenuItem* getParentAndReset();
 	/**
 	 * Convert a menu item into a textual representation in the buffer
 	 * @param item the menu item

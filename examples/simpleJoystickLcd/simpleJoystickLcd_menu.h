@@ -12,35 +12,37 @@
 #define MENU_GENERATED_CODE_H
 
 #include <tcMenu.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_PCD8544.h>
-#include <RemoteConnector.h>
-#include "EthernetTransport.h"
-#include "tcMenuAdaFruitGfx.h"
+#include <LiquidCrystalIO.h>
+#include <JoystickSwitchInput.h>
+#include "RemoteConnector.h"
+#include "tcMenuLiquidCrystal.h"
 
 // all define statements needed
 #define TCMENU_USING_PROGMEM true
-#define ENCODER_PIN_A 2
-#define ENCODER_PIN_B 3
-#define ENCODER_PIN_OK A3
 
 // all variables that need exporting
-extern Adafruit_PCD8544 gfx;
-extern AdaFruitGfxMenuRenderer renderer;
+extern LiquidCrystal lcd;
+extern LiquidCrystalRenderer renderer;
+extern ArduinoAnalogDevice analogDevice;
 extern const char applicationName[];
 
 // all menu item forward references.
-extern EnumMenuItem menuOnAlm;
-extern AnalogMenuItem menuKitchen;
-extern AnalogMenuItem menuLiving;
-extern AnalogMenuItem menuHall;
+extern FloatMenuItem menuFlow3;
+extern FloatMenuItem menuFlow2;
+extern FloatMenuItem menuFlow1;
+extern BackMenuItem menuBackFlows;
+extern SubMenuItem menuFlows;
+extern BooleanMenuItem menuOverrideAll;
+extern AnalogMenuItem menuTideGate3;
+extern AnalogMenuItem menuTideGate2;
+extern AnalogMenuItem menuTideGate1;
 
 // Callback functions always follow this pattern: void CALLBACK_FUNCTION myCallback();
 #define CALLBACK_FUNCTION
 
-void CALLBACK_FUNCTION onHallLight(int id);
-void CALLBACK_FUNCTION onLivingRoomLight(int id);
-void CALLBACK_FUNCTION onKitchenLight(int id);
+void CALLBACK_FUNCTION onTidalGate1(int id);
+void CALLBACK_FUNCTION onTidalGate2(int id);
+void CALLBACK_FUNCTION onTidalGate3(int id);
 
 void setupMenu();
 

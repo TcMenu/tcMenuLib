@@ -6,9 +6,11 @@
 #include <BaseRenderers.h>
 #include <MockEepromAbstraction.h>
 #include <MockIoAbstraction.h>
+#include <MenuIterator.h>
 
 #include "menuManagerTests.h"
 #include "baseRemoteTests.h"
+#include <tcm_test/testFixtures.h>
 
 using namespace aunit;
 
@@ -17,10 +19,13 @@ NoRenderer noRenderer;
 MockEepromAbstraction eeprom;
 char szData[10] = { "123456789" };
 const char PROGMEM pgmMyName[]  = "UnitTest";
+int counter = 0;
 
 void setup() {
     Serial.begin(115200);
     while(!Serial);
+
+    menuMgr.initWithoutInput(&noRenderer, &menuVolume);
 }
 
 void loop() {
@@ -53,5 +58,179 @@ test(testTcUtilIntegerConversions) {
     // and lasty try the divisor version without 0.
     strcpy(szBuffer, "val = ");
     fastltoa_mv(szBuffer, 22, 10000, NOT_PADDED, sizeof(szBuffer));
-    assertEqual(szBuffer, "val = 22");
+
+    // and now try something bigger than the divisor
+    strcpy(szBuffer, "val = ");
+    fastltoa_mv(szBuffer, 222222, 10000, NOT_PADDED, sizeof(szBuffer));
+    assertEqual(szBuffer, "val = 2222");
+}
+
+void printMenuItem(MenuItem* menuItem) {
+    char buffer[20];
+    menuItem->copyNameToBuffer(buffer, sizeof buffer);
+    Serial.print(menuItem->getId());Serial.print(',');Serial.print(menuItem->getMenuType());Serial.print(',');Serial.print(buffer);
+}
+
+class MenuItemIteratorFixture : public TestOnce {
+public:
+    void assertMenuItem(MenuItem* actual, MenuItem* expected) {
+        if(actual == NULL) {
+            Serial.print("Actual was null, expected ");
+            printMenuItem(expected);
+            Serial.println();
+        }
+        else if(expected != actual) {
+            Serial.print("Menu items are not equal: expected=");
+            printMenuItem(expected);
+            Serial.print(". Actual=");
+            printMenuItem(actual);
+            Serial.println();
+        }
+        assertTrue(actual == expected);
+    }
+};
+
+
+testF(MenuItemIteratorFixture, testTcUtilGetParentAndVisit) {
+    menuMgr.initWithoutInput(&noRenderer, &menuVolume);
+
+    assertTrue(getParentRoot(NULL) == NULL);
+    assertTrue(getParentRoot(&menuVolume) == NULL);
+    assertMenuItem(getParentRoot(&menuStatus), &menuVolume);
+    assertMenuItem(getParentRoot(&menuBackSettings), &menuVolume);
+    assertMenuItem(getParentRoot(&menuBackSecondLevel), &menuStatus);
+
+    counter = 0;
+    assertMenuItem(getParentRootAndVisit(&menuSecondLevel, [](MenuItem* item) { 
+        counter++;
+        Serial.print("Visited");printMenuItem(item);Serial.println();
+    }), &menuStatus);
+    assertEqual(counter, 12);
+}
+
+void clearAllChangeStatus() {
+    getParentRootAndVisit(&menuVolume, [](MenuItem* item) {
+        item->setSendRemoteNeeded(0, false);
+        item->setChanged(false);
+    });
+}
+
+testF(MenuItemIteratorFixture, testIterationWithPredicate) {
+    menuMgr.initWithoutInput(&noRenderer, &menuVolume);
+
+    clearAllChangeStatus();
+
+    MenuItemTypePredicate subPredicate(MENUTYPE_SUB_VALUE);
+    MenuItemIterator iterator;
+    iterator.setPredicate(&subPredicate);
+
+    for(int i=0;i<3;i++) {
+        Serial.print("Type Predicate item iteration ");Serial.println(i);
+
+        assertMenuItem(iterator.nextItem(), &menuSettings);
+        assertMenuItem(iterator.nextItem(), &menuStatus);
+        assertMenuItem(iterator.nextItem(), &menuSecondLevel);
+        assertTrue(iterator.nextItem() == NULL);
+    }
+
+    RemoteNoMenuItemPredicate remotePredicate(0);
+    iterator.setPredicate(&remotePredicate);
+
+    menuVolume.setSendRemoteNeededAll();
+    menuPressMe.setSendRemoteNeededAll();
+    
+    assertMenuItem(iterator.nextItem(), &menuVolume);
+    assertMenuItem(iterator.nextItem(), &menuPressMe);
+    assertTrue(iterator.nextItem() == NULL);
+
+    clearAllChangeStatus();
+
+    assertTrue(iterator.nextItem() == NULL);
+}
+
+
+class NothingMatchingMenuPredicate : public MenuItemPredicate {
+    bool matches(MenuItem* /*ignored*/) override {
+        return false;
+    }
+};
+
+testF(MenuItemIteratorFixture, testIteratorNothingMatchesPredicate) {
+    menuMgr.initWithoutInput(&noRenderer, &menuVolume);
+
+    clearAllChangeStatus();
+
+    NothingMatchingMenuPredicate noMatch;
+    MenuItemIterator iterator;
+    iterator.setPredicate(&noMatch);
+    iterator.reset();
+
+    // should be repeatedly null, nothing matches.
+    for(int i=0;i<10;i++) {
+        assertTrue(iterator.nextItem() == NULL);
+    }
+}
+
+testF(MenuItemIteratorFixture, testIterationOverAllMenuItems) {
+    menuMgr.initWithoutInput(&noRenderer, &menuVolume);
+
+    MenuItemIterator iterator;
+    iterator.setPredicate(NULL);
+    iterator.reset();
+
+    // iterators should be completely repeatable
+    for(int i=0;i<3;i++) {
+        Serial.print("All item iteration ");Serial.println(i);
+
+        // this should be the list of items in the text fixture exactly as they
+        // are laid out in the file, IE depth first ordering.
+
+        // first we get the volume and channel
+        assertMenuItem(iterator.nextItem(),&menuVolume);
+        assertMenuItem(iterator.nextItem(), &menuChannel);
+        assertTrue(iterator.currentParent() == NULL);
+
+        // then traverse into the settings menu (parent is volume)
+        assertMenuItem(iterator.nextItem(), &menuSettings);
+        assertMenuItem(iterator.currentParent(), NULL);
+        assertMenuItem(iterator.nextItem(), &menuBackSettings);
+        assertMenuItem(iterator.currentParent(), &menuSettings);
+        assertMenuItem(iterator.nextItem(), &menu12VStandby);
+        assertMenuItem(iterator.nextItem(), &menuContrast);
+
+        // and then into the status menu, which has a nested submenu
+        assertMenuItem(iterator.nextItem(), &menuStatus);
+        assertMenuItem(iterator.currentParent(), NULL);
+        assertMenuItem(iterator.nextItem(), &menuBackStatus);
+        assertMenuItem(iterator.currentParent(), &menuStatus);
+        assertMenuItem(iterator.nextItem(), &menuLHSTemp);
+        assertMenuItem(iterator.currentParent(), &menuStatus);
+        assertMenuItem(iterator.nextItem(), &menuRHSTemp);
+        // nested sub menu of status here
+        assertMenuItem(iterator.nextItem(), &menuSecondLevel);
+        assertMenuItem(iterator.currentParent(), &menuStatus);
+        assertMenuItem(iterator.nextItem(), &menuBackSecondLevel);
+        assertMenuItem(iterator.currentParent(), &menuSecondLevel);
+        assertMenuItem(iterator.nextItem(), &menuPressMe);
+        assertMenuItem(iterator.nextItem(), &menuFloatItem);
+        assertMenuItem(iterator.currentParent(), &menuSecondLevel);
+        // exit of nested submenu here.
+        assertMenuItem(iterator.nextItem(), &menuCaseTemp);
+        assertMenuItem(iterator.currentParent(), &menuStatus);
+        assertTrue(iterator.nextItem() == NULL);
+    }
+}
+
+testF(MenuItemIteratorFixture, testIterationOnSimpleMenu) {
+    menuMgr.initWithoutInput(&noRenderer, &menuSimple1);
+
+    MenuItemIterator iterator;
+    iterator.setPredicate(NULL);
+    iterator.reset();
+
+    for(int i=0;i<3;i++) {
+        assertMenuItem(iterator.nextItem(), &menuSimple1);
+        assertMenuItem(iterator.nextItem(), &menuSimple2);
+        assertTrue(iterator.nextItem() == NULL);
+    }
 }

@@ -14,7 +14,7 @@
 // Global variable declarations
 
 AdaColorGfxMenuConfig gfxConfig;
-AdaFruitGfxMenuRenderer renderer(DISPLAY_WIDTH, DISPLAY_HEIGHT);
+AdaFruitGfxMenuRenderer renderer;
 const char PROGMEM applicationName[] = "Lighting";
 EthernetServer server(3333);
 

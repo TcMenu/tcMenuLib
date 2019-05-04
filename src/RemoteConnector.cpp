@@ -33,13 +33,12 @@ inline void serdebugMsgHdr(const char* tx, int remoteNo, uint16_t msgType) {
 #define serdebugMsgHdr(x, y, z)
 #endif
 
-TagValueRemoteConnector::TagValueRemoteConnector() {
+TagValueRemoteConnector::TagValueRemoteConnector(uint8_t remoteNo) : bootPredicate(MENUTYPE_BACK_VALUE, true), remotePredicate(remoteNo) {
 	this->transport = NULL;
 	this->processor = NULL;
-	this->bootMenuPtr = preSubMenuBootPtr = NULL;
     this->remoteName[0] = 0;
 	this->localNamePgm = EMPTYNAME;
-	this->remoteNo = 0;
+	this->remoteNo = remoteNo;
 	this->ticksLastRead = this->ticksLastSend = 0xffff;
 	this->flags = 0;
     this->commsCallback = NULL;
@@ -54,7 +53,7 @@ void TagValueRemoteConnector::setRemoteConnected(uint8_t major, uint8_t minor, A
 	remoteMajorVer = major;
 	remoteMinorVer = minor;
 	remotePlatform = platform;
-	initiateBootstrap(menuMgr.getRoot());
+	initiateBootstrap();
 }
 
 void TagValueRemoteConnector::commsNotify(uint16_t err) {
@@ -133,94 +132,70 @@ void TagValueRemoteConnector::performAnyWrites() {
 		nextBootstrap();
 	}
 	else if(isBootstrapComplete()) {
-		if(bootMenuPtr == NULL) bootMenuPtr = menuMgr.getRoot();
-
-		// we loop here until either we've gone through the structure or something has changed
-		while(bootMenuPtr) {
-			int parentId = (preSubMenuBootPtr != NULL) ? preSubMenuBootPtr->getId() : 0;
-			if(bootMenuPtr->getMenuType() == MENUTYPE_SUB_VALUE) {
-				preSubMenuBootPtr = bootMenuPtr;
-				SubMenuItem* sub = (SubMenuItem*) bootMenuPtr;
-				bootMenuPtr = sub->getChild();
-			}
-			else if(bootMenuPtr->isSendRemoteNeeded(remoteNo)) {
-				bootMenuPtr->setSendRemoteNeeded(remoteNo, false);
-serdebugF2("in write new value", bootMenuPtr->getId());
-				encodeChangeValue(parentId, bootMenuPtr);
-				return; // exit once something is written
-			}
-
-			// see if there's more to do, including moving between submenu / root.
-			bootMenuPtr = bootMenuPtr->getNext();
-			if(bootMenuPtr == NULL && preSubMenuBootPtr != NULL) {
-				bootMenuPtr = preSubMenuBootPtr->getNext();
-				preSubMenuBootPtr = NULL;
-			}
-		}
-	}
+        MenuItem* item = iterator.nextItem();
+        MenuItem* parent = iterator.currentParent();
+        if(item) {
+            item->setSendRemoteNeeded(remoteNo, false);
+            encodeChangeValue(parent == NULL ? 0 : parent->getId(), item);
+        }
+    }
 }
 
-void TagValueRemoteConnector::initiateBootstrap(MenuItem* firstItem) {
+void TagValueRemoteConnector::initiateBootstrap() {
 	if(isBootstrapMode()) return; // already booting.
 
     serdebugF2("Starting bootstrap mode", remoteNo);
-	bootMenuPtr = firstItem;
-	preSubMenuBootPtr = NULL;
+    iterator.reset();
+    iterator.setPredicate(&bootPredicate);
 	encodeBootstrap(false);
 	setBootstrapMode(true);
     setBootstrapComplete(false);
 }
 
 void TagValueRemoteConnector::nextBootstrap() {
-	if(!bootMenuPtr) {
+	if(!transport->available()) return; // skip a turn, no write available.
+
+    MenuItem* bootItem = iterator.nextItem();
+	MenuItem* parent = iterator.currentParent() ;
+    int parentId = parent == NULL ? 0 : parent->getId();
+	if(!bootItem) {
         serdebugF2("Finishing bootstrap mode", remoteNo);
 		setBootstrapMode(false);
         setBootstrapComplete(true);
 		encodeBootstrap(true);
-		preSubMenuBootPtr = NULL;
+        iterator.reset();
+        iterator.setPredicate(&remotePredicate);
 		return;
 	}
 
-	if(!transport->available()) return; // skip a turn, no write available.
-
-	int parentId = (preSubMenuBootPtr != NULL) ? preSubMenuBootPtr->getId() : 0;
-	bootMenuPtr->setSendRemoteNeeded(remoteNo, false);
-	switch(bootMenuPtr->getMenuType()) {
+	bootItem->setSendRemoteNeeded(remoteNo, false);
+	switch(bootItem->getMenuType()) {
 	case MENUTYPE_SUB_VALUE:
-		encodeSubMenu(parentId, (SubMenuItem*)bootMenuPtr);
-		preSubMenuBootPtr = bootMenuPtr;
-		bootMenuPtr = ((SubMenuItem*)bootMenuPtr)->getChild();
+		encodeSubMenu(parentId, (SubMenuItem*)bootItem);
 		break;
 	case MENUTYPE_BOOLEAN_VALUE:
-		encodeBooleanMenu(parentId, (BooleanMenuItem*)bootMenuPtr);
+		encodeBooleanMenu(parentId, (BooleanMenuItem*)bootItem);
 		break;
 	case MENUTYPE_ENUM_VALUE:
-		encodeEnumMenu(parentId, (EnumMenuItem*)bootMenuPtr);
+		encodeEnumMenu(parentId, (EnumMenuItem*)bootItem);
 		break;
 	case MENUTYPE_INT_VALUE:
-		encodeAnalogItem(parentId, (AnalogMenuItem*)bootMenuPtr);
+		encodeAnalogItem(parentId, (AnalogMenuItem*)bootItem);
 		break;
 	case MENUTYPE_TEXT_VALUE:
-		encodeTextMenu(parentId, (TextMenuItem*)bootMenuPtr);
+		encodeTextMenu(parentId, (TextMenuItem*)bootItem);
 		break;
 	case MENUTYPE_REMOTE_VALUE:
-		encodeRemoteMenu(parentId, (RemoteMenuItem*)bootMenuPtr);
+		encodeRemoteMenu(parentId, (RemoteMenuItem*)bootItem);
 		break;
 	case MENUTYPE_FLOAT_VALUE:
-		encodeFloatMenu(parentId, (FloatMenuItem*)bootMenuPtr);
+		encodeFloatMenu(parentId, (FloatMenuItem*)bootItem);
 		break;
 	case MENUTYPE_ACTION_VALUE:
-		encodeActionMenu(parentId, (ActionMenuItem*)bootMenuPtr);
+		encodeActionMenu(parentId, (ActionMenuItem*)bootItem);
 		break;
 	default:
 		break;
-	}
-
-	// see if there's more to do, including moving between submenu / root.
-	bootMenuPtr = bootMenuPtr->getNext();
-	if(bootMenuPtr == NULL && preSubMenuBootPtr != NULL) {
-		bootMenuPtr = preSubMenuBootPtr->getNext();
-		preSubMenuBootPtr = NULL;
 	}
 }
 

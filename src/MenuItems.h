@@ -267,7 +267,7 @@ public:
      * @param sz the buffer space
      * @param size the size of sz, generally obtained using sizeof
      */
-	uint8_t copyNameToBuffer(char* sz, uint8_t size) { return copyNameToBuffer(sz, 0, size);}
+	uint8_t copyNameToBuffer(char* sz, int size) { return copyNameToBuffer(sz, 0, size);}
 
 	/** 
      * Copies the name info the provided buffer starting at the specified 
@@ -276,7 +276,7 @@ public:
      * @param offset the offset to start at relative to the buffer
      * @param size the size of sz, generally obtained using sizeof
      * */
-	uint8_t copyNameToBuffer(char* sz, uint8_t offset, uint8_t size);
+	uint8_t copyNameToBuffer(char* sz, int offset, int size);
 	/** Retrieves the ID from the info block */
 	uint16_t getId() { return get_info_uint(&info->id); }
 	/** Retrieves the maximum value for this menu type */
@@ -338,7 +338,7 @@ protected:
 	}
 public:
 	/** Sets the integer current value to a new value, and marks the menu changed */
-	void setCurrentValue(uint16_t val);
+	void setCurrentValue(uint16_t val, bool silent = false);
 
 	/** gets the current value */
 	uint16_t getCurrentValue() { return currentValue; }
@@ -428,7 +428,7 @@ public:
 	/** return the boolean value currently stored */
 	bool getBoolean() {return currentValue != 0;}
 	/** set the boolean value currently stored */
-	void setBoolean(bool b) {setCurrentValue(b);}
+	void setBoolean(bool b, bool silent = false) {setCurrentValue(b, silent);}
 };
 
 /**
@@ -495,7 +495,7 @@ public:
 	 * Copies the text into the internal buffer.
 	 * @param text the text to be copied.
 	 */
-	void setTextValue(const char* text);
+	void setTextValue(const char* text, bool silent = false);
 
 	/** returns the text value in the internal buffer */
 	const char* getTextValue() { return menuText; }
@@ -526,7 +526,7 @@ public:
 	/**
 	 * Set the floating point value and mark as changed
 	 */
-	void setFloatValue(float newVal);
+	void setFloatValue(float newVal, bool silent = false);
 
 	/**
 	 * Get the current floating point value

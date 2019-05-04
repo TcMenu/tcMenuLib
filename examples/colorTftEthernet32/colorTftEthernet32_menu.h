@@ -12,6 +12,7 @@
 #define MENU_GENERATED_CODE_H
 
 #include <tcMenu.h>
+#include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
 #include <RemoteConnector.h>
 #include "EthernetTransport.h"
@@ -19,8 +20,6 @@
 #include "tcMenuAdaFruitGfx.h"
 
 // all define statements needed
-#define DISPLAY_WIDTH 320
-#define DISPLAY_HEIGHT 240
 #define ENCODER_PIN_A 7
 #define ENCODER_PIN_B 6
 #define ENCODER_PIN_OK 5
@@ -37,6 +36,10 @@ extern FloatMenuItem menuVoltA1;
 extern FloatMenuItem menuVoltA0;
 extern BackMenuItem menuBackStatus;
 extern SubMenuItem menuStatus;
+extern BooleanMenuItem menuTempCheck;
+extern BooleanMenuItem menuSCircuitProtect;
+extern BackMenuItem menuBackAdvanced;
+extern SubMenuItem menuAdvanced;
 extern ActionMenuItem menuSaveAll;
 extern RemoteMenuItem menuRemote;
 extern BooleanMenuItem menuPwrDelay;

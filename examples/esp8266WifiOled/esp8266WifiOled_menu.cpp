@@ -13,8 +13,8 @@
 
 // Global variable declarations
 
-AdaColorGfxMenuConfig gfxConfig;
-AdaFruitGfxMenuRenderer renderer(DISPLAY_WIDTH, DISPLAY_HEIGHT);
+extern AdaColorGfxMenuConfig config;
+AdaFruitGfxMenuRenderer renderer;
 const char PROGMEM applicationName[] = "Greenhouse";
 
 // Global Menu Item declarations
@@ -45,9 +45,8 @@ AnalogMenuItem menuTomatoTemp(&minfoTomatoTemp, 0, &menuCucumberTemp);
 // Set up code
 
 void setupMenu() {
-    prepareAdaMonoGfxConfigLoRes(&gfxConfig);
-    renderer.setGraphicsDevice(&gfx, &gfxConfig);
-    switches.initialise(ioUsingArduino(), true);
-    menuMgr.initForEncoder(&renderer, &menuTomatoTemp, ENCODER_PIN_A, ENCODER_PIN_B, ENCODER_PIN_OK);
+    renderer.setGraphicsDevice(&gfx, &config);
+    //switches.initialise(ioUsingArduino(), true);
+    menuMgr.initWithoutInput(&renderer, &menuTomatoTemp); //,ENCODER_PIN_A, ENCODER_PIN_B, ENCODER_PIN_OK);
 }
 

@@ -122,7 +122,6 @@ public:
 
     int getLastWriteBufferChar() {
         if(linePosition == 0) return 0;
-        serdebugF3("getlastwrite ", linePosition, (char)lineBuffer[linePosition-1]);
         return lineBuffer[linePosition-1];
     }
 };
@@ -135,12 +134,12 @@ protected:
     UnitTestTransport transport;
     CombinedMessageProcessor messageProcessor;
 public:
-    RemoteFixture() : messageProcessor(msgHandlers, MSG_HANDLERS_SIZE) { }
+    RemoteFixture() : remoteConnector(2), messageProcessor(msgHandlers, MSG_HANDLERS_SIZE) { }
 
     void setup() override {
         taskManager.reset();
         transport.init();
-        remoteConnector.initialise(&transport, &messageProcessor, pgmMyName, 2);
+        remoteConnector.initialise(&transport, &messageProcessor, pgmMyName);
         menuMgr.initWithoutInput(&noRenderer, &textMenuItem1);
     }
 

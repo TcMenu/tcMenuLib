@@ -75,10 +75,14 @@ template<typename FONTPTR> struct ColorGfxMenuConfig {
  */
 void prepareDefaultGfxConfig(ColorGfxMenuConfig<void*>* config);
 
-typedef uint32_t Coord;
-#define MakeCoord(x, y) ((((long)x)<<16)|y)
-#define CoordX(c) (c>>16)
-#define CoordY(c) (c&0xffff)
+struct Coord {
+    Coord(int x, int y) {
+        this->x = x;
+        this->y = y;
+    }
+    int32_t x:15;
+    int32_t y:15;
+};
 
 /**
  * The default editing icon for approx 100-150 dpi resolution displays 

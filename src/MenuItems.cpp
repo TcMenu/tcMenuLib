@@ -11,6 +11,7 @@ MenuItem::MenuItem(MenuType menuType, const AnyMenuInfo* menuInfo, MenuItem* nex
 	this->menuType = menuType;
 	this->info = menuInfo;
 	this->next = next;
+    this->setChanged(true); // items always start out needing redrawing.
 }
 
 bool MenuItem::isSendRemoteNeeded(uint8_t remoteNo) {
@@ -35,7 +36,7 @@ void MenuItem::triggerCallback() {
 	}
 }
 
-uint8_t MenuItem::copyNameToBuffer(char* buf, uint8_t offset, uint8_t size) {
+uint8_t MenuItem::copyNameToBuffer(char* buf, int offset, int size) {
 	const char* name = info->name;
     uint8_t ret = safeProgCpy(buf + offset, name, size - offset);
     return ret + offset;
@@ -49,7 +50,7 @@ uint8_t MenuItem::copyNameToBuffer(char* buf, uint8_t offset, uint8_t size) {
 void EnumMenuItem::copyEnumStrToBuffer(char* buffer, int size, int idx) {
     char** itemPtr = ((char**)pgm_read_ptr_near(&((EnumMenuInfo*)info)->menuItems) + idx);
     char* itemLoc = (char *)pgm_read_ptr_near(itemPtr);
-    safeProgCpy(buffer, itemLoc, size);
+    strncpy_P(buffer, itemLoc, size);
 }
 
 int EnumMenuItem::getLengthOfEnumStr(int idx) {
@@ -76,7 +77,7 @@ int EnumMenuItem::getLengthOfEnumStr(int idx) {
 
 #endif
 
-void TextMenuItem::setTextValue(const char* text) {
+void TextMenuItem::setTextValue(const char* text, bool silent) {
 	// skip if they are the same
 	if(strncmp(menuText, text, textLength()) == 0) return;
 
@@ -84,7 +85,7 @@ void TextMenuItem::setTextValue(const char* text) {
 	menuText[textLength() - 1] = 0;
 	setChanged(true);
 	setSendRemoteNeededAll();
-	triggerCallback();
+	if(!silent) triggerCallback();
 }
 
 bool isSame(float d1, float d2) {
@@ -92,21 +93,20 @@ bool isSame(float d1, float d2) {
 	return result < 0.0000001;
 }
 
-void FloatMenuItem::setFloatValue(float newVal) {
+void FloatMenuItem::setFloatValue(float newVal, bool silent) {
 	if(isSame(newVal, currValue)) return;
 	
 	this->currValue = newVal;
 	setSendRemoteNeededAll();
 	setChanged(true);
-	triggerCallback();
+	if(!silent) triggerCallback();
 }
 
-void ValueMenuItem::setCurrentValue(uint16_t val) {
+void ValueMenuItem::setCurrentValue(uint16_t val, bool silent) {
 	if(val == currentValue || val > getMaximumValue()) return;
 	
 	setChanged(true);
 	setSendRemoteNeededAll();
 	currentValue = val;
-	triggerCallback();
-
+    if(!silent)	triggerCallback();
 }

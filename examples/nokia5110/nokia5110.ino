@@ -14,7 +14,7 @@
 #include <EepromAbstraction.h>
 #include <UIPEthernet.h>
 
-// you can turn on and off tcmenu loggin in the below file (within IoAbstraction)
+// you can turn on and off tcmenu logging in the below file (within IoAbstraction)
 #include <IoLogging.h>
 
 // We are going to load and save using the inbuilt AVR EEPROM storage

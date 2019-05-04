@@ -12,6 +12,7 @@
 #include "RemoteTypes.h"
 #include "MenuItems.h"
 #include "MessageProcessors.h"
+#include "MenuIterator.h"
 
 #define TAG_VAL_PROTOCOL 0x01
 #define START_OF_MESSAGE 0x01
@@ -145,15 +146,15 @@ private:
 	TagValueTransport* transport;	
     CommsCallbackFn commsCallback;
 
+    // used by bootstrapping and writing out messages
+    MenuItemIterator iterator;
+    MenuItemTypePredicate bootPredicate;
+    RemoteNoMenuItemPredicate remotePredicate;
+
 	// the remote connection details take 16 bytes
 	char remoteName[8];
 	uint8_t remoteMajorVer, remoteMinorVer;
 	ApiPlatform remotePlatform;
-
-	// for bootstrapping
-	MenuItem* bootMenuPtr;
-	MenuItem* preSubMenuBootPtr;
-
 	uint8_t flags;
 	uint8_t remoteNo;
 public:
@@ -162,7 +163,7 @@ public:
 	 * @param transport the actual underlying transport
 	 * @param remoteNo the index of this connector, 0 based.
 	 */
-	TagValueRemoteConnector();
+	TagValueRemoteConnector(uint8_t remoteNo = 0);
 
     /**
      * Initialises the connector with a specific transport that can send and recevie data, a message processor that can
@@ -172,10 +173,9 @@ public:
      * @param localNamePgm the name of this local device (in program memory on AVR).
      * @param remoteNo indicates the remote number associated with this connector (defaults to 0)
      */
-    void initialise(TagValueTransport* transport, CombinedMessageProcessor* processor, const char* localNamePgm, uint8_t remoteNo = 0) {
+    void initialise(TagValueTransport* transport, CombinedMessageProcessor* processor, const char* localNamePgm) {
        	this->processor = processor;
         this->transport = transport;
-        this->remoteNo = remoteNo;
         this->localNamePgm = localNamePgm;
     }
 
@@ -293,7 +293,7 @@ public:
 	/**
 	 * Called internally to start a bootstrap on new connections
 	 */
-	void initiateBootstrap(MenuItem* firstItem);
+	void initiateBootstrap();
 
 	/**
 	 * Returns the remoteNo (or remote number) for this remote

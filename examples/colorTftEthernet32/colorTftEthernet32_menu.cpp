@@ -13,7 +13,7 @@
 
 // Global variable declarations
 
-AdaFruitGfxMenuRenderer renderer(DISPLAY_WIDTH, DISPLAY_HEIGHT);
+AdaFruitGfxMenuRenderer renderer;
 const char applicationName[] = "Turntable";
 EthernetServer server(3333);
 
@@ -26,8 +26,15 @@ FloatMenuItem menuVoltA0(&minfoVoltA0, &menuVoltA1);
 const SubMenuInfo minfoStatus = { "Status", 7, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackStatus(&menuVoltA0, (const AnyMenuInfo*)&minfoStatus);
 SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, NULL);
+const BooleanMenuInfo minfoTempCheck = { "Temp Check", 13, 9, 1, NO_CALLBACK, NAMING_ON_OFF };
+BooleanMenuItem menuTempCheck(&minfoTempCheck, false, NULL);
+const BooleanMenuInfo minfoSCircuitProtect = { "S-Circuit Protect", 12, 8, 1, NO_CALLBACK, NAMING_ON_OFF };
+BooleanMenuItem menuSCircuitProtect(&minfoSCircuitProtect, false, &menuTempCheck);
+const SubMenuInfo minfoAdvanced = { "Advanced", 11, 0xffff, 0, NO_CALLBACK };
+BackMenuItem menuBackAdvanced(&menuSCircuitProtect, (const AnyMenuInfo*)&minfoAdvanced);
+SubMenuItem menuAdvanced(&minfoAdvanced, &menuBackAdvanced, NULL);
 const AnyMenuInfo minfoSaveAll = { "Save all", 10, 0xffff, 0, onSaveRom };
-ActionMenuItem menuSaveAll(&minfoSaveAll, NULL);
+ActionMenuItem menuSaveAll(&minfoSaveAll, &menuAdvanced);
 const RemoteMenuInfo minfoRemote = { "Remote", 6, 0xffff, 0, NO_CALLBACK };
 RemoteMenuItem menuRemote(&minfoRemote, remoteServer.getRemoteConnector(0), &menuSaveAll);
 const BooleanMenuInfo minfoPwrDelay = { "Pwr Delay", 5, 0xffff, 1, NO_CALLBACK, NAMING_YES_NO };

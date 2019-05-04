@@ -4,6 +4,7 @@
  */
 
 #include "MenuItems.h"
+#include "tcMenu.h"
 #include "tcUtil.h"
 
 void appendChar(char* str, char val, int len) {
@@ -44,6 +45,8 @@ void fastltoa(char* str, long val, uint8_t dp, char padChar, int len) {
 void fastltoa_mv(char* str, long val, long divisor, char padChar, int len) {
     int i=0;
     len -=2;
+
+    val %= divisor;
     divisor /= 10;
 
     while(str[i] && i < len) ++i; 

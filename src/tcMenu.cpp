@@ -13,7 +13,8 @@ void MenuManager::initForUpDownOk(MenuRenderer* renderer, MenuItem* root, uint8_
 	this->renderer = renderer;
 	this->rootMenu = root;
 
-	switches.addSwitch(pinOk, [](__attribute__((unused)) uint8_t key, bool held) {menuMgr.onMenuSelect(held); });
+	switches.addSwitch(pinOk, NULL);
+    switches.onRelease(pinOk, [](uint8_t /*key*/, bool held) { menuMgr.onMenuSelect(held); }); 
 	setupUpDownButtonEncoder(pinUp, pinDown, [](int value) {menuMgr.valueChanged(value); });
 
 	renderer->initialise();
@@ -23,7 +24,8 @@ void MenuManager::initForEncoder(MenuRenderer* renderer,  MenuItem* root, uint8_
 	this->renderer = renderer;
 	this->rootMenu = root;
 
-	switches.addSwitch(encoderButton, [](__attribute__((unused)) uint8_t key, bool held) {menuMgr.onMenuSelect(held); });
+	switches.addSwitch(encoderButton, NULL);
+    switches.onRelease(encoderButton, [](uint8_t /*key*/, bool held) { menuMgr.onMenuSelect(held); }); 
 	setupRotaryEncoderWithInterrupt(encoderPinA, encoderPinB, [](int value) {menuMgr.valueChanged(value); });
 
 	renderer->initialise();
@@ -62,8 +64,11 @@ void MenuManager::valueChanged(int value) {
 /**
  * Called when the button on the encoder (OK button) is pressed. Most of this is left to the renderer to decide.
  */
-void MenuManager::onMenuSelect(__attribute__((unused)) bool held) {
-	if (renderer->getCurrentEditor() != NULL) {
+void MenuManager::onMenuSelect(bool held) {
+    if(held) {
+        renderer->onHold();
+    }
+	else if (renderer->getCurrentEditor() != NULL) {
 		renderer->onSelectPressed(NULL);
 	}
 	else {

@@ -5,6 +5,7 @@
 
 #include "tcMenu.h"
 #include "tcUtil.h"
+#include "MenuIterator.h"
 #include "RemoteMenuItem.h"
 #include "BaseRenderers.h"
 
@@ -17,6 +18,7 @@ BaseMenuRenderer::BaseMenuRenderer(int bufferSize) {
 	this->currentEditor = NULL;
 	this->currentRoot = menuMgr.getRoot();
 	this->lastOffset = 0;
+    this->firstWidget = NULL;
 }
 
 void BaseMenuRenderer::initialise() {
@@ -257,22 +259,17 @@ void BaseMenuRenderer::giveBackDisplay() {
 	prepareNewSubmenu(currentRoot);
 }
 
-void recurseResetMenu(MenuItem* currentMenu) {
-	while(currentMenu != NULL) {
-		if(currentMenu->getMenuType() == MENUTYPE_SUB_VALUE) {
-			recurseResetMenu(((SubMenuItem*)currentMenu)->getChild());
-		}
-		currentMenu->setActive(false);
-		currentMenu->setEditing(false);
+MenuItem* BaseMenuRenderer::getParentAndReset() {
+    MenuItem* par = getParentRootAndVisit(currentRoot, [](MenuItem* curr) {
+		curr->setActive(false);
+		curr->setEditing(false);
+    });
 
-		currentMenu = currentMenu->getNext();
-	}
+    if(par == NULL) par = menuMgr.getRoot();
+    return par;
 }
 
 void BaseMenuRenderer::prepareNewSubmenu(MenuItem* newItems) {
-	// clear down all menu active and edit states before chaning menu
-	recurseResetMenu(menuMgr.getRoot());
-
 	menuAltered();
 	currentRoot = newItems;
 	currentRoot->setActive(true);
@@ -339,6 +336,10 @@ int BaseMenuRenderer::offsetOfCurrentActive() {
 	return 0;
 }
 
+void BaseMenuRenderer::onHold() {
+	prepareNewSubmenu(getParentAndReset());
+}
+
 void BaseMenuRenderer::onSelectPressed(MenuItem* toEdit) {
 	if(renderCallback) {
 		// we dont handle click events when the display is taken over
@@ -363,11 +364,12 @@ void BaseMenuRenderer::onSelectPressed(MenuItem* toEdit) {
 	if(toEdit != NULL) {
 		if (toEdit->getMenuType() == MENUTYPE_SUB_VALUE) {
 			toEdit->setActive(false);
+           	getParentAndReset();
 			prepareNewSubmenu(((SubMenuItem*)toEdit)->getChild());
 		}
 		else if (toEdit->getMenuType() == MENUTYPE_BACK_VALUE) {
 			toEdit->setActive(false);
-			prepareNewSubmenu(menuMgr.getRoot());
+			prepareNewSubmenu(getParentAndReset());
 		}
 		else if(toEdit->getMenuType() == MENUTYPE_ACTION_VALUE) {
 			toEdit->triggerCallback();

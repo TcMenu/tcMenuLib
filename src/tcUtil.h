@@ -9,6 +9,9 @@
 #include <Arduino.h>
 #include "RemoteTypes.h"
 
+// forward reference.
+class MenuItem;
+
 /**
  * @file tcUtil.h
  * 
@@ -69,8 +72,6 @@ void fastltoa_mv(char* str, long val, long divisor, char padChar, int len);
  */
 void fastltoa(char* str, long val, uint8_t dp, char padChar, int len);
 
-class MenuItem; // forward reference.
-
 /**
  * returns the number of items in the current menu described by itemCount
  */
@@ -94,8 +95,20 @@ long dpToDivisor(int dp);
  */
 uint8_t safeProgCpy(char* dst, const char* pgmSrc, uint8_t size);
 
+// for AVR only definitions
 #ifdef __AVR__
 #include <avr/pgmspace.h>
+#define get_info_callback(x) ((MenuCallbackFn)pgm_read_ptr_near(x))
+#endif
+
+// for ESP only definitions
+#ifdef ESP_H
+#include <pgmspace.h>
+#define get_info_callback(x) ((MenuCallbackFn)(*x))
+#endif
+
+// for things that are the same between AVR and ESP
+#if defined __AVR__ || defined ESP_H
 #define PGM_TCM PROGMEM
 extern char szGlobalBuffer[];
 inline char* potentialProgramMemory(const char *x) {
@@ -105,7 +118,6 @@ inline char* potentialProgramMemory(const char *x) {
 #define get_info_char(x) ((char) pgm_read_byte_near(x)) 
 #define get_info_int(x) ((int)pgm_read_word_near(x))
 #define get_info_uint(x) ((unsigned int)pgm_read_word_near(x))
-#define get_info_callback(x) ((MenuCallbackFn)pgm_read_ptr_near(x))
 #define safeProgStrLen(x) (strlen_P(x))
 #define TCMENU_DEFINED_PLATFORM PLATFORM_ARDUINO_8BIT
 #else 
