@@ -14,7 +14,9 @@
 #include <tcMenu.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include "RemoteConnector.h"
+#include <RemoteConnector.h>
+#include <ESP8266WiFi.h>
+#include "EthernetTransport.h"
 #include "tcMenuAdaFruitGfx.h"
 
 // all define statements needed

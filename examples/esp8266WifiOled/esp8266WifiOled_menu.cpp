@@ -15,6 +15,7 @@
 
 AdaFruitGfxMenuRenderer renderer;
 const char PROGMEM applicationName[] = "Greenhouse";
+WiFiServer server(3333);
 
 // Global Menu Item declarations
 
@@ -46,5 +47,6 @@ AnalogMenuItem menuTomatoTemp(&minfoTomatoTemp, 0, &menuCucumberTemp);
 void setupMenu() {
     renderer.setGraphicsDevice(&gfx, &config);
     menuMgr.initWithoutInput(&renderer, &menuTomatoTemp);
+    remoteServer.begin(&server, applicationName);
 }
 

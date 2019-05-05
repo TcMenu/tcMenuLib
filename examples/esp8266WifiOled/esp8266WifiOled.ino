@@ -66,6 +66,20 @@ void setup() {
     // initialise the rendering configuration, must be done before calling setupMenu().
     prepareOledDisplayConfig();
 
+    // this sketch assumes you've successfully connected to the Wifi before, does not
+    // call begin.. You can initialise the wifi whichever way you wish here.
+    Serial.println("Waiting for WiFi connection");
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        Serial.print(".");
+    }
+    Serial.println("");
+    Serial.print("Connected to ");
+    Serial.println(WiFi.SSID());
+    Serial.print("IP address: ");
+    Serial.println(WiFi.localIP());
+
+
     // initialise the menu.
     setupMenu();
 

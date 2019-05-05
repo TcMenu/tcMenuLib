@@ -75,7 +75,7 @@ uint8_t itemCount(MenuItem* item) {
 	return count;
 }
 
-#ifdef __AVR__
+#if defined __AVR__ || defined ESP_H
 char szGlobalBuffer[16];
 #endif
 
