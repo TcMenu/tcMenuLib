@@ -32,9 +32,6 @@ extern const unsigned char PROGMEM loResActiveIcon[];
 
 extern const char applicationName[];
 
-#define RGB_BLACK 0x0
-#define RGB_WHITE 0xffff
-
 /**
  * A standard menu render configuration that describes how to renderer each item and the title.
  * Specialised for Adafruit_GFX fonts.

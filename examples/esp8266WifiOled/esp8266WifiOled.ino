@@ -29,17 +29,17 @@ void prepareOledDisplayConfig() {
 	makePadding(config.itemPadding, 1, 1, 1, 1);
 	makePadding(config.widgetPadding, 2, 2, 0, 2);
 
-	config.bgTitleColor = RGB_WHITE;
-	config.fgTitleColor = RGB_BLACK;
+	config.bgTitleColor = WHITE;
+	config.fgTitleColor = BLACK;
 	config.titleFont = NULL;
 	config.titleBottomMargin = 1;
-	config.widgetColor = RGB_BLACK;
+	config.widgetColor = BLACK;
 	config.titleFontMagnification = 1;
 
-	config.bgItemColor = RGB_BLACK;
-	config.fgItemColor = RGB_WHITE;
-	config.bgSelectColor = RGB_WHITE;
-	config.fgSelectColor = RGB_BLACK;
+	config.bgItemColor = BLACK;
+	config.fgItemColor = WHITE;
+	config.bgSelectColor = BLACK;
+	config.fgSelectColor = WHITE;
 	config.itemFont = NULL;
 	config.itemFontMagnification = 1;
 
@@ -69,13 +69,15 @@ void setup() {
     // initialise the menu.
     setupMenu();
 
+    //
     // here we simulate the temprature changing.
     // temprature doesn't change that often, even 5 seconds is probably too short.
     // in a normal system you'd probably do something other than call random..
-    // taskManager.scheduleFixedRate(5000, [] {
-    //     menuTomatoTemp.setCurrentValue(random(255));
-    //     menuCucumberTemp.setCurrentValue(random(255));
-    // });
+    //
+    taskManager.scheduleFixedRate(5000, [] {
+        menuTomatoTemp.setCurrentValue(random(255));
+        menuCucumberTemp.setCurrentValue(random(255));
+    });
 }
 
 //

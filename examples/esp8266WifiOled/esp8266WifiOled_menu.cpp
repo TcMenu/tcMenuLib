@@ -13,7 +13,6 @@
 
 // Global variable declarations
 
-extern AdaColorGfxMenuConfig config;
 AdaFruitGfxMenuRenderer renderer;
 const char PROGMEM applicationName[] = "Greenhouse";
 
@@ -46,7 +45,6 @@ AnalogMenuItem menuTomatoTemp(&minfoTomatoTemp, 0, &menuCucumberTemp);
 
 void setupMenu() {
     renderer.setGraphicsDevice(&gfx, &config);
-    //switches.initialise(ioUsingArduino(), true);
-    menuMgr.initWithoutInput(&renderer, &menuTomatoTemp); //,ENCODER_PIN_A, ENCODER_PIN_B, ENCODER_PIN_OK);
+    menuMgr.initWithoutInput(&renderer, &menuTomatoTemp);
 }
 

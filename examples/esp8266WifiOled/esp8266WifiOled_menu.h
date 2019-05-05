@@ -19,13 +19,9 @@
 
 // all define statements needed
 #define TCMENU_USING_PROGMEM true
-#define DISPLAY_WIDTH 128
-#define DISPLAY_HEIGHT 32
-#define ENCODER_PIN_A 0
-#define ENCODER_PIN_B 3
-#define ENCODER_PIN_OK A0
 
 // all variables that need exporting
+extern AdaColorGfxMenuConfig config;
 extern Adafruit_SSD1306 gfx;
 extern AdaFruitGfxMenuRenderer renderer;
 extern const char applicationName[];

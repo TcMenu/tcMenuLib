@@ -14,8 +14,7 @@
 
 #include "tcMenuAdaFruitGfx.h"
 
-
-const unsigned char PROGMEM loResEditingIcon[] = {
+const uint8_t loResEditingIcon[] PROGMEM = {
 		0b00000000,
 		0b01111110,
 		0b00000000,
@@ -23,8 +22,7 @@ const unsigned char PROGMEM loResEditingIcon[] = {
 		0b01111110,
 		0b00000000,
 };
-
-const unsigned char PROGMEM loResActiveIcon[] = {
+const uint8_t loResActiveIcon[] PROGMEM = {
 		0b00011000,
 		0b00011100,
 		0b11111110,
@@ -35,8 +33,10 @@ const unsigned char PROGMEM loResActiveIcon[] = {
 
 extern const char applicationName[];
 
+int drawingCount = 0;
+
 #if DISPLAY_HAS_MEMBUFFER == true
-    #define refreshDisplayIfNeeded(gr, needUpd) {if(needUpd) {serdebugF("call display()");reinterpret_cast<Adafruit_SSD1306*>(gr)->display();}}
+    #define refreshDisplayIfNeeded(gr, needUpd) {if(needUpd) reinterpret_cast<Adafruit_SSD1306*>(gr)->display();}
 #else
     #define refreshDisplayIfNeeded(g, n)
 #endif
@@ -117,7 +117,7 @@ bool AdaFruitGfxMenuRenderer::renderWidgets(bool forceDraw) {
 }
 
 void AdaFruitGfxMenuRenderer::render() {
-	if (graphics == NULL) return;
+ 	if (graphics == NULL) return;
 
 	uint8_t locRedrawMode = redrawMode;
 	redrawMode = MENUDRAW_NO_CHANGE;
@@ -147,7 +147,6 @@ void AdaFruitGfxMenuRenderer::render() {
 	graphics->setFont(gfxConfig->itemFont);
 	graphics->setTextSize(gfxConfig->itemFontMagnification);
 	int maxItemsY = ((graphics->height()-titleHeight) / itemHeight);
-
 
 	MenuItem* item = currentRoot;
 	// first we find the first currently active item in our single linked list
@@ -179,7 +178,7 @@ void AdaFruitGfxMenuRenderer::render() {
 		ypos += itemHeight;
 		item = item->getNext();
 	}
-  
+
     refreshDisplayIfNeeded(graphics, requiresUpdate);
 }
 
@@ -193,22 +192,21 @@ void AdaFruitGfxMenuRenderer::renderMenuItem(int yPos, int menuHeight, MenuItem*
 		graphics->fillRect(0, yPos, graphics->width(), menuHeight, gfxConfig->bgSelectColor);
 		graphics->drawBitmap(gfxConfig->itemPadding.left, yPos + ((menuHeight - icoHei) / 2), gfxConfig->editIcon, icoWid, icoHei, gfxConfig->fgSelectColor);
 		graphics->setTextColor(gfxConfig->fgSelectColor);
-        taskManager.yieldForMicros(0);
         serdebugF("Item Editing");
 	}
 	else if(item->isActive()) {
 		graphics->setTextColor(gfxConfig->fgSelectColor);
 		graphics->fillRect(0, yPos, graphics->width(), menuHeight, gfxConfig->bgSelectColor);
 		graphics->drawBitmap(gfxConfig->itemPadding.left, yPos + ((menuHeight - icoHei) / 2), gfxConfig->activeIcon, icoWid, icoHei, gfxConfig->fgSelectColor);
-        taskManager.yieldForMicros(0);
         serdebugF("Item Active");
 	}
 	else {
 		graphics->fillRect(0, yPos, graphics->width(), menuHeight, gfxConfig->bgItemColor);
 		graphics->setTextColor(gfxConfig->fgItemColor);
-        taskManager.yieldForMicros(0);
         serdebugF("Item Normal");
 	}
+
+    taskManager.yieldForMicros(0);
 
 	int textPos = gfxConfig->itemPadding.left + icoWid + gfxConfig->itemPadding.left;
 	
@@ -229,6 +227,8 @@ void AdaFruitGfxMenuRenderer::renderMenuItem(int yPos, int menuHeight, MenuItem*
 	graphics->setCursor(right, drawingPositionY);
  	graphics->print(buffer);
     serdebugF2("Value ", buffer);
+
+    taskManager.yieldForMicros(0);
 }
 
 void prepareAdaColorDefaultGfxConfig(AdaColorGfxMenuConfig* config) { 
@@ -240,17 +240,17 @@ void prepareAdaMonoGfxConfigLoRes(AdaColorGfxMenuConfig* config) {
 	makePadding(config->itemPadding, 1, 1, 1, 1);
 	makePadding(config->widgetPadding, 2, 2, 0, 2);
 
-	config->bgTitleColor = RGB_WHITE;
-	config->fgTitleColor = RGB_BLACK;
+	config->bgTitleColor = WHITE;
+	config->fgTitleColor = BLACK;
 	config->titleFont = NULL;
 	config->titleBottomMargin = 2;
-	config->widgetColor = RGB_BLACK;
+	config->widgetColor = BLACK;
 	config->titleFontMagnification = 1;
 
-	config->bgItemColor = RGB_BLACK;
-	config->fgItemColor = RGB_WHITE;
-	config->bgSelectColor = RGB_WHITE;
-	config->fgSelectColor = RGB_BLACK;
+	config->bgItemColor = BLACK;
+	config->fgItemColor = WHITE;
+	config->bgSelectColor = WHITE;
+	config->fgSelectColor = BLACK;
 	config->itemFont = NULL;
 	config->itemFontMagnification = 1;
 
@@ -259,4 +259,3 @@ void prepareAdaMonoGfxConfigLoRes(AdaColorGfxMenuConfig* config) {
     config->editIconHeight = 6;
     config->editIconWidth = 8;
 }
-
