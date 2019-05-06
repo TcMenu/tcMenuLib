@@ -45,7 +45,7 @@ void prepareCustomConfiguration() {
     // first we set the spacing around title, items and widgets. The make padding function follows the
     // same standard as CSS. Top, right, bottom, left.
 	makePadding(colorConfig.titlePadding, 12, 5, 12, 5); // top, right, bottom & left
-	makePadding(colorConfig.itemPadding, 5, 5, 3, 5);   // top, right, bottom & left
+	makePadding(colorConfig.itemPadding, 5, 3, 6, 5);   // top, right, bottom & left
 	makePadding(colorConfig.widgetPadding, 5, 10, 0, 5);// top, right, bottom & left
 
     // and then the foreground, background and font of the title

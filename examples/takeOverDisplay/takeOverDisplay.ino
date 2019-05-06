@@ -19,6 +19,8 @@ IoAbstractionRef io23017 = ioFrom23017(0x20, ACTIVE_LOW_OPEN, 2);
 I2cAt24Eeprom eeprom(0x50, 64); // page size 64 for AT24-128 model
 
 void setup() {
+    Serial.begin(115200);
+
     // You must call wire.begin if you are using the wire library. Importantly the library
     // or designer does not presently do this for you to make it compatible with the widest
     // range of possibilities.
@@ -49,6 +51,9 @@ void CALLBACK_FUNCTION onFoodChoice(int /*id*/) {
     char enumStr[20];
     int enumVal = menuFood.getCurrentValue();
     menuFood.copyEnumStrToBuffer(enumStr, sizeof(enumStr), enumVal);
+
+    Serial.print("Changed food choice to ");
+    Serial.println(enumStr);
     
     // and put it into a text menu item
     menuText.setTextValue(enumStr);
