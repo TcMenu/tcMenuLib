@@ -19,11 +19,13 @@ WiFiServer server(3333);
 
 // Global Menu Item declarations
 
+const PROGMEM AnyMenuInfo minfoSaveAll = { "Save All", 8, 0xffff, 0, onSaveAll };
+ActionMenuItem menuSaveAll(&minfoSaveAll, NULL);
 const char enumStrWinOpening_0[] PROGMEM = "NARROW";
 const char enumStrWinOpening_1[] PROGMEM = "WIDE";
 const char* const enumStrWinOpening[] PROGMEM  = { enumStrWinOpening_0, enumStrWinOpening_1 };
 const PROGMEM EnumMenuInfo minfoWinOpening = { "Win Opening", 7, 6, 1, onWindowOpening, enumStrWinOpening };
-EnumMenuItem menuWinOpening(&minfoWinOpening, 0, NULL);
+EnumMenuItem menuWinOpening(&minfoWinOpening, 0, &menuSaveAll);
 const char enumStrHeaterPower_0[] PROGMEM = "LOW";
 const char enumStrHeaterPower_1[] PROGMEM = "MEDIUM";
 const char enumStrHeaterPower_2[] PROGMEM = "HIGH";
@@ -46,7 +48,8 @@ AnalogMenuItem menuTomatoTemp(&minfoTomatoTemp, 0, &menuCucumberTemp);
 
 void setupMenu() {
     renderer.setGraphicsDevice(&gfx, &config);
-    menuMgr.initWithoutInput(&renderer, &menuTomatoTemp);
+    switches.initialise(io8574, true);
+    menuMgr.initForEncoder(&renderer, &menuTomatoTemp, ENCODER_PIN_A, ENCODER_PIN_B, ENCODER_PIN_OK);
     remoteServer.begin(&server, applicationName);
 }
 

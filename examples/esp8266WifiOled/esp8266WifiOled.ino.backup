@@ -126,11 +126,8 @@ void setup() {
     ioDeviceDigitalWriteS(io8574, HEATER_PIN, HIGH);
 
     //
-    // Initialise 512 bytes of ROM then load back values from eeprom
-    // If this is the first time, there is protection in the library to
-    // avoid loading garbage.
+    // load back values from eeprom, if they were ever saved.
     //
-    EEPROM.begin(512);
     ArduinoEEPROMAbstraction eepromWrapper(&EEPROM);
     menuMgr.load(eepromWrapper);
 }
@@ -202,12 +199,4 @@ void CALLBACK_FUNCTION onElectricHeater(int /*id*/) {
     if(menuElectricHeater.getBoolean()) {
         heaterOnFn();
     }
-}
-
-void CALLBACK_FUNCTION onSaveAll(int id) {
-    Serial.println("Saving values to EEPROM");
-    ArduinoEEPROMAbstraction eepromWrapper(&EEPROM);
-    menuMgr.save(eepromWrapper);
-    // on esp you must commit after calling save.
-    EEPROM.commit();
 }

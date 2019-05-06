@@ -116,7 +116,7 @@ inline char* potentialProgramMemory(const char *x) {
     return szGlobalBuffer;
 }
 #define get_info_char(x) ((char) pgm_read_byte_near(x)) 
-#define get_info_int(x) ((int)pgm_read_word_near(x))
+#define get_info_int(x) ((int16_t)pgm_read_word_near(x))
 #define get_info_uint(x) ((unsigned int)pgm_read_word_near(x))
 #define safeProgStrLen(x) (strlen_P(x))
 #define TCMENU_DEFINED_PLATFORM PLATFORM_ARDUINO_8BIT
@@ -125,7 +125,7 @@ inline char* potentialProgramMemory(const char *x) {
 #define PGM_TCM
 #define potentialProgramMemory(x) (x)
 #define get_info_char(x) ((char)(*x)) 
-#define get_info_int(x) ((int)(*x))
+#define get_info_int(x) ((int16_t)(*x))
 #define get_info_uint(x) ((unsigned int)(*x))
 #define get_info_callback(x) ((MenuCallbackFn)(*x))
 #define safeProgStrLen(x) (strlen(x))

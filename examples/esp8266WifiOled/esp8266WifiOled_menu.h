@@ -21,14 +21,19 @@
 
 // all define statements needed
 #define TCMENU_USING_PROGMEM true
+#define ENCODER_PIN_A 0
+#define ENCODER_PIN_B 1
+#define ENCODER_PIN_OK 2
 
 // all variables that need exporting
 extern AdaColorGfxMenuConfig config;
 extern Adafruit_SSD1306 gfx;
 extern AdaFruitGfxMenuRenderer renderer;
+extern IoAbstractionRef io8574;
 extern const char applicationName[];
 
 // all menu item forward references.
+extern ActionMenuItem menuSaveAll;
 extern EnumMenuItem menuWinOpening;
 extern EnumMenuItem menuHeaterPower;
 extern BackMenuItem menuBackSetup;
@@ -45,6 +50,7 @@ void CALLBACK_FUNCTION onWindowOpen(int id);
 void CALLBACK_FUNCTION onElectricHeater(int id);
 void CALLBACK_FUNCTION onHeaterPower(int id);
 void CALLBACK_FUNCTION onWindowOpening(int id);
+void CALLBACK_FUNCTION onSaveAll(int id);
 
 void setupMenu();
 
