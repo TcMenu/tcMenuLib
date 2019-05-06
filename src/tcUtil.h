@@ -99,12 +99,14 @@ uint8_t safeProgCpy(char* dst, const char* pgmSrc, uint8_t size);
 #ifdef __AVR__
 #include <avr/pgmspace.h>
 #define get_info_callback(x) ((MenuCallbackFn)pgm_read_ptr_near(x))
+#define TCMENU_DEFINED_PLATFORM PLATFORM_ARDUINO_8BIT
 #endif
 
 // for ESP only definitions
 #ifdef ESP_H
 #include <pgmspace.h>
 #define get_info_callback(x) ((MenuCallbackFn)(*x))
+#define TCMENU_DEFINED_PLATFORM PLATFORM_ARDUINO_32BIT
 #endif
 
 // for things that are the same between AVR and ESP
@@ -119,7 +121,6 @@ inline char* potentialProgramMemory(const char *x) {
 #define get_info_int(x) ((int16_t)pgm_read_word_near(x))
 #define get_info_uint(x) ((unsigned int)pgm_read_word_near(x))
 #define safeProgStrLen(x) (strlen_P(x))
-#define TCMENU_DEFINED_PLATFORM PLATFORM_ARDUINO_8BIT
 #else 
 #define TCMENU_DEFINED_PLATFORM PLATFORM_ARDUINO_32BIT
 #define PGM_TCM
