@@ -54,6 +54,7 @@ void BaseMenuRenderer::activeIndexChanged(uint8_t index) {
 
 void BaseMenuRenderer::resetToDefault() {
 	currentEditor = NULL;
+    getParentAndReset();
 	prepareNewSubmenu(menuMgr.getRoot());
 	ticksToReset = 255;
 }
