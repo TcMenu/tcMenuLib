@@ -156,7 +156,7 @@ void BaseMenuRenderer::menuValueEnum(EnumMenuItem* item, MenuDrawJustification j
 	else {
 		uint8_t count = item->getLengthOfEnumStr(item->getCurrentValue());
         if(count > bufferSize) count = bufferSize;
-		item->copyEnumStrToBuffer(buffer + (bufferSize - count), bufferSize, item->getCurrentValue());
+		item->copyEnumStrToBuffer(buffer + (bufferSize - count), count, item->getCurrentValue());
 	}
 }
 
