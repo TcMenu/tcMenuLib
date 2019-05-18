@@ -22,6 +22,6 @@ because any strong and stable ecosystem, such as Java, has got where it is becau
 Enterprise, start-ups and just about any other group you care to mention.
 
 I think it's a shame that so many Arduino libraries are GPL instead of Apache, LGPL or MIT; as it means these can't be used
-by commerical entities, at least without contacting the vendor of the library first. Will they bother to do that, NO, they
+by commercial entities, at least without contacting the vendor of the library first. Will they bother to do that, NO, they
 will just write what they need to get the job done and probably never give it back. If the library were open, and this
-same commerical made changes, they could well decide to give them back! 
+same commercial made changes, they could well decide to give them back! 

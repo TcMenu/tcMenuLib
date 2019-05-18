@@ -57,6 +57,11 @@ void setup() {
     // optional override of the magic key. This key is saved out with the
     // menu, and the values are only loaded when the key matches.
     menuMgr.load(eeprom, 0xd00d);
+
+    taskManager.scheduleFixedRate(500, [] {
+        menuVoltsIn.setFloatValue(240.0 + (float(random(100) / 100.0)));
+        menuCurrent.setFloatValue(0.5 + (float(random(100) / 100.0)));
+    });
 }
 
 //

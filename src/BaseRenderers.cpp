@@ -13,7 +13,9 @@ BaseMenuRenderer::BaseMenuRenderer(int bufferSize) {
 	buffer = new char[bufferSize + 1]; // add one to allow for the trailing 0.
 	this->bufferSize = bufferSize;
 	ticksToReset = 0;
+    resetValInTicks = 30 * SECONDS_IN_TICKS;
 	renderCallback = NULL;
+    resetCallback = NULL;
 	redrawMode = MENUDRAW_COMPLETE_REDRAW;
 	this->currentEditor = NULL;
 	this->currentRoot = menuMgr.getRoot();
@@ -57,12 +59,16 @@ void BaseMenuRenderer::resetToDefault() {
     getParentAndReset();
 	prepareNewSubmenu(menuMgr.getRoot());
 	ticksToReset = 255;
+
+    // once the menu has been reset, if the reset callback is present
+    // then we 
+    if(resetCallback) resetCallback();
 }
 
 void BaseMenuRenderer::countdownToDefaulting() {
 	if (ticksToReset == 0) {
 		resetToDefault();
-		ticksToReset = 255;
+		ticksToReset = resetValInTicks;
 	}
 	else if (ticksToReset != 255) {
 		--ticksToReset;
@@ -115,7 +121,7 @@ void BaseMenuRenderer::menuValueAnalog(AnalogMenuItem* item, MenuDrawJustificati
 	}
 	else if (divisor > 10) {
 		// so we can display as decimal, work out the nearest highest unit for 2dp, 3dp and 4dp.
-		int fractMax = (divisor > 1000) ? divisor = 10000 : (divisor > 100) ? 1000 : 100;
+		int fractMax = (divisor > 1000) ? 10000 : (divisor > 100) ? 1000 : 100;
 
 		// when divisor is greater than 10 we need to deal with both parts using itoa
 		int whole = calcVal / divisor;

@@ -1,6 +1,8 @@
 /**
+ * ESP8266 / ESP32 WiFi and OLED example. Works out of the box with Heltek Kits 8 & 32.
+ * 
  * This example shows a very basic home automation system, in this case we simulate a greenhouse
- * growing tomatoes and cucumbers. We can check the temprature of the areas, check if windows
+ * growing tomatoes and cucumbers. We can check the temperature of the areas, check if windows
  * are opened, open the window, configure the heater and see if it's on.
  * 
  * It is not a full working automation project, but rather designed to show how easily such a thing
@@ -14,9 +16,14 @@
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_GFX.h>
 #include "esp8266WifiOled_menu.h"
-#include <ESP8266WiFi.h>
 #include <IoAbstractionWire.h>
 #include <ArduinoEEPROMAbstraction.h>
+#ifdef ESP32 
+#include <WiFi.h>
+#else
+#include <ESP8266WiFi.h>
+#endif
+
 
 // here we define the heater and window pins on the PCF8574
 // 0, 1 are A and B from encoder, 2 is OK button.
@@ -26,10 +33,13 @@
 // this is the interrupt pin connection from the PCF8574 back to the ESP8266 board.
 #define IO_INTERRUPT_PIN 2
 
+// the width and height of the attached OLED display.
+#define OLED_WIDTH 128
+#define OLED_HEIGHT 64
 //
 // We create an adafruit 1306 display driver and also the tcMenu display configuration options
 //
-Adafruit_SSD1306 gfx(128, 32, &Wire, 16);
+Adafruit_SSD1306 gfx(OLED_WIDTH, OLED_HEIGHT, &Wire, 16);
 AdaColorGfxMenuConfig config;
 IoAbstractionRef io8574 = ioFrom8574(0x20, IO_INTERRUPT_PIN);
 

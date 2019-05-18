@@ -18,7 +18,7 @@
 /** the frequency at which the screen is redrawn (only if needed). */
 #define SCREEN_DRAW_INTERVAL 250
 /** the number of ticks the menu should reset to defaults after not being used */
-#define TICKS_BEFORE_DEFAULTING 120
+#define SECONDS_IN_TICKS (1000 / SCREEN_DRAW_INTERVAL)
 
 /**
  * Used to take over rendering for a period of time. Normally one calls renderer.takeOverDisplay(..) 
@@ -29,6 +29,12 @@
  * @param userClicked if the user clicked the select button
  */
 typedef void (*RendererCallbackFn)(unsigned int currentValue, bool userClicked);
+
+/**
+ * Used to indicate when the renderer is about to be reset, you could use this to do custom rendering
+ * when the menu is not active, for example taking over the display until some condition is met.
+ */
+typedef void (*ResetCallbackFn)();
 
 /**
  * Title widgets allow for drawing small graphics in the title area, for example connectivity status
@@ -171,10 +177,12 @@ protected:
 	char* buffer;
 	uint8_t bufferSize;
 	uint8_t ticksToReset;
-	uint8_t lastOffset;
+    uint16_t resetValInTicks;
+	uint16_t lastOffset;
 	MenuRedrawState redrawMode;
 	TitleWidget* firstWidget;
 	RendererCallbackFn renderCallback;
+    ResetCallbackFn resetCallback;
 	MenuItem* currentRoot;
 	MenuItem* currentEditor;
 
@@ -194,6 +202,23 @@ public:
 	 * Initialise the render setting up tasks
 	 */
 	virtual void initialise();
+
+    /** 
+     * Adjust the default reset interval of 30 seconds. Maximum value is 60 seconds.
+     * At this point the reset callback is called and the menu is reset to root with
+     * no present editor.
+     * @param resetTime
+     */
+    void setResetIntervalTimeSeconds(uint16_t interval) { 
+        unsigned int ticks = interval * SECONDS_IN_TICKS;
+        resetValInTicks = interval; 
+    }
+
+    /**
+     * Sets the callback that will receive reset events when the menu has not been edited
+     * for some time.
+     */
+    void setResetCallback(ResetCallbackFn resetFn) { resetCallback = resetFn; }
 
     /**
      * Called by taskManager when we are scheduled
@@ -245,7 +270,7 @@ public:
 	 * Called when the menu has been altered, to reset the countdown to
 	 * reset behaviour
 	 */
-	void menuAltered() { ticksToReset = TICKS_BEFORE_DEFAULTING; }
+	void menuAltered() { ticksToReset = resetValInTicks; }
 
 	/**
 	 * In order to take over the display, provide a callback function that will receive

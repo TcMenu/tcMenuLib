@@ -16,6 +16,7 @@
 #include <Adafruit_PCD8544.h>
 #include <RemoteConnector.h>
 #include "EthernetTransport.h"
+#include <RemoteMenuItem.h>
 #include "tcMenuAdaFruitGfx.h"
 
 // all define statements needed
@@ -30,6 +31,19 @@ extern AdaFruitGfxMenuRenderer renderer;
 extern const char applicationName[];
 
 // all menu item forward references.
+extern RemoteMenuItem menuR0;
+extern BackMenuItem menuBackRemote;
+extern SubMenuItem menuRemote;
+extern TextMenuItem menuTxt;
+extern FloatMenuItem menuCurrent;
+extern FloatMenuItem menuVoltsIn;
+extern BackMenuItem menuBackStatus;
+extern SubMenuItem menuStatus;
+extern ActionMenuItem menuShutdownNow;
+extern AnalogMenuItem menuDelay;
+extern BooleanMenuItem menuPwrDelay;
+extern BackMenuItem menuBackSettings;
+extern SubMenuItem menuSettings;
 extern EnumMenuItem menuOnAlm;
 extern AnalogMenuItem menuKitchen;
 extern AnalogMenuItem menuLiving;

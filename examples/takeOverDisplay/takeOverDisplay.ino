@@ -13,6 +13,8 @@
 // make sure you've arranged for !RESET pin to be held HIGH!!
 IoAbstractionRef io23017 = ioFrom23017(0x20, ACTIVE_LOW_OPEN, 2);
 
+// a counter that we use in the display function when we take over the display.
+int counter = 0;
 
 // if you don't have an i2c rom uncomment the avr variant and remove the i2c one.
 // AvrEeprom eeprom; 
@@ -26,12 +28,21 @@ void setup() {
     // range of possibilities.
     Wire.begin();
 
+    // When the renderer times out and is about to reset to main menu, you can get a callback.
+    // For example if the menu should only be displayed during configuration.
+    //
+    // Call BEFORE setupMenu to ensure it takes effect immediately, call AFTER setupMenu if you
+    // want to start in menu mode, but then apply the reset handler from that point onwards.
+    renderer.setResetCallback([] {
+        counter = 0;
+        renderer.takeOverDisplay(myDisplayFunction);
+    });
+
     // this is put in by the menu designer and must be called (always ensure devices are setup first).
     setupMenu();
 
     // here we use the EEPROM to load back the last set of values.
     menuMgr.load(eeprom);
-
 }
 
 //
@@ -59,9 +70,6 @@ void CALLBACK_FUNCTION onFoodChoice(int /*id*/) {
     menuText.setTextValue(enumStr);
 }
 
-// a counter that we use in the display function when we take over the display.
-int counter = 0;
-
 //
 // this is the function called by the renderer every 1/5 second once the display is
 // taken over, we pass this function to takeOverDisplay below.
@@ -72,6 +80,8 @@ void myDisplayFunction(unsigned int encoderValue, bool clicked) {
         switches.changeEncoderPrecision(999, 50);
         lcd.clear();
         lcd.print("We have the display!");
+        lcd.setCursor(0, 1);
+        lcd.print("OK button for menu..");
     }
 
     // We are told when the button is pressed in by the boolean parameter.
@@ -83,10 +93,10 @@ void myDisplayFunction(unsigned int encoderValue, bool clicked) {
     else {
         char buffer[5];
         // otherwise update the counter.
-        lcd.setCursor(0, 1);
+        lcd.setCursor(0, 2);
         ltoaClrBuff(buffer, ++counter, 4, ' ', sizeof(buffer));
         lcd.print(buffer);
-        lcd.setCursor(12, 1);
+        lcd.setCursor(12, 2);
         ltoaClrBuff(buffer, encoderValue, 4, '0', sizeof(buffer));
         lcd.print(buffer);
     }
