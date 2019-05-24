@@ -16,7 +16,7 @@
 
 #include <RemoteConnector.h>
 #include <TaskManager.h>
-#include <ESP8266WiFi.h>
+#include <WiFi.h>
 
 /**
  * An implementation of TagValueTransport that is able to read and write using sockets.

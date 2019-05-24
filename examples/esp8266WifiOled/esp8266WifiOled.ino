@@ -13,8 +13,6 @@
  */
 
 #include <Wire.h>
-#include <Adafruit_SSD1306.h>
-#include <Adafruit_GFX.h>
 #include "esp8266WifiOled_menu.h"
 #include <IoAbstractionWire.h>
 #include <ArduinoEEPROMAbstraction.h>
@@ -39,8 +37,7 @@
 //
 // We create an adafruit 1306 display driver and also the tcMenu display configuration options
 //
-Adafruit_SSD1306 gfx(OLED_WIDTH, OLED_HEIGHT, &Wire, 16);
-AdaColorGfxMenuConfig config;
+U8G2_SSD1306_128X64_NONAME_F_SW_I2C gfx(U8G2_R0, 15, 4, 16);
 IoAbstractionRef io8574 = ioFrom8574(0x20, IO_INTERRUPT_PIN);
 
 //
@@ -56,12 +53,10 @@ void setup() {
     Serial.begin(115200);
 
     // start up the display.
-    if(!gfx.begin(SSD1306_SWITCHCAPVCC, 0x3c)) {
-        Serial.println("Display not allocated - check connections");
-        for(;;) yield();
-    }
-	gfx.clearDisplay();
-    gfx.display();
+    gfx.begin();
+
+    WiFi.begin("SSID", "PWD");
+    WiFi.mode(WIFI_STA);
 
     // this sketch assumes you've successfully connected to the Wifi before, does not
     // call begin.. You can initialise the wifi whichever way you wish here.

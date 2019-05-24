@@ -12,24 +12,17 @@
 #define MENU_GENERATED_CODE_H
 
 #include <tcMenu.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
 #include <RemoteConnector.h>
-#include <ESP8266WiFi.h>
+#include <WiFi.h>
 #include "EthernetTransport.h"
-#include "tcMenuAdaFruitGfx.h"
+#include "tcMenuU8g2.h"
 
 // all define statements needed
 #define TCMENU_USING_PROGMEM true
-#define ENCODER_PIN_A 0
-#define ENCODER_PIN_B 1
-#define ENCODER_PIN_OK 2
 
 // all variables that need exporting
-extern AdaColorGfxMenuConfig config;
-extern Adafruit_SSD1306 gfx;
-extern AdaFruitGfxMenuRenderer renderer;
-extern IoAbstractionRef io8574;
+extern U8G2_SSD1306_128X64_NONAME_F_SW_I2C gfx;
+extern U8g2MenuRenderer renderer;
 extern const char applicationName[];
 
 // all menu item forward references.

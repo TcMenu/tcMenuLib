@@ -13,7 +13,8 @@
 
 // Global variable declarations
 
-AdaFruitGfxMenuRenderer renderer;
+U8g2GfxMenuConfig gfxConfig;
+U8g2MenuRenderer renderer;
 const char PROGMEM applicationName[] = "Greenhouse";
 WiFiServer server(3333);
 
@@ -47,9 +48,9 @@ AnalogMenuItem menuTomatoTemp(&minfoTomatoTemp, 0, &menuCucumberTemp);
 // Set up code
 
 void setupMenu() {
-    renderer.setGraphicsDevice(&gfx, &config);
-    switches.initialise(io8574, true);
-    menuMgr.initForEncoder(&renderer, &menuTomatoTemp, ENCODER_PIN_A, ENCODER_PIN_B, ENCODER_PIN_OK);
+    prepareBasicU8x8Config(gfxConfig);
+    renderer.setGraphicsDevice(&gfx, &gfxConfig);
+    menuMgr.initWithoutInput(&renderer, &menuTomatoTemp);
     remoteServer.begin(&server, applicationName);
 }
 
