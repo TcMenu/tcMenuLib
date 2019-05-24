@@ -18,7 +18,7 @@ BaseMenuRenderer::BaseMenuRenderer(int bufferSize) {
     resetCallback = NULL;
 	redrawMode = MENUDRAW_COMPLETE_REDRAW;
 	this->currentEditor = NULL;
-	this->currentRoot = menuMgr.getRoot();
+	this->currentRoot = NULL;
 	this->lastOffset = 0;
     this->firstWidget = NULL;
 }
@@ -26,6 +26,7 @@ BaseMenuRenderer::BaseMenuRenderer(int bufferSize) {
 void BaseMenuRenderer::initialise() {
 	ticksToReset = 0;
 	renderCallback = NULL;
+    currentRoot = menuMgr.getRoot();
 	redrawMode = MENUDRAW_COMPLETE_REDRAW;
 
 	resetToDefault();
