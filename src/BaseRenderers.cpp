@@ -31,10 +31,8 @@ void BaseMenuRenderer::initialise() {
 	redrawMode = MENUDRAW_COMPLETE_REDRAW;
 
 	resetToDefault();
-    Serial.println("Past reset");
 
 	taskManager.scheduleFixedRate(SCREEN_DRAW_INTERVAL, this);
-    Serial.println("Past schedule");
 }
 
 void BaseMenuRenderer::exec() {
@@ -43,9 +41,7 @@ void BaseMenuRenderer::exec() {
 		renderCallback((encoder != NULL) ? encoder->getCurrentReading() : 0, false);
 	}
 	else {
-    Serial.println("Render1");
 		render();
-    Serial.println("Render2");
 	}
 }
 
