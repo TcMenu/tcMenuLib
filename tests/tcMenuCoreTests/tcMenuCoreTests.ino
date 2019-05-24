@@ -108,16 +108,17 @@ testF(MenuItemIteratorFixture, testTcUtilGetParentAndVisit) {
     assertEqual(counter, 15);
 }
 
-// testF(MenuItemIteratorFixture, testGetItemById) {
-//     menuMgr.initWithoutInput(&noRenderer, &menuVolume);
+testF(MenuItemIteratorFixture, testGetItemById) {
+    menuMgr.initWithoutInput(&noRenderer, &menuVolume);
 
-//     assertTrue(getMenuItemById(0) == NULL);
-//     assertMenuItem(getMenuItemById(1), &menuVolume);
-//     assertMenuItem(getMenuItemById(5), NULL); // ID 5 is a submenu, cannot get id for those.
-//     assertMenuItem(getMenuItemById(101), &menuPressMe);
-//     assertMenuItem(getMenuItemById(2), &menuChannel);
-//     assertMenuItem(getMenuItemById(7), &menuLHSTemp);
-// }
+    assertTrue(getMenuItemById(0) == NULL);
+    assertMenuItem(getMenuItemById(1), &menuVolume);
+    assertMenuItem(getMenuItemById(5), &menuBackStatus);
+    assertMenuItem(getMenuItemById(101), &menuPressMe);
+    assertMenuItem(getMenuItemById(2), &menuChannel);
+    assertMenuItem(getMenuItemById(7), &menuLHSTemp);
+    assertMenuItem(getMenuItemById(103), &menuCaseTemp);
+}
 
 void clearAllChangeStatus() {
     getParentRootAndVisit(&menuVolume, [](MenuItem* item) {

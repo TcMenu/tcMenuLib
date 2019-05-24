@@ -52,7 +52,8 @@ MenuItem* getParentRootAndVisit(MenuItem* current, MenuVisitorFn visitor) {
 MenuItem* recursiveFindById(MenuItem* current, int id) {
     while(current != NULL) {
         if(current->getMenuType() == MENUTYPE_SUB_VALUE) {
-            MenuItem* ret = recursiveFindById(current, id);
+            SubMenuItem* sub = reinterpret_cast<SubMenuItem*>(current);
+            MenuItem* ret = recursiveFindById(sub->getChild(), id);
             if(ret != NULL) {
                 return ret;
             }
