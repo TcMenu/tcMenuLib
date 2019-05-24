@@ -38,12 +38,19 @@ MenuItem* getParentRootAndVisit(MenuItem* current, MenuVisitorFn visitor);
 /**
  * Finds the parent root menu item to the item that's passed in, that is the root item that contains
  * this menu item. This version will short circuit out of the traversal as soon as the item is found.
+ * Never returns NULL.
  * 
  * @param current the menu item that is currently menu root
- * @return the parent menu item to the present menu item
+ * @return the parent menu item to the present menu item, returns root instead of NULL.
  */
 inline MenuItem* getParentRoot(MenuItem* current) { return getParentRootAndVisit(current, NULL); }
 
+/**
+ * Gets the first match by ID of a menu item in the menu structure.
+ * @param the ID to locate the menu item  for
+ * @return the menu item associated or NULL.
+ */
+MenuItem* getMenuItemById(int id);
 
 /**
  * A predicate that can match upon a menu item, the match is generally performed by calling the

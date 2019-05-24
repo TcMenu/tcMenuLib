@@ -9,7 +9,7 @@
 #include <MenuIterator.h>
 
 #include "menuManagerTests.h"
-#include "baseRemoteTests.h"
+//#include "baseRemoteTests.h"
 #include <tcm_test/testFixtures.h>
 
 using namespace aunit;
@@ -66,20 +66,20 @@ test(testTcUtilIntegerConversions) {
 }
 
 void printMenuItem(MenuItem* menuItem) {
-    char buffer[20];
-    menuItem->copyNameToBuffer(buffer, sizeof buffer);
-    Serial.print(menuItem->getId());Serial.print(',');Serial.print(menuItem->getMenuType());Serial.print(',');Serial.print(buffer);
+    if(menuItem == NULL) {
+        Serial.print("NULL");
+    }
+    else {
+        char buffer[20];
+        menuItem->copyNameToBuffer(buffer, sizeof buffer);
+        Serial.print(menuItem->getId());Serial.print(',');Serial.print(menuItem->getMenuType());Serial.print(',');Serial.print(buffer);
+    }
 }
 
 class MenuItemIteratorFixture : public TestOnce {
 public:
     void assertMenuItem(MenuItem* actual, MenuItem* expected) {
-        if(actual == NULL) {
-            Serial.print("Actual was null, expected ");
-            printMenuItem(expected);
-            Serial.println();
-        }
-        else if(expected != actual) {
+        if(expected != actual) {
             Serial.print("Menu items are not equal: expected=");
             printMenuItem(expected);
             Serial.print(". Actual=");
@@ -94,19 +94,30 @@ public:
 testF(MenuItemIteratorFixture, testTcUtilGetParentAndVisit) {
     menuMgr.initWithoutInput(&noRenderer, &menuVolume);
 
-    assertTrue(getParentRoot(NULL) == NULL);
-    assertTrue(getParentRoot(&menuVolume) == NULL);
+    assertMenuItem(getParentRoot(NULL), &menuVolume);
+    assertMenuItem(getParentRoot(&menuVolume), &menuVolume);
     assertMenuItem(getParentRoot(&menuStatus), &menuVolume);
     assertMenuItem(getParentRoot(&menuBackSettings), &menuVolume);
-    assertMenuItem(getParentRoot(&menuBackSecondLevel), &menuStatus);
+    assertMenuItem(getParentRoot(&menuBackSecondLevel), &menuBackStatus);
 
     counter = 0;
-    assertMenuItem(getParentRootAndVisit(&menuSecondLevel, [](MenuItem* item) { 
+    assertMenuItem(getParentRootAndVisit(&menuBackSecondLevel, [](MenuItem* item) { 
         counter++;
         Serial.print("Visited");printMenuItem(item);Serial.println();
-    }), &menuStatus);
-    assertEqual(counter, 12);
+    }), &menuBackStatus);
+    assertEqual(counter, 15);
 }
+
+// testF(MenuItemIteratorFixture, testGetItemById) {
+//     menuMgr.initWithoutInput(&noRenderer, &menuVolume);
+
+//     assertTrue(getMenuItemById(0) == NULL);
+//     assertMenuItem(getMenuItemById(1), &menuVolume);
+//     assertMenuItem(getMenuItemById(5), NULL); // ID 5 is a submenu, cannot get id for those.
+//     assertMenuItem(getMenuItemById(101), &menuPressMe);
+//     assertMenuItem(getMenuItemById(2), &menuChannel);
+//     assertMenuItem(getMenuItemById(7), &menuLHSTemp);
+// }
 
 void clearAllChangeStatus() {
     getParentRootAndVisit(&menuVolume, [](MenuItem* item) {

@@ -75,7 +75,13 @@ template<typename FONTPTR> struct ColorGfxMenuConfig {
  */
 void prepareDefaultGfxConfig(ColorGfxMenuConfig<void*>* config);
 
+/** A structure that holds both X and Y direction in a single 32 bit integer. Both x and y are public */
 struct Coord {
+    /** 
+     * Create a coord based on an X and Y location 
+     * @param x the x location
+     * @param y the y location
+     */
     Coord(int x, int y) {
         this->x = x;
         this->y = y;
@@ -87,37 +93,21 @@ struct Coord {
 /**
  * The default editing icon for approx 100-150 dpi resolution displays 
  */
-const uint8_t defEditingIcon[] PGM_TCM = {
-		0b11111111,0b11111111,
-		0b01111111,0b11111111,
-		0b00011100,0b00000000,
-		0b00000111,0b00000000,
-		0b00000001,0b1100000,
-		0b00000000,0b00111000,
-		0b00000000,0b00111000,
-		0b00000001,0b11000000,
-		0b00000111,0b00000000,
-		0b00011100,0b00000000,
-		0b01111111,0b11111111,
-		0b11111111,0b11111111
-};
+extern const unsigned char PROGMEM loResEditingIcon[];
 
 /**
  * The default active icon for approx 100-150 dpi resolution displays 
  */
-const uint8_t defActiveIcon[] PGM_TCM = {
-		0b00000000,0b11100000,
-		0b00000000,0b11110000,
-		0b00000000,0b11111000,
-		0b00000000,0b11111100,
-		0b00000000,0b11111110,
-		0b11111111,0b11111111,
-		0b11111111,0b11111111,
-		0b00000000,0b11111110,
-		0b00000000,0b11111100,
-		0b00000000,0b11111000,
-		0b00000000,0b11110000,
-		0b00000000,0b11100000
-};
+extern const unsigned char PROGMEM loResActiveIcon[];
+
+/**
+ * The low resolution icon for indicating active status
+ */
+extern const unsigned char PROGMEM defActiveIcon[];
+
+/**
+ * The low resolution icon for editing status
+ */
+extern const unsigned char PROGMEM defEditingIcon[];
 
 #endif // _GFX_MENU_CONFIG_H_

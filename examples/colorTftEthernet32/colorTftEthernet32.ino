@@ -69,10 +69,13 @@ void prepareCustomConfiguration() {
 	colorConfig.itemFontMagnification = 1;
 
     // and if you really want to, provide alternative bitmaps for the edit / active icon
+    // otherwise both icons must be set to NULL.
     //colorConfig.editIcon = myEditIcon;
     //colorConfig.activeIcon = myActiveIcon;
     //colorConfig.editIconWidth = myEditWidth;
     //colorConfig.editIconHeight = myEditheight;
+    colorConfig.editIcon = NULL;
+    colorConfig.activeIcon = NULL;
 }
 
 void setup() {
@@ -101,7 +104,8 @@ void setup() {
     // and then load back the previous state
     menuMgr.load(eeprom);
 
-    taskManager.scheduleFixedRate(250, [] {
+    taskManager.scheduleFixedRate(2250, [] {
+        Serial.print(".");
         float a1Value = analogDevice.getCurrentValue(A1);
         menuVoltA1.setFloatValue(a1Value / fractionsPerUnit);
     });

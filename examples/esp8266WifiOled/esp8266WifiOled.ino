@@ -50,36 +50,6 @@ bool heaterOn;
 bool windowOpen;
 
 //
-// here we prepare the configuration used by the adafruit display renderer with our custom
-// settings. We can rely on the defaults, but they don't always suit the display in question.
-// As the 1306 (128x32) has a slighly unusual ratio it needs custom configuration.
-//
-void prepareOledDisplayConfig() {
-	makePadding(config.titlePadding, 1, 1, 1, 1);
-	makePadding(config.itemPadding, 1, 1, 1, 1);
-	makePadding(config.widgetPadding, 2, 2, 0, 2);
-
-	config.bgTitleColor = WHITE;
-	config.fgTitleColor = BLACK;
-	config.titleFont = NULL;
-	config.titleBottomMargin = 1;
-	config.widgetColor = BLACK;
-	config.titleFontMagnification = 1;
-
-	config.bgItemColor = BLACK;
-	config.fgItemColor = WHITE;
-	config.bgSelectColor = BLACK;
-	config.fgSelectColor = WHITE;
-	config.itemFont = NULL;
-	config.itemFontMagnification = 1;
-
-    config.editIcon = loResEditingIcon;
-    config.activeIcon = loResActiveIcon;
-    config.editIconHeight = 6;
-    config.editIconWidth = 8;
-}
-
-//
 // here we just start serial for debugging and try to initialise the display and menu
 //
 void setup() {
@@ -92,9 +62,6 @@ void setup() {
     }
 	gfx.clearDisplay();
     gfx.display();
-
-    // initialise the rendering configuration, must be done before calling setupMenu().
-    prepareOledDisplayConfig();
 
     // this sketch assumes you've successfully connected to the Wifi before, does not
     // call begin.. You can initialise the wifi whichever way you wish here.

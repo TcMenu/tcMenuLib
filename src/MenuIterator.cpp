@@ -41,7 +41,33 @@ MenuItem* recursiveFindRootVisit(MenuItem* currentMenu, MenuItem* toFind, MenuVi
 }
 
 MenuItem* getParentRootAndVisit(MenuItem* current, MenuVisitorFn visitor) {
+    if(current == NULL) current = menuMgr.getRoot();
     return  recursiveFindRootVisit(menuMgr.getRoot(), current, visitor);
+}
+
+/**
+ * Find an item by it's ID by traversing through the menu structure looking
+ * for the ID and short circuiting on the first match.
+ */
+MenuItem* recursiveFindById(MenuItem* current, int id) {
+    while(current != NULL) {
+        if(current->getMenuType() == MENUTYPE_SUB_VALUE) {
+            MenuItem* ret = recursiveFindById(current, id);
+            if(ret != NULL) {
+                return ret;
+            }
+        }
+        else if(current->getId() == id) {
+            return current;
+        } 
+
+        current = current->getNext();
+    }
+    return NULL;
+}
+
+MenuItem* getMenuItemById(int id) {
+    return recursiveFindById(menuMgr.getRoot(), id);
 }
 
 void MenuItemIterator::reset() {

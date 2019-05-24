@@ -13,6 +13,7 @@ BaseMenuRenderer::BaseMenuRenderer(int bufferSize) {
 	buffer = new char[bufferSize + 1]; // add one to allow for the trailing 0.
 	this->bufferSize = bufferSize;
 	ticksToReset = 0;
+    lastOffset = 0;
     resetValInTicks = 30 * SECONDS_IN_TICKS;
 	renderCallback = NULL;
     resetCallback = NULL;
@@ -24,14 +25,16 @@ BaseMenuRenderer::BaseMenuRenderer(int bufferSize) {
 }
 
 void BaseMenuRenderer::initialise() {
-	ticksToReset = 0;
+	ticksToReset = MAX_TICKS;
 	renderCallback = NULL;
     currentRoot = menuMgr.getRoot();
 	redrawMode = MENUDRAW_COMPLETE_REDRAW;
 
 	resetToDefault();
+    Serial.println("Past reset");
 
 	taskManager.scheduleFixedRate(SCREEN_DRAW_INTERVAL, this);
+    Serial.println("Past schedule");
 }
 
 void BaseMenuRenderer::exec() {
@@ -40,7 +43,9 @@ void BaseMenuRenderer::exec() {
 		renderCallback((encoder != NULL) ? encoder->getCurrentReading() : 0, false);
 	}
 	else {
+    Serial.println("Render1");
 		render();
+    Serial.println("Render2");
 	}
 }
 
@@ -59,7 +64,7 @@ void BaseMenuRenderer::resetToDefault() {
 	currentEditor = NULL;
     getParentAndReset();
 	prepareNewSubmenu(menuMgr.getRoot());
-	ticksToReset = 255;
+	ticksToReset = MAX_TICKS;
 
     // once the menu has been reset, if the reset callback is present
     // then we 
@@ -71,7 +76,7 @@ void BaseMenuRenderer::countdownToDefaulting() {
 		resetToDefault();
 		ticksToReset = resetValInTicks;
 	}
-	else if (ticksToReset != 255) {
+	else if (ticksToReset != MAX_TICKS) {
 		--ticksToReset;
 	}
 }
@@ -268,13 +273,10 @@ void BaseMenuRenderer::giveBackDisplay() {
 }
 
 MenuItem* BaseMenuRenderer::getParentAndReset() {
-    MenuItem* par = getParentRootAndVisit(currentRoot, [](MenuItem* curr) {
+    return getParentRootAndVisit(currentRoot, [](MenuItem* curr) {
 		curr->setActive(false);
 		curr->setEditing(false);
     });
-
-    if(par == NULL) par = menuMgr.getRoot();
-    return par;
 }
 
 void BaseMenuRenderer::prepareNewSubmenu(MenuItem* newItems) {

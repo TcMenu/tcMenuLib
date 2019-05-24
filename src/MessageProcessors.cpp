@@ -6,6 +6,7 @@
  */
 #include "RemoteConnector.h"
 #include "MessageProcessors.h"
+#include "MenuIterator.h"
 
 /**
  * An array of message handlers, where each one is a function that can process that type of message and a message type.
@@ -44,12 +45,6 @@ void fieldUpdateJoinMsg(TagValueRemoteConnector* connector, FieldAndValue* field
 	}
 }
 
-MenuItem* findItem(MenuItem* itm, uint16_t id) {
-	while(itm != NULL && itm->getId() != id) {
-		itm = itm->getNext();
-	}
-	return itm;
-}
 
 void fieldUpdateValueMsg(TagValueRemoteConnector* /*unused*/, FieldAndValue* field, MessageProcessorInfo* info) {
 	if(field->fieldType == FVAL_END_MSG) {
@@ -61,22 +56,10 @@ void fieldUpdateValueMsg(TagValueRemoteConnector* /*unused*/, FieldAndValue* fie
 	}
 	
 	switch(field->field) {
-	case FIELD_PARENT:
-		info->value.parentId = atoi(field->value);
-		break;
 	case FIELD_ID: {
 		int id = atoi(field->value);
-		MenuItem* sub;
-		if(info->value.parentId != 0) {
-			sub = findItem(menuMgr.getRoot(), info->value.parentId);
-			if(sub == NULL || sub->getMenuType() != MENUTYPE_SUB_VALUE) return;
-			sub = ((SubMenuItem*)sub)->getChild();
-		}
-		else {
-			sub = menuMgr.getRoot();
-		}
         
-		MenuItem* foundItem = findItem(sub, id);
+		MenuItem* foundItem = getMenuItemById(id);
         if(foundItem != NULL && !foundItem->isReadOnly()) {
             info->value.item = foundItem;
             serdebugF2("ValChange for ID ", foundItem->getId());

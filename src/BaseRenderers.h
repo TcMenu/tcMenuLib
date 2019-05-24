@@ -19,6 +19,8 @@
 #define SCREEN_DRAW_INTERVAL 250
 /** the number of ticks the menu should reset to defaults after not being used */
 #define SECONDS_IN_TICKS (1000 / SCREEN_DRAW_INTERVAL)
+/** The maximum number of ticks that */
+#define MAX_TICKS 0xffff
 
 /**
  * Used to take over rendering for a period of time. Normally one calls renderer.takeOverDisplay(..) 
@@ -176,9 +178,9 @@ class BaseMenuRenderer : public MenuRenderer, Executable {
 protected:
 	char* buffer;
 	uint8_t bufferSize;
-	uint8_t ticksToReset;
+	uint8_t lastOffset;
+	uint16_t ticksToReset;
     uint16_t resetValInTicks;
-	uint16_t lastOffset;
 	MenuRedrawState redrawMode;
 	TitleWidget* firstWidget;
 	RendererCallbackFn renderCallback;
@@ -211,7 +213,7 @@ public:
      */
     void setResetIntervalTimeSeconds(uint16_t interval) { 
         unsigned int ticks = interval * SECONDS_IN_TICKS;
-        resetValInTicks = interval; 
+        resetValInTicks = ticks; 
     }
 
     /**
