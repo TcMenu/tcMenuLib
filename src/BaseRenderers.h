@@ -9,6 +9,9 @@
 #include "tcMenu.h"
 #include <TaskManager.h>
 
+// forward reference.
+class BaseDialog;
+
 /**
  * @file BaseRenderers.h
  * This file contains the common code for rendering onto displays, making it much easier to implement
@@ -130,6 +133,12 @@ public:
 	 */
 	virtual MenuItem* getCurrentSubMenu() = 0;
 
+    /**
+     * Gets the dialog instance that is associated with this renderer or NULL if
+     * this renderer cannot display dialogs (only NoRenderer case).
+     */
+    virtual BaseDialog* getDialog() = 0;
+
 	/** virtual destructor is required by the language */
 	virtual ~MenuRenderer() { }
 };
@@ -162,6 +171,7 @@ public:
 	void onSelectPressed(MenuItem* /*ignored*/) override { }
 	void initialise() override { }
     void onHold() override { }
+    BaseDialog* getDialog() override { return NULL; }
 };
 
 class RemoteMenuItem; // forward reference.
@@ -187,7 +197,9 @@ protected:
     ResetCallbackFn resetCallback;
 	MenuItem* currentRoot;
 	MenuItem* currentEditor;
-
+    BaseDialog* dialog;
+private:
+    static BaseMenuRenderer* theInstance;
 public:
 	/**
 	 * constructs the renderer with a given buffer size 
@@ -204,6 +216,9 @@ public:
 	 * Initialise the render setting up tasks
 	 */
 	virtual void initialise();
+
+    /* Gets the instance */
+    static BaseMenuRenderer* getInstance() { return theInstance; }
 
     /** 
      * Adjust the default reset interval of 30 seconds. Maximum value is 60 seconds.
@@ -291,6 +306,17 @@ public:
 	 * Returns a pointer to the rendering callback
 	 */
 	RendererCallbackFn getRenderingCallback() { return renderCallback; }
+    
+    /**
+     * Gets the buffer that is used internally for render buffering.
+     */
+    char* getBuffer() {return buffer;}
+    
+    /**
+     * Gets the buffer size of the buffer
+     */
+    uint8_t getBufferSize() {return bufferSize;}
+
 protected:
     /**
      * Gets the parent of the current menu.

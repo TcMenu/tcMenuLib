@@ -8,6 +8,9 @@
 #include "MenuIterator.h"
 #include "RemoteMenuItem.h"
 #include "BaseRenderers.h"
+#include "BaseDialog.h"
+
+BaseMenuRenderer* BaseMenuRenderer::theInstance = NULL;
 
 BaseMenuRenderer::BaseMenuRenderer(int bufferSize) {
 	buffer = new char[bufferSize + 1]; // add one to allow for the trailing 0.
@@ -22,6 +25,8 @@ BaseMenuRenderer::BaseMenuRenderer(int bufferSize) {
 	this->currentRoot = NULL;
 	this->lastOffset = 0;
     this->firstWidget = NULL;
+    this->dialog = NULL;
+    theInstance = this;
 }
 
 void BaseMenuRenderer::initialise() {
@@ -36,7 +41,11 @@ void BaseMenuRenderer::initialise() {
 }
 
 void BaseMenuRenderer::exec() {
-	if(getRenderingCallback()) {
+	if(dialog!=NULL && dialog->isInUse()) {
+        RotaryEncoder* encoder = switches.getEncoder();
+		dialog->dialogRendering((encoder != NULL) ? encoder->getCurrentReading() : 0, false);
+    }
+    else if(getRenderingCallback()) {
         RotaryEncoder* encoder = switches.getEncoder();
 		renderCallback((encoder != NULL) ? encoder->getCurrentReading() : 0, false);
 	}
@@ -57,6 +66,7 @@ void BaseMenuRenderer::activeIndexChanged(uint8_t index) {
 }
 
 void BaseMenuRenderer::resetToDefault() {
+    serdebugF2("Display reset - timeout ticks: ", resetValInTicks);
 	currentEditor = NULL;
     getParentAndReset();
 	prepareNewSubmenu(menuMgr.getRoot());
@@ -347,7 +357,15 @@ void BaseMenuRenderer::onHold() {
 }
 
 void BaseMenuRenderer::onSelectPressed(MenuItem* toEdit) {
-	if(renderCallback) {
+    if(dialog != NULL && dialog->isInUse()) {
+		// we dont handle click events when a dialog is being drawn.
+        // instead we give events to it, as it has the display
+        RotaryEncoder* encoder = switches.getEncoder();
+		dialog->dialogRendering((encoder != NULL) ? encoder->getCurrentReading() : 0, true);
+        return;
+    }
+	
+    if(renderCallback) {
 		// we dont handle click events when the display is taken over
 		// instead we tell the custom renderer that we've had a click
         RotaryEncoder* encoder = switches.getEncoder();

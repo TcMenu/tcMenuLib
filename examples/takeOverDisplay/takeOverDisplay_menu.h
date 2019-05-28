@@ -13,7 +13,8 @@
 
 #include <tcMenu.h>
 #include <LiquidCrystalIO.h>
-#include "RemoteConnector.h"
+#include <RemoteConnector.h>
+#include "EthernetTransport.h"
 #include "tcMenuLiquidCrystal.h"
 
 // all define statements needed
@@ -45,6 +46,8 @@ extern AnalogMenuItem menuPower;
 extern BooleanMenuItem menuEnabled;
 extern BackMenuItem menuBackSettings;
 extern SubMenuItem menuSettings;
+extern ActionMenuItem menuQuestionDialog;
+extern ActionMenuItem menuInfoDialog;
 extern EnumMenuItem menuFood;
 extern ActionMenuItem menuTakeDisplay;
 
@@ -53,6 +56,8 @@ extern ActionMenuItem menuTakeDisplay;
 
 void CALLBACK_FUNCTION onTakeOverDisplay(int id);
 void CALLBACK_FUNCTION onFoodChoice(int id);
+void CALLBACK_FUNCTION onInfoDlg(int id);
+void CALLBACK_FUNCTION onQuestionDlg(int id);
 void CALLBACK_FUNCTION onSaveSettings(int id);
 
 void setupMenu();

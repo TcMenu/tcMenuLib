@@ -15,7 +15,7 @@
  * This defines the maximum size of any field value that can be received by this library.
  * If you need longer fields, change this value to a higher one.
  */
-#define MAX_VALUE_LEN 24
+#define MAX_VALUE_LEN 40
 
 /**
  * A helper to generate the major minor version numbers used in the protocol
@@ -26,6 +26,8 @@
  * Definition of the current API version
  */
 #define API_VERSION majorminor(1, 0)
+
+enum AckResponseStatus { ACK_VALUE_RANGE = -1 , ACK_SUCCESS = 0, ACK_ID_NOT_FOUND = 1, ACK_CREDENTIALS_INVALID = 2 };
 
 /**
  * Converts a message field as two separate entities into a single word.
@@ -42,6 +44,10 @@
  */
 #define UNKNOWN_MSG_TYPE 0x0000
 
+/** Message type definition for paring message */
+#define MSG_PAIR msgFieldToWord('P','R')
+/** Message type definition for acknowledgement message */
+#define MSG_ACKNOWLEDGEMENT msgFieldToWord('A','K')
 /** Message type definition for Join message */
 #define MSG_JOIN msgFieldToWord('N','J')
 /** Message type definition for heartbeat message */
@@ -89,6 +95,9 @@
 #define FIELD_MAX_LEN     msgFieldToWord('M', 'L')
 #define FIELD_REMOTE_NO   msgFieldToWord('R', 'N')
 #define FIELD_FLOAT_DP    msgFieldToWord('F', 'D')
+#define FIELD_UUID        msgFieldToWord('U', 'U')
+#define FIELD_CORRELATION msgFieldToWord('I', 'C')
+#define FIELD_ACK_STATUS  msgFieldToWord('S', 'T')
 
 #define FIELD_PREPEND_CHOICE 'C'
 

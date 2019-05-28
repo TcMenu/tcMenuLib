@@ -16,6 +16,7 @@
 LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
 LiquidCrystalRenderer renderer(lcd, LCD_WIDTH, LCD_HEIGHT);
 const char PROGMEM applicationName[] = "TakeDisplay";
+EthernetServer server(3333);
 
 // Global Menu Item declarations
 
@@ -30,13 +31,17 @@ BooleanMenuItem menuEnabled(&minfoEnabled, false, &menuPower);
 const PROGMEM SubMenuInfo minfoSettings = { "Settings", 3, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackSettings(&menuEnabled, (const AnyMenuInfo*)&minfoSettings);
 SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, &menuText);
+const PROGMEM AnyMenuInfo minfoQuestionDialog = { "Question Dialog", 9, 0xffff, 0, onQuestionDlg };
+ActionMenuItem menuQuestionDialog(&minfoQuestionDialog, &menuSettings);
+const PROGMEM AnyMenuInfo minfoInfoDialog = { "Info Dialog", 8, 0xffff, 0, onInfoDlg };
+ActionMenuItem menuInfoDialog(&minfoInfoDialog, &menuQuestionDialog);
 const char enumStrFood_0[] PROGMEM = "Pizza";
 const char enumStrFood_1[] PROGMEM = "Pasta";
 const char enumStrFood_2[] PROGMEM = "Salad";
 const char* const enumStrFood[] PROGMEM  = { enumStrFood_0, enumStrFood_1, enumStrFood_2 };
 const PROGMEM EnumMenuInfo minfoFood = { "Food", 2, 3, 2, onFoodChoice, enumStrFood };
-EnumMenuItem menuFood(&minfoFood, 0, &menuSettings);
-const PROGMEM AnyMenuInfo minfoTakeDisplay = { "Take display", 1, 0xffff, 0, onTakeOverDisplay };
+EnumMenuItem menuFood(&minfoFood, 0, &menuInfoDialog);
+const PROGMEM AnyMenuInfo minfoTakeDisplay = { "Take Display", 1, 0xffff, 0, onTakeOverDisplay };
 ActionMenuItem menuTakeDisplay(&minfoTakeDisplay, &menuFood);
 
 // Set up code
@@ -46,5 +51,6 @@ void setupMenu() {
     lcd.begin(LCD_WIDTH, LCD_HEIGHT);
     switches.initialise(io23017, true);
     menuMgr.initForEncoder(&renderer, &menuTakeDisplay, ENCODER_PIN_A, ENCODER_PIN_B, ENCODER_PIN_OK);
+    remoteServer.begin(&server, applicationName);
 }
 

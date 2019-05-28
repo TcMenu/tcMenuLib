@@ -7,6 +7,7 @@
 #define __MENU_MANAGER_H
 
 #include <IoAbstraction.h>
+#include "tcUtil.h"
 #include "MenuItems.h"
 #include "BaseRenderers.h"
 #include "EepromAbstraction.h"

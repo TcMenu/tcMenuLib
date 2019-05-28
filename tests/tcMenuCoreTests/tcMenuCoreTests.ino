@@ -9,6 +9,7 @@
 #include <MenuIterator.h>
 
 #include "menuManagerTests.h"
+#include "authenticationTests.h"
 //#include "baseRemoteTests.h"
 #include <tcm_test/testFixtures.h>
 
@@ -16,7 +17,7 @@ using namespace aunit;
 
 MockedIoAbstraction mockIo;
 NoRenderer noRenderer; 
-MockEepromAbstraction eeprom;
+MockEepromAbstraction eeprom(400);
 char szData[10] = { "123456789" };
 const char PROGMEM pgmMyName[]  = "UnitTest";
 int counter = 0;
@@ -122,7 +123,7 @@ testF(MenuItemIteratorFixture, testGetItemById) {
 
 void clearAllChangeStatus() {
     getParentRootAndVisit(&menuVolume, [](MenuItem* item) {
-        item->setSendRemoteNeeded(0, false);
+        item->clearSendRemoteNeededAll();
         item->setChanged(false);
     });
 }
@@ -148,10 +149,13 @@ testF(MenuItemIteratorFixture, testIterationWithPredicate) {
     RemoteNoMenuItemPredicate remotePredicate(0);
     iterator.setPredicate(&remotePredicate);
 
+    // this predicate looks for a remote needing to be set.
     menuVolume.setSendRemoteNeededAll();
     menuPressMe.setSendRemoteNeededAll();
+
+    // prevent menu volume from being sent as it is local only
+    menuVolume.setLocalOnly(true);
     
-    assertMenuItem(iterator.nextItem(), &menuVolume);
     assertMenuItem(iterator.nextItem(), &menuPressMe);
     assertTrue(iterator.nextItem() == NULL);
 
@@ -160,6 +164,28 @@ testF(MenuItemIteratorFixture, testIterationWithPredicate) {
     assertTrue(iterator.nextItem() == NULL);
 }
 
+
+testF(MenuItemIteratorFixture, testIteratorTypePredicateLocalOnly) {
+    menuMgr.initWithoutInput(&noRenderer, &menuVolume);
+
+    clearAllChangeStatus();
+
+    MenuItemTypePredicate intPredicate(MENUTYPE_INT_VALUE, TM_REGULAR_LOCAL_ONLY);
+    MenuItemIterator iterator;
+    iterator.setPredicate(&intPredicate);
+
+    menuVolume.setLocalOnly(true);
+    menuContrast.setLocalOnly(true);
+
+    for(int i=0;i<3;i++) {
+        Serial.print("Local Int Predicate item iteration ");Serial.println(i);
+
+        assertMenuItem(iterator.nextItem(), &menuLHSTemp);
+        assertMenuItem(iterator.nextItem(), &menuRHSTemp);
+        assertMenuItem(iterator.nextItem(), &menuCaseTemp);
+        assertTrue(iterator.nextItem() == NULL);
+    }
+}
 
 class NothingMatchingMenuPredicate : public MenuItemPredicate {
     bool matches(MenuItem* /*ignored*/) override {

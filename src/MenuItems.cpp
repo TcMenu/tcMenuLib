@@ -15,17 +15,19 @@ MenuItem::MenuItem(MenuType menuType, const AnyMenuInfo* menuInfo, MenuItem* nex
 }
 
 bool MenuItem::isSendRemoteNeeded(uint8_t remoteNo) {
-	remoteNo += 5;
-	return (flags & (1 << remoteNo)) != 0;
+    return bitRead(flags, (remoteNo + (int)MENUITEM_REMOTE_SEND0));
 }
 
 void MenuItem::setSendRemoteNeeded(uint8_t remoteNo, bool needed) {
-	remoteNo += 5;
-	bitWrite(flags, remoteNo, needed);
+	bitWrite(flags, (remoteNo + (int)MENUITEM_REMOTE_SEND0), needed);
 }
 
 void MenuItem::setSendRemoteNeededAll() {
 	flags = flags | MENUITEM_ALL_REMOTES;
+}
+
+void MenuItem::clearSendRemoteNeededAll() {
+	flags = flags & (~MENUITEM_ALL_REMOTES);
 }
 
 void MenuItem::triggerCallback() {

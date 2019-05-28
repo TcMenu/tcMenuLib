@@ -35,14 +35,18 @@ class FieldAndValue; // forward reference
 union MessageProcessorInfo {
 	struct {
 		MenuItem* item;
-		int parentId;
 		int changeValue;
+        uint32_t correlation;
 		ChangeType changeType;
 	} value;
 	struct {
 		uint8_t major, minor;
 		ApiPlatform platform;
+        bool authProvided;
 	} join;
+    struct {
+        char name[16];
+    } pairing;
 };
 
 /**
@@ -65,7 +69,7 @@ struct MsgHandler {
  * For example: `CombinedMessageProcessor processor(msgHandlers, MSG_HANDLERS_SIZE);`
  */
 extern MsgHandler msgHandlers[];
-#define MSG_HANDLERS_SIZE 2
+#define MSG_HANDLERS_SIZE 3
 
 /**
  * If you decide to write your own processor, this method can handle join messages
@@ -76,6 +80,11 @@ void fieldUpdateJoinMsg(TagValueRemoteConnector* connector, FieldAndValue* field
  * If you decide to write your own processor, this method can handle value messages.
  */
 void fieldUpdateValueMsg(TagValueRemoteConnector* connector, FieldAndValue* field, MessageProcessorInfo* info);
+
+/**
+ * If you decide to write your own processor, this method can handle pairing messages.
+ */
+void fieldUpdatePairingMsg(TagValueRemoteConnector* connector, FieldAndValue* field, MessageProcessorInfo* info);
 
 /**
  * This message processor is responsible for handling messages coming off the wire and processing them into
@@ -92,6 +101,7 @@ private:
 	int noOfHandlers;
 
 	MsgHandler* currHandler;
+    uint16_t currentMsgType;
 public:
 	/**
 	 * Consructor takes an array of processors and the number of processors in the array.

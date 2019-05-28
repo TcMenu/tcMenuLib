@@ -15,12 +15,16 @@
 // root: menuVolume
 //
 
+#ifndef PRESSMECALLBACK
+#define PRESSMECALLBACK NULL
+#endif // PRESSMECALLBACK
+
 const PROGMEM AnalogMenuInfo minfoCaseTemp = { "Case Temp", 103, 0xffff, 255, NO_CALLBACK, 0, 2, "C" };
 AnalogMenuItem menuCaseTemp(&minfoCaseTemp, 0, NULL);
 
 const PROGMEM FloatMenuInfo minfoFloatItem = { "FloatItem", 102, 0xffff, 4, NO_CALLBACK };
 FloatMenuItem menuFloatItem(&minfoFloatItem, NULL);
-const PROGMEM AnyMenuInfo minfoPressMe = { "Press Me", 101, 0xffff, 0, NULL };
+const PROGMEM AnyMenuInfo minfoPressMe = { "Press Me", 101, 0xffff, 0, PRESSMECALLBACK };
 ActionMenuItem menuPressMe(&minfoPressMe, &menuFloatItem);
 
 const PROGMEM SubMenuInfo minfoSecondLevel = { "SecondLevel", 100, 0xffff, 0, NO_CALLBACK };

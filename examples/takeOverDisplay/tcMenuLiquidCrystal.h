@@ -12,7 +12,6 @@
  * 
  * LIBRARY REQUIREMENT
  * This renderer is designed for use with this library: https://github.com/davetcc/LiquidCrystalIO
-
  */
 
 #ifndef _TCMENU_LIQUID_CRYSTAL_H
@@ -21,6 +20,7 @@
 #include "tcMenu.h"
 #include "BaseRenderers.h"
 #include <LiquidCrystalIO.h>
+#include <BaseDialog.h>
 
 /**
  * A renderer that can renderer onto a LiquidCrystal display and supports the concept of single level
@@ -33,11 +33,23 @@ private:
 public:
 
 	LiquidCrystalRenderer(LiquidCrystal& lcd, uint8_t dimX, uint8_t dimY);
-	virtual ~LiquidCrystalRenderer() { delete this->buffer; }
+	virtual ~LiquidCrystalRenderer();
 	virtual void render();
 
+    uint8_t getRows() {return dimY;}
+    LiquidCrystal* getLCD() {return lcd;}
+    BaseDialog* getDialog();
 private:
 	void renderMenuItem(uint8_t row, MenuItem* item);
+};
+
+class LiquidCrystalDialog : public BaseDialog {
+public:
+    LiquidCrystalDialog(LiquidCrystalRenderer* renderer) : BaseDialog(renderer) { 
+        bitWrite(flags, DLG_FLAG_SMALLDISPLAY, (renderer->getRows() <= 2));
+    }
+protected:
+    void internalRender(int currentValue) override;
 };
 
 /**

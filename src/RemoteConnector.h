@@ -1,10 +1,13 @@
 /*
  * Copyright (c) 2018 https://www.thecoderscorner.com (Nutricherry LTD).
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
- *
- * RemoteConnector.h - contains the base functionality for communication between the menu library
- * and remote APIs.
  */
+
+/**
+ * @file RemoteConnector.h
+ * Contains the base functionality for communication between the menu library and remote APIs.
+ */
+
 #ifndef _TCMENU_REMOTECONNECTOR_H_
 #define _TCMENU_REMOTECONNECTOR_H_
 
@@ -21,6 +24,7 @@
 // when debugging you can increase the heartbeat time to reduce disconnects (below gives 90 seconds)
 //#define HEARTBEAT_INTERVAL 30000
 #define HEARTBEAT_INTERVAL_TICKS (HEARTBEAT_INTERVAL / TICK_INTERVAL)
+#define PAIRING_TIMEOUT_TICKS (15000 / TICK_INTERVAL)
 
 /**
  * @file RemoteConnector.h
@@ -130,8 +134,9 @@ private:
 
 #define FLAG_CURRENTLY_CONNECTED 0
 #define FLAG_BOOTSTRAP_MODE 1
-#define FLAG_WRITING_MSGS 2
-#define FLAG_BOOTSTRAP_COMPLETE 3
+#define FLAG_BOOTSTRAP_COMPLETE 2
+#define FLAG_AUTHENTICATED 3
+#define FLAG_PAIRING_MODE 4
 
 /**
  * The remote connector is what we would normally interact with when dealing with a remote. It provides functionality
@@ -152,7 +157,7 @@ private:
     RemoteNoMenuItemPredicate remotePredicate;
 
 	// the remote connection details take 16 bytes
-	char remoteName[8];
+	char remoteName[16];
 	uint8_t remoteMajorVer, remoteMinorVer;
 	ApiPlatform remotePlatform;
 	uint8_t flags;
@@ -189,6 +194,8 @@ public:
 	 * Indicates if the underlying transport is functionality
 	 */
 	bool isTransportAvailable() { return transport->available(); }
+
+    void provideAuthentication(const char* auth);
 
 	/**
 	 *  Indicates if the underlying transport is connected.
@@ -282,13 +289,32 @@ public:
 	 * @param parentId the parent menu
 	 * @param theItem the item to be bootstrapped.
 	 */
-	void encodeChangeValue(int parentId, MenuItem* theItem);
+	void encodeChangeValue(MenuItem* theItem);
+
+    /**
+     * Encodes an acknowledgement back to the other side to indicate the success or failure
+     * of an operation.
+     * @param correlation the ID to returned to the other side, or 0.
+     * @param status the status to be returned.
+     */
+    void encodeAcknowledgement(uint32_t correlation, AckResponseStatus status);
 
 	/**
 	 * Called frequently to perform all functions, this is arranged interally by
 	 * registering a taskManager task.
 	 */
 	void tick();
+
+    /**
+     * Puts the system into pairing mode, If the system is in pairing mode already the
+     * display is updated. This will present a dialog on the renderer if there is one
+     * and the connection will be allowed only when the user selects to pair on the
+     * local device.
+     * 
+     * @param name the name of the remote device
+     * @param uuid the UUID to go with the name
+     */
+    void pairingRequest(const char* name, const char* uuid);
 
 	/**
 	 * Called internally to start a bootstrap on new connections
@@ -342,6 +368,9 @@ public:
      * @param commsEventType an error usually defined in RemoteConnector.h
      */
     void commsNotify(uint16_t commsEventType);
+
+    /** indicates if the connection is yet authenicated */
+    bool isAuthenticated() { return bitRead(flags, FLAG_AUTHENTICATED); }
 private:
 	void encodeBaseMenuFields(int parentId, MenuItem* item);
     bool prepareWriteMsg(uint16_t msgType);
@@ -354,16 +383,18 @@ private:
      * 
      * @param conn the new connection state
      */
-	void setConnected(bool conn) { 
-        bitWrite(flags, FLAG_CURRENTLY_CONNECTED, conn); 
-        commsNotify(conn ? COMMSERR_CONNECTED : COMMSERR_DISCONNECTED);
-    }
+	void setConnected(bool conn);
 
 	bool isBootstrapMode() { return bitRead(flags, FLAG_BOOTSTRAP_MODE); }
 	void setBootstrapMode(bool mode) { bitWrite(flags, FLAG_BOOTSTRAP_MODE, mode); }
 
 	bool isBootstrapComplete() { return bitRead(flags, FLAG_BOOTSTRAP_COMPLETE); }
 	void setBootstrapComplete(bool mode) { bitWrite(flags, FLAG_BOOTSTRAP_COMPLETE, mode); }
+
+    void setAuthenticated(bool auth) { bitWrite(flags, FLAG_AUTHENTICATED, auth); }
+
+	bool isPairing() { return bitRead(flags, FLAG_PAIRING_MODE); }
+    void setPairing(bool pair) { bitWrite(flags, FLAG_PAIRING_MODE, pair); }
 };
 
 #endif /* _TCMENU_REMOTECONNECTOR_H_ */

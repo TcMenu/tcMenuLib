@@ -19,6 +19,11 @@ LiquidCrystalRenderer::LiquidCrystalRenderer(LiquidCrystal& lcd, uint8_t dimX, u
 	this->lcd = &lcd;
 }
 
+LiquidCrystalRenderer::~LiquidCrystalRenderer() { 
+    delete this->buffer; 
+    if(dialog) delete dialog;
+}
+
 void LiquidCrystalRenderer::render() {
 	uint8_t locRedrawMode = redrawMode;
 	redrawMode = MENUDRAW_NO_CHANGE;
@@ -75,3 +80,53 @@ void LiquidCrystalRenderer::renderMenuItem(uint8_t row, MenuItem* item) {
 	lcd->print(buffer);
 }
 
+BaseDialog* LiquidCrystalRenderer::getDialog() {
+    if(dialog == NULL) {
+        dialog = new LiquidCrystalDialog(this);
+    }
+    return dialog;
+}
+
+// dialog
+
+void LiquidCrystalDialog::internalRender(int currentValue) {
+    LiquidCrystalRenderer* lcdRender = ((LiquidCrystalRenderer*)renderer);
+    LiquidCrystal* lcd = lcdRender->getLCD();
+    if(needsDrawing == MENUDRAW_COMPLETE_REDRAW) {
+        lcd->clear();
+    }
+
+    char data[20];
+    strncpy_P(data, headerPgm, sizeof(data));
+    data[sizeof(data)-1]=0;
+    lcd->setCursor(0,0);
+    lcd->print(data);
+    
+    // we can only print the buffer on a newline when there's enough rows.
+    // so on 16x2 we have to show the buffer over the header. It's all we
+    // can do.
+    int nextY = 3;
+    if(isCompressedMode()) {
+        int len = strlen(lcdRender->getBuffer());
+        int startX = lcdRender->getBufferSize() - len;
+        lcd->setCursor(startX,0);
+        lcd->print(lcdRender->getBuffer());
+        nextY = 1; 
+    }
+    else {
+        lcd->setCursor(0,1);
+        lcd->print(lcdRender->getBuffer());
+    }
+
+    if(button1 != BTNTYPE_NONE) {
+        copyButtonText(data, 0, currentValue);
+        lcd->setCursor(0, nextY);
+        lcd->print(data);
+    }
+    if(button2 != BTNTYPE_NONE) {
+        copyButtonText(data, 1, currentValue);
+        int startX = lcdRender->getBufferSize() - strlen(data);
+        lcd->setCursor(startX, nextY);
+        lcd->print(data);
+    }
+}

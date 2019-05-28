@@ -203,16 +203,31 @@ struct FloatMenuInfo {
  * Each menu item can be in the following states.
  */
 enum Flags : byte {
-	MENUITEM_ACTIVE = 0,       // the menu is currently active but not editing
-	MENUITEM_CHANGED = 1,      // the menu has changed and needs drawing
-	MENUITEM_READONLY = 2,     // the menu cannot be changed
-	MENUITEM_EDITING = 3,      // the menu is being edited
-	MENUITEM_REMOTE_SEND0 = 5, // the menu needs to be sent remotely (for remote 0)
-	MENUITEM_REMOTE_SEND1 = 6, // the menu needs to be sent remotely (for remote 1)
-	MENUITEM_REMOTE_SEND2 = 7  // the menu needs to be sent remotely (for remote 2)
+    /** the menu is currently active but not editing */
+	MENUITEM_ACTIVE = 0,
+    /** the menu has changed and needs drawing by the renderer */
+	MENUITEM_CHANGED = 1,
+    /** the menu cannot be changed by the renderer or remote, it can be changed by calling the setter. */
+	MENUITEM_READONLY = 2,
+    /** the menu must not be sent remotely, and is only available via the local renderer */
+	MENUITEM_LOCAL_ONLY = 3,
+    /** the menu is currently being edited */
+	MENUITEM_EDITING = 4,
+    /** indicates that remote 0 needs to resend this item */
+	MENUITEM_REMOTE_SEND0 = 10,
+    /** indicates that remote 1 needs to resend this item */
+	MENUITEM_REMOTE_SEND1 = 11,
+    /** indicates that remote 2 needs to resend this item */
+	MENUITEM_REMOTE_SEND2 = 12,
+    /** indicates that remote 3 needs to resend this item */
+	MENUITEM_REMOTE_SEND3 = 13,
+    /** indicates that remote 4 needs to resend this item */
+	MENUITEM_REMOTE_SEND4 = 14,
+    /** indicates that remote 5 needs to resend this item */
+	MENUITEM_REMOTE_SEND5 = 15
 };
 
-#define MENUITEM_ALL_REMOTES (32+64+128)
+#define MENUITEM_ALL_REMOTES 0xFC00
 
 /**
  * As we don't have RTTI we need a way of identifying each menu item. Any value below 100 is based
@@ -256,10 +271,10 @@ enum MenuType : byte {
  */
 class MenuItem {
 protected:
-	uint8_t flags;
-	MenuType menuType;
+	uint16_t flags;
 	MenuItem* next;
 	const AnyMenuInfo *info;
+	MenuType menuType;
 public:
 
     /**
@@ -294,8 +309,10 @@ public:
 	bool isChanged() { return bitRead(flags, MENUITEM_CHANGED); }
 	/** returns if the menu item needs to be sent remotely */
 	bool isSendRemoteNeeded(uint8_t remoteNo);
-	/** set the flag indicating that a remote refresh is needed for all remotes - default */
+	/** Set all the flags indicating that a remote refresh is needed for all remotes */
 	void setSendRemoteNeededAll();
+    /** Clears all the flags indicating that a remote send is needed for all remotes. */
+    void clearSendRemoteNeededAll();
 	/** set the flag indicating that a remote refresh is needed for a specific remote */
 	void setSendRemoteNeeded(uint8_t remoteNo, bool needed);
 
@@ -313,6 +330,11 @@ public:
 	void setReadOnly(bool active) { bitWrite(flags, MENUITEM_READONLY, active); }
 	/** returns true if this item is read only */
 	bool isReadOnly() { return bitRead(flags, MENUITEM_READONLY); }
+
+	/** sets this item to be available only locally */
+	void setLocalOnly(bool localOnly) { bitWrite(flags, MENUITEM_LOCAL_ONLY, localOnly); }
+	/** returns true if this item is only available locally */
+	bool isLocalOnly() { return bitRead(flags, MENUITEM_LOCAL_ONLY); }
 
 	/** gets the next menu (sibling) at this level */
 	MenuItem* getNext() { return next; }

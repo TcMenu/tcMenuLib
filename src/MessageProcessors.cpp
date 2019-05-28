@@ -17,20 +17,43 @@
 
 MsgHandler msgHandlers[] = {
 	{ fieldUpdateValueMsg, MSG_CHANGE_INT }, 
-	{ fieldUpdateJoinMsg, MSG_JOIN }
+	{ fieldUpdateJoinMsg, MSG_JOIN },
+	{ fieldUpdatePairingMsg, MSG_PAIR }
 };
+
+void fieldUpdatePairingMsg(TagValueRemoteConnector* connector, FieldAndValue* field, MessageProcessorInfo* info) {
+	if(field->fieldType == FVAL_END_MSG) return;
+
+    switch(field->field) {
+    case FIELD_MSG_NAME:
+        strncpy(info->pairing.name, field->value, sizeof(info->pairing.name));
+        break;
+    case FIELD_UUID:
+        serdebugF3("Pairing request: ", info->pairing.name, field->value);
+        connector->pairingRequest(info->pairing.name, field->value);
+        break;
+    }
+}
 
 void fieldUpdateJoinMsg(TagValueRemoteConnector* connector, FieldAndValue* field, MessageProcessorInfo* info) {
 	if(field->fieldType == FVAL_END_MSG) {
-        serdebug2("Join from ", info->join.platform);
+        serdebugF2("Join from ", info->join.platform);
         serdebugF3("Remote version was ", info->join.major, info->join.minor);
-		connector->setRemoteConnected(info->join.major, info->join.minor, info->join.platform);
+
+        // ensure that authentication has been done, if not basically fail the connection.
+        if(!info->join.authProvided) {
+            serdebugF("Connection without authentication - stopping");
+            connector->provideAuthentication(NULL);
+        }
+        else {
+            connector->setRemoteConnected(info->join.major, info->join.minor, info->join.platform);
+        }
 		return;
 	}
 
 	switch(field->field) {
 	case FIELD_MSG_NAME:
-        serdebug2("Join device ", field->value);
+        serdebugF2("Join device ", field->value);
 		connector->setRemoteName(field->value);
 		break;
 	case FIELD_VERSION: {
@@ -39,14 +62,71 @@ void fieldUpdateJoinMsg(TagValueRemoteConnector* connector, FieldAndValue* field
 		info->join.minor = val % 100;
 		break;
 	}
+    case FIELD_UUID: {
+        connector->provideAuthentication(field->value);
+        info->join.authProvided = true;
+        break;
+    }
 	case FIELD_PLATFORM:
 		info->join.platform = (ApiPlatform) atoi(field->value);
 		break;
 	}
 }
 
+bool processValueChangeField(FieldAndValue* field, MessageProcessorInfo* info) {
+    if(info->value.item->getMenuType() == MENUTYPE_INT_VALUE || info->value.item->getMenuType() == MENUTYPE_ENUM_VALUE) {
+        auto valItem = (ValueMenuItem*)info->value.item;
+        if(info->value.changeType == CHANGE_ABSOLUTE) {
+            uint16_t newValue = atol(field->value);
+            valItem->setCurrentValue(newValue); // for absolutes, assume other system did checking.
+        }
+        else {
+            // get the delta and current values.
+            int deltaVal = atoi(field->value);
+            long existingVal = valItem->getCurrentValue();
 
-void fieldUpdateValueMsg(TagValueRemoteConnector* /*unused*/, FieldAndValue* field, MessageProcessorInfo* info) {
+            // prevent an underflow or overflow situation.
+            if((deltaVal < 0 && existingVal < abs(deltaVal)) || (deltaVal > 0 && (existingVal + deltaVal) > valItem->getMaximumValue()) ) {
+                return false; // valid update but outside of range.
+            }
+
+            // we must be good to go if we get here, write it..
+            valItem->setCurrentValue(existingVal + deltaVal);
+        }
+        serdebugF2("Int change: ", valItem->getCurrentValue());
+    }
+    else if(info->value.item->getMenuType() == MENUTYPE_BOOLEAN_VALUE) {
+        // booleans are always absolute
+        BooleanMenuItem* boolItem = reinterpret_cast<BooleanMenuItem*>(info->value.item);
+        boolItem->setBoolean(atoi(field->value));
+        serdebugF2("Bool change: ", boolItem->getBoolean());
+    }
+    else if(info->value.item->getMenuType() == MENUTYPE_TEXT_VALUE) {
+        // text is always absolute
+        TextMenuItem* textItem = reinterpret_cast<TextMenuItem*>(info->value.item);
+        textItem->setTextValue(field->value);
+        serdebugF2("Text change: ", textItem->getTextValue());
+    }
+    return true;
+}
+
+bool processIdChangeField(FieldAndValue* field, MessageProcessorInfo* info) {
+    int id = atoi(field->value);
+
+    MenuItem* foundItem = getMenuItemById(id);
+    if(foundItem != NULL && !foundItem->isReadOnly()) {
+        info->value.item = foundItem;
+        serdebugF2("ValChange for ID ", foundItem->getId());
+        return true;
+    }
+    else {
+        serdebugF("Bad ID on valchange msg");
+        info->value.item = NULL;
+        return false;
+    }
+}
+
+void fieldUpdateValueMsg(TagValueRemoteConnector* connector, FieldAndValue* field, MessageProcessorInfo* info) {
 	if(field->fieldType == FVAL_END_MSG) {
 		// if this is an action item, we trigger the callback to occur just before ending.
 		if(info->value.item != NULL && info->value.item->getMenuType() == MENUTYPE_ACTION_VALUE) {
@@ -55,52 +135,21 @@ void fieldUpdateValueMsg(TagValueRemoteConnector* /*unused*/, FieldAndValue* fie
 		return;
 	}
 	
+    bool ret = false;
+
 	switch(field->field) {
-	case FIELD_ID: {
-		int id = atoi(field->value);
-        
-		MenuItem* foundItem = getMenuItemById(id);
-        if(foundItem != NULL && !foundItem->isReadOnly()) {
-            info->value.item = foundItem;
-            serdebugF2("ValChange for ID ", foundItem->getId());
-        }
-        else {
-            serdebugF("Bad ID on valchange msg");
-        }
+    case FIELD_CORRELATION:
+        info->value.correlation = strtoul(field->value, NULL, 16);
+        break;
+	case FIELD_ID:
+        ret = processIdChangeField(field, info);
+        if(!ret) connector->encodeAcknowledgement(info->value.correlation, ACK_ID_NOT_FOUND);
 		break;
-	}
 	case FIELD_CURRENT_VAL:
-		if((info->value.item != NULL) && (info->value.item->getMenuType() == MENUTYPE_INT_VALUE || info->value.item->getMenuType() == MENUTYPE_ENUM_VALUE)) {
-			auto valItem = (ValueMenuItem*)info->value.item;
-			if(info->value.changeType == CHANGE_ABSOLUTE) {
-				uint16_t newValue = atol(field->value);
-				valItem->setCurrentValue(newValue); // for absolutes, assume other system did checking.
-			}
-			else {
-				// get the delta and current values.
-				int deltaVal = atoi(field->value);
-				long existingVal = valItem->getCurrentValue();
-
-				// prevent an underflow or overflow situation.
-				if((deltaVal < 0 && existingVal < abs(deltaVal)) || (deltaVal > 0 && (existingVal + deltaVal) > valItem->getMaximumValue()) ) return;
-
-				// we must be good to go if we get here, write it..
-				valItem->setCurrentValue(existingVal + deltaVal);
-			}
-            serdebugF2("Int change: ", valItem->getCurrentValue());
-		}
-		else if(info->value.item != NULL && info->value.item->getMenuType() == MENUTYPE_BOOLEAN_VALUE) {
-			// booleans are always absolute
-            BooleanMenuItem* boolItem = reinterpret_cast<BooleanMenuItem*>(info->value.item);
-			boolItem->setBoolean(atoi(field->value));
-            serdebugF2("Bool change: ", boolItem->getBoolean());
-		}
-		else if(info->value.item != NULL && info->value.item->getMenuType() == MENUTYPE_TEXT_VALUE) {
-			// text is always absolute
-            TextMenuItem* textItem = reinterpret_cast<TextMenuItem*>(info->value.item);
-			textItem->setTextValue(field->value);
-            serdebugF2("Text change: ", textItem->getTextValue());
-		}
+        if(info->value.item != NULL) {
+            ret = processValueChangeField(field, info);
+            connector->encodeAcknowledgement(info->value.correlation, ret ? ACK_SUCCESS : ACK_VALUE_RANGE);
+        }
 		break;
 	case FIELD_CHANGE_TYPE:
 		info->value.changeType = (ChangeType) atoi(field->value);

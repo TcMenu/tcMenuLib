@@ -8,6 +8,7 @@
 
 #include <Arduino.h>
 #include "RemoteConnector.h"
+#include "RemoteAuthentication.h"
 #include "MenuItems.h"
 #include "RemoteMenuItem.h"
 #include "TaskManager.h"
@@ -15,6 +16,8 @@
 #include "MessageProcessors.h"
 #include "tcUtil.h"
 #include <IoLogging.h>
+#include "BaseDialog.h"
+#include "BaseRenderers.h"
 
 const char PGM_TCM EMPTYNAME[] = "Device";
 const char PGM_TCM pmemBootStartText[] = "START";
@@ -33,6 +36,8 @@ inline void serdebugMsgHdr(const char* tx, int remoteNo, uint16_t msgType) {
 #define serdebugMsgHdr(x, y, z)
 #endif
 
+void stopPairing();
+
 TagValueRemoteConnector::TagValueRemoteConnector(uint8_t remoteNo) : bootPredicate(MENUTYPE_BACK_VALUE, true), remotePredicate(remoteNo) {
 	this->transport = NULL;
 	this->processor = NULL;
@@ -50,28 +55,101 @@ void TagValueRemoteConnector::setRemoteName(const char* name) {
 }
 
 void TagValueRemoteConnector::setRemoteConnected(uint8_t major, uint8_t minor, ApiPlatform platform) {
-	remoteMajorVer = major;
-	remoteMinorVer = minor;
-	remotePlatform = platform;
-	initiateBootstrap();
+    if(isAuthenticated()) {
+        remoteMajorVer = major;
+        remoteMinorVer = minor;
+        remotePlatform = platform;
+        initiateBootstrap();
+    }
+    else {
+        serdebugF("Not authenticated, dropping");
+        transport->close();
+    }
+}
+
+void TagValueRemoteConnector::provideAuthentication(const char* auth) {
+    if(auth == NULL || !authenticator.isAuthenticated(remoteName, auth)) {
+        setAuthenticated(false);
+        serdebugF2("Authentication failed for ", remoteName);
+        // wait before returning the state to prevent denial of service.
+        encodeAcknowledgement(0, ACK_CREDENTIALS_INVALID);
+        taskManager.yieldForMicros(1500); 
+        transport->close();
+    }
+    else {
+        encodeAcknowledgement(0, ACK_SUCCESS);
+        setAuthenticated(true);
+        serdebugF2("Authenticated device ", remoteName);
+    }
+}
+
+const char headerPairingText[] PROGMEM = "Pairing waiting";
+const char headerPairingDone[] PROGMEM = "Pairing complete";
+const char* lastUuid;
+
+void onPairingFinished(ButtonType ty, void* voidConnector) {
+    TagValueRemoteConnector* connector = reinterpret_cast<TagValueRemoteConnector*>(voidConnector);
+    if(ty==BTNTYPE_ACCEPT) {
+        authenticator.addAdditionalUUIDKey(connector->getRemoteName(), lastUuid);
+        connector->encodeAcknowledgement(0, ACK_SUCCESS);
+
+        // now show a confirmatory message
+        BaseDialog* dialog = BaseMenuRenderer::getInstance()->getDialog();
+        dialog->show(headerPairingDone);
+        dialog->copyIntoBuffer(connector->getRemoteName());
+        dialog->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
+    }
+    else {
+        connector->encodeAcknowledgement(0, ACK_CREDENTIALS_INVALID);
+    }
+} 
+
+void stopPairing() {
+    BaseDialog* dialog = BaseMenuRenderer::getInstance()->getDialog();
+    if(dialog->isInUse()) dialog->hide();
+}
+
+void TagValueRemoteConnector::pairingRequest(const char* name, const char* uuid) {
+    BaseDialog* dlg = BaseMenuRenderer::getInstance()->getDialog();
+    if(!dlg) {
+        // TODO, special handling for where there's no display locally.
+        return;
+    }
+    // store the fields
+    lastUuid = uuid;
+    setRemoteName(name);
+
+    if(!isPairing()) {
+        // mark this connection as paring only until disconnected
+        // this prevents any other use of the connection basically.
+        setPairing(true);
+
+        // show the dialog.
+        dlg->setButtons(BTNTYPE_ACCEPT, BTNTYPE_CANCEL, 1);
+        dlg->setUserData(this);
+        dlg->show(headerPairingText, onPairingFinished);
+    }
+    dlg->copyIntoBuffer(name);
 }
 
 void TagValueRemoteConnector::commsNotify(uint16_t err) {
     if(commsCallback != NULL) {
         CommunicationInfo info;
         info.remoteNo = remoteNo;
-        info.connected = isConnected();
+        info.connected = isAuthenticated();
         info.errorMode = err;
         commsCallback(info);
     }
 }
 
 void TagValueRemoteConnector::tick() {
-	dealWithHeartbeating();
+    dealWithHeartbeating();
 
-	if(isConnected() && transport->connected()) {
+	if(isConnected() && transport->connected() && isAuthenticated()) {
 		performAnyWrites();
 	}
+
+    if(isPairing()) return; // never read anything else when in pairing mode.
 
     // field if available is kind of like a state machine. Due to limited memory
     // on some AVR's and problems with the size of virtual tables, it cannot be
@@ -101,15 +179,30 @@ void TagValueRemoteConnector::tick() {
 	}
 }
 
+void TagValueRemoteConnector::setConnected(bool conn) {
+    if(!conn) {
+        this->ticksLastRead = this->ticksLastSend = 0xffff;
+        flags = 0; // clear all flags on disconnect.
+    }
+    else {
+        bitWrite(flags, FLAG_CURRENTLY_CONNECTED, true);
+    } 
+
+    commsNotify(conn ? COMMSERR_CONNECTED : COMMSERR_DISCONNECTED);
+}
+
 void TagValueRemoteConnector::dealWithHeartbeating() {
 	++ticksLastRead;
 	++ticksLastSend;
 
-	if(ticksLastRead > (HEARTBEAT_INTERVAL_TICKS * 3)) {
+    // pairing will not send heartbeats, so we wait about 10 seconds before closing out
+    unsigned int interval = isPairing() ? (PAIRING_TIMEOUT_TICKS) : (HEARTBEAT_INTERVAL_TICKS * 3);
+
+	if(ticksLastRead > interval) {
 		if(isConnected()) {
          	serdebugF3("Remote disconnected (rNo, ticks): ", remoteNo, ticksLastSend);
+            if(isPairing()) stopPairing();
 			setConnected(false);
-            setBootstrapComplete(false);
 			transport->close();
 		}
 	} else if(!isConnected() && transport->connected()) {
@@ -133,10 +226,9 @@ void TagValueRemoteConnector::performAnyWrites() {
 	}
 	else if(isBootstrapComplete()) {
         MenuItem* item = iterator.nextItem();
-        MenuItem* parent = iterator.currentParent();
         if(item) {
             item->setSendRemoteNeeded(remoteNo, false);
-            encodeChangeValue(parent == NULL ? 0 : parent->getId(), item);
+            encodeChangeValue(item);
         }
     }
 }
@@ -227,7 +319,6 @@ bool TagValueRemoteConnector::prepareWriteMsg(uint16_t msgType) {
     if(!transport->connected()) {
         serdebugMsgHdr("Wr Err ", remoteNo, msgType);
         commsNotify(COMMSERR_WRITE_NOT_CONNECTED);
-        setBootstrapComplete(false);
         setConnected(false); // we are immediately not connected in this case.
         return false;
     }
@@ -313,6 +404,17 @@ void TagValueRemoteConnector::encodeEnumMenu(int parentId, EnumMenuItem* item) {
     transport->endMsg();
 }
 
+void TagValueRemoteConnector::encodeAcknowledgement(uint32_t correlation, AckResponseStatus status) {
+    if(!prepareWriteMsg(MSG_ACKNOWLEDGEMENT)) return;
+    transport->writeFieldInt(FIELD_ACK_STATUS, status);
+    char sz[10];
+    ltoa(correlation, sz, 16);
+    transport->writeField(FIELD_CORRELATION, sz);
+    transport->endMsg();
+
+    serdebugF3("Ack send: ", correlation, status);
+}
+
 void TagValueRemoteConnector::encodeBooleanMenu(int parentId, BooleanMenuItem* item) {
 	if(!prepareWriteMsg(MSG_BOOT_BOOL)) return;
     encodeBaseMenuFields(parentId, item);
@@ -339,9 +441,8 @@ void writeRemoteValueToTransport(TagValueTransport* transport, RemoteMenuItem* i
 	transport->writeField(FIELD_CURRENT_VAL, sz);
 }
 
-void TagValueRemoteConnector::encodeChangeValue(int parentId, MenuItem* theItem) {
+void TagValueRemoteConnector::encodeChangeValue(MenuItem* theItem) {
 	if(!prepareWriteMsg(MSG_CHANGE_INT)) return;
-    transport->writeFieldInt(FIELD_PARENT, parentId);
     transport->writeFieldInt(FIELD_ID, theItem->getId());
     transport->writeFieldInt(FIELD_CHANGE_TYPE, CHANGE_ABSOLUTE); // menu host always sends absolute!
     switch(theItem->getMenuType()) {
@@ -561,6 +662,7 @@ CombinedMessageProcessor::CombinedMessageProcessor(MsgHandler handlers[], int no
 	this->handlers = handlers;
 	this->noOfHandlers = noOfHandlers;
 	this->currHandler = NULL;
+    this->currentMsgType = 0;
 }
 
 void CombinedMessageProcessor::newMsg(uint16_t msgType) {
@@ -572,12 +674,17 @@ void CombinedMessageProcessor::newMsg(uint16_t msgType) {
 	}
 
 	if(currHandler != NULL) {
+        currentMsgType = msgType;
 		memset(&val, 0, sizeof val);
 	}
 }
 
 void CombinedMessageProcessor::fieldUpdate(TagValueRemoteConnector* connector, FieldAndValue* field) {
-	if(currHandler != NULL) {
+    uint16_t mt = field->msgType;
+	if(currHandler != NULL && (connector->isAuthenticated() || mt == MSG_JOIN || mt == MSG_PAIR || mt == MSG_HEARTBEAT)) {        
 		currHandler->fieldUpdateFn(connector, field, &val);
 	}
+    else {
+        serdebugF3("Did not proccess(hdlr,auth)", (unsigned int)currHandler, connector->isAuthenticated());
+    }
 }

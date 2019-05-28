@@ -132,11 +132,13 @@ MenuItem* MenuItemIterator::currentParent() {
 }
 
 bool RemoteNoMenuItemPredicate::matches(MenuItem* item) { 
-    return item->isSendRemoteNeeded(remoteNo); 
+    return item->isSendRemoteNeeded(remoteNo) && !item->isLocalOnly(); 
 }
 
 bool MenuItemTypePredicate::matches(MenuItem* item) {
-    if(inverted)
+    if(bitRead(mode, 3) && item->isLocalOnly()) return false;
+
+    if(bitRead(mode, 0))
         return item->getMenuType() != filterType;
     else
         return item->getMenuType() == filterType;

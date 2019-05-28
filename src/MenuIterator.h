@@ -87,22 +87,32 @@ public:
     bool matches(MenuItem* item) override;
 };
 
+// the modes that can be passed to the type predicate
+#define TM_REGULAR  0
+#define TM_INVERTED  1
+#define TM_REGULAR_LOCAL_ONLY  8
+#define TM_INVERTED_LOCAL_ONLY  9
+
 /**
  * A specialisation of the MenuItemPredicate that matches on a given MenuType. For example sub menus or 
- * boolean menu items.
+ * boolean menu items. The following modes can be used
+ *  * TM_REGULAR anything matching the filter type
+ *  * TM_INVERTED anything not matching the filter type
+ *  * TM_REGULAR_NOLOCAL regular + local only not set
+ *  * TM_INVERTED_NOLOCAL inverted + local only not set
  */
 class MenuItemTypePredicate : public MenuItemPredicate {
 private:
     MenuType filterType;
-    bool inverted;
+    uint8_t mode;
 public:
     /**
      * Construct the predicate indicating the type of item to filter on
      * @param filterType the type to filter for
      */
-    MenuItemTypePredicate(MenuType filterType, bool inverted = false) { 
+    MenuItemTypePredicate(MenuType filterType, uint8_t mode = 0) { 
         this->filterType = filterType; 
-        this->inverted = inverted;
+        this->mode = mode;
     }
 
     /**
