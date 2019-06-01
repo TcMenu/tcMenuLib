@@ -136,7 +136,7 @@ void CALLBACK_FUNCTION onTakeOverDisplay(int /*id*/) {
 const char pgmInfoHeader[] PROGMEM = "Information dialog";
 const char pgmQuestionHeader[] PROGMEM = "Order Food?";
 
-void CALLBACK_FUNCTION onInfoDlg(int id) {
+void CALLBACK_FUNCTION onInfoDlg(int /*id*/) {
     // every renderer apart from NoRenderer has a dialog, that can be used to present
     // very basic info locally onto any display. Used in situations where something
     // needs to be confirmed / printed onto the local display.
@@ -163,7 +163,7 @@ void CALLBACK_FUNCTION onInfoDlg(int id) {
 // It's also possible to know when the dialog has finished, and what button was pressed.
 // This is done by passing a function like below as second parameter to show.
 //
-void onFinished(ButtonType btn, void* userData) {
+void onFinished(ButtonType btn, void* /*userData*/) {
     if(btn == BTNTYPE_ACCEPT) {
         Serial.print("Food chosen was ");
         char sz[20];
@@ -175,7 +175,7 @@ void onFinished(ButtonType btn, void* userData) {
     }
 }
 
-void CALLBACK_FUNCTION onQuestionDlg(int id) {
+void CALLBACK_FUNCTION onQuestionDlg(int /*id*/) {
     // yet another dialog, to ask a question this time.
     BaseDialog* dlg = renderer.getDialog();
     

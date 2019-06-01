@@ -19,10 +19,13 @@ bool MenuItem::isSendRemoteNeeded(uint8_t remoteNo) {
 }
 
 void MenuItem::setSendRemoteNeeded(uint8_t remoteNo, bool needed) {
-	bitWrite(flags, (remoteNo + (int)MENUITEM_REMOTE_SEND0), needed);
+	bitWrite(flags, (remoteNo + (int)MENUITEM_REMOTE_SEND0), (needed && !isLocalOnly()));
 }
 
 void MenuItem::setSendRemoteNeededAll() {
+    // make sure local only fields are never marked for sending.
+    if(isLocalOnly()) clearSendRemoteNeededAll();
+
 	flags = flags | MENUITEM_ALL_REMOTES;
 }
 

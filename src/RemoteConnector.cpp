@@ -19,7 +19,6 @@
 #include "BaseDialog.h"
 #include "BaseRenderers.h"
 
-const char PGM_TCM EMPTYNAME[] = "Device";
 const char PGM_TCM pmemBootStartText[] = "START";
 const char PGM_TCM pmemBootEndText[] = "END";
 
@@ -38,11 +37,11 @@ inline void serdebugMsgHdr(const char* tx, int remoteNo, uint16_t msgType) {
 
 void stopPairing();
 
-TagValueRemoteConnector::TagValueRemoteConnector(uint8_t remoteNo) : bootPredicate(MENUTYPE_BACK_VALUE, true), remotePredicate(remoteNo) {
+TagValueRemoteConnector::TagValueRemoteConnector(uint8_t remoteNo) : bootPredicate(MENUTYPE_BACK_VALUE, TM_INVERTED_LOCAL_ONLY), remotePredicate(remoteNo) {
 	this->transport = NULL;
 	this->processor = NULL;
     this->remoteName[0] = 0;
-	this->localNamePgm = EMPTYNAME;
+	this->localInfoPgm = NULL;
 	this->remoteNo = remoteNo;
 	this->ticksLastRead = this->ticksLastSend = 0xffff;
 	this->flags = 0;
@@ -208,7 +207,7 @@ void TagValueRemoteConnector::dealWithHeartbeating() {
 	} else if(!isConnected() && transport->connected()) {
        	serdebugF2("Remote connected: ", remoteNo);
         encodeHeartbeat();
-		encodeJoin(localNamePgm);
+		encodeJoin();
 		setConnected(true);
 	}
 
@@ -291,15 +290,17 @@ void TagValueRemoteConnector::nextBootstrap() {
 	}
 }
 
-void TagValueRemoteConnector::encodeJoin(const char* localName) {
+void TagValueRemoteConnector::encodeJoin() {
 	if(!prepareWriteMsg(MSG_JOIN)) return;
-    char szName[20];
-    safeProgCpy(szName, localName, sizeof(szName));
+    char szName[40];
+    safeProgCpy(szName, localInfoPgm->uuid, sizeof(szName));
+    transport->writeField(FIELD_UUID, szName);
+    safeProgCpy(szName, localInfoPgm->name, sizeof(szName));
     transport->writeField(FIELD_MSG_NAME, szName);
     transport->writeFieldInt(FIELD_VERSION, API_VERSION);
     transport->writeFieldInt(FIELD_PLATFORM, TCMENU_DEFINED_PLATFORM);
     transport->endMsg();
-    serdebugF3("Join message send: ", szName, TCMENU_DEFINED_PLATFORM);
+    serdebugF2("Join sent ", szName);
 }
 
 void TagValueRemoteConnector::encodeBootstrap(bool isComplete) {

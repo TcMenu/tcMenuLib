@@ -47,12 +47,12 @@ protected:
     BaseMenuRenderer* renderer;
     const char *headerPgm;
     CompletedHandlerFn completedHandler;
+    void* userData;
     ButtonType button1;
     ButtonType button2;
     uint8_t lastBtnVal;
     uint8_t flags;
     MenuRedrawState needsDrawing;
-    void* userData;
 
 public:
     /**

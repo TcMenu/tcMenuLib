@@ -19,6 +19,15 @@ class MenuItem;
  */
 
 /**
+ * This structure is created in program memory and passed to all RemoteConnector instances.
+ * It contains the name that this device should be identified by and it's UUID.
+ */
+struct ConnectorLocalInfo {
+    char name[20];
+    char uuid[38];
+};
+
+/**
  * appends a character at the end of the string, if there is space according to len
  */
 void appendChar(char* str, char val, int len);

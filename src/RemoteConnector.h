@@ -13,6 +13,7 @@
 
 #include <Arduino.h>
 #include "RemoteTypes.h"
+#include <tcUtil.h>
 #include "MenuItems.h"
 #include "MessageProcessors.h"
 #include "MenuIterator.h"
@@ -144,7 +145,7 @@ private:
  */
 class TagValueRemoteConnector {
 private:
-	const char* localNamePgm;
+	const ConnectorLocalInfo* localInfoPgm;
 	uint16_t ticksLastSend;
 	uint16_t ticksLastRead;
 	CombinedMessageProcessor* processor;
@@ -175,13 +176,12 @@ public:
      * process incoming message, the remote number that should be used and it's name.
      * @param transport a class that implements TagValueTransport for sending and receving data.
      * @param processor a linked list of processors that can process incoming messages.
-     * @param localNamePgm the name of this local device (in program memory on AVR).
-     * @param remoteNo indicates the remote number associated with this connector (defaults to 0)
+     * @param localInfoPgm the name and UUID of this local device (in program memory where available).
      */
-    void initialise(TagValueTransport* transport, CombinedMessageProcessor* processor, const char* localNamePgm) {
+    void initialise(TagValueTransport* transport, CombinedMessageProcessor* processor, const ConnectorLocalInfo* localInfoPgm) {
        	this->processor = processor;
         this->transport = transport;
-        this->localNamePgm = localNamePgm;
+        this->localInfoPgm = localInfoPgm;
     }
 
     /** 
@@ -206,7 +206,7 @@ public:
 	 * Encode a join message onto the wire, giving local name
 	 * @param localName the name to send in the join message
 	 */
-	void encodeJoin(const char* localName);
+	void encodeJoin();
 
 	/**
 	 * Encode a bootstrap message indicating we are sending state

@@ -13,8 +13,8 @@
 
 #include <tcMenu.h>
 #include <LiquidCrystalIO.h>
-#include <RemoteConnector.h>
 #include "EthernetTransport.h"
+#include <RemoteConnector.h>
 #include "tcMenuLiquidCrystal.h"
 
 // all define statements needed
@@ -37,7 +37,6 @@
 extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
 extern IoAbstractionRef io23017;
-extern const char applicationName[];
 
 // all menu item forward references.
 extern TextMenuItem menuText;
@@ -50,6 +49,7 @@ extern ActionMenuItem menuQuestionDialog;
 extern ActionMenuItem menuInfoDialog;
 extern EnumMenuItem menuFood;
 extern ActionMenuItem menuTakeDisplay;
+extern ConnectorLocalInfo menuapplicationInfo;
 
 // Callback functions always follow this pattern: void CALLBACK_FUNCTION myCallback();
 #define CALLBACK_FUNCTION
