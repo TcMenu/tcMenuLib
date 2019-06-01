@@ -47,6 +47,11 @@ union MessageProcessorInfo {
     struct {
         char name[16];
     } pairing;
+    struct {
+        char mode;
+        uint8_t button;
+        uint32_t correlation;
+    } dialog;
 };
 
 /**
@@ -69,7 +74,7 @@ struct MsgHandler {
  * For example: `CombinedMessageProcessor processor(msgHandlers, MSG_HANDLERS_SIZE);`
  */
 extern MsgHandler msgHandlers[];
-#define MSG_HANDLERS_SIZE 3
+#define MSG_HANDLERS_SIZE 4
 
 /**
  * If you decide to write your own processor, this method can handle join messages
@@ -85,6 +90,11 @@ void fieldUpdateValueMsg(TagValueRemoteConnector* connector, FieldAndValue* fiel
  * If you decide to write your own processor, this method can handle pairing messages.
  */
 void fieldUpdatePairingMsg(TagValueRemoteConnector* connector, FieldAndValue* field, MessageProcessorInfo* info);
+
+/**
+ * If you decide to write your own processor, this method can handle dialog updates
+ */
+void fieldUpdateDialogMsg(TagValueRemoteConnector* connector, FieldAndValue* field, MessageProcessorInfo* info);
 
 /**
  * This message processor is responsible for handling messages coming off the wire and processing them into

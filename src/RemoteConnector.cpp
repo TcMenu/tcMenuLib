@@ -94,7 +94,7 @@ void onPairingFinished(ButtonType ty, void* voidConnector) {
 
         // now show a confirmatory message
         BaseDialog* dialog = BaseMenuRenderer::getInstance()->getDialog();
-        dialog->show(headerPairingDone);
+        dialog->show(headerPairingDone, false);
         dialog->copyIntoBuffer(connector->getRemoteName());
         dialog->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
     }
@@ -126,7 +126,7 @@ void TagValueRemoteConnector::pairingRequest(const char* name, const char* uuid)
         // show the dialog.
         dlg->setButtons(BTNTYPE_ACCEPT, BTNTYPE_CANCEL, 1);
         dlg->setUserData(this);
-        dlg->show(headerPairingText, onPairingFinished);
+        dlg->show(headerPairingText, false, onPairingFinished);
     }
     dlg->copyIntoBuffer(name);
 }
@@ -229,6 +229,12 @@ void TagValueRemoteConnector::performAnyWrites() {
             item->setSendRemoteNeeded(remoteNo, false);
             encodeChangeValue(item);
         }
+
+        BaseDialog* dlg = BaseMenuRenderer::getInstance()->getDialog();
+        if(dlg!=NULL && dlg->isRemoteUpdateNeeded(remoteNo)) {
+            dlg->encodeMessage(this);
+            dlg->setRemoteUpdateNeeded(remoteNo, false);
+        }
     }
 }
 
@@ -288,6 +294,25 @@ void TagValueRemoteConnector::nextBootstrap() {
 	default:
 		break;
 	}
+}
+
+void TagValueRemoteConnector::encodeDialogMsg(uint8_t mode, uint8_t btn1, uint8_t btn2, const char* hdrPgm, const char* b1) {
+	if(!prepareWriteMsg(MSG_DIALOG)) return;
+    
+    char buffer[20];
+    buffer[0]=mode;
+    buffer[1]=0;
+    transport->writeField(FIELD_MODE, buffer);
+
+    transport->writeFieldInt(FIELD_BUTTON1, btn1);
+    transport->writeFieldInt(FIELD_BUTTON2, btn2);
+    
+    if(mode == 'S') {
+        safeProgCpy(buffer, hdrPgm, sizeof(buffer));
+        transport->writeField(FIELD_HEADER, buffer);    
+        transport->writeField(FIELD_BUFFER, b1);
+    }
+    transport->endMsg();
 }
 
 void TagValueRemoteConnector::encodeJoin() {

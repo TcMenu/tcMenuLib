@@ -146,8 +146,8 @@ void CALLBACK_FUNCTION onInfoDlg(int /*id*/) {
     // first we set the buttons how we want them. BTNTYPE_NONE means no button.
     dlg->setButtons(BTNTYPE_NONE, BTNTYPE_CLOSE);
 
-    // then we show the dialog
-    dlg->show(pgmInfoHeader);
+    // then we show the dialog - 2nd boolean parameter is if dialog is local only
+    dlg->show(pgmInfoHeader, true);
 
     // and then we set the second line (buffer) - must be after show.
     dlg->copyIntoBuffer("to be set..");
@@ -186,7 +186,7 @@ void CALLBACK_FUNCTION onQuestionDlg(int /*id*/) {
     dlg->setUserData(NULL); 
     
     // now we show the dialog (also giving the finished callback)
-    dlg->show(pgmQuestionHeader, onFinished);
+    dlg->show(pgmQuestionHeader, true, onFinished);
 
     // and lastly we set the text in the buffer area (2nd line)
     char sz[20];

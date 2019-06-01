@@ -34,6 +34,21 @@ typedef void (*CompletedHandlerFn)(ButtonType buttonPressed, void* yourData);
 
 #define DLG_FLAG_SMALLDISPLAY 0
 #define DLG_FLAG_INUSE 1
+#define DLG_FLAG_CAN_SEND_REMOTE 2 
+#define DLG_FLAG_REMOTE_0 3
+#define DLG_FLAG_REMOTE_1 4
+#define DLG_FLAG_REMOTE_2 5
+#define DLG_FLAG_REMOTE_3 6
+#define DLG_FLAG_REMOTE_4 7
+
+#define DLG_FLAG_REMOTE_MASK 0xf8
+
+
+#define DLG_VISIBLE 'S'
+#define DLG_HIDDEN 'H'
+#define DLG_ACTION 'A'
+
+class TagValueRemoteConnector; // forward reference
 
 /**
  * A dialog is able to take over the display completely in order to present the user with information
@@ -53,7 +68,6 @@ protected:
     uint8_t lastBtnVal;
     uint8_t flags;
     MenuRedrawState needsDrawing;
-
 public:
     /**
      * Create the base dialog and clear down all the fields
@@ -74,7 +88,7 @@ public:
      * Create a dialog that takes over the display and presents the header and
      * buffer, with the buttons set up as per `setButtons`
      */
-    void show(const char* headerPgm, CompletedHandlerFn completedHandler = NULL);
+    void show(const char* headerPgm, bool allowRemote, CompletedHandlerFn completedHandler = NULL);
     
     /**
      * You can set an item of data that will be passed to the callback when executed.
@@ -106,6 +120,15 @@ public:
      * @param userClicked indicates when the user clicks an item.
      */
     void dialogRendering(unsigned int currentValue, bool userClicked);
+
+    bool isRemoteUpdateNeeded(int remote) { return bitRead(flags, remote + DLG_FLAG_REMOTE_0) && bitRead(flags, DLG_FLAG_CAN_SEND_REMOTE); }
+    void setRemoteUpdateNeeded(int remote, bool b) { bitWrite(flags, remote + DLG_FLAG_REMOTE_0, b); }
+    void setRemoteUpdateNeededAll() { flags |= DLG_FLAG_REMOTE_MASK; }
+    void clearRemoteUpdateNeededAll() { flags &= ~DLG_FLAG_REMOTE_MASK; }
+    void setRemoteAllowed(bool allowed) {bitWrite(flags, DLG_FLAG_CAN_SEND_REMOTE, allowed); }
+
+    void encodeMessage(TagValueRemoteConnector* remote);
+    void remoteAction(ButtonType type);
 protected:
     /**
      * Sets the inuse flag to true or false

@@ -27,7 +27,18 @@
  */
 #define API_VERSION majorminor(1, 0)
 
-enum AckResponseStatus { ACK_VALUE_RANGE = -1 , ACK_SUCCESS = 0, ACK_ID_NOT_FOUND = 1, ACK_CREDENTIALS_INVALID = 2 };
+enum AckResponseStatus { 
+    // warnings
+    ACK_VALUE_RANGE = -1 , 
+    // success
+    ACK_SUCCESS = 0, 
+    //errors
+    ACK_ID_NOT_FOUND = 1, ACK_CREDENTIALS_INVALID = 2,
+    
+    // unknown error, always last
+    ACK_UNKNOWN = 10000 
+    // unknown error, always last
+};
 
 /**
  * Converts a message field as two separate entities into a single word.
@@ -72,6 +83,8 @@ enum AckResponseStatus { ACK_VALUE_RANGE = -1 , ACK_SUCCESS = 0, ACK_ID_NOT_FOUN
 #define MSG_BOOT_REMOTE msgFieldToWord('B','R')
 /** Message type definition for value change message */
 #define MSG_CHANGE_INT msgFieldToWord('V', 'C')
+/** Message type defintion for a dialog change msg */
+#define MSG_DIALOG msgFieldToWord('D', 'M')
 
 #define FIELD_MSG_TYPE    msgFieldToWord('M', 'T')
 #define FIELD_MSG_NAME    msgFieldToWord('N', 'M')
@@ -98,6 +111,11 @@ enum AckResponseStatus { ACK_VALUE_RANGE = -1 , ACK_SUCCESS = 0, ACK_ID_NOT_FOUN
 #define FIELD_UUID        msgFieldToWord('U', 'U')
 #define FIELD_CORRELATION msgFieldToWord('I', 'C')
 #define FIELD_ACK_STATUS  msgFieldToWord('S', 'T')
+#define FIELD_HEADER      msgFieldToWord('H', 'F')
+#define FIELD_BUTTON1     msgFieldToWord('B', '1')
+#define FIELD_BUTTON2     msgFieldToWord('B', '2')
+#define FIELD_BUFFER      msgFieldToWord('B', 'U')
+#define FIELD_MODE        msgFieldToWord('M', 'O')
 
 #define FIELD_PREPEND_CHOICE 'C'
 

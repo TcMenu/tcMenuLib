@@ -7,6 +7,7 @@
 #include "RemoteConnector.h"
 #include "MessageProcessors.h"
 #include "MenuIterator.h"
+#include "BaseDialog.h"
 
 /**
  * An array of message handlers, where each one is a function that can process that type of message and a message type.
@@ -18,8 +19,36 @@
 MsgHandler msgHandlers[] = {
 	{ fieldUpdateValueMsg, MSG_CHANGE_INT }, 
 	{ fieldUpdateJoinMsg, MSG_JOIN },
-	{ fieldUpdatePairingMsg, MSG_PAIR }
+	{ fieldUpdatePairingMsg, MSG_PAIR },
+	{ fieldUpdateDialogMsg, MSG_DIALOG }
 };
+
+void fieldUpdateDialogMsg(TagValueRemoteConnector* connector, FieldAndValue* field, MessageProcessorInfo* info) {
+	if(field->fieldType == FVAL_END_MSG && info->dialog.mode == 'A') {
+        BaseDialog* dialog = BaseMenuRenderer::getInstance()->getDialog();
+        if(dialog) {
+            dialog->remoteAction((ButtonType)info->dialog.button);
+            connector->encodeAcknowledgement(info->dialog.correlation, ACK_SUCCESS);
+        }
+        else {
+            connector->encodeAcknowledgement(info->dialog.correlation, ACK_UNKNOWN);
+        }
+        return;
+    }
+
+    switch(field->field) {
+    case FIELD_BUTTON1:
+        info->dialog.button = field->value[0] - '0';
+        break;
+    case FIELD_MODE:
+        info->dialog.mode = field->value[0];
+        break;
+    case FIELD_CORRELATION:
+        info->dialog.correlation = strtoul(field->value, NULL, 16);
+        break;
+    }
+
+}
 
 void fieldUpdatePairingMsg(TagValueRemoteConnector* connector, FieldAndValue* field, MessageProcessorInfo* info) {
 	if(field->fieldType == FVAL_END_MSG) return;

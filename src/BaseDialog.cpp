@@ -6,6 +6,7 @@
 #include "tcMenu.h"
 #include "tcUtil.h"
 #include <BaseRenderers.h>
+#include <RemoteConnector.h>
 #include <BaseDialog.h>
 #include <SwitchInput.h>
 
@@ -21,9 +22,11 @@ BaseDialog::BaseDialog(BaseMenuRenderer* renderer) {
     this->renderer = renderer;
 }
 
-void BaseDialog::show(const char* headerPgm, CompletedHandlerFn completedHandler) {
+void BaseDialog::show(const char* headerPgm, bool allowRemote, CompletedHandlerFn completedHandler) {
     serdebugF("showing new dialog");
     setInUse(true);
+    setRemoteAllowed(allowRemote);
+    setRemoteUpdateNeededAll();
     this->headerPgm = headerPgm;
     this->completedHandler = completedHandler;
     needsDrawing = MENUDRAW_COMPLETE_REDRAW;
@@ -31,6 +34,8 @@ void BaseDialog::show(const char* headerPgm, CompletedHandlerFn completedHandler
 
 void BaseDialog::hide() {
     serdebugF("hide() - give back display");
+
+    setRemoteUpdateNeededAll();
 
     // stop the renderer from doing any more rendering, and tell it to reset the menu
     setInUse(false);
@@ -115,6 +120,7 @@ void BaseDialog::copyIntoBuffer(const char* sz) {
 
         buffer[bufferSize]=0;
         setNeedsDrawing(true);
+        setRemoteUpdateNeededAll();
     }
 }
 
@@ -124,4 +130,14 @@ void BaseDialog::setButtons(ButtonType btn1, ButtonType btn2, int defVal) {
     int noOfOptions = (button1 != BTNTYPE_NONE && button2 != BTNTYPE_NONE)  ? 1 : 0;
     switches.getEncoder()->changePrecision(noOfOptions, defVal);
     setNeedsDrawing(true);
+}
+
+void BaseDialog::encodeMessage(TagValueRemoteConnector* remote) {
+    remote->encodeDialogMsg(isInUse() ? DLG_VISIBLE : DLG_HIDDEN, button1, button2, headerPgm, BaseMenuRenderer::getInstance()->getBuffer());
+}
+
+void BaseDialog::remoteAction(ButtonType btn) {
+    serdebugF2("Remote clicked button: ", btn);
+    hide();
+    if(completedHandler) completedHandler(btn, userData);
 }

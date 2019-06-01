@@ -208,6 +208,16 @@ public:
 	 */
 	void encodeJoin();
 
+    /**
+     * Encodes a dialog message that the UI can use to render / remove a dialog from the display.
+     * @param mode either 'S'how, 'H'ide or 'A'ction
+     * @param btn1 the status of the first button
+     * @param btn2 the status of the second button
+     * @param hdrPgm the header of the dialog (progrma memory)
+     * @param buffer the additional text
+     */
+    void encodeDialogMsg(uint8_t mode, uint8_t btn1, uint8_t btn2, const char* hdrPgm, const char* buffer);
+
 	/**
 	 * Encode a bootstrap message indicating we are sending state
 	 * @param isComplete true - end of boot sequence.
