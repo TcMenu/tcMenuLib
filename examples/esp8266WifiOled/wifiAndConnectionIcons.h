@@ -1,6 +1,12 @@
 #ifndef _WIFI_AND_CONNECTION_ICONS_H_
 #define _WIFI_AND_CONNECTION_ICONS_H_
 
+//
+// In this file we have the definition of icons for two widgets. You should stick to multiples of 8 pixels (one byte)
+// Each icon must be the same size and finally declared in a array at the bottom see bottom of this file.
+// These are then used in title widgets that appear in the title bar on graphical displays.
+//
+
 const uint8_t iconWifiNotConnected[] PROGMEM = {
 	0b00000001, 0b10000000,
 	0b00000110, 0b01100000,

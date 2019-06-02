@@ -52,5 +52,10 @@ void setupMenu() {
     renderer.setGraphicsDevice(&gfx, &gfxConfig);
     menuMgr.initWithoutInput(&renderer, &menuTomatoTemp);
     remoteServer.begin(&server, &applicationInfo);
+
+    // Read only and local only function calls
+    menuCucumberTemp.setReadOnly(true);
+    menuTomatoTemp.setReadOnly(true);
+    menuSaveAll.setLocalOnly(true);
 }
 

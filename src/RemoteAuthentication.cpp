@@ -56,7 +56,9 @@ bool AuthenticationManager::isAuthenticated(const char* connectionName, const ch
             serdebugF2("Authenticated ", connectionName);
             return true;
         }
-        else serdebugF2("Invalid Key ", connectionName);
+        else {
+             serdebugF2("Invalid Key ", connectionName);
+        }
     }
     serdebugF2("Not found ", connectionName);
     return false;

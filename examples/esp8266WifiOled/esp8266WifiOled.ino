@@ -16,13 +16,15 @@
 #include "esp8266WifiOled_menu.h"
 #include <IoAbstractionWire.h>
 #include <ArduinoEEPROMAbstraction.h>
-#include "wifiAndConnectionIcons.h"
 #include <RemoteAuthentication.h>
 #ifdef ESP32 
 #include <WiFi.h>
 #else
 #include <ESP8266WiFi.h>
 #endif
+
+// contains the graphical widget title components.
+#include "wifiAndConnectionIcons.h"
 
 
 // here we define the heater and window pins on the PCF8574
@@ -111,9 +113,6 @@ void setup() {
 
     // initialise the menu.
     setupMenu();
-    // we don't want to be able to edit the status tempratures.
-    menuTomatoTemp.setReadOnly(true);
-    menuCucumberTemp.setReadOnly(true);
 
     //
     // here we simulate the temprature changing.
@@ -122,7 +121,7 @@ void setup() {
     //
     taskManager.scheduleFixedRate(5000, [] {
         menuTomatoTemp.setCurrentValue(random(255));
-        menuCucumberTemp.setCurrentValue(random(255));
+        menuCucumberTemp.setCurrentValue(random(255));        
     });
 
     //
@@ -188,9 +187,37 @@ void CALLBACK_FUNCTION onWindowOpen(int /*id*/) {
     }
 }
 
+const char heaterOnHighWarningPgm[] PROGMEM = "Set heater to";
+
+//
+// this method is called when the dialog is dismissed.
+//
+void onDialogFinished(ButtonType btnPressed, void* /*userdata*/) {
+    // if user did not accept the change, set back to the first setting.
+    if(btnPressed != BTNTYPE_OK) {
+        menuHeaterPower.setCurrentValue(1);
+    }
+}
+
+//
+// Called when the heater power is changed, we draw a dialog when there is a 
+// change that is greater that 1. The dialog is configured to call the method
+// above when dismissed.
+//
 void CALLBACK_FUNCTION onHeaterPower(int /*id*/) {
     Serial.print("Heater power setting changed to ");
-    Serial.println(menuHeaterPower.getCurrentValue());
+    int pwr = menuHeaterPower.getCurrentValue();
+    Serial.println(pwr);
+    if(pwr >= 1) {
+        BaseDialog* dlg = renderer.getDialog();
+        if(dlg) {
+            dlg->setButtons(BTNTYPE_OK, BTNTYPE_CANCEL, 1);
+            dlg->show(heaterOnHighWarningPgm, true, onDialogFinished); // true = shows on remote sessions.
+            char sz[10];
+            menuHeaterPower.copyEnumStrToBuffer(sz, sizeof(sz), pwr);
+            dlg->copyIntoBuffer(sz);
+        }
+    }
 }
 
 void CALLBACK_FUNCTION onWindowOpening(int /*id*/) {
@@ -206,10 +233,19 @@ void CALLBACK_FUNCTION onElectricHeater(int /*id*/) {
     }
 }
 
+const char allSavedPgm[] PROGMEM = "All saved to EEPROM";
 void CALLBACK_FUNCTION onSaveAll(int id) {
     Serial.println("Saving values to EEPROM");
     ArduinoEEPROMAbstraction eepromWrapper(&EEPROM);
     menuMgr.save(*eeprom);
     // on esp you must commit after calling save.
     EEPROM.commit();
+
+    BaseDialog* dlg = renderer.getDialog();
+    if(dlg) {
+        dlg->setButtons(BTNTYPE_NONE, BTNTYPE_CLOSE);
+        dlg->show(allSavedPgm, false); // false = shows only on device
+        dlg->copyIntoBuffer("Committed to FLASH");
+    }
+
 }
