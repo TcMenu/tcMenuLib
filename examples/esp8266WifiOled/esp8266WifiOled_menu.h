@@ -12,9 +12,9 @@
 #define MENU_GENERATED_CODE_H
 
 #include <tcMenu.h>
-#include <RemoteConnector.h>
 #include <WiFi.h>
 #include "EthernetTransport.h"
+#include <RemoteConnector.h>
 #include "tcMenuU8g2.h"
 
 // all define statements needed
@@ -23,18 +23,18 @@
 // all variables that need exporting
 extern U8G2_SSD1306_128X64_NONAME_F_SW_I2C gfx;
 extern U8g2MenuRenderer renderer;
-extern const char applicationName[];
 
 // all menu item forward references.
-extern ActionMenuItem menuSaveAll;
-extern EnumMenuItem menuWinOpening;
-extern EnumMenuItem menuHeaterPower;
-extern BackMenuItem menuBackSetup;
-extern SubMenuItem menuSetup;
-extern BooleanMenuItem menuElectricHeater;
-extern BooleanMenuItem menuWindowOpen;
-extern AnalogMenuItem menuCucumberTemp;
-extern AnalogMenuItem menuTomatoTemp;
+extern ActionMenuItem  menuSaveAll;
+extern EnumMenuItem  menuWinOpening;
+extern EnumMenuItem  menuHeaterPower;
+extern BackMenuItem  menuBackSetup;
+extern SubMenuItem  menuSetup;
+extern BooleanMenuItem  menuElectricHeater;
+extern BooleanMenuItem  menuWindowOpen;
+extern AnalogMenuItem  menuCucumberTemp;
+extern AnalogMenuItem  menuTomatoTemp;
+extern const ConnectorLocalInfo  applicationInfo;
 
 // Callback functions always follow this pattern: void CALLBACK_FUNCTION myCallback();
 #define CALLBACK_FUNCTION

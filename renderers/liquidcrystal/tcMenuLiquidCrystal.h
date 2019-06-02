@@ -38,7 +38,7 @@ public:
 
     uint8_t getRows() {return dimY;}
     LiquidCrystal* getLCD() {return lcd;}
-    BaseDialog* getDialog();
+    BaseDialog* getDialog() override;
 private:
 	void renderMenuItem(uint8_t row, MenuItem* item);
 };

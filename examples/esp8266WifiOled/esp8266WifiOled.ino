@@ -16,6 +16,8 @@
 #include "esp8266WifiOled_menu.h"
 #include <IoAbstractionWire.h>
 #include <ArduinoEEPROMAbstraction.h>
+#include "wifiAndConnectionIcons.h"
+#include <RemoteAuthentication.h>
 #ifdef ESP32 
 #include <WiFi.h>
 #else
@@ -40,37 +42,72 @@
 U8G2_SSD1306_128X64_NONAME_F_SW_I2C gfx(U8G2_R0, 15, 4, 16);
 IoAbstractionRef io8574 = ioFrom8574(0x20, IO_INTERRUPT_PIN);
 
+// eeprom wrapper, initialised in setup.
+ArduinoEEPROMAbstraction *eeprom = NULL;
+
 //
 // state used later on by the heater and window control functions
 //
 bool heaterOn;
 bool windowOpen;
 
+// we add two widgets that show both the connection status and wifi signal strength
+// these are added to the renderer and rendered upon any change.
+TitleWidget connectedWidget(iconsConnection, 2, 16, 10);
+TitleWidget wifiWidget(iconsWifi, 5, 16, 10, &connectedWidget);
+
+// when there's a change in communication status (client connects for example) this gets called.
+void onCommsChange(CommunicationInfo info) {
+    if(info.remoteNo == 0) {
+        connectedWidget.setCurrentState(info.connected ? 1 : 0);
+    }
+    // this relies on logging in IoAbstraction's ioLogging.h, to turn it on visit the file for instructions.
+    serdebugF4("Comms notify (rNo, con, enum)", info.remoteNo, info.connected, info.errorMode);
+}
+
 //
 // here we just start serial for debugging and try to initialise the display and menu
 //
 void setup() {
+
+    // set up the inbuilt ESP32 rom to use for load and store.
+    EEPROM.begin(512);
+    eeprom = new ArduinoEEPROMAbstraction(&EEPROM);
+
     Serial.begin(115200);
+
+    // add a callback for connection changes, see function above.
+    remoteServer.getRemoteConnector(0)->setCommsNotificationCallback(onCommsChange);
+
+    // initialise the authentication to use the eeprom at position 50 onwards.
+    authenticator.initialise(eeprom, 50);
 
     // start up the display.
     gfx.begin();
 
+    // this sketch assumes you've successfully connected to the Wifi before, does not
+    // call begin.. You can initialise the wifi whichever way you wish here.
     WiFi.begin("SSID", "PWD");
     WiFi.mode(WIFI_STA);
 
-    // this sketch assumes you've successfully connected to the Wifi before, does not
-    // call begin.. You can initialise the wifi whichever way you wish here.
-    Serial.println("Waiting for WiFi connection");
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial.print(".");
-    }
-    Serial.println("");
-    Serial.print("Connected to ");
-    Serial.println(WiFi.SSID());
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
+    // now monitor the wifi level every second and report it in a widget.
+    taskManager.scheduleFixedRate(1000, [] {
+        if(WiFi.status() == WL_CONNECTED) {
+            int qualityIcon = 0;
+            long strength = WiFi.RSSI();
+            if(strength > -95) qualityIcon = 1;
+            else if(strength > -85) qualityIcon = 2;
+            else if(strength > -70) qualityIcon = 3;
+            else if(strength > -55) qualityIcon = 4;
+            wifiWidget.setCurrentState(qualityIcon);
+            Serial.print("LocalIP"); Serial.println(WiFi.localIP());
+        }
+        else wifiWidget.setCurrentState(0);
+        
 
+    });
+
+    renderer.setFirstWidget(&wifiWidget);
 
     // initialise the menu.
     setupMenu();
@@ -97,14 +134,7 @@ void setup() {
     ioDeviceDigitalWrite(io8574, WINDOW_PIN, HIGH);
     ioDeviceDigitalWriteS(io8574, HEATER_PIN, HIGH);
 
-    //
-    // Initialise 512 bytes of ROM then load back values from eeprom
-    // If this is the first time, there is protection in the library to
-    // avoid loading garbage.
-    //
-    EEPROM.begin(512);
-    ArduinoEEPROMAbstraction eepromWrapper(&EEPROM);
-    menuMgr.load(eepromWrapper);
+    menuMgr.load(*eeprom);
 }
 
 //
@@ -179,7 +209,7 @@ void CALLBACK_FUNCTION onElectricHeater(int /*id*/) {
 void CALLBACK_FUNCTION onSaveAll(int id) {
     Serial.println("Saving values to EEPROM");
     ArduinoEEPROMAbstraction eepromWrapper(&EEPROM);
-    menuMgr.save(eepromWrapper);
+    menuMgr.save(*eeprom);
     // on esp you must commit after calling save.
     EEPROM.commit();
 }

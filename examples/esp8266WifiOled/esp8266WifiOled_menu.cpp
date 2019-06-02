@@ -15,7 +15,6 @@
 
 U8g2GfxMenuConfig gfxConfig;
 U8g2MenuRenderer renderer;
-const char PROGMEM applicationName[] = "Greenhouse";
 WiFiServer server(3333);
 
 // Global Menu Item declarations
@@ -44,6 +43,7 @@ const PROGMEM AnalogMenuInfo minfoCucumberTemp = { "Cucumber Temp", 2, 0xffff, 2
 AnalogMenuItem menuCucumberTemp(&minfoCucumberTemp, 0, &menuWindowOpen);
 const PROGMEM AnalogMenuInfo minfoTomatoTemp = { "Tomato Temp", 1, 0xffff, 255, NO_CALLBACK, -20, 4, "C" };
 AnalogMenuItem menuTomatoTemp(&minfoTomatoTemp, 0, &menuCucumberTemp);
+const PROGMEM ConnectorLocalInfo applicationInfo = { "Greenhouse", "01b9cb76-c108-4be3-a133-6159f8f1c9c1" };
 
 // Set up code
 
@@ -51,6 +51,6 @@ void setupMenu() {
     prepareBasicU8x8Config(gfxConfig);
     renderer.setGraphicsDevice(&gfx, &gfxConfig);
     menuMgr.initWithoutInput(&renderer, &menuTomatoTemp);
-    remoteServer.begin(&server, applicationName);
+    remoteServer.begin(&server, &applicationInfo);
 }
 

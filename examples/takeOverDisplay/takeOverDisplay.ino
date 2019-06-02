@@ -52,6 +52,7 @@ void setup() {
         renderer.takeOverDisplay(myDisplayFunction);
     });
 
+    // we initialise the authenticator to write into the eeprom object at position 100.
     authenticator.initialise(&eeprom, 100);
 
     // this is put in by the menu designer and must be called (always ensure devices are setup first).

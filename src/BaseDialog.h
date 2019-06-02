@@ -164,8 +164,9 @@ protected:
      * @param data the buffer to copy into, must fit at least the largest button copyButtonText
      * @param buttonNum the button number either 0, 1
      * @param currentValue current value from encoder.
+     * @return true if this button is active, otherwise false.
      */
-    void copyButtonText(char* data, int buttonNum, int currentValue);
+    bool copyButtonText(char* data, int buttonNum, int currentValue);
 };
 
 #endif //_BASE_DIALOG_H_

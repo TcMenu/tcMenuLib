@@ -78,7 +78,7 @@ void BaseDialog::dialogRendering(unsigned int currentValue, bool userClicked) {
     }
 }
 
-void BaseDialog::copyButtonText(char* data, int buttonNum, int currentValue) {
+bool BaseDialog::copyButtonText(char* data, int buttonNum, int currentValue) {
     const char* tx;
     int bt = (buttonNum == 0) ? button1 : button2;
     switch(bt) {
@@ -102,7 +102,9 @@ void BaseDialog::copyButtonText(char* data, int buttonNum, int currentValue) {
             *data = toupper(*data);
             ++data;
         }
+        return true;
     }
+    return false;
 }
 
 void BaseDialog::copyIntoBuffer(const char* sz) {
@@ -121,14 +123,16 @@ void BaseDialog::copyIntoBuffer(const char* sz) {
         buffer[bufferSize]=0;
         setNeedsDrawing(true);
         setRemoteUpdateNeededAll();
+        
     }
 }
 
 void BaseDialog::setButtons(ButtonType btn1, ButtonType btn2, int defVal) {
+    serdebugF3("Set buttons on dialog", btn1, btn2);
     button1 = btn1;
     button2 = btn2;
     int noOfOptions = (button1 != BTNTYPE_NONE && button2 != BTNTYPE_NONE)  ? 1 : 0;
-    switches.getEncoder()->changePrecision(noOfOptions, defVal);
+    if(switches.getEncoder()) switches.getEncoder()->changePrecision(noOfOptions, defVal);
     setNeedsDrawing(true);
 }
 
