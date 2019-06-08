@@ -27,9 +27,6 @@ void setup() {
     // we are going to be toggling this so need to set it as output.
     pinMode(LED_BUILTIN, OUTPUT);
 
-    menuA0Voltage.setReadOnly(true);
-    menuA1Voltage.setReadOnly(true);
-    menuA2Voltage.setReadOnly(true);
 
     // added by designer to initialise the menu.
     setupMenu();

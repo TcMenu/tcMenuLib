@@ -14,7 +14,6 @@
 #include <tcMenu.h>
 #include <LiquidCrystalIO.h>
 #include <JoystickSwitchInput.h>
-#include "RemoteConnector.h"
 #include "tcMenuLiquidCrystal.h"
 
 // all define statements needed
@@ -24,18 +23,18 @@
 extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
 extern ArduinoAnalogDevice analogDevice;
-extern const char applicationName[];
 
 // all menu item forward references.
-extern FloatMenuItem menuFlow3;
-extern FloatMenuItem menuFlow2;
-extern FloatMenuItem menuFlow1;
-extern BackMenuItem menuBackFlows;
-extern SubMenuItem menuFlows;
-extern BooleanMenuItem menuOverrideAll;
-extern AnalogMenuItem menuTideGate3;
-extern AnalogMenuItem menuTideGate2;
-extern AnalogMenuItem menuTideGate1;
+extern FloatMenuItem  menuFlow3;
+extern FloatMenuItem  menuFlow2;
+extern FloatMenuItem  menuFlow1;
+extern BackMenuItem  menuBackFlows;
+extern SubMenuItem  menuFlows;
+extern BooleanMenuItem  menuOverrideAll;
+extern AnalogMenuItem  menuTideGate3;
+extern AnalogMenuItem  menuTideGate2;
+extern AnalogMenuItem  menuTideGate1;
+extern const ConnectorLocalInfo  applicationInfo;
 
 // Callback functions always follow this pattern: void CALLBACK_FUNCTION myCallback();
 #define CALLBACK_FUNCTION

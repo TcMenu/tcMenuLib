@@ -11,39 +11,54 @@
 #ifndef _REMOTE_AUTHENTICATION_H_
 #define _REMOTE_AUTHENTICATION_H_
 
-// START user adjustable
-
-// if you don't want to use security with your connections you can save a few bytes by turning it off here.
-// To turn off, comment out the line below to undefine REMOTE_SECURITY_REQUIRED
-#define REMOTE_SECURITY_REQUIRED
-
-// END  user adjustable
-
-
-#ifdef REMOTE_SECURITY_REQUIRED
-
 #include <EepromAbstraction.h>
-#include "MenuItems.h"
 
 #define UUID_KEY_SIZE 40
 #define CLIENT_DESC_SIZE 16
 #define TOTAL_KEY_SIZE (UUID_KEY_SIZE + CLIENT_DESC_SIZE)
 #define KEY_STORAGE_SIZE 6
-#define MENU_ID_RANGE_AUTH_START 30000
 
 /**
  * This is the external interface of authentication when using the menu library. It
  * provides the support for checking if a connection is authenticated and also for
- * adding new keys.
+ * adding new keys. There are two implementations of it so far, and more may follow
+ * so always try and use the interface rather than a given impl.
  */
 class AuthenticationManager {
+public:    
+    /**
+     * Adds an additional name, key mapping to the authentication manager, if there is space
+     * left in internal storage. If there is not enough space, it will return false and you
+     * need to reset the storage to proceed, as it's probably full.
+     * 
+     * @param connectionName the name of the remote
+     * @param uuid the key of the API / UI 
+     * @return true if successful otherwise false.
+     */
+    virtual bool addAdditionalUUIDKey(const char* connectionName, const char* uuid)=0;
+
+    /**
+     * Checks if a set of connection parameters is allowed to connect.
+     * @param connectionName the name of the remote
+     * @param authResponse the key from the remote
+     * @return true if authenticated otherwise false.
+     */
+    virtual bool isAuthenticated(const char* connectionName, const char* authResponse)=0;
+};
+
+/**
+ * An implementation of AuthenticationManager that stores it's values in EEPROM.
+ * It stores up to KEY_STORAGE_SIZE (default 6) key value pairs in EEPROM and
+ * checks directly against them without any buffering.
+ */
+class EepromAuthenticatorManager : public AuthenticationManager {
 private:
     EepromAbstraction *eeprom;
     EepromPosition romStart;
     uint16_t magicKey;
 
 public:
-    AuthenticationManager() {
+    EepromAuthenticatorManager() {
         eeprom = NULL;
         romStart = 0;
         this->magicKey = 0;
@@ -52,7 +67,8 @@ public:
     void initialise(EepromAbstraction* eeprom, EepromPosition start, uint16_t magicKey = 0x9078);
 
     /**
-     * Clear down the whole authentication structure to start again.
+     * Reset all keys in this authenticator, such that all connections would need to run
+     * through the normal joining behaviour.
      */
     void resetAllKeys();
 
@@ -70,14 +86,14 @@ public:
      * @param connectionName the name of the connection
      * @param uuid the key associated with it.
      */ 
-    bool addAdditionalUUIDKey(const char* connectionName, const char* uuid);
+    bool addAdditionalUUIDKey(const char* connectionName, const char* uuid) override;
 
     /**
      * Check if the connectionName and authResponse match the one on record.
      * @param connectionName the name of the connection
      * @param authResponse the key associated with it.
      */
-    bool isAuthenticated(const char* connectionName, const char* authResponse);
+    bool isAuthenticated(const char* connectionName, const char* authResponse) override;
 private:
     // finds the slot (or an empty slot) or if neither are found returns -1
     int findSlotFor(const char* name);
@@ -88,23 +104,58 @@ private:
     }
 };
 
-#else // REMOTE_SECURITY_REQUIRED
-
 /**
  * Should you not wish to use the security features, and there's little benefit memory wise to be honest
  * then this version of the class does nothing and always allows connections.
  */
-class AuthenticationManager {
+class NoAuthenticationManager : public AuthenticationManager {
 public:
-    AuthenticationManager() { }
+    NoAuthenticationManager() { }
 
-    void addAdditionalUUIDKey(const char* connectionName, const char* uuid) { }
+    /** prize every time with the No Authentication impl, everyone is always admitted. */
+    bool addAdditionalUUIDKey(const char* /*connectionName*/, const char* /*uuid*/) override { return true; }
 
-    bool isAuthenticated(const char* connectionName, const char* /*authResponse*/) { return true; }
+    /** prize every time with the No Authentication impl, everyone is always admitted. */
+    bool isAuthenticated(const char* /*connectionName*/, const char* /*authResponse*/) override { return true; }
 };
 
-#endif // REMOTE_SECURITY_REQUIRED
+/**
+ * When using the read only authenticator, you create these structures in read only memory up front at compile
+ * time using const and PROGMEM.
+ */
+struct AuthBlock {
+    char name[CLIENT_DESC_SIZE];
+    char uuid[UUID_KEY_SIZE];
+};
 
-extern AuthenticationManager authenticator;
+/**
+ * Should you wish to permit only a small number of pre-known keys to connect, then this version
+ * will authenticate against an array of AuthBlock's stored in PROGMEM / constant memory.
+ */
+class ReadOnlyAuthenticationManager : public AuthenticationManager {
+private:
+    const AuthBlock* authBlocksPgm;
+    int numberOfEntries;
+public:
+    /**
+     * Initialise with an array of AuthBlock structures in program memory and the number of entries
+     * @param authBlocksPgm the authorisation blocks in const / program memory
+     * @param numberOfEntries the number of blocks in the array.
+     */
+    ReadOnlyAuthenticationManager(const AuthBlock* authBlocksPgm, int numberOfEntries) {
+        this->authBlocksPgm = authBlocksPgm;
+        this->numberOfEntries = numberOfEntries;
+    }
+
+    /** Does not do anything in this variant - it is read only */
+    bool addAdditionalUUIDKey(const char* /*connectionName*/, const char* /*uuid*/) override { return false; }
+
+    /**
+     * Checks the list of AuthBlocks to see if any contain our credentials.
+     * @param connectionName the name of the remote
+     * @param authResponse the key provided in the join message
+     */
+    bool isAuthenticated(const char* connectionName, const char* authResponse) override;
+};
 
 #endif //_REMOTE_AUTHENTICATION_H_

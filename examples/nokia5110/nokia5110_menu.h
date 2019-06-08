@@ -14,8 +14,8 @@
 #include <tcMenu.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_PCD8544.h>
-#include <RemoteConnector.h>
 #include "EthernetTransport.h"
+#include <RemoteConnector.h>
 #include <RemoteMenuItem.h>
 #include "tcMenuAdaFruitGfx.h"
 
@@ -28,26 +28,26 @@
 // all variables that need exporting
 extern Adafruit_PCD8544 gfx;
 extern AdaFruitGfxMenuRenderer renderer;
-extern const char applicationName[];
 
 // all menu item forward references.
-extern RemoteMenuItem menuR0;
-extern BackMenuItem menuBackRemote;
-extern SubMenuItem menuRemote;
-extern TextMenuItem menuTxt;
-extern FloatMenuItem menuCurrent;
-extern FloatMenuItem menuVoltsIn;
-extern BackMenuItem menuBackStatus;
-extern SubMenuItem menuStatus;
-extern ActionMenuItem menuShutdownNow;
-extern AnalogMenuItem menuDelay;
-extern BooleanMenuItem menuPwrDelay;
-extern BackMenuItem menuBackSettings;
-extern SubMenuItem menuSettings;
-extern EnumMenuItem menuOnAlm;
-extern AnalogMenuItem menuKitchen;
-extern AnalogMenuItem menuLiving;
-extern AnalogMenuItem menuHall;
+extern RemoteMenuItem  menuR0;
+extern BackMenuItem  menuBackRemote;
+extern SubMenuItem  menuRemote;
+extern TextMenuItem  menuTxt;
+extern FloatMenuItem  menuCurrent;
+extern FloatMenuItem  menuVoltsIn;
+extern BackMenuItem  menuBackStatus;
+extern SubMenuItem  menuStatus;
+extern ActionMenuItem  menuShutdownNow;
+extern AnalogMenuItem  menuDelay;
+extern BooleanMenuItem  menuPwrDelay;
+extern BackMenuItem  menuBackSettings;
+extern SubMenuItem  menuSettings;
+extern EnumMenuItem  menuOnAlm;
+extern AnalogMenuItem  menuKitchen;
+extern AnalogMenuItem  menuLiving;
+extern AnalogMenuItem  menuHall;
+extern const ConnectorLocalInfo  applicationInfo;
 
 // Callback functions always follow this pattern: void CALLBACK_FUNCTION myCallback();
 #define CALLBACK_FUNCTION

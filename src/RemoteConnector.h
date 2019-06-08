@@ -98,6 +98,9 @@ struct CommunicationInfo {
  */
 typedef void (*CommsCallbackFn)(CommunicationInfo);
 
+// forward reference.
+class AuthenticationManager;
+
 /**
  * The definition of a transport that can send and receive information remotely using the TagVal protocol.
  * Implementations include SerialTransport and EthernetTransport located in the remotes directory.
@@ -151,6 +154,7 @@ private:
 	CombinedMessageProcessor* processor;
 	TagValueTransport* transport;	
     CommsCallbackFn commsCallback;
+    AuthenticationManager* authManager;
 
     // used by bootstrapping and writing out messages
     MenuItemIterator iterator;
@@ -178,11 +182,9 @@ public:
      * @param processor a linked list of processors that can process incoming messages.
      * @param localInfoPgm the name and UUID of this local device (in program memory where available).
      */
-    void initialise(TagValueTransport* transport, CombinedMessageProcessor* processor, const ConnectorLocalInfo* localInfoPgm) {
-       	this->processor = processor;
-        this->transport = transport;
-        this->localInfoPgm = localInfoPgm;
-    }
+    void initialise(TagValueTransport* transport, CombinedMessageProcessor* processor, const ConnectorLocalInfo* localInfoPgm);
+
+    void setAuthManager(AuthenticationManager* mgr) { authManager = mgr; }
 
     /** 
      * If you want to be informed of communication events for this remote, pass a function
@@ -381,6 +383,7 @@ public:
 
     /** indicates if the connection is yet authenicated */
     bool isAuthenticated() { return bitRead(flags, FLAG_AUTHENTICATED); }
+    AuthenticationManager* getAuthManager() { return authManager; }
 private:
 	void encodeBaseMenuFields(int parentId, MenuItem* item);
     bool prepareWriteMsg(uint16_t msgType);

@@ -38,14 +38,14 @@ public:
 
     uint8_t getRows() {return dimY;}
     LiquidCrystal* getLCD() {return lcd;}
-    BaseDialog* getDialog();
+    BaseDialog* getDialog() override;
 private:
 	void renderMenuItem(uint8_t row, MenuItem* item);
 };
 
 class LiquidCrystalDialog : public BaseDialog {
 public:
-    LiquidCrystalDialog(LiquidCrystalRenderer* renderer) : BaseDialog(renderer) { 
+    LiquidCrystalDialog(LiquidCrystalRenderer* renderer) { 
         bitWrite(flags, DLG_FLAG_SMALLDISPLAY, (renderer->getRows() <= 2));
     }
 protected:

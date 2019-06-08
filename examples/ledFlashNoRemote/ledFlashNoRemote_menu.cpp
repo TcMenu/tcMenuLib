@@ -15,7 +15,6 @@
 
 LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
 LiquidCrystalRenderer renderer(lcd, LCD_WIDTH, LCD_HEIGHT);
-const char PROGMEM applicationName[] = "LedBuiltIn";
 
 // Global Menu Item declarations
 
@@ -25,6 +24,7 @@ const PROGMEM AnalogMenuInfo minfoA0Volts = { "A0Volts", 2, 0xffff, 1024, NO_CAL
 AnalogMenuItem menuA0Volts(&minfoA0Volts, 0, &menuSaveLEDState);
 const PROGMEM BooleanMenuInfo minfoBuiltInLED = { "BuiltIn LED", 1, 2, 1, onLedChange, NAMING_ON_OFF };
 BooleanMenuItem menuBuiltInLED(&minfoBuiltInLED, false, &menuA0Volts);
+const PROGMEM ConnectorLocalInfo applicationInfo = { "LED Blink", "86bb814a-5b77-45eb-8050-7dba18617635" };
 
 // Set up code
 

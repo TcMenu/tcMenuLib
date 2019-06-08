@@ -15,7 +15,6 @@
 #include <LiquidCrystalIO.h>
 #include <IoAbstraction.h>
 #include <DfRobotInputAbstraction.h>
-#include "RemoteConnector.h"
 #include "tcMenuLiquidCrystal.h"
 
 // all define statements needed
@@ -24,14 +23,14 @@
 // all variables that need exporting
 extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
-extern const char applicationName[];
 
 // all menu item forward references.
-extern BooleanMenuItem menuLED2;
-extern BooleanMenuItem menuLED1;
-extern BackMenuItem menuBackLEDStates;
-extern SubMenuItem menuLEDStates;
-extern AnalogMenuItem menuValueA0;
+extern BooleanMenuItem  menuLED2;
+extern BooleanMenuItem  menuLED1;
+extern BackMenuItem  menuBackLEDStates;
+extern SubMenuItem  menuLEDStates;
+extern AnalogMenuItem  menuValueA0;
+extern const ConnectorLocalInfo  applicationInfo;
 
 // Callback functions always follow this pattern: void CALLBACK_FUNCTION myCallback();
 #define CALLBACK_FUNCTION

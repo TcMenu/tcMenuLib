@@ -15,7 +15,6 @@
 
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 LiquidCrystalRenderer renderer(lcd, 16, 2);
-const char PROGMEM applicationName[] = "New Device";
 
 // Global Menu Item declarations
 
@@ -28,6 +27,7 @@ BackMenuItem menuBackLEDStates(&menuLED1, (const AnyMenuInfo*)&minfoLEDStates);
 SubMenuItem menuLEDStates(&minfoLEDStates, &menuBackLEDStates, NULL);
 const PROGMEM AnalogMenuInfo minfoValueA0 = { "Value A0", 1, 0xffff, 1024, NO_CALLBACK, 0, 1, "" };
 AnalogMenuItem menuValueA0(&minfoValueA0, 0, &menuLEDStates);
+const PROGMEM ConnectorLocalInfo applicationInfo = { "DfRobot", "2ba37227-a412-40b7-94e7-42caf9bb0ff4" };
 
 // Set up code
 

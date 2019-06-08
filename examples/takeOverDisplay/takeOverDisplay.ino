@@ -31,6 +31,11 @@ int counter = 0;
 // AvrEeprom eeprom; 
 I2cAt24Eeprom eeprom(0x50, 64); // page size 64 for AT24-128 model
 
+// we want to authenticate connections, the easiest and quickest way is to use the EEPROM
+// authenticator where pairing requests add a new item into the EEPROM. Any authentication
+// requests are then handled by looking in the EEPROM.
+EepromAuthenticatorManager authManager;
+
 void setup() {
     Serial.begin(115200);
 
@@ -52,8 +57,12 @@ void setup() {
         renderer.takeOverDisplay(myDisplayFunction);
     });
 
-    // we initialise the authenticator to write into the eeprom object at position 100.
-    authenticator.initialise(&eeprom, 100);
+    // now we enable authentication using EEPROM authentication. Where the EEPROM is
+    // queried for authentication requests, and any additional pairs are stored there too.
+    // first we initialise the authManager, then pass it to the class.
+    // Always call BEFORE setupMenu()
+    authManager.initialise(&eeprom, 100);
+    remoteServer.setAuthenticator(&authManager);
 
     // this is put in by the menu designer and must be called (always ensure devices are setup first).
     setupMenu();

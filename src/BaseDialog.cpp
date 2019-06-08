@@ -15,11 +15,10 @@ const char buttonCancel[] PROGMEM = "cancel";
 const char buttonClose[] PROGMEM = "close";
 const char buttonAccept[] PROGMEM = "accept";
 
-BaseDialog::BaseDialog(BaseMenuRenderer* renderer) {
+BaseDialog::BaseDialog() {
     headerPgm = NULL;
     bitWrite(flags, DLG_FLAG_INUSE, false);
     button1 = button2 = BTNTYPE_NONE;
-    this->renderer = renderer;
 }
 
 void BaseDialog::show(const char* headerPgm, bool allowRemote, CompletedHandlerFn completedHandler) {
@@ -39,7 +38,9 @@ void BaseDialog::hide() {
 
     // stop the renderer from doing any more rendering, and tell it to reset the menu
     setInUse(false);
-    renderer->giveBackDisplay();
+    if(MenuRenderer::getInstance()->getRendererType() == RENDERER_TYPE_BASE) {
+        ((BaseMenuRenderer*)MenuRenderer::getInstance())->giveBackDisplay();
+    }
 
     // clear down all structures.
     button1 = button2 = BTNTYPE_NONE;
@@ -109,8 +110,8 @@ bool BaseDialog::copyButtonText(char* data, int buttonNum, int currentValue) {
 
 void BaseDialog::copyIntoBuffer(const char* sz) {
     if(isInUse()) {
-        char* buffer = renderer->getBuffer();
-        uint8_t bufferSize = renderer->getBufferSize();
+        char* buffer = MenuRenderer::getInstance()->getBuffer();
+        uint8_t bufferSize = MenuRenderer::getInstance()->getBufferSize();
         strncpy(buffer, sz, bufferSize);
         int l = strlen(buffer);
 
@@ -137,7 +138,7 @@ void BaseDialog::setButtons(ButtonType btn1, ButtonType btn2, int defVal) {
 }
 
 void BaseDialog::encodeMessage(TagValueRemoteConnector* remote) {
-    remote->encodeDialogMsg(isInUse() ? DLG_VISIBLE : DLG_HIDDEN, button1, button2, headerPgm, BaseMenuRenderer::getInstance()->getBuffer());
+    remote->encodeDialogMsg(isInUse() ? DLG_VISIBLE : DLG_HIDDEN, button1, button2, headerPgm, MenuRenderer::getInstance()->getBuffer());
 }
 
 void BaseDialog::remoteAction(ButtonType btn) {

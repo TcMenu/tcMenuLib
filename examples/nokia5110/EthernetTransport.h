@@ -17,6 +17,7 @@
 #include <RemoteConnector.h>
 #include <TaskManager.h>
 #include <UIPEthernet.h>
+#include <tcUtil.h>
 
 /**
  * An implementation of TagValueTransport that is able to read and write using sockets.
@@ -58,12 +59,23 @@ public:
 	 */
 	EthernetTagValServer();
 
+    /**
+     * Sets the mode of authentication used with your remote, if you don't call this the system will
+     * default to no authentication; which is probably fine for serial / bluetooth serial.
+     *
+     * This should always be called before begin(), to ensure this in your code always ensure this
+     * is called BEFORE setupMenu().
+     *
+     * @param authManager a reference to an authentication manager.
+     */
+    void setAuthenticator(AuthenticationManager* authManager) { connector.setAuthManager(authManager); }
+
 	/**
 	 * Creates the ethernet client manager components.
 	 * @param server a ready configured ethernet server instance.
 	 * @param namePgm the local name in program memory on AVR
 	 */
-	void begin(UIPServer* server, const char* namePgm);
+	void begin(UIPServer* server, const ConnectorLocalInfo* localInfo);
 
 	/**
 	 * @return the EthernetTagValTransport for the given connection number - zero based

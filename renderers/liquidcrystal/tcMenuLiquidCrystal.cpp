@@ -90,7 +90,7 @@ BaseDialog* LiquidCrystalRenderer::getDialog() {
 // dialog
 
 void LiquidCrystalDialog::internalRender(int currentValue) {
-    LiquidCrystalRenderer* lcdRender = ((LiquidCrystalRenderer*)renderer);
+    LiquidCrystalRenderer* lcdRender = ((LiquidCrystalRenderer*)MenuRenderer::getInstance());
     LiquidCrystal* lcd = lcdRender->getLCD();
     if(needsDrawing == MENUDRAW_COMPLETE_REDRAW) {
         lcd->clear();

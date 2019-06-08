@@ -59,7 +59,6 @@ class TagValueRemoteConnector; // forward reference
  */
 class BaseDialog {
 protected:
-    BaseMenuRenderer* renderer;
     const char *headerPgm;
     CompletedHandlerFn completedHandler;
     void* userData;
@@ -72,7 +71,7 @@ public:
     /**
      * Create the base dialog and clear down all the fields
      */
-    BaseDialog(BaseMenuRenderer* renderer);
+    BaseDialog();
     virtual ~BaseDialog() {}
 
     /**

@@ -10,11 +10,9 @@
 #include "BaseRenderers.h"
 #include "BaseDialog.h"
 
-BaseMenuRenderer* BaseMenuRenderer::theInstance = NULL;
+MenuRenderer* MenuRenderer::theInstance = NULL;
 
-BaseMenuRenderer::BaseMenuRenderer(int bufferSize) {
-	buffer = new char[bufferSize + 1]; // add one to allow for the trailing 0.
-	this->bufferSize = bufferSize;
+BaseMenuRenderer::BaseMenuRenderer(int bufferSize) : MenuRenderer(RENDERER_TYPE_BASE, bufferSize) {
 	ticksToReset = 0;
     lastOffset = 0;
     resetValInTicks = 30 * SECONDS_IN_TICKS;
@@ -26,7 +24,7 @@ BaseMenuRenderer::BaseMenuRenderer(int bufferSize) {
 	this->lastOffset = 0;
     this->firstWidget = NULL;
     this->dialog = NULL;
-    theInstance = this;
+    MenuRenderer::theInstance = this;
 }
 
 void BaseMenuRenderer::initialise() {
@@ -419,4 +417,20 @@ TitleWidget::TitleWidget(const uint8_t * const* icons, uint8_t maxStateIcons, ui
 	this->currentState = 0;
 	this->next = next;
 	this->changed = true;
+}
+
+class NoRenderDialog : public BaseDialog {
+public:
+    NoRenderDialog() { 
+        bitWrite(flags, DLG_FLAG_SMALLDISPLAY, false);
+    }
+protected:
+    void internalRender(int currentValue) override { /* does nothing */ }
+};
+
+BaseDialog* NoRenderer::getDialog() {
+    if(dialog == NULL) {
+        dialog = new NoRenderDialog();
+    }
+    return dialog;
 }

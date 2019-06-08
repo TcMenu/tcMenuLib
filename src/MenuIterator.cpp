@@ -49,7 +49,7 @@ MenuItem* getParentRootAndVisit(MenuItem* current, MenuVisitorFn visitor) {
  * Find an item by it's ID by traversing through the menu structure looking
  * for the ID and short circuiting on the first match.
  */
-MenuItem* recursiveFindById(MenuItem* current, int id) {
+MenuItem* recursiveFindById(MenuItem* current, uint16_t id) {
     while(current != NULL) {
         if(current->getMenuType() == MENUTYPE_SUB_VALUE) {
             SubMenuItem* sub = reinterpret_cast<SubMenuItem*>(current);

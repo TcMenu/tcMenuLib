@@ -45,7 +45,7 @@ private:
 
 class LiquidCrystalDialog : public BaseDialog {
 public:
-    LiquidCrystalDialog(LiquidCrystalRenderer* renderer) : BaseDialog(renderer) { 
+    LiquidCrystalDialog(LiquidCrystalRenderer* renderer) { 
         bitWrite(flags, DLG_FLAG_SMALLDISPLAY, (renderer->getRows() <= 2));
     }
 protected:

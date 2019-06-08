@@ -26,15 +26,15 @@
 // all variables that need exporting
 extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
-extern const char applicationName[];
 
 // all menu item forward references.
-extern ActionMenuItem menuPushMe;
-extern EnumMenuItem menuFood;
-extern TextMenuItem menuMyText;
-extern AnalogMenuItem menuA2Voltage;
-extern AnalogMenuItem menuA1Voltage;
-extern AnalogMenuItem menuA0Voltage;
+extern ActionMenuItem  menuPushMe;
+extern EnumMenuItem  menuFood;
+extern TextMenuItem  menuMyText;
+extern AnalogMenuItem  menuA2Voltage;
+extern AnalogMenuItem  menuA1Voltage;
+extern AnalogMenuItem  menuA0Voltage;
+extern const ConnectorLocalInfo  applicationInfo;
 
 // Callback functions always follow this pattern: void CALLBACK_FUNCTION myCallback();
 #define CALLBACK_FUNCTION

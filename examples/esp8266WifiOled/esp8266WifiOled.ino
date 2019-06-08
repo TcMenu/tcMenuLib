@@ -33,7 +33,7 @@
 #define HEATER_PIN 4
 
 // this is the interrupt pin connection from the PCF8574 back to the ESP8266 board.
-#define IO_INTERRUPT_PIN 2
+#define IO_INTERRUPT_PIN 12
 
 // the width and height of the attached OLED display.
 #define OLED_WIDTH 128
@@ -41,7 +41,7 @@
 //
 // We create an adafruit 1306 display driver and also the tcMenu display configuration options
 //
-U8G2_SSD1306_128X64_NONAME_F_SW_I2C gfx(U8G2_R0, 15, 4, 16);
+U8G2_SSD1306_128X64_NONAME_F_SW_I2C gfx(U8G2_R0, 15, 4);
 IoAbstractionRef io8574 = ioFrom8574(0x20, IO_INTERRUPT_PIN);
 
 // eeprom wrapper, initialised in setup.

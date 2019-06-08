@@ -92,12 +92,24 @@ public:
 	void setNext(TitleWidget* next) {this->next = next;}
 };
 
+enum RendererType: byte { RENDER_TYPE_NOLOCAL, RENDERER_TYPE_BASE };
+
 /** 
  * Each display must have a renderer, even if it is the NoRenderer, the NoRenderer is for situations
  * where the control is performed exclusively by a remote device.
  */
 class MenuRenderer {
+protected:
+    static MenuRenderer* theInstance;
+    char *buffer;
+	uint8_t bufferSize;
+    RendererType rendererType;
 public:
+    MenuRenderer(RendererType rendererType, int bufferSize) { 
+        buffer = new char[bufferSize+1]; 
+        this->bufferSize = bufferSize; 
+        this->rendererType = rendererType;
+    }
 	/**
 	 * This is called when the menu manager is created, to let the display perform one off tasks
 	 * to prepare the display for use
@@ -141,6 +153,22 @@ public:
 
 	/** virtual destructor is required by the language */
 	virtual ~MenuRenderer() { }
+
+    /* Gets the rendering instance */
+    static MenuRenderer* getInstance() { return theInstance; }
+
+    /**
+     * Gets the buffer that is used internally for render buffering.
+     */
+    char* getBuffer() {return buffer;}
+    
+    /**
+     * Gets the buffer size of the buffer
+     */
+    uint8_t getBufferSize() {return bufferSize;}
+
+    /** Returns if this is a no display type renderer or a base renderer type. */
+    RendererType getRendererType() { return rendererType; }
 };
 
 /**
@@ -163,7 +191,10 @@ enum MenuDrawJustification: byte {
  * A renderer that does nothing, for cases where there's no display
  */
 class NoRenderer : public MenuRenderer {
+private:
+    BaseDialog* dialog;
 public:
+    NoRenderer() : MenuRenderer(RENDER_TYPE_NOLOCAL, 20) { MenuRenderer::theInstance = this; dialog = NULL;}
     ~NoRenderer() override { }
 	void activeIndexChanged(uint8_t /*ignored*/) override {  }
 	MenuItem* getCurrentSubMenu() override { return NULL; }
@@ -171,7 +202,8 @@ public:
 	void onSelectPressed(MenuItem* /*ignored*/) override { }
 	void initialise() override { }
     void onHold() override { }
-    BaseDialog* getDialog() override { return NULL; }
+    BaseDialog* getDialog() override;
+    char* getBuffer();
 };
 
 class RemoteMenuItem; // forward reference.
@@ -186,8 +218,6 @@ class RemoteMenuItem; // forward reference.
  */
 class BaseMenuRenderer : public MenuRenderer, Executable {
 protected:
-	char* buffer;
-	uint8_t bufferSize;
 	uint8_t lastOffset;
 	uint16_t ticksToReset;
     uint16_t resetValInTicks;
@@ -198,8 +228,6 @@ protected:
 	MenuItem* currentRoot;
 	MenuItem* currentEditor;
     BaseDialog* dialog;
-private:
-    static BaseMenuRenderer* theInstance;
 public:
 	/**
 	 * constructs the renderer with a given buffer size 
@@ -216,9 +244,6 @@ public:
 	 * Initialise the render setting up tasks
 	 */
 	virtual void initialise();
-
-    /* Gets the instance */
-    static BaseMenuRenderer* getInstance() { return theInstance; }
 
     /** 
      * Adjust the default reset interval of 30 seconds. Maximum value is 60 seconds.
@@ -306,17 +331,6 @@ public:
 	 * Returns a pointer to the rendering callback
 	 */
 	RendererCallbackFn getRenderingCallback() { return renderCallback; }
-    
-    /**
-     * Gets the buffer that is used internally for render buffering.
-     */
-    char* getBuffer() {return buffer;}
-    
-    /**
-     * Gets the buffer size of the buffer
-     */
-    uint8_t getBufferSize() {return bufferSize;}
-
 protected:
     /**
      * Gets the parent of the current menu.

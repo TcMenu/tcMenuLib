@@ -6,11 +6,7 @@
 #include "RemoteAuthentication.h"
 #include <IoLogging.h>
 
-AuthenticationManager authenticator;
-
-#ifdef REMOTE_SECURITY_REQUIRED
-
-void AuthenticationManager::initialise(EepromAbstraction* eeprom, EepromPosition start, uint16_t magicKey) {
+void EepromAuthenticatorManager::initialise(EepromAbstraction* eeprom, EepromPosition start, uint16_t magicKey) {
     this->romStart = start;
     this->eeprom = eeprom;
     this->magicKey = magicKey;
@@ -20,7 +16,12 @@ void AuthenticationManager::initialise(EepromAbstraction* eeprom, EepromPosition
     }
 }
 
-bool AuthenticationManager::addAdditionalUUIDKey(const char* connectionName, const char* uuid) {
+bool EepromAuthenticatorManager::addAdditionalUUIDKey(const char* connectionName, const char* uuid) {
+    if(eeprom == NULL) {
+        serdebugF("EEPROM Auth not initialised!!");
+        return false;
+    }
+
     // find a space for the key
     int insertAt = findSlotFor(connectionName);
     if(insertAt == -1) {
@@ -45,7 +46,11 @@ bool AuthenticationManager::addAdditionalUUIDKey(const char* connectionName, con
     return true;
 }
 
-bool AuthenticationManager::isAuthenticated(const char* connectionName, const char* authResponse) {
+bool EepromAuthenticatorManager::isAuthenticated(const char* connectionName, const char* authResponse) {
+    if(eeprom == NULL) {
+        serdebugF("EEPROM Auth not initialised!!");
+        return false;
+    }
     char buffer[UUID_KEY_SIZE];
     int i = findSlotFor(connectionName);
     if(i != -1) {
@@ -64,7 +69,7 @@ bool AuthenticationManager::isAuthenticated(const char* connectionName, const ch
     return false;
 }
 
-void AuthenticationManager::copyKeyNameToBuffer(int idx, char* buffer, int bufSize) {
+void EepromAuthenticatorManager::copyKeyNameToBuffer(int idx, char* buffer, int bufSize) {
     if(idx < 0 || idx >= KEY_STORAGE_SIZE) {
         buffer[0]=0;
         return;
@@ -74,7 +79,7 @@ void AuthenticationManager::copyKeyNameToBuffer(int idx, char* buffer, int bufSi
     buffer[bufSize-1]=0;
 }
 
-void AuthenticationManager::resetAllKeys() {
+void EepromAuthenticatorManager::resetAllKeys() {
     serdebugF("Resetting auth store");
     eeprom->write16(romStart, magicKey);
     for(int i=0; i<KEY_STORAGE_SIZE;i++) {
@@ -84,7 +89,7 @@ void AuthenticationManager::resetAllKeys() {
     }
 }
 
-int AuthenticationManager::findSlotFor(const char* name) {
+int EepromAuthenticatorManager::findSlotFor(const char* name) {
     int emptySlot = -1;
     for(int i=0;i<KEY_STORAGE_SIZE;i++) {
         uint8_t val = eeprom->read8(eepromOffset(i));
@@ -106,4 +111,14 @@ int AuthenticationManager::findSlotFor(const char* name) {
     return emptySlot;
 }
 
-#endif // REMOTE_SECURITY_REQUIRED
+bool ReadOnlyAuthenticationManager::isAuthenticated(const char* connectionName, const char* authResponse) { 
+    for(int i=0;i<numberOfEntries;i++) {
+        if(strcmp_P(connectionName, authBlocksPgm[i].name) == 0) {                
+            bool keyMatch = strcmp_P(authResponse, authBlocksPgm[i].uuid) == 0;
+            serdebugF3("AuthBlock found (name, keyMatch) ", connectionName, keyMatch);
+            return keyMatch;
+        }
+    }
+    serdebugF2("AuthBlock not found for ", connectionName);
+    return false;
+}

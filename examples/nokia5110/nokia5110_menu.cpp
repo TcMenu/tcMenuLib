@@ -15,7 +15,6 @@
 
 AdaColorGfxMenuConfig gfxConfig;
 AdaFruitGfxMenuRenderer renderer;
-const char PROGMEM applicationName[] = "Lighting";
 EthernetServer server(3333);
 
 // Global Menu Item declarations
@@ -54,6 +53,7 @@ const PROGMEM AnalogMenuInfo minfoLiving = { "Living", 2, 4, 100, onLivingRoomLi
 AnalogMenuItem menuLiving(&minfoLiving, 0, &menuKitchen);
 const PROGMEM AnalogMenuInfo minfoHall = { "Hall", 1, 2, 100, onHallLight, 0, 1, "%" };
 AnalogMenuItem menuHall(&minfoHall, 0, &menuLiving);
+const PROGMEM ConnectorLocalInfo applicationInfo = { "Security App", "0e68e7f6-2932-43f0-aae3-d4f885b7561d" };
 
 // Set up code
 
@@ -62,6 +62,6 @@ void setupMenu() {
     renderer.setGraphicsDevice(&gfx, &gfxConfig);
     switches.initialise(ioUsingArduino(), true);
     menuMgr.initForEncoder(&renderer, &menuHall, ENCODER_PIN_A, ENCODER_PIN_B, ENCODER_PIN_OK);
-    remoteServer.begin(&server, applicationName);
+    remoteServer.begin(&server, &applicationInfo);
 }
 

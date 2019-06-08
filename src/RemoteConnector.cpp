@@ -46,6 +46,16 @@ TagValueRemoteConnector::TagValueRemoteConnector(uint8_t remoteNo) : bootPredica
 	this->ticksLastRead = this->ticksLastSend = 0xffff;
 	this->flags = 0;
     this->commsCallback = NULL;
+    this->authManager = NULL;
+}
+
+void TagValueRemoteConnector::initialise(TagValueTransport* transport, CombinedMessageProcessor* processor, const ConnectorLocalInfo* localInfoPgm) {
+    this->processor = processor;
+    this->transport = transport;
+    this->localInfoPgm = localInfoPgm;
+    
+    // we must always have a mode of authentication, if nothing has been set then create the NoAuthentication manager.
+    if(this->authManager == NULL) authManager = new NoAuthenticationManager();
 }
 
 void TagValueRemoteConnector::setRemoteName(const char* name) {
@@ -67,18 +77,20 @@ void TagValueRemoteConnector::setRemoteConnected(uint8_t major, uint8_t minor, A
 }
 
 void TagValueRemoteConnector::provideAuthentication(const char* auth) {
-    if(auth == NULL || !authenticator.isAuthenticated(remoteName, auth)) {
-        setAuthenticated(false);
+    if(auth == NULL || !authManager->isAuthenticated(remoteName, auth)) {
         serdebugF2("Authentication failed for ", remoteName);
         // wait before returning the state to prevent denial of service.
         encodeAcknowledgement(0, ACK_CREDENTIALS_INVALID);
-        taskManager.yieldForMicros(1500); 
+        taskManager.yieldForMicros(15000); 
+        setAuthenticated(false);
         transport->close();
+        commsNotify(COMMSERR_DISCONNECTED);
     }
     else {
         encodeAcknowledgement(0, ACK_SUCCESS);
         setAuthenticated(true);
         serdebugF2("Authenticated device ", remoteName);
+        commsNotify(COMMSERR_CONNECTED);
     }
 }
 
@@ -89,14 +101,8 @@ const char* lastUuid;
 void onPairingFinished(ButtonType ty, void* voidConnector) {
     TagValueRemoteConnector* connector = reinterpret_cast<TagValueRemoteConnector*>(voidConnector);
     if(ty==BTNTYPE_ACCEPT) {
-        authenticator.addAdditionalUUIDKey(connector->getRemoteName(), lastUuid);
-        connector->encodeAcknowledgement(0, ACK_SUCCESS);
-
-        // now show a confirmatory message
-        BaseDialog* dialog = BaseMenuRenderer::getInstance()->getDialog();
-        dialog->show(headerPairingDone, false);
-        dialog->copyIntoBuffer(connector->getRemoteName());
-        dialog->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
+        bool added = connector->getAuthManager()->addAdditionalUUIDKey(connector->getRemoteName(), lastUuid);
+        connector->encodeAcknowledgement(0, added ? ACK_SUCCESS : ACK_CREDENTIALS_INVALID);
     }
     else {
         connector->encodeAcknowledgement(0, ACK_CREDENTIALS_INVALID);
@@ -104,12 +110,12 @@ void onPairingFinished(ButtonType ty, void* voidConnector) {
 } 
 
 void stopPairing() {
-    BaseDialog* dialog = BaseMenuRenderer::getInstance()->getDialog();
+    BaseDialog* dialog = MenuRenderer::getInstance()->getDialog();
     if(dialog->isInUse()) dialog->hide();
 }
 
 void TagValueRemoteConnector::pairingRequest(const char* name, const char* uuid) {
-    BaseDialog* dlg = BaseMenuRenderer::getInstance()->getDialog();
+    BaseDialog* dlg = MenuRenderer::getInstance()->getDialog();
     if(!dlg) {
         // TODO, special handling for where there's no display locally.
         return;
@@ -230,7 +236,7 @@ void TagValueRemoteConnector::performAnyWrites() {
             encodeChangeValue(item);
         }
 
-        BaseDialog* dlg = BaseMenuRenderer::getInstance()->getDialog();
+        BaseDialog* dlg = MenuRenderer::getInstance()->getDialog();
         if(dlg!=NULL && dlg->isRemoteUpdateNeeded(remoteNo)) {
             dlg->encodeMessage(this);
             dlg->setRemoteUpdateNeeded(remoteNo, false);
@@ -707,10 +713,10 @@ void CombinedMessageProcessor::newMsg(uint16_t msgType) {
 
 void CombinedMessageProcessor::fieldUpdate(TagValueRemoteConnector* connector, FieldAndValue* field) {
     uint16_t mt = field->msgType;
-	if(currHandler != NULL && (connector->isAuthenticated() || mt == MSG_JOIN || mt == MSG_PAIR || mt == MSG_HEARTBEAT)) {        
+	if(currHandler != NULL && (connector->isAuthenticated() || mt == MSG_JOIN || mt == MSG_PAIR || mt == MSG_HEARTBEAT)) {
 		currHandler->fieldUpdateFn(connector, field, &val);
 	}
-    else {
+    else if(mt != MSG_HEARTBEAT) {
         serdebugF3("Did not proccess(hdlr,auth)", (unsigned int)currHandler, connector->isAuthenticated());
     }
 }

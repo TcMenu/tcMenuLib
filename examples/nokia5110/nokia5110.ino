@@ -13,12 +13,18 @@
 #include <Adafruit_PCD8544.h>
 #include <EepromAbstraction.h>
 #include <UIPEthernet.h>
+#include <RemoteAuthentication.h>
 
 // you can turn on and off tcmenu logging in the below file (within IoAbstraction)
 #include <IoLogging.h>
 
 // We are going to load and save using the inbuilt AVR EEPROM storage
 AvrEeprom eeprom;
+
+// we want to authenticate connections, the easiest and quickest way is to use the EEPROM
+// authenticator where pairing requests add a new item into the EEPROM. Any authentication
+// requests are then handled by looking in the EEPROM.
+EepromAuthenticatorManager authManager;
 
 // we are going to allow control of the menu over local area network
 // so therefore must configure ethernet..
@@ -32,6 +38,9 @@ IPAddress ip(192, 168, 0, 96);
 // the display. Here we're using software SPI, it's a small display so there's no issue.
 Adafruit_PCD8544 gfx = Adafruit_PCD8544(35, 34, 38, 37, 36);
 
+// used the the dialog further down, dialog headers are always from progmem / constant.
+const char warningPgm[] PROGMEM = "Warning!";
+
 void setup() {
     // as said earlier, it is our responsibility to provide a display that
     // is fully configured.
@@ -44,6 +53,17 @@ void setup() {
     // start serial, second line for hardware usb on 32 bit boards.
     while(!Serial);
     Serial.begin(115200);
+
+    // first we register for communication callbacks when there's a change in state
+    // see the onCommsChange function further down for the details.
+    remoteServer.getRemoteConnector(0)->setCommsNotificationCallback(onCommsChange);
+
+    // now we enable authentication using EEPROM authentication. Where the EEPROM is
+    // queried for authentication requests, and any additional pairs are stored there too.
+    // first we initialise the authManager, then pass it to the class.
+    // Always call BEFORE setupMenu()
+    authManager.initialise(&eeprom, 100);
+    remoteServer.setAuthenticator(&authManager);
 
     // and start up the internet to allow remote control of the menu.
     Ethernet.begin(mac, ip);
@@ -59,9 +79,24 @@ void setup() {
     menuMgr.load(eeprom, 0xd00d);
 
     taskManager.scheduleFixedRate(500, [] {
+        // here we simulate a changing field, where we are monitoring the voltage and current
         menuVoltsIn.setFloatValue(240.0 + (float(random(100) / 100.0)));
         menuCurrent.setFloatValue(0.5 + (float(random(100) / 100.0)));
+
+        // every now and again we pop up a dialog randomly
+        // it simulates a zone being triggered
+        if((random(1000) < 5)) {
+            BaseDialog* dlg = renderer.getDialog();
+            dlg->setButtons(BTNTYPE_NONE, BTNTYPE_CLOSE);
+            dlg->show(warningPgm, true);
+            char sz[20];
+            strcpy(sz, "Zone");
+            fastltoa(sz, random(6), 1, NOT_PADDED, sizeof(sz));
+            strcat(sz, " trigger");
+            dlg->copyIntoBuffer(sz);
+        }
     });
+
 }
 
 //

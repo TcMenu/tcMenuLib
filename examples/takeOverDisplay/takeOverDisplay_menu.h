@@ -39,17 +39,17 @@ extern LiquidCrystalRenderer renderer;
 extern IoAbstractionRef io23017;
 
 // all menu item forward references.
-extern TextMenuItem menuText;
-extern ActionMenuItem menuSaveSettings;
-extern AnalogMenuItem menuPower;
-extern BooleanMenuItem menuEnabled;
-extern BackMenuItem menuBackSettings;
-extern SubMenuItem menuSettings;
-extern ActionMenuItem menuQuestionDialog;
-extern ActionMenuItem menuInfoDialog;
-extern EnumMenuItem menuFood;
-extern ActionMenuItem menuTakeDisplay;
-extern ConnectorLocalInfo menuapplicationInfo;
+extern TextMenuItem  menuText;
+extern ActionMenuItem  menuSaveSettings;
+extern AnalogMenuItem  menuPower;
+extern BooleanMenuItem  menuEnabled;
+extern BackMenuItem  menuBackSettings;
+extern SubMenuItem  menuSettings;
+extern ActionMenuItem  menuQuestionDialog;
+extern ActionMenuItem  menuInfoDialog;
+extern EnumMenuItem  menuFood;
+extern ActionMenuItem  menuTakeDisplay;
+extern const ConnectorLocalInfo  applicationInfo;
 
 // Callback functions always follow this pattern: void CALLBACK_FUNCTION myCallback();
 #define CALLBACK_FUNCTION

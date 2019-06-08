@@ -16,7 +16,6 @@
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 LiquidCrystalRenderer renderer(lcd, 16, 2);
 ArduinoAnalogDevice analogDevice;
-const char PROGMEM applicationName[] = "Tide Monitor";
 
 // Global Menu Item declarations
 
@@ -37,6 +36,7 @@ const PROGMEM AnalogMenuInfo minfoTideGate2 = { "Tide Gate 2", 2, 4, 100, onTida
 AnalogMenuItem menuTideGate2(&minfoTideGate2, 0, &menuTideGate3);
 const PROGMEM AnalogMenuInfo minfoTideGate1 = { "Tide Gate 1", 1, 2, 100, onTidalGate1, 0, 1, "%" };
 AnalogMenuItem menuTideGate1(&minfoTideGate1, 0, &menuTideGate2);
+const PROGMEM ConnectorLocalInfo applicationInfo = { "Joystick", "2098c102-226d-4cd4-8847-f1f68b7974f4" };
 
 // Set up code
 
@@ -45,7 +45,6 @@ void setupMenu() {
     lcd.configureBacklightPin(10);
     lcd.backlight();
     switches.initialise(ioUsingArduino(), true);
-    menuMgr.initWithoutInput(&renderer, &menuTideGate1);
     switches.addSwitch(A3, NULL);
     switches.onRelease(A3, [](uint8_t /*key*/, bool held) {
             menuMgr.onMenuSelect(held);
@@ -53,5 +52,6 @@ void setupMenu() {
     setupAnalogJoystickEncoder(&analogDevice, A1, [](int val) {
             menuMgr.valueChanged(val);
         });
+    menuMgr.initWithoutInput(&renderer, &menuTideGate1);
 }
 

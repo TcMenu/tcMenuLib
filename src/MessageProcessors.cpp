@@ -25,7 +25,7 @@ MsgHandler msgHandlers[] = {
 
 void fieldUpdateDialogMsg(TagValueRemoteConnector* connector, FieldAndValue* field, MessageProcessorInfo* info) {
 	if(field->fieldType == FVAL_END_MSG && info->dialog.mode == 'A') {
-        BaseDialog* dialog = BaseMenuRenderer::getInstance()->getDialog();
+        BaseDialog* dialog = MenuRenderer::getInstance()->getDialog();
         if(dialog) {
             dialog->remoteAction((ButtonType)info->dialog.button);
             connector->encodeAcknowledgement(info->dialog.correlation, ACK_SUCCESS);
@@ -82,7 +82,7 @@ void fieldUpdateJoinMsg(TagValueRemoteConnector* connector, FieldAndValue* field
 
 	switch(field->field) {
 	case FIELD_MSG_NAME:
-        serdebugF2("Join device ", field->value);
+        serdebugF2("Join name ", field->value);
 		connector->setRemoteName(field->value);
 		break;
 	case FIELD_VERSION: {
@@ -92,6 +92,7 @@ void fieldUpdateJoinMsg(TagValueRemoteConnector* connector, FieldAndValue* field
 		break;
 	}
     case FIELD_UUID: {
+        serdebugF("Join UUID - start auth");
         connector->provideAuthentication(field->value);
         info->join.authProvided = true;
         break;
