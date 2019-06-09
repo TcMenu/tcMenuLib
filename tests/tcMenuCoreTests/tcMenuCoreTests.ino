@@ -10,6 +10,7 @@
 
 #include "menuManagerTests.h"
 #include "authenticationTests.h"
+#include "runtimeMenuItemTests.h"
 //#include "baseRemoteTests.h"
 #include <tcm_test/testFixtures.h>
 

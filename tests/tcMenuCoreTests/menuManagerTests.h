@@ -4,7 +4,6 @@
 extern MockedIoAbstraction mockIo;
 extern NoRenderer noRenderer; 
 extern MockEepromAbstraction eeprom;
-extern char szData[10];
 
 test(saveAndLoadFromMenu) {
     // initialise the menu manager and switches with basic configuration
@@ -17,7 +16,9 @@ test(saveAndLoadFromMenu) {
     eeprom.write16(4, 8);
     eeprom.write16(6, 2);
     eeprom.write8(8, 1);
-    eeprom.writeArrayToRom(9, (uint8_t*)szData, 10);
+	char sz[10];
+	strcpy(sz, "123456789");
+    eeprom.writeArrayToRom(9, (uint8_t*)sz, 10);
     eeprom.write16(20, 50);
     menuMgr.load(eeprom);
 
@@ -27,7 +28,8 @@ test(saveAndLoadFromMenu) {
     assertEqual((int)menuSubAnalog.getCurrentValue(), 50);
     assertEqual((int)menuEnum1.getCurrentValue(), 2);
     assertEqual((int)boolItem1.getBoolean(), 1);
-    assertEqual(szData, textMenuItem1.getTextValue());
+	assertEqual(uint8_t(10), textMenuItem1.textLength());
+	assertEqual(sz, textMenuItem1.getTextValue());
 
     // clear out the eeprom and then save the present structure.
     eeprom.reset();
@@ -44,7 +46,7 @@ test(saveAndLoadFromMenu) {
     char szCompare[10];
     eeprom.readIntoMemArray((uint8_t*)szCompare, 9, sizeof szCompare);
     szCompare[9]=0;
-    assertEqual(szCompare, szData);
+    assertEqual(szCompare, sz);
 
     // lastly make sure there were no errors in eeprom.
     assertFalse(eeprom.hasErrorOccurred());

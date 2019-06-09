@@ -5,6 +5,7 @@
 
 #include "tcMenu.h"
 #include "MenuItems.h"
+#include "RuntimeMenuItem.h"
 
 MenuItem::MenuItem(MenuType menuType, const AnyMenuInfo* menuInfo, MenuItem* next) {
 	this->flags = 0;
@@ -34,17 +35,47 @@ void MenuItem::clearSendRemoteNeededAll() {
 }
 
 void MenuItem::triggerCallback() {
-	MenuCallbackFn fn = get_info_callback(&info->callback);
-
-	if(fn != NULL) {
-		fn(getId());
+	if (isMenuRuntime(this)) {
+		return asRuntimeItem(this)->runCallback();
+	}
+	else {
+		MenuCallbackFn fn = get_info_callback(&info->callback);
+		if (fn != NULL) fn(getId());
 	}
 }
 
 uint8_t MenuItem::copyNameToBuffer(char* buf, int offset, int size) {
-	const char* name = info->name;
-    uint8_t ret = safeProgCpy(buf + offset, name, size - offset);
-    return ret + offset;
+	if (isMenuRuntime(this)) {
+		asRuntimeItem(this)->copyRuntimeName(buf + offset, size - offset);
+		return strlen(buf + offset) + offset;
+	}
+	else {
+		const char* name = info->name;
+		uint8_t ret = safeProgCpy(buf + offset, name, size - offset);
+		return ret + offset;
+	}
+}
+
+uint16_t MenuItem::getId()
+{
+	if (isMenuRuntime(this)) return asRuntimeItem(this)->getRuntimeId();
+	
+	return get_info_uint(&info->id);
+}
+
+uint16_t MenuItem::getMaximumValue()
+{
+	if (isMenuRuntime(this)) {
+		return asRuntimeItem(this)->getNumberOfParts();
+	}
+	else return get_info_uint(&info->maxValue);
+}
+
+uint16_t MenuItem::getEepromPosition()
+{
+	if (isMenuRuntime(this)) return asRuntimeItem(this)->getRuntimeEeprom();
+	
+	return get_info_uint(&info->eepromAddr);
 }
 
 // on avr boards we store all info structures in progmem, so we need this code to
@@ -81,17 +112,6 @@ int EnumMenuItem::getLengthOfEnumStr(int idx) {
 }
 
 #endif
-
-void TextMenuItem::setTextValue(const char* text, bool silent) {
-	// skip if they are the same
-	if(strncmp(menuText, text, textLength()) == 0) return;
-
-	strncpy(menuText, text, textLength());
-	menuText[textLength() - 1] = 0;
-	setChanged(true);
-	setSendRemoteNeededAll();
-	if(!silent) triggerCallback();
-}
 
 bool isSame(float d1, float d2) {
 	float result = abs(d1 - d2);

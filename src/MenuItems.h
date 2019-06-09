@@ -166,23 +166,6 @@ struct SubMenuInfo {
 };
 
 /**
- * The information block for a text menu component. This component stores a text representation that can be
- * modified, and is up to a certain length defined in maxValue.
- */
-struct TextMenuInfo {
-	/** the name given to this menu item */ 
-	char name[NAME_SIZE_T];
-	/** the identifier for this menu */
-	uint16_t id;
-	/** eeprom address for this item or -1 if not stored */
-	uint16_t eepromAddr;
-	/** maximum number of characters allowed */
-	uint16_t maxValue;
-	/** the callback function */
-	MenuCallbackFn callback;
-};
-
-/**
  * The information block for a floating point menu component. Floating point items are not editable, they are
  * generally to relay status information.
  */
@@ -232,7 +215,9 @@ enum Flags : byte {
 /**
  * As we don't have RTTI we need a way of identifying each menu item. Any value below 100 is based
  * on ValueMenuItem and can therefore be edited, otherwise it cannot be edited on the device.
- * MenuItems less than 100 are based on ValueMenuItem and can be edited on device.
+ * MenuItems less than 100 are based on ValueMenuItem and can be edited as an integer.
+ * MenuItems greater than 200 are runtime menu items.
+ * Items between 100 and 200 are non editable regular menu items.
  */
 enum MenuType : byte {
 	/** item is of type AnalogMenuItem */
@@ -245,14 +230,20 @@ enum MenuType : byte {
 	MENUTYPE_SUB_VALUE = 100,
 	/** item is of type BackMenuItem */
 	MENUTYPE_BACK_VALUE = 101,
-	/** item is of type RemoteMenuItem */
-	MENUTYPE_REMOTE_VALUE = 102,
 	/** item is of type FloatMenuItem */
-	MENUTYPE_FLOAT_VALUE = 103,
-	/** item is of type TextMenuItem */
-	MENUTYPE_TEXT_VALUE = 104,
+	MENUTYPE_FLOAT_VALUE = 102,
 	/** item is of type ActionMenuItem */
-	MENUTYPE_ACTION_VALUE = 105
+	MENUTYPE_ACTION_VALUE = 103,
+	/** item is a single item of type RuntimeMenuItem */
+	MENUTYPE_RUNTIME_VALUE = 200,
+	/** item is a list, of type MultiRuntimeMenuItem */
+	MENUTYPE_RUNTIME_LIST = 201,
+	/** item is an IP address and is editable per segment */
+	MENUTYPE_IPADDRESS = 202,
+	/** item is of type RemoteMenuItem */
+	MENUTYPE_REMOTE_VALUE = 203,
+	/** item is of type TextMenuItem */
+	MENUTYPE_TEXT_VALUE = 204
 };
 
 /**
@@ -293,11 +284,11 @@ public:
      * */
 	uint8_t copyNameToBuffer(char* sz, int offset, int size);
 	/** Retrieves the ID from the info block */
-	uint16_t getId() { return get_info_uint(&info->id); }
+	uint16_t getId();
 	/** Retrieves the maximum value for this menu type */
-	uint16_t getMaximumValue() { return get_info_uint(&info->maxValue); }
+	uint16_t getMaximumValue();
 	/** Retrieves the eeprom storage position for this menu (or 0xffff if not applicable) */
-	uint16_t getEepromPosition() { return get_info_uint(&info->eepromAddr); }
+	uint16_t getEepromPosition();
 	/** returns the menu type as one of the above menu type enumeration */
 	MenuType getMenuType() { return menuType; }
 	/** triggers the event callback associated with this item */
@@ -496,34 +487,6 @@ public:
 };
 
 /**
- * An item that can represent a text value that is held in RAM, and therefore change at runtime. In the info block we
- * just say how long we want the string to be. Choose the smallest size possible, it's allocated in RAM!
- * @see TextMenuInfo
- */
-class TextMenuItem : public MenuItem {
-private:
-	char *menuText;
-public:
-	/**
-	 * Create an instance of the class
-	 * 
-	 * @param info a TextMenuInfo structure
-	 * @param next the next menu in the chain if there is one, or NULL.
-	 */
-	TextMenuItem(const TextMenuInfo* textInfo, MenuItem* next) : MenuItem(MENUTYPE_TEXT_VALUE, (const AnyMenuInfo*)textInfo, next) { menuText = new char[textLength()]; menuText[0] = 0; }
-	uint8_t textLength() { return getMaximumValue(); }
-
-	/**
-	 * Copies the text into the internal buffer.
-	 * @param text the text to be copied.
-	 */
-	void setTextValue(const char* text, bool silent = false);
-
-	/** returns the text value in the internal buffer */
-	const char* getTextValue() { return menuText; }
-};
-
-/**
  * FloatMenuItem is for situations where absolute accuracy of the value is not important, for example showing
  * a calculated value from some sensors.
  * @see FloatMenuInfo
@@ -572,5 +535,25 @@ public:
 	 */
 	ActionMenuItem(const AnyMenuInfo* info, MenuItem* next) : MenuItem(MENUTYPE_ACTION_VALUE, info, next) {;}
 };
+
+// forward reference
+class RuntimeMenuItem;
+
+/**
+ * Returns true if the menu item is a runtime item type. Otherwise returns false.
+ */
+inline bool isMenuRuntime(MenuItem* t) {
+	return (byte(t->getMenuType()) >= byte(MENUTYPE_RUNTIME_VALUE));
+}
+
+/**
+ * gets the menu item as a real time item, only call after determining the menu item is realtime using
+ * the above isMenuRuntime() method.
+ * @see isMenuRuntime
+ */
+inline RuntimeMenuItem* asRuntimeItem(MenuItem* i) {
+	return reinterpret_cast<RuntimeMenuItem*>(i);
+}
+
 
 #endif

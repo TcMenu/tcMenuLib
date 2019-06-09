@@ -2,6 +2,7 @@
 #define _TCMENU_FIXTURES_H_
 
 #include "tcUtil.h"
+#include "RuntimeMenuItem.h"
 
 const PGM_TCM AnalogMenuInfo minfoAnalogSub = { "SubAnalog", 10, 20, 255, NO_CALLBACK, 0, 1, "SU" };
 AnalogMenuItem menuSubAnalog(&minfoAnalogSub, 0, NULL);
@@ -26,7 +27,7 @@ EnumMenuItem menuEnum1(&minfoEnum1, false, &menuAnalog2);
 const PGM_TCM BooleanMenuInfo boolMenu1 = {"Bool1", 4, 8, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
 BooleanMenuItem boolItem1(&boolMenu1, false, &menuEnum1);
 
-const PGM_TCM TextMenuInfo minfoText1 = {"Text1", 5, 9, 10, NO_CALLBACK };
-TextMenuItem textMenuItem1(&minfoText1, &boolItem1);
+const char textNamePgm[] PROGMEM = "Text1";
+TextMenuItem textMenuItem1(textNamePgm, 5, 9, 10, &boolItem1);
 
 #endif // defined

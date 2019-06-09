@@ -115,7 +115,7 @@ bool ReadOnlyAuthenticationManager::isAuthenticated(const char* connectionName, 
     for(int i=0;i<numberOfEntries;i++) {
         if(strcmp_P(connectionName, authBlocksPgm[i].name) == 0) {                
             bool keyMatch = strcmp_P(authResponse, authBlocksPgm[i].uuid) == 0;
-            serdebugF3("AuthBlock found (name, keyMatch) ", connectionName, keyMatch);
+            serdebugF3("AuthBlock found (name, match) ", connectionName, keyMatch);
             return keyMatch;
         }
     }

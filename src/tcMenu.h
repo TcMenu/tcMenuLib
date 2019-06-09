@@ -9,6 +9,7 @@
 #include <IoAbstraction.h>
 #include "tcUtil.h"
 #include "MenuItems.h"
+#include "RuntimeMenuItem.h"
 #include "BaseRenderers.h"
 #include "EepromAbstraction.h"
 

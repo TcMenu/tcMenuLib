@@ -105,7 +105,7 @@ void loadRecursively(EepromAbstraction& eeprom, MenuItem* nextMenuItem) {
 		}
 		else if(nextMenuItem->getMenuType() == MENUTYPE_TEXT_VALUE) {
 			TextMenuItem* textItem = (TextMenuItem*) nextMenuItem;
-			eeprom.readIntoMemArray((uint8_t*) textItem->getTextValue(), textItem->getEepromPosition(), textItem->getMaximumValue());
+			eeprom.readIntoMemArray((uint8_t*) textItem->getTextValue(), textItem->getEepromPosition(), textItem->textLength());
 			textItem->setSendRemoteNeededAll();
 			textItem->setChanged(true);
 			textItem->triggerCallback();
@@ -143,7 +143,7 @@ void saveRecursively(EepromAbstraction& eeprom, MenuItem* nextMenuItem) {
 		}
 		else if(nextMenuItem->getMenuType() == MENUTYPE_TEXT_VALUE) {
 			TextMenuItem* textItem = (TextMenuItem*) nextMenuItem;
-			eeprom.writeArrayToRom(textItem->getEepromPosition(), (const uint8_t*) textItem->getTextValue(), textItem->getMaximumValue());
+			eeprom.writeArrayToRom(textItem->getEepromPosition(), (const uint8_t*) textItem->getTextValue(), textItem->textLength());
 		}
 		else if(nextMenuItem->getMenuType() == MENUTYPE_INT_VALUE) {
 			AnalogMenuItem* intItem = (AnalogMenuItem*)nextMenuItem;
