@@ -82,7 +82,7 @@ char szGlobalBuffer[16];
 uint8_t safeProgCpy(char* dst, const char* pgmSrc, uint8_t size) {
     uint8_t pos = 0;
     char nm = get_info_char(pgmSrc);
-    while (nm && pos < size) {
+    while (nm && pos < (size - 1)) {
 		dst[pos] = nm;
 		++pgmSrc;
         ++pos;

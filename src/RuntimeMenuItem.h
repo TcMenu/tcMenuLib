@@ -26,7 +26,9 @@ enum RenderFnMode : byte {
 	/** A new value for a position in the list, provided in buffer, it's length is in size. - used only in editable mode */
 	RENDERFN_SET_VALUE,
 	/** Gets the range zero based, for this part - used only in editable mode */
-	RENDERFN_GETRANGE
+	RENDERFN_GETRANGE,
+	/** Gets the integer value of the current part that is being edited */
+	RENDERFN_GETPART
 };
 
 /**
@@ -106,17 +108,14 @@ public:
  */
 template<class V> class EditableMultiPartMenuItem : public RuntimeMenuItem {
 protected:
-	const char* namePgm;
 	V data;
 public:
-	EditableMultiPartMenuItem(MenuType type, const char *namePgm, uint16_t id, uint16_t eeprom, int numberOfParts, RuntimeRenderingFn renderFn, MenuItem* next = NULL) 
+	EditableMultiPartMenuItem(MenuType type, uint16_t id, uint16_t eeprom, int numberOfParts, RuntimeRenderingFn renderFn, MenuItem* next = NULL) 
 			: RuntimeMenuItem(type, id, eeprom, renderFn, 0, numberOfParts, next) {
-		this->namePgm = namePgm;
 	}
 
-	const char* getNameRuntimePgm() { return namePgm; }
-
 	uint8_t beginMultiEdit() {
+		setEditing(true);
 		itemPosition = 0;
 		return noOfParts;
 	}
@@ -135,9 +134,14 @@ public:
 	
 	void stopMultiEdit() {
 		itemPosition = 0xff;
+		setEditing(false);
 		setChanged(true);
 		setSendRemoteNeededAll();
 		runCallback();
+	}
+
+	int getPartValueAsInt() {
+		return renderFn(this, itemPosition, RENDERFN_GETPART, NULL, 0);
 	}
 
 	bool valueChanged(int newVal) {
@@ -157,15 +161,8 @@ public:
  */
 class TextMenuItem : public EditableMultiPartMenuItem<char*> {
 public:
-	TextMenuItem(const char* namePgm, uint16_t id, uint16_t eeprom, int size, MenuItem* next = NULL)
-		: EditableMultiPartMenuItem(MENUTYPE_TEXT_VALUE, namePgm, id, eeprom, size, textItemRenderFn, next) {
-		this->namePgm = namePgm;
-		data = new char[size];
-	}
-
 	TextMenuItem(RuntimeRenderingFn customRenderFn, uint16_t id, uint16_t eeprom, int size, MenuItem* next = NULL)
-		: EditableMultiPartMenuItem(MENUTYPE_TEXT_VALUE, NULL, id, eeprom, size, customRenderFn, next) {
-		this->namePgm = NULL;
+		: EditableMultiPartMenuItem(MENUTYPE_TEXT_VALUE, id, eeprom, size, customRenderFn, next) {
 		data = new char[size];
 	}
 
@@ -189,12 +186,13 @@ private:
 };
 
 /**
- * This represents an IP address that can be configured / or just displayed on the device
+ * This menu item represents an IP address that can be configured / or just displayed on the device,
+ * if it is editable it is edited 
  */
 class IpAddressMenuItem : public EditableMultiPartMenuItem<byte[4]> {
 public:
-	IpAddressMenuItem(const char* namePgm, uint16_t id, uint16_t eeprom, MenuItem* next = NULL)
-			: EditableMultiPartMenuItem(MENUTYPE_IPADDRESS, namePgm, id, eeprom, 4, ipAddressRenderFn, next) {
+	IpAddressMenuItem(RuntimeRenderingFn renderFn, uint16_t id, uint16_t eeprom, MenuItem* next = NULL)
+		: EditableMultiPartMenuItem(MENUTYPE_IPADDRESS, id, eeprom, 4, renderFn, next) {
 		setIpAddress(127, 0, 0, 1);
 	}
 
@@ -219,6 +217,25 @@ public:
 		setSendRemoteNeededAll();
 	}
 };
+
+/**
+ * This macro defines a rendering callback that will be often used with remote types, it takes as it's parameters
+ * a parent function for the type in question, the variable containing the progmem name and the call back method
+ * or NULL if there's no callback.
+ */
+#define RENDERING_CALLBACK_NAME_INVOKE(fnName, parent, namepgm, invoke) \
+int fnName(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int buffSize) { \
+	switch(mode) { \
+	case RENDERFN_NAME: \
+		safeProgCpy(buffer, namepgm, buffSize); \
+		return true; \
+	case RENDERFN_INVOKE: \
+		if(invoke) (reinterpret_cast<MenuCallbackFn>(invoke))(int(item->getId())); \
+		return true; \
+	default: \
+		return parent(item, row, mode, buffer, buffSize); \
+	} \
+}
 
 #endif //_RUNTIME_MENUITEM_H_
 

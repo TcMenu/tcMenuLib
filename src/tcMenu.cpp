@@ -91,10 +91,6 @@ MenuItem* MenuManager::findCurrentActive() {
 	return renderer->getCurrentSubMenu();
 }
 
-void MenuManager::changePrecisionForType(MenuItem* item) {
-	switches.changeEncoderPrecision(item->getMaximumValue(), ((ValueMenuItem*)item)->getCurrentValue());
-}
-
 void loadRecursively(EepromAbstraction& eeprom, MenuItem* nextMenuItem) {
 	while(nextMenuItem) {
 		if(nextMenuItem->getMenuType() == MENUTYPE_SUB_VALUE) {

@@ -388,8 +388,6 @@ protected:
 	 */
 	void countdownToDefaulting();
 	
-	void findFirstVisible();
-
 private:
 	void menuValueAnalog(AnalogMenuItem* item, MenuDrawJustification justification);
 	void menuValueEnum(EnumMenuItem* item, MenuDrawJustification justification);

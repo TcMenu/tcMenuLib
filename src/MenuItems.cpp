@@ -87,6 +87,7 @@ void EnumMenuItem::copyEnumStrToBuffer(char* buffer, int size, int idx) {
     char** itemPtr = ((char**)pgm_read_ptr_near(&((EnumMenuInfo*)info)->menuItems) + idx);
     char* itemLoc = (char *)pgm_read_ptr_near(itemPtr);
     strncpy_P(buffer, itemLoc, size);
+	buffer[size - 1] = 0;
 }
 
 int EnumMenuItem::getLengthOfEnumStr(int idx) {
@@ -102,6 +103,7 @@ void EnumMenuItem::copyEnumStrToBuffer(char* buffer, int size, int idx) {
     const char * const* choices = enumInfo->menuItems;
     const char * choice = choices[idx];
     strncpy(buffer, choice, size);
+	buffer[size - 1] = 0;
 }
 
 int EnumMenuItem::getLengthOfEnumStr(int idx) {

@@ -4,6 +4,7 @@
  */
 
 #include "tcMenu.h"
+#include "RuntimeMenuItem.h"
 #include "tcUtil.h"
 #include "MenuIterator.h"
 #include "RemoteMenuItem.h"
@@ -71,7 +72,7 @@ void BaseMenuRenderer::resetToDefault() {
 	ticksToReset = MAX_TICKS;
 
     // once the menu has been reset, if the reset callback is present
-    // then we 
+    // then we call it.
     if(resetCallback) resetCallback();
 }
 
@@ -294,30 +295,36 @@ void BaseMenuRenderer::prepareNewSubmenu(MenuItem* newItems) {
 
 void BaseMenuRenderer::setupForEditing(MenuItem* item) {
 	if(currentEditor != NULL) {
+		if (isMenuRuntimeMultiEdit(currentEditor)) {
+			EditableMultiPartMenuItem<void*>* editableItem = reinterpret_cast<EditableMultiPartMenuItem<void*>*>(currentEditor);
+			
+			// unless we've run out of parts to edit, go no further.
+			if (editableItem->nextPart() != 0) return;
+		}
 		currentEditor->setEditing(false);
 		currentEditor->setActive(false);
 	}
 
-	// basically clear down editor state
-	if(item == NULL) {
-		return;
-	}
+	// if the item is NULL, or it's read only, then it can't be edited.
+	if(item == NULL || item->isReadOnly()) return;
 
 	MenuType ty = item->getMenuType();
-	
-	// short circuit read only, cannot be edited.
-	if(item->isReadOnly()) return;
-
 	if ((ty == MENUTYPE_ENUM_VALUE || ty == MENUTYPE_INT_VALUE)) {
 		// these are the only types we can edit with a rotary encoder & LCD.
 		currentEditor = item;
 		currentEditor->setEditing(true);
-		menuMgr.changePrecisionForType(currentEditor);
+		switches.changeEncoderPrecision(item->getMaximumValue(), reinterpret_cast<ValueMenuItem*>(currentEditor)->getCurrentValue());
 	}
 	else if(ty == MENUTYPE_BOOLEAN_VALUE) {
 		// we don't actually edit boolean items, just toggle them instead
 		BooleanMenuItem* boolItem = (BooleanMenuItem*)item;
 		boolItem->setBoolean(!boolItem->getBoolean());
+	}
+	else if (isMenuRuntimeMultiEdit(item)) {
+		currentEditor = item;
+		EditableMultiPartMenuItem<void*>* editableItem = reinterpret_cast<EditableMultiPartMenuItem<void*>*>(item);
+		editableItem->beginMultiEdit();
+		switches.changeEncoderPrecision(editableItem->nextPart(), editableItem->getPartValueAsInt());
 	}
 }
 
@@ -351,6 +358,11 @@ int BaseMenuRenderer::offsetOfCurrentActive() {
 }
 
 void BaseMenuRenderer::onHold() {
+	if (currentEditor != NULL && isMenuRuntimeMultiEdit(currentEditor)) {
+		EditableMultiPartMenuItem<void*>* editableItem = reinterpret_cast<EditableMultiPartMenuItem<void*>*>(currentEditor);
+		editableItem->stopMultiEdit();
+		currentEditor = NULL;
+	}
 	prepareNewSubmenu(getParentAndReset());
 }
 

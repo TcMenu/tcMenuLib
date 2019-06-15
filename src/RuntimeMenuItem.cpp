@@ -65,11 +65,12 @@ int ipAddressRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, cha
 		ipItem->setIpPart(row - 1, (byte)buffer[0]);
 		return true;
 	}
+	case RENDERFN_GETPART: {
+		byte* data = ipItem->getIpAddress();
+		return (int)data[row - 1];
+	}
 	case RENDERFN_NAME: {
-		if (ipItem->getNameRuntimePgm()) {
-			safeProgCpy(buffer, ipItem->getNameRuntimePgm(), bufferSize);
-		}
-		else if (buffer) buffer[0] = 0;
+		if (buffer) buffer[0] = 0;
 		return true;
 	}
 	case RENDERFN_GETRANGE: return 255;
@@ -90,15 +91,14 @@ int textItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char
 		}
 		return true;
 	}
+	case RENDERFN_GETPART: 
+		return (int)txtItem->getTextValue()[row - 1];
 	case RENDERFN_SET_VALUE: {
 		txtItem->setCharValue(row - 1, buffer[0]);
 		return true;
 	}
 	case RENDERFN_NAME: {
-		if (txtItem->getNameRuntimePgm()) {
-			safeProgCpy(buffer, txtItem->getNameRuntimePgm(), bufferSize);
-		}
-		else buffer[0] = 0;
+		if (buffer) buffer[0] = 0;
 		return true;
 	}
 	case RENDERFN_GETRANGE: return 255;

@@ -235,21 +235,16 @@ enum MenuType : byte {
 	/** item is of type ActionMenuItem */
 	MENUTYPE_ACTION_VALUE = 103,
 	/** item is a single item of type RuntimeMenuItem */
-	MENUTYPE_RUNTIME_VALUE = 200,
+	MENUTYPE_RUNTIME_VALUE = 150,
 	/** item is a list, of type MultiRuntimeMenuItem */
-	MENUTYPE_RUNTIME_LIST = 201,
-	/** item is an IP address and is editable per segment */
-	MENUTYPE_IPADDRESS = 202,
-	/** item is of type RemoteMenuItem */
-	MENUTYPE_REMOTE_VALUE = 203,
+	MENUTYPE_RUNTIME_LIST = 151,
 	/** item is of type TextMenuItem */
-	MENUTYPE_TEXT_VALUE = 204
+	MENUTYPE_TEXT_VALUE = 200,
+	/** item is an IP address and is editable per segment */
+	MENUTYPE_IPADDRESS = 201,
+	/** item is of type RemoteMenuItem */
+	MENUTYPE_REMOTE_VALUE = 202
 };
-
-/**
- * Any MenuType with an ID less than 100 is editable on the device. EG: Numeric, Boolean or choices
- */
-#define menuTypeIsBasedOnValueType(x) (x < 99)
 
 /**
  * This is the base class of all menu items, containing functionality to hold the current state of the menu
@@ -540,10 +535,22 @@ public:
 class RuntimeMenuItem;
 
 /**
- * Returns true if the menu item is a runtime item type. Otherwise returns false.
+ * Any MenuType with an ID less than 100 is editable as an integer
+ */
+#define menuTypeIsBasedOnValueType(x) (x < 99)
+
+/**
+ * returns true if the menu item is an editable runtime item
  */
 inline bool isMenuRuntime(MenuItem* t) {
 	return (byte(t->getMenuType()) >= byte(MENUTYPE_RUNTIME_VALUE));
+}
+
+/**
+ * Returns true if the menu item is a runtime item type. Otherwise returns false.
+ */
+inline bool isMenuRuntimeMultiEdit(MenuItem* t) {
+	return (byte(t->getMenuType()) >= byte(MENUTYPE_TEXT_VALUE));
 }
 
 /**

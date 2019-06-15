@@ -43,7 +43,6 @@ typedef void (*CompletedHandlerFn)(ButtonType buttonPressed, void* yourData);
 
 #define DLG_FLAG_REMOTE_MASK 0xf8
 
-
 #define DLG_VISIBLE 'S'
 #define DLG_HIDDEN 'H'
 #define DLG_ACTION 'A'

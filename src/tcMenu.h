@@ -78,12 +78,6 @@ public:
 	 */
 	void setItemsInCurrentMenu(int size, int offs = 0) { switches.changeEncoderPrecision(size, offs); }
 
-	/** 
-	 * Used to change the precision of the encoder given a new menu item for editing
-	 * @param item the item being edited
-	 */
-	void changePrecisionForType(MenuItem* item);
-
 	/**
 	 * Used during initialisation to load the previously stored state. Only if the magic key matches at location 0.
 	 */

@@ -24,10 +24,16 @@ const char* const enumStrPort2Dir[] PGM_TCM  = { enumStrItem1, enumStrItem2, enu
 const PGM_TCM EnumMenuInfo minfoEnum1 = { "Enum1", 3, 6, 2, NO_CALLBACK , enumStrPort2Dir };
 EnumMenuItem menuEnum1(&minfoEnum1, false, &menuAnalog2);
 
-const PGM_TCM BooleanMenuInfo boolMenu1 = {"Bool1", 4, 8, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
+int idOfCallback = 0;
+void testCallback(int id) {
+	idOfCallback = id;
+}
+
+const PGM_TCM BooleanMenuInfo boolMenu1 = {"Bool1", 4, 8, 1, testCallback, NAMING_TRUE_FALSE };
 BooleanMenuItem boolItem1(&boolMenu1, false, &menuEnum1);
 
 const char textNamePgm[] PROGMEM = "Text1";
-TextMenuItem textMenuItem1(textNamePgm, 5, 9, 10, &boolItem1);
+RENDERING_CALLBACK_NAME_INVOKE(textMenuItem1Callback, textItemRenderFn, textNamePgm, NULL)
+TextMenuItem textMenuItem1(textMenuItem1Callback, 5, 9, 10, &boolItem1);
 
 #endif // defined
