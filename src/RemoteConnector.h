@@ -15,6 +15,7 @@
 #include "RemoteTypes.h"
 #include <tcUtil.h>
 #include "MenuItems.h"
+#include "RuntimeMenuItem.h"
 #include "MessageProcessors.h"
 #include "MenuIterator.h"
 
@@ -256,28 +257,12 @@ public:
 	void encodeBooleanMenu(int parentId, BooleanMenuItem* item);
 
 	/**
-	 * Encodes a bootstrap for a text menu item, this gives all needed state
-	 * to the remote. 
-	 * @param parentId the parent menu
-	 * @param item the item to be bootstrapped.
-	 */
-	void encodeTextMenu(int parentId, TextMenuItem* item);
-
-	/**
 	 * Encodes a bootstrap for an enum menu item, this gives all needed state
 	 * to the remote. 
 	 * @param parentId the parent menu
 	 * @param item the item to be bootstrapped.
 	 */
 	void encodeEnumMenu(int parentId, EnumMenuItem* item);
-
-	/**
-	 * Encodes a bootstrap for a remote menu item, this gives all needed state
-	 * to the remote. 
-	 * @param parentId the parent menu
-	 * @param item the item to be bootstrapped.
-	 */
-	void encodeRemoteMenu(int parentId, RemoteMenuItem* item);
 
 	/**
 	 * Encodes a bootstrap for an action menu item, this gives all needed state
@@ -294,6 +279,22 @@ public:
 	 * @param item the item to be bootstrapped.
 	 */
 	void encodeFloatMenu(int parentId, FloatMenuItem* item);
+
+	/**
+	 * Encodes a bootstrap for a runtime list menu item, this gives all needed state
+	 * to the remote.
+	 * @param parentId the parent menu
+	 * @param item the item to be bootstrapped.
+	 */
+	void encodeRuntimeMenuItem(int parentId, RuntimeMenuItem* item);
+
+	/**
+	 * Encodes a bootstrap for a multiEdit runtime menu item, this gives all needed state
+	 * to the remote.
+	 * @param parentId the parent menu
+	 * @param item the item to be bootstrapped.
+	 */
+	void encodeMultiEditMenu(int parentId, RuntimeMenuItem* item);
 
 	/**
 	 * Encodes a value change message to be sent to the remote. The embedded device
@@ -380,6 +381,9 @@ public:
      * @param commsEventType an error usually defined in RemoteConnector.h
      */
     void commsNotify(uint16_t commsEventType);
+
+	/** close the connection */
+	void close() { if(transport->connected()) transport->close(); }
 
     /** indicates if the connection is yet authenicated */
     bool isAuthenticated() { return bitRead(flags, FLAG_AUTHENTICATED); }

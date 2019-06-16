@@ -21,6 +21,32 @@ IoAbstractionRef io23017 = ioFrom23017(0x20, ACTIVE_LOW_OPEN, 2);
 LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
 LiquidCrystalRenderer renderer(lcd, 20, 4);
 
+int testRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
+	switch (mode) {
+	case RENDERFN_NAME:
+		strcpy(buffer, "TestNm");
+		fastltoa(buffer, row, 3, NOT_PADDED, bufferSize);
+		break;
+	case RENDERFN_VALUE:
+		buffer[0] = 0;
+		fastltoa(buffer, row, 3, NOT_PADDED, bufferSize);
+		break;
+	}
+	return true;
+}
+
+const char textAddressNmPgm[] PROGMEM = "Text";
+RENDERING_CALLBACK_NAME_INVOKE(textRenderingFunction, textItemRenderFn, textAddressNmPgm, NULL)
+TextMenuItem textItem(textRenderingFunction, 10003, 0xffff, 10, NULL);
+
+const char ipAddressNmPgm[] PROGMEM = "IpAddr";
+RENDERING_CALLBACK_NAME_INVOKE(ipRenderingFunction, ipAddressRenderFn, ipAddressNmPgm, NULL)
+IpAddressMenuItem ipItem(ipRenderingFunction, 10002, 0xffff, &textItem);
+
+RuntimeMenuItem runtimeItem(MENUTYPE_RUNTIME_VALUE, 10001, 0xffff, testRenderFn, 99, 1, &ipItem);
+
+ListRuntimeMenuItem listItem(10000, 3, testRenderFn, &runtimeItem);
+
 void setup() {
     Wire.begin();
     Serial.begin(115200);
@@ -32,6 +58,8 @@ void setup() {
   
     switches.initialise(io23017, true);
 	menuMgr.initForEncoder(&renderer, &menuVolume, 6, 7, 5);
+	menuCaseTemp.setNext(&listItem);
+	textItem.setTextValue("hello");
 }
 
 void loop() {
@@ -45,10 +73,10 @@ void onPressMe(int /*id*/) {
     BaseDialog* dialog = renderer.getDialog();
     if(dialog == NULL) return; // no dialog available.
 
-    dialog->show(helloWorld, [] (ButtonType type, void *data) {
+    dialog->show(helloWorld, false, [] (ButtonType type, void *data) {
         if(type == BTNTYPE_ACCEPT) {
             BaseDialog* dialog = renderer.getDialog();
-            dialog->show(secondMsg);
+            dialog->show(secondMsg, false);
             dialog->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
             dialog->copyIntoBuffer((char*)data);
         }

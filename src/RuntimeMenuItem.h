@@ -100,6 +100,12 @@ public:
 		itemPosition = 0xff;
 		return this;
 	}
+
+	void setNumberOfRows(uint8_t rows) { 
+		noOfParts = rows; 
+		setChanged(true); 
+		setSendRemoteNeededAll(); 
+	}
 };
 
 /**
@@ -164,6 +170,7 @@ public:
 	TextMenuItem(RuntimeRenderingFn customRenderFn, uint16_t id, uint16_t eeprom, int size, MenuItem* next = NULL)
 		: EditableMultiPartMenuItem(MENUTYPE_TEXT_VALUE, id, eeprom, size, customRenderFn, next) {
 		data = new char[size];
+		memset(data, 0, size);
 	}
 
 	~TextMenuItem() { delete data; }
@@ -181,7 +188,7 @@ public:
 	const char* getTextValue() { return data; }
 
 private:
-	void setCharValue(uint8_t location, char val);
+	bool setCharValue(uint8_t location, char val);
 	friend int textItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
 };
 

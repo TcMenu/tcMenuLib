@@ -5,6 +5,7 @@
 
 #include <Arduino.h>
 #include "tcMenu.h"
+#include "RuntimeMenuItem.h"
 #include <IoAbstraction.h>
 
 MenuManager menuMgr;
@@ -42,22 +43,25 @@ bool isMenuBoolean(MenuType ty) {
 	return ty == MENUTYPE_BOOLEAN_VALUE;
 }
 
-bool isMenuEditable(MenuItem* item) {
-	MenuType ty = item->getMenuType();
-	return (ty == MENUTYPE_ENUM_VALUE || ty == MENUTYPE_INT_VALUE || ty == MENUTYPE_BOOLEAN_VALUE) && !item->isReadOnly();
-}
-
 /**
  * Called when the rotary encoder value has changed, if we are editing this changes the value in the current editor, if we are
  * showing menu items, it changes the index of the active item (renderer will move into display if needed).
  */
 void MenuManager::valueChanged(int value) {
 	MenuItem* currentEditor = renderer->getCurrentEditor();
-	if (currentEditor && isMenuEditable(currentEditor)) {
+	if (currentEditor && isMenuBasedOnValueItem(currentEditor)) {
 		((ValueMenuItem*)currentEditor)->setCurrentValue(value);
+	}
+	else if (currentEditor && isMenuRuntimeMultiEdit(currentEditor)) {
+		reinterpret_cast<EditableMultiPartMenuItem<void*>*>(currentEditor)->valueChanged(value);
 	}
 	else {
 		renderer->activeIndexChanged(value);
+	}
+
+	// lastly if this is a type of renderer that's interested in resetting, let it know we changed
+	if (renderer->getRendererType() == RENDERER_TYPE_BASE) {
+		reinterpret_cast<BaseMenuRenderer*>(renderer)->menuAltered();
 	}
 }
 

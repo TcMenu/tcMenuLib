@@ -99,16 +99,16 @@ void BaseMenuRenderer::menuValueToText(MenuItem* item,	MenuDrawJustification jus
 		break;
 	case MENUTYPE_SUB_VALUE:
 	case MENUTYPE_ACTION_VALUE:
-		menuValueExec((SubMenuItem*)item, justification);
+		menuValueExec((MenuItem*)item, justification);
 		break;
 	case MENUTYPE_BACK_VALUE:
 		menuValueBack((BackMenuItem*)item, justification);
 		break;
 	case MENUTYPE_TEXT_VALUE:
-		menuValueText((TextMenuItem*)item, justification);
-		break;
-	case MENUTYPE_REMOTE_VALUE:
-		menuValueRemote((RemoteMenuItem*)item, justification);
+	case MENUTYPE_IPADDRESS:
+	case MENUTYPE_RUNTIME_LIST:
+	case MENUTYPE_RUNTIME_VALUE:
+		menuValueRuntime(reinterpret_cast<RuntimeMenuItem*>(item), justification);
 		break;
 	case MENUTYPE_FLOAT_VALUE:
 		menuValueFloat((FloatMenuItem*)item, justification);
@@ -174,7 +174,7 @@ void BaseMenuRenderer::menuValueEnum(EnumMenuItem* item, MenuDrawJustification j
 	else {
 		uint8_t count = item->getLengthOfEnumStr(item->getCurrentValue());
         if(count > bufferSize) count = bufferSize;
-		item->copyEnumStrToBuffer(buffer + (bufferSize - count), count, item->getCurrentValue());
+		item->copyEnumStrToBuffer(buffer + (bufferSize - count), count + 1, item->getCurrentValue());
 	}
 }
 
@@ -212,7 +212,7 @@ void BaseMenuRenderer::menuValueBool(BooleanMenuItem* item, MenuDrawJustificatio
 	}
 }
 
-void BaseMenuRenderer::menuValueExec(__attribute((unused)) MenuItem* item, MenuDrawJustification justification) {
+void BaseMenuRenderer::menuValueExec(MenuItem* /*item*/, MenuDrawJustification justification) {
 	if(justification == JUSTIFY_TEXT_LEFT) {
 		safeProgCpy(buffer, SUB_STR, bufferSize);
 	}
@@ -221,7 +221,7 @@ void BaseMenuRenderer::menuValueExec(__attribute((unused)) MenuItem* item, MenuD
 	}
 }
 
-void BaseMenuRenderer::menuValueBack(__attribute((unused)) BackMenuItem* item, MenuDrawJustification justification) {
+void BaseMenuRenderer::menuValueBack(BackMenuItem* /*item*/, MenuDrawJustification justification) {
 	if(justification == JUSTIFY_TEXT_LEFT) {
 		safeProgCpy(buffer, BACK_MENU_NAME, bufferSize);
 	}
@@ -251,19 +251,17 @@ void BaseMenuRenderer::menuValueFloat(FloatMenuItem* item, MenuDrawJustification
 	}
 }
 
-void BaseMenuRenderer::menuValueText(TextMenuItem* item, MenuDrawJustification justification) {
+void BaseMenuRenderer::menuValueRuntime(RuntimeMenuItem* item, MenuDrawJustification justification) {
 	if(justification == JUSTIFY_TEXT_LEFT) {
-		strcpy(buffer, item->getTextValue());
+		item->copyValue(buffer, bufferSize);
 	}
 	else {
-		uint8_t count = strlen(item->getTextValue());
+		char sz[20];
+		item->copyValue(sz, sizeof(sz));
+		uint8_t count = strlen(sz);
 		int cpy = bufferSize - count;
-		strcpy(buffer + cpy, item->getTextValue());
+		strcpy(buffer + cpy, sz);
 	}
-}
-
-void BaseMenuRenderer::menuValueRemote(RemoteMenuItem* item, MenuDrawJustification justification) {	
-	item->getCurrentState((justification == JUSTIFY_TEXT_LEFT) ? buffer : &buffer[1], bufferSize - 1);
 }
 
 void BaseMenuRenderer::takeOverDisplay(RendererCallbackFn displayFn) {
@@ -291,41 +289,6 @@ void BaseMenuRenderer::prepareNewSubmenu(MenuItem* newItems) {
 
 	menuMgr.setItemsInCurrentMenu(itemCount(newItems) - 1);
 	redrawRequirement(MENUDRAW_COMPLETE_REDRAW);
-}
-
-void BaseMenuRenderer::setupForEditing(MenuItem* item) {
-	if(currentEditor != NULL) {
-		if (isMenuRuntimeMultiEdit(currentEditor)) {
-			EditableMultiPartMenuItem<void*>* editableItem = reinterpret_cast<EditableMultiPartMenuItem<void*>*>(currentEditor);
-			
-			// unless we've run out of parts to edit, go no further.
-			if (editableItem->nextPart() != 0) return;
-		}
-		currentEditor->setEditing(false);
-		currentEditor->setActive(false);
-	}
-
-	// if the item is NULL, or it's read only, then it can't be edited.
-	if(item == NULL || item->isReadOnly()) return;
-
-	MenuType ty = item->getMenuType();
-	if ((ty == MENUTYPE_ENUM_VALUE || ty == MENUTYPE_INT_VALUE)) {
-		// these are the only types we can edit with a rotary encoder & LCD.
-		currentEditor = item;
-		currentEditor->setEditing(true);
-		switches.changeEncoderPrecision(item->getMaximumValue(), reinterpret_cast<ValueMenuItem*>(currentEditor)->getCurrentValue());
-	}
-	else if(ty == MENUTYPE_BOOLEAN_VALUE) {
-		// we don't actually edit boolean items, just toggle them instead
-		BooleanMenuItem* boolItem = (BooleanMenuItem*)item;
-		boolItem->setBoolean(!boolItem->getBoolean());
-	}
-	else if (isMenuRuntimeMultiEdit(item)) {
-		currentEditor = item;
-		EditableMultiPartMenuItem<void*>* editableItem = reinterpret_cast<EditableMultiPartMenuItem<void*>*>(item);
-		editableItem->beginMultiEdit();
-		switches.changeEncoderPrecision(editableItem->nextPart(), editableItem->getPartValueAsInt());
-	}
 }
 
 MenuItem* BaseMenuRenderer::getItemAtPosition(uint8_t pos) {
@@ -359,11 +322,11 @@ int BaseMenuRenderer::offsetOfCurrentActive() {
 
 void BaseMenuRenderer::onHold() {
 	if (currentEditor != NULL && isMenuRuntimeMultiEdit(currentEditor)) {
-		EditableMultiPartMenuItem<void*>* editableItem = reinterpret_cast<EditableMultiPartMenuItem<void*>*>(currentEditor);
-		editableItem->stopMultiEdit();
-		currentEditor = NULL;
+		prepareNewSubmenu(currentRoot);
 	}
-	prepareNewSubmenu(getParentAndReset());
+	else {
+		prepareNewSubmenu(getParentAndReset());
+	}
 }
 
 void BaseMenuRenderer::onSelectPressed(MenuItem* toEdit) {
@@ -386,8 +349,20 @@ void BaseMenuRenderer::onSelectPressed(MenuItem* toEdit) {
     // if we are already editing an item then we need to stop editing
     // that item once it has been selected with a click again.
 	if (currentEditor != NULL) {
+		if (isMenuRuntimeMultiEdit(currentEditor)) {
+			EditableMultiPartMenuItem<void*>* editableItem = reinterpret_cast<EditableMultiPartMenuItem<void*>*>(currentEditor);
+
+			// unless we've run out of parts to edit, stay in edit mode, moving to next part.
+			int editorRange = editableItem->nextPart();
+			if (editorRange != 0) {
+				switches.changeEncoderPrecision(editorRange, editableItem->getPartValueAsInt());
+				return;
+			}
+		}
+
 		currentEditor->setEditing(false);
 		currentEditor->setActive(true);
+		serdebugF2("onSel curr!=null", currentEditor->getId());
 		currentEditor = NULL;
 		menuMgr.setItemsInCurrentMenu(itemCount(currentRoot) - 1, offsetOfCurrentActive());
 		redrawRequirement(MENUDRAW_EDITOR_CHANGE);
@@ -414,6 +389,31 @@ void BaseMenuRenderer::onSelectPressed(MenuItem* toEdit) {
 		}
 	}
 	menuAltered();
+}
+
+void BaseMenuRenderer::setupForEditing(MenuItem* item) {
+	// if the item is NULL, or it's read only, then it can't be edited.
+	if (item == NULL || item->isReadOnly()) return;
+
+	MenuType ty = item->getMenuType();
+	if ((ty == MENUTYPE_ENUM_VALUE || ty == MENUTYPE_INT_VALUE)) {
+		// these are the only types we can edit with a rotary encoder & LCD.
+		currentEditor = item;
+		currentEditor->setEditing(true);
+		switches.changeEncoderPrecision(item->getMaximumValue(), reinterpret_cast<ValueMenuItem*>(currentEditor)->getCurrentValue());
+	}
+	else if (ty == MENUTYPE_BOOLEAN_VALUE) {
+		// we don't actually edit boolean items, just toggle them instead
+		BooleanMenuItem* boolItem = (BooleanMenuItem*)item;
+		boolItem->setBoolean(!boolItem->getBoolean());
+	}
+	else if (isMenuRuntimeMultiEdit(item)) {
+		currentEditor = item;
+		EditableMultiPartMenuItem<void*>* editableItem = reinterpret_cast<EditableMultiPartMenuItem<void*>*>(item);
+		editableItem->beginMultiEdit();
+		int range = editableItem->nextPart();
+		switches.changeEncoderPrecision(range, editableItem->getPartValueAsInt());
+	}
 }
 
 void BaseMenuRenderer::setFirstWidget(TitleWidget* widget) {

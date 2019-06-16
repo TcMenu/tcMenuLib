@@ -241,9 +241,7 @@ enum MenuType : byte {
 	/** item is of type TextMenuItem */
 	MENUTYPE_TEXT_VALUE = 200,
 	/** item is an IP address and is editable per segment */
-	MENUTYPE_IPADDRESS = 201,
-	/** item is of type RemoteMenuItem */
-	MENUTYPE_REMOTE_VALUE = 202
+	MENUTYPE_IPADDRESS = 201
 };
 
 /**
@@ -308,7 +306,7 @@ public:
 	bool isActive() { return bitRead(flags, MENUITEM_ACTIVE); }
 
 	/** sets this item as the currently being edited, so that the renderer shows it as being edited */
-	void setEditing(bool active) { bitWrite(flags, MENUITEM_EDITING, active); setChanged(true); }
+	void setEditing(bool active);
 	/** returns true if the status is currently being edited */
 	bool isEditing() { return bitRead(flags, MENUITEM_EDITING); }
 
@@ -324,6 +322,7 @@ public:
 
 	/** gets the next menu (sibling) at this level */
 	MenuItem* getNext() { return next; }
+	void setNext(MenuItem* next) { this->next = next; }
 
 protected:
 	/**
@@ -537,7 +536,9 @@ class RuntimeMenuItem;
 /**
  * Any MenuType with an ID less than 100 is editable as an integer
  */
-#define menuTypeIsBasedOnValueType(x) (x < 99)
+inline bool isMenuBasedOnValueItem(MenuItem* item) {
+	return byte(item->getMenuType()) < MENUTYPE_SUB_VALUE;
+}
 
 /**
  * returns true if the menu item is an editable runtime item

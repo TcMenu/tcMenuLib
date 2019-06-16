@@ -7,6 +7,7 @@
 #define _BASE_RENDERERS_H_
 
 #include "tcMenu.h"
+#include "RuntimeMenuItem.h"
 #include <TaskManager.h>
 
 // forward reference.
@@ -345,11 +346,6 @@ protected:
 	void menuValueToText(MenuItem* item, MenuDrawJustification justification);
 
 	/**
-	 * Internal method that handles each ticks
-	 */
-	void handleTicks();
-
-	/**
 	 * Sets the type of redraw that is needed
 	 * @param state the required redraw
 	 */
@@ -394,8 +390,7 @@ private:
 	void menuValueBool(BooleanMenuItem* item, MenuDrawJustification justification);
 	void menuValueExec(MenuItem* item, MenuDrawJustification justification);
 	void menuValueBack(BackMenuItem* item, MenuDrawJustification justification);
-	void menuValueText(TextMenuItem* item, MenuDrawJustification justification);
-	void menuValueRemote(RemoteMenuItem* item, MenuDrawJustification justification);
+	void menuValueRuntime(RuntimeMenuItem* item, MenuDrawJustification justification);
 	void menuValueFloat(FloatMenuItem* item, MenuDrawJustification justification);
 };
 

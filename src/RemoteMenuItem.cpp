@@ -5,37 +5,145 @@
 
 #include <Arduino.h>
 #include "RemoteMenuItem.h"
+#include "RemoteConnector.h"
 #include "tcUtil.h"
+#include "BaseDialog.h"
 
-RemoteMenuItem* RemoteMenuItem::FIRST_INSTANCE;
+RemoteMenuItem* RemoteMenuItem::instance = NULL;
 
-void remoteItemUpdateLoop() {
-    RemoteMenuItem::FIRST_INSTANCE->setChanged(true);
-    RemoteMenuItem::FIRST_INSTANCE->setSendRemoteNeededAll();
+const char REMOTE_NAME_PGM[] PROGMEM = "Remote";
+const char NO_LINK_STR[] PROGMEM = "No Link";
+const char REMOVE_CONN_HDR_PGM[] PROGMEM = "Close Connection";
+
+// called when the close connection dialog completes.
+void onRemoteInfoDialogComplete(ButtonType btn, void* data) {
+	if (btn == BTNTYPE_OK) {
+		TagValueRemoteConnector* connector = reinterpret_cast<TagValueRemoteConnector*>(data);
+		connector->close();
+	}
 }
 
-RemoteMenuItem::RemoteMenuItem(const RemoteMenuInfo *pgmMenuInfo, TagValueRemoteConnector* connector, MenuItem* next) : MenuItem(MENUTYPE_REMOTE_VALUE, (const AnyMenuInfo*)pgmMenuInfo, next) {
-    this->connector = connector; 
-    bool registerTask = (FIRST_INSTANCE == NULL);
-    FIRST_INSTANCE = this;
-    if(registerTask) taskManager.scheduleFixedRate(10, remoteItemUpdateLoop, TIME_SECONDS);
+// called for each state of the list, base row and child rows.
+int remoteInfoRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
+	switch (mode) {
+	case RENDERFN_NAME: {
+		safeProgCpy(buffer, REMOTE_NAME_PGM, bufferSize);
+		if (row < 9) {
+			fastltoa(buffer, row, 1, NOT_PADDED, bufferSize);
+		}
+		return true;
+	}
+	case RENDERFN_VALUE: {
+		if (row == 0xff) {
+			strcpy(buffer, "->");
+			return true;
+		}
+
+		TagValueRemoteConnector* connector = RemoteMenuItem::getInstance()->getConnector(row);
+		if (connector == NULL || !connector->isConnected()) {
+			safeProgCpy(buffer, NO_LINK_STR, bufferSize);
+		}
+		else {
+			strcat(buffer, connector->getRemoteName());
+			appendChar(buffer, ':', bufferSize);
+			char authStatus = connector->isAuthenticated() ? 'A' : (connector->isConnected() ? 'C' : 'D');
+			appendChar(buffer, authStatus, bufferSize);
+			appendChar(buffer, ':', bufferSize);
+			fastltoa(buffer, connector->getRemoteMajorVer(), 2, NOT_PADDED, bufferSize);
+			appendChar(buffer, '.', bufferSize);
+			fastltoa(buffer, connector->getRemoteMinorVer(), 2, NOT_PADDED, bufferSize);
+			if (strlen(buffer) < bufferSize) {
+				appendChar(buffer, ':', bufferSize);
+				appendChar(buffer, connector->getRemotePlatform() + '0', bufferSize);
+			}
+		}
+		return true;
+	}
+	case RENDERFN_INVOKE: {
+		TagValueRemoteConnector* connector = RemoteMenuItem::getInstance()->getConnector(row);
+		BaseDialog* dlg = MenuRenderer::getInstance()->getDialog();
+		if (connector && dlg && !dlg->isInUse()) {
+			dlg->setUserData(connector);
+			dlg->setButtons(BTNTYPE_OK, BTNTYPE_CANCEL, 1);
+			dlg->show(REMOVE_CONN_HDR_PGM, false, onRemoteInfoDialogComplete);
+			dlg->copyIntoBuffer(connector->getRemoteName());
+		}
+		return true;
+	}
+	}
+	return true;
 }
 
-const char NO_LINK_STR[] PGM_TCM = "No Link";
+void onRemoteItemCommsNotify(CommunicationInfo info) {
+	if (info.remoteNo < RemoteMenuItem::getInstance()->getNumberOfParts()) {
+		RemoteMenuItem::getInstance()->setSendRemoteNeededAll();
+		RemoteMenuItem::getInstance()->setChanged(true);
+	}
 
-void RemoteMenuItem::getCurrentState(char *szBuf, uint8_t len) {
-    szBuf[0]=0;
+	// check if the pass thru should be called.
+	RemoteMenuItem::getInstance()->doPassThru(info);
+}
 
-    if(!connector->isConnected()) {
-        safeProgCpy(szBuf, NO_LINK_STR, len);
-    }
-    else {
-        strcat(szBuf, connector->getRemoteName());
-        appendChar(szBuf, ' ', len);
-        fastltoa(szBuf, connector->getRemoteMajorVer(), 2, NOT_PADDED, len);
-        appendChar(szBuf, '.', len);
-        fastltoa(szBuf, connector->getRemoteMinorVer(), 2, NOT_PADDED, len);
-        appendChar(szBuf, ' ', len);
-        appendChar(szBuf, connector->getRemotePlatform() == PLATFORM_JAVA_API ? 'J' : 'A', len);
-    }
+RemoteMenuItem::RemoteMenuItem(uint16_t id, int maxRemotes, MenuItem* next = NULL) 
+	: ListRuntimeMenuItem(id, maxRemotes, remoteInfoRenderFn, next) {
+	RemoteMenuItem::instance = this;
+	connectors = new TagValueRemoteConnector*[maxRemotes];
+	memset(connectors, 0, sizeof(connectors));
+}
+
+void RemoteMenuItem::addConnector(TagValueRemoteConnector* connector) {
+	if (connector->getRemoteNo() < getNumberOfParts()) {
+		connector->setCommsNotificationCallback(onRemoteItemCommsNotify);
+		connectors[connector->getRemoteNo()] = connector;
+	}
+}
+
+const char AUTH_KEYS_MENU_PGM[] PROGMEM = "Authorised Keys";
+const char AUTH_REMOVE_KEY[] PROGMEM = "Remove";
+const char AUTH_REMOVE_ALL_KEYS[] PROGMEM = "Remove ALL keys?";
+
+void onAuthenticateRemoveKeysDlgComplete(ButtonType btn, void* data) {
+	if (btn == BTNTYPE_OK) {
+		EepromAuthenticatorManager* mgr = reinterpret_cast<EepromAuthenticatorManager*>(data);
+		mgr->resetAllKeys();
+	}
+}
+
+int authenticationMenuItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
+	EepromAuthenicationInfoMenuItem* authItem = reinterpret_cast<EepromAuthenicationInfoMenuItem*>(item);
+	switch (mode) {
+	case RENDERFN_NAME:
+		if (row == 0xff) {
+			safeProgCpy(buffer, AUTH_KEYS_MENU_PGM, bufferSize);
+		}
+		else if(row < authItem->getAuthManager()->getNumberOfEntries()) {
+			authItem->getAuthManager()->copyKeyNameToBuffer(row, buffer, bufferSize);
+		}
+		else buffer[0] = 0;
+		return true;
+	case RENDERFN_VALUE:
+		if (row == 0xff) {
+			strcpy(buffer, "->");
+		}
+		else {
+			safeProgCpy(buffer, AUTH_REMOVE_KEY, bufferSize);
+		}
+		return true;
+	case RENDERFN_INVOKE: {
+		BaseDialog* dlg = MenuRenderer::getInstance()->getDialog();
+		if (row < authItem->getAuthManager()->getNumberOfEntries() && dlg && !dlg->isInUse()) {
+			dlg->setUserData(authItem->getAuthManager());
+			dlg->setButtons(BTNTYPE_OK, BTNTYPE_CANCEL, 1);
+			dlg->show(AUTH_REMOVE_ALL_KEYS, false, onAuthenticateRemoveKeysDlgComplete);
+			dlg->copyIntoBuffer("");
+		}
+		return true;
+	}
+	}
+
+}
+
+EepromAuthenicationInfoMenuItem::EepromAuthenicationInfoMenuItem(uint16_t id, EepromAuthenticatorManager * authManager, MenuItem * next)
+	: ListRuntimeMenuItem(id, authManager->getNumberOfEntries(), authenticationMenuItemRenderFn, next) {
+	this->authManager = authManager;
 }

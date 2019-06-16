@@ -20,10 +20,6 @@
  */
 enum ButtonType: byte { BTNTYPE_NONE = 0, BTNTYPE_OK, BTNTYPE_ACCEPT, BTNTYPE_CANCEL, BTNTYPE_CLOSE };
 
-// used internally only
-#define DLGMODE_REDRAW 0
-#define DLGMODE_BTNTYPE_START 4
-
 class BaseDialog;
 /**
  * If you need to capture the finished state of the dialog, then you create a function to this spec

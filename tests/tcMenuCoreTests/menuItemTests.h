@@ -158,11 +158,11 @@ test(testIpAddressItem) {
 	assertEqual(0, ipItem.getPartValueAsInt());
 	ipItem.valueChanged(2);
 	ipItem.copyValue(sz, sizeof(sz));
-	assertStringCaseEqual("192.168=2.96", sz);
+	assertStringCaseEqual("192.168.[2].96", sz);
 	assertEqual(255, ipItem.nextPart());
 	ipItem.valueChanged(201);
 	ipItem.copyValue(sz, sizeof(sz));
-	assertStringCaseEqual("192.168.2=201", sz);
+	assertStringCaseEqual("192.168.2.[201]", sz);
 	assertTrue(ipItem.isEditing());
 
 	assertEqual(0, ipItem.nextPart());

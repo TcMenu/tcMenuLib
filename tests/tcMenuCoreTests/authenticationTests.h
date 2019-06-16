@@ -15,7 +15,7 @@ const char *uuid3 = "07cd8bc6-734d-43da-84e7-6084990becfe";
 void printAllAuthenticatorEntries(EepromAuthenticatorManager& authenticator, const char* why) {
 	Serial.print(why);
 	Serial.print(". entries : ");
-	for (int i = 0; i < KEY_STORAGE_SIZE; i++) {
+	for (int i = 0; i < authenticator.getNumberOfEntries(); i++) {
 		char sz[16];
 		authenticator.copyKeyNameToBuffer(i, sz, sizeof(sz));
 		if (sz[0] != 0) {

@@ -285,11 +285,13 @@ void TagValueRemoteConnector::nextBootstrap() {
 	case MENUTYPE_INT_VALUE:
 		encodeAnalogItem(parentId, (AnalogMenuItem*)bootItem);
 		break;
+	case MENUTYPE_IPADDRESS:
 	case MENUTYPE_TEXT_VALUE:
-		encodeTextMenu(parentId, (TextMenuItem*)bootItem);
+		encodeMultiEditMenu(parentId, reinterpret_cast<RuntimeMenuItem*>(bootItem));
 		break;
-	case MENUTYPE_REMOTE_VALUE:
-		encodeRemoteMenu(parentId, (RemoteMenuItem*)bootItem);
+	case MENUTYPE_RUNTIME_LIST:
+	case MENUTYPE_RUNTIME_VALUE:
+		encodeRuntimeMenuItem(parentId, reinterpret_cast<RuntimeMenuItem*>(bootItem));
 		break;
 	case MENUTYPE_FLOAT_VALUE:
 		encodeFloatMenu(parentId, (FloatMenuItem*)bootItem);
@@ -383,21 +385,22 @@ void TagValueRemoteConnector::encodeAnalogItem(int parentId, AnalogMenuItem* ite
     transport->endMsg();
 }
 
-void TagValueRemoteConnector::encodeTextMenu(int parentId, TextMenuItem* item) {
+void TagValueRemoteConnector::encodeMultiEditMenu(int parentId, RuntimeMenuItem* item) {
 	if(!prepareWriteMsg(MSG_BOOT_TEXT)) return;
     encodeBaseMenuFields(parentId, item);
-    transport->writeFieldInt(FIELD_MAX_LEN, item->textLength());
-    transport->writeField(FIELD_CURRENT_VAL, item->getTextValue());
-    transport->endMsg();
-}
-
-void TagValueRemoteConnector::encodeRemoteMenu(int parentId, RemoteMenuItem* item) {
-	if(!prepareWriteMsg(MSG_BOOT_REMOTE)) return;
-    encodeBaseMenuFields(parentId, item);
-    transport->writeFieldInt(FIELD_REMOTE_NO, item->getRemoteNum());
-    char sz[20];
-    item->getCurrentState(sz, sizeof sz);
-    transport->writeField(FIELD_CURRENT_VAL, sz);
+	if (item->getMenuType() == MENUTYPE_TEXT_VALUE) {
+		TextMenuItem* editable = reinterpret_cast<TextMenuItem*>(item);
+		transport->writeFieldInt(FIELD_MAX_LEN, editable->getNumberOfParts());
+		transport->writeField(FIELD_CURRENT_VAL, editable->getTextValue());
+	}
+	else if (item->getMenuType() == MENUTYPE_IPADDRESS) {
+		IpAddressMenuItem* editable = reinterpret_cast<IpAddressMenuItem*>(item);
+		transport->writeFieldInt(FIELD_MAX_LEN, editable->getNumberOfParts());
+		char sz[16];
+		editable->copyValue(sz, sizeof(sz));
+		transport->writeFieldInt(FIELD_MAX_LEN, 16);
+		transport->writeField(FIELD_CURRENT_VAL, sz);
+	}
     transport->endMsg();
 }
 
@@ -467,10 +470,13 @@ void TagValueRemoteConnector::encodeActionMenu(int parentId, ActionMenuItem* ite
     transport->endMsg();
 }
 
-void writeRemoteValueToTransport(TagValueTransport* transport, RemoteMenuItem* item) {
+void writeRemoteListToTransport(TagValueTransport* transport, ListRuntimeMenuItem* item) {
 	char sz[20];
-	item->getCurrentState(sz, sizeof sz);
-	transport->writeField(FIELD_CURRENT_VAL, sz);
+	transport->writeFieldInt(FIELD_NO_CHOICES, item->getNumberOfParts());
+	for (int i = 0; i < item->getNumberOfParts(); ++i) {
+		item->getChildItem(i)->copyValue(sz, sizeof(sz));
+		transport->writeField(FIELD_PREPEND_CHOICE | ('A' + i), sz);
+	}
 }
 
 void TagValueRemoteConnector::encodeChangeValue(MenuItem* theItem) {
@@ -483,13 +489,17 @@ void TagValueRemoteConnector::encodeChangeValue(MenuItem* theItem) {
     case MENUTYPE_BOOLEAN_VALUE:
         transport->writeFieldInt(FIELD_CURRENT_VAL, ((ValueMenuItem*)theItem)->getCurrentValue());
         break;
-    case MENUTYPE_TEXT_VALUE:
-        transport->writeField(FIELD_CURRENT_VAL, ((TextMenuItem*)theItem)->getTextValue());
-        break;
-    case MENUTYPE_REMOTE_VALUE: 
-        writeRemoteValueToTransport(transport, (RemoteMenuItem*)theItem);
-        break;
-    case MENUTYPE_FLOAT_VALUE:
+	case MENUTYPE_IPADDRESS:
+	case MENUTYPE_TEXT_VALUE: {
+		char sz[20];
+		((RuntimeMenuItem*)theItem)->copyValue(sz, sizeof(sz));
+		transport->writeField(FIELD_CURRENT_VAL, sz);
+		break;
+	}
+	case MENUTYPE_RUNTIME_LIST:
+		writeRemoteListToTransport(transport, (RemoteMenuItem*)theItem);
+		break;
+	case MENUTYPE_FLOAT_VALUE:
         writeFloatValueToTransport(transport, (FloatMenuItem*)theItem);
         break;
     default:

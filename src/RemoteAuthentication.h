@@ -16,7 +16,6 @@
 #define UUID_KEY_SIZE 40
 #define CLIENT_DESC_SIZE 16
 #define TOTAL_KEY_SIZE (UUID_KEY_SIZE + CLIENT_DESC_SIZE)
-#define KEY_STORAGE_SIZE 6
 
 /**
  * This is the external interface of authentication when using the menu library. It
@@ -56,14 +55,23 @@ private:
     EepromAbstraction *eeprom;
     EepromPosition romStart;
     uint16_t magicKey;
-
+	uint8_t  numberOfEntries;
 public:
-    EepromAuthenticatorManager() {
+    EepromAuthenticatorManager(uint8_t numOfEntries = 6) {
         eeprom = NULL;
         romStart = 0;
         this->magicKey = 0;
+		this->numberOfEntries = numOfEntries;
     }
 
+	/**
+	 * Initialises the authenticator with an eeprom object, start position in the rom and optional magic key.
+	 * the magic key is used to determine if the rom contains anything reasonable on startup. The default will
+	 * probably be OK
+	 * @param eeprom any eeprom abstraction from the IoAbstraction library
+	 * @param start position in the rom to start writing at
+	 * @param magicKey the value that is checked on load to see if stored data is trustworthy.
+	 */
     void initialise(EepromAbstraction* eeprom, EepromPosition start, uint16_t magicKey = 0x9078);
 
     /**
@@ -94,6 +102,13 @@ public:
      * @param authResponse the key associated with it.
      */
     bool isAuthenticated(const char* connectionName, const char* authResponse) override;
+
+	/**
+	 * @return the number of spaces for entries in the eeprom
+	 */
+	int getNumberOfEntries() {
+		return numberOfEntries;
+	}
 private:
     // finds the slot (or an empty slot) or if neither are found returns -1
     int findSlotFor(const char* name);

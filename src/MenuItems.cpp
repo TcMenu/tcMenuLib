@@ -23,6 +23,15 @@ void MenuItem::setSendRemoteNeeded(uint8_t remoteNo, bool needed) {
 	bitWrite(flags, (remoteNo + (int)MENUITEM_REMOTE_SEND0), (needed && !isLocalOnly()));
 }
 
+void MenuItem::setEditing(bool active) {
+	bool isEditOnEntry = isEditing();
+	bitWrite(flags, MENUITEM_EDITING, active); setChanged(true);
+	if (isMenuRuntimeMultiEdit(this) && !active && isEditOnEntry) {
+		EditableMultiPartMenuItem<void*>* item = reinterpret_cast<EditableMultiPartMenuItem<void*>*>(this);
+		item->stopMultiEdit();
+	}
+}
+
 void MenuItem::setSendRemoteNeededAll() {
     // make sure local only fields are never marked for sending.
     if(isLocalOnly()) clearSendRemoteNeededAll();
@@ -58,7 +67,9 @@ uint8_t MenuItem::copyNameToBuffer(char* buf, int offset, int size) {
 
 uint16_t MenuItem::getId()
 {
-	if (isMenuRuntime(this)) return asRuntimeItem(this)->getRuntimeId();
+	if (isMenuRuntime(this)) {
+		return asRuntimeItem(this)->getRuntimeId();
+	}
 	
 	return get_info_uint(&info->id);
 }

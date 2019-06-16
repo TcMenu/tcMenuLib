@@ -110,7 +110,7 @@ bool processValueChangeField(FieldAndValue* field, MessageProcessorInfo* info) {
             uint16_t newValue = atol(field->value);
             valItem->setCurrentValue(newValue); // for absolutes, assume other system did checking.
         }
-        else {
+        else if(info->value.changeType == CHANGE_DELTA) {
             // get the delta and current values.
             int deltaVal = atoi(field->value);
             long existingVal = valItem->getCurrentValue();

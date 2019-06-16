@@ -4,6 +4,7 @@
  */
 
 #include <Arduino.h>
+#include <IoLogging.h>
 #include "RuntimeMenuItem.h"
 
 const AnyMenuInfo runtimeBlankInfo PROGMEM = { "", 0xffff, 0xffff, 0, NULL };
@@ -32,12 +33,23 @@ void TextMenuItem::setTextValue(const char* text, bool silent) {
 	if (!silent) triggerCallback();
 }
 
-void TextMenuItem::setCharValue(uint8_t location, char val) {
-	if (location >= noOfParts) return;
+bool TextMenuItem::setCharValue(uint8_t location, char val) {
+	if (location >= (noOfParts - 1)) return false;
 
 	data[location] = val;
+	// always ensure zero terminated at last position.
+	data[noOfParts - 1] = 0;
 	setChanged(true);
 	setSendRemoteNeededAll();
+	return true;
+}
+
+void wrapForEdit(byte *ipData, uint8_t idx, uint8_t row, char* buffer, int bufferSize) {
+	--row;
+
+	if (idx == row) appendChar(buffer, '[', bufferSize);
+	fastltoa(buffer, ipData[idx], 3, NOT_PADDED, bufferSize);
+	if (idx == row) appendChar(buffer, ']', bufferSize);
 }
 
 int ipAddressRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
@@ -48,17 +60,13 @@ int ipAddressRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, cha
 	case RENDERFN_VALUE: {
 		buffer[0] = 0;
 		byte* data = ipItem->getIpAddress();
-		if (row == 1) appendChar(buffer, '=', bufferSize);
-		fastltoa(buffer, data[0], 3, NOT_PADDED, bufferSize);
-
-		appendChar(buffer, (row == 2) ? '=' : '.', bufferSize);
-		fastltoa(buffer, data[1], 3, NOT_PADDED, bufferSize);
-
-		appendChar(buffer, (row == 3) ? '=' : '.', bufferSize);
-		fastltoa(buffer, data[2], 3, NOT_PADDED, bufferSize);
-
-		appendChar(buffer, (row == 4) ? '=' : '.', bufferSize);
-		fastltoa(buffer, data[3], 3, NOT_PADDED, bufferSize);
+		wrapForEdit(data, 0, row, buffer, bufferSize);
+		appendChar(buffer, '.', bufferSize);
+		wrapForEdit(data, 1, row, buffer, bufferSize);
+		appendChar(buffer, '.', bufferSize);
+		wrapForEdit(data, 2, row, buffer, bufferSize);
+		appendChar(buffer, '.', bufferSize);
+		wrapForEdit(data, 3, row, buffer, bufferSize);
 		return true;
 	}
 	case RENDERFN_SET_VALUE: {
@@ -78,29 +86,35 @@ int ipAddressRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, cha
 }
 
 int textItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
+	serdebugF4("Rendering text item", row, mode, bufferSize);
 	if (item->getMenuType() != MENUTYPE_TEXT_VALUE) return 0;
 	TextMenuItem* txtItem = reinterpret_cast<TextMenuItem*>(item);
 
 	switch (mode) {
 	case RENDERFN_VALUE: {
 		buffer[0] = 0;
+		row--;
 		for (int i = 0; i < txtItem->textLength(); ++i) {
-			if ((i + 1) == row) appendChar(buffer, '[', bufferSize);
+			if (i == row) appendChar(buffer, '[', bufferSize);
 			appendChar(buffer, txtItem->getTextValue()[i], bufferSize);
-			if ((i + 1) == row) appendChar(buffer, ']', bufferSize);
+			if (i == row) appendChar(buffer, ']', bufferSize);
 		}
 		return true;
 	}
-	case RENDERFN_GETPART: 
-		return (int)txtItem->getTextValue()[row - 1];
+	case RENDERFN_GETRANGE: {
+		// we only enter more rows if there isn't a null terminator
+		// but position 0 is always allowed for editing.
+		return (row > 1 && txtItem->getTextValue()[row - 1] == 0) ? 0 : 255;
+	}
 	case RENDERFN_SET_VALUE: {
-		txtItem->setCharValue(row - 1, buffer[0]);
-		return true;
+		int idx = row - 1;
+		return txtItem->setCharValue(idx, buffer[0]);
 	}
 	case RENDERFN_NAME: {
 		if (buffer) buffer[0] = 0;
 		return true;
 	}
-	case RENDERFN_GETRANGE: return 255;
+	case RENDERFN_GETPART:
+		return (int)txtItem->getTextValue()[row - 1];
 	}
 }

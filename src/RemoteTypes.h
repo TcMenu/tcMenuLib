@@ -81,6 +81,10 @@ enum AckResponseStatus {
 #define MSG_BOOT_FLOAT msgFieldToWord('B','F')
 /** Message type definition for remote status bootstrap message */
 #define MSG_BOOT_REMOTE msgFieldToWord('B','R')
+/** Message type definition for ip address field bootstrap */
+#define MSG_BOOT_IPADDRESS msgFieldToWord('B','I')
+/** Message type definition for runtime list bootstrap message */
+#define MSG_BOOT_REMOTE msgFieldToWord('B','L')
 /** Message type definition for value change message */
 #define MSG_CHANGE_INT msgFieldToWord('V', 'C')
 /** Message type defintion for a dialog change msg */
@@ -124,7 +128,14 @@ enum AckResponseStatus {
  * delta or incremental (for example menuVolume + 3) or absolulte (channel is now 2)
  */
 enum ChangeType: byte {
-	CHANGE_DELTA = 0, CHANGE_ABSOLUTE = 1
+	CHANGE_DELTA = 0, CHANGE_ABSOLUTE = 1, CHANGE_LIST = 2
+};
+
+/**
+ * Defines the filter that should be applied to values of multi edit menu items on the UI
+ */
+enum MultiEditWireType {
+	PLAIN_TEXT = 0, IP_ADDRESS = 1
 };
 
 /**

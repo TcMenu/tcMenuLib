@@ -70,7 +70,7 @@ bool EepromAuthenticatorManager::isAuthenticated(const char* connectionName, con
 }
 
 void EepromAuthenticatorManager::copyKeyNameToBuffer(int idx, char* buffer, int bufSize) {
-    if(idx < 0 || idx >= KEY_STORAGE_SIZE) {
+    if(idx < 0 || idx >= numberOfEntries) {
         buffer[0]=0;
         return;
     }
@@ -82,7 +82,7 @@ void EepromAuthenticatorManager::copyKeyNameToBuffer(int idx, char* buffer, int 
 void EepromAuthenticatorManager::resetAllKeys() {
     serdebugF("Resetting auth store");
     eeprom->write16(romStart, magicKey);
-    for(int i=0; i<KEY_STORAGE_SIZE;i++) {
+    for(int i=0; i<numberOfEntries;i++) {
         // we just zero the name and UUID first character, to clear it.
         eeprom->write8(eepromOffset(i), 0);
         eeprom->write8(eepromOffset(i) + CLIENT_DESC_SIZE, 0);
@@ -91,7 +91,7 @@ void EepromAuthenticatorManager::resetAllKeys() {
 
 int EepromAuthenticatorManager::findSlotFor(const char* name) {
     int emptySlot = -1;
-    for(int i=0;i<KEY_STORAGE_SIZE;i++) {
+    for(int i=0;i<numberOfEntries;i++) {
         uint8_t val = eeprom->read8(eepromOffset(i));
         if(emptySlot == -1 && val == 0) {
             // if there's an empty slot and we haven't got one, then record it.

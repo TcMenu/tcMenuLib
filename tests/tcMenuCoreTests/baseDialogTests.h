@@ -3,7 +3,13 @@
 
 #include <AUnit.h>
 #include <BaseDialog.h>
+#include <RemoteTypes.h>
+#include <RemoteConnector.h>
 
+//
+// test implementation of the dialog, just counts up the number of render calls.
+// and gives access to the button text.
+//
 class DialogTestImpl : public BaseDialog {
 private:
 	int renderCount;
@@ -32,9 +38,11 @@ public:
 
 const char myHeader[] = "Hello";
 ButtonType lastPressedBtn = BTNTYPE_NONE;
+void* copyOfUserData;
 
-void dialogTestCallback(ButtonType buttonPressed, void* /*yourData*/) {
+void dialogTestCallback(ButtonType buttonPressed, void* yourData) {
 	lastPressedBtn = buttonPressed;
+	copyOfUserData = yourData;
 }
 
 test(testBaseDialogInfo) {
@@ -70,6 +78,7 @@ test(testBaseDialogInfo) {
 test(testBaseDialogQuestion) {
 	NoRenderer noRenderer;
 	DialogTestImpl dialog(false);
+	dialog.setUserData((void*)myHeader);
 	dialog.setButtons(BTNTYPE_OK, BTNTYPE_CANCEL);
 	dialog.show(myHeader, true, dialogTestCallback); // can send remote, has callback.
 	dialog.copyIntoBuffer("buffer text");
@@ -109,6 +118,7 @@ test(testBaseDialogQuestion) {
 	// and now simulate the remote cancelling
 	dialog.remoteAction(BTNTYPE_CANCEL);
 	assertEqual(BTNTYPE_CANCEL, lastPressedBtn);
+	assertEqual(myHeader, copyOfUserData);
 
 	// it should not be in use after this.
 	assertFalse(dialog.isInUse());
