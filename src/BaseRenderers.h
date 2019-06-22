@@ -176,17 +176,11 @@ public:
  * Used by renderers to determine how significant a redraw is needed at the next redraw interval.
  * They are prioritised in ascending order, so a more complete redraw has a higher number.
  */
-enum MenuRedrawState : byte {
+enum MenuRedrawState: byte {
 	MENUDRAW_NO_CHANGE = 0, MENUDRAW_EDITOR_CHANGE, MENUDRAW_COMPLETE_REDRAW
 };
 
-/**
- * Used by the base renderer, to indicate if you want text formatted left or right justified in
- * the buffer.
- */
-enum MenuDrawJustification: byte {
-	JUSTIFY_TEXT_LEFT, JUSTIFY_TEXT_RIGHT
-};
+enum MenuDrawJustification: byte { JUSTIFY_TEXT_LEFT, JUSTIFY_TEXT_RIGHT };
 
 /**
  * A renderer that does nothing, for cases where there's no display
@@ -388,8 +382,6 @@ private:
 	void menuValueAnalog(AnalogMenuItem* item, MenuDrawJustification justification);
 	void menuValueEnum(EnumMenuItem* item, MenuDrawJustification justification);
 	void menuValueBool(BooleanMenuItem* item, MenuDrawJustification justification);
-	void menuValueExec(MenuItem* item, MenuDrawJustification justification);
-	void menuValueBack(BackMenuItem* item, MenuDrawJustification justification);
 	void menuValueRuntime(RuntimeMenuItem* item, MenuDrawJustification justification);
 	void menuValueFloat(FloatMenuItem* item, MenuDrawJustification justification);
 };

@@ -13,42 +13,21 @@
 
 #include "MenuItems.h"
 
-/**
- * this is used in the redering function to indicate what needs to be done in this call.
- */
-enum RenderFnMode : byte {
-	/** render the current value for the item provided */
-	RENDERFN_VALUE,
-	/** render the name part into the buffer */
-	RENDERFN_NAME,
-	/** the callback has been triggered */
-	RENDERFN_INVOKE,
-	/** A new value for a position in the list, provided in buffer, it's length is in size. - used only in editable mode */
-	RENDERFN_SET_VALUE,
-	/** Gets the range zero based, for this part - used only in editable mode */
-	RENDERFN_GETRANGE,
-	/** Gets the integer value of the current part that is being edited */
-	RENDERFN_GETPART
-};
+/** For items that dont need to have the same id each time (such as back menu items), we just randomly give them an ID */
+#define RANDOM_ID_START 50000
 
-/**
- * When implementing runtime menu items, they need to have a render function that is called for
- * to obtain the name and value for each row, and should populate the buffer with appropriate 
- * text.
- *
- * @param item the menu item that is being drawn
- * @param row the row in the list of items that is being drawn
- * @param mode one of the RenderFnMode enumerations indicating what you need to do.
- * @param buffer the buffer to copy into
- * @param bufferSize the size of the buffer available.
- */
-typedef int (*RuntimeRenderingFn)(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
+/** For items that dont need to have the same id each time (such as back menu items), we just randomly give them an ID */
+int nextRandomId();
 
 /** This is the standard renderering function used for editable text items, for use with TextMenuItem */
 int textItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
 
 /** This is the standard rendering function used for editable IP addresses, for use with IpAddressMenuItem */
 int ipAddressRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
+
+/** The default rendering function for back menu items */
+int backSubItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
+
 
 /**
  * A menu item that can be defined at runtime and needs no additional structures. This represents a single value in terms of
@@ -59,12 +38,10 @@ int ipAddressRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, cha
 class RuntimeMenuItem : public MenuItem {
 protected:
 	uint16_t id;
-	uint16_t eeprom;
-	RuntimeRenderingFn renderFn;
 	uint8_t itemPosition;
 	uint8_t noOfParts;
 public:
-	RuntimeMenuItem(MenuType menuType, uint16_t id, uint16_t eeprom, RuntimeRenderingFn renderFn, 
+	RuntimeMenuItem(MenuType menuType, uint16_t id, RuntimeRenderingFn renderFn, 
 				    uint8_t itemPosition, uint8_t numberOfRows, MenuItem* next = NULL);
 	
 	void copyValue(char* buffer, int bufferSize) {
@@ -73,10 +50,37 @@ public:
 
 	void runCallback() { renderFn(this, itemPosition, RENDERFN_INVOKE, NULL, 0); }
 	int getRuntimeId() { return id; }
-	int getRuntimeEeprom() { return eeprom; }
+	int getRuntimeEeprom() { return renderFn(this, itemPosition, RENDERFN_EEPROM_POS, NULL, 0); }
 	uint8_t getNumberOfParts() { return noOfParts; }
 	void copyRuntimeName(char* buffer, int bufferSize) { renderFn(this, itemPosition, RENDERFN_NAME, buffer, bufferSize); }
 };
+
+/**
+ * Back menu item pairs with an associated SubMenuItem, it only exists in the embedded domain - not the API.
+ * This type is always the first item in a series of items for a submenu. It provides the functionality required
+ * to get back to root.
+ *
+ * For example
+ *
+ * 		SubMenu.getChild() -> Back Menu Item -> Sub Menu Item 1 ...
+ */
+class BackMenuItem : public RuntimeMenuItem {
+private:
+	MenuItem* child;
+public:
+	/**
+	 * Create an instance of the class
+	 *
+	 * @param nextChild the next menu in the chain if there is one, or NULL.
+	 * @param parentInfo the parent AnyMenuInfo block to be used for name etc.
+	 */
+	BackMenuItem(RuntimeRenderingFn renderFn, MenuItem* next) 
+		: RuntimeMenuItem(MENUTYPE_BACK_VALUE, nextRandomId(), renderFn, 0, 1, next) { }
+
+
+};
+
+#define LIST_PARENT_ITEM_POS 0xff
 
 /**
  * A menu item that represents a list of items and can be defined at runtime. This takes an ID that 
@@ -88,16 +92,32 @@ public:
  * These are the only menu items that can presently be created dynamically at runtime.
  */
 class ListRuntimeMenuItem : public RuntimeMenuItem {
+private:
+	uint8_t activeItem;
 public:
 	ListRuntimeMenuItem(uint16_t id, int numberOfRows, RuntimeRenderingFn renderFn, MenuItem* next = NULL);
 
 	RuntimeMenuItem* getChildItem(int pos) {
+		menuType = MENUTYPE_RUNTIME_LIST;
 		itemPosition = (pos < noOfParts) ? pos : 0xff;
+		setActive(activeItem == pos);
 		return this;
 	}
 
+	void setActiveIndex(uint8_t idx) { 
+		activeItem = idx; 
+		setChanged(true);
+	}
+
 	RuntimeMenuItem* asParent() { 
-		itemPosition = 0xff;
+		menuType = MENUTYPE_RUNTIME_LIST;
+		itemPosition = LIST_PARENT_ITEM_POS;
+		return this;
+	}
+
+	RuntimeMenuItem* asBackMenu() {
+		menuType = MENUTYPE_BACK_VALUE;
+		itemPosition = LIST_PARENT_ITEM_POS;
 		return this;
 	}
 
@@ -116,8 +136,8 @@ template<class V> class EditableMultiPartMenuItem : public RuntimeMenuItem {
 protected:
 	V data;
 public:
-	EditableMultiPartMenuItem(MenuType type, uint16_t id, uint16_t eeprom, int numberOfParts, RuntimeRenderingFn renderFn, MenuItem* next = NULL) 
-			: RuntimeMenuItem(type, id, eeprom, renderFn, 0, numberOfParts, next) {
+	EditableMultiPartMenuItem(MenuType type, uint16_t id, int numberOfParts, RuntimeRenderingFn renderFn, MenuItem* next = NULL) 
+			: RuntimeMenuItem(type, id, renderFn, 0, numberOfParts, next) {
 	}
 
 	uint8_t beginMultiEdit() {
@@ -167,8 +187,8 @@ public:
  */
 class TextMenuItem : public EditableMultiPartMenuItem<char*> {
 public:
-	TextMenuItem(RuntimeRenderingFn customRenderFn, uint16_t id, uint16_t eeprom, int size, MenuItem* next = NULL)
-		: EditableMultiPartMenuItem(MENUTYPE_TEXT_VALUE, id, eeprom, size, customRenderFn, next) {
+	TextMenuItem(RuntimeRenderingFn customRenderFn, uint16_t id, int size, MenuItem* next = NULL)
+		: EditableMultiPartMenuItem(MENUTYPE_TEXT_VALUE, id, size, customRenderFn, next) {
 		data = new char[size];
 		memset(data, 0, size);
 	}
@@ -198,8 +218,8 @@ private:
  */
 class IpAddressMenuItem : public EditableMultiPartMenuItem<byte[4]> {
 public:
-	IpAddressMenuItem(RuntimeRenderingFn renderFn, uint16_t id, uint16_t eeprom, MenuItem* next = NULL)
-		: EditableMultiPartMenuItem(MENUTYPE_IPADDRESS, id, eeprom, 4, renderFn, next) {
+	IpAddressMenuItem(RuntimeRenderingFn renderFn, uint16_t id, MenuItem* next = NULL)
+		: EditableMultiPartMenuItem(MENUTYPE_IPADDRESS, id, 4, renderFn, next) {
 		setIpAddress(127, 0, 0, 1);
 	}
 
@@ -230,15 +250,18 @@ public:
  * a parent function for the type in question, the variable containing the progmem name and the call back method
  * or NULL if there's no callback.
  */
-#define RENDERING_CALLBACK_NAME_INVOKE(fnName, parent, namepgm, invoke) \
+#define RENDERING_CALLBACK_NAME_INVOKE(fnName, parent, namepgm, eepromPosition, invoke) \
+const char fnName##Pgm[] PROGMEM = namepgm; \
 int fnName(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int buffSize) { \
 	switch(mode) { \
 	case RENDERFN_NAME: \
-		safeProgCpy(buffer, namepgm, buffSize); \
+		safeProgCpy(buffer, fnName##Pgm, buffSize); \
 		return true; \
 	case RENDERFN_INVOKE: \
 		if(invoke) (reinterpret_cast<MenuCallbackFn>(invoke))(int(item->getId())); \
 		return true; \
+	case RENDERFN_EEPROM_POS: \
+		return eepromPosition; \
 	default: \
 		return parent(item, row, mode, buffer, buffSize); \
 	} \

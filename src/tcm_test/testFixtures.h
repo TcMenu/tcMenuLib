@@ -28,23 +28,26 @@ FloatMenuItem menuFloatItem(&minfoFloatItem, NULL);
 const PROGMEM AnyMenuInfo minfoPressMe = { "Press Me", 101, 0xffff, 0, PRESSMECALLBACK };
 ActionMenuItem menuPressMe(&minfoPressMe, &menuFloatItem);
 
+RENDERING_CALLBACK_NAME_INVOKE(backSubSecondLevelFn, backSubItemRenderFn, "Second Level", 0xffff, NULL)
+BackMenuItem menuBackSecondLevel(backSubSecondLevelFn, &menuPressMe);
 const PROGMEM SubMenuInfo minfoSecondLevel = { "SecondLevel", 100, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackSecondLevel(&menuPressMe, (const AnyMenuInfo*)&minfoSecondLevel);
 SubMenuItem menuSecondLevel(&minfoSecondLevel, &menuBackSecondLevel, &menuCaseTemp);
 
 const PROGMEM AnalogMenuInfo minfoRHSTemp = { "R HS Temp", 8, 0xffff, 255, NO_CALLBACK, 0, 2, "C" };
 AnalogMenuItem menuRHSTemp(&minfoRHSTemp, 0, &menuSecondLevel);
 const PROGMEM AnalogMenuInfo minfoLHSTemp = { "L HS Temp", 7, 0xffff, 255, NO_CALLBACK, 0, 2, "C" };
 AnalogMenuItem menuLHSTemp(&minfoLHSTemp, 0, &menuRHSTemp);
+RENDERING_CALLBACK_NAME_INVOKE(backSubStatusFn, backSubItemRenderFn, "Status", 0xffff, NULL)
+BackMenuItem menuBackStatus(backSubStatusFn, &menuLHSTemp);
 const PROGMEM SubMenuInfo minfoStatus = { "Status", 5, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackStatus(&menuLHSTemp, (const AnyMenuInfo*)&minfoStatus);
 SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, NULL);
 const PROGMEM AnalogMenuInfo minfoContrast = { "Contrast", 10, 6, 255, NO_CALLBACK, 0, 2, "" };
 AnalogMenuItem menuContrast(&minfoContrast, 0, NULL);
 const PROGMEM BooleanMenuInfo minfo12VStandby = { "12V Standby", 4, 0xffff, 1, NO_CALLBACK, NAMING_YES_NO };
 BooleanMenuItem menu12VStandby(&minfo12VStandby, false, &menuContrast);
+RENDERING_CALLBACK_NAME_INVOKE(backSubSettingsFn, backSubItemRenderFn, "Settings", 0xffff, NULL)
+BackMenuItem menuBackSettings(backSubSettingsFn, &menu12VStandby);
 const PROGMEM SubMenuInfo minfoSettings = { "Settings", 3, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackSettings(&menu12VStandby, (const AnyMenuInfo*)&minfoSettings);
 SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, &menuStatus);
 const char enumStrChannel_0[] PROGMEM = "CD Player";
 const char enumStrChannel_1[] PROGMEM = "Turntable";

@@ -35,15 +35,13 @@ int testRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* bu
 	return true;
 }
 
-const char textAddressNmPgm[] PROGMEM = "Text";
-RENDERING_CALLBACK_NAME_INVOKE(textRenderingFunction, textItemRenderFn, textAddressNmPgm, NULL)
-TextMenuItem textItem(textRenderingFunction, 10003, 0xffff, 10, NULL);
+RENDERING_CALLBACK_NAME_INVOKE(textRenderingFunction, textItemRenderFn, "Text", 0xffff, NULL)
+TextMenuItem textItem(textRenderingFunction, 10003, 10, NULL);
 
-const char ipAddressNmPgm[] PROGMEM = "IpAddr";
-RENDERING_CALLBACK_NAME_INVOKE(ipRenderingFunction, ipAddressRenderFn, ipAddressNmPgm, NULL)
-IpAddressMenuItem ipItem(ipRenderingFunction, 10002, 0xffff, &textItem);
+RENDERING_CALLBACK_NAME_INVOKE(ipRenderingFunction, ipAddressRenderFn, "IpAddr", 0xffff, NULL)
+IpAddressMenuItem ipItem(ipRenderingFunction, 10002, &textItem);
 
-RuntimeMenuItem runtimeItem(MENUTYPE_RUNTIME_VALUE, 10001, 0xffff, testRenderFn, 99, 1, &ipItem);
+RuntimeMenuItem runtimeItem(MENUTYPE_RUNTIME_VALUE, 10001, testRenderFn, 99, 1, &ipItem);
 
 ListRuntimeMenuItem listItem(10000, 3, testRenderFn, &runtimeItem);
 
@@ -55,6 +53,7 @@ void setup() {
 
     lcd.setIoAbstraction(io23017);
     lcd.begin(20, 4);
+	renderer.setEditorChars(0x7f, 0x7e, 0xf6);
   
     switches.initialise(io23017, true);
 	menuMgr.initForEncoder(&renderer, &menuVolume, 6, 7, 5);

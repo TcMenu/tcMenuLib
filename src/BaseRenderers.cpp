@@ -99,11 +99,9 @@ void BaseMenuRenderer::menuValueToText(MenuItem* item,	MenuDrawJustification jus
 		break;
 	case MENUTYPE_SUB_VALUE:
 	case MENUTYPE_ACTION_VALUE:
-		menuValueExec((MenuItem*)item, justification);
+		if (justification == JUSTIFY_TEXT_LEFT) buffer[0] = 0;
 		break;
 	case MENUTYPE_BACK_VALUE:
-		menuValueBack((BackMenuItem*)item, justification);
-		break;
 	case MENUTYPE_TEXT_VALUE:
 	case MENUTYPE_IPADDRESS:
 	case MENUTYPE_RUNTIME_LIST:
@@ -184,8 +182,6 @@ const char YES_STR[] PGM_TCM  = "YES";
 const char NO_STR[] PGM_TCM   = " NO";
 const char TRUE_STR[] PGM_TCM = " TRUE";
 const char FALSE_STR[] PGM_TCM= "FALSE";
-const char SUB_STR[] PGM_TCM  = "->>>";
-const char BACK_MENU_NAME[] PGM_TCM  = "[Back]";
 
 void BaseMenuRenderer::menuValueBool(BooleanMenuItem* item, MenuDrawJustification justification) {
 	BooleanNaming naming = item->getBooleanNaming();
@@ -209,24 +205,6 @@ void BaseMenuRenderer::menuValueBool(BooleanMenuItem* item, MenuDrawJustificatio
 		uint8_t len = safeProgStrLen(val);
         if(len > bufferSize) len = bufferSize;
 		safeProgCpy(buffer + (bufferSize - len), val, bufferSize);
-	}
-}
-
-void BaseMenuRenderer::menuValueExec(MenuItem* /*item*/, MenuDrawJustification justification) {
-	if(justification == JUSTIFY_TEXT_LEFT) {
-		safeProgCpy(buffer, SUB_STR, bufferSize);
-	}
-	else {
-		safeProgCpy(buffer + (bufferSize - 4), SUB_STR, bufferSize);
-	}
-}
-
-void BaseMenuRenderer::menuValueBack(BackMenuItem* /*item*/, MenuDrawJustification justification) {
-	if(justification == JUSTIFY_TEXT_LEFT) {
-		safeProgCpy(buffer, BACK_MENU_NAME, bufferSize);
-	}
-	else {
-		safeProgCpy(buffer + (bufferSize - 6), BACK_MENU_NAME, bufferSize);
 	}
 }
 
@@ -287,7 +265,12 @@ void BaseMenuRenderer::prepareNewSubmenu(MenuItem* newItems) {
 	currentRoot = newItems;
 	currentRoot->setActive(true);
 
-	menuMgr.setItemsInCurrentMenu(itemCount(newItems) - 1);
+	if (newItems->getMenuType() == MENUTYPE_RUNTIME_LIST) {
+		menuMgr.setItemsInCurrentMenu(reinterpret_cast<ListRuntimeMenuItem*>(newItems)->getNumberOfParts() - 1);
+	}
+	else {
+		menuMgr.setItemsInCurrentMenu(itemCount(newItems) - 1);
+	}
 	redrawRequirement(MENUDRAW_COMPLETE_REDRAW);
 }
 
@@ -372,9 +355,13 @@ void BaseMenuRenderer::onSelectPressed(MenuItem* toEdit) {
     // the current editor (if it's possible to edit that value)
 	if(toEdit != NULL) {
 		if (toEdit->getMenuType() == MENUTYPE_SUB_VALUE) {
-			toEdit->setActive(false);
+			SubMenuItem* sub = reinterpret_cast<SubMenuItem*>(toEdit);
+			sub->setActive(false);
            	getParentAndReset();
-			prepareNewSubmenu(((SubMenuItem*)toEdit)->getChild());
+			prepareNewSubmenu(sub->getChild());
+		}
+		else if (toEdit->getMenuType() == MENUTYPE_RUNTIME_LIST) {
+			prepareNewSubmenu(toEdit);
 		}
 		else if (toEdit->getMenuType() == MENUTYPE_BACK_VALUE) {
 			toEdit->setActive(false);

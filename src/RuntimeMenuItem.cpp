@@ -7,19 +7,23 @@
 #include <IoLogging.h>
 #include "RuntimeMenuItem.h"
 
-const AnyMenuInfo runtimeBlankInfo PROGMEM = { "", 0xffff, 0xffff, 0, NULL };
+static uint16_t nextAvailableRandomId = RANDOM_ID_START;
 
-RuntimeMenuItem::RuntimeMenuItem(MenuType menuType, uint16_t id, uint16_t eeprom, RuntimeRenderingFn renderFn,
-	uint8_t itemPosition, uint8_t numberOfRows, MenuItem* next = NULL)	: MenuItem(menuType, &runtimeBlankInfo, next) {
+int nextRandomId() {
+	return nextAvailableRandomId++;
+}
+
+RuntimeMenuItem::RuntimeMenuItem(MenuType menuType, uint16_t id, RuntimeRenderingFn renderFn,
+	uint8_t itemPosition, uint8_t numberOfRows, MenuItem* next = NULL)	: MenuItem(menuType, NULL, next) {
 	this->id = id;
 	this->noOfParts = numberOfRows;
-	this->eeprom = eeprom;
 	this->renderFn = renderFn;
 	this->itemPosition = itemPosition;
 }
 
 ListRuntimeMenuItem::ListRuntimeMenuItem(uint16_t id, int numberOfRows, RuntimeRenderingFn renderFn, MenuItem* next = NULL)
-	: RuntimeMenuItem(MENUTYPE_RUNTIME_LIST, id, 0xffff, renderFn, 0xff, numberOfRows, next) {
+	: RuntimeMenuItem(MENUTYPE_RUNTIME_LIST, id, renderFn, 0xff, numberOfRows, next) {
+	activeItem = 0xff;
 }
 
 void TextMenuItem::setTextValue(const char* text, bool silent) {
@@ -83,10 +87,19 @@ int ipAddressRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, cha
 	}
 	case RENDERFN_GETRANGE: return 255;
 	}
+	return false;
+}
+
+int backSubItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
+	switch (mode) {
+	case RENDERFN_VALUE:
+		buffer[0] = 0;
+		return true;
+	}
+	return false;
 }
 
 int textItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
-	serdebugF4("Rendering text item", row, mode, bufferSize);
 	if (item->getMenuType() != MENUTYPE_TEXT_VALUE) return 0;
 	TextMenuItem* txtItem = reinterpret_cast<TextMenuItem*>(item);
 
@@ -95,16 +108,21 @@ int textItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char
 		buffer[0] = 0;
 		row--;
 		for (int i = 0; i < txtItem->textLength(); ++i) {
+			char txtVal = txtItem->getTextValue()[i];
+
 			if (i == row) appendChar(buffer, '[', bufferSize);
-			appendChar(buffer, txtItem->getTextValue()[i], bufferSize);
+			appendChar(buffer, txtVal, bufferSize);
 			if (i == row) appendChar(buffer, ']', bufferSize);
+
+			if (!txtVal) break;
 		}
 		return true;
 	}
 	case RENDERFN_GETRANGE: {
 		// we only enter more rows if there isn't a null terminator
 		// but position 0 is always allowed for editing.
-		return (row > 1 && txtItem->getTextValue()[row - 1] == 0) ? 0 : 255;
+		int idx = row - 1;
+		return (idx > 1 && txtItem->getTextValue()[idx - 1] == 0) ? 0 : 255;
 	}
 	case RENDERFN_SET_VALUE: {
 		int idx = row - 1;
@@ -117,4 +135,5 @@ int textItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char
 	case RENDERFN_GETPART:
 		return (int)txtItem->getTextValue()[row - 1];
 	}
+	return false;
 }

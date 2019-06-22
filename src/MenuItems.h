@@ -19,6 +19,9 @@
 
 #include "tcUtil.h"
 
+/** The maxmimum ID that is allowed manually, only automated ID's for back items and similar will exceed this */
+#define MAXIMUM_ID_ALLOWED 32000
+
 /** the size of each name in program memory */
 #define NAME_SIZE_T 20
 
@@ -228,21 +231,57 @@ enum MenuType : byte {
 	MENUTYPE_BOOLEAN_VALUE = 3,
 	/** item is of type SubMenuItem */
 	MENUTYPE_SUB_VALUE = 100,
-	/** item is of type BackMenuItem */
-	MENUTYPE_BACK_VALUE = 101,
 	/** item is of type FloatMenuItem */
-	MENUTYPE_FLOAT_VALUE = 102,
+	MENUTYPE_FLOAT_VALUE = 101,
 	/** item is of type ActionMenuItem */
-	MENUTYPE_ACTION_VALUE = 103,
+	MENUTYPE_ACTION_VALUE = 102,
 	/** item is a single item of type RuntimeMenuItem */
 	MENUTYPE_RUNTIME_VALUE = 150,
 	/** item is a list, of type MultiRuntimeMenuItem */
 	MENUTYPE_RUNTIME_LIST = 151,
+	/** item is of type BackMenuItem */
+	MENUTYPE_BACK_VALUE = 152,
 	/** item is of type TextMenuItem */
 	MENUTYPE_TEXT_VALUE = 200,
 	/** item is an IP address and is editable per segment */
 	MENUTYPE_IPADDRESS = 201
 };
+
+/**
+ * this is used in the redering function to indicate what needs to be done in this call.
+ */
+enum RenderFnMode : byte {
+	/** render the current value for the item provided */
+	RENDERFN_VALUE,
+	/** render the name part into the buffer */
+	RENDERFN_NAME,
+	/** Get the eeprom position in the returned int, buffer not needed */
+	RENDERFN_EEPROM_POS,
+	/** the callback has been triggered, buffer not needed */
+	RENDERFN_INVOKE,
+	/** A new value for a position in the list, provided in buffer, it's length is in size. - used only in editable mode */
+	RENDERFN_SET_VALUE,
+	/** Gets the range zero based, for this part - used only in editable mode, buffer not needed */
+	RENDERFN_GETRANGE,
+	/** Gets the integer value of the current part that is being edited, buffer not needed */
+	RENDERFN_GETPART
+};
+
+// forward reference
+class RuntimeMenuItem;
+
+/**
+ * When implementing runtime menu items, they need to have a render function that is called for
+ * to obtain the name and value for each row, and should populate the buffer with appropriate
+ * text.
+ *
+ * @param item the menu item that is being drawn
+ * @param row the row in the list of items that is being drawn
+ * @param mode one of the RenderFnMode enumerations indicating what you need to do.
+ * @param buffer the buffer to copy into
+ * @param bufferSize the size of the buffer available.
+ */
+typedef int(*RuntimeRenderingFn)(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
 
 /**
  * This is the base class of all menu items, containing functionality to hold the current state of the menu
@@ -257,7 +296,11 @@ class MenuItem {
 protected:
 	uint16_t flags;
 	MenuItem* next;
-	const AnyMenuInfo *info;
+	/** we only have either an info structure or a runtime menu callback function */
+	union {
+		const AnyMenuInfo *info;
+		RuntimeRenderingFn renderFn;
+	};
 	MenuType menuType;
 public:
 
@@ -458,26 +501,6 @@ public:
 	 * return the first child item
 	 */
 	MenuItem* getChild() { return child; }
-};
-
-/**
- * Back menu item pairs with an associated SubMenuItem, it only exists in the embedded domain - not the API.
- * This type is always the first item in a series of items for a submenu. It provides the functionality required
- * to get back to root.
- * 
- * For example
- * 
- * 		SubMenu.getChild() -> Back Menu Item -> Sub Menu Item 1 ...
- */
-class BackMenuItem : public MenuItem {
-public:
-	/**
-	 * Create an instance of the class
-	 * 
-	 * @param nextChild the next menu in the chain if there is one, or NULL.
-	 * @param parentInfo the parent AnyMenuInfo block to be used for name etc.
-	 */
-	BackMenuItem(MenuItem* nextChild, const AnyMenuInfo* parentInfo) : MenuItem(MENUTYPE_BACK_VALUE, parentInfo, nextChild) {;}
 };
 
 /**

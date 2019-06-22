@@ -120,6 +120,7 @@ enum AckResponseStatus {
 #define FIELD_BUTTON2     msgFieldToWord('B', '2')
 #define FIELD_BUFFER      msgFieldToWord('B', 'U')
 #define FIELD_MODE        msgFieldToWord('M', 'O')
+#define FIELD_EDIT_MODE   msgFieldToWord('E', 'M')
 
 #define FIELD_PREPEND_CHOICE 'C'
 
@@ -134,8 +135,12 @@ enum ChangeType: byte {
 /**
  * Defines the filter that should be applied to values of multi edit menu items on the UI
  */
-enum MultiEditWireType {
-	PLAIN_TEXT = 0, IP_ADDRESS = 1
+enum MultiEditWireType : byte {
+	EDITMODE_PLAIN_TEXT = 0, 
+	EDITMODE_IP_ADDRESS = 1,
+	EDITMODE_TIME_24H = 2,
+	EDITMODE_TIME_12H = 3,
+	EDITMODE_DATE_GREGORIAN = 4
 };
 
 /**

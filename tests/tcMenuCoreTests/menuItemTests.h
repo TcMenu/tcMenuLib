@@ -3,6 +3,9 @@
 
 #include <AUnit.h>
 #include <RuntimeMenuItem.h>
+#include <RemoteMenuItem.h>
+#include <RemoteAuthentication.h>
+#include <tcm_test/testFixtures.h>
 #include <tcUtil.h>
 
 bool renderActivateCalled = false;
@@ -22,6 +25,8 @@ int testBasicRuntimeFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, ch
 	case RENDERFN_VALUE:
 		ltoaClrBuff(buffer, row, row, NOT_PADDED, bufferSize);
 		break;
+	case RENDERFN_EEPROM_POS:
+		return 44;
 	case RENDERFN_INVOKE:
 		renderActivateCalled = true;
 		break;
@@ -30,7 +35,7 @@ int testBasicRuntimeFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, ch
 }
 
 test(testBasicRuntimeMenuItem) {
-	RuntimeMenuItem item(MENUTYPE_RUNTIME_VALUE, 22, 44, testBasicRuntimeFn, 222, NULL);
+	RuntimeMenuItem item(MENUTYPE_RUNTIME_VALUE, 22, testBasicRuntimeFn, 222, NULL);
 
 	assertEqual(item.getId(), uint16_t(22));
 	assertEqual(item.getEepromPosition(), uint16_t(44));
@@ -47,43 +52,110 @@ test(testBasicRuntimeMenuItem) {
 
 test(testListRuntimeItem) {
 	ListRuntimeMenuItem item(22, 2, testBasicRuntimeFn, NULL);
-	RuntimeMenuItem* parent = item.asParent();
-	assertEqual(parent->getId(), uint16_t(22));
-	assertEqual(parent->getEepromPosition(), uint16_t(0xffff));
 
 	// check the name and test on the "top level" or parent item
 	char sz[20];
-	parent->copyNameToBuffer(sz, sizeof(sz));
-	assertStringCaseEqual("hello", sz);
-	parent->copyValue(sz, sizeof(sz));
-	assertStringCaseEqual("255", sz);
 
 	// ensure there are two parts
 	assertEqual(uint8_t(2), item.getNumberOfParts());
 
 	RuntimeMenuItem* child = item.getChildItem(0);
+	assertEqual(MENUTYPE_RUNTIME_LIST, child->getMenuType());
 	child->copyNameToBuffer(sz, sizeof(sz));
 	assertStringCaseEqual("name0", sz);
 	child->copyValue(sz, sizeof(sz));
 	assertStringCaseEqual("0", sz);
 
 	child = item.getChildItem(1);
+	assertEqual(MENUTYPE_RUNTIME_LIST, child->getMenuType());
 	child->copyNameToBuffer(sz, sizeof(sz));
 	assertStringCaseEqual("name1", sz);
 	child->copyValue(sz, sizeof(sz));
 	assertStringCaseEqual("1", sz);
+
+	RuntimeMenuItem* back = item.asBackMenu();
+	assertEqual(MENUTYPE_BACK_VALUE, back->getMenuType());
+
+	RuntimeMenuItem* parent = item.asParent();
+	assertEqual(MENUTYPE_RUNTIME_LIST, back->getMenuType());
+	assertEqual(parent->getId(), uint16_t(22));
+	assertEqual(parent->getEepromPosition(), uint16_t(44));
+	parent->copyNameToBuffer(sz, sizeof(sz));
+	assertStringCaseEqual("hello", sz);
+	item.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("255", sz);
 }
 
 void renderCallback(int id) {
 	renderActivateCalled = true;
 }
 
-const char helloWorldPgm[] PROGMEM = "HelloWorld";
+RENDERING_CALLBACK_NAME_INVOKE(textMenuItemTestCb, textItemRenderFn, "HelloWorld", 99, renderCallback)
 
-RENDERING_CALLBACK_NAME_INVOKE(textMenuItemTestCb, textItemRenderFn, helloWorldPgm, renderCallback)
+test(testTextMenuItemFromEmpty) {
+	TextMenuItem textItem(textMenuItemTestCb, 33, 10, NULL);
+
+	// start off with an empty string
+	char sz[20];
+	textItem.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("", sz);
+
+	// ensure we can edit an empty string position
+	assertEqual(uint8_t(10), textItem.beginMultiEdit());
+	assertTrue(textItem.isEditing());
+	assertEqual(255, textItem.nextPart());
+	assertEqual(0, textItem.getPartValueAsInt());
+	textItem.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("[]", sz);
+
+	// add char to empty string
+	textItem.valueChanged(int('A'));
+	textItem.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("[A]", sz);
+
+	// add another char to empty string
+	assertEqual(255, textItem.nextPart());
+	textItem.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("A[]", sz);
+
+	textItem.valueChanged(int('B'));
+	textItem.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("A[B]", sz);
+
+	// add a last char and stop editing.
+	assertEqual(255, textItem.nextPart());
+	textItem.valueChanged(int('C'));
+	textItem.stopMultiEdit();
+	
+	// check that the edit worked ok
+	textItem.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("ABC", sz);
+
+	// now start editing again and clear down the string to zero terminated at position 0
+	assertEqual(uint8_t(10), textItem.beginMultiEdit());
+	assertEqual(255, textItem.nextPart());
+	textItem.valueChanged(0);
+	textItem.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("[]", sz);
+
+	// now put back to a character, the text after it should come back.
+	textItem.valueChanged(int('a'));
+	textItem.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("[a]BC", sz);
+
+	// now put back to blank.
+	textItem.valueChanged(0);
+	textItem.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("[]", sz);
+
+	// should be empty now
+	textItem.stopMultiEdit();
+	textItem.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("", sz);
+}
 
 test(testTextRuntimeItem) {
-	TextMenuItem textItem(textMenuItemTestCb, 33, 99, 10, NULL);
+	TextMenuItem textItem(textMenuItemTestCb, 33, 10, NULL);
 	textItem.setTextValue("Goodbye");
 
 	assertEqual(textItem.getId(), uint16_t(33));
@@ -123,6 +195,7 @@ test(testTextRuntimeItem) {
 	assertEqual(255, textItem.nextPart());
 	textItem.copyValue(sz, sizeof(sz));
 	assertStringCaseEqual("0o1[d]bye", sz);
+
 	assertFalse(renderActivateCalled);
 	textItem.stopMultiEdit();
 	assertTrue(renderActivateCalled);
@@ -132,10 +205,10 @@ test(testTextRuntimeItem) {
 
 }
 
-RENDERING_CALLBACK_NAME_INVOKE(ipMenuItemTestCb, ipAddressRenderFn, helloWorldPgm, NULL)
+RENDERING_CALLBACK_NAME_INVOKE(ipMenuItemTestCb, ipAddressRenderFn, "HelloWorld", 102, NULL)
 
 test(testIpAddressItem) {
-	IpAddressMenuItem ipItem(ipMenuItemTestCb, 2039, 102, NULL);
+	IpAddressMenuItem ipItem(ipMenuItemTestCb, 2039, NULL);
 	ipItem.setIpAddress(192U, 168U, 0U, 96U);
 
 	assertEqual(ipItem.getId(), uint16_t(2039));
@@ -169,6 +242,11 @@ test(testIpAddressItem) {
 	ipItem.copyValue(sz, sizeof(sz));
 	assertStringCaseEqual("192.168.2.201", sz);
 	assertFalse(ipItem.isEditing());
+
+	assertTrue(isMenuRuntime(&ipItem));
+	assertFalse(isMenuBasedOnValueItem(&ipItem));
+	assertTrue(isMenuRuntimeMultiEdit(&ipItem));
+
 }
 
 test(testCoreAndBooleanMenuItem) {
@@ -223,6 +301,9 @@ test(testCoreAndBooleanMenuItem) {
 }
 
 test(testAnalogEnumMenuItem) {
+	assertEqual(MENUTYPE_ENUM_VALUE, menuEnum1.getMenuType());
+	assertEqual(MENUTYPE_INT_VALUE, menuAnalog.getMenuType());
+
 	char sz[10];
 	// try getting all the strings.
 	menuEnum1.copyEnumStrToBuffer(sz, sizeof(sz), 0);
@@ -250,6 +331,55 @@ test(testAnalogEnumMenuItem) {
 
 	menuAnalog.setCurrentValue(192);
 	assertEqual(192U, menuAnalog.getCurrentValue());
+}
+
+test(testFloatAndActionTypes) {
+	menuFloatItem.clearSendRemoteNeededAll();
+	menuFloatItem.setChanged(false);
+	menuFloatItem.setFloatValue(1.001);
+	assertNear(1.001, menuFloatItem.getFloatValue(), 0.0001);
+	assertTrue(menuFloatItem.isChanged());
+	assertTrue(menuFloatItem.isSendRemoteNeeded(0));
+	assertEqual(4, menuFloatItem.getDecimalPlaces());
+
+	assertFalse(isMenuRuntime(&menuFloatItem));
+	assertFalse(isMenuBasedOnValueItem(&menuFloatItem));
+	assertFalse(isMenuRuntimeMultiEdit(&menuFloatItem));
+}
+
+test(testAuthMenuItem) {
+	EepromAuthenticatorManager auth;
+	auth.initialise(&eeprom, 20);
+	auth.addAdditionalUUIDKey("uuid1", uuid1);
+	auth.addAdditionalUUIDKey("uuid2", uuid2);
+
+	EepromAuthenicationInfoMenuItem menuItem(2002, &auth, NULL);
+	RuntimeMenuItem *itm = menuItem.asParent();
+	char sz[20];
+	itm->copyNameToBuffer(sz, sizeof(sz));
+	assertStringCaseEqual("Authorised Keys", sz);
+	itm->copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("->", sz);
+
+	assertEqual(uint8_t(6), itm->getNumberOfParts());
+
+	itm = menuItem.getChildItem(0);
+	itm->copyNameToBuffer(sz, sizeof(sz));
+	assertStringCaseEqual("uuid1", sz);
+	itm->copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("Remove", sz);
+
+	itm = menuItem.getChildItem(1);
+	itm->copyNameToBuffer(sz, sizeof(sz));
+	assertStringCaseEqual("uuid2", sz);
+
+	itm = menuItem.getChildItem(2);
+	itm->copyNameToBuffer(sz, sizeof(sz));
+	assertStringCaseEqual("", sz);
+
+	assertTrue(isMenuRuntime(&menuItem));
+	assertFalse(isMenuBasedOnValueItem(&menuItem));
+	assertFalse(isMenuRuntimeMultiEdit(&menuItem));
 
 }
 

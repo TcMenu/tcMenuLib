@@ -7,8 +7,9 @@
 const PGM_TCM AnalogMenuInfo minfoAnalogSub = { "SubAnalog", 10, 20, 255, NO_CALLBACK, 0, 1, "SU" };
 AnalogMenuItem menuSubAnalog(&minfoAnalogSub, 0, NULL);
 
+RENDERING_CALLBACK_NAME_INVOKE(backSubFixturesFn, backSubItemRenderFn, "Settings", 0xffff, NULL)
+BackMenuItem menuBackSub(backSubFixturesFn, &menuSubAnalog);
 const PGM_TCM SubMenuInfo minfoSub = { "Settings", 7, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackSub(&menuSubAnalog, (const AnyMenuInfo*)&minfoSub);
 SubMenuItem menuSub(&minfoSub, &menuBackSub, NULL);
 
 const PGM_TCM AnalogMenuInfo minfoAnalog = { "Analog", 1, 2, 255, NO_CALLBACK, 0, 1, "AB" };
@@ -32,8 +33,7 @@ void testCallback(int id) {
 const PGM_TCM BooleanMenuInfo boolMenu1 = {"Bool1", 4, 8, 1, testCallback, NAMING_TRUE_FALSE };
 BooleanMenuItem boolItem1(&boolMenu1, false, &menuEnum1);
 
-const char textNamePgm[] PROGMEM = "Text1";
-RENDERING_CALLBACK_NAME_INVOKE(textMenuItem1Callback, textItemRenderFn, textNamePgm, NULL)
-TextMenuItem textMenuItem1(textMenuItem1Callback, 5, 9, 10, &boolItem1);
+RENDERING_CALLBACK_NAME_INVOKE(textMenuItem1Callback, textItemRenderFn, "Text1", 9, NULL)
+TextMenuItem textMenuItem1(textMenuItem1Callback, 5, 10, &boolItem1);
 
 #endif // defined

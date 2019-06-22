@@ -10,7 +10,7 @@
 MenuItem::MenuItem(MenuType menuType, const AnyMenuInfo* menuInfo, MenuItem* next) {
 	this->flags = 0;
 	this->menuType = menuType;
-	this->info = menuInfo;
+	if(menuInfo != NULL) this->info = menuInfo;
 	this->next = next;
     this->setChanged(true); // items always start out needing redrawing.
 }

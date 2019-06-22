@@ -8,21 +8,19 @@
 #include "tcUtil.h"
 #include "MenuIterator.h"
 
-MenuItem* recursiveFindRootVisit(MenuItem* currentMenu, MenuItem* toFind, MenuVisitorFn fn) {
-    MenuItem* currentRoot = currentMenu;
+MenuItem* recursiveFindParentRootVisit(MenuItem* currentMenu, MenuItem* toFind, MenuItem* parentRoot, MenuVisitorFn fn) {
     MenuItem* parent = NULL;
+	MenuItem* currentRoot = currentMenu;
 
     while(currentMenu != NULL) {
-        if(parent == NULL && currentMenu->getId() == toFind->getId()) {
-            parent = currentRoot;
+        if(currentMenu->getId() == toFind->getId()) {
+            parent = parentRoot;
         }
 
 		if(currentMenu->getMenuType() == MENUTYPE_SUB_VALUE) {
-			MenuItem *par = recursiveFindRootVisit(((SubMenuItem*)currentMenu)->getChild(), toFind, fn);
+			MenuItem *par = recursiveFindParentRootVisit(((SubMenuItem*)currentMenu)->getChild(), toFind, currentRoot, fn);
             // if the recursive operation found the parent.
-            if(parent == NULL && par != NULL) {
-                parent = par;
-            }
+            if(par) parent = par;
 		}
 
         if(fn) {
@@ -42,7 +40,7 @@ MenuItem* recursiveFindRootVisit(MenuItem* currentMenu, MenuItem* toFind, MenuVi
 
 MenuItem* getParentRootAndVisit(MenuItem* current, MenuVisitorFn visitor) {
     if(current == NULL) current = menuMgr.getRoot();
-    return  recursiveFindRootVisit(menuMgr.getRoot(), current, visitor);
+    return  recursiveFindParentRootVisit(menuMgr.getRoot(), current, menuMgr.getRoot(), visitor);
 }
 
 /**

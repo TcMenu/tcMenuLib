@@ -106,7 +106,8 @@ testF(MenuItemIteratorFixture, testTcUtilGetParentAndVisit) {
     counter = 0;
     assertMenuItem(getParentRootAndVisit(&menuBackSecondLevel, [](MenuItem* item) { 
         counter++;
-        Serial.print("Visited");printMenuItem(item);Serial.println();
+		// below is for debugging
+        //Serial.print("Visited");printMenuItem(item);Serial.println();
     }), &menuBackStatus);
     assertEqual(counter, 15);
 }
@@ -116,7 +117,7 @@ testF(MenuItemIteratorFixture, testGetItemById) {
 
     assertTrue(getMenuItemById(0) == NULL);
     assertMenuItem(getMenuItemById(1), &menuVolume);
-    assertMenuItem(getMenuItemById(5), &menuBackStatus);
+    assertMenuItem(getMenuItemById(menuBackStatus.getId()), &menuBackStatus);
     assertMenuItem(getMenuItemById(101), &menuPressMe);
     assertMenuItem(getMenuItemById(2), &menuChannel);
     assertMenuItem(getMenuItemById(7), &menuLHSTemp);
