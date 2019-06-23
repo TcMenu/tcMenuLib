@@ -223,15 +223,10 @@ public:
 		setIpAddress(127, 0, 0, 1);
 	}
 
+	void setIpAddress(const char* source);
+
 	/** Sets the whole IP address as four parts */
-	void setIpAddress(uint8_t p1, uint8_t p2, uint8_t p3, uint8_t p4) {
-		data[0] = p1;
-		data[1] = p2;
-		data[2] = p3;
-		data[3] = p4;
-		setChanged(true);
-		setSendRemoteNeededAll();
-	}
+	void setIpAddress(uint8_t p1, uint8_t p2, uint8_t p3, uint8_t p4);
 
 	/** gets the IP address as four separate bytes */
 	byte* getIpAddress() { return data; }

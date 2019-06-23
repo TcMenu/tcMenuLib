@@ -137,6 +137,11 @@ bool processValueChangeField(FieldAndValue* field, MessageProcessorInfo* info) {
         textItem->setTextValue(field->value);
         serdebugF2("Text change: ", textItem->getTextValue());
     }
+	else if (info->value.item->getMenuType() == MENUTYPE_IPADDRESS) {
+		IpAddressMenuItem* ipItem = reinterpret_cast<IpAddressMenuItem*>(info->value.item);
+		ipItem->setIpAddress(field->value);
+		serdebugF2("Ip Addr change: ", field->value);
+	}
     return true;
 }
 

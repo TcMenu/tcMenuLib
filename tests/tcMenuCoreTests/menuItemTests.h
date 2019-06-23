@@ -246,6 +246,27 @@ test(testIpAddressItem) {
 	assertTrue(isMenuRuntime(&ipItem));
 	assertFalse(isMenuBasedOnValueItem(&ipItem));
 	assertTrue(isMenuRuntimeMultiEdit(&ipItem));
+}
+
+test(testSettingIpItemDirectly) {
+	IpAddressMenuItem ipItem(ipMenuItemTestCb, 2039, NULL);
+	char sz[20];
+
+	ipItem.setIpAddress("192.168.99.22");
+	ipItem.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("192.168.99.22", sz);
+
+	ipItem.setIpAddress("255.254.12.");
+	ipItem.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("255.254.12.0", sz);
+
+	ipItem.setIpAddress("127.1.2");
+	ipItem.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("127.1.2.0", sz);
+
+	ipItem.setIpAddress("badvalue");
+	ipItem.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("0.0.0.0", sz);
 
 }
 

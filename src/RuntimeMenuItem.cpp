@@ -137,3 +137,29 @@ int textItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char
 	}
 	return false;
 }
+
+void IpAddressMenuItem::setIpAddress(const char * ipData) {
+	memset(data, 0, sizeof(data));
+	char part[4];
+	uint8_t currPart = 0;
+	while (*ipData && currPart < 4) {
+		part[0] = 0;
+		while (*ipData && *ipData != '.') {
+			appendChar(part, *ipData, sizeof(part));
+			ipData++;
+		}
+		serdebugF3("IpPart", getId(), part);
+		setIpPart(currPart, atoi(part));
+		currPart++;
+		if(*ipData) ipData++;
+	}
+}
+
+void IpAddressMenuItem::setIpAddress(uint8_t p1, uint8_t p2, uint8_t p3, uint8_t p4) {
+	data[0] = p1;
+	data[1] = p2;
+	data[2] = p3;
+	data[3] = p4;
+	setChanged(true);
+	setSendRemoteNeededAll();
+}
