@@ -40,6 +40,7 @@ extern LiquidCrystalRenderer renderer;
 extern IoAbstractionRef io23017;
 
 // all menu item forward references.
+extern ListRuntimeMenuItem menuCountingList;
 extern TextMenuItem menuText;
 extern ActionMenuItem menuSaveSettings;
 extern AnalogMenuItem menuPower;
