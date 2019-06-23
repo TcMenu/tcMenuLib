@@ -17,11 +17,33 @@
 LiquidCrystalRenderer::LiquidCrystalRenderer(LiquidCrystal& lcd, uint8_t dimX, uint8_t dimY) : BaseMenuRenderer(dimX) {
 	this->dimY = dimY;
 	this->lcd = &lcd;
+	this->backChar = '<';
+	this->forwardChar = '>';
+	this->editChar = '=';
 }
 
 LiquidCrystalRenderer::~LiquidCrystalRenderer() { 
     delete this->buffer; 
     if(dialog) delete dialog;
+}
+
+void LiquidCrystalRenderer::setEditorChars(char back, char forward, char edit) {
+	backChar = back;
+	forwardChar = forward;
+	editChar = edit;
+}
+
+void LiquidCrystalRenderer::renderList() {
+	ListRuntimeMenuItem* runList = reinterpret_cast<ListRuntimeMenuItem*>(currentRoot);
+	int maxY = min(dimY, runList->getNumberOfParts());
+
+	for (int i = 0; i < maxY; i++) {
+		RuntimeMenuItem* toDraw = (i==0) ? runList->asBackMenu() : runList->getChildItem(i);
+		renderMenuItem(i, toDraw);
+	}
+
+	// reset the list item to a normal list again.
+	runList->asParent();
 }
 
 void LiquidCrystalRenderer::render() {
@@ -32,6 +54,11 @@ void LiquidCrystalRenderer::render() {
 	}
 
 	countdownToDefaulting();
+
+	if (currentRoot->getMenuType() == MENUTYPE_RUNTIME_LIST) {
+		renderList();
+		return;
+	}
 
 	MenuItem* item = currentRoot;
 	uint8_t cnt = 0;
@@ -72,11 +99,26 @@ void LiquidCrystalRenderer::renderMenuItem(uint8_t row, MenuItem* item) {
 	memset(buffer, 32, bufferSize);
 	buffer[bufferSize] = 0;
 
-	buffer[0] = item->isEditing() ? '=' : (item->isActive() ? '>' : ' ');
-    uint8_t finalPos = item->copyNameToBuffer(buffer, 1, bufferSize);
-    buffer[finalPos] = 32;
+	int offs;
+	if (item->getMenuType() == MENUTYPE_BACK_VALUE) {
+		buffer[0] = item->isActive() ? backChar : ' ';
+		buffer[1] = backChar;
+		offs = 3;
+	}
+	else {
+		buffer[0] = item->isEditing() ? editChar : (item->isActive() ? forwardChar : ' ');
+		offs = 1;
+	}
+    uint8_t finalPos = item->copyNameToBuffer(buffer, offs, bufferSize);
+	buffer[finalPos] = 32;
 
-	menuValueToText(item, JUSTIFY_TEXT_RIGHT);
+	if (item->getMenuType() == MENUTYPE_SUB_VALUE || item->getMenuType() == MENUTYPE_ACTION_VALUE) {
+		buffer[bufferSize - 1] = forwardChar;
+	}
+	else {
+		menuValueToText(item, JUSTIFY_TEXT_RIGHT);
+	}
+	serdebugF3("Buffer: ", row, buffer);
 	lcd->print(buffer);
 }
 

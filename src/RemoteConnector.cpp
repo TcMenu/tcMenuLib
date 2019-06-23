@@ -425,6 +425,28 @@ void TagValueRemoteConnector::encodeFloatMenu(int parentId, FloatMenuItem* item)
     transport->endMsg();
 }
 
+void runtimeSendList(ListRuntimeMenuItem* item, TagValueTransport* transport) {
+	char sz[25];
+	for (int i = 0; i < item->getNumberOfParts(); i++) {
+		item->getChildItem(i);
+		item->copyValue(sz, sizeof(sz));
+		transport->writeField(FIELD_PREPEND_CHOICE | (i + 'A'), sz);
+		item->copyNameToBuffer(sz, sizeof(sz));
+		transport->writeField(FIELD_PREPEND_NAMECHOICE | (i + 'A'), sz);
+	}
+	item->asParent();
+}
+
+void TagValueRemoteConnector::encodeRuntimeMenuItem(int parentId, RuntimeMenuItem * item) {
+	if (!prepareWriteMsg(MSG_BOOT_LIST)) return;
+	transport->writeFieldInt(FIELD_NO_CHOICES, item->getNumberOfParts());
+	if (item->getMenuType() == MENUTYPE_RUNTIME_LIST) {
+		runtimeSendList(reinterpret_cast<ListRuntimeMenuItem*>(item), transport);
+	}
+	encodeBaseMenuFields(parentId, item);
+	transport->endMsg();
+}
+
 void TagValueRemoteConnector::encodeEnumMenu(int parentId, EnumMenuItem* item) {
 	if(!prepareWriteMsg(MSG_BOOT_ENUM)) return;
     encodeBaseMenuFields(parentId, item);
@@ -471,15 +493,6 @@ void TagValueRemoteConnector::encodeActionMenu(int parentId, ActionMenuItem* ite
     transport->endMsg();
 }
 
-void writeRemoteListToTransport(TagValueTransport* transport, ListRuntimeMenuItem* item) {
-	char sz[20];
-	transport->writeFieldInt(FIELD_NO_CHOICES, item->getNumberOfParts());
-	for (int i = 0; i < item->getNumberOfParts(); ++i) {
-		item->getChildItem(i)->copyValue(sz, sizeof(sz));
-		transport->writeField(FIELD_PREPEND_CHOICE | ('A' + i), sz);
-	}
-}
-
 void TagValueRemoteConnector::encodeChangeValue(MenuItem* theItem) {
 	if(!prepareWriteMsg(MSG_CHANGE_INT)) return;
     transport->writeFieldInt(FIELD_ID, theItem->getId());
@@ -498,7 +511,7 @@ void TagValueRemoteConnector::encodeChangeValue(MenuItem* theItem) {
 		break;
 	}
 	case MENUTYPE_RUNTIME_LIST:
-		writeRemoteListToTransport(transport, (RemoteMenuItem*)theItem);
+		runtimeSendList(reinterpret_cast<ListRuntimeMenuItem*>(theItem), transport);
 		break;
 	case MENUTYPE_FLOAT_VALUE:
         writeFloatValueToTransport(transport, (FloatMenuItem*)theItem);

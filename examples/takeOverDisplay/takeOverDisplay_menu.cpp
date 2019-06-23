@@ -19,16 +19,18 @@ EthernetServer server(3333);
 
 // Global Menu Item declarations
 
-const PROGMEM TextMenuInfo minfoText = { "Text", 7, 0xffff, 10, NO_CALLBACK };
-TextMenuItem menuText(&minfoText, NULL);
+ListRuntimeMenuItem menuCountingList(10, 0, fnCountingListRtCall, NULL);
+RENDERING_CALLBACK_NAME_INVOKE(fnTextRtCall, textItemRenderFn, "Text", -1, NULL)
+TextMenuItem menuText(fnTextRtCall, 7, 10, &menuCountingList);
 const PROGMEM AnyMenuInfo minfoSaveSettings = { "Save Settings", 6, 0xffff, 0, onSaveSettings };
 ActionMenuItem menuSaveSettings(&minfoSaveSettings, NULL);
 const PROGMEM AnalogMenuInfo minfoPower = { "Power", 5, 5, 250, NO_CALLBACK, 0, 10, "W" };
 AnalogMenuItem menuPower(&minfoPower, 0, &menuSaveSettings);
 const PROGMEM BooleanMenuInfo minfoEnabled = { "Enabled", 4, 2, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
 BooleanMenuItem menuEnabled(&minfoEnabled, false, &menuPower);
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings", -1, NULL)
 const PROGMEM SubMenuInfo minfoSettings = { "Settings", 3, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackSettings(&menuEnabled, (const AnyMenuInfo*)&minfoSettings);
+BackMenuItem menuBackSettings(fnSettingsRtCall, &menuEnabled);
 SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, &menuText);
 const PROGMEM AnyMenuInfo minfoQuestionDialog = { "Question Dialog", 9, 0xffff, 0, onQuestionDlg };
 ActionMenuItem menuQuestionDialog(&minfoQuestionDialog, &menuSettings);

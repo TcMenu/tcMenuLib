@@ -1,12 +1,23 @@
 #include "takeOverDisplay_menu.h"
 #include <EepromAbstractionWire.h>
 #include <IoAbstractionWire.h>
+#include <TaskManager.h>
+#include <RemoteAuthentication.h>
 
 /**
  * This TcMenu example shows how to take over the display for your own purposes from a menu item.
+ * It also shows how to use the dialog facilities to locally show an information dialog and also a
+ * question dialog.
  * 
  * For more detail see the README.md file
  */
+
+// Set up ethernet, the usual default settings are chosen. Change to your preferred values or use DHCP.
+byte mac[] = {
+  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
+};
+IPAddress ip(192, 168, 0, 96);
+
 
 // In the designer UI we configured io23017 as an IoExpander variable for both the input and display.
 // We must now create it as an MCP23017 expander. Address is 0x20 with interrupt pin connected to pin 2.
@@ -20,8 +31,16 @@ int counter = 0;
 // AvrEeprom eeprom; 
 I2cAt24Eeprom eeprom(0x50, 64); // page size 64 for AT24-128 model
 
+// we want to authenticate connections, the easiest and quickest way is to use the EEPROM
+// authenticator where pairing requests add a new item into the EEPROM. Any authentication
+// requests are then handled by looking in the EEPROM.
+EepromAuthenticatorManager authManager;
+
 void setup() {
     Serial.begin(115200);
+
+    // spin up the Ethernet library
+    Ethernet.begin(mac, ip);
 
     // You must call wire.begin if you are using the wire library. Importantly the library
     // or designer does not presently do this for you to make it compatible with the widest
@@ -37,6 +56,13 @@ void setup() {
         counter = 0;
         renderer.takeOverDisplay(myDisplayFunction);
     });
+
+    // now we enable authentication using EEPROM authentication. Where the EEPROM is
+    // queried for authentication requests, and any additional pairs are stored there too.
+    // first we initialise the authManager, then pass it to the class.
+    // Always call BEFORE setupMenu()
+    authManager.initialise(&eeprom, 100);
+    remoteServer.setAuthenticator(&authManager);
 
     // this is put in by the menu designer and must be called (always ensure devices are setup first).
     setupMenu();
@@ -115,6 +141,67 @@ void CALLBACK_FUNCTION onTakeOverDisplay(int /*id*/) {
 
     counter = 0;
     renderer.takeOverDisplay(myDisplayFunction);
+}
+
+const char pgmInfoHeader[] PROGMEM = "Information dialog";
+const char pgmQuestionHeader[] PROGMEM = "Order Food?";
+
+void CALLBACK_FUNCTION onInfoDlg(int /*id*/) {
+    // every renderer apart from NoRenderer has a dialog, that can be used to present
+    // very basic info locally onto any display. Used in situations where something
+    // needs to be confirmed / printed onto the local display.
+    BaseDialog* dlg = renderer.getDialog();
+    if(!dlg) return;
+
+    // first we set the buttons how we want them. BTNTYPE_NONE means no button.
+    dlg->setButtons(BTNTYPE_NONE, BTNTYPE_CLOSE);
+
+    // then we show the dialog - 2nd boolean parameter is if dialog is local only
+    dlg->show(pgmInfoHeader, true);
+
+    // and then we set the second line (buffer) - must be after show.
+    dlg->copyIntoBuffer("to be set..");
+
+    // you can set the dialog buffer at some point later, it's safe, even if it's been dismissed.
+    taskManager.scheduleOnce(1000, [] {
+        BaseDialog* dlg = renderer.getDialog();
+        dlg->copyIntoBuffer("now it's set..");
+    });
+}
+
+//
+// It's also possible to know when the dialog has finished, and what button was pressed.
+// This is done by passing a function like below as second parameter to show.
+//
+void onFinished(ButtonType btn, void* /*userData*/) {
+    if(btn == BTNTYPE_ACCEPT) {
+        Serial.print("Food chosen was ");
+        char sz[20];
+        menuFood.copyEnumStrToBuffer(sz, sizeof(sz), menuFood.getCurrentValue());
+        Serial.println(sz);
+    }
+    else {
+        Serial.println("User did not choose to proceed.");
+    }
+}
+
+void CALLBACK_FUNCTION onQuestionDlg(int /*id*/) {
+    // yet another dialog, to ask a question this time.
+    BaseDialog* dlg = renderer.getDialog();
+    
+    // this time we use two buttons and provide the selected index at the end (zero based)
+    dlg->setButtons(BTNTYPE_ACCEPT, BTNTYPE_CANCEL, 1);
+    
+    // we can optionally set some data that will be given to us in the finished call back.
+    dlg->setUserData(NULL); 
+    
+    // now we show the dialog (also giving the finished callback)
+    dlg->show(pgmQuestionHeader, true, onFinished);
+
+    // and lastly we set the text in the buffer area (2nd line)
+    char sz[20];
+    menuFood.copyEnumStrToBuffer(sz, sizeof(sz), menuFood.getCurrentValue());
+    dlg->copyIntoBuffer(sz);
 }
 
 //

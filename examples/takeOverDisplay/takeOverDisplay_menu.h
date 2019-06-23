@@ -15,6 +15,7 @@
 #include <LiquidCrystalIO.h>
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
+#include <RuntimeMenuItem.h>
 #include "tcMenuLiquidCrystal.h"
 
 // all define statements needed
@@ -39,26 +40,27 @@ extern LiquidCrystalRenderer renderer;
 extern IoAbstractionRef io23017;
 
 // all menu item forward references.
-extern TextMenuItem  menuText;
-extern ActionMenuItem  menuSaveSettings;
-extern AnalogMenuItem  menuPower;
-extern BooleanMenuItem  menuEnabled;
-extern BackMenuItem  menuBackSettings;
-extern SubMenuItem  menuSettings;
-extern ActionMenuItem  menuQuestionDialog;
-extern ActionMenuItem  menuInfoDialog;
-extern EnumMenuItem  menuFood;
-extern ActionMenuItem  menuTakeDisplay;
-extern const ConnectorLocalInfo  applicationInfo;
+extern TextMenuItem menuText;
+extern ActionMenuItem menuSaveSettings;
+extern AnalogMenuItem menuPower;
+extern BooleanMenuItem menuEnabled;
+extern BackMenuItem menuBackSettings;
+extern SubMenuItem menuSettings;
+extern ActionMenuItem menuQuestionDialog;
+extern ActionMenuItem menuInfoDialog;
+extern EnumMenuItem menuFood;
+extern ActionMenuItem menuTakeDisplay;
+extern const ConnectorLocalInfo applicationInfo;
 
-// Callback functions always follow this pattern: void CALLBACK_FUNCTION myCallback();
+// Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
-void CALLBACK_FUNCTION onTakeOverDisplay(int id);
+int fnCountingListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
 void CALLBACK_FUNCTION onFoodChoice(int id);
 void CALLBACK_FUNCTION onInfoDlg(int id);
 void CALLBACK_FUNCTION onQuestionDlg(int id);
 void CALLBACK_FUNCTION onSaveSettings(int id);
+void CALLBACK_FUNCTION onTakeOverDisplay(int id);
 
 void setupMenu();
 

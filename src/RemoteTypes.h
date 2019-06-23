@@ -84,7 +84,7 @@ enum AckResponseStatus {
 /** Message type definition for ip address field bootstrap */
 #define MSG_BOOT_IPADDRESS msgFieldToWord('B','I')
 /** Message type definition for runtime list bootstrap message */
-#define MSG_BOOT_REMOTE msgFieldToWord('B','L')
+#define MSG_BOOT_LIST msgFieldToWord('B','L')
 /** Message type definition for value change message */
 #define MSG_CHANGE_INT msgFieldToWord('V', 'C')
 /** Message type defintion for a dialog change msg */
@@ -123,6 +123,7 @@ enum AckResponseStatus {
 #define FIELD_EDIT_MODE   msgFieldToWord('E', 'M')
 
 #define FIELD_PREPEND_CHOICE 'C'
+#define FIELD_PREPEND_NAMECHOICE 'c'
 
 /**
  * Defines the types of change that can be received / sent in changes messages, either
