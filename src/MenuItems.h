@@ -395,11 +395,36 @@ public:
 };
 
 /**
+ * This makes working with the analog values in an AnalogMenuItem easier by splitting the raw value
+ * into a whole part and a decimal fraction part based on the menu items divisor.
+ */
+struct WholeAndFraction {
+public:
+	WholeAndFraction() {
+		this->whole = this->fraction = 0;
+	}
+
+	WholeAndFraction(const WholeAndFraction& that) {
+		this->whole = that.whole;
+		this->fraction = that.fraction;
+	}
+
+	WholeAndFraction(int16_t whole, uint16_t fract) {
+		this->whole = whole;
+		this->fraction = fract;
+	}
+	int16_t whole;
+	uint16_t fraction;
+
+};
+
+/**
  * An item that can represent a numeric value, integer, or decimal. On an 8bit Arduino this value is a
  * 16 bit unsigned integer value. We can make it appear negative by giving a negative offset. We make
  * it appear decimal by giving it a divisor. If the divisor were 2, we'd increment in halves. If the
  * offset point were -100, unit dB and divisor 2, the first value would be -50.0dB and the next would be
- * -49.5dB and so on.
+ * -49.5dB and so on. For convenience there are methods to convert between both floating point values and
+ * also fixed point (WholeAndFraction) values.
  * @see AnalogMenuInfo
  */
 class AnalogMenuItem : public ValueMenuItem {
@@ -420,7 +445,52 @@ public:
 	/** Returns the length of the unit name */
 	int unitNameLength() {return (int) strlen_P(((AnalogMenuInfo*)info)->unitName);}
 	/** copies the unit name into the provided buffer */
-	void copyUnitToBuffer(char* unitBuff) { safeProgCpy(unitBuff, ((AnalogMenuInfo*)info)->unitName, 5);}
+	void copyUnitToBuffer(char* unitBuff, uint8_t size = 5) { safeProgCpy(unitBuff, ((AnalogMenuInfo*)info)->unitName, size);}
+
+	/**
+	 * copies the whole value including unit into the buffer provided.
+	 * @param buffer the buffer to write the value into
+	 * @param bufferSize the size of the buffer
+	 */
+	void copyValue(char* buffer, uint8_t bufferSize);
+
+
+	/** 
+	 * returns the closest floating point representation of the value, note that floating point values are
+	 * not always able to exactly represent a given value and may therefore be slightly out.
+	 * @return the nearest floating point value
+	 */
+	float getAsFloatingPointValue();
+
+	/**
+	 * Sets the menu item's current value to be the value provided in the float.
+	 * @param value the new value.
+	 */
+	void setFromFloatingPointValue(float value);
+
+	/**
+	 * gets the whole and fraction part with the fractional part converted to decimal for ease of use. It
+	 * based upon the divisor.
+	 * @return a structure containing the whole and fraction in decimal form
+	 */
+	WholeAndFraction getWholeAndFraction();
+
+	/**
+	 * sets the menu based on the decimal whole and decimal fraction part. If decimal is true, the fraction
+	 * is expected to be in decimal form (eg for halves it would be 0 or 5).
+	 * @param wf the whole fraction part.
+	 */
+	void setFromWholeAndFraction(WholeAndFraction wf);
+
+	/**
+	 * @return the number of decimal places needed for the fraction part based on the divisor
+	 */
+	uint8_t getDecimalPlacesForDivisor();
+
+	/**
+	 * @return the nearest decimal divisor based on the divisor.
+	 */
+	uint16_t getActualDecimalDivisor();
 };
 
 /**
@@ -585,6 +655,5 @@ inline bool isMenuRuntimeMultiEdit(MenuItem* t) {
 inline RuntimeMenuItem* asRuntimeItem(MenuItem* i) {
 	return reinterpret_cast<RuntimeMenuItem*>(i);
 }
-
 
 #endif

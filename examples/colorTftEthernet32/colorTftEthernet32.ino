@@ -2,8 +2,11 @@
 #include <IoAbstractionWire.h>
 #include <EepromAbstractionWire.h>
 #include <AnalogDeviceAbstraction.h>
+#include <RemoteAuthentication.h>
+#include <RemoteMenuItem.h>
 #include <Fonts/FreeSans18pt7b.h>
 #include <Fonts/FreeSans9pt7b.h>
+#include <Ethernet.h>
 
 /*
  * Shows how to use adagraphics with a TFT panel and an ethernet module.
@@ -18,7 +21,6 @@
 byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
 };
-IPAddress ip(192, 168, 0, 96);
 
 // we set up a TFT display first using the exact graphics variable used in the designer.
 Adafruit_ILI9341 gfx(6, 7);
@@ -30,6 +32,11 @@ AdaColorGfxMenuConfig colorConfig;
 // We also store/restore state from an i2c EEPROM chip
 I2cAt24Eeprom eeprom(0x50, PAGESIZE_AT24C128);
 
+// we want to authenticate connections, the easiest and quickest way is to use the EEPROM
+// authenticator where pairing requests add a new item into the EEPROM. Any authentication
+// requests are then handled by looking in the EEPROM.
+EepromAuthenticatorManager authManager;
+
 // then we setup the IO expander that the also set up in the designer for input.
 IoAbstractionRef io8574 = ioFrom8574(0x20, 0); // on addr 0x20 and interrupt pin 0
 
@@ -37,6 +44,11 @@ IoAbstractionRef io8574 = ioFrom8574(0x20, 0); // on addr 0x20 and interrupt pin
 ArduinoAnalogDevice analogDevice(12, 10);
 
 float fractionsPerUnit;
+
+// Here we create two additional menus, that will be added manually to handle the connectivity
+// status and authentication keys. In a future version these will be added to th desinger.
+RemoteMenuItem menuRemoteMonitor(1001, 2);
+EepromAuthenicationInfoMenuItem menuAuthKeyMgr(1002, &authManager, &menuRemoteMonitor);
 
 //
 // here we provide a completely custom configuration of color and spacing
@@ -79,15 +91,25 @@ void prepareCustomConfiguration() {
 }
 
 void setup() {
-    // spin up the Ethernet library
-    Ethernet.begin(mac, ip);
-
     // we are responsible for setting up the initial graphics
     gfx.begin();
     gfx.setRotation(3);
 
     // we used an i2c device (io8574) so must initialise wire too
     Wire.begin();
+
+    // now we enable authentication using EEPROM authentication. Where the EEPROM is
+    // queried for authentication requests, and any additional pairs are stored there too.
+    // first we initialise the authManager, then pass it to the class.
+    // Always call BEFORE setupMenu()
+    authManager.initialise(&eeprom, 100);
+    remoteServer.setAuthenticator(&authManager);
+
+    // Here we add two additional menus for managing the connectivity and authentication keys.
+    // In the future, there will be an option to autogenerate these from the designer.
+    menuIpAddress.setNext(&menuAuthKeyMgr);
+    menuRemoteMonitor.addConnector(remoteServer.getRemoteConnector(0));
+    menuAuthKeyMgr.setLocalOnly(true);
 
     // and set up the dac on the 32 bit board.
     analogDevice.initPin(A0, DIR_OUT);
@@ -103,6 +125,15 @@ void setup() {
 
     // and then load back the previous state
     menuMgr.load(eeprom);
+
+    // spin up the Ethernet library
+    byte* rawIp = menuIpAddress.getIpAddress();
+    IPAddress ipAddr(rawIp[0], rawIp[1], rawIp[2], rawIp[3]);
+    Ethernet.begin(mac, ipAddr);
+
+    char sz[20];
+    menuIpAddress.copyValue(sz, sizeof(sz));
+    Serial.print("Ethernet available on ");Serial.println(sz);
 
     taskManager.scheduleFixedRate(2250, [] {
         Serial.print(".");
@@ -123,19 +154,19 @@ void writeToDac() {
     menuVoltA0.setFloatValue(total);
 }
 
-void CALLBACK_FUNCTION onVoltageChange(int id) {
+void CALLBACK_FUNCTION onVoltageChange(int /*id*/) {
     writeToDac();
 }
 
-void CALLBACK_FUNCTION onCurrentChange(int id) {
+void CALLBACK_FUNCTION onCurrentChange(int /*id*/) {
     writeToDac();
 }
 
-void CALLBACK_FUNCTION onLimitMode(int id) {
+void CALLBACK_FUNCTION onLimitMode(int /*id*/) {
     // TODO - your menu change code
 }
 
-void CALLBACK_FUNCTION onSaveRom(int id) {
+void CALLBACK_FUNCTION onSaveRom(int /*id*/) {
     // save out the state, in a real system we could detect power down for this.
     menuMgr.save(eeprom);
 }

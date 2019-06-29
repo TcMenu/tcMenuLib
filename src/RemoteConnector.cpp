@@ -430,9 +430,9 @@ void runtimeSendList(ListRuntimeMenuItem* item, TagValueTransport* transport) {
 	for (int i = 0; i < item->getNumberOfParts(); i++) {
 		item->getChildItem(i);
 		item->copyValue(sz, sizeof(sz));
-		transport->writeField(FIELD_PREPEND_CHOICE | (i + 'A'), sz);
+		transport->writeField(msgFieldToWord(FIELD_PREPEND_CHOICE, 'A' + i), sz);
 		item->copyNameToBuffer(sz, sizeof(sz));
-		transport->writeField(FIELD_PREPEND_NAMECHOICE | (i + 'A'), sz);
+		transport->writeField(msgFieldToWord(FIELD_PREPEND_NAMECHOICE, 'A' + i), sz);
 	}
 	item->asParent();
 }
@@ -442,6 +442,11 @@ void TagValueRemoteConnector::encodeRuntimeMenuItem(int parentId, RuntimeMenuIte
 	transport->writeFieldInt(FIELD_NO_CHOICES, item->getNumberOfParts());
 	if (item->getMenuType() == MENUTYPE_RUNTIME_LIST) {
 		runtimeSendList(reinterpret_cast<ListRuntimeMenuItem*>(item), transport);
+	}
+	else {
+		char sz[25];
+		item->copyValue(sz, sizeof(sz));
+		transport->writeField(FIELD_PREPEND_CHOICE | 'A', sz);
 	}
 	encodeBaseMenuFields(parentId, item);
 	transport->endMsg();

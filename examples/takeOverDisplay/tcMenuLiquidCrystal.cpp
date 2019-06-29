@@ -93,11 +93,7 @@ void LiquidCrystalRenderer::renderMenuItem(uint8_t row, MenuItem* item) {
 	if (item == NULL || row > dimY) return;
 
 	item->setChanged(false);
-
 	lcd->setCursor(0, row);
-
-	memset(buffer, 32, bufferSize);
-	buffer[bufferSize] = 0;
 
 	int offs;
 	if (item->getMenuType() == MENUTYPE_BACK_VALUE) {
@@ -110,9 +106,10 @@ void LiquidCrystalRenderer::renderMenuItem(uint8_t row, MenuItem* item) {
 		offs = 1;
 	}
     uint8_t finalPos = item->copyNameToBuffer(buffer, offs, bufferSize);
-	buffer[finalPos] = 32;
+	for(uint8_t i = finalPos; i < bufferSize; ++i)  buffer[i] = 32;
+	buffer[bufferSize] = 0;
 
-	if (item->getMenuType() == MENUTYPE_SUB_VALUE || item->getMenuType() == MENUTYPE_ACTION_VALUE) {
+	if (isItemActionable(item)) {
 		buffer[bufferSize - 1] = forwardChar;
 	}
 	else {

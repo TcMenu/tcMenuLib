@@ -19,28 +19,31 @@ EthernetServer server(3333);
 
 // Global Menu Item declarations
 
-const PROGMEM RemoteMenuInfo minfoR0 = { "R0", 13, 0xffff, 0, NO_CALLBACK };
-RemoteMenuItem menuR0(&minfoR0, remoteServer.getRemoteConnector(0), NULL);
-const PROGMEM SubMenuInfo minfoRemote = { "Remote", 12, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackRemote(&menuR0, (const AnyMenuInfo*)&minfoRemote);
-SubMenuItem menuRemote(&minfoRemote, &menuBackRemote, NULL);
-const PROGMEM TextMenuInfo minfoTxt = { "Txt", 14, 0xffff, 6, NO_CALLBACK };
-TextMenuItem menuTxt(&minfoTxt, NULL);
+RENDERING_CALLBACK_NAME_INVOKE(fnIpAddressRtCall, ipAddressRenderFn, "Ip", 13, NULL)
+IpAddressMenuItem menuIpAddress(fnIpAddressRtCall, 16, NULL);
+RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NULL)
+const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 15, 0xffff, 0, NO_CALLBACK };
+BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuIpAddress);
+SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL);
+RENDERING_CALLBACK_NAME_INVOKE(fnTxtRtCall, textItemRenderFn, "Txt", -1, NULL)
+TextMenuItem menuTxt(fnTxtRtCall, 14, 6, NULL);
 const PROGMEM FloatMenuInfo minfoCurrent = { "Current", 10, 0xffff, 2, NO_CALLBACK };
 FloatMenuItem menuCurrent(&minfoCurrent, &menuTxt);
 const PROGMEM FloatMenuInfo minfoVoltsIn = { "Volts in", 9, 0xffff, 2, NO_CALLBACK };
 FloatMenuItem menuVoltsIn(&minfoVoltsIn, &menuCurrent);
+RENDERING_CALLBACK_NAME_INVOKE(fnStatusRtCall, backSubItemRenderFn, "Status", -1, NULL)
 const PROGMEM SubMenuInfo minfoStatus = { "Status", 8, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackStatus(&menuVoltsIn, (const AnyMenuInfo*)&minfoStatus);
-SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuRemote);
-const PROGMEM AnyMenuInfo minfoShutdownNow = { "Shutdown now", 11, 0xffff, 0, NO_CALLBACK };
+BackMenuItem menuBackStatus(fnStatusRtCall, &menuVoltsIn);
+SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuConnectivity);
+const PROGMEM AnyMenuInfo minfoShutdownNow = { "Shutdown now", 11, 0xffff, 0, onPowerDownDetected };
 ActionMenuItem menuShutdownNow(&minfoShutdownNow, NULL);
 const PROGMEM AnalogMenuInfo minfoDelay = { "Delay", 7, 11, 10, NO_CALLBACK, 0, 1, "S" };
 AnalogMenuItem menuDelay(&minfoDelay, 0, &menuShutdownNow);
 const PROGMEM BooleanMenuInfo minfoPwrDelay = { "Pwr Delay", 6, 10, 1, NO_CALLBACK, NAMING_YES_NO };
 BooleanMenuItem menuPwrDelay(&minfoPwrDelay, false, &menuDelay);
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings", -1, NULL)
 const PROGMEM SubMenuInfo minfoSettings = { "Settings", 5, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackSettings(&menuPwrDelay, (const AnyMenuInfo*)&minfoSettings);
+BackMenuItem menuBackSettings(fnSettingsRtCall, &menuPwrDelay);
 SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, &menuStatus);
 const char enumStrOnAlm_0[] PROGMEM = "All On";
 const char enumStrOnAlm_1[] PROGMEM = "Silient";

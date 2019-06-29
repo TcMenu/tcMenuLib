@@ -10,6 +10,9 @@
 
 bool renderActivateCalled = false;
 
+// forward reference
+void printMenuItem(MenuItem* menuItem);
+
 int testBasicRuntimeFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
 	switch (mode) {
 	case RENDERFN_NAME: {
@@ -321,6 +324,17 @@ test(testCoreAndBooleanMenuItem) {
 	assertTrue(boolItem1.getBoolean());
 }
 
+bool checkWholeFraction(AnalogMenuItem* item, int16_t whole, int16_t fract) {
+	WholeAndFraction wf = item->getWholeAndFraction();
+	if (wf.fraction != fract || wf.whole != whole) {
+		printMenuItem(item);
+		serdebugF3("Mismatch in whole fraction expected: ", whole, fract);
+		serdebugF3("Actual values: ", wf.whole, wf.fraction);
+		return false;
+	}
+	return true;
+}
+
 test(testAnalogEnumMenuItem) {
 	assertEqual(MENUTYPE_ENUM_VALUE, menuEnum1.getMenuType());
 	assertEqual(MENUTYPE_INT_VALUE, menuAnalog.getMenuType());
@@ -350,8 +364,67 @@ test(testAnalogEnumMenuItem) {
 	menuAnalog.copyUnitToBuffer(sz);
 	assertStringCaseEqual("AB", sz);
 
+	assertEqual(uint8_t(0), menuAnalog.getDecimalPlacesForDivisor());
+
 	menuAnalog.setCurrentValue(192);
 	assertEqual(192U, menuAnalog.getCurrentValue());
+	assertTrue(checkWholeFraction(&menuAnalog, 192, 0));
+	assertEqual(192U, menuAnalog.getCurrentValue());
+	assertNear(float(192.0), menuAnalog.getAsFloatingPointValue(), float(0.0001));
+	menuAnalog.setCurrentValue(0);
+	assertTrue(checkWholeFraction(&menuAnalog, 0, 0));
+	assertNear(float(0.0), menuAnalog.getAsFloatingPointValue(), float(0.0001));
+	menuAnalog.setFromFloatingPointValue(21.3);
+	assertNear(float(21.0), menuAnalog.getAsFloatingPointValue(), float(0.0001));
+	assertTrue(checkWholeFraction(&menuAnalog, 21, 0));
+	menuAnalog.copyValue(sz, sizeof sz);
+	assertStringCaseEqual("21AB", sz);
+
+}
+
+test(testAnalogValuesWithFractions) {
+	char sz[20];
+	assertEqual(uint8_t(1), menuHalvesOffs.getDecimalPlacesForDivisor());
+	menuHalvesOffs.setCurrentValue(21);
+	assertTrue(checkWholeFraction(&menuHalvesOffs, -39, 5));
+	assertNear(float(-39.5), menuHalvesOffs.getAsFloatingPointValue(), float(0.0001));
+	menuHalvesOffs.copyValue(sz, sizeof sz);
+	assertStringCaseEqual("-39.5dB", sz);
+
+	menuHalvesOffs.setCurrentValue(103);
+	assertTrue(checkWholeFraction(&menuHalvesOffs, 1, 5));
+	assertNear(float(1.5), menuHalvesOffs.getAsFloatingPointValue(), float(0.0001));
+
+	menuHalvesOffs.setFromFloatingPointValue(50.5);
+	assertTrue(checkWholeFraction(&menuHalvesOffs, 50, 5));
+	assertNear(float(50.5), menuHalvesOffs.getAsFloatingPointValue(), float(0.0001));
+	assertEqual(uint16_t(201), menuHalvesOffs.getCurrentValue());
+	menuHalvesOffs.copyValue(sz, sizeof sz);
+	assertStringCaseEqual("50.5dB", sz);
+
+	menuHalvesOffs.setFromWholeAndFraction(WholeAndFraction(10, 5));
+	assertEqual(uint16_t(121), menuHalvesOffs.getCurrentValue());
+	assertTrue(checkWholeFraction(&menuHalvesOffs, 10, 5));
+	assertNear(float(10.5), menuHalvesOffs.getAsFloatingPointValue(), float(0.0001));
+	menuHalvesOffs.copyValue(sz, sizeof sz);
+	assertStringCaseEqual("10.5dB", sz);
+
+	assertEqual(uint8_t(2), menuNumTwoDp.getDecimalPlacesForDivisor());
+	menuNumTwoDp.setFromFloatingPointValue(98.234);
+	assertNear(float(98.23), menuNumTwoDp.getAsFloatingPointValue(), float(0.0001));
+	assertEqual(uint16_t(9823), menuNumTwoDp.getCurrentValue());
+	assertTrue(checkWholeFraction(&menuNumTwoDp, 98, 23));
+
+	menuNumTwoDp.copyValue(sz, sizeof sz);
+	assertStringCaseEqual("98.23", sz);
+
+	menuNumTwoDp.setFromWholeAndFraction(WholeAndFraction(22, 99));
+	assertNear(float(22.99), menuNumTwoDp.getAsFloatingPointValue(), float(0.0001));
+	assertEqual(uint16_t(2299), menuNumTwoDp.getCurrentValue());
+	assertTrue(checkWholeFraction(&menuNumTwoDp, 22, 99));
+
+	menuNumTwoDp.copyValue(sz, sizeof sz);
+	assertStringCaseEqual("22.99", sz);
 }
 
 test(testFloatAndActionTypes) {
@@ -380,7 +453,7 @@ test(testAuthMenuItem) {
 	itm->copyNameToBuffer(sz, sizeof(sz));
 	assertStringCaseEqual("Authorised Keys", sz);
 	itm->copyValue(sz, sizeof(sz));
-	assertStringCaseEqual("->", sz);
+	assertStringCaseEqual("", sz);
 
 	assertEqual(uint8_t(6), itm->getNumberOfParts());
 
@@ -396,7 +469,7 @@ test(testAuthMenuItem) {
 
 	itm = menuItem.getChildItem(2);
 	itm->copyNameToBuffer(sz, sizeof(sz));
-	assertStringCaseEqual("", sz);
+	assertStringCaseEqual("EmptyKey", sz);
 
 	assertTrue(isMenuRuntime(&menuItem));
 	assertFalse(isMenuBasedOnValueItem(&menuItem));

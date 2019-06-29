@@ -4,8 +4,18 @@
 #include "tcUtil.h"
 #include "RuntimeMenuItem.h"
 
+const PGM_TCM AnalogMenuInfo minfoNumTwoDp = { "TwoDpNum", 23, 32, 30000, NO_CALLBACK, 0, 100, "" };
+AnalogMenuItem menuNumTwoDp(&minfoNumTwoDp, 0, NULL);
+
+const PGM_TCM AnalogMenuInfo minfoNumHalvesOffs = { "Halves", 22, 30, 255, NO_CALLBACK, -100, 2, "dB" };
+AnalogMenuItem menuHalvesOffs(&minfoNumHalvesOffs, 0, &menuNumTwoDp);
+
+
+RENDERING_CALLBACK_NAME_INVOKE(fnIpAddrRenderFn, ipAddressRenderFn, "Ip Addr", 22, NULL)
+IpAddressMenuItem menuIpAddr(fnIpAddrRenderFn, 99, &menuHalvesOffs);
+
 const PGM_TCM AnalogMenuInfo minfoAnalogSub = { "SubAnalog", 10, 20, 255, NO_CALLBACK, 0, 1, "SU" };
-AnalogMenuItem menuSubAnalog(&minfoAnalogSub, 0, NULL);
+AnalogMenuItem menuSubAnalog(&minfoAnalogSub, 0, &menuIpAddr);
 
 RENDERING_CALLBACK_NAME_INVOKE(backSubFixturesFn, backSubItemRenderFn, "Settings", 0xffff, NULL)
 BackMenuItem menuBackSub(backSubFixturesFn, &menuSubAnalog);

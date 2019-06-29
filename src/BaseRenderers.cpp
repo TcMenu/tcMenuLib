@@ -55,13 +55,18 @@ void BaseMenuRenderer::exec() {
 
 void BaseMenuRenderer::activeIndexChanged(uint8_t index) {
     // we only change the active index / edit state if we own the display
-    if(!getRenderingCallback()) {
-        MenuItem* currentActive = menuMgr.findCurrentActive();
-        currentActive->setActive(false);
-        currentActive = getItemAtPosition(index);
-        currentActive->setActive(true);
-        menuAltered();
-    }
+	if (!getRenderingCallback()) {
+		if (currentRoot->getMenuType() == MENUTYPE_RUNTIME_LIST) {
+			reinterpret_cast<ListRuntimeMenuItem*>(currentRoot)->setActiveIndex(index);
+		}
+		else {
+			MenuItem* currentActive = menuMgr.findCurrentActive();
+			currentActive->setActive(false);
+			currentActive = getItemAtPosition(index);
+			currentActive->setActive(true);
+			menuAltered();
+		}
+	}
 }
 
 void BaseMenuRenderer::resetToDefault() {
@@ -120,48 +125,15 @@ void BaseMenuRenderer::menuValueToText(MenuItem* item,	MenuDrawJustification jus
 
 void BaseMenuRenderer::menuValueAnalog(AnalogMenuItem* item, MenuDrawJustification justification) {
 	char itoaBuf[12];
-
-	int16_t calcVal = ((int16_t)item->getCurrentValue()) + ((int16_t)item->getOffset());
-	int divisor = item->getDivisor();
-
-	if (divisor < 2) {
-		// in this case divisor was 0 or 1, this means treat as integer.
-		itoa(calcVal, itoaBuf, 10);
-	}
-	else if (divisor > 10) {
-		// so we can display as decimal, work out the nearest highest unit for 2dp, 3dp and 4dp.
-		int fractMax = (divisor > 1000) ? 10000 : (divisor > 100) ? 1000 : 100;
-
-		// when divisor is greater than 10 we need to deal with both parts using itoa
-		int whole = calcVal / divisor;
-		uint16_t fraction = abs((calcVal % divisor)) * (fractMax / divisor);
-
-		itoa(whole, itoaBuf, 10);
-		appendChar(itoaBuf, '.', sizeof itoaBuf);
-		fastltoa_mv(itoaBuf, fraction, fractMax, '0', sizeof itoaBuf);
-	}
-	else {
-		// an efficient optimisation for fractions < 10.
-		int whole = calcVal / divisor;
-		uint8_t fraction = abs((calcVal % divisor)) * (10 / divisor);
-
-		itoa(whole, itoaBuf, 10);
-		uint8_t decPart = strlen(itoaBuf);
-		itoaBuf[decPart] = '.';
-		itoaBuf[decPart + 1] = fraction + '0';
-		itoaBuf[decPart + 2] = 0;
-	}
-	uint8_t numLen = strlen(itoaBuf);
+	item->copyValue(itoaBuf, sizeof(itoaBuf));
 
 	if(justification == JUSTIFY_TEXT_LEFT) {
 		strcpy(buffer, itoaBuf);
-		item->copyUnitToBuffer(buffer + numLen);
 	}
 	else {
-		uint8_t unitLen = item->unitNameLength();
-		uint8_t startPlace = bufferSize - (numLen + unitLen);
+		uint8_t numLen = strlen(itoaBuf);
+		uint8_t startPlace = bufferSize - numLen;
 		strcpy(buffer + startPlace, itoaBuf);
-		item->copyUnitToBuffer(buffer + (bufferSize - unitLen));
 	}
 }
 
@@ -266,7 +238,9 @@ void BaseMenuRenderer::prepareNewSubmenu(MenuItem* newItems) {
 	currentRoot->setActive(true);
 
 	if (newItems->getMenuType() == MENUTYPE_RUNTIME_LIST) {
-		menuMgr.setItemsInCurrentMenu(reinterpret_cast<ListRuntimeMenuItem*>(newItems)->getNumberOfParts() - 1);
+		ListRuntimeMenuItem* listMenu = reinterpret_cast<ListRuntimeMenuItem*>(newItems);
+		listMenu->setActiveIndex(0);
+		menuMgr.setItemsInCurrentMenu(listMenu->getNumberOfParts());
 	}
 	else {
 		menuMgr.setItemsInCurrentMenu(itemCount(newItems) - 1);
@@ -360,8 +334,20 @@ void BaseMenuRenderer::onSelectPressed(MenuItem* toEdit) {
            	getParentAndReset();
 			prepareNewSubmenu(sub->getChild());
 		}
-		else if (toEdit->getMenuType() == MENUTYPE_RUNTIME_LIST) {
-			prepareNewSubmenu(toEdit);
+		if (toEdit->getMenuType() == MENUTYPE_RUNTIME_LIST) {
+			if (currentRoot == toEdit) {
+				ListRuntimeMenuItem* listItem = reinterpret_cast<ListRuntimeMenuItem*>(toEdit);
+				serdebugF2("List press: ", listItem->getActiveIndex());
+				if (listItem->getActiveIndex() == 0) {
+					prepareNewSubmenu(getParentAndReset());
+				}
+				else {
+					listItem->getChildItem(listItem->getActiveIndex() - 1)->triggerCallback();
+					// reset to parent after doing the callback
+					listItem->asParent();
+				}
+			}
+			else prepareNewSubmenu(toEdit);
 		}
 		else if (toEdit->getMenuType() == MENUTYPE_BACK_VALUE) {
 			toEdit->setActive(false);
@@ -432,4 +418,12 @@ BaseDialog* NoRenderer::getDialog() {
         dialog = new NoRenderDialog();
     }
     return dialog;
+}
+
+bool isItemActionable(MenuItem* item) {
+	if (item->getMenuType() == MENUTYPE_SUB_VALUE || item->getMenuType() == MENUTYPE_ACTION_VALUE) return true;
+	if (item->getMenuType() == MENUTYPE_RUNTIME_LIST) {
+		return reinterpret_cast<ListRuntimeMenuItem*>(item)->isActingAsParent();
+	}
+	return false;
 }

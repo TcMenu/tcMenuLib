@@ -99,10 +99,12 @@ public:
 
 	RuntimeMenuItem* getChildItem(int pos) {
 		menuType = MENUTYPE_RUNTIME_LIST;
-		itemPosition = (pos < noOfParts) ? pos : 0xff;
-		setActive(activeItem == pos);
+		itemPosition = pos;
+		setActive((activeItem - 1) == pos);
 		return this;
 	}
+
+	uint8_t getActiveIndex() { return activeItem; }
 
 	void setActiveIndex(uint8_t idx) { 
 		activeItem = idx; 
@@ -116,6 +118,7 @@ public:
 	}
 
 	RuntimeMenuItem* asBackMenu() {
+		setActive(activeItem == 0);
 		menuType = MENUTYPE_BACK_VALUE;
 		itemPosition = LIST_PARENT_ITEM_POS;
 		return this;
@@ -125,6 +128,10 @@ public:
 		noOfParts = rows; 
 		setChanged(true); 
 		setSendRemoteNeededAll(); 
+	}
+
+	bool isActingAsParent() {
+		return itemPosition == LIST_PARENT_ITEM_POS;
 	}
 };
 
@@ -177,7 +184,7 @@ public:
 		byte sz[2];
 		sz[0] = lowByte(newVal);
 		sz[1] = highByte(newVal);
-		return renderFn(this, itemPosition, RENDERFN_SET_VALUE, sz, sizeof(sz));
+		return renderFn(this, itemPosition, RENDERFN_SET_VALUE, reinterpret_cast<char*>(sz), sizeof(sz));
 	}
 };
 

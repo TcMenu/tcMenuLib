@@ -24,27 +24,30 @@ void onRemoteInfoDialogComplete(ButtonType btn, void* data) {
 }
 
 // called for each state of the list, base row and child rows.
-int remoteInfoRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
+int remoteInfoRenderFn(RuntimeMenuItem* /*item*/, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
 	switch (mode) {
 	case RENDERFN_NAME: {
-		safeProgCpy(buffer, REMOTE_NAME_PGM, bufferSize);
-		if (row < 9) {
-			fastltoa(buffer, row, 1, NOT_PADDED, bufferSize);
+		if (row < 0xff) {
+			buffer[0] = 'R'; buffer[1] = 0;
+			fastltoa(buffer, row, 2, NOT_PADDED, bufferSize);
+		}
+		else {
+			safeProgCpy(buffer, REMOTE_NAME_PGM, bufferSize);
 		}
 		return true;
 	}
 	case RENDERFN_VALUE: {
 		if (row == 0xff) {
-			strcpy(buffer, "->");
+			buffer[0] = 0;
 			return true;
 		}
-
 		TagValueRemoteConnector* connector = RemoteMenuItem::getInstance()->getConnector(row);
 		if (connector == NULL || !connector->isConnected()) {
 			safeProgCpy(buffer, NO_LINK_STR, bufferSize);
 		}
 		else {
-			strcat(buffer, connector->getRemoteName());
+			strncpy(buffer, connector->getRemoteName(), bufferSize);
+			buffer[bufferSize - 1] = 0; // make sure it's zero terminated
 			appendChar(buffer, ':', bufferSize);
 			char authStatus = connector->isAuthenticated() ? 'A' : (connector->isConnected() ? 'C' : 'D');
 			appendChar(buffer, authStatus, bufferSize);
@@ -52,7 +55,7 @@ int remoteInfoRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, ch
 			fastltoa(buffer, connector->getRemoteMajorVer(), 2, NOT_PADDED, bufferSize);
 			appendChar(buffer, '.', bufferSize);
 			fastltoa(buffer, connector->getRemoteMinorVer(), 2, NOT_PADDED, bufferSize);
-			if (strlen(buffer) < bufferSize) {
+			if (strlen(buffer) < (unsigned int)bufferSize) {
 				appendChar(buffer, ':', bufferSize);
 				appendChar(buffer, connector->getRemotePlatform() + '0', bufferSize);
 			}
@@ -70,8 +73,8 @@ int remoteInfoRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, ch
 		}
 		return true;
 	}
+	default: return false;
 	}
-	return true;
 }
 
 void onRemoteItemCommsNotify(CommunicationInfo info) {
@@ -84,11 +87,11 @@ void onRemoteItemCommsNotify(CommunicationInfo info) {
 	RemoteMenuItem::getInstance()->doPassThru(info);
 }
 
-RemoteMenuItem::RemoteMenuItem(uint16_t id, int maxRemotes, MenuItem* next = NULL) 
+RemoteMenuItem::RemoteMenuItem(uint16_t id, int maxRemotes, MenuItem* next) 
 	: ListRuntimeMenuItem(id, maxRemotes, remoteInfoRenderFn, next) {
 	RemoteMenuItem::instance = this;
 	connectors = new TagValueRemoteConnector*[maxRemotes];
-	memset(connectors, 0, sizeof(connectors));
+	memset(connectors, 0, sizeof(TagValueRemoteConnector*) * maxRemotes);
 }
 
 void RemoteMenuItem::addConnector(TagValueRemoteConnector* connector) {
@@ -101,6 +104,7 @@ void RemoteMenuItem::addConnector(TagValueRemoteConnector* connector) {
 const char AUTH_KEYS_MENU_PGM[] PROGMEM = "Authorised Keys";
 const char AUTH_REMOVE_KEY[] PROGMEM = "Remove";
 const char AUTH_REMOVE_ALL_KEYS[] PROGMEM = "Remove ALL keys?";
+const char AUTH_EMPTY_KEY[] PROGMEM = "EmptyKey";
 
 void onAuthenticateRemoveKeysDlgComplete(ButtonType btn, void* data) {
 	if (btn == BTNTYPE_OK) {
@@ -118,12 +122,16 @@ int authenticationMenuItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnM
 		}
 		else if(row < authItem->getAuthManager()->getNumberOfEntries()) {
 			authItem->getAuthManager()->copyKeyNameToBuffer(row, buffer, bufferSize);
+			serdebugF4("Aname: ", row, buffer, bufferSize);
+			if (buffer[0] == 0) safeProgCpy(buffer, AUTH_EMPTY_KEY, bufferSize);
 		}
-		else buffer[0] = 0;
+		else {
+			buffer[0] = 0;
+		}
 		return true;
 	case RENDERFN_VALUE:
 		if (row == 0xff) {
-			strcpy(buffer, "->");
+			buffer[0] = 0;
 		}
 		else {
 			safeProgCpy(buffer, AUTH_REMOVE_KEY, bufferSize);
@@ -139,8 +147,8 @@ int authenticationMenuItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnM
 		}
 		return true;
 	}
+	default: return false;
 	}
-
 }
 
 EepromAuthenicationInfoMenuItem::EepromAuthenicationInfoMenuItem(uint16_t id, EepromAuthenticatorManager * authManager, MenuItem * next)

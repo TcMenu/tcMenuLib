@@ -40,8 +40,9 @@ extern LiquidCrystalRenderer renderer;
 extern IoAbstractionRef io23017;
 
 // all menu item forward references.
-extern ListRuntimeMenuItem menuCountingList;
-extern TextMenuItem menuText;
+extern IpAddressMenuItem menuIPAddress;
+extern BackMenuItem menuBackConnectivity;
+extern SubMenuItem menuConnectivity;
 extern ActionMenuItem menuSaveSettings;
 extern AnalogMenuItem menuPower;
 extern BooleanMenuItem menuEnabled;
@@ -49,6 +50,7 @@ extern BackMenuItem menuBackSettings;
 extern SubMenuItem menuSettings;
 extern ActionMenuItem menuQuestionDialog;
 extern ActionMenuItem menuInfoDialog;
+extern TextMenuItem menuText;
 extern EnumMenuItem menuFood;
 extern ActionMenuItem menuTakeDisplay;
 extern const ConnectorLocalInfo applicationInfo;
@@ -56,7 +58,6 @@ extern const ConnectorLocalInfo applicationInfo;
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
-int fnCountingListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
 void CALLBACK_FUNCTION onFoodChoice(int id);
 void CALLBACK_FUNCTION onInfoDlg(int id);
 void CALLBACK_FUNCTION onQuestionDlg(int id);

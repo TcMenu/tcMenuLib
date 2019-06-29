@@ -5,6 +5,8 @@ extern MockedIoAbstraction mockIo;
 extern NoRenderer noRenderer; 
 extern MockEepromAbstraction eeprom;
 
+const char szCompareData[] = "123456789";
+
 test(saveAndLoadFromMenu) {
     // initialise the menu manager and switches with basic configuration
     switches.initialise(&mockIo, true);
@@ -16,11 +18,14 @@ test(saveAndLoadFromMenu) {
     eeprom.write16(4, 8);
     eeprom.write16(6, 2);
     eeprom.write8(8, 1);
-	char sz[10];
-	strcpy(sz, "123456789");
-    eeprom.writeArrayToRom(9, (uint8_t*)sz, 10);
+    eeprom.writeArrayToRom(9, (uint8_t*)szCompareData, 10);
     eeprom.write16(20, 50);
-    menuMgr.load(eeprom);
+	// and the Ip address
+	eeprom.write8(22, 192);
+	eeprom.write8(23, 168);
+	eeprom.write8(24, 90);
+	eeprom.write8(25, 88);
+	menuMgr.load(eeprom);
 
     // now check the values we've loaded back from eeprom.
     assertEqual((int)menuAnalog.getCurrentValue(), 100);
@@ -29,7 +34,11 @@ test(saveAndLoadFromMenu) {
     assertEqual((int)menuEnum1.getCurrentValue(), 2);
     assertEqual((int)boolItem1.getBoolean(), 1);
 	assertEqual(uint8_t(10), textMenuItem1.textLength());
-	assertEqual(sz, textMenuItem1.getTextValue());
+	assertEqual(szCompareData, textMenuItem1.getTextValue());
+	
+	char sz[20];
+	menuIpAddr.copyValue(sz, sizeof(sz));
+	assertEqual("192.168.90.88", sz);
 
     // clear out the eeprom and then save the present structure.
     eeprom.reset();
@@ -43,10 +52,14 @@ test(saveAndLoadFromMenu) {
     assertEqual(eeprom.read16(6), (uint16_t)2);
     assertEqual(eeprom.read8(8), (uint8_t)1);
     
-    char szCompare[10];
-    eeprom.readIntoMemArray((uint8_t*)szCompare, 9, sizeof szCompare);
-    szCompare[9]=0;
-    assertEqual(szCompare, sz);
+    eeprom.readIntoMemArray((uint8_t*)sz, 9, 10);
+    sz[9]=0;
+    assertEqual(szCompareData, sz);
+
+	assertEqual(eeprom.read8(22), (uint8_t)192);
+	assertEqual(eeprom.read8(23), (uint8_t)168);
+	assertEqual(eeprom.read8(24), (uint8_t)90);
+	assertEqual(eeprom.read8(25), (uint8_t)88);
 
     // lastly make sure there were no errors in eeprom.
     assertFalse(eeprom.hasErrorOccurred());

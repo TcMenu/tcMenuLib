@@ -43,7 +43,7 @@ IpAddressMenuItem ipItem(ipRenderingFunction, 10002, &textItem);
 
 RuntimeMenuItem runtimeItem(MENUTYPE_RUNTIME_VALUE, 10001, testRenderFn, 99, 1, &ipItem);
 
-ListRuntimeMenuItem listItem(10000, 3, testRenderFn, &runtimeItem);
+ListRuntimeMenuItem listItem(10000, 10, testRenderFn, &runtimeItem);
 
 void setup() {
     Wire.begin();

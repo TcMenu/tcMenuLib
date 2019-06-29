@@ -16,7 +16,7 @@
 #include <Adafruit_PCD8544.h>
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
-#include <RemoteMenuItem.h>
+#include <RuntimeMenuItem.h>
 #include "tcMenuAdaFruitGfx.h"
 
 // all define statements needed
@@ -30,31 +30,32 @@ extern Adafruit_PCD8544 gfx;
 extern AdaFruitGfxMenuRenderer renderer;
 
 // all menu item forward references.
-extern RemoteMenuItem  menuR0;
-extern BackMenuItem  menuBackRemote;
-extern SubMenuItem  menuRemote;
-extern TextMenuItem  menuTxt;
-extern FloatMenuItem  menuCurrent;
-extern FloatMenuItem  menuVoltsIn;
-extern BackMenuItem  menuBackStatus;
-extern SubMenuItem  menuStatus;
-extern ActionMenuItem  menuShutdownNow;
-extern AnalogMenuItem  menuDelay;
-extern BooleanMenuItem  menuPwrDelay;
-extern BackMenuItem  menuBackSettings;
-extern SubMenuItem  menuSettings;
-extern EnumMenuItem  menuOnAlm;
-extern AnalogMenuItem  menuKitchen;
-extern AnalogMenuItem  menuLiving;
-extern AnalogMenuItem  menuHall;
-extern const ConnectorLocalInfo  applicationInfo;
+extern IpAddressMenuItem menuIpAddress;
+extern BackMenuItem menuBackConnectivity;
+extern SubMenuItem menuConnectivity;
+extern TextMenuItem menuTxt;
+extern FloatMenuItem menuCurrent;
+extern FloatMenuItem menuVoltsIn;
+extern BackMenuItem menuBackStatus;
+extern SubMenuItem menuStatus;
+extern ActionMenuItem menuShutdownNow;
+extern AnalogMenuItem menuDelay;
+extern BooleanMenuItem menuPwrDelay;
+extern BackMenuItem menuBackSettings;
+extern SubMenuItem menuSettings;
+extern EnumMenuItem menuOnAlm;
+extern AnalogMenuItem menuKitchen;
+extern AnalogMenuItem menuLiving;
+extern AnalogMenuItem menuHall;
+extern const ConnectorLocalInfo applicationInfo;
 
-// Callback functions always follow this pattern: void CALLBACK_FUNCTION myCallback();
+// Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
 void CALLBACK_FUNCTION onHallLight(int id);
-void CALLBACK_FUNCTION onLivingRoomLight(int id);
 void CALLBACK_FUNCTION onKitchenLight(int id);
+void CALLBACK_FUNCTION onLivingRoomLight(int id);
+void CALLBACK_FUNCTION onPowerDownDetected(int id);
 
 void setupMenu();
 

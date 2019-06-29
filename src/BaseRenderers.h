@@ -26,6 +26,8 @@ class BaseDialog;
 /** The maximum number of ticks that */
 #define MAX_TICKS 0xffff
 
+bool isItemActionable(MenuItem* item);
+
 /**
  * Used to take over rendering for a period of time. Normally one calls renderer.takeOverDisplay(..) 
  * with a reference to a function meeting this spec. Whenever the callback occurs the current value

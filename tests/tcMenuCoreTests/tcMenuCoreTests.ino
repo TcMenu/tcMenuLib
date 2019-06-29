@@ -47,6 +47,10 @@ test(testTcUtilIntegerConversions) {
     assertEqual(szBuffer, " 907");
     ltoaClrBuff(szBuffer, 22, 4, '0', sizeof(szBuffer));
     assertEqual(szBuffer, "0022");
+	ltoaClrBuff(szBuffer, -22, 4, '0', sizeof(szBuffer));
+	assertEqual(szBuffer, "-0022");
+	ltoaClrBuff(szBuffer, -93, 2, NOT_PADDED, sizeof(szBuffer));
+	assertEqual(szBuffer, "-93");
 
     // and now test the appending version with zero padding
     strcpy(szBuffer, "val = ");

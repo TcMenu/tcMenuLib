@@ -3,6 +3,7 @@
 #include <IoAbstractionWire.h>
 #include <TaskManager.h>
 #include <RemoteAuthentication.h>
+#include <RemoteMenuItem.h>
 
 /**
  * This TcMenu example shows how to take over the display for your own purposes from a menu item.
@@ -16,8 +17,6 @@
 byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
 };
-IPAddress ip(192, 168, 0, 96);
-
 
 // In the designer UI we configured io23017 as an IoExpander variable for both the input and display.
 // We must now create it as an MCP23017 expander. Address is 0x20 with interrupt pin connected to pin 2.
@@ -29,22 +28,24 @@ int counter = 0;
 
 // if you don't have an i2c rom uncomment the avr variant and remove the i2c one.
 // AvrEeprom eeprom; 
-I2cAt24Eeprom eeprom(0x50, 64); // page size 64 for AT24-128 model
+I2cAt24Eeprom eeprom(0x50, PAGESIZE_AT24C128); // page size 64 for AT24-128 model
 
 // we want to authenticate connections, the easiest and quickest way is to use the EEPROM
 // authenticator where pairing requests add a new item into the EEPROM. Any authentication
 // requests are then handled by looking in the EEPROM.
 EepromAuthenticatorManager authManager;
 
+// Here we create two additional menus, that will be added manually to handle the connectivity
+// status and authentication keys. In a future version these will be added to th desinger.
+RemoteMenuItem menuRemoteMonitor(1001, 2);
+EepromAuthenicationInfoMenuItem menuAuthKeyMgr(1002, &authManager, &menuRemoteMonitor);
+
 void setup() {
+    //
+    // If you are using serial (connectivity or logging) and wire they must be initialised 
+    // before their first use.
+    //
     Serial.begin(115200);
-
-    // spin up the Ethernet library
-    Ethernet.begin(mac, ip);
-
-    // You must call wire.begin if you are using the wire library. Importantly the library
-    // or designer does not presently do this for you to make it compatible with the widest
-    // range of possibilities.
     Wire.begin();
 
     // When the renderer times out and is about to reset to main menu, you can get a callback.
@@ -57,6 +58,8 @@ void setup() {
         renderer.takeOverDisplay(myDisplayFunction);
     });
 
+    serdebug("Added the reset callback");
+
     // now we enable authentication using EEPROM authentication. Where the EEPROM is
     // queried for authentication requests, and any additional pairs are stored there too.
     // first we initialise the authManager, then pass it to the class.
@@ -64,11 +67,27 @@ void setup() {
     authManager.initialise(&eeprom, 100);
     remoteServer.setAuthenticator(&authManager);
 
+    // Here we add two additional menus for managing the connectivity and authentication keys.
+    // In the future, there will be an option to autogenerate these from the designer.
+    menuIPAddress.setNext(&menuAuthKeyMgr);
+    menuRemoteMonitor.addConnector(remoteServer.getRemoteConnector(0));
+    menuAuthKeyMgr.setLocalOnly(true);
+
     // this is put in by the menu designer and must be called (always ensure devices are setup first).
     setupMenu();
 
     // here we use the EEPROM to load back the last set of values.
     menuMgr.load(eeprom);
+
+    // spin up the Ethernet library, get the IP address from the menu
+    byte* rawIp = menuIPAddress.getIpAddress();
+    IPAddress ip(rawIp[0], rawIp[1], rawIp[2], rawIp[3]);
+    Ethernet.begin(mac, ip);
+
+    // and print out the IP address
+    char sz[20];
+    menuIPAddress.copyValue(sz, sizeof(sz));
+    Serial.print("Device IP is: "); Serial.println(sz);
 }
 
 //
@@ -211,24 +230,4 @@ void CALLBACK_FUNCTION onQuestionDlg(int /*id*/) {
 //
 void CALLBACK_FUNCTION onSaveSettings(int /*id*/) {
     menuMgr.save(eeprom);
-}
-
-// see tcMenu list documentation on thecoderscorner.com
-int CALLBACK_FUNCTION fnCountingListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
-   switch(mode) {
-    case RENDERFN_INVOKE:
-        // TODO - your code to invoke goes here - row is the index of the item
-        return true;
-    case RENDERFN_NAME:
-        // TODO - each row has it's own name - 0xff is the parent item
-        ltoaClrBuff(buffer, row, 3, NOT_PADDED, bufferSize);
-        return true;
-    case RENDERFN_VALUE:
-        // TODO - each row can has its own value - 0xff is the parent item
-        buffer[0] = 'V'; buffer[1]=0;
-        fastltoa(buffer, row, 3, NOT_PADDED, bufferSize);
-        return true;
-    case RENDERFN_EEPROM_POS: return 0xffff; // lists are generally not saved to EEPROM
-    default: return false;
-    }
 }

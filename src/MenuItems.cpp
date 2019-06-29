@@ -131,6 +131,72 @@ bool isSame(float d1, float d2) {
 	return result < 0.0000001;
 }
 
+void AnalogMenuItem::copyValue(char * buffer, uint8_t bufferSize) {
+	uint8_t dpNeeded = getDecimalPlacesForDivisor();
+	WholeAndFraction wf = getWholeAndFraction();
+
+	ltoaClrBuff(buffer, wf.whole, 5, NOT_PADDED, bufferSize);
+
+	if (dpNeeded != 0) {
+		appendChar(buffer, '.', sizeof bufferSize);
+		fastltoa(buffer, wf.fraction, dpNeeded, '0', bufferSize);
+	}
+	uint8_t numLen = strlen(buffer);
+	if(numLen < bufferSize) copyUnitToBuffer(buffer + numLen, bufferSize - numLen);
+}
+
+float AnalogMenuItem::getAsFloatingPointValue() {
+	WholeAndFraction wf = getWholeAndFraction();
+	float fract = (float(wf.fraction) / float(getActualDecimalDivisor()));
+	return  (wf.whole < 0) ? (wf.whole - fract) : (wf.whole + fract);
+}
+
+uint16_t AnalogMenuItem::getActualDecimalDivisor() {
+	uint16_t divisor = getDivisor();
+	if (divisor < 2) return 1;
+	return (divisor > 1000) ? 10000 : (divisor > 100) ? 1000 : (divisor > 10) ? 100 : 10;
+}
+
+WholeAndFraction AnalogMenuItem::getWholeAndFraction() {
+	WholeAndFraction wf;
+	int calcVal = int16_t(getCurrentValue()) + getOffset();
+	int divisor = getDivisor();
+
+	if (divisor < 2) {
+		wf.whole = calcVal;
+		wf.fraction = 0;
+	}
+	else {
+		wf.whole = calcVal / int16_t(divisor);
+		int fractMax = getActualDecimalDivisor();
+		wf.fraction = abs((calcVal % divisor)) * (fractMax / divisor);
+	}
+	return wf;
+}
+
+void AnalogMenuItem::setFromWholeAndFraction(WholeAndFraction wf) {
+	serdebugF3("setWF ", wf.whole, wf.fraction);
+	int fractMax = getActualDecimalDivisor();
+	uint16_t divisor = getDivisor();
+	int correctedFraction = wf.fraction / (fractMax / divisor);
+	setCurrentValue(((wf.whole * getDivisor()) + correctedFraction) - getOffset());
+}
+
+void AnalogMenuItem::setFromFloatingPointValue(float value) {
+	WholeAndFraction wf;
+	wf.whole = value;
+	wf.fraction = abs(value - float(wf.whole)) * getActualDecimalDivisor();
+
+	setFromWholeAndFraction(wf);
+}
+
+uint8_t AnalogMenuItem::getDecimalPlacesForDivisor() {
+	uint16_t divisor = getDivisor();
+	if (divisor < 2) return 0;
+
+	return (divisor > 1000) ? 4 : (divisor > 100) ? 3 : (divisor > 10) ? 2 : 1;
+}
+
 void FloatMenuItem::setFloatValue(float newVal, bool silent) {
 	if(isSame(newVal, currValue)) return;
 	
@@ -141,7 +207,10 @@ void FloatMenuItem::setFloatValue(float newVal, bool silent) {
 }
 
 void ValueMenuItem::setCurrentValue(uint16_t val, bool silent) {
-	if(val == currentValue || val > getMaximumValue()) return;
+	if (val == currentValue || val > getMaximumValue()) {
+		serdebugF4("Not changing ", val, currentValue, getMaximumValue());
+		return;
+	}
 	
 	setChanged(true);
 	setSendRemoteNeededAll();

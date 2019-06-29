@@ -14,16 +14,16 @@ int nextRandomId() {
 }
 
 RuntimeMenuItem::RuntimeMenuItem(MenuType menuType, uint16_t id, RuntimeRenderingFn renderFn,
-	uint8_t itemPosition, uint8_t numberOfRows, MenuItem* next = NULL)	: MenuItem(menuType, NULL, next) {
+	uint8_t itemPosition, uint8_t numberOfRows, MenuItem* next)	: MenuItem(menuType, NULL, next) {
 	this->id = id;
 	this->noOfParts = numberOfRows;
 	this->renderFn = renderFn;
 	this->itemPosition = itemPosition;
 }
 
-ListRuntimeMenuItem::ListRuntimeMenuItem(uint16_t id, int numberOfRows, RuntimeRenderingFn renderFn, MenuItem* next = NULL)
+ListRuntimeMenuItem::ListRuntimeMenuItem(uint16_t id, int numberOfRows, RuntimeRenderingFn renderFn, MenuItem* next)
 	: RuntimeMenuItem(MENUTYPE_RUNTIME_LIST, id, renderFn, 0xff, numberOfRows, next) {
-	activeItem = 0xff;
+	activeItem = 0;
 }
 
 void TextMenuItem::setTextValue(const char* text, bool silent) {
@@ -86,17 +86,17 @@ int ipAddressRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, cha
 		return true;
 	}
 	case RENDERFN_GETRANGE: return 255;
+    default: return false;
 	}
-	return false;
 }
 
-int backSubItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
+int backSubItemRenderFn(RuntimeMenuItem* /*item*/, uint8_t /*row*/, RenderFnMode mode, char* buffer, int /*bufferSize*/) {
 	switch (mode) {
 	case RENDERFN_VALUE:
 		buffer[0] = 0;
 		return true;
+    default: return false;
 	}
-	return false;
 }
 
 int textItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
@@ -134,8 +134,8 @@ int textItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char
 	}
 	case RENDERFN_GETPART:
 		return (int)txtItem->getTextValue()[row - 1];
+    default: return false;
 	}
-	return false;
 }
 
 void IpAddressMenuItem::setIpAddress(const char * ipData) {

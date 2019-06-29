@@ -19,9 +19,12 @@ EthernetServer server(3333);
 
 // Global Menu Item declarations
 
-ListRuntimeMenuItem menuCountingList(10, 0, fnCountingListRtCall, NULL);
-RENDERING_CALLBACK_NAME_INVOKE(fnTextRtCall, textItemRenderFn, "Text", -1, NULL)
-TextMenuItem menuText(fnTextRtCall, 7, 10, &menuCountingList);
+RENDERING_CALLBACK_NAME_INVOKE(fnIPAddressRtCall, ipAddressRenderFn, "IPAddress", 7, NULL)
+IpAddressMenuItem menuIPAddress(fnIPAddressRtCall, 12, NULL);
+RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NULL)
+const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 11, 0xffff, 0, NO_CALLBACK };
+BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuIPAddress);
+SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL);
 const PROGMEM AnyMenuInfo minfoSaveSettings = { "Save Settings", 6, 0xffff, 0, onSaveSettings };
 ActionMenuItem menuSaveSettings(&minfoSaveSettings, NULL);
 const PROGMEM AnalogMenuInfo minfoPower = { "Power", 5, 5, 250, NO_CALLBACK, 0, 10, "W" };
@@ -31,17 +34,19 @@ BooleanMenuItem menuEnabled(&minfoEnabled, false, &menuPower);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings", -1, NULL)
 const PROGMEM SubMenuInfo minfoSettings = { "Settings", 3, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackSettings(fnSettingsRtCall, &menuEnabled);
-SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, &menuText);
+SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, &menuConnectivity);
 const PROGMEM AnyMenuInfo minfoQuestionDialog = { "Question Dialog", 9, 0xffff, 0, onQuestionDlg };
 ActionMenuItem menuQuestionDialog(&minfoQuestionDialog, &menuSettings);
 const PROGMEM AnyMenuInfo minfoInfoDialog = { "Info Dialog", 8, 0xffff, 0, onInfoDlg };
 ActionMenuItem menuInfoDialog(&minfoInfoDialog, &menuQuestionDialog);
+RENDERING_CALLBACK_NAME_INVOKE(fnTextRtCall, textItemRenderFn, "Text", -1, NULL)
+TextMenuItem menuText(fnTextRtCall, 7, 10, &menuInfoDialog);
 const char enumStrFood_0[] PROGMEM = "Pizza";
 const char enumStrFood_1[] PROGMEM = "Pasta";
 const char enumStrFood_2[] PROGMEM = "Salad";
 const char* const enumStrFood[] PROGMEM  = { enumStrFood_0, enumStrFood_1, enumStrFood_2 };
 const PROGMEM EnumMenuInfo minfoFood = { "Food", 2, 3, 2, onFoodChoice, enumStrFood };
-EnumMenuItem menuFood(&minfoFood, 0, &menuInfoDialog);
+EnumMenuItem menuFood(&minfoFood, 0, &menuText);
 const PROGMEM AnyMenuInfo minfoTakeDisplay = { "Take Display", 1, 0xffff, 0, onTakeOverDisplay };
 ActionMenuItem menuTakeDisplay(&minfoTakeDisplay, &menuFood);
 const PROGMEM ConnectorLocalInfo applicationInfo = { "Take Over Display", "40722ec4-e8bc-4889-b54e-d81b14cb429c" };

@@ -14,6 +14,7 @@
 #include <EepromAbstraction.h>
 #include <UIPEthernet.h>
 #include <RemoteAuthentication.h>
+#include <RemoteMenuItem.h>
 
 // you can turn on and off tcmenu logging in the below file (within IoAbstraction)
 #include <IoLogging.h>
@@ -31,7 +32,11 @@ EepromAuthenticatorManager authManager;
 byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
 };
-IPAddress ip(192, 168, 0, 96);
+
+// Here we create two additional menus, that will be added manually to handle the connectivity
+// status and authentication keys. In a future version these will be added to th desinger.
+RemoteMenuItem menuRemoteMonitor(1001, 2);
+EepromAuthenicationInfoMenuItem menuAuthKeyMgr(1002, &authManager, &menuRemoteMonitor);
 
 // when we use the Ada graphics support, the designer only generates an export definition
 // for the graphics variable. It is our responsibility to both declare it and initialise
@@ -54,10 +59,6 @@ void setup() {
     while(!Serial);
     Serial.begin(115200);
 
-    // first we register for communication callbacks when there's a change in state
-    // see the onCommsChange function further down for the details.
-    remoteServer.getRemoteConnector(0)->setCommsNotificationCallback(onCommsChange);
-
     // now we enable authentication using EEPROM authentication. Where the EEPROM is
     // queried for authentication requests, and any additional pairs are stored there too.
     // first we initialise the authManager, then pass it to the class.
@@ -65,18 +66,32 @@ void setup() {
     authManager.initialise(&eeprom, 100);
     remoteServer.setAuthenticator(&authManager);
 
-    // and start up the internet to allow remote control of the menu.
-    Ethernet.begin(mac, ip);
-
     addWidgetToTitleArea();
-
-    // initialise the menu
-    setupMenu();
+    
+    // Here we add two additional menus for managing the connectivity and authentication keys.
+    // In the future, there will be an option to autogenerate these from the designer.
+    menuIpAddress.setNext(&menuAuthKeyMgr);
+    menuRemoteMonitor.addConnector(remoteServer.getRemoteConnector(0));
+    menuRemoteMonitor.registerCommsNotification(onCommsChange);
+    menuAuthKeyMgr.setLocalOnly(true);
 
     // we can load the menu back from eeprom, the second parameter is an
     // optional override of the magic key. This key is saved out with the
     // menu, and the values are only loaded when the key matches.
     menuMgr.load(eeprom, 0xd00d);
+
+    // spin up the Ethernet library, get the IP address from the menu
+    byte* rawIp = menuIpAddress.getIpAddress();
+    IPAddress ip(rawIp[0], rawIp[1], rawIp[2], rawIp[3]);
+    Ethernet.begin(mac, ip);
+
+    // initialise the menu
+    setupMenu();
+
+    // and print out the IP address
+    char sz[20];
+    menuIpAddress.copyValue(sz, sizeof(sz));
+    Serial.print("Device IP is: "); Serial.println(sz);
 
     taskManager.scheduleFixedRate(500, [] {
         // here we simulate a changing field, where we are monitoring the voltage and current
@@ -96,7 +111,6 @@ void setup() {
             dlg->copyIntoBuffer(sz);
         }
     });
-
 }
 
 //
@@ -104,7 +118,7 @@ void setup() {
 // the power down scenario started. Notice we use the same key as load.
 // https://www.thecoderscorner.com/electronics/microcontrollers/psu-control/detecting-power-loss-in-powersupply/ 
 //
-void onPowerDownDetected() {
+void CALLBACK_FUNCTION onPowerDownDetected(int) {
     menuMgr.save(eeprom, 0xd00d);
 }
 

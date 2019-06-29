@@ -14,9 +14,8 @@
 #include <tcMenu.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
-#include <RemoteConnector.h>
 #include "EthernetTransport.h"
-#include <RemoteMenuItem.h>
+#include <RemoteConnector.h>
 #include "tcMenuAdaFruitGfx.h"
 
 // all define statements needed
@@ -29,9 +28,11 @@ extern AdaColorGfxMenuConfig colorConfig;
 extern Adafruit_ILI9341 gfx;
 extern AdaFruitGfxMenuRenderer renderer;
 extern IoAbstractionRef io8574;
-extern const char applicationName[];
 
 // all menu item forward references.
+extern IpAddressMenuItem menuIpAddress;
+extern BackMenuItem menuBackConnectivity;
+extern SubMenuItem menuConnectivity;
 extern FloatMenuItem menuVoltA1;
 extern FloatMenuItem menuVoltA0;
 extern BackMenuItem menuBackStatus;
@@ -41,21 +42,21 @@ extern BooleanMenuItem menuSCircuitProtect;
 extern BackMenuItem menuBackAdvanced;
 extern SubMenuItem menuAdvanced;
 extern ActionMenuItem menuSaveAll;
-extern RemoteMenuItem menuRemote;
 extern BooleanMenuItem menuPwrDelay;
 extern BackMenuItem menuBackSettings;
 extern SubMenuItem menuSettings;
 extern EnumMenuItem menuLimit;
 extern AnalogMenuItem menuCurrent;
 extern AnalogMenuItem menuVoltage;
+extern const ConnectorLocalInfo applicationInfo;
 
-// Callback functions always follow this pattern: void CALLBACK_FUNCTION myCallback();
+// Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
-void CALLBACK_FUNCTION onVoltageChange(int id);
 void CALLBACK_FUNCTION onCurrentChange(int id);
 void CALLBACK_FUNCTION onLimitMode(int id);
 void CALLBACK_FUNCTION onSaveRom(int id);
+void CALLBACK_FUNCTION onVoltageChange(int id);
 
 void setupMenu();
 

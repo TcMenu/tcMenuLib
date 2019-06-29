@@ -46,6 +46,11 @@ void fastltoa_mv(char* str, long val, long divisor, char padChar, int len) {
     int i=0;
     len -=2;
 
+	if (val < 0) {
+		val = abs(val);
+		appendChar(str, '-', len);
+	}
+
     val %= divisor;
     divisor /= 10;
 
