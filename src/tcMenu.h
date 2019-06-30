@@ -59,6 +59,14 @@ public:
 	 */
 	void initWithoutInput(MenuRenderer* renderer, MenuItem* root);
 
+    /**
+     * Sometimes you need to use the menu structure before everything is initialised, in this case
+     * you can call this function early on to set up the root menu item.
+     */
+    void setRootMenu(MenuItem* menuItem) {
+        rootMenu = menuItem;
+    }
+
 	/** 
 	 * called when the rotary encoder has moved to a new position to update the menu
 	 * @param value the new changed value

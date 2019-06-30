@@ -25,14 +25,14 @@ extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
 
 // all menu item forward references.
-extern BooleanMenuItem  menuLED2;
-extern BooleanMenuItem  menuLED1;
-extern BackMenuItem  menuBackLEDStates;
-extern SubMenuItem  menuLEDStates;
-extern AnalogMenuItem  menuValueA0;
-extern const ConnectorLocalInfo  applicationInfo;
+extern BooleanMenuItem menuLED2;
+extern BooleanMenuItem menuLED1;
+extern BackMenuItem menuBackLEDStates;
+extern SubMenuItem menuLEDStates;
+extern AnalogMenuItem menuValueA0;
+extern const ConnectorLocalInfo applicationInfo;
 
-// Callback functions always follow this pattern: void CALLBACK_FUNCTION myCallback();
+// Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
 void CALLBACK_FUNCTION onLed1(int id);

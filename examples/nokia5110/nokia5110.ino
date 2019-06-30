@@ -78,6 +78,7 @@ void setup() {
     // we can load the menu back from eeprom, the second parameter is an
     // optional override of the magic key. This key is saved out with the
     // menu, and the values are only loaded when the key matches.
+    menuMgr.setRootMenu(&menuHall);
     menuMgr.load(eeprom, 0xd00d);
 
     // spin up the Ethernet library, get the IP address from the menu
