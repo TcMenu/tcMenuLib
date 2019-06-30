@@ -19,6 +19,16 @@ WiFiServer server(3333);
 
 // Global Menu Item declarations
 
+RENDERING_CALLBACK_NAME_INVOKE(fnIpAddressRtCall, ipAddressRenderFn, "IpAddress", -1, NULL)
+IpAddressMenuItem menuIpAddress(fnIpAddressRtCall, 10, NULL);
+RENDERING_CALLBACK_NAME_INVOKE(fnPwdRtCall, textItemRenderFn, "Pwd", 23, NULL)
+TextMenuItem menuPwd(fnPwdRtCall, 12, 15, &menuIpAddress);
+RENDERING_CALLBACK_NAME_INVOKE(fnSSIDRtCall, textItemRenderFn, "SSID", 8, NULL)
+TextMenuItem menuSSID(fnSSIDRtCall, 11, 15, &menuPwd);
+RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NULL)
+const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 9, 0xffff, 0, NO_CALLBACK };
+BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuSSID);
+SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL);
 const PROGMEM AnyMenuInfo minfoSaveAll = { "Save All", 8, 0xffff, 0, onSaveAll };
 ActionMenuItem menuSaveAll(&minfoSaveAll, NULL);
 const char enumStrWinOpening_0[] PROGMEM = "NARROW";
@@ -32,9 +42,10 @@ const char enumStrHeaterPower_2[] PROGMEM = "HIGH";
 const char* const enumStrHeaterPower[] PROGMEM  = { enumStrHeaterPower_0, enumStrHeaterPower_1, enumStrHeaterPower_2 };
 const PROGMEM EnumMenuInfo minfoHeaterPower = { "Heater Power", 6, 4, 2, onHeaterPower, enumStrHeaterPower };
 EnumMenuItem menuHeaterPower(&minfoHeaterPower, 0, &menuWinOpening);
+RENDERING_CALLBACK_NAME_INVOKE(fnSetupRtCall, backSubItemRenderFn, "Setup", -1, NULL)
 const PROGMEM SubMenuInfo minfoSetup = { "Setup", 5, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackSetup(&menuHeaterPower, (const AnyMenuInfo*)&minfoSetup);
-SubMenuItem menuSetup(&minfoSetup, &menuBackSetup, NULL);
+BackMenuItem menuBackSetup(fnSetupRtCall, &menuHeaterPower);
+SubMenuItem menuSetup(&minfoSetup, &menuBackSetup, &menuConnectivity);
 const PROGMEM BooleanMenuInfo minfoElectricHeater = { "Electric Heater", 4, 3, 1, onElectricHeater, NAMING_ON_OFF };
 BooleanMenuItem menuElectricHeater(&minfoElectricHeater, false, &menuSetup);
 const PROGMEM BooleanMenuInfo minfoWindowOpen = { "Window Open", 3, 2, 1, onWindowOpen, NAMING_YES_NO };
@@ -50,12 +61,16 @@ const PROGMEM ConnectorLocalInfo applicationInfo = { "Greenhouse", "01b9cb76-c10
 void setupMenu() {
     prepareBasicU8x8Config(gfxConfig);
     renderer.setGraphicsDevice(&gfx, &gfxConfig);
-    menuMgr.initWithoutInput(&renderer, &menuTomatoTemp);
+    switches.initialise(ioUsingArduino(), true);
+    menuMgr.initForEncoder(&renderer, &menuTomatoTemp, ENCODER_PIN_A, ENCODER_PIN_B, ENCODER_PIN_OK);
     remoteServer.begin(&server, &applicationInfo);
 
     // Read only and local only function calls
     menuCucumberTemp.setReadOnly(true);
     menuTomatoTemp.setReadOnly(true);
+    menuIpAddress.setReadOnly(true);
+    menuPwd.setLocalOnly(true);
     menuSaveAll.setLocalOnly(true);
+    menuSSID.setLocalOnly(true);
 }
 

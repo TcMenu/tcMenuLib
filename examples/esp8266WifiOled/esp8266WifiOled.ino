@@ -17,6 +17,8 @@
 #include <IoAbstractionWire.h>
 #include <ArduinoEEPROMAbstraction.h>
 #include <RemoteAuthentication.h>
+#include <RemoteMenuItem.h>
+
 #ifdef ESP32 
 #include <WiFi.h>
 #else
@@ -41,11 +43,14 @@
 //
 // We create an adafruit 1306 display driver and also the tcMenu display configuration options
 //
-U8G2_SSD1306_128X64_NONAME_F_SW_I2C gfx(U8G2_R0, 15, 4);
+U8G2_SSD1306_128X64_NONAME_F_SW_I2C gfx(U8G2_R0, 15, 4, 16);
 IoAbstractionRef io8574 = ioFrom8574(0x20, IO_INTERRUPT_PIN);
 
 // eeprom wrapper, initialised in setup.
 ArduinoEEPROMAbstraction *eeprom = NULL;
+
+// local store of if we are connected to wifi.
+bool connectedToWifi = false;
 
 //
 // state used later on by the heater and window control functions
@@ -53,10 +58,20 @@ ArduinoEEPROMAbstraction *eeprom = NULL;
 bool heaterOn;
 bool windowOpen;
 
+// we want to authenticate connections, the easiest and quickest way is to use the EEPROM
+// authenticator where pairing requests add a new item into the EEPROM. Any authentication
+// requests are then handled by looking in the EEPROM.
+EepromAuthenticatorManager authManager;
+
 // we add two widgets that show both the connection status and wifi signal strength
 // these are added to the renderer and rendered upon any change.
 TitleWidget connectedWidget(iconsConnection, 2, 16, 10);
 TitleWidget wifiWidget(iconsWifi, 5, 16, 10, &connectedWidget);
+
+// Here we create two additional menus, that will be added manually to handle the connectivity
+// status and authentication keys. In a future version these will be added to th desinger.
+RemoteMenuItem menuRemoteMonitor(1001, 2);
+EepromAuthenicationInfoMenuItem menuAuthKeyMgr(1002, &authManager, &menuRemoteMonitor);
 
 // when there's a change in communication status (client connects for example) this gets called.
 void onCommsChange(CommunicationInfo info) {
@@ -78,23 +93,43 @@ void setup() {
 
     Serial.begin(115200);
 
-    // add a callback for connection changes, see function above.
-    remoteServer.getRemoteConnector(0)->setCommsNotificationCallback(onCommsChange);
+    // now we enable authentication using EEPROM authentication. Where the EEPROM is
+    // queried for authentication requests, and any additional pairs are stored there too.
+    // first we initialise the authManager, then pass it to the class.
+    // Always call BEFORE setupMenu()
+    authManager.initialise(eeprom, 100);
+    remoteServer.setAuthenticator(&authManager);
 
-    // initialise the authentication to use the eeprom at position 50 onwards.
-    authenticator.initialise(eeprom, 50);
+    // Here we add two additional menus for managing the connectivity and authentication keys.
+    // In the future, there will be an option to autogenerate these from the designer.
+    menuIpAddress.setNext(&menuAuthKeyMgr);
+    menuRemoteMonitor.addConnector(remoteServer.getRemoteConnector(0));
+    menuRemoteMonitor.registerCommsNotification(onCommsChange);
+    menuAuthKeyMgr.setLocalOnly(true);
 
     // start up the display.
     gfx.begin();
 
+    // because we are initialising wifi from the menu entries, we need to load the eeprom
+    // values very early, in this case, set the root item first, before calling load.
+    menuMgr.setRootMenu(&menuTomatoTemp);
+    menuMgr.load(*eeprom);
+
     // this sketch assumes you've successfully connected to the Wifi before, does not
     // call begin.. You can initialise the wifi whichever way you wish here.
-    WiFi.begin("SSID", "PWD");
+    WiFi.begin(menuSSID.getTextValue(), menuPwd.getTextValue());
     WiFi.mode(WIFI_STA);
 
     // now monitor the wifi level every second and report it in a widget.
     taskManager.scheduleFixedRate(1000, [] {
         if(WiFi.status() == WL_CONNECTED) {
+            if(!connectedToWifi) {
+                IPAddress localIp = WiFi.localIP();
+                Serial.print("Now connected to WiFi");
+                Serial.println(localIp);
+                menuIpAddress.setIpAddress(localIp[0], localIp[1], localIp[2], localIp[3]);
+                connectedToWifi = true;
+            }
             int qualityIcon = 0;
             long strength = WiFi.RSSI();
             if(strength > -95) qualityIcon = 1;
@@ -102,9 +137,11 @@ void setup() {
             else if(strength > -70) qualityIcon = 3;
             else if(strength > -55) qualityIcon = 4;
             wifiWidget.setCurrentState(qualityIcon);
-            Serial.print("LocalIP"); Serial.println(WiFi.localIP());
         }
-        else wifiWidget.setCurrentState(0);
+        else {
+            connectedToWifi = false;
+            wifiWidget.setCurrentState(0);
+        }
         
 
     });
@@ -132,8 +169,6 @@ void setup() {
     ioDevicePinMode(io8574, HEATER_PIN, OUTPUT);
     ioDeviceDigitalWrite(io8574, WINDOW_PIN, HIGH);
     ioDeviceDigitalWriteS(io8574, HEATER_PIN, HIGH);
-
-    menuMgr.load(*eeprom);
 }
 
 //
@@ -236,7 +271,6 @@ void CALLBACK_FUNCTION onElectricHeater(int /*id*/) {
 const char allSavedPgm[] PROGMEM = "All saved to EEPROM";
 void CALLBACK_FUNCTION onSaveAll(int id) {
     Serial.println("Saving values to EEPROM");
-    ArduinoEEPROMAbstraction eepromWrapper(&EEPROM);
     menuMgr.save(*eeprom);
     // on esp you must commit after calling save.
     EEPROM.commit();

@@ -26,8 +26,8 @@ const char enumStrFood_2[] PROGMEM = "Salad";
 const char* const enumStrFood[] PROGMEM  = { enumStrFood_0, enumStrFood_1, enumStrFood_2 };
 const PROGMEM EnumMenuInfo minfoFood = { "Food", 5, 0xffff, 2, NO_CALLBACK, enumStrFood };
 EnumMenuItem menuFood(&minfoFood, 0, &menuPushMe);
-const PROGMEM TextMenuInfo minfoMyText = { "MyText", 4, 0xffff, 10, NO_CALLBACK };
-TextMenuItem menuMyText(&minfoMyText, &menuFood);
+RENDERING_CALLBACK_NAME_INVOKE(fnMyTextRtCall, textItemRenderFn, "MyText", -1, NULL)
+TextMenuItem menuMyText(fnMyTextRtCall, 4, 10, &menuFood);
 const PROGMEM AnalogMenuInfo minfoA2Voltage = { "A2 Voltage", 3, 0xffff, 1024, NO_CALLBACK, 0, 200, "V" };
 AnalogMenuItem menuA2Voltage(&minfoA2Voltage, 0, &menuMyText);
 const PROGMEM AnalogMenuInfo minfoA1Voltage = { "A1 Voltage", 2, 0xffff, 1024, NO_CALLBACK, 0, 200, "V" };
@@ -44,7 +44,7 @@ void setupMenu() {
     lcd.backlight();
     switches.initialise(ioUsingArduino(), true);
     menuMgr.initForEncoder(&renderer, &menuA0Voltage, ENCODER_PIN_A, ENCODER_PIN_B, ENCODER_PIN_OK);
-    remoteServer.begin(&Serial, &applicationInfo);
+    remoteServer.begin(&Serial1, &applicationInfo);
 
     // Read only and local only function calls
     menuA0Voltage.setReadOnly(true);

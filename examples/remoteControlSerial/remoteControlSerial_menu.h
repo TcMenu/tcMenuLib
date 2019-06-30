@@ -15,6 +15,7 @@
 #include <LiquidCrystalIO.h>
 #include "SerialTransport.h"
 #include <RemoteConnector.h>
+#include <RuntimeMenuItem.h>
 #include "tcMenuLiquidCrystal.h"
 
 // all define statements needed
@@ -28,15 +29,15 @@ extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
 
 // all menu item forward references.
-extern ActionMenuItem  menuPushMe;
-extern EnumMenuItem  menuFood;
-extern TextMenuItem  menuMyText;
-extern AnalogMenuItem  menuA2Voltage;
-extern AnalogMenuItem  menuA1Voltage;
-extern AnalogMenuItem  menuA0Voltage;
-extern const ConnectorLocalInfo  applicationInfo;
+extern ActionMenuItem menuPushMe;
+extern EnumMenuItem menuFood;
+extern TextMenuItem menuMyText;
+extern AnalogMenuItem menuA2Voltage;
+extern AnalogMenuItem menuA1Voltage;
+extern AnalogMenuItem menuA0Voltage;
+extern const ConnectorLocalInfo applicationInfo;
 
-// Callback functions always follow this pattern: void CALLBACK_FUNCTION myCallback();
+// Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
 void CALLBACK_FUNCTION onPushMe(int id);

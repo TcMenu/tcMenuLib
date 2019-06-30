@@ -30,17 +30,25 @@ class LiquidCrystalRenderer : public BaseMenuRenderer {
 private:
 	LiquidCrystal* lcd;
 	uint8_t dimY;
+	uint8_t backChar;
+	uint8_t forwardChar;
+	uint8_t editChar;
 public:
 
 	LiquidCrystalRenderer(LiquidCrystal& lcd, uint8_t dimX, uint8_t dimY);
 	virtual ~LiquidCrystalRenderer();
 	virtual void render();
 
+	void setEditorChars(char back, char forward, char edit);
+
     uint8_t getRows() {return dimY;}
     LiquidCrystal* getLCD() {return lcd;}
     BaseDialog* getDialog() override;
 private:
 	void renderMenuItem(uint8_t row, MenuItem* item);
+	void renderActionItem(uint8_t row, MenuItem* item);
+	void renderBackItem(uint8_t row, MenuItem* item);
+	void renderList();
 };
 
 class LiquidCrystalDialog : public BaseDialog {

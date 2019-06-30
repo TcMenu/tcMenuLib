@@ -208,7 +208,6 @@ void FloatMenuItem::setFloatValue(float newVal, bool silent) {
 
 void ValueMenuItem::setCurrentValue(uint16_t val, bool silent) {
 	if (val == currentValue || val > getMaximumValue()) {
-		serdebugF4("Not changing ", val, currentValue, getMaximumValue());
 		return;
 	}
 	
