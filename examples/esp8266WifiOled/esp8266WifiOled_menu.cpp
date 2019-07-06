@@ -61,7 +61,7 @@ const PROGMEM ConnectorLocalInfo applicationInfo = { "Greenhouse", "01b9cb76-c10
 void setupMenu() {
     prepareBasicU8x8Config(gfxConfig);
     renderer.setGraphicsDevice(&gfx, &gfxConfig);
-    switches.initialise(ioUsingArduino(), true);
+    switches.initialise(io8574, true);
     menuMgr.initForEncoder(&renderer, &menuTomatoTemp, ENCODER_PIN_A, ENCODER_PIN_B, ENCODER_PIN_OK);
     remoteServer.begin(&server, &applicationInfo);
 
@@ -69,8 +69,8 @@ void setupMenu() {
     menuCucumberTemp.setReadOnly(true);
     menuTomatoTemp.setReadOnly(true);
     menuIpAddress.setReadOnly(true);
-    menuPwd.setLocalOnly(true);
-    menuSaveAll.setLocalOnly(true);
     menuSSID.setLocalOnly(true);
+    menuSaveAll.setLocalOnly(true);
+    menuPwd.setLocalOnly(true);
 }
 

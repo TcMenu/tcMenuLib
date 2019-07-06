@@ -20,13 +20,16 @@ void updateAnalogMenuItems() {
 void setup() {
     // for 32 bit boards we should wait for serial before proceeding.
     while(!Serial);
+    Serial.begin(115200);
 
     // for serial communication, we only need to setup the speed here.
-    Serial.begin(115200);
+    // in this example I am using a bluetooth module with serial1, you could switch to
+    // regular Serial by changing the below line and change the menu designer code generator
+    // too.
+    Serial1.begin(9600);
 
     // we are going to be toggling this so need to set it as output.
     pinMode(LED_BUILTIN, OUTPUT);
-
 
     // added by designer to initialise the menu.
     setupMenu();

@@ -79,7 +79,9 @@ public:
     }
 	/** sets the current state of the widget, there must be an icon for this value */
 	void setCurrentState(uint8_t state) {
-		if (state >= maxStateIcons) return; // protect against wrong mem access
+        // if outside of allowable icons or value hasn't changed just return.
+		if (state >= maxStateIcons || currentState == state) return; 
+        
 		this->currentState = state;
 		this->changed = true;
 	}

@@ -43,7 +43,11 @@
 //
 // We create an adafruit 1306 display driver and also the tcMenu display configuration options
 //
+#ifdef ESP32 
 U8G2_SSD1306_128X64_NONAME_F_SW_I2C gfx(U8G2_R0, 15, 4, 16);
+#else 
+U8G2_SSD1306_128X64_NONAME_F_SW_I2C gfx(U8G2_R0, 5, 4);
+#endif
 
 //
 // ESP boards tend to have few pins available for general purpose use, to make things easier
@@ -88,6 +92,7 @@ void onCommsChange(CommunicationInfo info) {
 // here we just start serial for debugging and try to initialise the display and menu
 //
 void setup() {
+    Wire.begin();
 
     // set up the inbuilt ESP rom to use for load and store.
     EEPROM.begin(512);
@@ -111,6 +116,7 @@ void setup() {
 
     // start up the display.
     gfx.begin();
+    
 
     // because we are initialising wifi from the menu entries, we need to load the eeprom
     // values very early, in this case, set the root item first, before calling load.
@@ -119,8 +125,17 @@ void setup() {
 
     // this sketch assumes you've successfully connected to the Wifi before, does not
     // call begin.. You can initialise the wifi whichever way you wish here.
-    WiFi.begin(menuSSID.getTextValue(), menuPwd.getTextValue());
-    WiFi.mode(WIFI_STA);
+    if(strlen(menuSSID.getTextValue())==0) {
+        // no SSID come up as an access point
+        WiFi.mode(WIFI_AP);
+        WiFi.softAP("tcmenu", "secret");
+        serdebugF("Started up in AP mode, connect with 'tcmenu' and 'secret'");
+    }
+    else {
+        WiFi.begin(menuSSID.getTextValue(), menuPwd.getTextValue());
+        WiFi.mode(WIFI_STA);
+        serdebugF("Connecting to Wifi using settings from connectivity menu");
+    }
 
     // now monitor the wifi level every second and report it in a widget.
     taskManager.scheduleFixedRate(1000, [] {
@@ -134,10 +149,10 @@ void setup() {
             }
             int qualityIcon = 0;
             long strength = WiFi.RSSI();
-            if(strength > -95) qualityIcon = 1;
-            else if(strength > -85) qualityIcon = 2;
-            else if(strength > -70) qualityIcon = 3;
-            else if(strength > -55) qualityIcon = 4;
+            if(strength > -50) qualityIcon = 4;
+            else if(strength > -60) qualityIcon = 3;
+            else if(strength > -75) qualityIcon = 2;
+            else if(strength > -90) qualityIcon = 1;
             wifiWidget.setCurrentState(qualityIcon);
         }
         else {

@@ -12,7 +12,7 @@
 #define MENU_GENERATED_CODE_H
 
 #include <tcMenu.h>
-#include <WiFi.h>
+#include <ESP8266WiFi.h>
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
 #include <RuntimeMenuItem.h>
@@ -20,13 +20,14 @@
 
 // all define statements needed
 #define TCMENU_USING_PROGMEM true
-#define ENCODER_PIN_A 12
-#define ENCODER_PIN_B 14
-#define ENCODER_PIN_OK 27
+#define ENCODER_PIN_A 0
+#define ENCODER_PIN_B 1
+#define ENCODER_PIN_OK 2
 
 // all variables that need exporting
 extern U8G2_SSD1306_128X64_NONAME_F_SW_I2C gfx;
 extern U8g2MenuRenderer renderer;
+extern IoAbstractionRef io8574;
 
 // all menu item forward references.
 extern IpAddressMenuItem menuIpAddress;
