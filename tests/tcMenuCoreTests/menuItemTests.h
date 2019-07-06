@@ -97,6 +97,16 @@ RENDERING_CALLBACK_NAME_INVOKE(textMenuItemTestCb, textItemRenderFn, "HelloWorld
 
 test(testTextMenuItemFromEmpty) {
 	TextMenuItem textItem(textMenuItemTestCb, 33, 10, NULL);
+	
+	// first simulate eeprom loading back from storage.
+	uint8_t* data = (uint8_t*)textItem.getTextValue();
+	data[0] = 0;
+	data[1] = 'Z';
+	data[2] = 'Y';
+	data[3] = 'X';
+	data[4] = '[';
+	data[5] = ']';
+	textItem.cleanUpArray();
 
 	// start off with an empty string
 	char sz[20];
@@ -106,47 +116,43 @@ test(testTextMenuItemFromEmpty) {
 	// ensure we can edit an empty string position
 	assertEqual(uint8_t(10), textItem.beginMultiEdit());
 	assertTrue(textItem.isEditing());
-	assertEqual(255, textItem.nextPart());
+	assertEqual(ALLOWABLE_CHARS_ENCODER_SIZE, textItem.nextPart());
 	assertEqual(0, textItem.getPartValueAsInt());
+
 	textItem.copyValue(sz, sizeof(sz));
 	assertStringCaseEqual("[]", sz);
 
 	// add char to empty string
-	textItem.valueChanged(int('A'));
+	textItem.valueChanged(findPositionInEditorSet('N'));
 	textItem.copyValue(sz, sizeof(sz));
-	assertStringCaseEqual("[A]", sz);
+	assertStringCaseEqual("[N]", sz);
 
 	// add another char to empty string
-	assertEqual(255, textItem.nextPart());
+	assertEqual(ALLOWABLE_CHARS_ENCODER_SIZE, textItem.nextPart());
+	textItem.valueChanged(findPositionInEditorSet('E'));
 	textItem.copyValue(sz, sizeof(sz));
-	assertStringCaseEqual("A[]", sz);
+	assertStringCaseEqual("N[E]", sz);
 
-	textItem.valueChanged(int('B'));
+	assertEqual(ALLOWABLE_CHARS_ENCODER_SIZE, textItem.nextPart());
+	textItem.valueChanged(findPositionInEditorSet('T'));
 	textItem.copyValue(sz, sizeof(sz));
-	assertStringCaseEqual("A[B]", sz);
+	assertStringCaseEqual("NE[T]", sz);
 
-	// add a last char and stop editing.
-	assertEqual(255, textItem.nextPart());
-	textItem.valueChanged(int('C'));
-	textItem.stopMultiEdit();
-	
+	assertEqual(ALLOWABLE_CHARS_ENCODER_SIZE, textItem.nextPart());
+	textItem.valueChanged(findPositionInEditorSet('_'));
+	textItem.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("NET[_]", sz);
+
+	assertEqual(ALLOWABLE_CHARS_ENCODER_SIZE, textItem.nextPart());
+
 	// check that the edit worked ok
+	textItem.stopMultiEdit();
 	textItem.copyValue(sz, sizeof(sz));
-	assertStringCaseEqual("ABC", sz);
+	assertStringCaseEqual("NET_", sz);
 
 	// now start editing again and clear down the string to zero terminated at position 0
 	assertEqual(uint8_t(10), textItem.beginMultiEdit());
-	assertEqual(255, textItem.nextPart());
-	textItem.valueChanged(0);
-	textItem.copyValue(sz, sizeof(sz));
-	assertStringCaseEqual("[]", sz);
-
-	// now put back to a character, the text after it should come back.
-	textItem.valueChanged(int('a'));
-	textItem.copyValue(sz, sizeof(sz));
-	assertStringCaseEqual("[a]BC", sz);
-
-	// now put back to blank.
+	assertEqual(ALLOWABLE_CHARS_ENCODER_SIZE, textItem.nextPart());
 	textItem.valueChanged(0);
 	textItem.copyValue(sz, sizeof(sz));
 	assertStringCaseEqual("[]", sz);
@@ -155,6 +161,16 @@ test(testTextMenuItemFromEmpty) {
 	textItem.stopMultiEdit();
 	textItem.copyValue(sz, sizeof(sz));
 	assertStringCaseEqual("", sz);
+
+	// check every byte of buffer is 0.
+	for (int i = 0; i < textItem.textLength(); i++) assertEqual(int(data[i]), 0);
+}
+
+test(testFindEditorSetFunction) {
+	assertEqual(10, findPositionInEditorSet('9'));
+	assertEqual(21, findPositionInEditorSet('K'));
+	assertEqual(93, findPositionInEditorSet('~'));
+	assertEqual(0, findPositionInEditorSet(0));
 }
 
 test(testTextRuntimeItem) {
@@ -175,27 +191,27 @@ test(testTextRuntimeItem) {
 
 	assertEqual(uint8_t(10), textItem.beginMultiEdit());
 	assertTrue(textItem.isEditing());
-	assertEqual(255, textItem.nextPart());
-	assertEqual(int('G'), textItem.getPartValueAsInt());
+	assertEqual(ALLOWABLE_CHARS_ENCODER_SIZE, textItem.nextPart());
+	assertEqual(findPositionInEditorSet('G'), textItem.getPartValueAsInt());
 
 	textItem.copyValue(sz, sizeof(sz));
 	assertStringCaseEqual("[G]oodbye", sz);
 
-	textItem.valueChanged(48);
+	textItem.valueChanged(findPositionInEditorSet('0'));
 	textItem.copyValue(sz, sizeof(sz));
 	assertStringCaseEqual("[0]oodbye", sz);
 
-	assertEqual(255, textItem.nextPart());
-	assertEqual(int('o'), textItem.getPartValueAsInt());
+	assertEqual(ALLOWABLE_CHARS_ENCODER_SIZE, textItem.nextPart());
+	assertEqual(findPositionInEditorSet('o'), textItem.getPartValueAsInt());
 	textItem.copyValue(sz, sizeof(sz));
 	assertStringCaseEqual("0[o]odbye", sz);
 
-	assertEqual(255, textItem.nextPart());
+	assertEqual(ALLOWABLE_CHARS_ENCODER_SIZE, textItem.nextPart());
 	textItem.copyValue(sz, sizeof(sz));
 	assertStringCaseEqual("0o[o]dbye", sz);
 
-	textItem.valueChanged(49);
-	assertEqual(255, textItem.nextPart());
+	textItem.valueChanged(findPositionInEditorSet('1'));
+	assertEqual(ALLOWABLE_CHARS_ENCODER_SIZE, textItem.nextPart());
 	textItem.copyValue(sz, sizeof(sz));
 	assertStringCaseEqual("0o1[d]bye", sz);
 

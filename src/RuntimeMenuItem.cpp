@@ -9,6 +9,8 @@
 
 static uint16_t nextAvailableRandomId = RANDOM_ID_START;
 
+const char ALLOWABLE_EDIT_CHARACTERS[] PROGMEM = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!\"$%^&*()_-+=@';:#{/?\\|,.<>#{}~";
+
 int nextRandomId() {
 	return nextAvailableRandomId++;
 }
@@ -31,10 +33,20 @@ void TextMenuItem::setTextValue(const char* text, bool silent) {
 	if (strncmp(data, text, textLength()) == 0) return;
 
 	strncpy(data, text, textLength());
-	data[textLength() - 1] = 0;
+	cleanUpArray();
 	setChanged(true);
 	setSendRemoteNeededAll();
 	if (!silent) triggerCallback();
+}
+
+void TextMenuItem::cleanUpArray() {
+	uint8_t len = 0;
+	uint8_t actualLen = textLength();
+	data[actualLen - 1] = 0;
+	while (len < actualLen && data[len] != 0) len++;
+	for (int i = len; i < actualLen; i++) {
+		data[i] = 0;
+	}
 }
 
 bool TextMenuItem::setCharValue(uint8_t location, char val) {
@@ -42,7 +54,7 @@ bool TextMenuItem::setCharValue(uint8_t location, char val) {
 
 	data[location] = val;
 	// always ensure zero terminated at last position.
-	data[noOfParts - 1] = 0;
+	cleanUpArray();
 	setChanged(true);
 	setSendRemoteNeededAll();
 	return true;
@@ -99,6 +111,22 @@ int backSubItemRenderFn(RuntimeMenuItem* /*item*/, uint8_t /*row*/, RenderFnMode
 	}
 }
 
+inline char charFromEditableSet(int i) {
+	const char* ptr = &ALLOWABLE_EDIT_CHARACTERS[i];
+	return pgm_read_byte_near(ptr);
+}
+
+int findPositionInEditorSet(char ch) {
+	if (ch == 0) return 0;
+	for (int i = 0; i < ALLOWABLE_CHARS_ENCODER_SIZE; i++) {
+		char pgmCmp = charFromEditableSet(i);
+		if (pgmCmp == ch) {
+			return i + 1;
+		}
+	}
+	return 0; // return zero terminator when not found
+}
+
 int textItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
 	if (item->getMenuType() != MENUTYPE_TEXT_VALUE) return 0;
 	TextMenuItem* txtItem = reinterpret_cast<TextMenuItem*>(item);
@@ -122,18 +150,24 @@ int textItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char
 		// we only enter more rows if there isn't a null terminator
 		// but position 0 is always allowed for editing.
 		int idx = row - 1;
-		return (idx > 1 && txtItem->getTextValue()[idx - 1] == 0) ? 0 : 255;
+		return (idx > 1 && txtItem->getTextValue()[idx - 1] == 0) ? 0 : ALLOWABLE_CHARS_ENCODER_SIZE;
 	}
 	case RENDERFN_SET_VALUE: {
 		int idx = row - 1;
-		return txtItem->setCharValue(idx, buffer[0]);
+		int offset = buffer[0];
+		if (offset == 0) {
+			txtItem->setCharValue(idx, 0);
+			return true;
+		}
+		return txtItem->setCharValue(idx, charFromEditableSet(offset - 1));
 	}
 	case RENDERFN_NAME: {
 		if (buffer) buffer[0] = 0;
 		return true;
 	}
-	case RENDERFN_GETPART:
-		return (int)txtItem->getTextValue()[row - 1];
+	case RENDERFN_GETPART: {
+		return findPositionInEditorSet(txtItem->getTextValue()[row - 1]);
+	}
     default: return false;
 	}
 }

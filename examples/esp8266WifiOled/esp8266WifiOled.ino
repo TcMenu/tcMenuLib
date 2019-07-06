@@ -44,19 +44,16 @@
 // We create an adafruit 1306 display driver and also the tcMenu display configuration options
 //
 U8G2_SSD1306_128X64_NONAME_F_SW_I2C gfx(U8G2_R0, 15, 4, 16);
+
+//
+// ESP boards tend to have few pins available for general purpose use, to make things easier
+// this sketch assumes the rotary encoder and switch are attached to a PCF8574 IO Expander.
+// Change in menu designer's code generator to remove this if you prefer to use device pins.
+//
 IoAbstractionRef io8574 = ioFrom8574(0x20, IO_INTERRUPT_PIN);
 
 // eeprom wrapper, initialised in setup.
 ArduinoEEPROMAbstraction *eeprom = NULL;
-
-// local store of if we are connected to wifi.
-bool connectedToWifi = false;
-
-//
-// state used later on by the heater and window control functions
-//
-bool heaterOn;
-bool windowOpen;
 
 // we want to authenticate connections, the easiest and quickest way is to use the EEPROM
 // authenticator where pairing requests add a new item into the EEPROM. Any authentication
@@ -73,6 +70,11 @@ TitleWidget wifiWidget(iconsWifi, 5, 16, 10, &connectedWidget);
 RemoteMenuItem menuRemoteMonitor(1001, 2);
 EepromAuthenicationInfoMenuItem menuAuthKeyMgr(1002, &authManager, &menuRemoteMonitor);
 
+
+// state used by the sketch
+
+bool connectedToWifi = false;
+
 // when there's a change in communication status (client connects for example) this gets called.
 void onCommsChange(CommunicationInfo info) {
     if(info.remoteNo == 0) {
@@ -87,7 +89,7 @@ void onCommsChange(CommunicationInfo info) {
 //
 void setup() {
 
-    // set up the inbuilt ESP32 rom to use for load and store.
+    // set up the inbuilt ESP rom to use for load and store.
     EEPROM.begin(512);
     eeprom = new ArduinoEEPROMAbstraction(&EEPROM);
 
@@ -142,8 +144,6 @@ void setup() {
             connectedToWifi = false;
             wifiWidget.setCurrentState(0);
         }
-        
-
     });
 
     renderer.setFirstWidget(&wifiWidget);
@@ -152,8 +152,8 @@ void setup() {
     setupMenu();
 
     //
-    // here we simulate the temprature changing.
-    // temprature doesn't change that often, even 5 seconds is probably too short.
+    // here we simulate the temperature changing.
+    // temperature doesn't change that often, even 5 seconds is probably too short.
     // in a normal system you'd probably do something other than call random..
     //
     taskManager.scheduleFixedRate(5000, [] {
@@ -182,6 +182,9 @@ void loop() {
 }
 
 
+// used by the below function to store state.
+bool windowOpen = false;
+
 //
 // here we have the function that is called initially when the window is open
 // and then repeatedly called by rescheduling itself until the window is closed
@@ -197,6 +200,10 @@ void windowOpenFn() {
 
     ioDeviceDigitalWriteS(io8574, WINDOW_PIN, windowOpen);
 }
+
+// we are using a simulated low speed PWM to control the heater
+// store it in a global variable
+bool heaterOn;
 
 void heaterOnFn() {
     if(menuElectricHeater.getBoolean()) {

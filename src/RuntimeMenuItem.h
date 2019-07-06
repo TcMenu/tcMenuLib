@@ -28,6 +28,8 @@ int ipAddressRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, cha
 /** The default rendering function for back menu items */
 int backSubItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
 
+/** helper function for text items that finds the position of a char in the allowable set of editable chars */
+int findPositionInEditorSet(char ch);
 
 /**
  * A menu item that can be defined at runtime and needs no additional structures. This represents a single value in terms of
@@ -81,6 +83,7 @@ public:
 };
 
 #define LIST_PARENT_ITEM_POS 0xff
+
 
 /**
  * A menu item that represents a list of items and can be defined at runtime. This takes an ID that 
@@ -188,6 +191,9 @@ public:
 	}
 };
 
+// number of characters in the edit set.
+#define ALLOWABLE_CHARS_ENCODER_SIZE 93
+
 /**
  * An item that can represent a text value that is held in RAM, and therefore change at runtime. We now manually
  * configure the settings for this menu item in the constructor. This variant gets the name from program memory
@@ -214,6 +220,11 @@ public:
 	/** returns the text value in the internal buffer */
 	const char* getTextValue() { return data; }
 
+	/**
+	 * Called after the array has been changed to ensure that it is in a good
+	 * state for editing. IE zero's extended to the end.
+	 */
+	void cleanUpArray();
 private:
 	bool setCharValue(uint8_t location, char val);
 	friend int textItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);

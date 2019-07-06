@@ -106,6 +106,7 @@ void loadRecursively(EepromAbstraction& eeprom, MenuItem* nextMenuItem) {
 		else if(nextMenuItem->getMenuType() == MENUTYPE_TEXT_VALUE) {
 			TextMenuItem* textItem = reinterpret_cast<TextMenuItem*>(nextMenuItem);
 			eeprom.readIntoMemArray((uint8_t*) textItem->getTextValue(), textItem->getEepromPosition(), textItem->textLength());
+			textItem->cleanUpArray();
 			textItem->setSendRemoteNeededAll();
 			textItem->setChanged(true);
 			textItem->triggerCallback();

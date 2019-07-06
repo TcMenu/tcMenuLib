@@ -20,9 +20,9 @@
 
 // all define statements needed
 #define TCMENU_USING_PROGMEM true
-#define ENCODER_PIN_A 19
-#define ENCODER_PIN_B 18
-#define ENCODER_PIN_OK 21
+#define ENCODER_PIN_A 12
+#define ENCODER_PIN_B 14
+#define ENCODER_PIN_OK 27
 
 // all variables that need exporting
 extern U8G2_SSD1306_128X64_NONAME_F_SW_I2C gfx;
