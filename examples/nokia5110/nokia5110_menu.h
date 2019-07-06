@@ -30,7 +30,7 @@ extern Adafruit_PCD8544 gfx;
 extern AdaFruitGfxMenuRenderer renderer;
 
 // all menu item forward references.
-extern IpAddressMenuItem menuIpAddress;
+extern IpAddressMenuItem menuIP;
 extern BackMenuItem menuBackConnectivity;
 extern SubMenuItem menuConnectivity;
 extern TextMenuItem menuTxt;

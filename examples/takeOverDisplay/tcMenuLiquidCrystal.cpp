@@ -35,10 +35,18 @@ void LiquidCrystalRenderer::setEditorChars(char back, char forward, char edit) {
 
 void LiquidCrystalRenderer::renderList() {
 	ListRuntimeMenuItem* runList = reinterpret_cast<ListRuntimeMenuItem*>(currentRoot);
-	int maxY = min(dimY, runList->getNumberOfParts());
+	
+	uint8_t maxY = min(dimY, runList->getNumberOfParts());
+	uint8_t currentActive = runList->getActiveIndex();
+	
+	uint8_t offset = 0;
+	if (currentActive >= maxY) {
+		offset = (currentActive+1) - maxY;
+	}
 
 	for (int i = 0; i < maxY; i++) {
-		RuntimeMenuItem* toDraw = (i==0) ? runList->asBackMenu() : runList->getChildItem(i);
+		uint8_t current = offset + i;
+		RuntimeMenuItem* toDraw = (current==0) ? runList->asBackMenu() : runList->getChildItem(current - 1);
 		renderMenuItem(i, toDraw);
 	}
 
@@ -55,37 +63,39 @@ void LiquidCrystalRenderer::render() {
 
 	countdownToDefaulting();
 
-	if (currentRoot->getMenuType() == MENUTYPE_RUNTIME_LIST) {
-		renderList();
-		return;
-	}
-
-	MenuItem* item = currentRoot;
-	uint8_t cnt = 0;
-
-	// first we find the first currently active item in our single linked list
-	if (offsetOfCurrentActive() >= dimY) {
-		uint8_t toOffsetBy = (offsetOfCurrentActive() - dimY) + 1;
-
-		if(lastOffset != toOffsetBy) locRedrawMode = MENUDRAW_COMPLETE_REDRAW;
-		lastOffset = toOffsetBy;
-
-		while (item != NULL && toOffsetBy--) {
-			item = item->getNext();
+	if (currentRoot->getMenuType() == MENUTYPE_RUNTIME_LIST ) {
+		if (currentRoot->isChanged() || locRedrawMode != MENUDRAW_NO_CHANGE) {
+			renderList();
 		}
 	}
 	else {
-		if(lastOffset != 0xff) locRedrawMode = MENUDRAW_COMPLETE_REDRAW;
-		lastOffset = 0xff;
-	}
+		MenuItem* item = currentRoot;
+		uint8_t cnt = 0;
 
-	// and then we start drawing items until we run out of screen or items
-	while (item && cnt < dimY) {
-		if (locRedrawMode != MENUDRAW_NO_CHANGE || item->isChanged()) {
-			renderMenuItem(cnt, item);
+		// first we find the first currently active item in our single linked list
+		if (offsetOfCurrentActive() >= dimY) {
+			uint8_t toOffsetBy = (offsetOfCurrentActive() - dimY) + 1;
+
+			if (lastOffset != toOffsetBy) locRedrawMode = MENUDRAW_COMPLETE_REDRAW;
+			lastOffset = toOffsetBy;
+
+			while (item != NULL && toOffsetBy--) {
+				item = item->getNext();
+			}
 		}
-		++cnt;
-		item = item->getNext();
+		else {
+			if (lastOffset != 0xff) locRedrawMode = MENUDRAW_COMPLETE_REDRAW;
+			lastOffset = 0xff;
+		}
+
+		// and then we start drawing items until we run out of screen or items
+		while (item && cnt < dimY) {
+			if (locRedrawMode != MENUDRAW_NO_CHANGE || item->isChanged()) {
+				renderMenuItem(cnt, item);
+			}
+			++cnt;
+			item = item->getNext();
+		}
 	}
 }
 
@@ -99,7 +109,7 @@ void LiquidCrystalRenderer::renderMenuItem(uint8_t row, MenuItem* item) {
 	if (item->getMenuType() == MENUTYPE_BACK_VALUE) {
 		buffer[0] = item->isActive() ? backChar : ' ';
 		buffer[1] = backChar;
-		offs = 3;
+		offs = 2;
 	}
 	else {
 		buffer[0] = item->isEditing() ? editChar : (item->isActive() ? forwardChar : ' ');

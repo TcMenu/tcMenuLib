@@ -25,18 +25,18 @@ extern LiquidCrystalRenderer renderer;
 extern ArduinoAnalogDevice analogDevice;
 
 // all menu item forward references.
-extern FloatMenuItem  menuFlow3;
-extern FloatMenuItem  menuFlow2;
-extern FloatMenuItem  menuFlow1;
-extern BackMenuItem  menuBackFlows;
-extern SubMenuItem  menuFlows;
-extern BooleanMenuItem  menuOverrideAll;
-extern AnalogMenuItem  menuTideGate3;
-extern AnalogMenuItem  menuTideGate2;
-extern AnalogMenuItem  menuTideGate1;
-extern const ConnectorLocalInfo  applicationInfo;
+extern FloatMenuItem menuFlow3;
+extern FloatMenuItem menuFlow2;
+extern FloatMenuItem menuFlow1;
+extern BackMenuItem menuBackFlows;
+extern SubMenuItem menuFlows;
+extern BooleanMenuItem menuOverrideAll;
+extern AnalogMenuItem menuTideGate3;
+extern AnalogMenuItem menuTideGate2;
+extern AnalogMenuItem menuTideGate1;
+extern const ConnectorLocalInfo applicationInfo;
 
-// Callback functions always follow this pattern: void CALLBACK_FUNCTION myCallback();
+// Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
 void CALLBACK_FUNCTION onTidalGate1(int id);

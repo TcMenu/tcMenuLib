@@ -19,11 +19,11 @@ EthernetServer server(3333);
 
 // Global Menu Item declarations
 
-RENDERING_CALLBACK_NAME_INVOKE(fnIpAddressRtCall, ipAddressRenderFn, "Ip", 13, NULL)
-IpAddressMenuItem menuIpAddress(fnIpAddressRtCall, 16, NULL);
+RENDERING_CALLBACK_NAME_INVOKE(fnIPRtCall, ipAddressRenderFn, "IP", 13, NULL)
+IpAddressMenuItem menuIP(fnIPRtCall, 16, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NULL)
 const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 15, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuIpAddress);
+BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuIP);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnTxtRtCall, textItemRenderFn, "Txt", -1, NULL)
 TextMenuItem menuTxt(fnTxtRtCall, 14, 6, NULL);

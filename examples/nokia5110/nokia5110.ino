@@ -70,7 +70,7 @@ void setup() {
     
     // Here we add two additional menus for managing the connectivity and authentication keys.
     // In the future, there will be an option to autogenerate these from the designer.
-    menuIpAddress.setNext(&menuAuthKeyMgr);
+    menuIP.setNext(&menuAuthKeyMgr);
     menuRemoteMonitor.addConnector(remoteServer.getRemoteConnector(0));
     menuRemoteMonitor.registerCommsNotification(onCommsChange);
     menuAuthKeyMgr.setLocalOnly(true);
@@ -82,7 +82,7 @@ void setup() {
     menuMgr.load(eeprom, 0xd00d);
 
     // spin up the Ethernet library, get the IP address from the menu
-    byte* rawIp = menuIpAddress.getIpAddress();
+    byte* rawIp = menuIP.getIpAddress();
     IPAddress ip(rawIp[0], rawIp[1], rawIp[2], rawIp[3]);
     Ethernet.begin(mac, ip);
 
@@ -91,7 +91,7 @@ void setup() {
 
     // and print out the IP address
     char sz[20];
-    menuIpAddress.copyValue(sz, sizeof(sz));
+    menuIP.copyValue(sz, sizeof(sz));
     Serial.print("Device IP is: "); Serial.println(sz);
 
     taskManager.scheduleFixedRate(500, [] {

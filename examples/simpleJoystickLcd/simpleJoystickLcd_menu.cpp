@@ -25,8 +25,9 @@ const PROGMEM FloatMenuInfo minfoFlow2 = { "Flow 2", 6, 0xffff, 2, NO_CALLBACK }
 FloatMenuItem menuFlow2(&minfoFlow2, &menuFlow3);
 const PROGMEM FloatMenuInfo minfoFlow1 = { "Flow 1", 5, 0xffff, 2, NO_CALLBACK };
 FloatMenuItem menuFlow1(&minfoFlow1, &menuFlow2);
+RENDERING_CALLBACK_NAME_INVOKE(fnFlowsRtCall, backSubItemRenderFn, "Flows", -1, NULL)
 const PROGMEM SubMenuInfo minfoFlows = { "Flows", 4, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackFlows(&menuFlow1, (const AnyMenuInfo*)&minfoFlows);
+BackMenuItem menuBackFlows(fnFlowsRtCall, &menuFlow1);
 SubMenuItem menuFlows(&minfoFlows, &menuBackFlows, NULL);
 const PROGMEM BooleanMenuInfo minfoOverrideAll = { "Override all", 8, 0xffff, 1, NO_CALLBACK, NAMING_YES_NO };
 BooleanMenuItem menuOverrideAll(&minfoOverrideAll, false, &menuFlows);
