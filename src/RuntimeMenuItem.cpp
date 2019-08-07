@@ -9,7 +9,7 @@
 
 static uint16_t nextAvailableRandomId = RANDOM_ID_START;
 
-const char ALLOWABLE_EDIT_CHARACTERS[] PROGMEM = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!\"$%^&*()_-+=@';:#{/?\\|,.<>#{}~";
+const char ALLOWABLE_EDIT_CHARACTERS[] PROGMEM = " .,0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!\"$%^&*()_-+=@';:#{/?\\|<>#{}~";
 
 int nextRandomId() {
 	return nextAvailableRandomId++;
