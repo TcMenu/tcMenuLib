@@ -88,7 +88,7 @@ public:
 	 * Create an instance of the class
 	 *
 	 * @param nextChild the next menu in the chain if there is one, or NULL.
-	 * @param parentInfo the parent AnyMenuInfo block to be used for name etc.
+	 * @param renderFn the callback that provides the runtime information about the menu.
 	 */
 	BackMenuItem(RuntimeRenderingFn renderFn, MenuItem* next) 
 		: RuntimeMenuItem(MENUTYPE_BACK_VALUE, nextRandomId(), renderFn, 0, 1, next) { }
