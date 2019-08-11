@@ -28,8 +28,22 @@ int ipAddressRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, cha
 /** The default rendering function for back menu items */
 int backSubItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
 
+/** The default rendering function for time menu items */
+int timeItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
+
 /** helper function for text items that finds the position of a char in the allowable set of editable chars */
 int findPositionInEditorSet(char ch);
+
+/**
+ * Defines the filter that should be applied to values of multi edit menu items on the UI
+ */
+enum MultiEditWireType : byte {
+	EDITMODE_PLAIN_TEXT = 0, 
+	EDITMODE_IP_ADDRESS = 1,
+	EDITMODE_TIME_24H = 2,
+	EDITMODE_TIME_12H = 3,
+	EDITMODE_TIME_HUNDREDS_24H = 4,
+};
 
 /**
  * A menu item that can be defined at runtime and needs no additional structures. This represents a single value in terms of
@@ -192,7 +206,7 @@ public:
 };
 
 // number of characters in the edit set.
-#define ALLOWABLE_CHARS_ENCODER_SIZE 93
+#define ALLOWABLE_CHARS_ENCODER_SIZE 94
 
 /**
  * An item that can represent a text value that is held in RAM, and therefore change at runtime. We now manually
@@ -256,6 +270,52 @@ public:
 		setChanged(true);
 		setSendRemoteNeededAll();
 	}
+};
+
+/**
+ * The storage for a time field can hold down to hundreds of a second
+ */
+struct TimeStorage {
+    TimeStorage() {
+        this->hours = this->minutes = this->seconds = this->hundreds = 0;
+    }
+    
+    TimeStorage(uint8_t hours, uint8_t minutes, uint8_t seconds = 0, uint8_t hundreds = 0) {
+        this->hours = hours;
+        this->minutes = minutes;
+        this->seconds = seconds;
+        this->hundreds = hundreds;
+    }
+
+    uint8_t hours;
+    uint8_t minutes;
+    uint8_t seconds;
+    uint8_t hundreds;
+};
+
+class TimeFormattedMenuItem : public EditableMultiPartMenuItem<TimeStorage> {
+private:
+    MultiEditWireType format;
+public:
+	TimeFormattedMenuItem(RuntimeRenderingFn renderFn, uint16_t id, MultiEditWireType format, MenuItem* next = NULL)
+		: EditableMultiPartMenuItem(MENUTYPE_TIME, id, format == EDITMODE_TIME_HUNDREDS_24H ? 4 : 3, renderFn, next) {
+		setTime(TimeStorage(12, 0));
+        this->format = format;
+	}
+
+	/** gets the IP address as four separate bytes */
+	TimeStorage getTime() { return data; }
+    
+    /** sets the time */
+	void setTime(TimeStorage newTime) { data = newTime; }
+
+    /** sets a time from a string in the form HH:MM:SS[.ss]*/
+    void setTimeFromString(const char* time);
+
+    /** gets the formatting currently being used. */
+    MultiEditWireType  getFormat() { return format; }	
+
+    TimeStorage* getUnderlyingData() {return &data;}
 };
 
 /**

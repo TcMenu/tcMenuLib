@@ -287,6 +287,7 @@ void TagValueRemoteConnector::nextBootstrap() {
 		break;
 	case MENUTYPE_IPADDRESS:
 	case MENUTYPE_TEXT_VALUE:
+    case MENUTYPE_TIME:
 		encodeMultiEditMenu(parentId, reinterpret_cast<RuntimeMenuItem*>(bootItem));
 		break;
 	case MENUTYPE_RUNTIME_LIST:
@@ -402,6 +403,10 @@ void TagValueRemoteConnector::encodeMultiEditMenu(int parentId, RuntimeMenuItem*
 		transport->writeFieldInt(FIELD_MAX_LEN, sizeof(sz));
 		transport->writeField(FIELD_CURRENT_VAL, sz);
 	}
+    else if(item->getMenuType() == MENUTYPE_TIME) {
+        TimeFormattedMenuItem* editable = reinterpret_cast<TimeFormattedMenuItem*>(item);
+        transport->writeFieldInt(FIELD_EDIT_MODE, editable->getFormat());
+    }
     transport->endMsg();
 }
 
@@ -509,6 +514,7 @@ void TagValueRemoteConnector::encodeChangeValue(MenuItem* theItem) {
         transport->writeFieldInt(FIELD_CURRENT_VAL, ((ValueMenuItem*)theItem)->getCurrentValue());
         break;
 	case MENUTYPE_IPADDRESS:
+    case MENUTYPE_TIME:
 	case MENUTYPE_TEXT_VALUE: {
 		char sz[20];
 		((RuntimeMenuItem*)theItem)->copyValue(sz, sizeof(sz));
@@ -542,14 +548,12 @@ void TagValueTransport::startMsg(uint16_t msgType) {
 	// start of message
 	writeChar(START_OF_MESSAGE);
 
-	// protocol low and high byte
+	// protocol byte
 	writeChar(TAG_VAL_PROTOCOL);
 
-	char sz[3];
-	sz[0] = msgType >> 8;
-	sz[1] = msgType & 0xff;
-	sz[2] = 0;
-	writeField(FIELD_MSG_TYPE, sz);
+    // message type high then low
+	writeChar(msgType >> 8);
+	writeChar(msgType & 0xff);
 }
 
 void TagValueTransport::writeField(uint16_t field, const char* value) {
@@ -588,7 +592,7 @@ void TagValueTransport::writeFieldLong(uint16_t field, long value) {
 }
 
 void TagValueTransport::endMsg() {
-	writeStr("~\n");
+	writeChar(0x02);
 }
 
 void TagValueTransport::clearFieldStatus(FieldValueType ty) {
@@ -608,7 +612,7 @@ bool TagValueTransport::findNextMessageStart() {
 bool TagValueTransport::processMsgKey() {
 	if(highByte(currentField.field) == UNKNOWN_FIELD_PART && readAvailable()) {
 		char r = readByte();
-		if(r == '~') {
+		if(r == 0x02) {
 			currentField.fieldType = FVAL_END_MSG;
 			return false;
 		}
@@ -642,18 +646,7 @@ bool TagValueTransport::processValuePart() {
 	// reached end of field?
 	if(current == '|') {
 		currentField.value[currentField.len] = 0;
-
-		// if this is a new message and the first field is not the type, that's an error
-		if(currentField.msgType == UNKNOWN_MSG_TYPE && currentField.field != FIELD_MSG_TYPE) {
-			return false;
-		}
-
-		// if its the message type field, populate it and report new message, otherwise report regular field
-		if(currentField.field == FIELD_MSG_TYPE) {
-			currentField.msgType = msgFieldToWord(currentField.value[0], currentField.value[1]);
-			currentField.fieldType = FVAL_NEW_MSG;
-		}
-		else currentField.fieldType = FVAL_FIELD;
+         currentField.fieldType = FVAL_FIELD;
 	}
 	return true;
 }
@@ -682,15 +675,31 @@ FieldAndValue* TagValueTransport::fieldIfAvailable() {
 			}
 			break;
 
-		case FVAL_NEW_MSG:
+		case FVAL_PROCESSING_PROTOCOL: // we need to make sure the protocol is valid
+			if(readAvailable()) {
+                currentField.fieldType = (readByte() == TAG_VAL_PROTOCOL) ? FVAL_PROCESSING_MSGTYPE_HI : FVAL_ERROR_PROTO;
+                serdebugF("Protocol");
+            }
+			break;
+
+        case FVAL_PROCESSING_MSGTYPE_HI:
+            if(readAvailable()) {
+                currentField.msgType = readByte() << 8;
+                currentField.fieldType = FVAL_PROCESSING_MSGTYPE_LO;
+            } 
+            break;
+
+        case FVAL_PROCESSING_MSGTYPE_LO:
+            if(readAvailable()) {
+                currentField.msgType |= readByte() & 0xff;
+                currentField.fieldType = FVAL_NEW_MSG;
+            }
+            return &currentField;
+
+        case FVAL_NEW_MSG:
 		case FVAL_FIELD: // the field finished last time around, now reset it.
 			currentField.fieldType = FVAL_PROCESSING;
 			currentField.field = UNKNOWN_FIELD_PART;
-			break;
-
-		case FVAL_PROCESSING_PROTOCOL: // we need to make sure the protocol is valid
-			if(!readAvailable()) break;
-			currentField.fieldType = (readByte() == TAG_VAL_PROTOCOL) ? FVAL_PROCESSING : FVAL_ERROR_PROTO;
 			break;
 
 		case FVAL_PROCESSING: // we are looking for the field key

@@ -244,7 +244,9 @@ enum MenuType : byte {
 	/** item is of type TextMenuItem */
 	MENUTYPE_TEXT_VALUE = 200,
 	/** item is an IP address and is editable per segment */
-	MENUTYPE_IPADDRESS = 201
+	MENUTYPE_IPADDRESS = 201,
+    /** An item that represents a time */
+    MENUTYPE_TIME = 202
 };
 
 /**

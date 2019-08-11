@@ -109,6 +109,7 @@ void BaseMenuRenderer::menuValueToText(MenuItem* item,	MenuDrawJustification jus
 	case MENUTYPE_BACK_VALUE:
 	case MENUTYPE_TEXT_VALUE:
 	case MENUTYPE_IPADDRESS:
+    case MENUTYPE_TIME:
 	case MENUTYPE_RUNTIME_LIST:
 	case MENUTYPE_RUNTIME_VALUE:
 		menuValueRuntime(reinterpret_cast<RuntimeMenuItem*>(item), justification);

@@ -90,7 +90,6 @@ enum AckResponseStatus {
 /** Message type defintion for a dialog change msg */
 #define MSG_DIALOG msgFieldToWord('D', 'M')
 
-#define FIELD_MSG_TYPE    msgFieldToWord('M', 'T')
 #define FIELD_MSG_NAME    msgFieldToWord('N', 'M')
 #define FIELD_VERSION     msgFieldToWord('V', 'E')
 #define FIELD_PLATFORM    msgFieldToWord('P', 'F')
@@ -131,17 +130,6 @@ enum AckResponseStatus {
  */
 enum ChangeType: byte {
 	CHANGE_DELTA = 0, CHANGE_ABSOLUTE = 1, CHANGE_LIST = 2
-};
-
-/**
- * Defines the filter that should be applied to values of multi edit menu items on the UI
- */
-enum MultiEditWireType : byte {
-	EDITMODE_PLAIN_TEXT = 0, 
-	EDITMODE_IP_ADDRESS = 1,
-	EDITMODE_TIME_24H = 2,
-	EDITMODE_TIME_12H = 3,
-	EDITMODE_DATE_GREGORIAN = 4
 };
 
 /**

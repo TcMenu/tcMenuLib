@@ -142,6 +142,11 @@ bool processValueChangeField(FieldAndValue* field, MessageProcessorInfo* info) {
 		ipItem->setIpAddress(field->value);
 		serdebugF2("Ip Addr change: ", field->value);
 	}
+    else if(info->value.item->getMenuType() == MENUTYPE_TIME) {
+        TimeFormattedMenuItem* timeItem = reinterpret_cast<TimeFormattedMenuItem*>(info->value.item);
+        timeItem->setTimeFromString(field->value);
+        serdebugF2("Time item change: ", field->value);
+    }
     return true;
 }
 

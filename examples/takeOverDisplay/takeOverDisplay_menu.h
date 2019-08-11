@@ -53,6 +53,7 @@ extern ActionMenuItem menuInfoDialog;
 extern TextMenuItem menuText;
 extern EnumMenuItem menuFood;
 extern ActionMenuItem menuTakeDisplay;
+extern TimeFormattedMenuItem menuTime;
 extern const ConnectorLocalInfo applicationInfo;
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type

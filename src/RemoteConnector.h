@@ -58,7 +58,11 @@ enum FieldValueType : byte {
     /** waiting for a new message */
     FVAL_PROCESSING_AWAITINGMSG, 
     /** waiting to find the protocol type */
-    FVAL_PROCESSING_PROTOCOL
+    FVAL_PROCESSING_PROTOCOL,
+    /** waiting to find the first message type in the header */
+    FVAL_PROCESSING_MSGTYPE_HI,
+    /** waiting to find the second message type in the header */
+    FVAL_PROCESSING_MSGTYPE_LO
 };
 
 /** 

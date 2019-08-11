@@ -33,6 +33,7 @@ int testBasicRuntimeFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, ch
 	case RENDERFN_INVOKE:
 		renderActivateCalled = true;
 		break;
+    default: break;
 	}
 	return true;
 }
@@ -167,9 +168,11 @@ test(testTextMenuItemFromEmpty) {
 }
 
 test(testFindEditorSetFunction) {
-	assertEqual(10, findPositionInEditorSet('9'));
-	assertEqual(21, findPositionInEditorSet('K'));
-	assertEqual(93, findPositionInEditorSet('~'));
+	assertEqual(13, findPositionInEditorSet('9'));
+	assertEqual(24, findPositionInEditorSet('K'));
+	assertEqual(94, findPositionInEditorSet('~'));
+	assertEqual(1, findPositionInEditorSet(' '));
+	assertEqual(2, findPositionInEditorSet('.'));
 	assertEqual(0, findPositionInEditorSet(0));
 }
 
@@ -222,6 +225,72 @@ test(testTextRuntimeItem) {
 	textItem.copyValue(sz, sizeof(sz));
 	assertStringCaseEqual("0o1dbye", sz);
 
+}
+
+RENDERING_CALLBACK_NAME_INVOKE(timeMenuItemTestCb, timeItemRenderFn, "Time", 103, NULL)
+
+test(testTimeMenuItem12Hr) {
+    TimeFormattedMenuItem timeItem24(timeMenuItemTestCb, 111, EDITMODE_TIME_12H);
+
+	char sz[20];
+    timeItem24.setTime(TimeStorage(12, 20, 30));
+	timeItem24.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("12:20:30PM", sz);
+
+    timeItem24.setTime(TimeStorage(0, 10, 30));
+	timeItem24.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("12:10:30AM", sz);
+
+    timeItem24.setTime(TimeStorage(11, 59, 30));
+	timeItem24.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("11:59:30AM", sz);
+
+    timeItem24.setTime(TimeStorage(23, 59, 30));
+	timeItem24.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("11:59:30PM", sz);
+}
+
+
+test(testTimeMenuItem24Hr) {
+    TimeFormattedMenuItem timeItem24(timeMenuItemTestCb, 111, EDITMODE_TIME_HUNDREDS_24H);
+
+	char sz[20];
+    timeItem24.setTime(TimeStorage(20, 39, 30, 93));
+	timeItem24.copyNameToBuffer(sz, sizeof(sz));
+	assertStringCaseEqual("Time", sz);
+	timeItem24.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("20:39:30.93", sz);
+
+	assertEqual(uint8_t(4), timeItem24.beginMultiEdit());
+	assertEqual(23, timeItem24.nextPart());
+	assertEqual(20, timeItem24.getPartValueAsInt());
+    timeItem24.valueChanged(18);
+
+	assertEqual(59, timeItem24.nextPart());
+	assertEqual(39, timeItem24.getPartValueAsInt());
+    timeItem24.valueChanged(30);
+
+	timeItem24.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("18:[30]:30.93", sz);
+
+	assertEqual(59, timeItem24.nextPart());
+	assertEqual(30, timeItem24.getPartValueAsInt());
+
+	assertEqual(99, timeItem24.nextPart());
+	assertEqual(93, timeItem24.getPartValueAsInt());
+    timeItem24.valueChanged(10);
+
+	timeItem24.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("18:30:30.[10]", sz);
+    timeItem24.stopMultiEdit();
+
+    timeItem24.setTimeFromString("23:44:00.33");
+	timeItem24.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("23:44:00.33", sz);
+
+    timeItem24.setTimeFromString("8:32");
+	timeItem24.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("08:32:00.00", sz);
 }
 
 RENDERING_CALLBACK_NAME_INVOKE(ipMenuItemTestCb, ipAddressRenderFn, "HelloWorld", 102, NULL)

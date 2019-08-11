@@ -111,6 +111,13 @@ void loadRecursively(EepromAbstraction& eeprom, MenuItem* nextMenuItem) {
 			textItem->setChanged(true);
 			textItem->triggerCallback();
 		}
+        else if (nextMenuItem->getMenuType() == MENUTYPE_TIME) {
+            TimeFormattedMenuItem* timeItem = reinterpret_cast<TimeFormattedMenuItem*>(nextMenuItem);
+            eeprom.readIntoMemArray((uint8_t*) timeItem->getUnderlyingData(), timeItem->getEepromPosition(), sizeof(TimeFormattedMenuItem));
+			timeItem->setSendRemoteNeededAll();
+			timeItem->setChanged(true);
+			timeItem->triggerCallback();
+        }
 		else if (nextMenuItem->getMenuType() == MENUTYPE_IPADDRESS) {
 			IpAddressMenuItem* ipItem = reinterpret_cast<IpAddressMenuItem*>(nextMenuItem);
 			eeprom.readIntoMemArray(ipItem->getIpAddress(), ipItem->getEepromPosition(), 4);
@@ -152,6 +159,10 @@ void saveRecursively(EepromAbstraction& eeprom, MenuItem* nextMenuItem) {
 		else if(nextMenuItem->getMenuType() == MENUTYPE_TEXT_VALUE) {
 			TextMenuItem* textItem = (TextMenuItem*) nextMenuItem;
 			eeprom.writeArrayToRom(textItem->getEepromPosition(), (const uint8_t*) (textItem->getTextValue()), textItem->textLength());
+		}
+		else if(nextMenuItem->getMenuType() == MENUTYPE_TIME) {
+			TimeFormattedMenuItem* timeItem = reinterpret_cast<TimeFormattedMenuItem*>(nextMenuItem);
+			eeprom.writeArrayToRom(timeItem->getEepromPosition(), (const uint8_t*) (timeItem->getUnderlyingData()), sizeof(TimeFormattedMenuItem));
 		}
 		else if (nextMenuItem->getMenuType() == MENUTYPE_IPADDRESS) {
 			IpAddressMenuItem* ipItem = reinterpret_cast<IpAddressMenuItem*>(nextMenuItem);

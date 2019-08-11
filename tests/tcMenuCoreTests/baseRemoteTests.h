@@ -145,7 +145,7 @@ public:
 
 	void waitForMessageOnTransport(const char* expected) {
         int counter = 0;
-		while (transport.getLastWriteBufferChar() != '~' && counter < 1000) {
+		while (transport.getLastWriteBufferChar() != 0x02 && counter < 1000) {
 			remoteConnector.tick();
             counter++;
 		}

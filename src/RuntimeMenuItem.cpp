@@ -60,11 +60,11 @@ bool TextMenuItem::setCharValue(uint8_t location, char val) {
 	return true;
 }
 
-void wrapForEdit(byte *ipData, uint8_t idx, uint8_t row, char* buffer, int bufferSize) {
+void wrapForEdit(int val, int idx, uint8_t row, char* buffer, int bufferSize, bool forTime = false) {
 	--row;
 
 	if (idx == row) appendChar(buffer, '[', bufferSize);
-	fastltoa(buffer, ipData[idx], 3, NOT_PADDED, bufferSize);
+	fastltoa(buffer, val, forTime ? 2 : 3, forTime ? '0' : NOT_PADDED, bufferSize);
 	if (idx == row) appendChar(buffer, ']', bufferSize);
 }
 
@@ -76,13 +76,13 @@ int ipAddressRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, cha
 	case RENDERFN_VALUE: {
 		buffer[0] = 0;
 		byte* data = ipItem->getIpAddress();
-		wrapForEdit(data, 0, row, buffer, bufferSize);
+		wrapForEdit(data[0], 0, row, buffer, bufferSize);
 		appendChar(buffer, '.', bufferSize);
-		wrapForEdit(data, 1, row, buffer, bufferSize);
+		wrapForEdit(data[1], 1, row, buffer, bufferSize);
 		appendChar(buffer, '.', bufferSize);
-		wrapForEdit(data, 2, row, buffer, bufferSize);
+		wrapForEdit(data[2], 2, row, buffer, bufferSize);
 		appendChar(buffer, '.', bufferSize);
-		wrapForEdit(data, 3, row, buffer, bufferSize);
+		wrapForEdit(data[3], 3, row, buffer, bufferSize);
 		return true;
 	}
 	case RENDERFN_SET_VALUE: {
@@ -100,6 +100,67 @@ int ipAddressRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, cha
 	case RENDERFN_GETRANGE: return 255;
     default: return false;
 	}
+}
+
+int twelveHourTime(int hr) {
+    if(hr == 0 || hr == 12) return 12;
+    else if(hr < 12) return hr;
+    else return hr - 12;
+}
+
+int timeItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
+	if (item->getMenuType() != MENUTYPE_TIME) return 0;
+    TimeFormattedMenuItem* timeItem = reinterpret_cast<TimeFormattedMenuItem*>(item);
+    int idx = row - 1;
+    TimeStorage data = timeItem->getTime();
+
+    switch(mode) {
+    case RENDERFN_NAME: {
+		if (buffer) buffer[0] = 0;
+		return true;
+	}
+    case RENDERFN_VALUE: {
+        bool twelveHr = timeItem->getFormat() == EDITMODE_TIME_12H;
+		buffer[0] = 0;
+        int hr = twelveHr ? twelveHourTime(data.hours) : data.hours;
+		wrapForEdit(hr, 0, row, buffer, bufferSize, true);
+		appendChar(buffer, ':', bufferSize);
+		wrapForEdit(data.minutes, 1, row, buffer, bufferSize, true);
+		appendChar(buffer, ':', bufferSize);
+		wrapForEdit(data.seconds, 2, row, buffer, bufferSize, true);
+        if(timeItem->getFormat() == EDITMODE_TIME_HUNDREDS_24H) {
+            appendChar(buffer, '.', bufferSize);
+            wrapForEdit(data.hundreds, 3, row, buffer, bufferSize, true);
+        }
+        else if(twelveHr)  {
+            appendChar(buffer, (data.hours > 11) ? 'P' : 'A', bufferSize);
+            appendChar(buffer, 'M', bufferSize);
+        }
+		return true;
+	}
+    case RENDERFN_GETRANGE: {
+		if(idx == 0) return 23;
+        else if(idx == 1 || idx == 2) return 59;
+        else if(idx == 3) return 99;
+        else return true;		
+    }
+    case RENDERFN_GETPART: {
+		if(idx == 0) return data.hours;
+        else if(idx==1) return data.minutes;
+        else if(idx==2) return data.seconds;
+        else return data.hundreds;
+	}
+
+	case RENDERFN_SET_VALUE: {
+		int idx = row - 1;
+        if(idx == 0) timeItem->getUnderlyingData()->hours = buffer[0];
+        else if(idx == 1) timeItem->getUnderlyingData()->minutes = buffer[0];
+        else if(idx == 2) timeItem->getUnderlyingData()->seconds = buffer[0];
+        else if(idx == 3) timeItem->getUnderlyingData()->hundreds = buffer[0];
+        return true;
+	}
+    default: return false;
+    }
 }
 
 int backSubItemRenderFn(RuntimeMenuItem* /*item*/, uint8_t /*row*/, RenderFnMode mode, char* buffer, int /*bufferSize*/) {
@@ -196,4 +257,27 @@ void IpAddressMenuItem::setIpAddress(uint8_t p1, uint8_t p2, uint8_t p3, uint8_t
 	data[3] = p4;
 	setChanged(true);
 	setSendRemoteNeededAll();
+}
+
+int parseIntUntilSeparator(const char* ptr, int& offset) {
+    char sz[10];
+    int pos = 0;
+    // skip any non numerics
+    while(ptr[offset] && ptr[offset] < '0' || ptr[offset] > '9') {
+        offset++;
+    }
+    // collect the numerics
+    while(pos < (sizeof(sz)-1) && ptr[offset] && ptr[offset] >= '0' && ptr[offset] <= '9') {
+        sz[pos++] = ptr[offset++];
+    }
+    sz[pos] = 0;
+    return atoi(sz);
+}
+
+void TimeFormattedMenuItem::setTimeFromString(const char* ptr) {
+    int offset = 0;
+    data.hours = parseIntUntilSeparator(ptr, offset);
+    data.minutes = parseIntUntilSeparator(ptr, offset);
+    data.seconds = parseIntUntilSeparator(ptr, offset);
+    data.hundreds = parseIntUntilSeparator(ptr, offset);
 }
