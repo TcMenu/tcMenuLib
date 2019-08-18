@@ -389,24 +389,24 @@ void TagValueRemoteConnector::encodeAnalogItem(int parentId, AnalogMenuItem* ite
 void TagValueRemoteConnector::encodeMultiEditMenu(int parentId, RuntimeMenuItem* item) {
 	if(!prepareWriteMsg(MSG_BOOT_TEXT)) return;
     encodeBaseMenuFields(parentId, item);
+
 	if (item->getMenuType() == MENUTYPE_TEXT_VALUE) {
-		TextMenuItem* editable = reinterpret_cast<TextMenuItem*>(item);
-		transport->writeFieldInt(FIELD_MAX_LEN, editable->getNumberOfParts());
 		transport->writeFieldInt(FIELD_EDIT_MODE, EDITMODE_PLAIN_TEXT);
-		transport->writeField(FIELD_CURRENT_VAL, editable->getTextValue());
 	}
 	else if (item->getMenuType() == MENUTYPE_IPADDRESS) {
-		IpAddressMenuItem* editable = reinterpret_cast<IpAddressMenuItem*>(item);
 		transport->writeFieldInt(FIELD_EDIT_MODE, EDITMODE_IP_ADDRESS);
-		char sz[20];
-		editable->copyValue(sz, sizeof(sz));
-		transport->writeFieldInt(FIELD_MAX_LEN, sizeof(sz));
-		transport->writeField(FIELD_CURRENT_VAL, sz);
 	}
     else if(item->getMenuType() == MENUTYPE_TIME) {
         TimeFormattedMenuItem* editable = reinterpret_cast<TimeFormattedMenuItem*>(item);
         transport->writeFieldInt(FIELD_EDIT_MODE, editable->getFormat());
     }
+
+    EditableMultiPartMenuItem<byte[4]>* multipart = reinterpret_cast<EditableMultiPartMenuItem<byte[4]>*>(item);
+    char sz[20];
+    multipart->copyValue(sz, sizeof(sz));
+    transport->writeField(FIELD_CURRENT_VAL, sz);
+    transport->writeFieldInt(FIELD_MAX_LEN, multipart->getNumberOfParts());
+
     transport->endMsg();
 }
 

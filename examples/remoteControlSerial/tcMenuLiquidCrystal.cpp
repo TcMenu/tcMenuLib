@@ -125,7 +125,7 @@ void LiquidCrystalRenderer::renderMenuItem(uint8_t row, MenuItem* item) {
 	else {
 		menuValueToText(item, JUSTIFY_TEXT_RIGHT);
 	}
-	//serdebugF3("Buffer: ", row, buffer);
+	serdebugF3("Buffer: ", row, buffer);
 	lcd->print(buffer);
 }
 
