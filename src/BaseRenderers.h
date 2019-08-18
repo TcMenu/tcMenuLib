@@ -330,6 +330,12 @@ public:
 	 * Returns a pointer to the rendering callback
 	 */
 	RendererCallbackFn getRenderingCallback() { return renderCallback; }
+
+	/**
+	 * Used to reset the display to it's default state, root menu, nothing being edited
+	 */
+	void resetToDefault();
+
 protected:
     /**
      * Gets the parent of the current menu.
@@ -349,11 +355,6 @@ protected:
 	 */
 	void redrawRequirement(MenuRedrawState state) { if (state > redrawMode) redrawMode = state; }
 	
-	/**
-	 * Used to reset the display to it's default state, root menu, nothing being edited
-	 */
-	void resetToDefault();
-
 	/**
 	 * Used to set up a new submenu for display on the renderer
 	 * @param newItems the new submenu

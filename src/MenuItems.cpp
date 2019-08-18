@@ -175,11 +175,11 @@ WholeAndFraction AnalogMenuItem::getWholeAndFraction() {
 }
 
 void AnalogMenuItem::setFromWholeAndFraction(WholeAndFraction wf) {
-	serdebugF3("setWF ", wf.whole, wf.fraction);
 	int fractMax = getActualDecimalDivisor();
 	uint16_t divisor = getDivisor();
 	int correctedFraction = wf.fraction / (fractMax / divisor);
 	setCurrentValue(((wf.whole * getDivisor()) + correctedFraction) - getOffset());
+	serdebugF4("setWF ", wf.whole, wf.fraction, getCurrentValue());
 }
 
 void AnalogMenuItem::setFromFloatingPointValue(float value) {

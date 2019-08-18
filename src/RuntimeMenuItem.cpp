@@ -263,7 +263,7 @@ int parseIntUntilSeparator(const char* ptr, int& offset) {
     char sz[10];
     int pos = 0;
     // skip any non numerics
-    while(ptr[offset] && ptr[offset] < '0' || ptr[offset] > '9') {
+    while(ptr[offset] && (ptr[offset] < '0' || ptr[offset] > '9')) {
         offset++;
     }
     // collect the numerics

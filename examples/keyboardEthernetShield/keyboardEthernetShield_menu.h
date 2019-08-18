@@ -40,30 +40,24 @@ extern LiquidCrystalRenderer renderer;
 extern IoAbstractionRef io23017;
 
 // all menu item forward references.
-extern IpAddressMenuItem menuConnectivityIPAddress;
+extern TextMenuItem menuConnectivityText;
+extern IpAddressMenuItem menuConnectivityIpAddress;
 extern BackMenuItem menuBackConnectivity;
 extern SubMenuItem menuConnectivity;
-extern ActionMenuItem menuSettingsSaveSettings;
-extern AnalogMenuItem menuSettingsPower;
-extern BooleanMenuItem menuSettingsEnabled;
-extern BackMenuItem menuBackSettings;
-extern SubMenuItem menuSettings;
-extern ActionMenuItem menuQuestionDialog;
-extern ActionMenuItem menuInfoDialog;
-extern TextMenuItem menuText;
-extern EnumMenuItem menuFood;
-extern ActionMenuItem menuTakeDisplay;
+extern EnumMenuItem menuFruits;
+extern AnalogMenuItem menuFiths;
+extern AnalogMenuItem menuDecimalTens;
+extern AnalogMenuItem menuInteger;
+extern AnalogMenuItem menuAnalog1;
 extern TimeFormattedMenuItem menuTime;
 extern const ConnectorLocalInfo applicationInfo;
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
-void CALLBACK_FUNCTION onFoodChoice(int id);
-void CALLBACK_FUNCTION onInfoDlg(int id);
-void CALLBACK_FUNCTION onQuestionDlg(int id);
-void CALLBACK_FUNCTION onSaveSettings(int id);
-void CALLBACK_FUNCTION onTakeOverDisplay(int id);
+void CALLBACK_FUNCTION onAnalog1(int id);
+void CALLBACK_FUNCTION onFiths(int id);
+void CALLBACK_FUNCTION onInteger(int id);
 
 void setupMenu();
 

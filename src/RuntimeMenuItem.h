@@ -171,14 +171,18 @@ public:
 	}
 
 	int nextPart() {
-		itemPosition++;
-		if (itemPosition > noOfParts) {
+		if (itemPosition >= noOfParts) {
 			stopMultiEdit();
 			return 0;
 		}
 
+		itemPosition++;
 		setChanged(true);
 		setSendRemoteNeededAll();
+		return renderFn(this, itemPosition, RENDERFN_GETRANGE, NULL, 0);
+	}
+
+	int getCurrentRange() {
 		return renderFn(this, itemPosition, RENDERFN_GETRANGE, NULL, 0);
 	}
 	
@@ -243,6 +247,13 @@ private:
 	bool setCharValue(uint8_t location, char val);
 	friend int textItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
 };
+
+/**
+ * finds the position of the character in the editor set
+ * @param ch the character to find.
+ * @return the location in the allowable chars
+ */
+int findPositionInEditorSet(char ch);
 
 /**
  * This menu item represents an IP address that can be configured / or just displayed on the device,

@@ -13,6 +13,9 @@
 #include "BaseRenderers.h"
 #include "EepromAbstraction.h"
 
+// forward reference
+class MenuRenderer;
+
 /**
  * @file tcMenu.h
  * 
@@ -106,6 +109,11 @@ public:
 	 * Get the root of all menus, the first menu item basically
 	 */
 	MenuItem* getRoot() { return rootMenu; }
+
+    /**
+     * Get the renderer that this menu is using
+     */
+    MenuRenderer* getRenderer() { return renderer; }
 };
 
 /**

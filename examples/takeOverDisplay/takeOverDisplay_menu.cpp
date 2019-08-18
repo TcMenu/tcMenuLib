@@ -19,21 +19,21 @@ EthernetServer server(3333);
 
 // Global Menu Item declarations
 
-RENDERING_CALLBACK_NAME_INVOKE(fnIPAddressRtCall, ipAddressRenderFn, "IPAddress", 7, NULL)
-IpAddressMenuItem menuIPAddress(fnIPAddressRtCall, 12, NULL);
+RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityIPAddressRtCall, ipAddressRenderFn, "IPAddress", 7, NULL)
+IpAddressMenuItem menuConnectivityIPAddress(fnConnectivityIPAddressRtCall, 12, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NULL)
 const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 11, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuIPAddress);
+BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuConnectivityIPAddress);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL);
-const PROGMEM AnyMenuInfo minfoSaveSettings = { "Save Settings", 6, 0xffff, 0, onSaveSettings };
-ActionMenuItem menuSaveSettings(&minfoSaveSettings, NULL);
-const PROGMEM AnalogMenuInfo minfoPower = { "Power", 5, 5, 250, NO_CALLBACK, 0, 10, "W" };
-AnalogMenuItem menuPower(&minfoPower, 0, &menuSaveSettings);
-const PROGMEM BooleanMenuInfo minfoEnabled = { "Enabled", 4, 2, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
-BooleanMenuItem menuEnabled(&minfoEnabled, false, &menuPower);
+const PROGMEM AnyMenuInfo minfoSettingsSaveSettings = { "Save Settings", 6, 0xffff, 0, onSaveSettings };
+ActionMenuItem menuSettingsSaveSettings(&minfoSettingsSaveSettings, NULL);
+const PROGMEM AnalogMenuInfo minfoSettingsPower = { "Power", 5, 5, 250, NO_CALLBACK, 0, 10, "W" };
+AnalogMenuItem menuSettingsPower(&minfoSettingsPower, 0, &menuSettingsSaveSettings);
+const PROGMEM BooleanMenuInfo minfoSettingsEnabled = { "Enabled", 4, 2, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
+BooleanMenuItem menuSettingsEnabled(&minfoSettingsEnabled, false, &menuSettingsPower);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings", -1, NULL)
 const PROGMEM SubMenuInfo minfoSettings = { "Settings", 3, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackSettings(fnSettingsRtCall, &menuEnabled);
+BackMenuItem menuBackSettings(fnSettingsRtCall, &menuSettingsEnabled);
 SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, &menuConnectivity);
 const PROGMEM AnyMenuInfo minfoQuestionDialog = { "Question Dialog", 9, 0xffff, 0, onQuestionDlg };
 ActionMenuItem menuQuestionDialog(&minfoQuestionDialog, &menuSettings);
@@ -64,7 +64,7 @@ void setupMenu() {
 
     // Read only and local only function calls
     menuText.setReadOnly(true);
-    menuSaveSettings.setLocalOnly(true);
+    menuSettingsSaveSettings.setLocalOnly(true);
     menuInfoDialog.setLocalOnly(true);
 }
 
