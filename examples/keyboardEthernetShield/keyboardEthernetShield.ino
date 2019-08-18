@@ -66,7 +66,7 @@ void setup() {
 
 	// Here we add two additional menus for managing the connectivity and authentication keys.
 	// In the future, there will be an option to autogenerate these from the designer.
-	menuConnectivityText.setNext(&menuAuthKeyMgr);
+	menuConnectivitySaveToEEPROM.setNext(&menuAuthKeyMgr);
 	menuRemoteMonitor.addConnector(remoteServer.getRemoteConnector(0));
 	menuAuthKeyMgr.setLocalOnly(true);
 
@@ -105,4 +105,9 @@ void CALLBACK_FUNCTION onInteger(int id) {
 
 void CALLBACK_FUNCTION onAnalog1(int id) {
 	Serial.println("Analog1 changed");
+}
+
+
+void CALLBACK_FUNCTION onSaveToEeprom(int id) {
+	menuMgr.save(eeprom);
 }

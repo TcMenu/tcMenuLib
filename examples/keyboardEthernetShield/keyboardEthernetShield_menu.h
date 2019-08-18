@@ -40,6 +40,7 @@ extern LiquidCrystalRenderer renderer;
 extern IoAbstractionRef io23017;
 
 // all menu item forward references.
+extern ActionMenuItem menuConnectivitySaveToEEPROM;
 extern TextMenuItem menuConnectivityText;
 extern IpAddressMenuItem menuConnectivityIpAddress;
 extern BackMenuItem menuBackConnectivity;
@@ -58,6 +59,7 @@ extern const ConnectorLocalInfo applicationInfo;
 void CALLBACK_FUNCTION onAnalog1(int id);
 void CALLBACK_FUNCTION onFiths(int id);
 void CALLBACK_FUNCTION onInteger(int id);
+void CALLBACK_FUNCTION onSaveToEeprom(int id);
 
 void setupMenu();
 

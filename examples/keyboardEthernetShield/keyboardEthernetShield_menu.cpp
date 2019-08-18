@@ -19,8 +19,10 @@ EthernetServer server(3333);
 
 // Global Menu Item declarations
 
+const PROGMEM AnyMenuInfo minfoConnectivitySaveToEEPROM = { "Save to EEPROM", 10, 0xffff, 0, onSaveToEeprom };
+ActionMenuItem menuConnectivitySaveToEEPROM(&minfoConnectivitySaveToEEPROM, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityTextRtCall, textItemRenderFn, "Text", -1, NULL)
-TextMenuItem menuConnectivityText(fnConnectivityTextRtCall, 9, 10, NULL);
+TextMenuItem menuConnectivityText(fnConnectivityTextRtCall, 9, 10, &menuConnectivitySaveToEEPROM);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityIpAddressRtCall, ipAddressRenderFn, "IpAddress", -1, NULL)
 IpAddressMenuItem menuConnectivityIpAddress(fnConnectivityIpAddressRtCall, 7, &menuConnectivityText);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NULL)
