@@ -29,10 +29,26 @@ AvrEeprom eeprom;
 RemoteMenuItem menuRemoteMonitor(1001, 2);
 EepromAuthenicationInfoMenuItem menuAuthKeyMgr(1002, &authManager, &menuRemoteMonitor);
 
+// 
+// Here we add the keyboard components to the menu. For more general documentation of keyboards
+// https://www.thecoderscorner.com/products/arduino-libraries/io-abstraction/matrix-keyboard-keypad-manager/
+//
+
+// First we create a standard layout, in this case the 3x4 layout but there's also a 4x4 one
+// You can also generate your own layouts for this. The class is KeyboardLayout.
 MAKE_KEYBOARD_LAYOUT_3X4(keyboardLayout)
+//MAKE_KEYBOARD_LAYOUT_4X4(keyboardLayout)
+
+// The matrix keyboard manager itself, looks after the keyboard, notifies of changes etc.
 MatrixKeyboardManager keyboard;
+
+// This is the tcMenu standard keyboard listener. It allows control of the menu by keyboard
+// You could also write your own keyboard interface if this didn't work as expected for you.
 MenuEditingKeyListener menuKeyListener;
 
+//
+// This function is called by setup() further down to initialise the keyboard.
+//
 void setupKeyboard() {
 	// set up the pin mappings.
 	keyboardLayout.setRowPin(0, 22);
@@ -75,17 +91,18 @@ void setup() {
 	setupKeyboard();
 
 	// here we use the EEPROM to load back the last set of values.
-	menuMgr.load(eeprom);
+	menuMgr.load(eeprom, 0xf8f3);
+
+	// and print out the IP address
+	char sz[20];
+	menuConnectivityIpAddress.copyValue(sz, sizeof(sz));
+	Serial.print("Device IP is: "); Serial.println(sz);
 
 	// spin up the Ethernet library, get the IP address from the menu
 	byte* rawIp = menuConnectivityIpAddress.getIpAddress();
 	IPAddress ip(rawIp[0], rawIp[1], rawIp[2], rawIp[3]);
 	Ethernet.begin(mac, ip);
 
-	// and print out the IP address
-	char sz[20];
-	menuConnectivityIpAddress.copyValue(sz, sizeof(sz));
-	Serial.print("Device IP is: "); Serial.println(sz);
 }
 
 void loop() {
@@ -109,5 +126,5 @@ void CALLBACK_FUNCTION onAnalog1(int id) {
 
 
 void CALLBACK_FUNCTION onSaveToEeprom(int id) {
-	menuMgr.save(eeprom);
+	menuMgr.save(eeprom, 0xf8f3);
 }

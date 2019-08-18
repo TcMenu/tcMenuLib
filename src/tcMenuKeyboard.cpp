@@ -157,9 +157,9 @@ void MenuEditingKeyListener::processAnalogKeyPress(AnalogMenuItem* item, char ke
 }
 
 void MenuEditingKeyListener::processMultiEditKeyPress(TextMenuItem* item, char key) {
-	clearState();
 	item->valueChanged(findPositionInEditorSet(key));
 	if (!item->nextPart()) {
+		clearState();
 		item->setEditing(false);
 	}
 }

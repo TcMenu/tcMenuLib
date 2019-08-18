@@ -21,9 +21,9 @@ EthernetServer server(3333);
 
 const PROGMEM AnyMenuInfo minfoConnectivitySaveToEEPROM = { "Save to EEPROM", 10, 0xffff, 0, onSaveToEeprom };
 ActionMenuItem menuConnectivitySaveToEEPROM(&minfoConnectivitySaveToEEPROM, NULL);
-RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityTextRtCall, textItemRenderFn, "Text", -1, NULL)
+RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityTextRtCall, textItemRenderFn, "Text", 16, NULL)
 TextMenuItem menuConnectivityText(fnConnectivityTextRtCall, 9, 10, &menuConnectivitySaveToEEPROM);
-RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityIpAddressRtCall, ipAddressRenderFn, "IpAddress", -1, NULL)
+RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityIpAddressRtCall, ipAddressRenderFn, "IpAddress", 12, NULL)
 IpAddressMenuItem menuConnectivityIpAddress(fnConnectivityIpAddressRtCall, 7, &menuConnectivityText);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NULL)
 const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 6, 0xffff, 0, NO_CALLBACK };
@@ -35,17 +35,17 @@ const char enumStrFruits_2[] PROGMEM = "Pears";
 const char enumStrFruits_3[] PROGMEM = "Plums";
 const char enumStrFruits_4[] PROGMEM = "Grapes";
 const char* const enumStrFruits[] PROGMEM  = { enumStrFruits_0, enumStrFruits_1, enumStrFruits_2, enumStrFruits_3, enumStrFruits_4 };
-const PROGMEM EnumMenuInfo minfoFruits = { "Fruits", 8, 0xffff, 4, NO_CALLBACK, enumStrFruits };
+const PROGMEM EnumMenuInfo minfoFruits = { "Fruits", 8, 26, 4, NO_CALLBACK, enumStrFruits };
 EnumMenuItem menuFruits(&minfoFruits, 0, &menuConnectivity);
 const PROGMEM AnalogMenuInfo minfoFiths = { "Fiths", 5, 6, 200, onFiths, 0, 5, "A" };
 AnalogMenuItem menuFiths(&minfoFiths, 0, &menuFruits);
-const PROGMEM AnalogMenuInfo minfoDecimalTens = { "DecimalTens", 4, 0xffff, 1000, NO_CALLBACK, 0, 10, "V" };
+const PROGMEM AnalogMenuInfo minfoDecimalTens = { "DecimalTens", 4, 28, 1000, NO_CALLBACK, 0, 10, "V" };
 AnalogMenuItem menuDecimalTens(&minfoDecimalTens, 0, &menuFiths);
 const PROGMEM AnalogMenuInfo minfoInteger = { "Integer", 3, 4, 1000, onInteger, 100, 1, "" };
 AnalogMenuItem menuInteger(&minfoInteger, 0, &menuDecimalTens);
 const PROGMEM AnalogMenuInfo minfoAnalog1 = { "Analog1", 2, 2, 255, onAnalog1, -180, 2, "dB" };
 AnalogMenuItem menuAnalog1(&minfoAnalog1, 0, &menuInteger);
-RENDERING_CALLBACK_NAME_INVOKE(fnTimeRtCall, timeItemRenderFn, "Time", -1, NULL)
+RENDERING_CALLBACK_NAME_INVOKE(fnTimeRtCall, timeItemRenderFn, "Time", 8, NULL)
 TimeFormattedMenuItem menuTime(fnTimeRtCall, 1, 3, &menuAnalog1);
 const PROGMEM ConnectorLocalInfo applicationInfo = { "Keyboard Ethernet", "b6ee8e21-449c-4f8a-bab6-a89e3f2c68d9" };
 
