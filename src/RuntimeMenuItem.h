@@ -42,7 +42,7 @@ enum MultiEditWireType : byte {
 	EDITMODE_IP_ADDRESS = 1,
 	EDITMODE_TIME_24H = 2,
 	EDITMODE_TIME_12H = 3,
-	EDITMODE_TIME_HUNDREDS_24H = 4,
+	EDITMODE_TIME_HUNDREDS_24H = 4    
 };
 
 /**
@@ -217,12 +217,23 @@ public:
  * configure the settings for this menu item in the constructor. This variant gets the name from program memory
  */
 class TextMenuItem : public EditableMultiPartMenuItem<char*> {
+private:
+    bool passwordField;
 public:
 	TextMenuItem(RuntimeRenderingFn customRenderFn, uint16_t id, int size, MenuItem* next = NULL)
 		: EditableMultiPartMenuItem(MENUTYPE_TEXT_VALUE, id, size, customRenderFn, next) {
 		data = new char[size];
 		memset(data, 0, size);
+        passwordField = false;
 	}
+
+    void setPasswordField(bool pwd) {
+        this->passwordField = pwd;
+    }
+
+    bool isPasswordField() {
+        return this->passwordField;
+    }
 
 	~TextMenuItem() { delete data; }
 

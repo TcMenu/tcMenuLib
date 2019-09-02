@@ -176,6 +176,27 @@ test(testFindEditorSetFunction) {
 	assertEqual(0, findPositionInEditorSet(0));
 }
 
+test(testTextPasswordItem) {
+    // this menu item is fully tested in the main tests
+    // here we concentrate on password functions
+	TextMenuItem textItem(textMenuItemTestCb, 33, 5, NULL);
+    textItem.setPasswordField(true);
+	textItem.setTextValue("1234");
+	
+	char sz[20];
+	textItem.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("****", sz);
+
+	assertEqual(uint8_t(5), textItem.beginMultiEdit());
+	assertTrue(textItem.isEditing());
+	assertEqual(ALLOWABLE_CHARS_ENCODER_SIZE, textItem.nextPart());
+	textItem.valueChanged(findPositionInEditorSet('9'));
+	assertEqual(findPositionInEditorSet('9'), textItem.getPartValueAsInt());
+	textItem.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("[9]***", sz);
+    assertStringCaseEqual("9234", textItem.getTextValue());
+}
+
 test(testTextRuntimeItem) {
 	TextMenuItem textItem(textMenuItemTestCb, 33, 10, NULL);
 	textItem.setTextValue("Goodbye");

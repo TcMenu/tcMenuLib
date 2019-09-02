@@ -199,9 +199,17 @@ int textItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char
 		for (int i = 0; i < txtItem->textLength(); ++i) {
 			char txtVal = txtItem->getTextValue()[i];
 
-			if (i == row) appendChar(buffer, '[', bufferSize);
-			appendChar(buffer, txtVal, bufferSize);
-			if (i == row) appendChar(buffer, ']', bufferSize);
+			if (i == row) {
+                appendChar(buffer, '[', bufferSize);
+    			appendChar(buffer, txtVal, bufferSize);
+    			appendChar(buffer, ']', bufferSize);
+            } 
+            else if(txtVal != 0) {
+                appendChar(buffer, (txtItem->isPasswordField()) ? '*' : txtVal, bufferSize);
+            }
+            else {
+                appendChar(buffer, 0, bufferSize);
+            }
 
 			if (!txtVal) break;
 		}
