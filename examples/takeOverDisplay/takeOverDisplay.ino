@@ -66,6 +66,7 @@ void setup() {
     // Always call BEFORE setupMenu()
     authManager.initialise(&eeprom, 100);
     remoteServer.setAuthenticator(&authManager);
+	menuMgr.setAuthenticator(&authManager);
 
     // Here we add two additional menus for managing the connectivity and authentication keys.
     // In the future, there will be an option to autogenerate these from the designer.
@@ -88,6 +89,10 @@ void setup() {
     char sz[20];
     menuConnectivityIPAddress.copyValue(sz, sizeof(sz));
     Serial.print("Device IP is: "); Serial.println(sz);
+
+	authManager.copyPinToBuffer(sz, sizeof(sz));
+	menuConnectivityChangePin.setTextValue(sz);
+	menuConnectivityChangePin.setPasswordField(true);
 }
 
 //
@@ -119,7 +124,7 @@ void CALLBACK_FUNCTION onFoodChoice(int /*id*/) {
 // this is the function called by the renderer every 1/5 second once the display is
 // taken over, we pass this function to takeOverDisplay below.
 //
-void myDisplayFunction(unsigned int encoderValue, bool clicked) {
+void myDisplayFunction(unsigned int encoderValue, RenderPressMode clicked) {
     // we initialise the display on the first call.
     if(counter == 0) {
         switches.changeEncoderPrecision(999, 50);
@@ -230,4 +235,19 @@ void CALLBACK_FUNCTION onQuestionDlg(int /*id*/) {
 //
 void CALLBACK_FUNCTION onSaveSettings(int /*id*/) {
     menuMgr.save(eeprom);
+}
+
+const char pgmPinTooShort[] PROGMEM = "Pin too short";
+void CALLBACK_FUNCTION onChangePin(int id) {
+	const char* sz = menuConnectivityChangePin.getTextValue();
+	if (strlen(sz) < 4) {
+		BaseDialog* dlg = renderer.getDialog();
+		dlg->setButtons(BTNTYPE_NONE, BTNTYPE_CLOSE);
+		dlg->copyIntoBuffer(sz);
+		dlg->show(pgmPinTooShort, false);
+	}
+	else {
+		authManager.changePin(sz);
+		serdebugF2("Pin changed to ", sz);
+	}
 }

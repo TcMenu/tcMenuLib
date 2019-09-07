@@ -90,8 +90,10 @@ const AuthBlock authBlocks[] PROGMEM = {
 	{ "uuid2", "07cd8bc6-734d-43da-84e7-6084990becfd" }   // UUID2
 };
 
+const char pgmPassword[] PROGMEM = "1234";
+
 test(testProgmemAuthenicatorMode) {
-	ReadOnlyAuthenticationManager roAuth(authBlocks, 2);
+	ReadOnlyAuthenticationManager roAuth(authBlocks, 2, pgmPassword);
 
 	// check the ones we know should work
 	assertTrue(roAuth.isAuthenticated("uuid1", uuid1));

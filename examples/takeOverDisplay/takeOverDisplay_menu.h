@@ -41,6 +41,7 @@ extern IoAbstractionRef io23017;
 
 // all menu item forward references.
 extern IpAddressMenuItem menuConnectivityIPAddress;
+extern TextMenuItem menuConnectivityChangePin;
 extern BackMenuItem menuBackConnectivity;
 extern SubMenuItem menuConnectivity;
 extern ActionMenuItem menuSettingsSaveSettings;
@@ -59,6 +60,7 @@ extern const ConnectorLocalInfo applicationInfo;
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
+void CALLBACK_FUNCTION onChangePin(int id);
 void CALLBACK_FUNCTION onFoodChoice(int id);
 void CALLBACK_FUNCTION onInfoDlg(int id);
 void CALLBACK_FUNCTION onQuestionDlg(int id);

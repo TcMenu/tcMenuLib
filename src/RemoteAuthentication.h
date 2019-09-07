@@ -13,6 +13,8 @@
 
 #include <EepromAbstraction.h>
 
+#define MAX_PIN_LENGTH 16
+
 #define UUID_KEY_SIZE 40
 #define CLIENT_DESC_SIZE 16
 #define TOTAL_KEY_SIZE (UUID_KEY_SIZE + CLIENT_DESC_SIZE)
@@ -43,6 +45,14 @@ public:
      * @return true if authenticated otherwise false.
      */
     virtual bool isAuthenticated(const char* connectionName, const char* authResponse)=0;
+
+	/**
+	 * Checks if the parameter pinAttempt matches with the one stored within
+	 * this authentication class.
+	 * @param pinAttempt the pin to be checked
+	 * @return true if there is a match, otherwise false
+	 */
+	virtual bool doesPinMatch(const char* pinAttempt)=0;
 };
 
 /**
@@ -72,13 +82,26 @@ public:
 	 * @param start position in the rom to start writing at
 	 * @param magicKey the value that is checked on load to see if stored data is trustworthy.
 	 */
-    void initialise(EepromAbstraction* eeprom, EepromPosition start, uint16_t magicKey = 0x9078);
+    void initialise(EepromAbstraction* eeprom, EepromPosition start, uint16_t magicKey = 0x9B32);
 
     /**
      * Reset all keys in this authenticator, such that all connections would need to run
      * through the normal joining behaviour.
      */
     void resetAllKeys();
+
+	/**
+	 * Changes the current pin to a new pin
+	 * @param newPin the new pin to save
+	 */
+	void changePin(const char* newPin);
+
+	/**
+	 * copies the current pin into the buffer provided.
+	 * @param buffer the area to copy to
+	 * @param size the buffer size
+	 */
+	void copyPinToBuffer(char* buffer, int size);
 
     /**
      * Copy the name of the item at position idx into the provided buffer.
@@ -102,6 +125,8 @@ public:
      * @param authResponse the key associated with it.
      */
     bool isAuthenticated(const char* connectionName, const char* authResponse) override;
+
+	bool doesPinMatch(const char* pinAttempt) override;
 
 	/**
 	 * @return the number of spaces for entries in the eeprom
@@ -132,6 +157,9 @@ public:
 
     /** prize every time with the No Authentication impl, everyone is always admitted. */
     bool isAuthenticated(const char* /*connectionName*/, const char* /*authResponse*/) override { return true; }
+
+	/** prize every time again for pin match, when there's no authentication, pins always match */
+	bool doesPinMatch(const char* pinAttempt) override { return true; }
 };
 
 /**
@@ -151,16 +179,24 @@ class ReadOnlyAuthenticationManager : public AuthenticationManager {
 private:
     const AuthBlock* authBlocksPgm;
     int numberOfEntries;
+	const char* pgmActualPin;
 public:
     /**
      * Initialise with an array of AuthBlock structures in program memory and the number of entries
      * @param authBlocksPgm the authorisation blocks in const / program memory
      * @param numberOfEntries the number of blocks in the array.
      */
-    ReadOnlyAuthenticationManager(const AuthBlock* authBlocksPgm, int numberOfEntries) {
+    ReadOnlyAuthenticationManager(const AuthBlock* authBlocksPgm, int numberOfEntries, const char* pgmActualPin) {
         this->authBlocksPgm = authBlocksPgm;
         this->numberOfEntries = numberOfEntries;
+		this->pgmActualPin = pgmActualPin;
     }
+
+	ReadOnlyAuthenticationManager(const char* pgmActualPin) {
+		this->authBlocksPgm = NULL;
+		this->numberOfEntries = 0;
+		this->pgmActualPin = pgmActualPin;
+	}
 
     /** Does not do anything in this variant - it is read only */
     bool addAdditionalUUIDKey(const char* /*connectionName*/, const char* /*uuid*/) override { return false; }
@@ -171,6 +207,10 @@ public:
      * @param authResponse the key provided in the join message
      */
     bool isAuthenticated(const char* connectionName, const char* authResponse) override;
+
+	bool doesPinMatch(const char* pinAttempt) override {
+		return strcmp_P(pgmActualPin, pinAttempt) == 0;
+	}
 };
 
 #endif //_REMOTE_AUTHENTICATION_H_

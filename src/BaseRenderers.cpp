@@ -6,7 +6,6 @@
 #include "tcMenu.h"
 #include "RuntimeMenuItem.h"
 #include "tcUtil.h"
-#include "MenuIterator.h"
 #include "RemoteMenuItem.h"
 #include "BaseRenderers.h"
 #include "BaseDialog.h"
@@ -20,8 +19,6 @@ BaseMenuRenderer::BaseMenuRenderer(int bufferSize) : MenuRenderer(RENDERER_TYPE_
 	renderCallback = NULL;
     resetCallback = NULL;
 	redrawMode = MENUDRAW_COMPLETE_REDRAW;
-	this->currentEditor = NULL;
-	this->currentRoot = NULL;
 	this->lastOffset = 0;
     this->firstWidget = NULL;
     this->dialog = NULL;
@@ -31,7 +28,6 @@ BaseMenuRenderer::BaseMenuRenderer(int bufferSize) : MenuRenderer(RENDERER_TYPE_
 void BaseMenuRenderer::initialise() {
 	ticksToReset = MAX_TICKS;
 	renderCallback = NULL;
-    currentRoot = menuMgr.getRoot();
 	redrawMode = MENUDRAW_COMPLETE_REDRAW;
 
 	resetToDefault();
@@ -39,41 +35,37 @@ void BaseMenuRenderer::initialise() {
 	taskManager.scheduleFixedRate(SCREEN_DRAW_INTERVAL, this);
 }
 
+bool BaseMenuRenderer::tryTakeSelectIfNeeded(int currentReading, RenderPressMode pressType) {
+	// always set the menu as altered.
+	menuAltered();
+
+	BaseDialog* dialog = getDialog();
+	if (renderCallback != NULL || (dialog != NULL && dialog->isInUse()) ) {
+		// When there's a dialog, or render function, just record the change until exec().
+		renderFnPressType = pressType;
+		return true;
+	}
+
+	// standard processing of the event required.
+	return false;
+}
+
 void BaseMenuRenderer::exec() {
+
 	if(dialog!=NULL && dialog->isInUse()) {
-        RotaryEncoder* encoder = switches.getEncoder();
-		dialog->dialogRendering((encoder != NULL) ? encoder->getCurrentReading() : 0, false);
+		dialog->dialogRendering(menuMgr.getCurrentRangeValue(), renderFnPressType);
     }
     else if(getRenderingCallback()) {
-        RotaryEncoder* encoder = switches.getEncoder();
-		renderCallback((encoder != NULL) ? encoder->getCurrentReading() : 0, false);
+		renderCallback(menuMgr.getCurrentRangeValue(), renderFnPressType);
 	}
 	else {
 		render();
 	}
 }
 
-void BaseMenuRenderer::activeIndexChanged(uint8_t index) {
-    // we only change the active index / edit state if we own the display
-	if (!getRenderingCallback()) {
-		if (currentRoot->getMenuType() == MENUTYPE_RUNTIME_LIST) {
-			reinterpret_cast<ListRuntimeMenuItem*>(currentRoot)->setActiveIndex(index);
-		}
-		else {
-			MenuItem* currentActive = menuMgr.findCurrentActive();
-			currentActive->setActive(false);
-			currentActive = getItemAtPosition(index);
-			currentActive->setActive(true);
-			menuAltered();
-		}
-	}
-}
-
 void BaseMenuRenderer::resetToDefault() {
     serdebugF2("Display reset - timeout ticks: ", resetValInTicks);
-	currentEditor = NULL;
-    getParentAndReset();
-	prepareNewSubmenu(menuMgr.getRoot());
+	menuMgr.setCurrentMenu(menuMgr.getRoot());
 	ticksToReset = MAX_TICKS;
 
     // once the menu has been reset, if the reset callback is present
@@ -84,7 +76,7 @@ void BaseMenuRenderer::resetToDefault() {
 void BaseMenuRenderer::countdownToDefaulting() {
 	if (ticksToReset == 0) {
 		resetToDefault();
-		ticksToReset = resetValInTicks;
+		ticksToReset = MAX_TICKS;
 	}
 	else if (ticksToReset != MAX_TICKS) {
 		--ticksToReset;
@@ -217,177 +209,30 @@ void BaseMenuRenderer::menuValueRuntime(RuntimeMenuItem* item, MenuDrawJustifica
 
 void BaseMenuRenderer::takeOverDisplay(RendererCallbackFn displayFn) {
 	// when we set this, we are stopping tcMenu rendering and letting this take over
+	renderFnPressType = RPRESS_NONE;
 	renderCallback = displayFn;
 }
 
 void BaseMenuRenderer::giveBackDisplay() {
 	// clear off the rendering callback.
+	renderFnPressType = RPRESS_NONE;
 	renderCallback = NULL;
-	prepareNewSubmenu(currentRoot);
-}
-
-MenuItem* BaseMenuRenderer::getParentAndReset() {
-    return getParentRootAndVisit(currentRoot, [](MenuItem* curr) {
-		curr->setActive(false);
-		curr->setEditing(false);
-    });
-}
-
-void BaseMenuRenderer::prepareNewSubmenu(MenuItem* newItems) {
+	menuMgr.setCurrentMenu(menuMgr.getRoot());
 	menuAltered();
-	currentRoot = newItems;
-	currentRoot->setActive(true);
+}
 
-	if (newItems->getMenuType() == MENUTYPE_RUNTIME_LIST) {
-		ListRuntimeMenuItem* listMenu = reinterpret_cast<ListRuntimeMenuItem*>(newItems);
+void BaseMenuRenderer::prepareNewSubmenu() {
+	menuMgr.getParentAndReset();
+
+	if (menuMgr.getCurrentMenu()->getMenuType() == MENUTYPE_RUNTIME_LIST) {
+		ListRuntimeMenuItem* listMenu = reinterpret_cast<ListRuntimeMenuItem*>(menuMgr.getCurrentMenu());
 		listMenu->setActiveIndex(0);
 		menuMgr.setItemsInCurrentMenu(listMenu->getNumberOfParts());
 	}
 	else {
-		menuMgr.setItemsInCurrentMenu(itemCount(newItems) - 1);
+		menuMgr.setItemsInCurrentMenu(itemCount(menuMgr.getCurrentMenu()) - 1);
 	}
 	redrawRequirement(MENUDRAW_COMPLETE_REDRAW);
-}
-
-MenuItem* BaseMenuRenderer::getItemAtPosition(uint8_t pos) {
-	uint8_t i = 0;
-	MenuItem* itm = currentRoot;
-
-	while (itm != NULL) {
-		if (i == pos) {
-			return itm;
-		}
-		i++;
-		itm = itm->getNext();
-	}
-
-	return currentRoot;
-}
-
-int BaseMenuRenderer::offsetOfCurrentActive() {
-	uint8_t i = 0;
-	MenuItem* itm = currentRoot;
-	while (itm != NULL) {
-		if (itm->isActive() || itm->isEditing()) {
-			return i;
-		}
-		i++;
-		itm = itm->getNext();
-	}
-
-	return 0;
-}
-
-void BaseMenuRenderer::onHold() {
-	if (currentEditor != NULL && isMenuRuntimeMultiEdit(currentEditor)) {
-		prepareNewSubmenu(currentRoot);
-	}
-	else {
-		prepareNewSubmenu(getParentAndReset());
-	}
-}
-
-void BaseMenuRenderer::onSelectPressed(MenuItem* toEdit) {
-    if(dialog != NULL && dialog->isInUse()) {
-		// we dont handle click events when a dialog is being drawn.
-        // instead we give events to it, as it has the display
-        RotaryEncoder* encoder = switches.getEncoder();
-		dialog->dialogRendering((encoder != NULL) ? encoder->getCurrentReading() : 0, true);
-        return;
-    }
-	
-    if(renderCallback) {
-		// we dont handle click events when the display is taken over
-		// instead we tell the custom renderer that we've had a click
-        RotaryEncoder* encoder = switches.getEncoder();
-		renderCallback((encoder != NULL) ? encoder->getCurrentReading() : 0, true);
-		return;
-	}
-
-    // if we are already editing an item then we need to stop editing
-    // that item once it has been selected with a click again.
-	if (currentEditor != NULL) {
-		if (isMenuRuntimeMultiEdit(currentEditor)) {
-			EditableMultiPartMenuItem<void*>* editableItem = reinterpret_cast<EditableMultiPartMenuItem<void*>*>(currentEditor);
-
-			// unless we've run out of parts to edit, stay in edit mode, moving to next part.
-			int editorRange = editableItem->nextPart();
-			if (editorRange != 0) {
-				switches.changeEncoderPrecision(editorRange, editableItem->getPartValueAsInt());
-				return;
-			}
-		}
-
-		currentEditor->setEditing(false);
-		currentEditor->setActive(true);
-		serdebugF2("onSel curr!=null", currentEditor->getId());
-		currentEditor = NULL;
-		menuMgr.setItemsInCurrentMenu(itemCount(currentRoot) - 1, offsetOfCurrentActive());
-		redrawRequirement(MENUDRAW_EDITOR_CHANGE);
-	}
-
-    // if there's a new item specified in toEdit, it means we need to change
-    // the current editor (if it's possible to edit that value)
-	if(toEdit != NULL) {
-		if (toEdit->getMenuType() == MENUTYPE_SUB_VALUE) {
-			SubMenuItem* sub = reinterpret_cast<SubMenuItem*>(toEdit);
-			sub->setActive(false);
-           	getParentAndReset();
-			prepareNewSubmenu(sub->getChild());
-		}
-		if (toEdit->getMenuType() == MENUTYPE_RUNTIME_LIST) {
-			if (currentRoot == toEdit) {
-				ListRuntimeMenuItem* listItem = reinterpret_cast<ListRuntimeMenuItem*>(toEdit);
-				serdebugF2("List press: ", listItem->getActiveIndex());
-				if (listItem->getActiveIndex() == 0) {
-					prepareNewSubmenu(getParentAndReset());
-				}
-				else {
-					listItem->getChildItem(listItem->getActiveIndex() - 1)->triggerCallback();
-					// reset to parent after doing the callback
-					listItem->asParent();
-				}
-			}
-			else prepareNewSubmenu(toEdit);
-		}
-		else if (toEdit->getMenuType() == MENUTYPE_BACK_VALUE) {
-			toEdit->setActive(false);
-			prepareNewSubmenu(getParentAndReset());
-		}
-		else if(toEdit->getMenuType() == MENUTYPE_ACTION_VALUE) {
-			toEdit->triggerCallback();
-		}
-		else {
-			setupForEditing(toEdit);
-			redrawRequirement(MENUDRAW_EDITOR_CHANGE);
-		}
-	}
-	menuAltered();
-}
-
-void BaseMenuRenderer::setupForEditing(MenuItem* item) {
-	// if the item is NULL, or it's read only, then it can't be edited.
-	if (item == NULL || item->isReadOnly()) return;
-
-	MenuType ty = item->getMenuType();
-	if ((ty == MENUTYPE_ENUM_VALUE || ty == MENUTYPE_INT_VALUE)) {
-		// these are the only types we can edit with a rotary encoder & LCD.
-		currentEditor = item;
-		currentEditor->setEditing(true);
-		switches.changeEncoderPrecision(item->getMaximumValue(), reinterpret_cast<ValueMenuItem*>(currentEditor)->getCurrentValue());
-	}
-	else if (ty == MENUTYPE_BOOLEAN_VALUE) {
-		// we don't actually edit boolean items, just toggle them instead
-		BooleanMenuItem* boolItem = (BooleanMenuItem*)item;
-		boolItem->setBoolean(!boolItem->getBoolean());
-	}
-	else if (isMenuRuntimeMultiEdit(item)) {
-		currentEditor = item;
-		EditableMultiPartMenuItem<void*>* editableItem = reinterpret_cast<EditableMultiPartMenuItem<void*>*>(item);
-		editableItem->beginMultiEdit();
-		int range = editableItem->nextPart();
-		switches.changeEncoderPrecision(range, editableItem->getPartValueAsInt());
-	}
 }
 
 void BaseMenuRenderer::setFirstWidget(TitleWidget* widget) {
@@ -422,7 +267,9 @@ BaseDialog* NoRenderer::getDialog() {
 }
 
 bool isItemActionable(MenuItem* item) {
-	if (item->getMenuType() == MENUTYPE_SUB_VALUE || item->getMenuType() == MENUTYPE_ACTION_VALUE) return true;
+	if (item->getMenuType() == MENUTYPE_SUB_VALUE || item->getMenuType() == MENUTYPE_ACTION_VALUE 
+		|| item->getMenuType() == MENUTYPE_ACTIVATE_SUBMENU || item->getMenuType() == MENUTYPE_RUNTIME_VALUE) return true;
+
 	if (item->getMenuType() == MENUTYPE_RUNTIME_LIST) {
 		return reinterpret_cast<ListRuntimeMenuItem*>(item)->isActingAsParent();
 	}

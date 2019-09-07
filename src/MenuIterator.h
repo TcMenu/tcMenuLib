@@ -53,6 +53,21 @@ inline MenuItem* getParentRoot(MenuItem* current) { return getParentRootAndVisit
 MenuItem* getMenuItemById(int id);
 
 /**
+ * Gets the item at the position requested within menu root.
+ * @param root the root of the menu
+ * @param pos the index of the item
+ * @return either root or the item at the index.
+ */
+MenuItem* getItemAtPosition(MenuItem* root, uint8_t pos);
+
+/**
+ * Gets the zero based offset of the active item in the menu provided 
+ * @param root the root of the current menu
+ * @return the offset from zero of the item 
+ */
+int offsetOfCurrentActive(MenuItem* root);
+
+/**
  * A predicate that can match upon a menu item, the match is generally performed by calling the
  * match method, which returns true for a match.
  */

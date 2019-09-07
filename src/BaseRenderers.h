@@ -8,6 +8,7 @@
 
 #include "tcMenu.h"
 #include "RuntimeMenuItem.h"
+#include "MenuIterator.h"
 #include <TaskManager.h>
 
 // forward reference.
@@ -29,6 +30,13 @@ class BaseDialog;
 bool isItemActionable(MenuItem* item);
 
 /**
+ * an enumeration of possible values that are given to either custom render functions or used internally
+ * by renderers to describe the state of the select button. Values should be self explanatory. High
+ * compatability with bool for determining if the button is pressed.
+ */
+enum RenderPressMode: byte { RPRESS_NONE = 0, RPRESS_PRESSED = 1, RPRESS_HELD = 2 };
+
+/**
  * Used to take over rendering for a period of time. Normally one calls renderer.takeOverDisplay(..) 
  * with a reference to a function meeting this spec. Whenever the callback occurs the current value
  * of the rotary encoder is provided along with the state of the menu select switch.
@@ -36,7 +44,7 @@ bool isItemActionable(MenuItem* item);
  * @param currentValue is the current value of the rotary encoder
  * @param userClicked if the user clicked the select button
  */
-typedef void (*RendererCallbackFn)(unsigned int currentValue, bool userClicked);
+typedef void (*RendererCallbackFn)(unsigned int currentValue, RenderPressMode userClicked);
 
 /**
  * Used to indicate when the renderer is about to be reset, you could use this to do custom rendering
@@ -122,33 +130,12 @@ public:
 	virtual void initialise() = 0;
 
 	/**
-	 * Tell the renderer that a new item has become active
-	 * @index the new active index
+	 * Allows the select key to be overriden for situations such as dialogs and other
+	 * special cases.
+	 * @param held true when the select was held down.
+	 * @return true to indicate we consumed the event, otherwise false.
 	 */
-	virtual void activeIndexChanged(uint8_t index) = 0;
-
-	/**
-	 * Renders keep track of which item is currently being edited, only one item can be edited at
-	 * once
-	 * @returns the current item being edited
-	 */
-	virtual MenuItem* getCurrentEditor() = 0;
-
-	/**
-	 * Sets the current editor, only one item can be edited at once.
-	 */
-	virtual void onSelectPressed(MenuItem* editItem) = 0;
-
-    /**
-     * Indicates to the renderer that select  has been held in
-     */
-    virtual void onHold() = 0;
-
-	/**
-	 * Renderers work out which submenu is current.
-	 * @returns the current sub menu
-	 */
-	virtual MenuItem* getCurrentSubMenu() = 0;
+	virtual bool tryTakeSelectIfNeeded(int currentReading, RenderPressMode press) = 0;
 
     /**
      * Gets the dialog instance that is associated with this renderer or NULL if
@@ -195,14 +182,9 @@ private:
 public:
     NoRenderer() : MenuRenderer(RENDER_TYPE_NOLOCAL, 20) { MenuRenderer::theInstance = this; dialog = NULL;}
     ~NoRenderer() override { }
-	void activeIndexChanged(uint8_t /*ignored*/) override {  }
-	MenuItem* getCurrentSubMenu() override { return NULL; }
-	MenuItem* getCurrentEditor() override { return NULL; }
-	void onSelectPressed(MenuItem* /*ignored*/) override { }
+	bool tryTakeSelectIfNeeded(int currentReading, RenderPressMode press) override { return false; }
 	void initialise() override { }
-    void onHold() override { }
     BaseDialog* getDialog() override;
-    char* getBuffer();
 };
 
 class RemoteMenuItem; // forward reference.
@@ -222,11 +204,11 @@ protected:
     uint16_t resetValInTicks;
 	MenuRedrawState redrawMode;
 	TitleWidget* firstWidget;
-	RendererCallbackFn renderCallback;
     ResetCallbackFn resetCallback;
-	MenuItem* currentRoot;
-	MenuItem* currentEditor;
     BaseDialog* dialog;
+
+	RenderPressMode renderFnPressType;
+	RendererCallbackFn renderCallback;
 public:
 	/**
 	 * constructs the renderer with a given buffer size 
@@ -274,32 +256,13 @@ public:
 	virtual void render() = 0;
 
 	/**
-	 * Get the current MenuItem that is being edited (or null)
-	 */
-	virtual MenuItem* getCurrentEditor() { return currentEditor; }
-
-	/** 
-	 * Get the current sub menu that is being rendered
-	 */
-	virtual MenuItem* getCurrentSubMenu() { return currentRoot; }
-
-	/**
-	 * Used to indicate that the active index has changed, this is used to move
-	 * the offset of the menu.
-	 * @param index the index offset needed to show the active menu item
-	 */
-	virtual void activeIndexChanged(uint8_t index);
-
-	/**
-	 * When select is pressed this method works out what action to take
+	 * If this renderer has been taken over, displaying a dialog or needs to do
+	 * something special with a button press, then this function can take action
+	 * BEFORE anything else
 	 * @param editor the current editor
+	 * @return Ah it
 	 */
-	virtual void onSelectPressed(MenuItem* editor);
-
-    /**
-     * When the select button is held in, the action is defined here
-     */
-    void onHold() override;
+	virtual bool tryTakeSelectIfNeeded(int currentReading, RenderPressMode pressMode);
 
 	/**
 	 * For menu systems that support title widgets, this will allow the first widget.
@@ -336,48 +299,26 @@ public:
 	 */
 	void resetToDefault();
 
-protected:
-    /**
-     * Gets the parent of the current menu.
-     * @return the parent for the current root.
-     */
-    MenuItem* getParentAndReset();
 	/**
-	 * Convert a menu item into a textual representation in the buffer
-	 * @param item the menu item
-	 * @param justification use either JUSTIFY_TEXT_LEFT or JUSTIFY_TEXT_RIGHT
+	 * Used to set up a new submenu for display on the renderer
+	 * @param newItems the new submenu
 	 */
-	void menuValueToText(MenuItem* item, MenuDrawJustification justification);
+	void prepareNewSubmenu();
 
 	/**
 	 * Sets the type of redraw that is needed
 	 * @param state the required redraw
 	 */
 	void redrawRequirement(MenuRedrawState state) { if (state > redrawMode) redrawMode = state; }
+
+protected:
+	/**
+	 * Convert a menu item into a textual representation in the buffer
+	 * @param item the menu item
+	 * @param justification use either JUSTIFY_TEXT_LEFT or JUSTIFY_TEXT_RIGHT
+	 */
+	void menuValueToText(MenuItem* item, MenuDrawJustification justification);
 	
-	/**
-	 * Used to set up a new submenu for display on the renderer
-	 * @param newItems the new submenu
-	 */
-	void prepareNewSubmenu(MenuItem* newItems);
-
-	/**
-	 * Find the item at a given position in the current submenu
-	 * @param pos the integer offset
-	 */
-	MenuItem* getItemAtPosition(uint8_t pos);
-
-	/**
-	 * set up an item to be edited
-	 * @param toEdit the item to edited
-	 */
-	void setupForEditing(MenuItem* toEdit);
-
-	/**
-	 * Find the offset of the currently active item
-	 */
-	int offsetOfCurrentActive();
-
 	/**
 	 * set up a countdown to default back to the submenu
 	 */

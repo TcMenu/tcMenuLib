@@ -269,7 +269,7 @@ void IpAddressMenuItem::setIpAddress(uint8_t p1, uint8_t p2, uint8_t p3, uint8_t
 
 int parseIntUntilSeparator(const char* ptr, int& offset) {
     char sz[10];
-    int pos = 0;
+    unsigned int pos = 0;
     // skip any non numerics
     while(ptr[offset] && (ptr[offset] < '0' || ptr[offset] > '9')) {
         offset++;

@@ -34,7 +34,7 @@ void LiquidCrystalRenderer::setEditorChars(char back, char forward, char edit) {
 }
 
 void LiquidCrystalRenderer::renderList() {
-	ListRuntimeMenuItem* runList = reinterpret_cast<ListRuntimeMenuItem*>(currentRoot);
+	ListRuntimeMenuItem* runList = reinterpret_cast<ListRuntimeMenuItem*>(menuMgr.getCurrentMenu());
 	
 	uint8_t maxY = min(dimY, runList->getNumberOfParts());
 	uint8_t currentActive = runList->getActiveIndex();
@@ -63,18 +63,19 @@ void LiquidCrystalRenderer::render() {
 
 	countdownToDefaulting();
 
-	if (currentRoot->getMenuType() == MENUTYPE_RUNTIME_LIST ) {
-		if (currentRoot->isChanged() || locRedrawMode != MENUDRAW_NO_CHANGE) {
+	if (menuMgr.getCurrentMenu()->getMenuType() == MENUTYPE_RUNTIME_LIST ) {
+		if (menuMgr.getCurrentMenu()->isChanged() || locRedrawMode != MENUDRAW_NO_CHANGE) {
 			renderList();
 		}
 	}
 	else {
-		MenuItem* item = currentRoot;
+		MenuItem* item = menuMgr.getCurrentMenu();
 		uint8_t cnt = 0;
 
 		// first we find the first currently active item in our single linked list
-		if (offsetOfCurrentActive() >= dimY) {
-			uint8_t toOffsetBy = (offsetOfCurrentActive() - dimY) + 1;
+        int activeOffs = offsetOfCurrentActive(item);
+		if (activeOffs >= dimY) {
+			uint8_t toOffsetBy = (activeOffs - dimY) + 1;
 
 			if (lastOffset != toOffsetBy) locRedrawMode = MENUDRAW_COMPLETE_REDRAW;
 			lastOffset = toOffsetBy;

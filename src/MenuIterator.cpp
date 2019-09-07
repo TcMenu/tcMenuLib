@@ -141,3 +141,32 @@ bool MenuItemTypePredicate::matches(MenuItem* item) {
     else
         return item->getMenuType() == filterType;
 }
+
+MenuItem* getItemAtPosition(MenuItem* root, uint8_t pos) {
+	uint8_t i = 0;
+	MenuItem* itm = root;
+
+	while (itm != NULL) {
+		if (i == pos) {
+			return itm;
+		}
+		i++;
+		itm = itm->getNext();
+	}
+
+	return root;
+}
+
+int offsetOfCurrentActive(MenuItem* root) {
+	uint8_t i = 0;
+	MenuItem* itm = root;
+	while (itm != NULL) {
+		if (itm->isActive() || itm->isEditing()) {
+			return i;
+		}
+		i++;
+		itm = itm->getNext();
+	}
+
+	return 0;
+}

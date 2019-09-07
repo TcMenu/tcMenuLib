@@ -26,7 +26,7 @@ void MenuEditingKeyListener::keyPressed(char key, bool held) {
 		renderer->resetToDefault();
 	}
 
-	MenuItem* editor = renderer->getCurrentEditor();
+	MenuItem* editor = menuMgr.getCurrentEditor();
 	if (editor != NULL) {
 		// we are editing, attempt to manipulate the item using the keypress
 		if (editor->getMenuType() == MENUTYPE_ENUM_VALUE || editor->getMenuType() == MENUTYPE_BOOLEAN_VALUE) {
@@ -60,7 +60,7 @@ void MenuEditingKeyListener::keyReleased(char key) {
 void MenuEditingKeyListener::processSimpleValueKeyPress(ValueMenuItem* item, char key) {
 	clearState();
 	if (isdigit(key)) {
-		int val = key - '0';
+		unsigned int val = key - '0';
 		if (val > item->getMaximumValue()) val = item->getMaximumValue();
 		item->setCurrentValue(val);
 	}
@@ -165,7 +165,7 @@ void MenuEditingKeyListener::processMultiEditKeyPress(TextMenuItem* item, char k
 }
 
 void MenuEditingKeyListener::clearState() {
-	menuMgr.getRenderer()->onSelectPressed(NULL);
+	menuMgr.stopEditingCurrentItem();
 	currentEditor = NULL;
 	mode = KEYEDIT_NONE;
 }

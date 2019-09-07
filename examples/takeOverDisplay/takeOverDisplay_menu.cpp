@@ -21,9 +21,11 @@ EthernetServer server(3333);
 
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityIPAddressRtCall, ipAddressRenderFn, "IPAddress", 7, NULL)
 IpAddressMenuItem menuConnectivityIPAddress(fnConnectivityIPAddressRtCall, 12, NULL);
+RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityChangePinRtCall, textItemRenderFn, "ChangePin", -1, onChangePin)
+TextMenuItem menuConnectivityChangePin(fnConnectivityChangePinRtCall, 14, 15, &menuConnectivityIPAddress);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NULL)
 const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 11, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuConnectivityIPAddress);
+BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuConnectivityChangePin);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL);
 const PROGMEM AnyMenuInfo minfoSettingsSaveSettings = { "Save Settings", 6, 0xffff, 0, onSaveSettings };
 ActionMenuItem menuSettingsSaveSettings(&minfoSettingsSaveSettings, NULL);
@@ -66,5 +68,7 @@ void setupMenu() {
     menuText.setReadOnly(true);
     menuSettingsSaveSettings.setLocalOnly(true);
     menuInfoDialog.setLocalOnly(true);
+    menuConnectivity.setLocalOnly(true);
+    menuConnectivity.setSecured(true);
 }
 

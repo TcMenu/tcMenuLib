@@ -87,6 +87,7 @@ void EepromAuthenticatorManager::resetAllKeys() {
         eeprom->write8(eepromOffset(i), 0);
         eeprom->write8(eepromOffset(i) + CLIENT_DESC_SIZE, 0);
     }
+	changePin("1234");
 }
 
 int EepromAuthenticatorManager::findSlotFor(const char* name) {
@@ -111,7 +112,25 @@ int EepromAuthenticatorManager::findSlotFor(const char* name) {
     return emptySlot;
 }
 
+bool EepromAuthenticatorManager::doesPinMatch(const char* pinAttempt) {
+	char eepromPin[MAX_PIN_LENGTH];
+	eeprom->readIntoMemArray(reinterpret_cast<uint8_t*>(eepromPin), eepromOffset(numberOfEntries), MAX_PIN_LENGTH);
+	eepromPin[MAX_PIN_LENGTH - 1] = 0;
+	return strncmp(eepromPin, pinAttempt, MAX_PIN_LENGTH) == 0;
+}
+
+void EepromAuthenticatorManager::copyPinToBuffer(char* buffer, int size) {
+	eeprom->readIntoMemArray((uint8_t*)buffer, eepromOffset(numberOfEntries), size);
+	buffer[size - 1] = 0;
+}
+
+void EepromAuthenticatorManager::changePin(const char* newPin) {
+	eeprom->writeArrayToRom(eepromOffset(numberOfEntries), (uint8_t*)newPin, MAX_PIN_LENGTH);
+}
+
 bool ReadOnlyAuthenticationManager::isAuthenticated(const char* connectionName, const char* authResponse) { 
+	if (authBlocksPgm == NULL) return false;
+
     for(int i=0;i<numberOfEntries;i++) {
         if(strcmp_P(connectionName, authBlocksPgm[i].name) == 0) {                
             bool keyMatch = strcmp_P(authResponse, authBlocksPgm[i].uuid) == 0;

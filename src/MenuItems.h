@@ -199,6 +199,8 @@ enum Flags : byte {
 	MENUITEM_LOCAL_ONLY = 3,
     /** the menu is currently being edited */
 	MENUITEM_EDITING = 4,
+    /** the menu item is secured, and must be accessed with a pin */
+    MENUITEM_PIN_SECURED = 5,
     /** indicates that remote 0 needs to resend this item */
 	MENUITEM_REMOTE_SEND0 = 10,
     /** indicates that remote 1 needs to resend this item */
@@ -241,6 +243,8 @@ enum MenuType : byte {
 	MENUTYPE_RUNTIME_LIST = 151,
 	/** item is of type BackMenuItem */
 	MENUTYPE_BACK_VALUE = 152,
+	/** item is of type ActivateSubMenuItem */
+	MENUTYPE_ACTIVATE_SUBMENU = 153,
 	/** item is of type TextMenuItem */
 	MENUTYPE_TEXT_VALUE = 200,
 	/** item is an IP address and is editable per segment */
@@ -364,6 +368,11 @@ public:
 	void setLocalOnly(bool localOnly) { bitWrite(flags, MENUITEM_LOCAL_ONLY, localOnly); }
 	/** returns true if this item is only available locally */
 	bool isLocalOnly() { return bitRead(flags, MENUITEM_LOCAL_ONLY); }
+
+	/** sets this item to need pin security in order to display, currently only available locally */
+	void setSecured(bool secured) { bitWrite(flags, MENUITEM_PIN_SECURED, secured); }
+	/** returns true if this item requires a pin to display, , currently only available locally */
+	bool isSecured() { return bitRead(flags, MENUITEM_PIN_SECURED); }
 
 	/** gets the next menu (sibling) at this level */
 	MenuItem* getNext() { return next; }
