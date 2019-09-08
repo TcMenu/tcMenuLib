@@ -33,11 +33,13 @@ private:
 	uint8_t backChar;
 	uint8_t forwardChar;
 	uint8_t editChar;
+    bool drewTitleThisTime;
 public:
 
 	LiquidCrystalRenderer(LiquidCrystal& lcd, uint8_t dimX, uint8_t dimY);
 	virtual ~LiquidCrystalRenderer();
-	virtual void render();
+	void render() override;
+    void initialise() override;
 
 	void setEditorChars(char back, char forward, char edit);
 
@@ -45,6 +47,7 @@ public:
     LiquidCrystal* getLCD() {return lcd;}
     BaseDialog* getDialog() override;
 private:
+    void renderTitle(bool forceDraw);
 	void renderMenuItem(uint8_t row, MenuItem* item);
 	void renderActionItem(uint8_t row, MenuItem* item);
 	void renderBackItem(uint8_t row, MenuItem* item);

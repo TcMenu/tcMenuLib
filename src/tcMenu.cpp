@@ -132,7 +132,7 @@ void MenuManager::actionOnCurrentItem(MenuItem* toEdit) {
 		toEdit->setActive(false);
 		menuMgr.setCurrentMenu(menuMgr.getParentAndReset());
 	}
-	else if (toEdit->getMenuType() == MENUTYPE_ACTION_VALUE || toEdit->getMenuType() == MENUTYPE_RUNTIME_VALUE || toEdit->getMenuType() == MENUTYPE_ACTIVATE_SUBMENU) {
+	else if (isItemActionable(toEdit)) {
 		toEdit->triggerCallback();
 	}
 	else {

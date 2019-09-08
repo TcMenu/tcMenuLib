@@ -43,6 +43,7 @@ extern IoAbstractionRef io23017;
 extern ActionMenuItem menuConnectivitySaveToEEPROM;
 extern TextMenuItem menuConnectivityText;
 extern IpAddressMenuItem menuConnectivityIpAddress;
+extern TextMenuItem menuConnectivityChangePin;
 extern BackMenuItem menuBackConnectivity;
 extern SubMenuItem menuConnectivity;
 extern EnumMenuItem menuFruits;
@@ -57,6 +58,7 @@ extern const ConnectorLocalInfo applicationInfo;
 #define CALLBACK_FUNCTION
 
 void CALLBACK_FUNCTION onAnalog1(int id);
+void CALLBACK_FUNCTION onChangePin(int id);
 void CALLBACK_FUNCTION onFiths(int id);
 void CALLBACK_FUNCTION onInteger(int id);
 void CALLBACK_FUNCTION onSaveToEeprom(int id);

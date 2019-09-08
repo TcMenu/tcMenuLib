@@ -15,6 +15,7 @@
 #include <UIPEthernet.h>
 #include <RemoteAuthentication.h>
 #include <RemoteMenuItem.h>
+#include <stockIcons/wifiAndConnectionIcons8x7.h>
 
 // you can turn on and off tcmenu logging in the below file (within IoAbstraction)
 #include <IoLogging.h>
@@ -65,6 +66,7 @@ void setup() {
     // Always call BEFORE setupMenu()
     authManager.initialise(&eeprom, 100);
     remoteServer.setAuthenticator(&authManager);
+    menuMgr.setAuthenticator(&authManager);
 
     addWidgetToTitleArea();
     
@@ -158,28 +160,6 @@ void CALLBACK_FUNCTION onKitchenLight(int /*id*/) {
 // put the widget in the renderer.
 //
 
-const uint8_t iconConnectionNone[] PROGMEM = {
-	0b01111111,
-	0b01100011,
-	0b01010101,
-	0b01001001,
-	0b01010101,
-	0b01100011,
-	0b01111111,
-};
-
-const uint8_t iconConnected[] PROGMEM = {
-	0b01111111,
-	0b01000001,
-	0b01000001,
-	0b01000001,
-	0b01000001,
-	0b01001001,
-	0b01111111,
-};
-
-// here is the definition of the actual widget, where we assign the above bitmaps to the widget.
-const uint8_t* const iconsConnection[] PROGMEM = { iconConnectionNone, iconConnected };
 TitleWidget connectedWidget(iconsConnection, 2, 8, 7);
 
 //

@@ -66,5 +66,9 @@ void setupMenu() {
     switches.initialise(ioUsingArduino(), true);
     menuMgr.initForEncoder(&renderer, &menuHall, ENCODER_PIN_A, ENCODER_PIN_B, ENCODER_PIN_OK);
     remoteServer.begin(&server, &applicationInfo);
+
+    // Read only and local only function calls
+    menuConnectivity.setLocalOnly(true);
+    menuConnectivity.setSecured(true);
 }
 

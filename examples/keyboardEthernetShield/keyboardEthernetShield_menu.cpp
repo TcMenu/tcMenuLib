@@ -25,9 +25,11 @@ RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityTextRtCall, textItemRenderFn, "Text
 TextMenuItem menuConnectivityText(fnConnectivityTextRtCall, 9, 10, &menuConnectivitySaveToEEPROM);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityIpAddressRtCall, ipAddressRenderFn, "IpAddress", 12, NULL)
 IpAddressMenuItem menuConnectivityIpAddress(fnConnectivityIpAddressRtCall, 7, &menuConnectivityText);
+RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityChangePinRtCall, textItemRenderFn, "Change Pin", -1, onChangePin)
+TextMenuItem menuConnectivityChangePin(fnConnectivityChangePinRtCall, 11, 15, &menuConnectivityIpAddress);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NULL)
 const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 6, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuConnectivityIpAddress);
+BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuConnectivityChangePin);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL);
 const char enumStrFruits_0[] PROGMEM = "Apples";
 const char enumStrFruits_1[] PROGMEM = "Oranges";
@@ -57,5 +59,9 @@ void setupMenu() {
     switches.initialise(io23017, true);
     menuMgr.initForEncoder(&renderer, &menuTime, ENCODER_PIN_A, ENCODER_PIN_B, ENCODER_PIN_OK);
     remoteServer.begin(&server, &applicationInfo);
+
+    // Read only and local only function calls
+    menuConnectivity.setLocalOnly(true);
+    menuConnectivity.setSecured(true);
 }
 

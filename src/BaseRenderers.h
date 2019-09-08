@@ -11,6 +11,10 @@
 #include "MenuIterator.h"
 #include <TaskManager.h>
 
+/** Checks if a given menu item can have an action performed on it.
+ */
+bool isItemActionable(MenuItem* item);
+
 // forward reference.
 class BaseDialog;
 
@@ -77,14 +81,26 @@ public:
 	/** Get the current state that the widget represents */
 	uint8_t getCurrentState() {return currentState;}
 	/** gets the current icon data */
+#ifdef __AVR__
 	const uint8_t* getCurrentIcon() {
         changed = false;
-#ifdef __AVR__
         return pgm_read_ptr(&iconData[currentState]);
-#else
-        return iconData[currentState];
-#endif
     }
+    const uint8_t* getIcon(int num) {
+        if(num >= maxStateIcons) num = 0;
+        return pgm_read_ptr(&iconData[num]);
+    }
+#else
+	const uint8_t* getCurrentIcon() {
+        changed = false;
+        return iconData[currentState];
+    }
+    const uint8_t* getIcon(int num) {
+        if(num >= maxStateIcons) num = 0;
+        return iconData[num];
+    }
+#endif
+
 	/** sets the current state of the widget, there must be an icon for this value */
 	void setCurrentState(uint8_t state) {
         // if outside of allowable icons or value hasn't changed just return.
@@ -93,15 +109,26 @@ public:
 		this->currentState = state;
 		this->changed = true;
 	}
+
 	/** checks if the widget has changed since last drawn. */
 	bool isChanged() {return this->changed;}
+
+    /** Sets the changed flag on this widget */
+    void setChanged(bool ch) { changed = ch; }
+
 	/** gets the width of all the images */
 	uint8_t getWidth() {return width;}
+
 	/** gets the height of all the images */
 	uint8_t getHeight() {return height;}
+
+    /** the maximum state value - ie number of icons */
+    uint8_t getMaxValue() { return maxStateIcons; }
+
 	/** gets the next widget in the chain or null */
 	TitleWidget* getNext() {return next;}
-	/** sets the next widget in the chain */
+	
+    /** sets the next widget in the chain */
 	void setNext(TitleWidget* next) {this->next = next;}
 };
 
@@ -182,7 +209,7 @@ private:
 public:
     NoRenderer() : MenuRenderer(RENDER_TYPE_NOLOCAL, 20) { MenuRenderer::theInstance = this; dialog = NULL;}
     ~NoRenderer() override { }
-	bool tryTakeSelectIfNeeded(int currentReading, RenderPressMode press) override { return false; }
+	bool tryTakeSelectIfNeeded(int, RenderPressMode) override { return false; }
 	void initialise() override { }
     BaseDialog* getDialog() override;
 };

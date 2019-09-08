@@ -159,7 +159,7 @@ public:
     bool isAuthenticated(const char* /*connectionName*/, const char* /*authResponse*/) override { return true; }
 
 	/** prize every time again for pin match, when there's no authentication, pins always match */
-	bool doesPinMatch(const char* pinAttempt) override { return true; }
+	bool doesPinMatch(const char*) override { return true; }
 };
 
 /**

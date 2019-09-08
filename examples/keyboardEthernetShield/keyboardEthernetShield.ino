@@ -79,12 +79,13 @@ void setup() {
 	// Always call BEFORE setupMenu()
 	authManager.initialise(&eeprom, 100);
 	remoteServer.setAuthenticator(&authManager);
+    menuMgr.setAuthenticator(&authManager);
 
 	// Here we add two additional menus for managing the connectivity and authentication keys.
 	// In the future, there will be an option to autogenerate these from the designer.
 	menuConnectivitySaveToEEPROM.setNext(&menuAuthKeyMgr);
 	menuRemoteMonitor.addConnector(remoteServer.getRemoteConnector(0));
-	menuAuthKeyMgr.setLocalOnly(true);
+	menuAuthKeyMgr.setLocalOnly(true);    
 
 	setupMenu();
 
@@ -103,6 +104,11 @@ void setup() {
 	IPAddress ip(rawIp[0], rawIp[1], rawIp[2], rawIp[3]);
 	Ethernet.begin(mac, ip);
 
+    // copy the pin from the authenticator into the change pin field.
+    // and make it a password field so characters are not visible unless edited.
+    authManager.copyPinToBuffer(sz, sizeof(sz));
+    menuConnectivityChangePin.setTextValue(sz);
+    menuConnectivityChangePin.setPasswordField(true);
 }
 
 void loop() {
@@ -110,21 +116,38 @@ void loop() {
 }
 
 
-void CALLBACK_FUNCTION onFiths(int id) {
+void CALLBACK_FUNCTION onFiths(int /*id*/) {
 	Serial.println("Fiths changed");
 }
 
 
-void CALLBACK_FUNCTION onInteger(int id) {
+void CALLBACK_FUNCTION onInteger(int /*id*/) {
 	Serial.println("Integer changed");
 }
 
 
-void CALLBACK_FUNCTION onAnalog1(int id) {
+void CALLBACK_FUNCTION onAnalog1(int /*id*/) {
 	Serial.println("Analog1 changed");
 }
 
 
-void CALLBACK_FUNCTION onSaveToEeprom(int id) {
+void CALLBACK_FUNCTION onSaveToEeprom(int /*id*/) {
 	menuMgr.save(eeprom, 0xf8f3);
+}
+
+const char pgmPinTooShort[] PROGMEM = "Pin too short";
+
+void CALLBACK_FUNCTION onChangePin(int /*id*/) {
+    // Here we check if the pin that's just been entered is too short.
+    // Diallowing setting and showing a dialog if it is.
+    const char* newPin = menuConnectivityChangePin.getTextValue();
+    if(strlen(newPin) < 4) {
+        BaseDialog* dlg = renderer.getDialog();
+        dlg->setButtons(BTNTYPE_NONE, BTNTYPE_CLOSE);
+        dlg->show(pgmPinTooShort, false);
+        dlg->copyIntoBuffer(newPin);
+    }
+    else {
+        authManager.changePin(newPin);
+    }
 }

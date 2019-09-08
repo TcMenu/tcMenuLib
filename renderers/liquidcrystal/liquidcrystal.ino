@@ -7,9 +7,7 @@
 void onPressMe(int);
 #define PRESSMECALLBACK onPressMe
 #include <tcm_test/testFixtures.h>
-
-const char applicationName[] PROGMEM = "Graphics Test";
-
+#include <stockIcons/wifiAndConnectionIconsLCD.h>
 
 IoAbstractionRef io23017 = ioFrom23017(0x20, ACTIVE_LOW_OPEN, 2);
 #define LCD_RS 8
@@ -31,6 +29,8 @@ int testRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* bu
 		buffer[0] = 0;
 		fastltoa(buffer, row, 3, NOT_PADDED, bufferSize);
 		break;
+    default:
+        break;
 	}
 	return true;
 }
@@ -45,20 +45,29 @@ RuntimeMenuItem runtimeItem(MENUTYPE_RUNTIME_VALUE, 10001, testRenderFn, 99, 1, 
 
 ListRuntimeMenuItem listItem(10000, 10, testRenderFn, &runtimeItem);
 
+TitleWidget wifiWidget(iconsWifi, 5, 5, 8, NULL);
+TitleWidget titleWidget(iconsConnection, 2, 5, 8, &wifiWidget);
+
 void setup() {
     Wire.begin();
     Serial.begin(115200);
-	Serial.print("Testing LiquidCrystal driver");
-	Serial.println(applicationName);
+	Serial.println("Testing LiquidCrystal driver");
 
     lcd.setIoAbstraction(io23017);
     lcd.begin(20, 4);
 	renderer.setEditorChars(0x7f, 0x7e, 0xf6);
+    renderer.setFirstWidget(&titleWidget);
   
     switches.initialise(io23017, true);
 	menuMgr.initForEncoder(&renderer, &menuVolume, 6, 7, 5);
 	menuCaseTemp.setNext(&listItem);
 	textItem.setTextValue("hello");
+
+    taskManager.scheduleFixedRate(1500, [] {
+        titleWidget.setCurrentState(titleWidget.getCurrentState() ? 0 : 1);
+        int wifiState = (wifiWidget.getCurrentState() + 1) % 5;
+        wifiWidget.setCurrentState(wifiState);
+    });
 }
 
 void loop() {

@@ -147,13 +147,8 @@ void setup() {
                 menuIpAddress.setIpAddress(localIp[0], localIp[1], localIp[2], localIp[3]);
                 connectedToWifi = true;
             }
-            int qualityIcon = 0;
             long strength = WiFi.RSSI();
-            if(strength > -50) qualityIcon = 4;
-            else if(strength > -60) qualityIcon = 3;
-            else if(strength > -75) qualityIcon = 2;
-            else if(strength > -90) qualityIcon = 1;
-            wifiWidget.setCurrentState(qualityIcon);
+            wifiWidget.setCurrentState();
         }
         else {
             connectedToWifi = false;

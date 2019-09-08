@@ -14,12 +14,33 @@
 
 #include "tcMenuLiquidCrystal.h"
 
+const ConnectorLocalInfo applicationInfo {"Test App", "12342345534533453" };
+
 LiquidCrystalRenderer::LiquidCrystalRenderer(LiquidCrystal& lcd, uint8_t dimX, uint8_t dimY) : BaseMenuRenderer(dimX) {
 	this->dimY = dimY;
 	this->lcd = &lcd;
 	this->backChar = '<';
 	this->forwardChar = '>';
 	this->editChar = '=';
+    this->drewTitleThisTime = false;
+}
+
+void LiquidCrystalRenderer::initialise() {
+    // first we create the custom characters for any title widget.
+    // we iterate over each widget then over each each icon.
+    TitleWidget* wid = firstWidget;
+    int charNo = 0;
+    while(wid != NULL) {
+        serdebugF2("Title widget present max=", wid->getMaxValue());
+        for(int i = 0; i < wid->getMaxValue(); i++) {
+            serdebugF2("Creating char ", charNo);
+            lcd->createCharPgm((byte)charNo, wid->getIcon(i));
+            charNo++;
+        }
+        wid = wid->getNext();
+    }
+    lcd->clear();
+    BaseMenuRenderer::initialise();
 }
 
 LiquidCrystalRenderer::~LiquidCrystalRenderer() { 
@@ -34,7 +55,7 @@ void LiquidCrystalRenderer::setEditorChars(char back, char forward, char edit) {
 }
 
 void LiquidCrystalRenderer::renderList() {
-	ListRuntimeMenuItem* runList = reinterpret_cast<ListRuntimeMenuItem*>(currentRoot);
+	ListRuntimeMenuItem* runList = reinterpret_cast<ListRuntimeMenuItem*>(menuMgr.getCurrentMenu());
 	
 	uint8_t maxY = min(dimY, runList->getNumberOfParts());
 	uint8_t currentActive = runList->getActiveIndex();
@@ -54,6 +75,37 @@ void LiquidCrystalRenderer::renderList() {
 	runList->asParent();
 }
 
+void LiquidCrystalRenderer::renderTitle(bool forceDraw) {
+    if(!drewTitleThisTime || forceDraw) {
+        strcpy(buffer, applicationInfo.name);
+        serdebugF("print app name");
+        uint8_t bufSz = bufferSize;
+        uint8_t last = min(bufSz, strlen(buffer));
+        for(uint8_t i = last; i < bufSz; i++) {
+            buffer[i] = ' ';
+        }
+        buffer[bufSz] = 0;
+        lcd->setCursor(0,0);
+        lcd->print(buffer);
+    }
+
+    uint8_t widCount = 0;
+    uint8_t charOffset = 0;
+    TitleWidget* widget = firstWidget;
+    while(widget != NULL) {
+        if(widget->isChanged() || forceDraw) {
+            lcd->setCursor(bufferSize - (widCount + 1), 0);
+            serdebugF3("print widget ", widCount,  bufferSize - (widCount + 1));
+            widget->setChanged(false);
+            lcd->write(charOffset + widget->getCurrentState());
+        }
+        charOffset += widget->getMaxValue();
+        widget = widget->getNext();
+        widCount++;
+    }
+
+}
+
 void LiquidCrystalRenderer::render() {
 	uint8_t locRedrawMode = redrawMode;
 	redrawMode = MENUDRAW_NO_CHANGE;
@@ -63,18 +115,35 @@ void LiquidCrystalRenderer::render() {
 
 	countdownToDefaulting();
 
-	if (currentRoot->getMenuType() == MENUTYPE_RUNTIME_LIST ) {
-		if (currentRoot->isChanged() || locRedrawMode != MENUDRAW_NO_CHANGE) {
+	if (menuMgr.getCurrentMenu()->getMenuType() == MENUTYPE_RUNTIME_LIST ) {
+		if (menuMgr.getCurrentMenu()->isChanged() || locRedrawMode != MENUDRAW_NO_CHANGE) {
 			renderList();
 		}
 	}
 	else {
-		MenuItem* item = currentRoot;
-		uint8_t cnt = 0;
+		MenuItem* item = menuMgr.getCurrentMenu();
+
+        bool titleNeeded = menuMgr.getCurrentMenu() == menuMgr.getRoot();
 
 		// first we find the first currently active item in our single linked list
-		if (offsetOfCurrentActive() >= dimY) {
-			uint8_t toOffsetBy = (offsetOfCurrentActive() - dimY) + 1;
+        int activeOffs = offsetOfCurrentActive(item);
+
+		uint8_t cnt = 0;
+        uint8_t numLines = dimY;        
+        if(titleNeeded && activeOffs <= (dimY - 2)) {
+            renderTitle(locRedrawMode != MENUDRAW_NO_CHANGE);
+            cnt++;
+            if(!drewTitleThisTime) locRedrawMode = MENUDRAW_COMPLETE_REDRAW;
+            drewTitleThisTime = true;
+            numLines--;
+        }
+        else {
+            if(drewTitleThisTime) locRedrawMode = MENUDRAW_COMPLETE_REDRAW;
+            drewTitleThisTime = false;
+        }
+
+		if (activeOffs >= numLines) {
+			uint8_t toOffsetBy = (activeOffs - dimY) + 1;
 
 			if (lastOffset != toOffsetBy) locRedrawMode = MENUDRAW_COMPLETE_REDRAW;
 			lastOffset = toOffsetBy;
