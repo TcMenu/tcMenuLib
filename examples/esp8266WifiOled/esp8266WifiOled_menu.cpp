@@ -69,8 +69,8 @@ void setupMenu() {
     menuCucumberTemp.setReadOnly(true);
     menuTomatoTemp.setReadOnly(true);
     menuIpAddress.setReadOnly(true);
-    menuSaveAll.setLocalOnly(true);
     menuPwd.setLocalOnly(true);
+    menuSaveAll.setLocalOnly(true);
     menuSSID.setLocalOnly(true);
 }
 

@@ -14,7 +14,7 @@
 
 #include "tcMenuLiquidCrystal.h"
 
-const ConnectorLocalInfo applicationInfo {"Test App", "12342345534533453" };
+extern const ConnectorLocalInfo applicationInfo;
 
 LiquidCrystalRenderer::LiquidCrystalRenderer(LiquidCrystal& lcd, uint8_t dimX, uint8_t dimY) : BaseMenuRenderer(dimX) {
 	this->dimY = dimY;

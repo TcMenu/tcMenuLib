@@ -26,7 +26,7 @@
 #endif
 
 // contains the graphical widget title components.
-#include "wifiAndConnectionIcons.h"
+#include "stockIcons/wifiAndConnectionIcons16x10.h"
 
 
 // here we define the heater and window pins on the PCF8574
@@ -147,8 +147,7 @@ void setup() {
                 menuIpAddress.setIpAddress(localIp[0], localIp[1], localIp[2], localIp[3]);
                 connectedToWifi = true;
             }
-            long strength = WiFi.RSSI();
-            wifiWidget.setCurrentState();
+            wifiWidget.setCurrentState(fromWiFiRSSITo4StateIndicator(WiFi.RSSI()));
         }
         else {
             connectedToWifi = false;

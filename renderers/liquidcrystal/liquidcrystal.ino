@@ -9,6 +9,8 @@ void onPressMe(int);
 #include <tcm_test/testFixtures.h>
 #include <stockIcons/wifiAndConnectionIconsLCD.h>
 
+extern const ConnectorLocalInfo applicationInfo = {"Test App", "12342345534533453" };
+
 IoAbstractionRef io23017 = ioFrom23017(0x20, ACTIVE_LOW_OPEN, 2);
 #define LCD_RS 8
 #define LCD_EN 9

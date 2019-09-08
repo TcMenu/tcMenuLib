@@ -16,7 +16,7 @@
 
 #include <RemoteConnector.h>
 #include <TaskManager.h>
-#include <ESP8266WiFi.h>
+#include <WiFi.h>
 #include <tcUtil.h>
 
 /**
@@ -97,5 +97,15 @@ public:
  * This is the global instance of the remote server for ethernet.
  */
 extern EthernetTagValServer remoteServer;
+
+/**
+ * This function converts from a RSSI (Radio Strength indicator)
+ * measurement into a series of icons (of the ones we have defined
+ * in the stock icons. The input is the RSSI figure in dB as an
+ * integer.
+ * @param strength the signal strength (usually negative) as an int
+ * @return a state that can be used with the standard wifi TitleWidget
+ */
+int fromWiFiRSSITo4StateIndicator(int strength);
 
 #endif /* _TCMENU_ETHERNETTRANSPORT_H_ */
