@@ -25,7 +25,7 @@
 /**
  * Definition of the current API version
  */
-#define API_VERSION majorminor(1, 0)
+#define API_VERSION majorminor(1, 3)
 
 enum AckResponseStatus { 
     // warnings
