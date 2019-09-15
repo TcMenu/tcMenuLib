@@ -12,7 +12,7 @@
 #define MENU_GENERATED_CODE_H
 
 #include <tcMenu.h>
-#include <WiFi.h>
+#include <ESP8266WiFi.h>
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
 #include <RuntimeMenuItem.h>

@@ -18,6 +18,7 @@
 #include <ArduinoEEPROMAbstraction.h>
 #include <RemoteAuthentication.h>
 #include <RemoteMenuItem.h>
+#include <MockIoAbstraction.h>
 
 #ifdef ESP32 
 #include <WiFi.h>
@@ -54,6 +55,7 @@ U8G2_SSD1306_128X64_NONAME_F_SW_I2C gfx(U8G2_R0, 5, 4);
 // this sketch assumes the rotary encoder and switch are attached to a PCF8574 IO Expander.
 // Change in menu designer's code generator to remove this if you prefer to use device pins.
 //
+//IoAbstractionRef io8574 = new LoggingIoAbstraction(ioFrom8574(0x20, IO_INTERRUPT_PIN), 8);
 IoAbstractionRef io8574 = ioFrom8574(0x20, IO_INTERRUPT_PIN);
 
 // eeprom wrapper, initialised in setup.
@@ -203,6 +205,7 @@ void windowOpenFn() {
         windowOpen = !windowOpen;
         // 0 is narrow opening, 1 is wide. We simulate this by adjusting the speed of the call.
         int windowDelay = menuWinOpening.getCurrentValue() == 0 ? 500 : 250;
+        serdebugF2("Setting window delay to ", windowDelay);
         taskManager.scheduleOnce(windowDelay, windowOpenFn);
     }
     else windowOpen = false;
@@ -218,7 +221,8 @@ void heaterOnFn() {
     if(menuElectricHeater.getBoolean()) {
         heaterOn = !heaterOn;
         // the power is low medium or high. We simulate by changing the delay
-        int heaterDelay = (menuHeaterPower.getCurrentValue() + 1) * 500;
+        int heaterDelay = min(500, (menuHeaterPower.getCurrentValue() + 1) * 500);
+        serdebugF2("Setting heater delay to ", heaterDelay);
         taskManager.scheduleOnce(heaterDelay, heaterOnFn);
     }
     else heaterOn = false;
