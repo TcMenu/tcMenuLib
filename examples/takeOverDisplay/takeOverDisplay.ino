@@ -93,6 +93,11 @@ void setup() {
 	authManager.copyPinToBuffer(sz, sizeof(sz));
 	menuConnectivityChangePin.setTextValue(sz);
 	menuConnectivityChangePin.setPasswordField(true);
+
+    switches.addSwitch(4, [](uint8_t, bool held) {
+        Serial.print("Extra switch ");
+        Serial.println(held ? "held" : "pressed");
+    }, 20, true);
 }
 
 //
