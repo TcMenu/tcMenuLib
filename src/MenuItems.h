@@ -582,6 +582,7 @@ public:
 	 * return the first child item
 	 */
 	MenuItem* getChild() { return child; }
+    void setChild(MenuItem* child) { this->child = child; }
 };
 
 /**
