@@ -146,6 +146,8 @@ private:
 #define FLAG_BOOTSTRAP_COMPLETE 2
 #define FLAG_AUTHENTICATED 3
 #define FLAG_PAIRING_MODE 4
+#define FLAG_FULLY_JOINED_RX 5
+#define FLAG_FULLY_JOINED_TX 6
 
 /**
  * The remote connector is what we would normally interact with when dealing with a remote. It provides functionality
@@ -416,6 +418,14 @@ private:
 
 	bool isPairing() { return bitRead(flags, FLAG_PAIRING_MODE); }
     void setPairing(bool pair) { bitWrite(flags, FLAG_PAIRING_MODE, pair); }
+
+	bool isConnectionFullyEstablished() {
+		return isConnected() && (bitRead(flags, FLAG_FULLY_JOINED_RX) != 0) && (bitRead(flags, FLAG_FULLY_JOINED_TX) != 0);
+	}
+
+	void setFullyJoinedRx(bool joinRx) { bitWrite(flags, FLAG_FULLY_JOINED_RX, joinRx);	}
+
+	void setFullyJoinedTx(bool joinTx) { bitWrite(flags, FLAG_FULLY_JOINED_TX, joinTx); }
 };
 
 #endif /* _TCMENU_REMOTECONNECTOR_H_ */

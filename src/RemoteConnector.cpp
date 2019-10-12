@@ -68,6 +68,7 @@ void TagValueRemoteConnector::setRemoteConnected(uint8_t major, uint8_t minor, A
         remoteMajorVer = major;
         remoteMinorVer = minor;
         remotePlatform = platform;
+		setFullyJoinedRx(true);
         initiateBootstrap();
     }
     else {
@@ -208,6 +209,7 @@ void TagValueRemoteConnector::dealWithHeartbeating() {
          	serdebugF3("Remote disconnected (rNo, ticks): ", remoteNo, ticksLastSend);
             if(isPairing()) stopPairing();
 			setConnected(false);
+			setPairing(false);
 			transport->close();
 		}
 	} else if(!isConnected() && transport->connected()) {
@@ -218,7 +220,7 @@ void TagValueRemoteConnector::dealWithHeartbeating() {
 	}
 
 	if(ticksLastSend > HEARTBEAT_INTERVAL_TICKS) {
-		if(isConnected() && transport->available()) {
+		if(isConnectionFullyEstablished() && transport->available()) {
          	serdebugF3("Sending HB (rNo, ticks) : ", remoteNo, ticksLastSend);
             encodeHeartbeat();
         }
@@ -334,6 +336,7 @@ void TagValueRemoteConnector::encodeJoin() {
     transport->writeFieldInt(FIELD_VERSION, API_VERSION);
     transport->writeFieldInt(FIELD_PLATFORM, TCMENU_DEFINED_PLATFORM);
     transport->endMsg();
+	setFullyJoinedTx(true);
     serdebugF2("Join sent ", szName);
 }
 
