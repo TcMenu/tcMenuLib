@@ -60,7 +60,7 @@ const PROGMEM ConnectorLocalInfo applicationInfo = { "Take Over Display", "40722
 void setupMenu() {
     lcd.setIoAbstraction(io23017);
     lcd.begin(LCD_WIDTH, LCD_HEIGHT);
-    switches.initialiseInterrupt(io23017, true);
+    switches.initialise(io23017, true);
     menuMgr.initForEncoder(&renderer, &menuTime, ENCODER_PIN_A, ENCODER_PIN_B, ENCODER_PIN_OK);
     remoteServer.begin(&server, &applicationInfo);
 

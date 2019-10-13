@@ -247,8 +247,6 @@ void TagValueRemoteConnector::performAnyWrites() {
 }
 
 void TagValueRemoteConnector::initiateBootstrap() {
-	if(isBootstrapMode()) return; // already booting.
-
     serdebugF2("Starting bootstrap mode", remoteNo);
     iterator.reset();
     iterator.setPredicate(&bootPredicate);
