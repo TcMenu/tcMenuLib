@@ -250,7 +250,9 @@ enum MenuType : byte {
 	/** item is an IP address and is editable per segment */
 	MENUTYPE_IPADDRESS = 201,
     /** An item that represents a time */
-    MENUTYPE_TIME = 202
+    MENUTYPE_TIME = 202,
+    /** An item that represent a large editable number */
+    MENUTYPE_LARGENUM_VALUE = 203
 };
 
 /**

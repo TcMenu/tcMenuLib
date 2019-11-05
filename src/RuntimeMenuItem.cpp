@@ -267,7 +267,7 @@ void IpAddressMenuItem::setIpAddress(uint8_t p1, uint8_t p2, uint8_t p3, uint8_t
 	setSendRemoteNeededAll();
 }
 
-int parseIntUntilSeparator(const char* ptr, int& offset) {
+long parseIntUntilSeparator(const char* ptr, int& offset) {
     char sz[10];
     unsigned int pos = 0;
     // skip any non numerics
@@ -279,7 +279,7 @@ int parseIntUntilSeparator(const char* ptr, int& offset) {
         sz[pos++] = ptr[offset++];
     }
     sz[pos] = 0;
-    return atoi(sz);
+	return atol(sz);
 }
 
 void TimeFormattedMenuItem::setTimeFromString(const char* ptr) {

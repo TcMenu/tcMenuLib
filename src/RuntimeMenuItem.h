@@ -42,7 +42,8 @@ enum MultiEditWireType : byte {
 	EDITMODE_IP_ADDRESS = 1,
 	EDITMODE_TIME_24H = 2,
 	EDITMODE_TIME_12H = 3,
-	EDITMODE_TIME_HUNDREDS_24H = 4    
+	EDITMODE_TIME_HUNDREDS_24H = 4,
+	EDITMODE_LARGE_INTEGER = 5
 };
 
 /**
@@ -69,6 +70,12 @@ public:
 	int getRuntimeEeprom() { return renderFn(this, itemPosition, RENDERFN_EEPROM_POS, NULL, 0); }
 	uint8_t getNumberOfParts() { return noOfParts; }
 	void copyRuntimeName(char* buffer, int bufferSize) { renderFn(this, itemPosition, RENDERFN_NAME, buffer, bufferSize); }
+
+	void setNumberOfRows(uint8_t rows) { 
+		noOfParts = rows; 
+		setChanged(true); 
+		setSendRemoteNeededAll(); 
+	}
 };
 
 /**
@@ -141,12 +148,6 @@ public:
 		return this;
 	}
 
-	void setNumberOfRows(uint8_t rows) { 
-		noOfParts = rows; 
-		setChanged(true); 
-		setSendRemoteNeededAll(); 
-	}
-
 	bool isActingAsParent() {
 		return itemPosition == LIST_PARENT_ITEM_POS;
 	}
@@ -170,16 +171,28 @@ public:
 		return noOfParts;
 	}
 
+	int changeEditBy(int amt) {
+		itemPosition += amt;
+		setChanged(true);
+		setSendRemoteNeededAll();
+		return renderFn(this, itemPosition, RENDERFN_GETRANGE, NULL, 0);
+	}
+
+	int previousPart() {
+		if (itemPosition <= 1) {
+			stopMultiEdit();
+			return 0;
+		}
+		return changeEditBy(-1);
+	}
+
 	int nextPart() {
 		if (itemPosition >= noOfParts) {
 			stopMultiEdit();
 			return 0;
 		}
 
-		itemPosition++;
-		setChanged(true);
-		setSendRemoteNeededAll();
-		return renderFn(this, itemPosition, RENDERFN_GETRANGE, NULL, 0);
+		return changeEditBy(1);
 	}
 
 	int getCurrentRange() {
@@ -339,6 +352,14 @@ public:
 
     TimeStorage* getUnderlyingData() {return &data;}
 };
+
+/**
+ * Utility function to parse a string from a given offset to obtain an integer
+ * @param ptr the pointer to the text
+ * @param offset a ref to an integer that starts as the offset and is updated
+ * @return the integer that was obtain before a non digit was found
+ */
+long parseIntUntilSeparator(const char* ptr, int& offset);
 
 /**
  * This macro defines a rendering callback that will be often used with remote types, it takes as it's parameters

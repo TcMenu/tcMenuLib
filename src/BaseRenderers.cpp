@@ -104,7 +104,8 @@ void BaseMenuRenderer::menuValueToText(MenuItem* item,	MenuDrawJustification jus
     case MENUTYPE_TIME:
 	case MENUTYPE_RUNTIME_LIST:
 	case MENUTYPE_RUNTIME_VALUE:
-		menuValueRuntime(reinterpret_cast<RuntimeMenuItem*>(item), justification);
+	case MENUTYPE_LARGENUM_VALUE:
+			menuValueRuntime(reinterpret_cast<RuntimeMenuItem*>(item), justification);
 		break;
 	case MENUTYPE_FLOAT_VALUE:
 		menuValueFloat((FloatMenuItem*)item, justification);

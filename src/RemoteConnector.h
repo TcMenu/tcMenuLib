@@ -21,7 +21,7 @@
 
 #define TAG_VAL_PROTOCOL 0x01
 #define START_OF_MESSAGE 0x01
-#define TICK_INTERVAL 20
+#define TICK_INTERVAL 1
 #define HEARTBEAT_INTERVAL 2500
 // when debugging you can increase the heartbeat time to reduce disconnects (below gives 90 seconds)
 //#define HEARTBEAT_INTERVAL 30000
@@ -103,8 +103,9 @@ struct CommunicationInfo {
  */
 typedef void (*CommsCallbackFn)(CommunicationInfo);
 
-// forward reference.
+// forward references.
 class AuthenticationManager;
+class EditableLargeNumberMenuItem;
 
 /**
  * The definition of a transport that can send and receive information remotely using the TagVal protocol.
@@ -235,8 +236,9 @@ public:
 
 	/**
 	 * Encodes a heartbeat message onto the transport
+     * @param restartConnection indicates that the connection is to restart. 
 	 */
-	void encodeHeartbeat();
+	void encodeHeartbeat(HeartbeatMode restartConnection);
 
 	/**
 	 * Encodes a bootstrap for an Analog menu item, this gives all needed state
@@ -301,6 +303,13 @@ public:
 	 * @param item the item to be bootstrapped.
 	 */
 	void encodeMultiEditMenu(int parentId, RuntimeMenuItem* item);
+
+	/**
+	 * Encodes a large number type (a specialisation of multiedit) as a boot command
+	 * @param parentId the parent menu
+	 * @param item the item to be bootstrapped.
+	 */
+	void encodeLargeNumberMenuItem(int parentId, EditableLargeNumberMenuItem* item);
 
 	/**
 	 * Encodes a value change message to be sent to the remote. The embedded device
@@ -389,7 +398,7 @@ public:
     void commsNotify(uint16_t commsEventType);
 
 	/** close the connection */
-	void close() { if(transport->connected()) transport->close(); }
+	void close();
 
     /** indicates if the connection is yet authenicated */
     bool isAuthenticated() { return bitRead(flags, FLAG_AUTHENTICATED); }

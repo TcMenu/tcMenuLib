@@ -18,6 +18,7 @@
 #include <IoLogging.h>
 #include "BaseDialog.h"
 #include "BaseRenderers.h"
+#include "EditableLargeNumberMenuItem.h"
 
 const char PGM_TCM pmemBootStartText[] = "START";
 const char PGM_TCM pmemBootEndText[] = "END";
@@ -65,6 +66,7 @@ void TagValueRemoteConnector::setRemoteName(const char* name) {
 
 void TagValueRemoteConnector::setRemoteConnected(uint8_t major, uint8_t minor, ApiPlatform platform) {
     if(isAuthenticated()) {
+        serdebugF("Fully authenticated connection");
         remoteMajorVer = major;
         remoteMinorVer = minor;
         remotePlatform = platform;
@@ -148,6 +150,19 @@ void TagValueRemoteConnector::commsNotify(uint16_t err) {
     }
 }
 
+void TagValueRemoteConnector::close() {
+	serdebugF("Closing connection");
+	if (transport->connected()) {
+		encodeHeartbeat(HBMODE_ENDCONNECT);
+	}
+	transport->close();
+
+	if (isPairing()) stopPairing();
+	setConnected(false);
+	setPairing(false);
+
+}
+
 void TagValueRemoteConnector::tick() {
     dealWithHeartbeating();
 
@@ -170,6 +185,7 @@ void TagValueRemoteConnector::tick() {
 		processor->newMsg(field->msgType);
 		break;
 	case FVAL_FIELD:
+        serdebugMsgHdr("Fld: ", remoteNo, field->field);
 		processor->fieldUpdate(this, field);
         break;
 	case FVAL_END_MSG:
@@ -207,22 +223,18 @@ void TagValueRemoteConnector::dealWithHeartbeating() {
 	if(ticksLastRead > interval) {
 		if(isConnected()) {
          	serdebugF3("Remote disconnected (rNo, ticks): ", remoteNo, ticksLastSend);
-            if(isPairing()) stopPairing();
-			setConnected(false);
-			setPairing(false);
-			transport->close();
+			close();
 		}
 	} else if(!isConnected() && transport->connected()) {
        	serdebugF2("Remote connected: ", remoteNo);
-        encodeHeartbeat();
-		encodeJoin();
+        encodeHeartbeat(HBMODE_STARTCONNECT);
 		setConnected(true);
 	}
 
 	if(ticksLastSend > HEARTBEAT_INTERVAL_TICKS) {
 		if(isConnectionFullyEstablished() && transport->available()) {
          	serdebugF3("Sending HB (rNo, ticks) : ", remoteNo, ticksLastSend);
-            encodeHeartbeat();
+            encodeHeartbeat(HBMODE_NORMAL);
         }
 	}
 }
@@ -266,6 +278,7 @@ void TagValueRemoteConnector::nextBootstrap() {
 		setBootstrapMode(false);
         setBootstrapComplete(true);
 		encodeBootstrap(true);
+        encodeHeartbeat(HBMODE_NORMAL);
         iterator.reset();
         iterator.setPredicate(&remotePredicate);
 		return;
@@ -289,6 +302,9 @@ void TagValueRemoteConnector::nextBootstrap() {
 	case MENUTYPE_TEXT_VALUE:
     case MENUTYPE_TIME:
 		encodeMultiEditMenu(parentId, reinterpret_cast<RuntimeMenuItem*>(bootItem));
+		break;
+	case MENUTYPE_LARGENUM_VALUE:
+		encodeLargeNumberMenuItem(parentId, reinterpret_cast<EditableLargeNumberMenuItem*>(bootItem));
 		break;
 	case MENUTYPE_RUNTIME_LIST:
 	case MENUTYPE_RUNTIME_VALUE:
@@ -344,10 +360,11 @@ void TagValueRemoteConnector::encodeBootstrap(bool isComplete) {
     transport->endMsg();
 }
 
-void TagValueRemoteConnector::encodeHeartbeat() {
+void TagValueRemoteConnector::encodeHeartbeat(HeartbeatMode hbMode) {
 	if(!prepareWriteMsg(MSG_HEARTBEAT)) return;
     transport->writeFieldInt(FIELD_HB_INTERVAL, HEARTBEAT_INTERVAL);
     transport->writeFieldLong(FIELD_HB_MILLISEC, millis());
+    transport->writeFieldInt(FIELD_HB_MODE, hbMode);
     transport->endMsg();
 }
 
@@ -384,6 +401,17 @@ void TagValueRemoteConnector::encodeAnalogItem(int parentId, AnalogMenuItem* ite
     transport->writeFieldInt(FIELD_ANALOG_OFF, item->getOffset());
     transport->writeFieldInt(FIELD_ANALOG_DIV, item->getDivisor());
     transport->writeFieldInt(FIELD_CURRENT_VAL, item->getCurrentValue());
+    transport->endMsg();
+}
+
+void TagValueRemoteConnector::encodeLargeNumberMenuItem(int parentId, EditableLargeNumberMenuItem* item) {
+	if (!prepareWriteMsg(MSG_BOOT_LARGENUM)) return;
+	encodeBaseMenuFields(parentId, item);
+	transport->writeFieldInt(FIELD_FLOAT_DP, item->getLargeNumber()->decimalPointIndex());
+	transport->writeFieldInt(FIELD_MAX_LEN, item->getNumberOfParts());
+	char sz[20];
+	item->copyValue(sz, sizeof(sz));
+	transport->writeField(FIELD_CURRENT_VAL, sz);
     transport->endMsg();
 }
 
@@ -516,6 +544,7 @@ void TagValueRemoteConnector::encodeChangeValue(MenuItem* theItem) {
         break;
 	case MENUTYPE_IPADDRESS:
     case MENUTYPE_TIME:
+	case MENUTYPE_LARGENUM_VALUE:
 	case MENUTYPE_TEXT_VALUE: {
 		char sz[20];
 		((RuntimeMenuItem*)theItem)->copyValue(sz, sizeof(sz));
@@ -679,7 +708,6 @@ FieldAndValue* TagValueTransport::fieldIfAvailable() {
 		case FVAL_PROCESSING_PROTOCOL: // we need to make sure the protocol is valid
 			if(readAvailable()) {
                 currentField.fieldType = (readByte() == TAG_VAL_PROTOCOL) ? FVAL_PROCESSING_MSGTYPE_HI : FVAL_ERROR_PROTO;
-                serdebugF("Protocol");
             }
 			break;
 

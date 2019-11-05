@@ -77,6 +77,8 @@ enum AckResponseStatus {
 #define MSG_BOOT_BOOL msgFieldToWord('B', 'B')
 /** Message type definition for text boostrap message */
 #define MSG_BOOT_TEXT msgFieldToWord('B','T')
+/** Message type definition for large number boot message */
+#define MSG_BOOT_LARGENUM msgFieldToWord('B', 'N')
 /** Message type definition for floating point bootstrap message */
 #define MSG_BOOT_FLOAT msgFieldToWord('B','F')
 /** Message type definition for remote status bootstrap message */
@@ -96,6 +98,7 @@ enum AckResponseStatus {
 #define FIELD_BOOT_TYPE   msgFieldToWord('B', 'T')
 #define FIELD_HB_INTERVAL msgFieldToWord('H', 'I')
 #define FIELD_HB_MILLISEC msgFieldToWord('H', 'M')
+#define FIELD_HB_MODE     msgFieldToWord('H', 'R')
 #define FIELD_ID          msgFieldToWord('I', 'D')
 #define FIELD_EEPROM      msgFieldToWord('I', 'E')
 #define FIELD_READONLY    msgFieldToWord('R', 'O')
@@ -138,7 +141,20 @@ enum ChangeType: byte {
 enum ApiPlatform : byte {
 	PLATFORM_ARDUINO_8BIT = 0,
 	PLATFORM_JAVA_API = 1,
-    PLATFORM_ARDUINO_32BIT = 2
+    PLATFORM_ARDUINO_32BIT = 2,
+	PLATFORM_DOTNET = 3
+};
+
+/**
+ * Defines the type of heartbeat we are dealing with
+ */
+enum HeartbeatMode : byte {
+	/** During normal operation we send this to continue the connection during idle times */
+	HBMODE_NORMAL = 0,
+	/** At connection start, we wait for this before proceeding */
+	HBMODE_STARTCONNECT = 1,
+	/** At the end of a connection we send this to stop the connection */
+	HBMODE_ENDCONNECT = 2
 };
 
 #endif /* _TCMENU_REMOTETYPES_H_ */

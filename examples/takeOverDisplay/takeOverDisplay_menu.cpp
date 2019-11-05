@@ -52,7 +52,7 @@ EnumMenuItem menuFood(&minfoFood, 0, &menuText);
 const PROGMEM AnyMenuInfo minfoTakeDisplay = { "Take Display", 1, 0xffff, 0, onTakeOverDisplay };
 ActionMenuItem menuTakeDisplay(&minfoTakeDisplay, &menuFood);
 RENDERING_CALLBACK_NAME_INVOKE(fnTimeRtCall, timeItemRenderFn, "Time", -1, NULL)
-TimeFormattedMenuItem menuTime(fnTimeRtCall, 13, 3, &menuTakeDisplay);
+TimeFormattedMenuItem menuTime(fnTimeRtCall, 13, (MultiEditWireType)3, &menuTakeDisplay);
 const PROGMEM ConnectorLocalInfo applicationInfo = { "Take Over Display", "40722ec4-e8bc-4889-b54e-d81b14cb429c" };
 
 // Set up code

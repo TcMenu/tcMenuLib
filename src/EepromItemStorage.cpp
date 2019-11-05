@@ -5,6 +5,7 @@
 
 #include "EepromItemStorage.h"
 #include "tcMenu.h"
+#include "EditableLargeNumberMenuItem.h"
 
 void saveRecursively(EepromAbstraction& eeprom, MenuItem* nextMenuItem) {
 	while (nextMenuItem) {
@@ -25,6 +26,11 @@ void saveRecursively(EepromAbstraction& eeprom, MenuItem* nextMenuItem) {
 		else if (nextMenuItem->getMenuType() == MENUTYPE_IPADDRESS) {
 			IpAddressMenuItem* ipItem = reinterpret_cast<IpAddressMenuItem*>(nextMenuItem);
 			eeprom.writeArrayToRom(ipItem->getEepromPosition(), ipItem->getIpAddress(), 4);
+		}
+		else if (nextMenuItem->getMenuType() == MENUTYPE_LARGENUM_VALUE) {
+			EditableLargeNumberMenuItem* numItem = reinterpret_cast<EditableLargeNumberMenuItem*>(nextMenuItem);
+			eeprom.write8(numItem->getEepromPosition(), numItem->getLargeNumber()->isNegative());
+			eeprom.writeArrayToRom(numItem->getEepromPosition() + 1, numItem->getLargeNumber()->getNumberBuffer(), 6);
 		}
 		else if (nextMenuItem->getMenuType() == MENUTYPE_INT_VALUE) {
 			AnalogMenuItem* intItem = (AnalogMenuItem*)nextMenuItem;
@@ -77,6 +83,11 @@ void loadRecursively(EepromAbstraction& eeprom, MenuItem* nextMenuItem) {
 			ipItem->setSendRemoteNeededAll();
 			ipItem->setChanged(true);
 			ipItem->triggerCallback();
+		}
+		else if (nextMenuItem->getMenuType() == MENUTYPE_LARGENUM_VALUE) {
+			EditableLargeNumberMenuItem* numItem = reinterpret_cast<EditableLargeNumberMenuItem*>(nextMenuItem);
+			numItem->getLargeNumber()->setNegative(eeprom.read8(numItem->getEepromPosition()));
+			eeprom.readIntoMemArray(numItem->getLargeNumber()->getNumberBuffer(), numItem->getEepromPosition() + 1, 6);
 		}
 		else if (nextMenuItem->getMenuType() == MENUTYPE_INT_VALUE) {
 			AnalogMenuItem* intItem = (AnalogMenuItem*)nextMenuItem;

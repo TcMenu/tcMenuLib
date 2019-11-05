@@ -12,6 +12,7 @@
 #include "authenticationTests.h"
 #include "menuItemTests.h"
 #include "baseDialogTests.h"
+#include "LargeNumberItemTests.h"
 //#include "baseRemoteTests.h"
 #include <tcm_test/testFixtures.h>
 

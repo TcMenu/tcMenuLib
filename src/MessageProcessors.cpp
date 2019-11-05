@@ -8,6 +8,7 @@
 #include "MessageProcessors.h"
 #include "MenuIterator.h"
 #include "BaseDialog.h"
+#include "EditableLargeNumberMenuItem.h"
 
 /**
  * An array of message handlers, where each one is a function that can process that type of message and a message type.
@@ -20,8 +21,28 @@ MsgHandler msgHandlers[] = {
 	{ fieldUpdateValueMsg, MSG_CHANGE_INT }, 
 	{ fieldUpdateJoinMsg, MSG_JOIN },
 	{ fieldUpdatePairingMsg, MSG_PAIR },
-	{ fieldUpdateDialogMsg, MSG_DIALOG }
+	{ fieldUpdateDialogMsg, MSG_DIALOG },
+    { fieldUpdateHeartbeatMsg, MSG_HEARTBEAT }
 };
+
+void fieldUpdateHeartbeatMsg(TagValueRemoteConnector* connector, FieldAndValue* field, MessageProcessorInfo* info) {
+	if(field->fieldType == FVAL_END_MSG) {
+		if (info->hb.hbMode == HBMODE_ENDCONNECT) {
+			serdebugF("HB close msg");
+			connector->close();
+		}
+		else if (info->hb.hbMode == HBMODE_STARTCONNECT) {
+			serdebugF("HB start msg");
+			connector->encodeJoin();
+		}
+    }
+
+    else {
+        if(field->field == FIELD_HB_MODE) {
+            info->hb.hbMode = (HeartbeatMode)(atoi(field->value));
+        }
+    }
+}
 
 void fieldUpdateDialogMsg(TagValueRemoteConnector* connector, FieldAndValue* field, MessageProcessorInfo* info) {
 	if(field->fieldType == FVAL_END_MSG && info->dialog.mode == 'A') {
@@ -147,6 +168,11 @@ bool processValueChangeField(FieldAndValue* field, MessageProcessorInfo* info) {
         timeItem->setTimeFromString(field->value);
         serdebugF2("Time item change: ", field->value);
     }
+	else if (info->value.item->getMenuType() == MENUTYPE_LARGENUM_VALUE) {
+		EditableLargeNumberMenuItem* numItem = reinterpret_cast<EditableLargeNumberMenuItem*>(info->value.item);
+		numItem->setLargeNumberFromString(field->value);
+		serdebugF2("Large num change: ", field->value);
+	}
     return true;
 }
 

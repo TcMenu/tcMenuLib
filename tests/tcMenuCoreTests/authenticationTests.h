@@ -32,7 +32,7 @@ test(authenticationTest) {
 	EepromAuthenticatorManager authenticator;
 	authenticator.initialise(&eeprom, 10);
 
-    assertEqual(eeprom.read16(10), uint16_t(0x9078));
+    assertEqual(eeprom.read16(10), uint16_t(0x9B32));
 
     // we should be in an out the box state, nothing should authenticate.
     assertFalse(authenticator.isAuthenticated("uuid1", uuid1));

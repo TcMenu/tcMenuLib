@@ -52,6 +52,9 @@ union MessageProcessorInfo {
         uint8_t button;
         uint32_t correlation;
     } dialog;
+    struct {
+        HeartbeatMode hbMode;
+    } hb;
 };
 
 /**
@@ -74,7 +77,7 @@ struct MsgHandler {
  * For example: `CombinedMessageProcessor processor(msgHandlers, MSG_HANDLERS_SIZE);`
  */
 extern MsgHandler msgHandlers[];
-#define MSG_HANDLERS_SIZE 4
+#define MSG_HANDLERS_SIZE 5
 
 /**
  * If you decide to write your own processor, this method can handle join messages
@@ -95,6 +98,11 @@ void fieldUpdatePairingMsg(TagValueRemoteConnector* connector, FieldAndValue* fi
  * If you decide to write your own processor, this method can handle dialog updates
  */
 void fieldUpdateDialogMsg(TagValueRemoteConnector* connector, FieldAndValue* field, MessageProcessorInfo* info);
+
+/**
+ * If you decide to write your own processor, this method can handle heartbeat updates
+ */
+void fieldUpdateHeartbeatMsg(TagValueRemoteConnector* connector, FieldAndValue* field, MessageProcessorInfo* info);
 
 /**
  * This message processor is responsible for handling messages coming off the wire and processing them into

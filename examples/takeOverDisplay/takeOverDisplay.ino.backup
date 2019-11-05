@@ -89,6 +89,15 @@ void setup() {
     char sz[20];
     menuConnectivityIPAddress.copyValue(sz, sizeof(sz));
     Serial.print("Device IP is: "); Serial.println(sz);
+
+	authManager.copyPinToBuffer(sz, sizeof(sz));
+	menuConnectivityChangePin.setTextValue(sz);
+	menuConnectivityChangePin.setPasswordField(true);
+
+    switches.addSwitch(4, [](uint8_t, bool held) {
+        Serial.print("Extra switch ");
+        Serial.println(held ? "held" : "pressed");
+    }, 20, true);
 }
 
 //
@@ -231,4 +240,19 @@ void CALLBACK_FUNCTION onQuestionDlg(int /*id*/) {
 //
 void CALLBACK_FUNCTION onSaveSettings(int /*id*/) {
     menuMgr.save(eeprom);
+}
+
+const char pgmPinTooShort[] PROGMEM = "Pin too short";
+void CALLBACK_FUNCTION onChangePin(int id) {
+	const char* sz = menuConnectivityChangePin.getTextValue();
+	if (strlen(sz) < 4) {
+		BaseDialog* dlg = renderer.getDialog();
+		dlg->setButtons(BTNTYPE_NONE, BTNTYPE_CLOSE);
+		dlg->copyIntoBuffer(sz);
+		dlg->show(pgmPinTooShort, false);
+	}
+	else {
+		authManager.changePin(sz);
+		serdebugF2("Pin changed to ", sz);
+	}
 }
