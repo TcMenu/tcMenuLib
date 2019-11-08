@@ -22,7 +22,7 @@
 #define TAG_VAL_PROTOCOL 0x01
 #define START_OF_MESSAGE 0x01
 #define TICK_INTERVAL 1
-#define HEARTBEAT_INTERVAL 2500
+#define HEARTBEAT_INTERVAL 1500
 // when debugging you can increase the heartbeat time to reduce disconnects (below gives 90 seconds)
 //#define HEARTBEAT_INTERVAL 30000
 #define HEARTBEAT_INTERVAL_TICKS (HEARTBEAT_INTERVAL / TICK_INTERVAL)

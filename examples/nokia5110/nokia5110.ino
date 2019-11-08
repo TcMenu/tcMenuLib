@@ -181,3 +181,8 @@ void addWidgetToTitleArea() {
     // and give the renderer our widget.
     renderer.setFirstWidget(&connectedWidget);
 }
+
+
+
+
+

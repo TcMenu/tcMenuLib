@@ -535,11 +535,11 @@ void TagValueRemoteConnector::encodeActionMenu(int parentId, ActionMenuItem* ite
 void TagValueRemoteConnector::encodeChangeValue(MenuItem* theItem) {
 	if(!prepareWriteMsg(MSG_CHANGE_INT)) return;
     transport->writeFieldInt(FIELD_ID, theItem->getId());
-    transport->writeFieldInt(FIELD_CHANGE_TYPE, CHANGE_ABSOLUTE); // menu host always sends absolute!
     switch(theItem->getMenuType()) {
     case MENUTYPE_ENUM_VALUE:
     case MENUTYPE_INT_VALUE:
     case MENUTYPE_BOOLEAN_VALUE:
+        transport->writeFieldInt(FIELD_CHANGE_TYPE, CHANGE_ABSOLUTE); // menu host always sends absolute!
         transport->writeFieldInt(FIELD_CURRENT_VAL, ((ValueMenuItem*)theItem)->getCurrentValue());
         break;
 	case MENUTYPE_IPADDRESS:
@@ -549,12 +549,15 @@ void TagValueRemoteConnector::encodeChangeValue(MenuItem* theItem) {
 		char sz[20];
 		((RuntimeMenuItem*)theItem)->copyValue(sz, sizeof(sz));
 		transport->writeField(FIELD_CURRENT_VAL, sz);
+        transport->writeFieldInt(FIELD_CHANGE_TYPE, CHANGE_ABSOLUTE); // menu host always sends absolute!
 		break;
 	}
 	case MENUTYPE_RUNTIME_LIST:
+        transport->writeFieldInt(FIELD_CHANGE_TYPE, CHANGE_LIST); // menu host always sends absolute!
 		runtimeSendList(reinterpret_cast<ListRuntimeMenuItem*>(theItem), transport);
 		break;
 	case MENUTYPE_FLOAT_VALUE:
+        transport->writeFieldInt(FIELD_CHANGE_TYPE, CHANGE_ABSOLUTE); // menu host always sends absolute!
         writeFloatValueToTransport(transport, (FloatMenuItem*)theItem);
         break;
     default:

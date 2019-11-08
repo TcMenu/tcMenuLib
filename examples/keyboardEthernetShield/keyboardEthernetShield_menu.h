@@ -16,6 +16,7 @@
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
 #include <RuntimeMenuItem.h>
+#include <EditableLargeNumberMenuItem.h>
 #include "tcMenuLiquidCrystal.h"
 
 // all define statements needed
@@ -48,6 +49,7 @@ extern BackMenuItem menuBackConnectivity;
 extern SubMenuItem menuConnectivity;
 extern EnumMenuItem menuFruits;
 extern AnalogMenuItem menuFiths;
+extern EditableLargeNumberMenuItem menuLargeNum;
 extern AnalogMenuItem menuDecimalTens;
 extern AnalogMenuItem menuInteger;
 extern AnalogMenuItem menuAnalog1;

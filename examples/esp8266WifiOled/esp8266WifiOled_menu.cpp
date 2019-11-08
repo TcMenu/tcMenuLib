@@ -67,10 +67,10 @@ void setupMenu() {
 
     // Read only and local only function calls
     menuCucumberTemp.setReadOnly(true);
-    menuTomatoTemp.setReadOnly(true);
     menuIpAddress.setReadOnly(true);
-    menuSaveAll.setLocalOnly(true);
+    menuTomatoTemp.setReadOnly(true);
     menuPwd.setLocalOnly(true);
+    menuSaveAll.setLocalOnly(true);
     menuSSID.setLocalOnly(true);
 }
 

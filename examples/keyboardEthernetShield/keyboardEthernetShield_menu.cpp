@@ -41,14 +41,16 @@ const PROGMEM EnumMenuInfo minfoFruits = { "Fruits", 8, 26, 4, NO_CALLBACK, enum
 EnumMenuItem menuFruits(&minfoFruits, 0, &menuConnectivity);
 const PROGMEM AnalogMenuInfo minfoFiths = { "Fiths", 5, 6, 200, onFiths, 0, 5, "A" };
 AnalogMenuItem menuFiths(&minfoFiths, 0, &menuFruits);
+RENDERING_CALLBACK_NAME_INVOKE(fnLargeNumRtCall, largeNumItemRenderFn, "Large Num", -1, NULL)
+EditableLargeNumberMenuItem menuLargeNum(fnLargeNumRtCall, 12, 8, 4, &menuFiths);
 const PROGMEM AnalogMenuInfo minfoDecimalTens = { "DecimalTens", 4, 28, 1000, NO_CALLBACK, 0, 10, "V" };
-AnalogMenuItem menuDecimalTens(&minfoDecimalTens, 0, &menuFiths);
+AnalogMenuItem menuDecimalTens(&minfoDecimalTens, 0, &menuLargeNum);
 const PROGMEM AnalogMenuInfo minfoInteger = { "Integer", 3, 4, 1000, onInteger, 100, 1, "" };
 AnalogMenuItem menuInteger(&minfoInteger, 0, &menuDecimalTens);
 const PROGMEM AnalogMenuInfo minfoAnalog1 = { "Analog1", 2, 2, 255, onAnalog1, -180, 2, "dB" };
 AnalogMenuItem menuAnalog1(&minfoAnalog1, 0, &menuInteger);
 RENDERING_CALLBACK_NAME_INVOKE(fnTimeRtCall, timeItemRenderFn, "Time", 8, NULL)
-TimeFormattedMenuItem menuTime(fnTimeRtCall, 1, 3, &menuAnalog1);
+TimeFormattedMenuItem menuTime(fnTimeRtCall, 1, (MultiEditWireType)3, &menuAnalog1);
 const PROGMEM ConnectorLocalInfo applicationInfo = { "Keyboard Ethernet", "b6ee8e21-449c-4f8a-bab6-a89e3f2c68d9" };
 
 // Set up code

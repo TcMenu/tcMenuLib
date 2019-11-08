@@ -73,3 +73,4 @@ void CALLBACK_FUNCTION onStartToasting(int id) {
     Serial.print("Type:   "); Serial.println(menuType.getCurrentValue());
     Serial.print("Frozen: "); Serial.println(menuFrozen.getCurrentValue());
 }
+

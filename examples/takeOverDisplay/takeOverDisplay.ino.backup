@@ -74,16 +74,17 @@ void setup() {
     menuRemoteMonitor.addConnector(remoteServer.getRemoteConnector(0));
     menuAuthKeyMgr.setLocalOnly(true);
 
-    // this is put in by the menu designer and must be called (always ensure devices are setup first).
-    setupMenu();
-
     // here we use the EEPROM to load back the last set of values.
+    menuMgr.setRootMenu(&menuTime);
     menuMgr.load(eeprom);
 
     // spin up the Ethernet library, get the IP address from the menu
     byte* rawIp = menuConnectivityIPAddress.getIpAddress();
     IPAddress ip(rawIp[0], rawIp[1], rawIp[2], rawIp[3]);
     Ethernet.begin(mac, ip);
+
+    // this is put in by the menu designer and must be called (always ensure devices are setup first).
+    setupMenu();
 
     // and print out the IP address
     char sz[20];
@@ -256,3 +257,13 @@ void CALLBACK_FUNCTION onChangePin(int id) {
 		serdebugF2("Pin changed to ", sz);
 	}
 }
+
+
+
+
+
+
+
+
+
+
