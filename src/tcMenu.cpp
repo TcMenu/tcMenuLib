@@ -33,6 +33,49 @@ void MenuManager::initForEncoder(MenuRenderer* renderer,  MenuItem* root, uint8_
 	renderer->initialise();
 }
 
+void MenuManager::setBackButton(uint8_t backButtonPin) {
+    switches.addSwitch(backButtonPin, [](uint8_t, bool held){
+        if(!held) menuMgr.performDirectionMove(true);
+    });
+}
+
+void MenuManager::setNextButton(uint8_t nextButtonPin) {
+    switches.addSwitch(nextButtonPin, [](uint8_t, bool held){
+        if(!held) menuMgr.performDirectionMove(false);
+    });    
+}
+
+void MenuManager::performDirectionMove(bool dirIsBack) {
+    if(currentEditor != NULL && isMenuRuntimeMultiEdit(currentEditor)) {
+        EditableMultiPartMenuItem<void*>* editableItem = reinterpret_cast<EditableMultiPartMenuItem<void*>*>(currentEditor);
+		
+        int editorRange = dirIsBack ? editableItem->previousPart() : editableItem->nextPart();
+		if (editorRange != 0) {
+			switches.changeEncoderPrecision(editorRange, editableItem->getPartValueAsInt());
+		}
+        else {
+            currentEditor->setEditing(false);
+            currentEditor->setActive(true);
+            currentEditor = NULL;
+        }
+    }
+    else if(currentEditor != NULL) {
+        currentEditor->setEditing(false);
+        currentEditor->setActive(true);
+        currentEditor = NULL;
+    }
+    else if(currentEditor == NULL && dirIsBack) {
+        setCurrentMenu(getParentAndReset());
+    }
+    else if(currentEditor == NULL && !dirIsBack) {
+        MenuItem* currentActive = menuMgr.findCurrentActive();
+        if(currentActive != NULL && currentActive->getMenuType() == MENUTYPE_SUB_VALUE) {
+            setCurrentMenu(currentActive);
+        }
+    }
+
+}
+
 void MenuManager::initWithoutInput(MenuRenderer* renderer, MenuItem* root) {
 	this->renderer = renderer;
 	this->currentRoot = this->rootMenu = root;
@@ -79,13 +122,13 @@ void MenuManager::onMenuSelect(bool held) {
 	if (renderer->tryTakeSelectIfNeeded(0, held ? RPRESS_HELD : RPRESS_PRESSED)) return;
 
 	if (held) {
-		if (currentEditor != NULL && isMenuRuntimeMultiEdit(currentEditor)) {
-			setCurrentMenu(currentRoot);
-		}
-		else {
-			setCurrentMenu(getParentAndReset());
-		}
-	}
+        if (currentEditor != NULL && isMenuRuntimeMultiEdit(currentEditor)) {
+            setCurrentMenu(currentRoot);
+        }
+        else {
+            setCurrentMenu(getParentAndReset());
+        }
+    }
 	else if (getCurrentEditor() != NULL) {
 		stopEditingCurrentItem();
 	}

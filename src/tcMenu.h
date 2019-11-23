@@ -81,6 +81,18 @@ public:
 	void initWithoutInput(MenuRenderer* renderer, MenuItem* root);
 
     /**
+     * You can add a back button that generally performs the back or left function
+     * @param backButtonPin the pin on which the back button is assigned.
+     */
+    void setBackButton(uint8_t backButtonPin);
+
+    /**
+     * YOu can add a next button that generally performs the next or right function
+     * @param nextButtonPin the pin to which the next button is assigned
+     */
+    void setNextButton(uint8_t nextButtonPin);
+
+    /**
      * Sometimes you need to use the menu structure before everything is initialised, in this case
      * you can call this function early on to set up the root menu item.
      */
@@ -107,6 +119,13 @@ public:
 	 * @param held if the button is held down
 	 */
 	void onMenuSelect(bool held);
+
+    /**
+     * This provides support for next and back (left, right) functionality by making the menu
+     * structure respond to such functions in a reasonable way.
+     * @param dirIsBack true for back (left), false for next (right)
+     */
+    void performDirectionMove(bool dirIsBack);
 
 	/**
 	 * Sets the number of items and offset of the items in the current menu

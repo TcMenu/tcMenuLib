@@ -15,6 +15,8 @@
 #include <LiquidCrystalIO.h>
 #include <IoAbstraction.h>
 #include <DfRobotInputAbstraction.h>
+#include <RuntimeMenuItem.h>
+#include <EditableLargeNumberMenuItem.h>
 #include "tcMenuLiquidCrystal.h"
 
 // all define statements needed
@@ -25,6 +27,8 @@ extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
 
 // all menu item forward references.
+extern TextMenuItem menuText;
+extern EditableLargeNumberMenuItem menuLgeNum;
 extern BooleanMenuItem menuLED2;
 extern BooleanMenuItem menuLED1;
 extern BackMenuItem menuBackLEDStates;
