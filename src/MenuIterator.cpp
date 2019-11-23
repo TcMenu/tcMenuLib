@@ -104,10 +104,10 @@ MenuItem* MenuItemIterator::nextItem() {
                     processingSubMenu = true;
                     return currentItem;
                 }
-                else processingSubMenu = true;
+                else processingSubMenu = predicateMatches;
                 
-                // we always follow submenus even if we don't report them. But we sometimes need
-                // to do it in two iterations.
+                // We should most certainly not follow a sub menu that does not match, because it's
+                // highly unlikely to be useful and will probably cause problems in the remote side.
                 if(processingSubMenu) {
                     processingSubMenu = false;
                     parentItems[level++] = currentItem;

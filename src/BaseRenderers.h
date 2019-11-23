@@ -84,11 +84,11 @@ public:
 #ifdef __AVR__
 	const uint8_t* getCurrentIcon() {
         changed = false;
-        return pgm_read_ptr(&iconData[currentState]);
+        return (const uint8_t *)pgm_read_ptr(&iconData[currentState]);
     }
     const uint8_t* getIcon(int num) {
         if(num >= maxStateIcons) num = 0;
-        return pgm_read_ptr(&iconData[num]);
+        return (const uint8_t *)pgm_read_ptr(&iconData[num]);
     }
 #else
 	const uint8_t* getCurrentIcon() {
