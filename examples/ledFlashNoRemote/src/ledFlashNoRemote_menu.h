@@ -12,33 +12,23 @@
 #define MENU_GENERATED_CODE_H
 
 #include <tcMenu.h>
-#include <RuntimeMenuItem.h>
-#include <RuntimeMenuItem.h>
 #include <LiquidCrystalIO.h>
 #include "tcMenuLiquidCrystal.h"
-#include <DfRobotInputAbstraction.h>
-#include <EditableLargeNumberMenuItem.h>
-
-void setupMenu();  // forward reference of the menu setup function.
-extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app info to the linker.
 
 // Global variables that need exporting
 
-extern LiquidCrystal lcd;
-extern LiquidCrystalRenderer renderer;
+extern LiquidCrystal LiquidCrystal;
+extern LiquidCrystalRenderer LiquidCrystalRenderer;
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
 // Global Menu Item exports
 
-extern TextMenuItem menuText;
-extern EditableLargeNumberMenuItem menuLgeNum;
-void CALLBACK_FUNCTION onLed2(int id);
-extern BooleanMenuItem menuLED2;
-void CALLBACK_FUNCTION onLed1(int id);
-extern BooleanMenuItem menuLED1;
-extern SubMenuItem menuLEDStates;
-extern AnalogMenuItem menuValueA0;
+void CALLBACK_FUNCTION onSaveState(int id);
+extern ActionMenuItem menuSaveLEDState;
+extern AnalogMenuItem menuA0Volts;
+void CALLBACK_FUNCTION onLedChange(int id);
+extern BooleanMenuItem menuBuiltInLED;
 
 #endif // MENU_GENERATED_CODE_H

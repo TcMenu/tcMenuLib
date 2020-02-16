@@ -201,6 +201,8 @@ enum Flags : byte {
 	MENUITEM_EDITING = 4,
     /** the menu item is secured, and must be accessed with a pin */
     MENUITEM_PIN_SECURED = 5,
+    /** the menu item is visible on the display and remote */
+    MENUITEM_PIN_VISIBLE = 6,
     /** indicates that remote 0 needs to resend this item */
 	MENUITEM_REMOTE_SEND0 = 10,
     /** indicates that remote 1 needs to resend this item */
@@ -375,6 +377,11 @@ public:
 	void setSecured(bool secured) { bitWrite(flags, MENUITEM_PIN_SECURED, secured); }
 	/** returns true if this item requires a pin to display, , currently only available locally */
 	bool isSecured() { return bitRead(flags, MENUITEM_PIN_SECURED); }
+
+	/** sets this item to need pin security in order to display, currently only available locally */
+	void setVisible(bool visible) { bitWrite(flags, MENUITEM_PIN_VISIBLE, visible); }
+	/** returns true if this item requires a pin to display, , currently only available locally */
+	bool isVisible() { return bitRead(flags, MENUITEM_PIN_VISIBLE); }
 
 	/** gets the next menu (sibling) at this level */
 	MenuItem* getNext() { return next; }

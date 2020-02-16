@@ -122,7 +122,6 @@ public:
 	void writeField(uint16_t field, const char* value);
 	void writeFieldInt(uint16_t field, int value);
     void writeFieldLong(uint16_t field, long value);
-	void endMsg();
 	FieldAndValue* fieldIfAvailable();
 	void clearFieldStatus(FieldValueType ty = FVAL_PROCESSING);
 
@@ -135,6 +134,7 @@ public:
 	virtual bool available() = 0;
 	virtual bool connected() = 0;
 	virtual void close() = 0;
+	virtual void endMsg();
 
 private:
 	bool findNextMessageStart();

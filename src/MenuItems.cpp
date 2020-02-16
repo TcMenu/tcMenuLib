@@ -13,6 +13,7 @@ MenuItem::MenuItem(MenuType menuType, const AnyMenuInfo* menuInfo, MenuItem* nex
 	if(menuInfo != NULL) this->info = menuInfo;
 	this->next = next;
     this->setChanged(true); // items always start out needing redrawing.
+    this->setVisible(true); // always start out visible.
 }
 
 bool MenuItem::isSendRemoteNeeded(uint8_t remoteNo) {
