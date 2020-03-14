@@ -1,1 +1,300 @@
-{"version":"1.00","projectName":"C:\\Users\\dave\\Documents\\Arduino\\libraries\\tcMenu\\examples\\takeOverDisplay\\takeOverDisplay.emf","author":"dave","lastEdited":{"seconds":1573238687,"nanos":31826500},"namingRecursive":false,"items":[{"parentId":0,"type":"textItem","item":{"textLength":10,"itemType":"TIME_12H","name":"Time","id":13,"eepromAddress":-1,"readOnly":false,"localOnly":false}},{"parentId":0,"type":"actionMenu","item":{"name":"Take Display","id":1,"eepromAddress":-1,"functionName":"onTakeOverDisplay","readOnly":false,"localOnly":false}},{"parentId":0,"type":"enumItem","item":{"enumEntries":["Pizza","Pasta","Salad"],"name":"Food","id":2,"eepromAddress":3,"functionName":"onFoodChoice","readOnly":false,"localOnly":false}},{"parentId":0,"type":"textItem","item":{"textLength":10,"itemType":"PLAIN_TEXT","name":"Text","id":7,"eepromAddress":-1,"readOnly":true,"localOnly":false}},{"parentId":0,"type":"actionMenu","item":{"name":"Info Dialog","id":8,"eepromAddress":-1,"functionName":"onInfoDlg","readOnly":false,"localOnly":true}},{"parentId":0,"type":"actionMenu","item":{"name":"Question Dialog","id":9,"eepromAddress":-1,"functionName":"onQuestionDlg","readOnly":false,"localOnly":false}},{"parentId":0,"type":"subMenu","item":{"secured":false,"name":"Settings","id":3,"eepromAddress":-1,"readOnly":false,"localOnly":false}},{"parentId":3,"type":"boolItem","item":{"naming":"TRUE_FALSE","name":"Enabled","id":4,"eepromAddress":2,"readOnly":false,"localOnly":false}},{"parentId":3,"type":"analogItem","item":{"maxValue":250,"offset":0,"divisor":10,"unitName":"W","name":"Power","id":5,"eepromAddress":5,"readOnly":false,"localOnly":false}},{"parentId":3,"type":"actionMenu","item":{"name":"Save Settings","id":6,"eepromAddress":-1,"functionName":"onSaveSettings","readOnly":false,"localOnly":true}},{"parentId":0,"type":"subMenu","item":{"secured":true,"name":"Connectivity","id":11,"eepromAddress":-1,"readOnly":false,"localOnly":true}},{"parentId":11,"type":"textItem","item":{"textLength":15,"itemType":"PLAIN_TEXT","name":"ChangePin","id":14,"eepromAddress":-1,"functionName":"onChangePin","readOnly":false,"localOnly":false}},{"parentId":11,"type":"textItem","item":{"textLength":20,"itemType":"IP_ADDRESS","name":"IPAddress","id":12,"eepromAddress":7,"readOnly":false,"localOnly":false}}],"codeOptions":{"embeddedPlatform":"ARDUINO","lastDisplayUuid":"61f370f4-0294-41cf-8988-1458f242914a","lastInputUuid":"6dd87e7d-e751-4912-a70d-91793b1d3d87","lastRemoteUuid":"0877131c-e03e-426b-8eaf-228e01f5e7f1","applicationUUID":"40722ec4-e8bc-4889-b54e-d81b14cb429c","applicationName":"Take Over Display","lastProperties":[{"name":"LCD_RS","latestValue":"8","subsystem":"DISPLAY"},{"name":"LCD_EN","latestValue":"9","subsystem":"DISPLAY"},{"name":"LCD_D4","latestValue":"10","subsystem":"DISPLAY"},{"name":"LCD_D5","latestValue":"11","subsystem":"DISPLAY"},{"name":"LCD_D6","latestValue":"12","subsystem":"DISPLAY"},{"name":"LCD_D7","latestValue":"13","subsystem":"DISPLAY"},{"name":"LCD_WIDTH","latestValue":"20","subsystem":"DISPLAY"},{"name":"LCD_HEIGHT","latestValue":"4","subsystem":"DISPLAY"},{"name":"LCD_BACKLIGHT","latestValue":"-1","subsystem":"DISPLAY"},{"name":"LCD_PWM_PIN","latestValue":"-1","subsystem":"DISPLAY"},{"name":"LCD_IO_DEVICE","latestValue":"io23017","subsystem":"DISPLAY"},{"name":"PULLUP_LOGIC","latestValue":"true","subsystem":"INPUT"},{"name":"INTERRUPT_SWITCHES","latestValue":"false","subsystem":"INPUT"},{"name":"SWITCH_IODEVICE","latestValue":"io23017","subsystem":"INPUT"},{"name":"ENCODER_PIN_A","latestValue":"6","subsystem":"INPUT"},{"name":"ENCODER_PIN_B","latestValue":"7","subsystem":"INPUT"},{"name":"ENCODER_PIN_OK","latestValue":"5","subsystem":"INPUT"},{"name":"LISTEN_PORT","latestValue":"3333","subsystem":"REMOTE"},{"name":"LIBRARY_TYPE","latestValue":"ETHERNET_2","subsystem":"REMOTE"}],"namingRecursive":true}}
+{
+  "lastEdited": {
+    "seconds": 1584199064,
+    "nanos": 0
+  },
+  "codeOptions": {
+    "applicationUUID": "40722ec4-e8bc-4889-b54e-d81b14cb429c",
+    "applicationName": "Take Over Display",
+    "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
+    "lastDisplayUuid": "61f370f4-0294-41cf-8988-1458f242914a",
+    "lastRemoteUuid": "0877131c-e03e-426b-8eaf-228e01f5e7f1",
+    "embeddedPlatform": "ARDUINO_AVR",
+    "namingRecursive": true,
+    "saveToSrc": false,
+    "lastProperties": [
+      {
+        "name": "PULLUP_LOGIC",
+        "latestValue": "true",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "INTERRUPT_SWITCHES",
+        "latestValue": "false",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SWITCH_IODEVICE",
+        "latestValue": "io23017",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_A",
+        "latestValue": "6",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_B",
+        "latestValue": "7",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_OK",
+        "latestValue": "5",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "LCD_WIDTH",
+        "latestValue": "20",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "LCD_HEIGHT",
+        "latestValue": "4",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "LCD_EN",
+        "latestValue": "9",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "LCD_RS",
+        "latestValue": "8",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "LCD_D4",
+        "latestValue": "10",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "LCD_D5",
+        "latestValue": "11",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "LCD_D6",
+        "latestValue": "12",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "LCD_D7",
+        "latestValue": "13",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "LCD_BACKLIGHT",
+        "latestValue": "-1",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "LCD_PWM_PIN",
+        "latestValue": "-1",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "LCD_IO_DEVICE",
+        "latestValue": "io23017",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "LIBRARY_TYPE",
+        "latestValue": "ETHERNET_2",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "LISTEN_PORT",
+        "latestValue": "3333",
+        "subsystem": "REMOTE"
+      }
+    ]
+  },
+  "projectName": "Example showing how to take over the display, LCD 20x4 and Encoder on MCP23017, Ethernet 2 control",
+  "namingRecursive": true,
+  "version": "1.00",
+  "items": [
+    {
+      "parentId": 0,
+      "type": "textItem",
+      "item": {
+        "name": "Time",
+        "eepromAddress": -1,
+        "id": 13,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "itemType": "TIME_12H",
+        "textLength": 10
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "actionMenu",
+      "item": {
+        "name": "Take Display",
+        "eepromAddress": -1,
+        "id": 1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "onTakeOverDisplay"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "enumItem",
+      "item": {
+        "name": "Food",
+        "eepromAddress": 3,
+        "id": 2,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "onFoodChoice",
+        "enumEntries": [
+          "Pizza",
+          "Pasta",
+          "Salad"
+        ]
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "textItem",
+      "item": {
+        "name": "Text",
+        "eepromAddress": -1,
+        "id": 7,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "itemType": "PLAIN_TEXT",
+        "textLength": 10
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "actionMenu",
+      "item": {
+        "name": "Info Dialog",
+        "eepromAddress": -1,
+        "id": 8,
+        "readOnly": false,
+        "localOnly": true,
+        "visible": true,
+        "functionName": "onInfoDlg"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "actionMenu",
+      "item": {
+        "name": "Question Dialog",
+        "eepromAddress": -1,
+        "id": 9,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "onQuestionDlg"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "name": "Settings",
+        "eepromAddress": -1,
+        "id": 3,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "secured": false
+      }
+    },
+    {
+      "parentId": 3,
+      "type": "boolItem",
+      "item": {
+        "name": "Enabled",
+        "eepromAddress": 2,
+        "id": 4,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "naming": "TRUE_FALSE"
+      }
+    },
+    {
+      "parentId": 3,
+      "type": "analogItem",
+      "item": {
+        "name": "Power",
+        "eepromAddress": 5,
+        "id": 5,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 250,
+        "offset": 0,
+        "divisor": 10,
+        "unitName": "W"
+      }
+    },
+    {
+      "parentId": 3,
+      "type": "actionMenu",
+      "item": {
+        "name": "Save Settings",
+        "eepromAddress": -1,
+        "id": 6,
+        "readOnly": false,
+        "localOnly": true,
+        "visible": true,
+        "functionName": "onSaveSettings"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "name": "Connectivity",
+        "eepromAddress": -1,
+        "id": 11,
+        "readOnly": false,
+        "localOnly": true,
+        "visible": true,
+        "secured": true
+      }
+    },
+    {
+      "parentId": 11,
+      "type": "textItem",
+      "item": {
+        "name": "ChangePin",
+        "eepromAddress": -1,
+        "id": 14,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "onChangePin",
+        "itemType": "PLAIN_TEXT",
+        "textLength": 15
+      }
+    },
+    {
+      "parentId": 11,
+      "type": "textItem",
+      "item": {
+        "name": "IPAddress",
+        "eepromAddress": 7,
+        "id": 12,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "itemType": "IP_ADDRESS",
+        "textLength": 20
+      }
+    }
+  ]
+}

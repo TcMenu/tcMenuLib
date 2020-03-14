@@ -6,42 +6,37 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
- */
+*/
 
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
 
 #include <tcMenu.h>
-#include <LiquidCrystalIO.h>
-#include "SerialTransport.h"
-#include <RemoteConnector.h>
 #include <RuntimeMenuItem.h>
+#include <LiquidCrystalIO.h>
 #include "tcMenuLiquidCrystal.h"
+#include <RemoteConnector.h>
+#include "SerialTransport.h"
 
-// all define statements needed
-#define TCMENU_USING_PROGMEM true
-#define ENCODER_PIN_A 2
-#define ENCODER_PIN_B 3
-#define ENCODER_PIN_OK A3
+void setupMenu();  // forward reference of the menu setup function.
+extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app info to the linker.
 
-// all variables that need exporting
+// Global variables that need exporting
+
 extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
 
-// all menu item forward references.
+// Callback functions must always include CALLBACK_FUNCTION after the return type
+#define CALLBACK_FUNCTION
+
+// Global Menu Item exports
+
+void CALLBACK_FUNCTION onPushMe(int id);
 extern ActionMenuItem menuPushMe;
 extern EnumMenuItem menuFood;
 extern TextMenuItem menuMyText;
 extern AnalogMenuItem menuA2Voltage;
 extern AnalogMenuItem menuA1Voltage;
 extern AnalogMenuItem menuA0Voltage;
-extern const ConnectorLocalInfo applicationInfo;
-
-// Callback functions must always include CALLBACK_FUNCTION after the return type
-#define CALLBACK_FUNCTION
-
-void CALLBACK_FUNCTION onPushMe(int id);
-
-void setupMenu();
 
 #endif // MENU_GENERATED_CODE_H

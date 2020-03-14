@@ -6,43 +6,40 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
- */
+*/
 
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
 
 #include <tcMenu.h>
 #include <LiquidCrystalIO.h>
-#include <JoystickSwitchInput.h>
 #include "tcMenuLiquidCrystal.h"
+#include <JoystickSwitchInput.h>
 
-// all define statements needed
-#define TCMENU_USING_PROGMEM true
+void setupMenu();  // forward reference of the menu setup function.
+extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app info to the linker.
 
-// all variables that need exporting
+// Global variables that need exporting
+
 extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
 extern ArduinoAnalogDevice analogDevice;
 
-// all menu item forward references.
-extern FloatMenuItem menuFlow3;
-extern FloatMenuItem menuFlow2;
-extern FloatMenuItem menuFlow1;
-extern BackMenuItem menuBackFlows;
-extern SubMenuItem menuFlows;
-extern BooleanMenuItem menuOverrideAll;
-extern AnalogMenuItem menuTideGate3;
-extern AnalogMenuItem menuTideGate2;
-extern AnalogMenuItem menuTideGate1;
-extern const ConnectorLocalInfo applicationInfo;
-
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
-void CALLBACK_FUNCTION onTidalGate1(int id);
-void CALLBACK_FUNCTION onTidalGate2(int id);
-void CALLBACK_FUNCTION onTidalGate3(int id);
+// Global Menu Item exports
 
-void setupMenu();
+extern FloatMenuItem menuFlow3;
+extern FloatMenuItem menuFlow2;
+extern FloatMenuItem menuFlow1;
+extern SubMenuItem menuFlows;
+extern BooleanMenuItem menuOverrideAll;
+void CALLBACK_FUNCTION onTidalGate3(int id);
+extern AnalogMenuItem menuTideGate3;
+void CALLBACK_FUNCTION onTidalGate2(int id);
+extern AnalogMenuItem menuTideGate2;
+void CALLBACK_FUNCTION onTidalGate1(int id);
+extern AnalogMenuItem menuTideGate1;
 
 #endif // MENU_GENERATED_CODE_H

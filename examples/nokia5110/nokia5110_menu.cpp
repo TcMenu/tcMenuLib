@@ -6,57 +6,58 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
- */
+*/
 
 #include <tcMenu.h>
 #include "nokia5110_menu.h"
 
 // Global variable declarations
 
+const PROGMEM ConnectorLocalInfo applicationInfo = { "Security App", "0e68e7f6-2932-43f0-aae3-d4f885b7561d" };
 AdaColorGfxMenuConfig gfxConfig;
 AdaFruitGfxMenuRenderer renderer;
 EthernetServer server(3333);
 
 // Global Menu Item declarations
 
-RENDERING_CALLBACK_NAME_INVOKE(fnIPRtCall, ipAddressRenderFn, "IP", 13, NULL)
+RENDERING_CALLBACK_NAME_INVOKE(fnIPRtCall, ipAddressRenderFn, "IP", 13, NO_CALLBACK)
 IpAddressMenuItem menuIP(fnIPRtCall, 16, NULL);
-RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NULL)
-const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 15, 0xffff, 0, NO_CALLBACK };
+const SubMenuInfo PROGMEM minfoConnectivity = { "Connectivity", 15, 0xFFFF, 0, NO_CALLBACK };
+RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NO_CALLBACK)
 BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuIP);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL);
-RENDERING_CALLBACK_NAME_INVOKE(fnTxtRtCall, textItemRenderFn, "Txt", -1, NULL)
+RENDERING_CALLBACK_NAME_INVOKE(fnTxtRtCall, textItemRenderFn, "Txt", -1, NO_CALLBACK)
 TextMenuItem menuTxt(fnTxtRtCall, 14, 6, NULL);
-const PROGMEM FloatMenuInfo minfoCurrent = { "Current", 10, 0xffff, 2, NO_CALLBACK };
+const FloatMenuInfo PROGMEM minfoCurrent = { "Current", 10, 0xFFFF, 2, NO_CALLBACK };
 FloatMenuItem menuCurrent(&minfoCurrent, &menuTxt);
-const PROGMEM FloatMenuInfo minfoVoltsIn = { "Volts in", 9, 0xffff, 2, NO_CALLBACK };
+const FloatMenuInfo PROGMEM minfoVoltsIn = { "Volts in", 9, 0xFFFF, 2, NO_CALLBACK };
 FloatMenuItem menuVoltsIn(&minfoVoltsIn, &menuCurrent);
-RENDERING_CALLBACK_NAME_INVOKE(fnStatusRtCall, backSubItemRenderFn, "Status", -1, NULL)
-const PROGMEM SubMenuInfo minfoStatus = { "Status", 8, 0xffff, 0, NO_CALLBACK };
+const SubMenuInfo PROGMEM minfoStatus = { "Status", 8, 0xFFFF, 0, NO_CALLBACK };
+RENDERING_CALLBACK_NAME_INVOKE(fnStatusRtCall, backSubItemRenderFn, "Status", -1, NO_CALLBACK)
 BackMenuItem menuBackStatus(fnStatusRtCall, &menuVoltsIn);
 SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuConnectivity);
-const PROGMEM AnyMenuInfo minfoShutdownNow = { "Shutdown now", 11, 0xffff, 0, onPowerDownDetected };
+const AnyMenuInfo PROGMEM minfoShutdownNow = { "Shutdown now", 11, 0xFFFF, 0, onPowerDownDetected };
 ActionMenuItem menuShutdownNow(&minfoShutdownNow, NULL);
-const PROGMEM AnalogMenuInfo minfoDelay = { "Delay", 7, 11, 10, NO_CALLBACK, 0, 1, "S" };
+const AnalogMenuInfo PROGMEM minfoDelay = { "Delay", 7, 11, 10, NO_CALLBACK, 0, 1, "S" };
 AnalogMenuItem menuDelay(&minfoDelay, 0, &menuShutdownNow);
-const PROGMEM BooleanMenuInfo minfoPwrDelay = { "Pwr Delay", 6, 10, 1, NO_CALLBACK, NAMING_YES_NO };
+const BooleanMenuInfo PROGMEM minfoPwrDelay = { "Pwr Delay", 6, 10, 1, NO_CALLBACK, NAMING_YES_NO };
 BooleanMenuItem menuPwrDelay(&minfoPwrDelay, false, &menuDelay);
-RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings", -1, NULL)
-const PROGMEM SubMenuInfo minfoSettings = { "Settings", 5, 0xffff, 0, NO_CALLBACK };
+const SubMenuInfo PROGMEM minfoSettings = { "Settings", 5, 0xFFFF, 0, NO_CALLBACK };
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings", -1, NO_CALLBACK)
 BackMenuItem menuBackSettings(fnSettingsRtCall, &menuPwrDelay);
 SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, &menuStatus);
-const char enumStrOnAlm_0[] PROGMEM = "All On";
-const char enumStrOnAlm_1[] PROGMEM = "Silient";
+const char enumStrOnAlm_0[] PROGMEM  = "All On";
+const char enumStrOnAlm_1[] PROGMEM  = "Silient";
 const char* const enumStrOnAlm[] PROGMEM  = { enumStrOnAlm_0, enumStrOnAlm_1 };
-const PROGMEM EnumMenuInfo minfoOnAlm = { "On Alm", 4, 8, 1, NO_CALLBACK, enumStrOnAlm };
+const EnumMenuInfo PROGMEM minfoOnAlm = { "On Alm", 4, 8, 1, NO_CALLBACK, enumStrOnAlm };
 EnumMenuItem menuOnAlm(&minfoOnAlm, 0, &menuSettings);
-const PROGMEM AnalogMenuInfo minfoKitchen = { "Kitchen", 3, 6, 100, onKitchenLight, 0, 1, "%" };
+const AnalogMenuInfo PROGMEM minfoKitchen = { "Kitchen", 3, 6, 100, onKitchenLight, 0, 1, "%" };
 AnalogMenuItem menuKitchen(&minfoKitchen, 0, &menuOnAlm);
-const PROGMEM AnalogMenuInfo minfoLiving = { "Living", 2, 4, 100, onLivingRoomLight, 0, 1, "%" };
+const AnalogMenuInfo PROGMEM minfoLiving = { "Living", 2, 4, 100, onLivingRoomLight, 0, 1, "%" };
 AnalogMenuItem menuLiving(&minfoLiving, 0, &menuKitchen);
-const PROGMEM AnalogMenuInfo minfoHall = { "Hall", 1, 2, 100, onHallLight, 0, 1, "%" };
+const AnalogMenuInfo PROGMEM minfoHall = { "Hall", 1, 2, 100, onHallLight, 0, 1, "%" };
 AnalogMenuItem menuHall(&minfoHall, 0, &menuLiving);
-const PROGMEM ConnectorLocalInfo applicationInfo = { "Security App", "0e68e7f6-2932-43f0-aae3-d4f885b7561d" };
+
 
 // Set up code
 
@@ -64,11 +65,9 @@ void setupMenu() {
     prepareAdaMonoGfxConfigLoRes(&gfxConfig);
     renderer.setGraphicsDevice(&gfx, &gfxConfig);
     switches.initialise(ioUsingArduino(), true);
-    menuMgr.initForEncoder(&renderer, &menuHall, ENCODER_PIN_A, ENCODER_PIN_B, ENCODER_PIN_OK);
+    menuMgr.initForEncoder(&renderer, &menuHall, 2, 3, A3);
     remoteServer.begin(&server, &applicationInfo);
 
-    // Read only and local only function calls
-    menuConnectivity.setLocalOnly(true);
     menuConnectivity.setSecured(true);
+    menuConnectivity.setLocalOnly(true);
 }
-

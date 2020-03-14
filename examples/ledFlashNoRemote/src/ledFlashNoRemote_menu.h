@@ -15,10 +15,13 @@
 #include <LiquidCrystalIO.h>
 #include "tcMenuLiquidCrystal.h"
 
+void setupMenu();  // forward reference of the menu setup function.
+extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app info to the linker.
+
 // Global variables that need exporting
 
-extern LiquidCrystal LiquidCrystal;
-extern LiquidCrystalRenderer LiquidCrystalRenderer;
+extern LiquidCrystal lcd;
+extern LiquidCrystalRenderer renderer;
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION

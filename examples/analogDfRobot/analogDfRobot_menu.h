@@ -13,7 +13,6 @@
 
 #include <tcMenu.h>
 #include <RuntimeMenuItem.h>
-#include <RuntimeMenuItem.h>
 #include <LiquidCrystalIO.h>
 #include "tcMenuLiquidCrystal.h"
 #include <DfRobotInputAbstraction.h>

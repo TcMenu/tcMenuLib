@@ -6,58 +6,52 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
- */
+*/
 
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
 
 #include <tcMenu.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_ILI9341.h>
+#include <RuntimeMenuItem.h>
+#include "Adafruit_GFX.h"
+#include "Adafruit_ILI9341.h"
+#include "tcMenuAdaFruitGfx.h"
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
-#include "tcMenuAdaFruitGfx.h"
 
-// all define statements needed
-#define ENCODER_PIN_A 7
-#define ENCODER_PIN_B 6
-#define ENCODER_PIN_OK 5
+void setupMenu();  // forward reference of the menu setup function.
+extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app info to the linker.
 
-// all variables that need exporting
-extern AdaColorGfxMenuConfig colorConfig;
+// Global variables that need exporting
+
 extern Adafruit_ILI9341 gfx;
+extern AdaColorGfxMenuConfig colorConfig;
 extern AdaFruitGfxMenuRenderer renderer;
 extern IoAbstractionRef io8574;
-
-// all menu item forward references.
-extern IpAddressMenuItem menuIpAddress;
-extern BackMenuItem menuBackConnectivity;
-extern SubMenuItem menuConnectivity;
-extern FloatMenuItem menuVoltA1;
-extern FloatMenuItem menuVoltA0;
-extern BackMenuItem menuBackStatus;
-extern SubMenuItem menuStatus;
-extern BooleanMenuItem menuTempCheck;
-extern BooleanMenuItem menuSCircuitProtect;
-extern BackMenuItem menuBackAdvanced;
-extern SubMenuItem menuAdvanced;
-extern ActionMenuItem menuSaveAll;
-extern BooleanMenuItem menuPwrDelay;
-extern BackMenuItem menuBackSettings;
-extern SubMenuItem menuSettings;
-extern EnumMenuItem menuLimit;
-extern AnalogMenuItem menuCurrent;
-extern AnalogMenuItem menuVoltage;
-extern const ConnectorLocalInfo applicationInfo;
+extern EthernetServer server;
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
-void CALLBACK_FUNCTION onCurrentChange(int id);
-void CALLBACK_FUNCTION onLimitMode(int id);
-void CALLBACK_FUNCTION onSaveRom(int id);
-void CALLBACK_FUNCTION onVoltageChange(int id);
+// Global Menu Item exports
 
-void setupMenu();
+extern IpAddressMenuItem menuIpAddress;
+extern SubMenuItem menuConnectivity;
+extern FloatMenuItem menuVoltA1;
+extern FloatMenuItem menuVoltA0;
+extern SubMenuItem menuStatus;
+extern BooleanMenuItem menuTempCheck;
+extern BooleanMenuItem menuSCircuitProtect;
+extern SubMenuItem menuAdvanced;
+void CALLBACK_FUNCTION onSaveRom(int id);
+extern ActionMenuItem menuSaveAll;
+extern BooleanMenuItem menuPwrDelay;
+extern SubMenuItem menuSettings;
+void CALLBACK_FUNCTION onLimitMode(int id);
+extern EnumMenuItem menuLimit;
+void CALLBACK_FUNCTION onCurrentChange(int id);
+extern AnalogMenuItem menuCurrent;
+void CALLBACK_FUNCTION onVoltageChange(int id);
+extern AnalogMenuItem menuVoltage;
 
 #endif // MENU_GENERATED_CODE_H

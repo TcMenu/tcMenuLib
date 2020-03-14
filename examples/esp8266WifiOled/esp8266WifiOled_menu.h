@@ -6,55 +6,49 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
- */
+*/
 
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
 
 #include <tcMenu.h>
-#include <WiFi.h>
-#include "EthernetTransport.h"
-#include <RemoteConnector.h>
 #include <RuntimeMenuItem.h>
 #include "tcMenuU8g2.h"
+#include "EthernetTransport.h"
+#include <RemoteConnector.h>
 
-// all define statements needed
-#define TCMENU_USING_PROGMEM true
-#define ENCODER_PIN_A 0
-#define ENCODER_PIN_B 1
-#define ENCODER_PIN_OK 2
+void setupMenu();  // forward reference of the menu setup function.
+extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app info to the linker.
 
-// all variables that need exporting
+// Global variables that need exporting
+
 extern U8G2_SSD1306_128X64_NONAME_F_SW_I2C gfx;
+extern U8g2GfxMenuConfig gfxConfig;
 extern U8g2MenuRenderer renderer;
 extern IoAbstractionRef io8574;
-
-// all menu item forward references.
-extern IpAddressMenuItem menuIpAddress;
-extern TextMenuItem menuPwd;
-extern TextMenuItem menuSSID;
-extern BackMenuItem menuBackConnectivity;
-extern SubMenuItem menuConnectivity;
-extern ActionMenuItem menuSaveAll;
-extern EnumMenuItem menuWinOpening;
-extern EnumMenuItem menuHeaterPower;
-extern BackMenuItem menuBackSetup;
-extern SubMenuItem menuSetup;
-extern BooleanMenuItem menuElectricHeater;
-extern BooleanMenuItem menuWindowOpen;
-extern AnalogMenuItem menuCucumberTemp;
-extern AnalogMenuItem menuTomatoTemp;
-extern const ConnectorLocalInfo applicationInfo;
+extern WiFiServer server;
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
-void CALLBACK_FUNCTION onElectricHeater(int id);
-void CALLBACK_FUNCTION onHeaterPower(int id);
-void CALLBACK_FUNCTION onSaveAll(int id);
-void CALLBACK_FUNCTION onWindowOpen(int id);
-void CALLBACK_FUNCTION onWindowOpening(int id);
+// Global Menu Item exports
 
-void setupMenu();
+extern IpAddressMenuItem menuIpAddress;
+extern TextMenuItem menuPwd;
+extern TextMenuItem menuSSID;
+extern SubMenuItem menuConnectivity;
+void CALLBACK_FUNCTION onSaveAll(int id);
+extern ActionMenuItem menuSaveAll;
+void CALLBACK_FUNCTION onWindowOpening(int id);
+extern EnumMenuItem menuWinOpening;
+void CALLBACK_FUNCTION onHeaterPower(int id);
+extern EnumMenuItem menuHeaterPower;
+extern SubMenuItem menuSetup;
+void CALLBACK_FUNCTION onElectricHeater(int id);
+extern BooleanMenuItem menuElectricHeater;
+void CALLBACK_FUNCTION onWindowOpen(int id);
+extern BooleanMenuItem menuWindowOpen;
+extern AnalogMenuItem menuCucumberTemp;
+extern AnalogMenuItem menuTomatoTemp;
 
 #endif // MENU_GENERATED_CODE_H

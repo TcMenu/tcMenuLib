@@ -6,7 +6,7 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
- */
+*/
 
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
@@ -14,32 +14,27 @@
 #include <tcMenu.h>
 #include "tcMenuU8g2.h"
 
-// all define statements needed
-#define TCMENU_USING_PROGMEM true
-#define ENCODER_PIN_A 0
-#define ENCODER_PIN_B 1
-#define ENCODER_PIN_OK 2
+void setupMenu();  // forward reference of the menu setup function.
+extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app info to the linker.
 
-// all variables that need exporting
+// Global variables that need exporting
+
 extern U8G2_SSD1306_128X64_NONAME_F_SW_I2C gfx;
+extern U8g2GfxMenuConfig gfxConfig;
 extern U8g2MenuRenderer renderer;
 extern IoAbstractionRef io8574;
-
-// all menu item forward references.
-extern BooleanMenuItem menuSettingsSafetyLock;
-extern BackMenuItem menuBackSettings;
-extern SubMenuItem menuSettings;
-extern ActionMenuItem menuStartToasting;
-extern BooleanMenuItem menuFrozen;
-extern EnumMenuItem menuType;
-extern AnalogMenuItem menuToasterPower;
-extern const ConnectorLocalInfo applicationInfo;
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
-void CALLBACK_FUNCTION onStartToasting(int id);
+// Global Menu Item exports
 
-void setupMenu();
+extern BooleanMenuItem menuSettingsSafetyLock;
+extern SubMenuItem menuSettings;
+void CALLBACK_FUNCTION onStartToasting(int id);
+extern ActionMenuItem menuStartToasting;
+extern BooleanMenuItem menuFrozen;
+extern EnumMenuItem menuType;
+extern AnalogMenuItem menuToasterPower;
 
 #endif // MENU_GENERATED_CODE_H

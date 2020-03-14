@@ -1,1 +1,107 @@
-{"version":"1.00","projectName":"C:\\Users\\dave\\Documents\\Arduino\\libraries\\tcMenu\\examples\\analogDfRobot\\analogDfRobot.emf","author":"dave","lastEdited":{"seconds":1574526348,"nanos":899682800},"namingRecursive":false,"items":[{"parentId":0,"type":"analogItem","item":{"maxValue":1024,"offset":0,"divisor":1,"unitName":"","name":"Value A0","id":1,"eepromAddress":-1,"readOnly":false,"localOnly":false}},{"parentId":0,"type":"subMenu","item":{"secured":false,"name":"LED States","id":2,"eepromAddress":-1,"readOnly":false,"localOnly":false}},{"parentId":2,"type":"boolItem","item":{"naming":"ON_OFF","name":"LED 1","id":3,"eepromAddress":2,"functionName":"onLed1","readOnly":false,"localOnly":false}},{"parentId":2,"type":"boolItem","item":{"naming":"ON_OFF","name":"LED 2","id":4,"eepromAddress":3,"functionName":"onLed2","readOnly":false,"localOnly":false}},{"parentId":0,"type":"largeNumItem","item":{"digitsAllowed":8,"decimalPlaces":4,"name":"LgeNum","id":5,"eepromAddress":10,"readOnly":false,"localOnly":false}},{"parentId":0,"type":"textItem","item":{"textLength":6,"itemType":"PLAIN_TEXT","name":"Text","id":6,"eepromAddress":4,"readOnly":false,"localOnly":false}}],"codeOptions":{"embeddedPlatform":"ARDUINO","lastDisplayUuid":"bcd5fe34-9e9f-4fcb-9edf-f4e3caca0674","lastInputUuid":"7daa6a81-dd09-422e-b83c-bda5045abaef","lastRemoteUuid":"2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb","applicationUUID":"2ba37227-a412-40b7-94e7-42caf9bb0ff4","applicationName":"DfRobot","lastProperties":[],"namingRecursive":false}}
+{
+  "lastEdited": {
+    "seconds": 1584199664,
+    "nanos": 0
+  },
+  "codeOptions": {
+    "applicationUUID": "2ba37227-a412-40b7-94e7-42caf9bb0ff4",
+    "applicationName": "DfRobot",
+    "lastInputUuid": "7daa6a81-dd09-422e-b83c-bda5045abaef",
+    "lastDisplayUuid": "bcd5fe34-9e9f-4fcb-9edf-f4e3caca0674",
+    "lastRemoteUuid": "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb",
+    "embeddedPlatform": "ARDUINO_AVR",
+    "namingRecursive": false,
+    "saveToSrc": false,
+    "lastProperties": []
+  },
+  "projectName": "Uses the DF Robot shield for both input and display",
+  "namingRecursive": false,
+  "version": "1.00",
+  "items": [
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "name": "Value A0",
+        "eepromAddress": -1,
+        "id": 1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 1024,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": ""
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "name": "LED States",
+        "eepromAddress": -1,
+        "id": 2,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "secured": false
+      }
+    },
+    {
+      "parentId": 2,
+      "type": "boolItem",
+      "item": {
+        "name": "LED 1",
+        "eepromAddress": 2,
+        "id": 3,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "onLed1",
+        "naming": "ON_OFF"
+      }
+    },
+    {
+      "parentId": 2,
+      "type": "boolItem",
+      "item": {
+        "name": "LED 2",
+        "eepromAddress": 3,
+        "id": 4,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "onLed2",
+        "naming": "ON_OFF"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "largeNumItem",
+      "item": {
+        "name": "LgeNum",
+        "eepromAddress": 10,
+        "id": 5,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "decimalPlaces": 4,
+        "digitsAllowed": 8
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "textItem",
+      "item": {
+        "name": "Text",
+        "eepromAddress": 4,
+        "id": 6,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "itemType": "PLAIN_TEXT",
+        "textLength": 6
+      }
+    }
+  ]
+}

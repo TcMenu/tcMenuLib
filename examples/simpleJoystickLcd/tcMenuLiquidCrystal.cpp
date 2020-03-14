@@ -14,7 +14,7 @@
 
 #include "tcMenuLiquidCrystal.h"
 
-const ConnectorLocalInfo applicationInfo {"Test App", "12342345534533453" };
+extern const ConnectorLocalInfo applicationInfo;
 
 LiquidCrystalRenderer::LiquidCrystalRenderer(LiquidCrystal& lcd, uint8_t dimX, uint8_t dimY) : BaseMenuRenderer(dimX) {
 	this->dimY = dimY;
@@ -77,8 +77,8 @@ void LiquidCrystalRenderer::renderList() {
 
 void LiquidCrystalRenderer::renderTitle(bool forceDraw) {
     if(!drewTitleThisTime || forceDraw) {
-        strcpy(buffer, applicationInfo.name);
-        serdebugF("print app name");
+        strcpy_P(buffer, applicationInfo.name);
+        serdebugF2("print app name", buffer);
         uint8_t bufSz = bufferSize;
         uint8_t last = min(bufSz, strlen(buffer));
         for(uint8_t i = last; i < bufSz; i++) {

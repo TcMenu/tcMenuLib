@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1581267923,
+    "seconds": 1584200621,
     "nanos": 0
   },
   "codeOptions": {
@@ -13,61 +13,6 @@
     "namingRecursive": false,
     "saveToSrc": true,
     "lastProperties": [
-      {
-        "name": "LCD_RS",
-        "latestValue": "8",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "LCD_EN",
-        "latestValue": "9",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "LCD_D4",
-        "latestValue": "4",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "LCD_D5",
-        "latestValue": "5",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "LCD_D6",
-        "latestValue": "6",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "LCD_D7",
-        "latestValue": "7",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "LCD_WIDTH",
-        "latestValue": "16",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "LCD_HEIGHT",
-        "latestValue": "2",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "LCD_BACKLIGHT",
-        "latestValue": "10",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "LCD_PWM_PIN",
-        "latestValue": "-1",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "LCD_IO_DEVICE",
-        "latestValue": "",
-        "subsystem": "DISPLAY"
-      },
       {
         "name": "PULLUP_LOGIC",
         "latestValue": "true",
@@ -97,10 +42,65 @@
         "name": "ENCODER_PIN_OK",
         "latestValue": "A3",
         "subsystem": "INPUT"
+      },
+      {
+        "name": "LCD_WIDTH",
+        "latestValue": "16",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "LCD_HEIGHT",
+        "latestValue": "2",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "LCD_EN",
+        "latestValue": "9",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "LCD_RS",
+        "latestValue": "8",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "LCD_D4",
+        "latestValue": "4",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "LCD_D5",
+        "latestValue": "5",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "LCD_D6",
+        "latestValue": "6",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "LCD_D7",
+        "latestValue": "7",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "LCD_BACKLIGHT",
+        "latestValue": "10",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "LCD_PWM_PIN",
+        "latestValue": "-1",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "LCD_IO_DEVICE",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
       }
     ]
   },
-  "projectName": "C:\\Users\\dave\\Documents\\Arduino\\libraries\\tcMenu\\examples\\ledFlashNoRemote\\ledFlashNoRemote.emf",
+  "projectName": "Very simple example that blinks an LED",
   "namingRecursive": false,
   "version": "1.00",
   "items": [
@@ -113,6 +113,7 @@
         "id": 1,
         "readOnly": false,
         "localOnly": false,
+        "visible": true,
         "functionName": "onLedChange",
         "naming": "ON_OFF"
       }
@@ -126,6 +127,7 @@
         "id": 2,
         "readOnly": false,
         "localOnly": false,
+        "visible": true,
         "maxValue": 1024,
         "offset": 0,
         "divisor": 200,
@@ -141,6 +143,7 @@
         "id": 3,
         "readOnly": false,
         "localOnly": false,
+        "visible": true,
         "functionName": "onSaveState"
       }
     }

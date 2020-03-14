@@ -6,50 +6,51 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
- */
+*/
 
 #include <tcMenu.h>
 #include "colorTftEthernet32_menu.h"
 
 // Global variable declarations
 
+const PROGMEM ConnectorLocalInfo applicationInfo = { "Ada32 Ethernet", "22813e5e-88b1-42d5-9601-4831b2be369b" };
 AdaFruitGfxMenuRenderer renderer;
 EthernetServer server(3333);
 
 // Global Menu Item declarations
 
-RENDERING_CALLBACK_NAME_INVOKE(fnIpAddressRtCall, ipAddressRenderFn, "Ip Address", 10, NULL)
+RENDERING_CALLBACK_NAME_INVOKE(fnIpAddressRtCall, ipAddressRenderFn, "Ip Address", 10, NO_CALLBACK)
 IpAddressMenuItem menuIpAddress(fnIpAddressRtCall, 15, NULL);
-RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NULL)
-const SubMenuInfo minfoConnectivity = { "Connectivity", 14, 0xffff, 0, NO_CALLBACK };
+const SubMenuInfo minfoConnectivity = { "Connectivity", 14, 0xFFFF, 0, NO_CALLBACK };
+RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NO_CALLBACK)
 BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuIpAddress);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL);
-const FloatMenuInfo minfoVoltA1 = { "Volt A1", 9, 0xffff, 2, NO_CALLBACK };
+const FloatMenuInfo minfoVoltA1 = { "Volt A1", 9, 0xFFFF, 2, NO_CALLBACK };
 FloatMenuItem menuVoltA1(&minfoVoltA1, NULL);
-const FloatMenuInfo minfoVoltA0 = { "Volt A0", 8, 0xffff, 2, NO_CALLBACK };
+const FloatMenuInfo minfoVoltA0 = { "Volt A0", 8, 0xFFFF, 2, NO_CALLBACK };
 FloatMenuItem menuVoltA0(&minfoVoltA0, &menuVoltA1);
-RENDERING_CALLBACK_NAME_INVOKE(fnStatusRtCall, backSubItemRenderFn, "Status", -1, NULL)
-const SubMenuInfo minfoStatus = { "Status", 7, 0xffff, 0, NO_CALLBACK };
+const SubMenuInfo minfoStatus = { "Status", 7, 0xFFFF, 0, NO_CALLBACK };
+RENDERING_CALLBACK_NAME_INVOKE(fnStatusRtCall, backSubItemRenderFn, "Status", -1, NO_CALLBACK)
 BackMenuItem menuBackStatus(fnStatusRtCall, &menuVoltA0);
 SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuConnectivity);
 const BooleanMenuInfo minfoTempCheck = { "Temp Check", 13, 9, 1, NO_CALLBACK, NAMING_ON_OFF };
 BooleanMenuItem menuTempCheck(&minfoTempCheck, false, NULL);
 const BooleanMenuInfo minfoSCircuitProtect = { "S-Circuit Protect", 12, 8, 1, NO_CALLBACK, NAMING_ON_OFF };
 BooleanMenuItem menuSCircuitProtect(&minfoSCircuitProtect, false, &menuTempCheck);
-RENDERING_CALLBACK_NAME_INVOKE(fnAdvancedRtCall, backSubItemRenderFn, "Advanced", -1, NULL)
-const SubMenuInfo minfoAdvanced = { "Advanced", 11, 0xffff, 0, NO_CALLBACK };
+const SubMenuInfo minfoAdvanced = { "Advanced", 11, 0xFFFF, 0, NO_CALLBACK };
+RENDERING_CALLBACK_NAME_INVOKE(fnAdvancedRtCall, backSubItemRenderFn, "Advanced", -1, NO_CALLBACK)
 BackMenuItem menuBackAdvanced(fnAdvancedRtCall, &menuSCircuitProtect);
 SubMenuItem menuAdvanced(&minfoAdvanced, &menuBackAdvanced, NULL);
-const AnyMenuInfo minfoSaveAll = { "Save all", 10, 0xffff, 0, onSaveRom };
+const AnyMenuInfo minfoSaveAll = { "Save all", 10, 0xFFFF, 0, onSaveRom };
 ActionMenuItem menuSaveAll(&minfoSaveAll, &menuAdvanced);
-const BooleanMenuInfo minfoPwrDelay = { "Pwr Delay", 5, 0xffff, 1, NO_CALLBACK, NAMING_YES_NO };
+const BooleanMenuInfo minfoPwrDelay = { "Pwr Delay", 5, 0xFFFF, 1, NO_CALLBACK, NAMING_YES_NO };
 BooleanMenuItem menuPwrDelay(&minfoPwrDelay, false, &menuSaveAll);
-RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings", -1, NULL)
-const SubMenuInfo minfoSettings = { "Settings", 4, 0xffff, 0, NO_CALLBACK };
+const SubMenuInfo minfoSettings = { "Settings", 4, 0xFFFF, 0, NO_CALLBACK };
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings", -1, NO_CALLBACK)
 BackMenuItem menuBackSettings(fnSettingsRtCall, &menuPwrDelay);
 SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, &menuStatus);
-const char enumStrLimit_0[] = "Current";
-const char enumStrLimit_1[] = "Voltage";
+const char enumStrLimit_0[]  = "Current";
+const char enumStrLimit_1[]  = "Voltage";
 const char* const enumStrLimit[]  = { enumStrLimit_0, enumStrLimit_1 };
 const EnumMenuInfo minfoLimit = { "Limit", 3, 6, 1, onLimitMode, enumStrLimit };
 EnumMenuItem menuLimit(&minfoLimit, 0, &menuSettings);
@@ -57,14 +58,15 @@ const AnalogMenuInfo minfoCurrent = { "Current", 2, 4, 255, onCurrentChange, 0, 
 AnalogMenuItem menuCurrent(&minfoCurrent, 0, &menuLimit);
 const AnalogMenuInfo minfoVoltage = { "Voltage", 1, 2, 255, onVoltageChange, -128, 2, "V" };
 AnalogMenuItem menuVoltage(&minfoVoltage, 0, &menuCurrent);
-const ConnectorLocalInfo applicationInfo = { "Ada32 Ethernet", "22813e5e-88b1-42d5-9601-4831b2be369b" };
+
 
 // Set up code
 
 void setupMenu() {
     renderer.setGraphicsDevice(&gfx, &colorConfig);
     switches.initialise(io8574, true);
-    menuMgr.initForEncoder(&renderer, &menuVoltage, ENCODER_PIN_A, ENCODER_PIN_B, ENCODER_PIN_OK);
+    menuMgr.initForEncoder(&renderer, &menuVoltage, 7, 6, 5);
     remoteServer.begin(&server, &applicationInfo);
-}
 
+
+}

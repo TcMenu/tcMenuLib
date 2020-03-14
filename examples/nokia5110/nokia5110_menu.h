@@ -6,57 +6,51 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
- */
+*/
 
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
 
 #include <tcMenu.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_PCD8544.h>
+#include <RuntimeMenuItem.h>
+#include "Adafruit_GFX.h"
+#include "Adafruit_PCD8544.h"
+#include "tcMenuAdaFruitGfx.h"
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
-#include <RuntimeMenuItem.h>
-#include "tcMenuAdaFruitGfx.h"
 
-// all define statements needed
-#define TCMENU_USING_PROGMEM true
-#define ENCODER_PIN_A 2
-#define ENCODER_PIN_B 3
-#define ENCODER_PIN_OK A3
+void setupMenu();  // forward reference of the menu setup function.
+extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app info to the linker.
 
-// all variables that need exporting
+// Global variables that need exporting
+
 extern Adafruit_PCD8544 gfx;
+extern AdaColorGfxMenuConfig gfxConfig;
 extern AdaFruitGfxMenuRenderer renderer;
-
-// all menu item forward references.
-extern IpAddressMenuItem menuIP;
-extern BackMenuItem menuBackConnectivity;
-extern SubMenuItem menuConnectivity;
-extern TextMenuItem menuTxt;
-extern FloatMenuItem menuCurrent;
-extern FloatMenuItem menuVoltsIn;
-extern BackMenuItem menuBackStatus;
-extern SubMenuItem menuStatus;
-extern ActionMenuItem menuShutdownNow;
-extern AnalogMenuItem menuDelay;
-extern BooleanMenuItem menuPwrDelay;
-extern BackMenuItem menuBackSettings;
-extern SubMenuItem menuSettings;
-extern EnumMenuItem menuOnAlm;
-extern AnalogMenuItem menuKitchen;
-extern AnalogMenuItem menuLiving;
-extern AnalogMenuItem menuHall;
-extern const ConnectorLocalInfo applicationInfo;
+extern EthernetServer server;
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
-void CALLBACK_FUNCTION onHallLight(int id);
-void CALLBACK_FUNCTION onKitchenLight(int id);
-void CALLBACK_FUNCTION onLivingRoomLight(int id);
-void CALLBACK_FUNCTION onPowerDownDetected(int id);
+// Global Menu Item exports
 
-void setupMenu();
+extern IpAddressMenuItem menuIP;
+extern SubMenuItem menuConnectivity;
+extern TextMenuItem menuTxt;
+extern FloatMenuItem menuCurrent;
+extern FloatMenuItem menuVoltsIn;
+extern SubMenuItem menuStatus;
+void CALLBACK_FUNCTION onPowerDownDetected(int id);
+extern ActionMenuItem menuShutdownNow;
+extern AnalogMenuItem menuDelay;
+extern BooleanMenuItem menuPwrDelay;
+extern SubMenuItem menuSettings;
+extern EnumMenuItem menuOnAlm;
+void CALLBACK_FUNCTION onKitchenLight(int id);
+extern AnalogMenuItem menuKitchen;
+void CALLBACK_FUNCTION onLivingRoomLight(int id);
+extern AnalogMenuItem menuLiving;
+void CALLBACK_FUNCTION onHallLight(int id);
+extern AnalogMenuItem menuHall;
 
 #endif // MENU_GENERATED_CODE_H

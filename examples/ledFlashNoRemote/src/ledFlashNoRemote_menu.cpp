@@ -9,7 +9,7 @@
 */
 
 #include <tcMenu.h>
-#include <ledFlashNoRemote_menu.h>
+#include "ledFlashNoRemote_menu.h"
 
 // Global variable declarations
 
@@ -19,9 +19,9 @@ LiquidCrystalRenderer renderer(lcd, 16, 2);
 
 // Global Menu Item declarations
 
-const ActionMenuInfo PROGMEM minfoSaveLEDState = { "Save LED state", 3, 0xFFFF, 0, onSaveState };
-ActionMenuItem menuSaveLEDState(&minfoSaveLEDState, false, NULL);
-const AnalogMenuInfo PROGMEM minfoA0Volts = { "A0Volts", 2, 0xFFFF, 1024, NULL, 0, 200, "V" };
+const AnyMenuInfo PROGMEM minfoSaveLEDState = { "Save LED state", 3, 0xFFFF, 0, onSaveState };
+ActionMenuItem menuSaveLEDState(&minfoSaveLEDState, NULL);
+const AnalogMenuInfo PROGMEM minfoA0Volts = { "A0Volts", 2, 0xFFFF, 1024, NO_CALLBACK, 0, 200, "V" };
 AnalogMenuItem menuA0Volts(&minfoA0Volts, 0, &menuSaveLEDState);
 const BooleanMenuInfo PROGMEM minfoBuiltInLED = { "BuiltIn LED", 1, 2, 1, onLedChange, NAMING_ON_OFF };
 BooleanMenuItem menuBuiltInLED(&minfoBuiltInLED, false, &menuA0Volts);
@@ -30,12 +30,12 @@ BooleanMenuItem menuBuiltInLED(&minfoBuiltInLED, false, &menuA0Volts);
 // Set up code
 
 void setupMenu() {
-    switches.initialise(ioUsingArduino(), true);
-    menuMgr.initForEncoder(&renderer, menuBuiltInLED, 2, 3, A3);
     lcd.setIoAbstraction(ioUsingArduino());
     lcd.begin(16, 2);
     lcd.configureBacklightPin(10);
     lcd.backlight();
+    switches.initialise(ioUsingArduino(), true);
+    menuMgr.initForEncoder(&renderer, &menuBuiltInLED, 2, 3, A3);
 
 
 }

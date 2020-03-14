@@ -16,8 +16,43 @@
 
 #include <RemoteConnector.h>
 #include <TaskManager.h>
-#include <WiFi.h>
+#include <ESP8266WiFi.h>
 #include <tcUtil.h>
+
+#ifndef ETHERNET_BUFFER_SIZE
+#define ETHERNET_BUFFER_SIZE 0
+#endif
+
+#if ETHERNET_BUFFER_SIZE > 0
+
+/**
+ * An implementation of TagValueTransport that is able to read and write via a buffer to sockets.
+ */
+class EthernetTagValTransport : public TagValueTransport {
+private:
+	WiFiClient client;
+    uint8_t bufferData[ETHERNET_BUFFER_SIZE];
+    int bufferPosition;
+public:
+	EthernetTagValTransport();
+	virtual ~EthernetTagValTransport();
+	void setClient(WiFiClient client) { this->client = client; }
+
+    void endMsg() override {
+        TagValueTransport::endMsg();
+        flush();
+    }
+	int writeChar(char data) override ;
+	int writeStr(const char* data) override;
+	void flush() override;
+	bool available() override;
+	bool connected() override;
+	uint8_t readByte() override;
+	bool readAvailable() override;
+	void close() override;
+};
+
+#else // ethernet buffering not needed
 
 /**
  * An implementation of TagValueTransport that is able to read and write using sockets.
@@ -39,6 +74,8 @@ public:
 	virtual bool readAvailable();
 	virtual void close();
 };
+
+#endif // ethernet buffering check
 
 /**
  * This is the actual server component that manages all the ethernet connections.
@@ -62,7 +99,7 @@ public:
     /**
      * Sets the mode of authentication used with your remote, if you don't call this the system will
      * default to no authentication; which is probably fine for serial / bluetooth serial.
-     *
+    *
      * This should always be called before begin(), to ensure this in your code always ensure this
      * is called BEFORE setupMenu().
      *
