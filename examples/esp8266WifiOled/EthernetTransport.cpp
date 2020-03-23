@@ -49,7 +49,7 @@ int EthernetTagValTransport::writeStr(const char* data) {
     int i  = 0;
     int len = strlen(data);
 	for(int i = 0; i < len; ++i) {
-        if(write(data[i]) == 0) {
+        if(writeChar(data[i]) == 0) {
             return 0;
         }
     }

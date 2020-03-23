@@ -4,7 +4,6 @@
 #include <AnalogDeviceAbstraction.h>
 #include <RemoteAuthentication.h>
 #include <RemoteMenuItem.h>
-#include <Fonts/FreeSans18pt7b.h>
 #include <Fonts/FreeSans9pt7b.h>
 #include <Ethernet.h>
 
@@ -22,8 +21,11 @@ byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
 };
 
-// we set up a TFT display first using the exact graphics variable used in the designer.
-Adafruit_ILI9341 gfx(6, 7);
+  #define TFT_CS        6
+  #define TFT_RST       3
+  #define TFT_DC        7
+
+Adafruit_ST7735 gfx = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
 
 // we also want to customise the colours and menu spacing. So we create this config object too
 // which we initialise during the setup method.
@@ -56,20 +58,20 @@ EepromAuthenicationInfoMenuItem menuAuthKeyMgr(1002, &authManager, &menuRemoteMo
 void prepareCustomConfiguration() {
     // first we set the spacing around title, items and widgets. The make padding function follows the
     // same standard as CSS. Top, right, bottom, left.
-	makePadding(colorConfig.titlePadding, 12, 5, 12, 5); // top, right, bottom & left
-	makePadding(colorConfig.itemPadding, 5, 3, 6, 5);   // top, right, bottom & left
-	makePadding(colorConfig.widgetPadding, 5, 10, 0, 5);// top, right, bottom & left
+	makePadding(colorConfig.titlePadding, 6, 3, 6, 3); // top, right, bottom & left
+	makePadding(colorConfig.itemPadding, 3, 3, 3, 3);   // top, right, bottom & left
+	makePadding(colorConfig.widgetPadding, 3, 8, 0, 3);// top, right, bottom & left
 
     // and then the foreground, background and font of the title
 	colorConfig.bgTitleColor = RGB(50, 100, 200);
 	colorConfig.fgTitleColor = RGB(0, 0, 0);
-	colorConfig.titleFont = &FreeSans18pt7b;
+	colorConfig.titleFont = &FreeSans9pt7b;
 	colorConfig.titleBottomMargin = 10; // the space between title and items.
 
     // and then the colours for items.
 	colorConfig.bgItemColor = RGB(0, 0, 0);
 	colorConfig.fgItemColor = RGB(222, 222, 222);
-	colorConfig.itemFont = &FreeSans9pt7b;
+	colorConfig.itemFont = NULL;
 
     // and when items are selected.
 	colorConfig.bgSelectColor = RGB(0, 50, 200);
@@ -92,8 +94,8 @@ void prepareCustomConfiguration() {
 
 void setup() {
     // we are responsible for setting up the initial graphics
-    gfx.begin();
-    gfx.setRotation(3);
+    gfx.initR(INITR_BLACKTAB);
+    gfx.setRotation(1);
 
     // we used an i2c device (io8574) so must initialise wire too
     Wire.begin();

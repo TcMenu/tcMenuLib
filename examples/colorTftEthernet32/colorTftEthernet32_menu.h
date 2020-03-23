@@ -14,7 +14,7 @@
 #include <tcMenu.h>
 #include <RuntimeMenuItem.h>
 #include "Adafruit_GFX.h"
-#include "Adafruit_ILI9341.h"
+#include "Adafruit_ST7735.h"
 #include "tcMenuAdaFruitGfx.h"
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
@@ -24,7 +24,7 @@ extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app inf
 
 // Global variables that need exporting
 
-extern Adafruit_ILI9341 gfx;
+extern Adafruit_ST7735 gfx;
 extern AdaColorGfxMenuConfig colorConfig;
 extern AdaFruitGfxMenuRenderer renderer;
 extern IoAbstractionRef io8574;
