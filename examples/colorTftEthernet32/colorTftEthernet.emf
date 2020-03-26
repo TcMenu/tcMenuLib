@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1584888681,
+    "seconds": 1585206207,
     "nanos": 0
   },
   "codeOptions": {
@@ -50,7 +50,7 @@
       },
       {
         "name": "DISPLAY_TYPE",
-        "latestValue": "Adafruit_ILI9341",
+        "latestValue": "Adafruit_ST7735",
         "subsystem": "DISPLAY"
       },
       {
@@ -193,6 +193,18 @@
         "localOnly": false,
         "visible": true,
         "naming": "ON_OFF"
+      }
+    },
+    {
+      "parentId": 11,
+      "type": "actionMenu",
+      "item": {
+        "name": "Hidden item",
+        "eepromAddress": -1,
+        "id": 16,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
       }
     },
     {

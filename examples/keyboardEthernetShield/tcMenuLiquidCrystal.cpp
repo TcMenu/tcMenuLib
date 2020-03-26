@@ -148,7 +148,8 @@ void LiquidCrystalRenderer::render() {
 			if (lastOffset != toOffsetBy) locRedrawMode = MENUDRAW_COMPLETE_REDRAW;
 			lastOffset = toOffsetBy;
 
-			while (item != NULL && toOffsetBy--) {
+			while (item != NULL && toOffsetBy) {
+                if(item->isVisible()) toOffsetBy = toOffsetBy - 1;
 				item = item->getNext();
 			}
 		}
@@ -159,10 +160,13 @@ void LiquidCrystalRenderer::render() {
 
 		// and then we start drawing items until we run out of screen or items
 		while (item && cnt < dimY) {
-			if (locRedrawMode != MENUDRAW_NO_CHANGE || item->isChanged()) {
-				renderMenuItem(cnt, item);
-			}
-			++cnt;
+            if(item->isVisible())
+            {
+                if (locRedrawMode != MENUDRAW_NO_CHANGE || item->isChanged()) {
+                    renderMenuItem(cnt, item);
+                }
+                ++cnt;
+            }
 			item = item->getNext();
 		}
 	}

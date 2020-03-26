@@ -41,6 +41,7 @@ extern FloatMenuItem menuVoltA1;
 extern FloatMenuItem menuVoltA0;
 extern SubMenuItem menuStatus;
 extern BooleanMenuItem menuTempCheck;
+extern ActionMenuItem menuHiddenItem;
 extern BooleanMenuItem menuSCircuitProtect;
 extern SubMenuItem menuAdvanced;
 void CALLBACK_FUNCTION onSaveRom(int id);

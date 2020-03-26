@@ -49,6 +49,7 @@ extern EditableLargeNumberMenuItem menuLargeNum;
 extern AnalogMenuItem menuDecimalTens;
 void CALLBACK_FUNCTION onInteger(int id);
 extern AnalogMenuItem menuInteger;
+extern BooleanMenuItem menuHiddenItem;
 void CALLBACK_FUNCTION onAnalog1(int id);
 extern AnalogMenuItem menuAnalog1;
 extern TimeFormattedMenuItem menuTime;

@@ -122,6 +122,12 @@ void setup() {
     // before calling setupMenu..
     prepareCustomConfiguration();
 
+    // here we make the menuitem "hidden item" invisible. It will not be displayed.
+    // here it is done before setupMenu is called, so there's no need to refresh the
+    // display. If it's done after initialisation, the menu must be reset by calling
+    // menuMgr.setCurrentMenu(getRoot());
+    menuHiddenItem.setVisible(false);
+
     // set up the menu
     setupMenu();
 

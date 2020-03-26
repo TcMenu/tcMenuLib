@@ -68,6 +68,15 @@ MenuItem* getItemAtPosition(MenuItem* root, uint8_t pos);
 int offsetOfCurrentActive(MenuItem* root);
 
 /**
+ * returns the number of items in the current menu described by itemCount
+ * @param item the root item of the menu to be counted.
+ * @param includeNonVisble include menu items that are not marked visible
+ * @return the number of items, may include only visible ones depending on flag
+ */
+uint8_t itemCount(MenuItem* item,  bool includeNonVisble = false);
+
+
+/**
  * A predicate that can match upon a menu item, the match is generally performed by calling the
  * match method, which returns true for a match.
  */

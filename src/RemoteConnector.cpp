@@ -386,6 +386,7 @@ void TagValueRemoteConnector::encodeBaseMenuFields(int parentId, MenuItem* item)
     transport->writeFieldInt(FIELD_ID, item->getId());
     transport->writeFieldInt(FIELD_EEPROM, item->getEepromPosition());
     transport->writeFieldInt(FIELD_READONLY, item->isReadOnly());
+    transport->writeFieldInt(FIELD_VISIBLE, item->isVisible());
     char sz[20];
     item->copyNameToBuffer(sz, sizeof(sz));
     transport->writeField(FIELD_MSG_NAME, sz);

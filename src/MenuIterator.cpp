@@ -147,10 +147,13 @@ MenuItem* getItemAtPosition(MenuItem* root, uint8_t pos) {
 	MenuItem* itm = root;
 
 	while (itm != NULL) {
-		if (i == pos) {
-			return itm;
-		}
-		i++;
+        if(itm->isVisible())
+        {
+            if (i == pos) {
+                return itm;
+            }
+            i++;
+        }
 		itm = itm->getNext();
 	}
 
@@ -161,12 +164,23 @@ int offsetOfCurrentActive(MenuItem* root) {
 	uint8_t i = 0;
 	MenuItem* itm = root;
 	while (itm != NULL) {
-		if (itm->isActive() || itm->isEditing()) {
-			return i;
-		}
-		i++;
+        if(itm->isVisible()) {
+            if (itm->isActive() || itm->isEditing()) {
+                return i;
+            }
+            i++;
+        }
 		itm = itm->getNext();
 	}
 
 	return 0;
+}
+
+uint8_t itemCount(MenuItem* item, bool includeNonVisible) {
+	uint8_t count = 0;
+	while (item) {
+        if(includeNonVisible || item->isVisible()) ++count;
+		item = item->getNext();
+	}
+	return count;
 }

@@ -82,11 +82,6 @@ void fastltoa_mv(char* str, long val, long divisor, char padChar, int len);
 void fastltoa(char* str, long val, uint8_t dp, char padChar, int len);
 
 /**
- * returns the number of items in the current menu described by itemCount
- */
-uint8_t itemCount(MenuItem* item);
-
-/**
  * converts decimal places into a suitable divisor, eg: 2 -> 100, 4 -> 10000
  */
 long dpToDivisor(int dp);

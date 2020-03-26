@@ -35,8 +35,10 @@ BackMenuItem menuBackStatus(fnStatusRtCall, &menuVoltA0);
 SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuConnectivity);
 const BooleanMenuInfo minfoTempCheck = { "Temp Check", 13, 9, 1, NO_CALLBACK, NAMING_ON_OFF };
 BooleanMenuItem menuTempCheck(&minfoTempCheck, false, NULL);
+const AnyMenuInfo minfoHiddenItem = { "Hidden item", 16, 0xFFFF, 0, NO_CALLBACK };
+ActionMenuItem menuHiddenItem(&minfoHiddenItem, &menuTempCheck);
 const BooleanMenuInfo minfoSCircuitProtect = { "S-Circuit Protect", 12, 8, 1, NO_CALLBACK, NAMING_ON_OFF };
-BooleanMenuItem menuSCircuitProtect(&minfoSCircuitProtect, false, &menuTempCheck);
+BooleanMenuItem menuSCircuitProtect(&minfoSCircuitProtect, false, &menuHiddenItem);
 const SubMenuInfo minfoAdvanced = { "Advanced", 11, 0xFFFF, 0, NO_CALLBACK };
 RENDERING_CALLBACK_NAME_INVOKE(fnAdvancedRtCall, backSubItemRenderFn, "Advanced", -1, NO_CALLBACK)
 BackMenuItem menuBackAdvanced(fnAdvancedRtCall, &menuSCircuitProtect);
@@ -63,10 +65,10 @@ AnalogMenuItem menuVoltage(&minfoVoltage, 0, &menuCurrent);
 // Set up code
 
 void setupMenu() {
+
+
     renderer.setGraphicsDevice(&gfx, &colorConfig);
     switches.initialise(io8574, true);
     menuMgr.initForEncoder(&renderer, &menuVoltage, 7, 6, 5);
     remoteServer.begin(&server, &applicationInfo);
-
-
 }

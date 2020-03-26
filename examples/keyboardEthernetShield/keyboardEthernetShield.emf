@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1584198922,
+    "seconds": 1585206203,
     "nanos": 0
   },
   "codeOptions": {
@@ -143,6 +143,19 @@
         "offset": -180,
         "divisor": 2,
         "unitName": "dB"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "boolItem",
+      "item": {
+        "name": "Hidden item",
+        "eepromAddress": -1,
+        "id": 13,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": false,
+        "naming": "TRUE_FALSE"
       }
     },
     {

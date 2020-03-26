@@ -359,7 +359,5 @@ private:
 	void menuValueFloat(FloatMenuItem* item, MenuDrawJustification justification);
 };
 
-/** Counts the number of items from this menu item to the end of the list */
-uint8_t itemCount(MenuItem* item);
 
 #endif

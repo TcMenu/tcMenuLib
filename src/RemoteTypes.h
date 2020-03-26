@@ -102,6 +102,7 @@ enum AckResponseStatus {
 #define FIELD_ID          msgFieldToWord('I', 'D')
 #define FIELD_EEPROM      msgFieldToWord('I', 'E')
 #define FIELD_READONLY    msgFieldToWord('R', 'O')
+#define FIELD_VISIBLE     msgFieldToWord('V', 'I')
 #define FIELD_PARENT      msgFieldToWord('P', 'I')
 #define FIELD_ANALOG_MAX  msgFieldToWord('A', 'M')
 #define FIELD_ANALOG_OFF  msgFieldToWord('A', 'O')

@@ -48,8 +48,10 @@ const AnalogMenuInfo PROGMEM minfoDecimalTens = { "DecimalTens", 4, 28, 1000, NO
 AnalogMenuItem menuDecimalTens(&minfoDecimalTens, 0, &menuLargeNum);
 const AnalogMenuInfo PROGMEM minfoInteger = { "Integer", 3, 4, 1000, onInteger, 100, 1, "" };
 AnalogMenuItem menuInteger(&minfoInteger, 0, &menuDecimalTens);
+const BooleanMenuInfo PROGMEM minfoHiddenItem = { "Hidden item", 13, 0xFFFF, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
+BooleanMenuItem menuHiddenItem(&minfoHiddenItem, false, &menuInteger);
 const AnalogMenuInfo PROGMEM minfoAnalog1 = { "Analog1", 2, 2, 255, onAnalog1, -180, 2, "dB" };
-AnalogMenuItem menuAnalog1(&minfoAnalog1, 0, &menuInteger);
+AnalogMenuItem menuAnalog1(&minfoAnalog1, 0, &menuHiddenItem);
 RENDERING_CALLBACK_NAME_INVOKE(fnTimeRtCall, timeItemRenderFn, "Time", 8, NO_CALLBACK)
 TimeFormattedMenuItem menuTime(fnTimeRtCall, 1, (MultiEditWireType)EDITMODE_TIME_12H, &menuAnalog1);
 
@@ -57,12 +59,13 @@ TimeFormattedMenuItem menuTime(fnTimeRtCall, 1, (MultiEditWireType)EDITMODE_TIME
 // Set up code
 
 void setupMenu() {
+    menuHiddenItem.setVisible(false);
+    menuConnectivity.setSecured(true);
+    menuConnectivity.setLocalOnly(true);
+
     lcd.setIoAbstraction(io23017);
     lcd.begin(20, 4);
     switches.initialise(io23017, true);
     menuMgr.initForEncoder(&renderer, &menuTime, 6, 7, 5);
     remoteServer.begin(&server, &applicationInfo);
-
-    menuConnectivity.setSecured(true);
-    menuConnectivity.setLocalOnly(true);
 }

@@ -71,15 +71,6 @@ void fastltoa_mv(char* str, long val, long divisor, char padChar, int len) {
     str[i] = (char)0;
 }
 
-uint8_t itemCount(MenuItem* item) {
-	uint8_t count = 0;
-	while (item) {
-		++count;
-		item = item->getNext();
-	}
-	return count;
-}
-
 #if defined __AVR__ || defined ESP_H
 char szGlobalBuffer[16];
 #endif
