@@ -21,6 +21,8 @@ enum MenuEditingKeyMode: byte {
 	KEYEDIT_MULTIEDIT_INT_START = 100,
 };
 
+class EditableLargeNumberMenuItem;
+
 /**
  * An implementation of the key listener that can be used with TcMenu to edit menu items and control
  * the menu. When not in edit mode, the keyboard 0-9 keys can be used to select menu items. Pressing
@@ -50,6 +52,7 @@ private:
 	void processAnalogKeyPress(AnalogMenuItem* item, char key);
 	void processMultiEditKeyPress(TextMenuItem* item, char key);
 	void processIntegerMultiEdit(EditableMultiPartMenuItem<byte[4]>* item, char key);
+    void processLargeNumberPress(EditableLargeNumberMenuItem*, char key);
 	void clearState();
 };
 

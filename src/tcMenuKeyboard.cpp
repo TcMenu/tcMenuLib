@@ -6,6 +6,7 @@
 #include "BaseRenderers.h"
 #include "tcMenuKeyboard.h"
 #include <IoLogging.h>
+#include "EditableLargeNumberMenuItem.h"
 
 /**
  * this makes the index based selections feel more natural
@@ -38,6 +39,10 @@ void MenuEditingKeyListener::keyPressed(char key, bool held) {
 		else if (editor->getMenuType() == MENUTYPE_TEXT_VALUE) {
 			processMultiEditKeyPress(reinterpret_cast<TextMenuItem*>(editor), key);
 		}
+        else if (editor->getMenuType() == MENUTYPE_LARGENUM_VALUE) {
+			processLargeNumberPress(reinterpret_cast<EditableLargeNumberMenuItem*>(editor), key);
+
+        }
 		else if (isMenuRuntimeMultiEdit(editor)) {
 			processIntegerMultiEdit(reinterpret_cast<EditableMultiPartMenuItem<byte[4]>*>(editor), key);
 		}
@@ -154,6 +159,17 @@ void MenuEditingKeyListener::processAnalogKeyPress(AnalogMenuItem* item, char ke
 	}
 	serdebugF3("Setting to ", currentValue.whole, currentValue.fraction);
 	item->setFromWholeAndFraction(currentValue);
+}
+
+void MenuEditingKeyListener::processLargeNumberPress(EditableLargeNumberMenuItem* item, char key) {
+    if(key >= '0' && key <= '9') {
+        item->valueChanged(key - '0');
+        if (!item->nextPart()) {
+            clearState();
+            item->setEditing(false);
+        }        
+    }
+
 }
 
 void MenuEditingKeyListener::processMultiEditKeyPress(TextMenuItem* item, char key) {
