@@ -144,16 +144,16 @@ void MenuManager::actionOnCurrentItem(MenuItem* toEdit) {
 	// if there's a new item specified in toEdit, it means we need to change
 	// the current editor (if it's possible to edit that value)
 	if (toEdit->getMenuType() == MENUTYPE_SUB_VALUE) {
-		if (toEdit->getMenuType() == MENUTYPE_SUB_VALUE && toEdit->isSecured() && authenticationManager != NULL) {
+	    SubMenuItem* subMenu = reinterpret_cast<SubMenuItem*>(toEdit);
+		if (subMenu->isSecured() && authenticationManager != NULL) {
 			serdebugF2("Submenu is secured: ", toEdit->getId());
-			SubMenuItem* subMenu = reinterpret_cast<SubMenuItem*>(toEdit);
 			SecuredMenuPopup* popup = secureMenuInstance();
 			popup->start(subMenu);
 			currentRoot = popup->getRootItem();
 			baseRenderer->prepareNewSubmenu();
 		}
 		else {
-			menuMgr.setCurrentMenu(toEdit);
+			menuMgr.setCurrentMenu(subMenu->getChild());
 		}
 	}
 	else if (toEdit->getMenuType() == MENUTYPE_RUNTIME_LIST) {
@@ -273,10 +273,6 @@ void MenuManager::setCurrentMenu(MenuItem * theItem) {
 	getParentAndReset();
 
 	MenuItem* root = theItem;
-	if (theItem->getMenuType() == MENUTYPE_SUB_VALUE) {
-		SubMenuItem* subMenu = reinterpret_cast<SubMenuItem*>(theItem);
-		root = subMenu->getChild();
-	}
 	currentRoot = root;
 	root->setActive(true);
 	baseRenderer->prepareNewSubmenu();

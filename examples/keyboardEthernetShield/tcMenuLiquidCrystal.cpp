@@ -23,6 +23,7 @@ LiquidCrystalRenderer::LiquidCrystalRenderer(LiquidCrystal& lcd, uint8_t dimX, u
 	this->forwardChar = '>';
 	this->editChar = '=';
     this->drewTitleThisTime = false;
+    this->titleRequired = true;
 }
 
 void LiquidCrystalRenderer::initialise() {
@@ -123,7 +124,7 @@ void LiquidCrystalRenderer::render() {
 	else {
 		MenuItem* item = menuMgr.getCurrentMenu();
 
-        bool titleNeeded = menuMgr.getCurrentMenu() == menuMgr.getRoot();
+        bool titleNeeded = titleRequired && menuMgr.getCurrentMenu() == menuMgr.getRoot();
 
 		// first we find the first currently active item in our single linked list
         int activeOffs = offsetOfCurrentActive(item);

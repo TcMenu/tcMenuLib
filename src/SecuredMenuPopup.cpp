@@ -46,7 +46,7 @@ int secPopupActionRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode
 	case RENDERFN_INVOKE:
 		if(act->getSecuredItem() != NULL) {
 			if (menuMgr.secureMenuInstance()->doesPinMatch()) {
-				menuMgr.setCurrentMenu(act->getSecuredItem());
+				menuMgr.setCurrentMenu(act->getSecuredItem()->getChild());
 			}
 			else {
 				BaseDialog* dlg = menuMgr.getRenderer()->getDialog();

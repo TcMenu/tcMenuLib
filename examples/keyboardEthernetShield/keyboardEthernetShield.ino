@@ -87,6 +87,8 @@ void setup() {
 	menuRemoteMonitor.addConnector(remoteServer.getRemoteConnector(0));
 	menuAuthKeyMgr.setLocalOnly(true);    
 
+    renderer.setTitleRequired(false);
+
 	setupMenu();
 
 	setupKeyboard();
