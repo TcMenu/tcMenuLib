@@ -22,7 +22,7 @@ extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app inf
 
 // Global variables that need exporting
 
-extern U8G2_SSD1306_128X64_NONAME_F_SW_I2C gfx;
+extern U8G2_SH1106_128X64_NONAME_F_SW_I2C gfx;
 extern U8g2GfxMenuConfig gfxConfig;
 extern U8g2MenuRenderer renderer;
 extern IoAbstractionRef io8574;
@@ -37,6 +37,7 @@ extern IpAddressMenuItem menuIpAddress;
 extern TextMenuItem menuPwd;
 extern TextMenuItem menuSSID;
 extern SubMenuItem menuConnectivity;
+extern BooleanMenuItem menuSecretEntry;
 void CALLBACK_FUNCTION onSaveAll(int id);
 extern ActionMenuItem menuSaveAll;
 void CALLBACK_FUNCTION onWindowOpening(int id);

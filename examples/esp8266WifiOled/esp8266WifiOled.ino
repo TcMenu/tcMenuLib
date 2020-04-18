@@ -41,13 +41,14 @@
 // the width and height of the attached OLED display.
 #define OLED_WIDTH 128
 #define OLED_HEIGHT 64
+
 //
-// We create an adafruit 1306 display driver and also the tcMenu display configuration options
+// We create a U8G2 1306 / 1106 display driver that gets used by tcMenu
 //
 #ifdef ESP32 
 U8G2_SSD1306_128X64_NONAME_F_SW_I2C gfx(U8G2_R0, 15, 4, 16);
 #else 
-U8G2_SSD1306_128X64_NONAME_F_SW_I2C gfx(U8G2_R0, 5, 4);
+U8G2_SH1106_128X64_NONAME_F_SW_I2C gfx(U8G2_R0, 5, 4);
 #endif
 
 //

@@ -30,8 +30,10 @@ const SubMenuInfo PROGMEM minfoConnectivity = { "Connectivity", 9, 0xFFFF, 0, NO
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NO_CALLBACK)
 BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuSSID);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL);
+const BooleanMenuInfo PROGMEM minfoSecretEntry = { "Secret Entry", 13, 0xFFFF, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
+BooleanMenuItem menuSecretEntry(&minfoSecretEntry, false, NULL);
 const AnyMenuInfo PROGMEM minfoSaveAll = { "Save All", 8, 0xFFFF, 0, onSaveAll };
-ActionMenuItem menuSaveAll(&minfoSaveAll, NULL);
+ActionMenuItem menuSaveAll(&minfoSaveAll, &menuSecretEntry);
 const char enumStrWinOpening_0[] PROGMEM  = "NARROW";
 const char enumStrWinOpening_1[] PROGMEM  = "WIDE";
 const char* const enumStrWinOpening[] PROGMEM  = { enumStrWinOpening_0, enumStrWinOpening_1 };
@@ -60,16 +62,16 @@ AnalogMenuItem menuTomatoTemp(&minfoTomatoTemp, 0, &menuCucumberTemp);
 // Set up code
 
 void setupMenu() {
+    menuTomatoTemp.setReadOnly(true);
+    menuCucumberTemp.setReadOnly(true);
+    menuSecretEntry.setVisible(false);
+    menuSSID.setLocalOnly(true);
+    menuPwd.setLocalOnly(true);
+    menuIpAddress.setReadOnly(true);
+
     prepareBasicU8x8Config(gfxConfig);
     renderer.setGraphicsDevice(&gfx, &gfxConfig);
     switches.initialise(io8574, true);
     menuMgr.initForEncoder(&renderer, &menuTomatoTemp, 0, 1, 2);
     remoteServer.begin(&server, &applicationInfo);
-
-    menuTomatoTemp.setReadOnly(true);
-    menuCucumberTemp.setReadOnly(true);
-    menuSaveAll.setLocalOnly(true);
-    menuSSID.setLocalOnly(true);
-    menuPwd.setLocalOnly(true);
-    menuIpAddress.setReadOnly(true);
 }

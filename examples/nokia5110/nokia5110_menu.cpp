@@ -62,12 +62,12 @@ AnalogMenuItem menuHall(&minfoHall, 0, &menuLiving);
 // Set up code
 
 void setupMenu() {
+    menuConnectivity.setSecured(true);
+    menuConnectivity.setLocalOnly(true);
+
     prepareAdaMonoGfxConfigLoRes(&gfxConfig);
     renderer.setGraphicsDevice(&gfx, &gfxConfig);
     switches.initialise(ioUsingArduino(), true);
     menuMgr.initForEncoder(&renderer, &menuHall, 2, 3, A3);
     remoteServer.begin(&server, &applicationInfo);
-
-    menuConnectivity.setSecured(true);
-    menuConnectivity.setLocalOnly(true);
 }

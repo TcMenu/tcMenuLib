@@ -1,11 +1,11 @@
 {
   "lastEdited": {
-    "seconds": 1584187745,
+    "seconds": 1587049284,
     "nanos": 0
   },
   "codeOptions": {
     "applicationUUID": "fddaa423-cb5c-4024-8f67-a9742f4457f3",
-    "applicationName": "Super Toaster",
+    "applicationName": "Simple U8G2 Toaster",
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
     "lastDisplayUuid": "8646497b-1427-415f-8020-1260a1fef57d",
     "lastRemoteUuid": "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb",

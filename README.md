@@ -2,27 +2,52 @@
 
 ## Summary
 
-TcMenuLib is the Arduino menu library for part of tcMenu, that supports different displays, remote control using a simple protocol over Ethernet and Serial, a 
-Java API and rotary encoder or switch input. Target platform is anything from Arduino Uno upward. Tested on ATMEGA328 (Uno), Mega2560 and SAMD (MKR1300).
+TcMenu is a modular, IoT ready menu library for the Arduino platform, it uses plugins to support many displays, input devices and provides remote control using a simple protocol over Ethernet and Serial. Target platform is anything from Arduino Uno upward. Tested on ATMEGA328 (Uno), Mega2560, SAMD (MKR1300) and ESP8266/ESP32 boards. Note that this repository contains just the Arduino library to meet the requirements in the Arduino specification. For the main repository see the links below.
 
-This is the Arduino library part of the package, it also comes with a Java designer and Java API. You can get the whole lot packaged from the URL below, it is recommended to use this with the designer.
+* [TcMenu main repo](https://github.com/davetcc/tcMenu)
+* [TcMenu main page at TheCodersCorner website](https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/)
 
-* [TcMenuAPI, Designer UI and Example UI](https://github.com/davetcc/tcMenu)
-* [TCC Community forum](https://www.thecoderscorner.com/jforum/)
+## Tested Configurations
 
-## Installation
+We test each release of the software on a wide range of hardware. Here's what's tested with nearly every release. Our tests include generating the menu for each of the boards, compiling, uploading and testing on device, then testing remote control against the latest embedCONTROL UI.
 
-This is the native library that goes along with tcMenu. It's in a separate repository because of the way that Arduino libraries need to be packaged. Install by unzipping into the Arduino/libraries directory and rename the folder to tcMenu. You can also get the full package with generator UI and examples, see below. This library depends upon:
+* MKR 1300, MKR Ethernet Shield, AdaFruit_GFX ST7735 and IL, Rotary Encoder connected to PCF8574, i2c EEPROM
+* MEGA 2560, DF Robot shield for input and output. Internal EEPROM
+* MEGA 2560, Nokia 5110, Rotary Encoder, UIP Ethernet, Bluetooth Serial Module. Internal EEPROM
+* MEGA 2560, Matrix keyboard, Rotary Encoder on MCP23017, display 20x4 sharing MCP23017, i2c EEPROM 
+* ESP8266, OLED SSD1106 display, rotary encoder on PCF8574, ESP WiFi remote using DHCP.
+* ESP32, OLED SSD1306 display, minimal input, ESP WiFi remote using DHCP. (Heltek WiFi Kit 32)
 
-* IoAbstraction [https://github.com/davetcc/IoAbstraction] in all cases.
-* LiquidCrystalIO fork [https://github.com/davetcc/LiquidCrystalIO] that supports task manager when using the LiquidCrystal support.
+## Arduino Library Installation
+
+For most people, the best way to proceed is via library manager from Arduino IDE. Simply choose tcMenu and this will include it's core dependencies (IoAbstraction and LiquidCrystalIO). The only additions you'll need are:
+
 * Adafruit_GFX if you are using the Adafruit graphics driver.
+* U8G2 if you are using the U8G2 driver.
+* UIP Ethernet, if you are using the UIP driver, take special care that this is GPL licensed.
 
-## Package structure and installation:
+### Installing tcMenu Designer UI, recommended
 
-Usually the best way to get started with tcMenu is to use the TcMenu designer, this is packaged for Windows and Mac, it is also available for Linux.
+For designing menu structures we recommend using the TcMenu Designer which can design your menu in a round trip way, generate the code including the correct plugins for your hardware setup.
 
-If you are manually using tcMenu, without the designer, this page fully documents the types used, along with how to create them.
+* On Windows 10, a hidden *early* access of the app is available in the Windows Store, **expect issues and be gentle, please report anything found on the forum** - https://www.microsoft.com/store/apps/9NHJNH9BCNJN, forum topic for reporting issues https://www.thecoderscorner.com/jforum/posts/list/47.page
+* On MacOS a native app is probably about a month away, in the mean time use the original packaged version below.
+* Windows 7/8 (and MacOS for now), continue to use the original packaged application updated for 1.4.x, we'll keep this version viable for at least the rest of 2020 - https://github.com/davetcc/tcMenu/releases
+
+### Controlling menu items remotely
+
+You can use the embedCONTROL UI (coming soon), Java Example UI and TcMenu Java API (soon TcMenu C# API too) to remotely control your menu design. Connectivity is near automatic, connection establishment and loss detection is managed by the API, and it's quite straightforward to set up authentication. At the moment we support Ethernet2, UipEthernet, most serial devices including bluetooth, ESP8266 WiFi and ESP32 WiFi.
+
+### Manual usage of library, NOT recommended
+
+If you are manually using tcMenu, without the designer, this page fully documents the types used, along with how to create them. Once you've created a menu structure, at this point you will need to include the right plugins. The plugins are hosted in the main repository and each one is documented to some extent in the second link below:
 
 * [Describing the TcMenu type system](https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-menu-item-types-tutorial/)
+* [The core plugins that you can use](https://github.com/davetcc/tcMenu/tree/master/CoreXmlPlugins)
 
+## Asking questions
+
+We try our best to answer all questions in our hosted forum that covers our libraries, we also provide commercial support for companies trying to use our libraries in a commercial design. Further, you can also ask questions related to Arduino in the regular Arduino forum, we try to monitor that on a best efforts basis, please include the library name in the forum topic if you use Arduino forum.
+
+* [TCC Community forum](https://www.thecoderscorner.com/jforum/)
+* [Commercial support](https://www.thecoderscorner.com/jforum/)
