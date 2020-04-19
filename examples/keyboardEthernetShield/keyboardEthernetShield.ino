@@ -87,7 +87,11 @@ void setup() {
 	menuRemoteMonitor.addConnector(remoteServer.getRemoteConnector(0));
 	menuAuthKeyMgr.setLocalOnly(true);    
 
+    // now we turn off the title and change the editor characters
     renderer.setTitleRequired(false);
+    
+    // Here we set the character to be used for back, next and editing for the "cursor".
+    renderer.setEditorChars(0b01111111, 0b01111110, '=');
 
 	setupMenu();
 

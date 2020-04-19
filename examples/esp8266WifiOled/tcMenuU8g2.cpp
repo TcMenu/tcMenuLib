@@ -88,7 +88,6 @@ bool U8g2MenuRenderer::renderWidgets(bool forceDraw) {
 
             serdebugF3("Drawing widget pos,icon: ", xPos, widget->getCurrentState());
             u8g2->setColorIndex(gfxConfig->widgetColor);
-            
 			drawBitmap(xPos, gfxConfig->widgetPadding.top, widget->getWidth(), widget->getHeight(), widget->getCurrentIcon());
 		}
 
