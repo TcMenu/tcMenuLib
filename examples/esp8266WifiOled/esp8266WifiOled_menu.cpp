@@ -13,7 +13,7 @@
 
 // Global variable declarations
 
-const PROGMEM ConnectorLocalInfo applicationInfo = { "Greenhouse", "01b9cb76-c108-4be3-a133-6159f8f1c9c1" };
+const PROGMEM ConnectorLocalInfo applicationInfo = { "ESP8266 Greenhouse", "01b9cb76-c108-4be3-a133-6159f8f1c9c1" };
 U8g2GfxMenuConfig gfxConfig;
 U8g2MenuRenderer renderer;
 WiFiServer server(3333);

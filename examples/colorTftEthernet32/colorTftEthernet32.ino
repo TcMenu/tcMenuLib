@@ -7,6 +7,9 @@
 #include <Fonts/FreeSans9pt7b.h>
 #include <Ethernet.h>
 
+// contains the graphical widget title components.
+#include "stockIcons/wifiAndConnectionIcons16x12.h"
+
 /*
  * Shows how to use adagraphics with a TFT panel and an ethernet module.
  * This is a 32 bit example, which by default targets 32 bit devices.
@@ -52,6 +55,10 @@ float fractionsPerUnit;
 RemoteMenuItem menuRemoteMonitor(1001, 2);
 EepromAuthenicationInfoMenuItem menuAuthKeyMgr(1002, &authManager, &menuRemoteMonitor);
 
+// We add a title widget that shows when a user is connected to the device. Connection icons
+// are in the standard icon set we included at the top.
+TitleWidget connectedWidget(iconsConnection, 2, 16, 12);
+
 //
 // here we provide a completely custom configuration of color and spacing
 //
@@ -60,7 +67,7 @@ void prepareCustomConfiguration() {
     // same standard as CSS. Top, right, bottom, left.
 	makePadding(colorConfig.titlePadding, 6, 3, 6, 3); // top, right, bottom & left
 	makePadding(colorConfig.itemPadding, 3, 3, 3, 3);   // top, right, bottom & left
-	makePadding(colorConfig.widgetPadding, 3, 8, 0, 3);// top, right, bottom & left
+	makePadding(colorConfig.widgetPadding, 6, 8, 0, 3);// top, right, bottom & left
 
     // and then the foreground, background and font of the title
 	colorConfig.bgTitleColor = RGB(50, 100, 200);
@@ -92,6 +99,15 @@ void prepareCustomConfiguration() {
     colorConfig.activeIcon = NULL;
 }
 
+// when there's a change in communication status (client connects for example) this gets called.
+void onCommsChange(CommunicationInfo info) {
+    if(info.remoteNo == 0) {
+        connectedWidget.setCurrentState(info.connected ? 1 : 0);
+    }
+    // this relies on logging in IoAbstraction's ioLogging.h, to turn it on visit the file for instructions.
+    serdebugF4("Comms notify (rNo, con, enum)", info.remoteNo, info.connected, info.errorMode);
+}
+
 void setup() {
     // we are responsible for setting up the initial graphics
     gfx.initR(INITR_BLACKTAB);
@@ -111,6 +127,7 @@ void setup() {
     // In the future, there will be an option to autogenerate these from the designer.
     menuIpAddress.setNext(&menuAuthKeyMgr);
     menuRemoteMonitor.addConnector(remoteServer.getRemoteConnector(0));
+    menuRemoteMonitor.registerCommsNotification(onCommsChange);
     menuAuthKeyMgr.setLocalOnly(true);
 
     // and set up the dac on the 32 bit board.
@@ -127,6 +144,9 @@ void setup() {
     // display. If it's done after initialisation, the menu must be reset by calling
     // menuMgr.setCurrentMenu(getRoot());
     menuHiddenItem.setVisible(false);
+
+    // set up the widget to appear in the title.
+    renderer.setFirstWidget(&connectedWidget);
 
     // set up the menu
     setupMenu();

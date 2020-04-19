@@ -19,15 +19,10 @@
 #include <RemoteAuthentication.h>
 #include <RemoteMenuItem.h>
 #include <MockIoAbstraction.h>
-
-#ifdef ESP32 
-#include <WiFi.h>
-#else
 #include <ESP8266WiFi.h>
-#endif
 
 // contains the graphical widget title components.
-#include "stockIcons/wifiAndConnectionIcons16x10.h"
+#include "stockIcons/wifiAndConnectionIcons16x12.h"
 
 
 // here we define the heater and window pins on the PCF8574
@@ -43,13 +38,10 @@
 #define OLED_HEIGHT 64
 
 //
-// We create a U8G2 1306 / 1106 display driver that gets used by tcMenu
+// We create a U8G2 1106 display driver that gets used by tcMenu
+// Change to your preffered choice of display!
 //
-#ifdef ESP32 
-U8G2_SSD1306_128X64_NONAME_F_SW_I2C gfx(U8G2_R0, 15, 4, 16);
-#else 
 U8G2_SH1106_128X64_NONAME_F_SW_I2C gfx(U8G2_R0, 5, 4);
-#endif
 
 //
 // ESP boards tend to have few pins available for general purpose use, to make things easier
@@ -69,8 +61,8 @@ EepromAuthenticatorManager authManager;
 
 // we add two widgets that show both the connection status and wifi signal strength
 // these are added to the renderer and rendered upon any change.
-TitleWidget connectedWidget(iconsConnection, 2, 16, 10);
-TitleWidget wifiWidget(iconsWifi, 5, 16, 10, &connectedWidget);
+TitleWidget connectedWidget(iconsConnection, 2, 16, 12);
+TitleWidget wifiWidget(iconsWifi, 5, 16, 12, &connectedWidget);
 
 // Here we create two additional menus, that will be added manually to handle the connectivity
 // status and authentication keys. In a future version these will be added to th desinger.
@@ -95,13 +87,13 @@ void onCommsChange(CommunicationInfo info) {
 // here we just start serial for debugging and try to initialise the display and menu
 //
 void setup() {
+    Serial.begin(115200);
     Wire.begin();
 
     // set up the inbuilt ESP rom to use for load and store.
     EEPROM.begin(512);
     eeprom = new ArduinoEEPROMAbstraction(&EEPROM);
 
-    Serial.begin(115200);
 
     // now we enable authentication using EEPROM authentication. Where the EEPROM is
     // queried for authentication requests, and any additional pairs are stored there too.
