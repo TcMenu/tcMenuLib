@@ -7,17 +7,6 @@ TcMenu is a modular, IoT ready menu library for the Arduino platform, it uses pl
 * [TcMenu main repo](https://github.com/davetcc/tcMenu)
 * [TcMenu main page at TheCodersCorner website](https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/)
 
-## Tested Configurations
-
-We test each release of the software on a wide range of hardware. Here's what's tested with nearly every release. Our tests include generating the menu for each of the boards, compiling, uploading and testing on device, then testing remote control against the latest embedCONTROL UI.
-
-* MKR 1300, MKR Ethernet Shield, AdaFruit_GFX ST7735 and IL, Rotary Encoder connected to PCF8574, i2c EEPROM
-* MEGA 2560, DF Robot shield for input and output. Internal EEPROM
-* MEGA 2560, Nokia 5110, Rotary Encoder, UIP Ethernet, Bluetooth Serial Module. Internal EEPROM
-* MEGA 2560, Matrix keyboard, Rotary Encoder on MCP23017, display 20x4 sharing MCP23017, i2c EEPROM 
-* ESP8266, OLED SSD1106 display, rotary encoder on PCF8574, ESP WiFi remote using DHCP.
-* ESP32, OLED SSD1306 display, minimal input, ESP WiFi remote using DHCP. (Heltek WiFi Kit 32)
-
 ## Arduino Library Installation
 
 For most people, the best way to proceed is via library manager from Arduino IDE. Simply choose tcMenu and this will include it's core dependencies (IoAbstraction and LiquidCrystalIO). The only additions you'll need are:
@@ -30,9 +19,20 @@ For most people, the best way to proceed is via library manager from Arduino IDE
 
 For designing menu structures we recommend using the TcMenu Designer which can design your menu in a round trip way, generate the code including the correct plugins for your hardware setup.
 
-* On Windows 10, a hidden *early* access of the app is available in the Windows Store, **expect issues and be gentle, please report anything found on the forum** - https://www.microsoft.com/store/apps/9NHJNH9BCNJN, forum topic for reporting issues https://www.thecoderscorner.com/jforum/posts/list/47.page
+* On Windows 10, an *early* access of the app is available in the Windows Store, **expect issues and be gentle, please report anything found on the forum** - https://www.microsoft.com/store/apps/9NHJNH9BCNJN, forum topic for reporting issues https://www.thecoderscorner.com/jforum/posts/list/47.page
 * On MacOS a native app is probably about a month away, in the mean time use the original packaged version below.
-* Windows 7/8 (and MacOS for now), continue to use the original packaged application updated for 1.4.x, we'll keep this version viable for at least the rest of 2020 - https://github.com/davetcc/tcMenu/releases
+* Linux, Windows 7/8 (and MacOS for now), continue to use the original packaged application updated for 1.4.x - https://github.com/davetcc/tcMenu/releases
+
+## Tested Configurations
+
+We test each release of the software on a wide range of hardware. Here's what's tested with nearly every release. Our tests include generating the menu for each of the boards, compiling, uploading and testing on device, then testing remote control against the latest embedCONTROL UI.
+
+* MKR 1300, MKR Ethernet Shield, AdaFruit_GFX ST7735 and IL, Rotary Encoder connected to PCF8574, i2c EEPROM
+* MEGA 2560, DF Robot shield for input and output. Internal EEPROM
+* MEGA 2560, Nokia 5110, Rotary Encoder, UIP Ethernet, Bluetooth Serial Module. Internal EEPROM
+* MEGA 2560, Matrix keyboard, Rotary Encoder on MCP23017, display 20x4 sharing MCP23017, i2c EEPROM 
+* ESP8266, OLED SSD1106 display, rotary encoder on PCF8574, ESP WiFi remote using DHCP.
+* ESP32, OLED SSD1306 display, minimal input, ESP WiFi remote using DHCP. (Heltek WiFi Kit 32)
 
 ### Controlling menu items remotely
 
