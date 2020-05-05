@@ -50,5 +50,5 @@ If you are manually using tcMenu, without the designer, this page fully document
 We try our best to answer all questions in our hosted forum that covers our libraries, we also provide commercial support for companies trying to use our libraries in a commercial design. Further, you can also ask questions related to Arduino in the regular Arduino forum, we try to monitor that on a best efforts basis, please include the library name in the forum topic if you use Arduino forum.
 
 * [TCC Community forum](https://www.thecoderscorner.com/jforum/)
-* [Commercial support](https://www.thecoderscorner.com/jforum/)
+* [Commercial support](https://www.thecoderscorner.com/all-contact)
 * I also monitor the Arduino forum [https://forum.arduino.cc/], Arduino related questions can be asked there too, please make sure the library name is in the subject.
