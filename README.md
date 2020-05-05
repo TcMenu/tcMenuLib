@@ -51,3 +51,4 @@ We try our best to answer all questions in our hosted forum that covers our libr
 
 * [TCC Community forum](https://www.thecoderscorner.com/jforum/)
 * [Commercial support](https://www.thecoderscorner.com/jforum/)
+* I also monitor the Arduino forum [https://forum.arduino.cc/], Arduino related questions can be asked there too, please make sure the library name is in the subject.
