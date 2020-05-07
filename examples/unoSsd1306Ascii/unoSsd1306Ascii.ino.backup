@@ -1,0 +1,19 @@
+#include "src/unoSsd1306Ascii_menu.h"
+
+SSD1306AsciiWire oled;
+
+#define I2C_ADDRESS 0x3C
+
+void setup() {
+    Wire.begin();
+    Serial.begin(115200);
+    oled.begin(&SH1106_128x64, I2C_ADDRESS);
+
+    setupMenu();
+}
+
+void loop() {
+    taskManager.runLoop();
+
+}
+
