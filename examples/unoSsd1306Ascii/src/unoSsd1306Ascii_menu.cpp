@@ -18,6 +18,7 @@ SSD1306AsciiRenderer renderer(20, Arial14, System5x7);
 
 // Global Menu Item declarations
 
+ListRuntimeMenuItem menuListItem(11, 10, fnListItemRtCall, NULL);
 const AnalogMenuInfo PROGMEM minfoStatusTemprature = { "Temprature", 9, 0xFFFF, 255, NO_CALLBACK, -40, 2, "C" };
 AnalogMenuItem menuStatusTemprature(&minfoStatusTemprature, 0, NULL);
 const FloatMenuInfo PROGMEM minfoStatusVoltageIn = { "Voltage In", 8, 0xFFFF, 0, NO_CALLBACK };
@@ -27,7 +28,7 @@ FloatMenuItem menuStatusPowerUse(&minfoStatusPowerUse, &menuStatusVoltageIn);
 const SubMenuInfo PROGMEM minfoStatus = { "Status", 6, 0xFFFF, 0, NO_CALLBACK };
 RENDERING_CALLBACK_NAME_INVOKE(fnStatusRtCall, backSubItemRenderFn, "Status", -1, NO_CALLBACK)
 BackMenuItem menuBackStatus(fnStatusRtCall, &menuStatusPowerUse);
-SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, NULL);
+SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuListItem);
 const AnyMenuInfo PROGMEM minfoPressMe = { "Press me", 10, 0xFFFF, 0, onActionPressed };
 ActionMenuItem menuPressMe(&minfoPressMe, &menuStatus);
 const BooleanMenuInfo PROGMEM minfoStandby = { "Standby", 5, 10, 1, NO_CALLBACK, NAMING_YES_NO };

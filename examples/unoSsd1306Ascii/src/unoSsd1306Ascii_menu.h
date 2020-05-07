@@ -13,6 +13,7 @@
 
 #include <tcMenu.h>
 #include <SSD1306Ascii.h>
+#include <RuntimeMenuItem.h>
 #include <SSD1306AsciiAvrI2c.h>
 #include "ssd1306asciiRenderer.h"
 #include <RemoteConnector.h>
@@ -31,6 +32,8 @@ extern SSD1306AsciiRenderer renderer;
 
 // Global Menu Item exports
 
+int fnListItemRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize);
+extern ListRuntimeMenuItem menuListItem;
 extern AnalogMenuItem menuStatusTemprature;
 extern FloatMenuItem menuStatusVoltageIn;
 extern FloatMenuItem menuStatusPowerUse;
