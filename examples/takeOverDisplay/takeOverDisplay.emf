@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1584199064,
+    "seconds": 1589221216,
     "nanos": 0
   },
   "codeOptions": {
@@ -110,7 +110,7 @@
       }
     ]
   },
-  "projectName": "Example showing how to take over the display, LCD 20x4 and Encoder on MCP23017, Ethernet 2 control",
+  "projectName": "C:\\Users\\dave\\Documents\\Arduino\\libraries\\tcMenu\\examples\\takeOverDisplay\\takeOverDisplay.emf",
   "namingRecursive": true,
   "version": "1.00",
   "items": [

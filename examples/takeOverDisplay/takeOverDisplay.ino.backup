@@ -5,6 +5,9 @@
 #include <RemoteAuthentication.h>
 #include <RemoteMenuItem.h>
 
+// contains the graphical widget title components.
+#include "stockIcons/wifiAndConnectionIconsLCD.h"
+
 /**
  * This TcMenu example shows how to take over the display for your own purposes from a menu item.
  * It also shows how to use the dialog facilities to locally show an information dialog and also a
@@ -40,6 +43,21 @@ EepromAuthenticatorManager authManager;
 RemoteMenuItem menuRemoteMonitor(1001, 2);
 EepromAuthenicationInfoMenuItem menuAuthKeyMgr(1002, &authManager, &menuRemoteMonitor);
 
+// We add a title widget that shows when a user is connected to the device. Connection icons
+// are in the standard icon set we included at the top.
+// Yes even on LCD we now support title widgets, but they eat up a few of your custom chars.
+TitleWidget connectedWidget(iconsConnection, 2, 16, 12);
+
+
+// when there's a change in communication status (client connects for example) this gets called.
+void onCommsChange(CommunicationInfo info) {
+    if(info.remoteNo == 0) {
+        connectedWidget.setCurrentState(info.connected ? 1 : 0);
+    }
+    // this relies on logging in IoAbstraction's ioLogging.h, to turn it on visit the file for instructions.
+    serdebugF4("Comms notify (rNo, con, enum)", info.remoteNo, info.connected, info.errorMode);
+}
+
 void setup() {
     //
     // If you are using serial (connectivity or logging) and wire they must be initialised 
@@ -72,6 +90,7 @@ void setup() {
     // In the future, there will be an option to autogenerate these from the designer.
     menuConnectivityIPAddress.setNext(&menuAuthKeyMgr);
     menuRemoteMonitor.addConnector(remoteServer.getRemoteConnector(0));
+    menuRemoteMonitor.registerCommsNotification(onCommsChange);
     menuAuthKeyMgr.setLocalOnly(true);
 
     // here we use the EEPROM to load back the last set of values.
@@ -82,6 +101,9 @@ void setup() {
     byte* rawIp = menuConnectivityIPAddress.getIpAddress();
     IPAddress ip(rawIp[0], rawIp[1], rawIp[2], rawIp[3]);
     Ethernet.begin(mac, ip);
+
+    // Here we add a widget to the display, it will display connected status.
+    renderer.setFirstWidget(&connectedWidget);
 
     // this is put in by the menu designer and must be called (always ensure devices are setup first).
     setupMenu();
@@ -257,6 +279,11 @@ void CALLBACK_FUNCTION onChangePin(int id) {
 		serdebugF2("Pin changed to ", sz);
 	}
 }
+
+
+
+
+
 
 
 

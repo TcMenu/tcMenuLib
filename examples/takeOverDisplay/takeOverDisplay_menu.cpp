@@ -59,15 +59,15 @@ TimeFormattedMenuItem menuTime(fnTimeRtCall, 13, (MultiEditWireType)EDITMODE_TIM
 // Set up code
 
 void setupMenu() {
-    lcd.setIoAbstraction(io23017);
-    lcd.begin(20, 4);
-    switches.initialise(io23017, true);
-    menuMgr.initForEncoder(&renderer, &menuTime, 6, 7, 5);
-    remoteServer.begin(&server, &applicationInfo);
-
     menuText.setReadOnly(true);
     menuInfoDialog.setLocalOnly(true);
     menuConnectivity.setSecured(true);
     menuConnectivity.setLocalOnly(true);
     menuSettingsSaveSettings.setLocalOnly(true);
+
+    lcd.setIoAbstraction(io23017);
+    lcd.begin(20, 4);
+    switches.initialise(io23017, true);
+    menuMgr.initForEncoder(&renderer, &menuTime, 6, 7, 5);
+    remoteServer.begin(&server, &applicationInfo);
 }

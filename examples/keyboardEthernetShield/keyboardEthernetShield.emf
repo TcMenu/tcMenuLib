@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1587313254,
+    "seconds": 1589221513,
     "nanos": 0
   },
   "codeOptions": {
@@ -13,36 +13,6 @@
     "namingRecursive": true,
     "saveToSrc": false,
     "lastProperties": [
-      {
-        "name": "PULLUP_LOGIC",
-        "latestValue": "true",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "INTERRUPT_SWITCHES",
-        "latestValue": "false",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "SWITCH_IODEVICE",
-        "latestValue": "io23017",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "ENCODER_PIN_A",
-        "latestValue": "6",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "ENCODER_PIN_B",
-        "latestValue": "7",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "ENCODER_PIN_OK",
-        "latestValue": "5",
-        "subsystem": "INPUT"
-      },
       {
         "name": "LCD_WIDTH",
         "latestValue": "20",
@@ -99,6 +69,36 @@
         "subsystem": "DISPLAY"
       },
       {
+        "name": "PULLUP_LOGIC",
+        "latestValue": "true",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "INTERRUPT_SWITCHES",
+        "latestValue": "false",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SWITCH_IODEVICE",
+        "latestValue": "io23017",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_A",
+        "latestValue": "6",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_B",
+        "latestValue": "7",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_OK",
+        "latestValue": "5",
+        "subsystem": "INPUT"
+      },
+      {
         "name": "LIBRARY_TYPE",
         "latestValue": "ETHERNET_2",
         "subsystem": "REMOTE"
@@ -110,7 +110,7 @@
       }
     ]
   },
-  "projectName": "Uses a 20x4 display and encoder connected to MCP23017, matrix keyboard and Ethernet2",
+  "projectName": "C:\\Users\\dave\\Documents\\Arduino\\libraries\\tcMenu\\examples\\keyboardEthernetShield\\keyboardEthernetShield.emf",
   "namingRecursive": true,
   "version": "1.00",
   "items": [

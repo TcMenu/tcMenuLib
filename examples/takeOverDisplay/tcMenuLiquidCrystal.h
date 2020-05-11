@@ -34,12 +34,14 @@ private:
 	uint8_t forwardChar;
 	uint8_t editChar;
     bool drewTitleThisTime;
+    bool titleRequired;
 public:
 
 	LiquidCrystalRenderer(LiquidCrystal& lcd, uint8_t dimX, uint8_t dimY);
 	virtual ~LiquidCrystalRenderer();
 	void render() override;
     void initialise() override;
+    void setTitleRequired(bool titleRequired) { this->titleRequired = titleRequired; }
 
 	void setEditorChars(char back, char forward, char edit);
 
