@@ -254,7 +254,7 @@ void AdaFruitGfxMenuRenderer::renderMenuItem(int yPos, int menuHeight, MenuItem*
 
     if(isItemActionable(item)) {
         int rightOffset = graphics->width() - (gfxConfig->itemPadding.right + icoWid);
-		graphics->drawXBitmap(rightOffset, imgMiddleY, gfxConfig->activeIcon, icoWid, icoHei, gfxConfig->fgSelectColor);        
+		graphics->drawXBitmap(rightOffset, imgMiddleY, gfxConfig->activeIcon, icoWid, icoHei, gfxConfig->fgSelectColor);
         buffer[0] = 0;
     }
     else if(item->getMenuType() == MENUTYPE_BACK_VALUE) {

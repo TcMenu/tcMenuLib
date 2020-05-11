@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1585206986,
+    "seconds": 1589220779,
     "nanos": 0
   },
   "codeOptions": {
@@ -75,7 +75,7 @@
       }
     ]
   },
-  "projectName": "SAMD/MKR Adafruit_GFX TFT display, rotary encoder, ethernet capability.",
+  "projectName": "C:\\Users\\dave\\Documents\\Arduino\\libraries\\tcMenu\\examples\\colorTftEthernet32\\colorTftEthernet.emf",
   "namingRecursive": false,
   "version": "1.00",
   "items": [

@@ -1,1 +1,243 @@
-{"version":"1.00","projectName":"C:\\Users\\dave\\Documents\\Arduino\\libraries\\tcMenu\\examples\\unoSsd1306Ascii\\unoSsd1306Ascii.emf","author":"dave","lastEdited":{"seconds":1589219421,"nanos":231962700},"namingRecursive":false,"items":[{"parentId":0,"type":"analogItem","item":{"maxValue":100,"offset":0,"divisor":1,"unitName":"%","name":"Brightness","id":1,"eepromAddress":2,"functionName":"","readOnly":false,"localOnly":false,"visible":true}},{"parentId":0,"type":"analogItem","item":{"maxValue":100,"offset":0,"divisor":1,"unitName":"%","name":"Red","id":2,"eepromAddress":4,"readOnly":false,"localOnly":false,"visible":true}},{"parentId":0,"type":"analogItem","item":{"maxValue":100,"offset":0,"divisor":1,"unitName":"%","name":"Green","id":3,"eepromAddress":6,"readOnly":false,"localOnly":false,"visible":true}},{"parentId":0,"type":"analogItem","item":{"maxValue":100,"offset":0,"divisor":1,"unitName":"%","name":"Blue","id":4,"eepromAddress":8,"readOnly":false,"localOnly":false,"visible":true}},{"parentId":0,"type":"boolItem","item":{"naming":"YES_NO","name":"Standby","id":5,"eepromAddress":10,"readOnly":false,"localOnly":false,"visible":true}},{"parentId":0,"type":"actionMenu","item":{"name":"Press me","id":10,"eepromAddress":-1,"functionName":"onActionPressed","readOnly":false,"localOnly":false,"visible":true}},{"parentId":0,"type":"subMenu","item":{"secured":false,"name":"Status","id":6,"eepromAddress":-1,"readOnly":false,"localOnly":false,"visible":true}},{"parentId":6,"type":"floatItem","item":{"numDecimalPlaces":2,"name":"Power Use","id":7,"eepromAddress":-1,"readOnly":true,"localOnly":false,"visible":true}},{"parentId":6,"type":"floatItem","item":{"numDecimalPlaces":0,"name":"Voltage In","id":8,"eepromAddress":-1,"readOnly":true,"localOnly":false,"visible":true}},{"parentId":6,"type":"analogItem","item":{"maxValue":255,"offset":-40,"divisor":2,"unitName":"C","name":"Temprature","id":9,"eepromAddress":-1,"readOnly":true,"localOnly":false,"visible":true}},{"parentId":0,"type":"runtimeList","item":{"initialRows":10,"name":"List Item","id":11,"eepromAddress":-1,"functionName":"","readOnly":false,"localOnly":false,"visible":true}}],"codeOptions":{"embeddedPlatform":"ARDUINO","lastDisplayUuid":"1ec1b247-cc51-49d7-aa5c-dd0d4530751d","lastInputUuid":"6dd87e7d-e751-4912-a70d-91793b1d3d87","lastRemoteUuid":"1e38dc42-672d-4c1c-a393-2c7632bf6c5c","applicationUUID":"c4858c2f-4134-4597-a7a0-b6719631a99b","applicationName":"Uno1306Ascii","lastProperties":[{"name":"DISPLAY_VARIABLE","latestValue":"gfx","subsystem":"DISPLAY"},{"name":"DISPLAY_TYPE","latestValue":"SSD1306AsciiAvrI2c","subsystem":"DISPLAY"},{"name":"CHAR_WIDTH","latestValue":"20","subsystem":"DISPLAY"},{"name":"TITLE_FONT","latestValue":"Arial14","subsystem":"DISPLAY"},{"name":"ITEM_FONT","latestValue":"System5x7","subsystem":"DISPLAY"},{"name":"PULLUP_LOGIC","latestValue":"true","subsystem":"INPUT"},{"name":"INTERRUPT_SWITCHES","latestValue":"false","subsystem":"INPUT"},{"name":"SWITCH_IODEVICE","latestValue":"","subsystem":"INPUT"},{"name":"ENCODER_PIN_A","latestValue":"2","subsystem":"INPUT"},{"name":"ENCODER_PIN_B","latestValue":"3","subsystem":"INPUT"},{"name":"ENCODER_PIN_OK","latestValue":"A3","subsystem":"INPUT"},{"name":"SERIAL_PORT","latestValue":"Serial","subsystem":"REMOTE"}],"namingRecursive":true,"saveToSrc":true}}
+{
+  "lastEdited": {
+    "seconds": 1589219808,
+    "nanos": 0
+  },
+  "codeOptions": {
+    "applicationUUID": "c4858c2f-4134-4597-a7a0-b6719631a99b",
+    "applicationName": "Uno1306Ascii",
+    "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
+    "lastDisplayUuid": "1ec1b247-cc51-49d7-aa5c-dd0d4530751d",
+    "lastRemoteUuid": "1e38dc42-672d-4c1c-a393-2c7632bf6c5c",
+    "embeddedPlatform": "ARDUINO_AVR",
+    "namingRecursive": true,
+    "saveToSrc": true,
+    "lastProperties": [
+      {
+        "name": "PULLUP_LOGIC",
+        "latestValue": "true",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "INTERRUPT_SWITCHES",
+        "latestValue": "false",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SWITCH_IODEVICE",
+        "latestValue": "",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_A",
+        "latestValue": "2",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_B",
+        "latestValue": "3",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_OK",
+        "latestValue": "A3",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "DISPLAY_VARIABLE",
+        "latestValue": "gfx",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_TYPE",
+        "latestValue": "SSD1306AsciiAvrI2c",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "CHAR_WIDTH",
+        "latestValue": "20",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TITLE_FONT",
+        "latestValue": "Arial14",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "ITEM_FONT",
+        "latestValue": "System5x7",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "SERIAL_PORT",
+        "latestValue": "Serial",
+        "subsystem": "REMOTE"
+      }
+    ]
+  },
+  "projectName": "C:\\Users\\dave\\Documents\\Arduino\\libraries\\tcMenu\\examples\\unoSsd1306Ascii\\unoSsd1306Ascii.emf",
+  "namingRecursive": true,
+  "version": "1.00",
+  "items": [
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "name": "Brightness",
+        "eepromAddress": 2,
+        "id": 1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "",
+        "maxValue": 100,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "%"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "name": "Red",
+        "eepromAddress": 4,
+        "id": 2,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 100,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "%"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "name": "Green",
+        "eepromAddress": 6,
+        "id": 3,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 100,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "%"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "name": "Blue",
+        "eepromAddress": 8,
+        "id": 4,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 100,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "%"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "boolItem",
+      "item": {
+        "name": "Standby",
+        "eepromAddress": 10,
+        "id": 5,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "naming": "YES_NO"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "actionMenu",
+      "item": {
+        "name": "Press me",
+        "eepromAddress": -1,
+        "id": 10,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "onActionPressed"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "name": "Status",
+        "eepromAddress": -1,
+        "id": 6,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "secured": false
+      }
+    },
+    {
+      "parentId": 6,
+      "type": "floatItem",
+      "item": {
+        "name": "Power Use",
+        "eepromAddress": -1,
+        "id": 7,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "numDecimalPlaces": 2
+      }
+    },
+    {
+      "parentId": 6,
+      "type": "floatItem",
+      "item": {
+        "name": "Voltage In",
+        "eepromAddress": -1,
+        "id": 8,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "numDecimalPlaces": 0
+      }
+    },
+    {
+      "parentId": 6,
+      "type": "analogItem",
+      "item": {
+        "name": "Temprature",
+        "eepromAddress": -1,
+        "id": 9,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 255,
+        "offset": -40,
+        "divisor": 2,
+        "unitName": "C"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "runtimeList",
+      "item": {
+        "name": "List Item",
+        "eepromAddress": -1,
+        "id": 11,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "",
+        "initialRows": 10
+      }
+    }
+  ]
+}
