@@ -31,6 +31,7 @@ extern LiquidCrystalRenderer renderer;
 
 // Global Menu Item exports
 
+extern AnalogMenuItem menuCommits;
 extern TextMenuItem menuText;
 extern EditableLargeNumberMenuItem menuLgeNum;
 void CALLBACK_FUNCTION onLed2(int id);

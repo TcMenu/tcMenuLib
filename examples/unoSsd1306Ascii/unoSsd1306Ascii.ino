@@ -5,10 +5,15 @@ SSD1306AsciiAvrI2c gfx;
 
 #define I2C_ADDRESS 0x3C
 
+int currentCommits = 0;
+
 void setup() {
     Serial.begin(115200);
     gfx.begin(&SH1106_128x64, I2C_ADDRESS);
     gfx.clear();
+    menuMgr.setItemCommittedHook([](int id) {
+        ++currentCommits;
+    });
     setupMenu();
 }
 
@@ -16,15 +21,16 @@ void loop() {
     taskManager.runLoop();
 }
 
-const char szDialogHeader[] PROGMEM = "You pressed me";
+const char szDialogHeader[] PROGMEM = "Edits Committed";
 
 void CALLBACK_FUNCTION onActionPressed(int id) {
     BaseDialog* dlg = renderer.getDialog();
-    char extraData[10];
-    fastltoa(extraData, menuBrightness.getCurrentValue(), 3, '0', sizeof(extraData));
-    dlg->copyIntoBuffer(extraData);
     dlg->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
     dlg->show(szDialogHeader, true);
+
+    char extraData[10];
+    ltoaClrBuff(extraData, currentCommits, 5, '0', sizeof(extraData));
+    dlg->copyIntoBuffer(extraData);
 }
 
 
@@ -32,19 +38,20 @@ void CALLBACK_FUNCTION onActionPressed(int id) {
 int CALLBACK_FUNCTION fnListItemRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize) {
    switch(mode) {
     case RENDERFN_INVOKE:
-        // TODO - your code to invoke goes here - row is the index of the item
+        // if you wanted to take action on a list item being activated, you'd put the code here.
         return true;
     case RENDERFN_NAME:
-        // TODO - each row has it's own name - 0xff is the parent item
         if(row == 0xff) {
+            // row 0xff is the title row basically, this requests title rendering.
             strcpy(buffer, "My List");
         }
         else {
+            // Any other row is the name of a numbered item
             ltoaClrBuff(buffer, row, 3, NOT_PADDED, bufferSize);
         }
         return true;
     case RENDERFN_VALUE:
-        // TODO - each row can has its own value - 0xff is the parent item
+        // Each row can has its own value - 0xff is the parent item and is probably empty.
         buffer[0] = 'V'; buffer[1]=0;
         fastltoa(buffer, row, 3, NOT_PADDED, bufferSize);
         return true;

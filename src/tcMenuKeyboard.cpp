@@ -181,7 +181,7 @@ void MenuEditingKeyListener::processMultiEditKeyPress(TextMenuItem* item, char k
 }
 
 void MenuEditingKeyListener::clearState() {
-	menuMgr.stopEditingCurrentItem();
+	menuMgr.stopEditingCurrentItem(true);
 	currentEditor = NULL;
 	mode = KEYEDIT_NONE;
 }

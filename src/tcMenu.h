@@ -35,6 +35,7 @@ private:
 	MenuItem* currentEditor;
 	SecuredMenuPopup* securedMenuPopup;
 	AuthenticationManager *authenticationManager;
+    MenuCallbackFn itemCommittedHook;
 
 public:
 	MenuManager() {
@@ -44,6 +45,7 @@ public:
 		this->rootMenu = NULL;
 		this->securedMenuPopup = NULL;
 		this->authenticationManager = NULL;
+        this->itemCommittedHook = NULL;
 	}
 
 	/**
@@ -107,6 +109,14 @@ public:
 	 * @param manager the authentication manager to use for the submenu pin lock.
 	 */
 	void setAuthenticator(AuthenticationManager* manager) { authenticationManager = manager; }
+
+    /**
+     * This is a special callback, one per menu that indicates when a commit has taken place rather
+     * than when there has been a change. It uses the same callback signature as the standard change
+     * callback.
+     * @param commitCallback the callback to be notified when there is a commit event. 
+     */
+    void setItemCommittedHook(MenuCallbackFn commitCallback) { itemCommittedHook = commitCallback; }
 
 	/** 
 	 * called when the rotary encoder has moved to a new position to update the menu
@@ -202,7 +212,7 @@ public:
 	 */
 	SecuredMenuPopup* secureMenuInstance();
 
-	void stopEditingCurrentItem();
+	void stopEditingCurrentItem(bool checkMultiPart);
 protected:
 	void setupForEditing(MenuItem* item);
 	void actionOnCurrentItem(MenuItem * toEdit);

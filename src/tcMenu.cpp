@@ -54,15 +54,11 @@ void MenuManager::performDirectionMove(bool dirIsBack) {
 			switches.changeEncoderPrecision(editorRange, editableItem->getPartValueAsInt());
 		}
         else {
-            currentEditor->setEditing(false);
-            currentEditor->setActive(true);
-            currentEditor = NULL;
+            stopEditingCurrentItem(false);
         }
     }
     else if(currentEditor != NULL) {
-        currentEditor->setEditing(false);
-        currentEditor->setActive(true);
-        currentEditor = NULL;
+        stopEditingCurrentItem(false);
     }
     else if(currentEditor == NULL && dirIsBack) {
         setCurrentMenu(getParentAndReset());
@@ -130,7 +126,7 @@ void MenuManager::onMenuSelect(bool held) {
         }
     }
 	else if (getCurrentEditor() != NULL) {
-		stopEditingCurrentItem();
+		stopEditingCurrentItem(true);
 	}
 	else  {
 		MenuItem* toEdit = findCurrentActive();
@@ -184,9 +180,9 @@ void MenuManager::actionOnCurrentItem(MenuItem* toEdit) {
 	}
 }
 
-void MenuManager::stopEditingCurrentItem() {
+void MenuManager::stopEditingCurrentItem(bool doMultiPartNext) {
 
-	if (isMenuRuntimeMultiEdit(menuMgr.getCurrentEditor())) {
+	if (doMultiPartNext && isMenuRuntimeMultiEdit(menuMgr.getCurrentEditor())) {
 		EditableMultiPartMenuItem<void*>* editableItem = reinterpret_cast<EditableMultiPartMenuItem<void*>*>(menuMgr.getCurrentEditor());
 
 		// unless we've run out of parts to edit, stay in edit mode, moving to next part.
@@ -198,7 +194,10 @@ void MenuManager::stopEditingCurrentItem() {
 	}
 
 	currentEditor->setEditing(false);
-	currentEditor = NULL;
+
+    if(itemCommittedHook) itemCommittedHook(currentEditor->getId());
+	
+    currentEditor = NULL;
 	setItemsInCurrentMenu(itemCount(menuMgr.getCurrentMenu()) - 1, offsetOfCurrentActive(menuMgr.getCurrentMenu()));
 
 	if (renderer->getRendererType() == RENDERER_TYPE_BASE) {

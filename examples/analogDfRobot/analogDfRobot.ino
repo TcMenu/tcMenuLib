@@ -16,6 +16,13 @@ void setup() {
     // Finally we set up back (left) and next (right) functionality.
     menuMgr.setBackButton(DF_KEY_LEFT);
     menuMgr.setNextButton(DF_KEY_RIGHT);
+
+    // This registers a special callback, unlike the usual one, this callback is 
+    // only called when editing is completely finished, you register it once and
+    // it triggers for every menu item.    
+    menuMgr.setItemCommittedHook([](int id) {
+        menuCommits.setCurrentValue(menuCommits.getCurrentValue() + 1);
+    });
 }
 
 void loop() {
