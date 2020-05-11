@@ -43,6 +43,8 @@ AnalogMenuItem menuTideGate1(&minfoTideGate1, 0, &menuTideGate2);
 // Set up code
 
 void setupMenu() {
+
+
     lcd.begin(16, 2);
     lcd.configureBacklightPin(10);
     lcd.backlight();
@@ -55,6 +57,4 @@ void setupMenu() {
             menuMgr.valueChanged(val);
         });
     menuMgr.initWithoutInput(&renderer, &menuTideGate1);
-
-
 }

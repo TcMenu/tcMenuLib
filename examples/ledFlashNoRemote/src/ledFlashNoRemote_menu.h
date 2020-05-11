@@ -6,32 +6,51 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
-*/
+ */
 
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
 
 #include <tcMenu.h>
+
 #include <LiquidCrystalIO.h>
 #include "tcMenuLiquidCrystal.h"
 
-void setupMenu();  // forward reference of the menu setup function.
-extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app info to the linker.
+// all define statements needed
+#define LCD_WIDTH 16
+#define LCD_HEIGHT 2
+#define LCD_EN 9
+#define LCD_RS 8
+#define LCD_D4 4
+#define LCD_D5 5
+#define LCD_D6 6
+#define LCD_D7 7
+#define LCD_BACKLIGHT 10
+#define LCD_PWM_PIN -1
+#define LCD_IO_DEVICE 
+#define PULLUP_LOGIC true
+#define INTERRUPT_SWITCHES false
+#define SWITCH_IODEVICE 
+#define ENCODER_PIN_A 2
+#define ENCODER_PIN_B 3
+#define ENCODER_PIN_OK A3
 
-// Global variables that need exporting
-
+// all variables that need exporting
 extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
+
+// all menu item forward references.
+extern ActionMenuItem menuSaveLEDState;
+extern AnalogMenuItem menuA0Volts;
+extern BooleanMenuItem menuBuiltInLED;
+extern const ConnectorLocalInfo applicationInfo;
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
-// Global Menu Item exports
-
-void CALLBACK_FUNCTION onSaveState(int id);
-extern ActionMenuItem menuSaveLEDState;
-extern AnalogMenuItem menuA0Volts;
 void CALLBACK_FUNCTION onLedChange(int id);
-extern BooleanMenuItem menuBuiltInLED;
+void CALLBACK_FUNCTION onSaveState(int id);
+
+void setupMenu();
 
 #endif // MENU_GENERATED_CODE_H
