@@ -6,29 +6,32 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
- */
+*/
 
 #include <tcMenu.h>
 #include "ledFlashNoRemote_menu.h"
 
 // Global variable declarations
 
+const PROGMEM ConnectorLocalInfo applicationInfo = { "LED Blink", "86bb814a-5b77-45eb-8050-7dba18617635" };
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 LiquidCrystalRenderer renderer(lcd, 16, 2);
 
 // Global Menu Item declarations
 
-const PROGMEM AnyMenuInfo minfoSaveLEDState = { "Save LED state", 3, 0xffff, 0, onSaveState };
+const AnyMenuInfo PROGMEM minfoSaveLEDState = { "Save LED state", 3, 0xFFFF, 0, onSaveState };
 ActionMenuItem menuSaveLEDState(&minfoSaveLEDState, NULL);
-const PROGMEM AnalogMenuInfo minfoA0Volts = { "A0Volts", 2, 0xffff, 1024, NO_CALLBACK, 0, 200, "V" };
+const AnalogMenuInfo PROGMEM minfoA0Volts = { "A0Volts", 2, 0xFFFF, 1024, NO_CALLBACK, 0, 200, "V" };
 AnalogMenuItem menuA0Volts(&minfoA0Volts, 0, &menuSaveLEDState);
-const PROGMEM BooleanMenuInfo minfoBuiltInLED = { "BuiltIn LED", 1, 2, 1, onLedChange, NAMING_ON_OFF };
+const BooleanMenuInfo PROGMEM minfoBuiltInLED = { "BuiltIn LED", 1, 2, 1, onLedChange, NAMING_ON_OFF };
 BooleanMenuItem menuBuiltInLED(&minfoBuiltInLED, false, &menuA0Volts);
-const PROGMEM ConnectorLocalInfo applicationInfo = { "LED Blink", "86bb814a-5b77-45eb-8050-7dba18617635" };
+
 
 // Set up code
 
 void setupMenu() {
+
+
     lcd.setIoAbstraction(ioUsingArduino());
     lcd.begin(16, 2);
     lcd.configureBacklightPin(10);
@@ -36,4 +39,3 @@ void setupMenu() {
     switches.initialise(ioUsingArduino(), true);
     menuMgr.initForEncoder(&renderer, &menuBuiltInLED, 2, 3, A3);
 }
-

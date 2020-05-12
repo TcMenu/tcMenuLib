@@ -40,14 +40,14 @@ AnalogMenuItem menuA0Voltage(&minfoA0Voltage, 0, &menuA1Voltage);
 // Set up code
 
 void setupMenu() {
+    menuA0Voltage.setReadOnly(true);
+    menuA1Voltage.setReadOnly(true);
+    menuA2Voltage.setReadOnly(true);
+
     lcd.begin(16, 2);
     lcd.configureBacklightPin(10);
     lcd.backlight();
     switches.initialise(ioUsingArduino(), true);
     menuMgr.initForEncoder(&renderer, &menuA0Voltage, 2, 3, A3);
     remoteServer.begin(&Serial1, &applicationInfo);
-
-    menuA0Voltage.setReadOnly(true);
-    menuA1Voltage.setReadOnly(true);
-    menuA2Voltage.setReadOnly(true);
 }

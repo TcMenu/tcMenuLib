@@ -13,7 +13,7 @@
 
 // Global variable declarations
 
-const PROGMEM ConnectorLocalInfo applicationInfo = { "Super Toaster", "fddaa423-cb5c-4024-8f67-a9742f4457f3" };
+const PROGMEM ConnectorLocalInfo applicationInfo = { "Simple U8G2 Toaster", "fddaa423-cb5c-4024-8f67-a9742f4457f3" };
 U8g2GfxMenuConfig gfxConfig;
 U8g2MenuRenderer renderer;
 
@@ -42,10 +42,10 @@ AnalogMenuItem menuToasterPower(&minfoToasterPower, 0, &menuType);
 // Set up code
 
 void setupMenu() {
+
+
     prepareBasicU8x8Config(gfxConfig);
     renderer.setGraphicsDevice(&gfx, &gfxConfig);
     switches.initialise(io8574, true);
     menuMgr.initForEncoder(&renderer, &menuToasterPower, 0, 1, 2);
-
-
 }
