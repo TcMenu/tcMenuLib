@@ -132,14 +132,14 @@ enum AckResponseStatus {
  * Defines the types of change that can be received / sent in changes messages, either
  * delta or incremental (for example menuVolume + 3) or absolulte (channel is now 2)
  */
-enum ChangeType: byte {
+enum ChangeType: uint8_t {
 	CHANGE_DELTA = 0, CHANGE_ABSOLUTE = 1, CHANGE_LIST = 2
 };
 
 /**
  * Defines the API platforms that are supported at the moment
  */
-enum ApiPlatform : byte {
+enum ApiPlatform : uint8_t {
 	PLATFORM_ARDUINO_8BIT = 0,
 	PLATFORM_JAVA_API = 1,
     PLATFORM_ARDUINO_32BIT = 2,
@@ -149,7 +149,7 @@ enum ApiPlatform : byte {
 /**
  * Defines the type of heartbeat we are dealing with
  */
-enum HeartbeatMode : byte {
+enum HeartbeatMode : uint8_t {
 	/** During normal operation we send this to continue the connection during idle times */
 	HBMODE_NORMAL = 0,
 	/** At connection start, we wait for this before proceeding */

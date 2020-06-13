@@ -6,6 +6,12 @@
 #ifndef _WIFI_AND_CONNECTION_ICONS_H_
 #define _WIFI_AND_CONNECTION_ICONS_H_
 
+#ifdef __MBED__
+#include <mbed.h>
+#else
+#include <Arduino.h>
+#endif
+
 /**
  * @file wifiAndConnectionIcons16x12.h
  * 

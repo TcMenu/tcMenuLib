@@ -3,7 +3,12 @@
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
+#ifdef __MBED__
+#include <mbed.h>
+#else
 #include <Arduino.h>
+#endif
+
 #include "RemoteMenuItem.h"
 #include "RemoteConnector.h"
 #include "tcUtil.h"

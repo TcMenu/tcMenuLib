@@ -1,4 +1,9 @@
+#ifdef __MBED__
+#include <mbed.h>
+#else
 #include <Arduino.h>
+#endif
+
 #include "GfxMenuConfig.h"
 
 void prepareDefaultGfxConfig(ColorGfxMenuConfig<void*>* config) {

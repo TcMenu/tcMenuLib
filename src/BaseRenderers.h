@@ -38,7 +38,7 @@ bool isItemActionable(MenuItem* item);
  * by renderers to describe the state of the select button. Values should be self explanatory. High
  * compatability with bool for determining if the button is pressed.
  */
-enum RenderPressMode: byte { RPRESS_NONE = 0, RPRESS_PRESSED = 1, RPRESS_HELD = 2 };
+enum RenderPressMode: uint8_t { RPRESS_NONE = 0, RPRESS_PRESSED = 1, RPRESS_HELD = 2 };
 
 /**
  * Used to take over rendering for a period of time. Normally one calls renderer.takeOverDisplay(..) 
@@ -132,7 +132,7 @@ public:
 	void setNext(TitleWidget* next) {this->next = next;}
 };
 
-enum RendererType: byte { RENDER_TYPE_NOLOCAL, RENDERER_TYPE_BASE };
+enum RendererType: uint8_t { RENDER_TYPE_NOLOCAL, RENDERER_TYPE_BASE };
 
 /** 
  * Each display must have a renderer, even if it is the NoRenderer, the NoRenderer is for situations
@@ -194,11 +194,11 @@ public:
  * Used by renderers to determine how significant a redraw is needed at the next redraw interval.
  * They are prioritised in ascending order, so a more complete redraw has a higher number.
  */
-enum MenuRedrawState: byte {
+enum MenuRedrawState: uint8_t {
 	MENUDRAW_NO_CHANGE = 0, MENUDRAW_EDITOR_CHANGE, MENUDRAW_COMPLETE_REDRAW
 };
 
-enum MenuDrawJustification: byte { JUSTIFY_TEXT_LEFT, JUSTIFY_TEXT_RIGHT };
+enum MenuDrawJustification: uint8_t { JUSTIFY_TEXT_LEFT, JUSTIFY_TEXT_RIGHT };
 
 /**
  * A renderer that does nothing, for cases where there's no display

@@ -11,7 +11,12 @@
 #ifndef _TCMENU_REMOTECONNECTOR_H_
 #define _TCMENU_REMOTECONNECTOR_H_
 
+#ifdef __MBED__
+#include <mbed.h>
+#else
 #include <Arduino.h>
+#endif
+
 #include "RemoteTypes.h"
 #include <tcUtil.h>
 #include "MenuItems.h"
@@ -40,7 +45,7 @@
  * around, so it can be processed asynchronously.
  * @see FieldAndValue
  */
-enum FieldValueType : byte {
+enum FieldValueType : uint8_t {
     /** a new message has arrived */
 	FVAL_NEW_MSG,
     /** the end of the present message has been located */

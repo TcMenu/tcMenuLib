@@ -3,7 +3,11 @@
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
+#ifdef __MBED__
+#include <mbed.h>
+#else
 #include <Arduino.h>
+#endif
 #include "tcMenu.h"
 #include "RuntimeMenuItem.h"
 #include "MenuIterator.h"
@@ -12,35 +16,35 @@
 
 MenuManager menuMgr;
 
-void MenuManager::initForUpDownOk(MenuRenderer* renderer, MenuItem* root, uint8_t pinUp, uint8_t pinDown, uint8_t pinOk) {
+void MenuManager::initForUpDownOk(MenuRenderer* renderer, MenuItem* root, pinid_t pinUp, pinid_t pinDown, pinid_t pinOk) {
 	this->renderer = renderer;
 	this->currentRoot = this->rootMenu = root;
 
 	switches.addSwitch(pinOk, NULL);
-    switches.onRelease(pinOk, [](uint8_t /*key*/, bool held) { menuMgr.onMenuSelect(held); }); 
+    switches.onRelease(pinOk, [](pinid_t /*key*/, bool held) { menuMgr.onMenuSelect(held); });
 	setupUpDownButtonEncoder(pinUp, pinDown, [](int value) {menuMgr.valueChanged(value); });
 	renderer->initialise();
 }
 
-void MenuManager::initForEncoder(MenuRenderer* renderer,  MenuItem* root, uint8_t encoderPinA, uint8_t encoderPinB, uint8_t encoderButton) {
+void MenuManager::initForEncoder(MenuRenderer* renderer,  MenuItem* root, pinid_t encoderPinA, pinid_t encoderPinB, pinid_t encoderButton) {
 	this->renderer = renderer;
 	this->currentRoot = this->rootMenu = root;
 
 	switches.addSwitch(encoderButton, NULL);
-    switches.onRelease(encoderButton, [](uint8_t /*key*/, bool held) { menuMgr.onMenuSelect(held); }); 
+    switches.onRelease(encoderButton, [](pinid_t /*key*/, bool held) { menuMgr.onMenuSelect(held); });
 	setupRotaryEncoderWithInterrupt(encoderPinA, encoderPinB, [](int value) {menuMgr.valueChanged(value); });
 
 	renderer->initialise();
 }
 
-void MenuManager::setBackButton(uint8_t backButtonPin) {
-    switches.addSwitch(backButtonPin, [](uint8_t, bool held){
+void MenuManager::setBackButton(pinid_t backButtonPin) {
+    switches.addSwitch(backButtonPin, [](pinid_t, bool held){
         if(!held) menuMgr.performDirectionMove(true);
     });
 }
 
-void MenuManager::setNextButton(uint8_t nextButtonPin) {
-    switches.addSwitch(nextButtonPin, [](uint8_t, bool held){
+void MenuManager::setNextButton(pinid_t nextButtonPin) {
+    switches.addSwitch(nextButtonPin, [](pinid_t, bool held){
         if(!held) menuMgr.performDirectionMove(false);
     });    
 }

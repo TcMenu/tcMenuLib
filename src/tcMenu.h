@@ -56,7 +56,7 @@ public:
 	 * @param encorerPinB encoder B pin
 	 * @param encoderButton the OK button for the menu select / edit action
 	 */
-	void initForEncoder(MenuRenderer* renderer, MenuItem* root, uint8_t encoderPinA, uint8_t encoderPinB, uint8_t encoderButton);
+	void initForEncoder(MenuRenderer* renderer, MenuItem* root, pinid_t encoderPinA, pinid_t encoderPinB, pinid_t encoderButton);
 	
 	/**
 	 * Initialise for up down and OK button, instead of using hardware changeEncoderPrecision
@@ -66,7 +66,7 @@ public:
 	 * @param downPin the button for down
 	 * @param okPin the OK button for the menu select / edit action
 	 */
-	void initForUpDownOk(MenuRenderer* renderer, MenuItem* root, uint8_t upPin, uint8_t downPin, uint8_t okPin);
+	void initForUpDownOk(MenuRenderer* renderer, MenuItem* root, pinid_t upPin, pinid_t downPin, pinid_t okPin);
 
 	/**
 	 * Initialise in situations where local input is not needed or where a custom type of input is needed
@@ -86,13 +86,13 @@ public:
      * You can add a back button that generally performs the back or left function
      * @param backButtonPin the pin on which the back button is assigned.
      */
-    void setBackButton(uint8_t backButtonPin);
+    void setBackButton(pinid_t backButtonPin);
 
     /**
      * YOu can add a next button that generally performs the next or right function
      * @param nextButtonPin the pin to which the next button is assigned
      */
-    void setNextButton(uint8_t nextButtonPin);
+    void setNextButton(pinid_t nextButtonPin);
 
     /**
      * Sometimes you need to use the menu structure before everything is initialised, in this case

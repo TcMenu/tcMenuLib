@@ -102,6 +102,7 @@ void BaseMenuRenderer::menuValueToText(MenuItem* item,	MenuDrawJustification jus
 	case MENUTYPE_TEXT_VALUE:
 	case MENUTYPE_IPADDRESS:
     case MENUTYPE_TIME:
+    case MENUTYPE_DATE:
 	case MENUTYPE_RUNTIME_LIST:
 	case MENUTYPE_RUNTIME_VALUE:
 	case MENUTYPE_LARGENUM_VALUE:
@@ -177,7 +178,7 @@ void BaseMenuRenderer::menuValueBool(BooleanMenuItem* item, MenuDrawJustificatio
 void BaseMenuRenderer::menuValueFloat(FloatMenuItem* item, MenuDrawJustification justification) {
 	char sz[20];
 	sz[0]=0;
-	ltoa((long)item->getFloatValue(), sz, 10);
+	ltoaClrBuff(sz, long(item->getFloatValue()), 10, NOT_PADDED, sizeof(sz));
 	appendChar(sz, '.', sizeof sz);
 	
 	long dpDivisor = dpToDivisor(item->getDecimalPlaces());

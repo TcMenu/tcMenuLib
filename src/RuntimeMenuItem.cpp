@@ -3,7 +3,12 @@
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
+#ifdef __MBED__
+#include <mbed.h>
+#else
 #include <Arduino.h>
+#endif
+
 #include <IoLogging.h>
 #include "RuntimeMenuItem.h"
 
@@ -75,7 +80,7 @@ int ipAddressRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, cha
 	switch (mode) {
 	case RENDERFN_VALUE: {
 		buffer[0] = 0;
-		byte* data = ipItem->getIpAddress();
+		uint8_t* data = ipItem->getIpAddress();
 		wrapForEdit(data[0], 0, row, buffer, bufferSize);
 		appendChar(buffer, '.', bufferSize);
 		wrapForEdit(data[1], 1, row, buffer, bufferSize);
@@ -86,11 +91,11 @@ int ipAddressRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, cha
 		return true;
 	}
 	case RENDERFN_SET_VALUE: {
-		ipItem->setIpPart(row - 1, (byte)buffer[0]);
+		ipItem->setIpPart(row - 1, (uint8_t)buffer[0]);
 		return true;
 	}
 	case RENDERFN_GETPART: {
-		byte* data = ipItem->getIpAddress();
+		uint8_t* data = ipItem->getIpAddress();
 		return (int)data[row - 1];
 	}
 	case RENDERFN_NAME: {
@@ -160,6 +165,49 @@ int timeItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char
         return true;
 	}
     default: return false;
+    }
+}
+
+int dateItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
+    if (item->getMenuType() != MENUTYPE_DATE) return 0;
+    auto timeItem = reinterpret_cast<DateFormattedMenuItem*>(item);
+    auto idx = row - 1;
+    auto data = timeItem->getDate();
+
+    switch(mode) {
+        case RENDERFN_NAME: {
+            if (buffer) buffer[0] = 0;
+            return true;
+        }
+        case RENDERFN_VALUE: {
+            buffer[0] = 0;
+            wrapForEdit(data.day, 0, row, buffer, bufferSize, true);
+            appendChar(buffer, '/', bufferSize);
+            wrapForEdit(data.month, 1, row, buffer, bufferSize, true);
+            appendChar(buffer, '/', bufferSize);
+            wrapForEdit(data.year, 2, row, buffer, bufferSize, true);
+            return true;
+        }
+        case RENDERFN_GETRANGE: {
+            if(idx == 0) return 31;
+            else if(idx == 1) return 12;
+            else if(idx == 2) return 9999;
+            else return true;
+        }
+        case RENDERFN_GETPART: {
+            if(idx == 0) return data.day;
+            else if(idx==1) return data.month;
+            else return data.year;
+        }
+
+        case RENDERFN_SET_VALUE: {
+            int idx = row - 1;
+            if(idx == 0) timeItem->getUnderlyingData()->day = buffer[0];
+            else if(idx == 1) timeItem->getUnderlyingData()->month = buffer[0];
+            else if(idx == 2) timeItem->getUnderlyingData()->year = *((int*)buffer);
+            return true;
+        }
+        default: return false;
     }
 }
 
@@ -288,4 +336,11 @@ void TimeFormattedMenuItem::setTimeFromString(const char* ptr) {
     data.minutes = parseIntUntilSeparator(ptr, offset);
     data.seconds = parseIntUntilSeparator(ptr, offset);
     data.hundreds = parseIntUntilSeparator(ptr, offset);
+}
+
+void DateFormattedMenuItem::setDateFromString(const char *dateText) {
+    int offset = 0;
+    data.year = parseIntUntilSeparator(dateText, offset);
+    data.month = parseIntUntilSeparator(dateText, offset);
+    data.day = parseIntUntilSeparator(dateText, offset);
 }

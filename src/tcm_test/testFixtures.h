@@ -1,8 +1,14 @@
 #ifndef _TESTFIXTURES_H_
 #define _TESTFIXTURES_H_
 
-#include <tcMenu.h>
-#include <RuntimeMenuItem.h>
+#ifdef __MBED__
+#include <mbed.h>
+#else
+#include <Arduino.h>
+#endif
+
+#include "../tcMenu.h"
+#include "../RuntimeMenuItem.h"
 
 /**
  * @file testFixtures.h 

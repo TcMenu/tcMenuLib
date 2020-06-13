@@ -14,7 +14,7 @@
  */
 
 /** internal enumeration used by the keyboard listener to hold state */
-enum MenuEditingKeyMode: byte {
+enum MenuEditingKeyMode: uint8_t {
 	KEYEDIT_NONE,
 	KEYEDIT_ANALOG_EDIT_WHOLE,
 	KEYEDIT_ANALOG_EDIT_FRACT,
@@ -51,7 +51,7 @@ private:
 	void processSimpleValueKeyPress(ValueMenuItem* item, char key);
 	void processAnalogKeyPress(AnalogMenuItem* item, char key);
 	void processMultiEditKeyPress(TextMenuItem* item, char key);
-	void processIntegerMultiEdit(EditableMultiPartMenuItem<byte[4]>* item, char key);
+	void processIntegerMultiEdit(EditableMultiPartMenuItem<uint8_t[4]>* item, char key);
     void processLargeNumberPress(EditableLargeNumberMenuItem*, char key);
 	void clearState();
 };

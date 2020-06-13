@@ -8,7 +8,12 @@
 #ifndef _TCMENU_MESSAGEPROCESSORS_H_
 #define _TCMENU_MESSAGEPROCESSORS_H_
 
+#ifdef __MBED__
+#include <mbed.h>
+#else
 #include <Arduino.h>
+#endif
+
 #include "tcMenu.h"
 
 /**
