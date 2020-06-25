@@ -32,6 +32,9 @@ int backSubItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, c
 /** The default rendering function for time menu items */
 int timeItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
 
+/** The default rendering function for time menu items */
+int dateItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
+
 /** helper function for text items that finds the position of a char in the allowable set of editable chars */
 int findPositionInEditorSet(char ch);
 
@@ -373,7 +376,7 @@ public:
 class DateFormattedMenuItem : public EditableMultiPartMenuItem<DateStorage>{
 public:
     DateFormattedMenuItem(RuntimeRenderingFn renderFn, uint16_t id, MenuItem* next = NULL)
-    : EditableMultiPartMenuItem(MENUTYPE_TIME, id, 3, renderFn, next) {
+    : EditableMultiPartMenuItem(MENUTYPE_DATE, id, 3, renderFn, next) {
         setDate(DateStorage(1, 1, 2020));
     }
 

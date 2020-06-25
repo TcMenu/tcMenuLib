@@ -69,7 +69,7 @@ void wrapForEdit(int val, int idx, uint8_t row, char* buffer, int bufferSize, bo
 	--row;
 
 	if (idx == row) appendChar(buffer, '[', bufferSize);
-	fastltoa(buffer, val, forTime ? 2 : 3, forTime ? '0' : NOT_PADDED, bufferSize);
+	fastltoa(buffer, val, forTime ? 2 : 4, forTime ? '0' : NOT_PADDED, bufferSize);
 	if (idx == row) appendChar(buffer, ']', bufferSize);
 }
 
@@ -168,6 +168,18 @@ int timeItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char
     }
 }
 
+int daysForMonth(DateStorage& theDate) {
+    auto month = theDate.month;
+    auto year = theDate.year;
+    if (month == 4 || month == 6 || month == 9 || month == 11)
+        return 30;
+    else if (month == 02) {
+        bool isLeap = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+        return isLeap ?  29 : 28;
+    }
+    else return 31;
+}
+
 int dateItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
     if (item->getMenuType() != MENUTYPE_DATE) return 0;
     auto timeItem = reinterpret_cast<DateFormattedMenuItem*>(item);
@@ -185,11 +197,11 @@ int dateItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char
             appendChar(buffer, '/', bufferSize);
             wrapForEdit(data.month, 1, row, buffer, bufferSize, true);
             appendChar(buffer, '/', bufferSize);
-            wrapForEdit(data.year, 2, row, buffer, bufferSize, true);
+            wrapForEdit(data.year, 2, row, buffer, bufferSize, false);
             return true;
         }
         case RENDERFN_GETRANGE: {
-            if(idx == 0) return 31;
+            if(idx == 0) return daysForMonth(data);
             else if(idx == 1) return 12;
             else if(idx == 2) return 9999;
             else return true;
