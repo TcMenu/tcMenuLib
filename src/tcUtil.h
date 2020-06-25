@@ -6,7 +6,22 @@
 #ifndef _TCUTIL_H
 #define _TCUTIL_H
 
+#ifdef __MBED__
+#include <mbed.h>
+#define min(x, y) ((x < y)?(x):(y))
+#define max(x, y) ((x > y)?(x):(y))
+#define highByte(x) (x >> 8)
+#define lowByte(x) (x & 0xff)
+#define ltoa(a,b,c) itoa(a,b,c)
+#define strcmp_P(x,y) strcmp(x,y)
+#define strncpy_P(x,y,z) strncpy(x,y,z)
+#define strcpy_P(x,y) strcpy(x,y)
+#define strlen_P(x) strlen(x)
+#else
 #include <Arduino.h>
+#endif
+
+#include <BasicIoAbstraction.h>
 #include "RemoteTypes.h"
 
 // forward reference.
@@ -114,7 +129,7 @@ uint8_t safeProgCpy(char* dst, const char* pgmSrc, uint8_t size);
 #endif
 
 // for things that are the same between AVR and ESP
-#if defined __AVR__ || defined ESP_H
+#if (defined __AVR__ || defined ESP_H) && !defined __MBED__
 #define PGM_TCM PROGMEM
 extern char szGlobalBuffer[];
 inline char* potentialProgramMemory(const char *x) {

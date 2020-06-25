@@ -44,7 +44,7 @@ void MenuEditingKeyListener::keyPressed(char key, bool held) {
 
         }
 		else if (isMenuRuntimeMultiEdit(editor)) {
-			processIntegerMultiEdit(reinterpret_cast<EditableMultiPartMenuItem<byte[4]>*>(editor), key);
+			processIntegerMultiEdit(reinterpret_cast<EditableMultiPartMenuItem<uint8_t[4]>*>(editor), key);
 		}
 	}
 	else if(isdigit(key)) {
@@ -71,7 +71,7 @@ void MenuEditingKeyListener::processSimpleValueKeyPress(ValueMenuItem* item, cha
 	}
 }
 
-void MenuEditingKeyListener::processIntegerMultiEdit(EditableMultiPartMenuItem<byte[4]>* item, char key) {
+void MenuEditingKeyListener::processIntegerMultiEdit(EditableMultiPartMenuItem<uint8_t[4]>* item, char key) {
 	if (mode == KEYEDIT_NONE || item != currentEditor) {
 		mode = KEYEDIT_MULTIEDIT_INT_START;
 		currentEditor = item;

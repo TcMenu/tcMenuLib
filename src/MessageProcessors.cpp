@@ -158,7 +158,7 @@ bool processValueChangeField(FieldAndValue* field, MessageProcessorInfo* info) {
         textItem->setTextValue(field->value);
         serdebugF2("Text change: ", textItem->getTextValue());
     }
-	else if (info->value.item->getMenuType() == MENUTYPE_IPADDRESS) {
+    else if (info->value.item->getMenuType() == MENUTYPE_IPADDRESS) {
 		IpAddressMenuItem* ipItem = reinterpret_cast<IpAddressMenuItem*>(info->value.item);
 		ipItem->setIpAddress(field->value);
 		serdebugF2("Ip Addr change: ", field->value);
@@ -168,7 +168,12 @@ bool processValueChangeField(FieldAndValue* field, MessageProcessorInfo* info) {
         timeItem->setTimeFromString(field->value);
         serdebugF2("Time item change: ", field->value);
     }
-	else if (info->value.item->getMenuType() == MENUTYPE_LARGENUM_VALUE) {
+    else if(info->value.item->getMenuType() == MENUTYPE_DATE) {
+        DateFormattedMenuItem* dateItem = reinterpret_cast<DateFormattedMenuItem*>(info->value.item);
+        dateItem->setDateFromString(field->value);
+        serdebugF2("Date change: ", field->value);
+    }
+    else if (info->value.item->getMenuType() == MENUTYPE_LARGENUM_VALUE) {
 		EditableLargeNumberMenuItem* numItem = reinterpret_cast<EditableLargeNumberMenuItem*>(info->value.item);
 		numItem->setLargeNumberFromString(field->value);
 		serdebugF2("Large num change: ", field->value);

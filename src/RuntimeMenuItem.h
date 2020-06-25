@@ -12,6 +12,7 @@
 #define _RUNTIME_MENUITEM_H_
 
 #include "MenuItems.h"
+#include "tcUtil.h"
 
 /** For items that dont need to have the same id each time (such as back menu items), we just randomly give them an ID */
 #define RANDOM_ID_START 50000
@@ -31,19 +32,22 @@ int backSubItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, c
 /** The default rendering function for time menu items */
 int timeItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
 
+/** The default rendering function for time menu items */
+int dateItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
+
 /** helper function for text items that finds the position of a char in the allowable set of editable chars */
 int findPositionInEditorSet(char ch);
 
 /**
  * Defines the filter that should be applied to values of multi edit menu items on the UI
  */
-enum MultiEditWireType : byte {
+enum MultiEditWireType : uint8_t {
 	EDITMODE_PLAIN_TEXT = 0, 
 	EDITMODE_IP_ADDRESS = 1,
 	EDITMODE_TIME_24H = 2,
 	EDITMODE_TIME_12H = 3,
 	EDITMODE_TIME_HUNDREDS_24H = 4,
-	EDITMODE_LARGE_INTEGER = 5
+    EDITMODE_GREGORIAN_DATE = 5
 };
 
 /**
@@ -215,7 +219,7 @@ public:
 		setChanged(true);
 		setSendRemoteNeededAll();
 
-		byte sz[2];
+		uint8_t sz[2];
 		sz[0] = lowByte(newVal);
 		sz[1] = highByte(newVal);
 		return renderFn(this, itemPosition, RENDERFN_SET_VALUE, reinterpret_cast<char*>(sz), sizeof(sz));
@@ -283,7 +287,7 @@ int findPositionInEditorSet(char ch);
  * This menu item represents an IP address that can be configured / or just displayed on the device,
  * if it is editable it is edited 
  */
-class IpAddressMenuItem : public EditableMultiPartMenuItem<byte[4]> {
+class IpAddressMenuItem : public EditableMultiPartMenuItem<uint8_t[4]> {
 public:
 	IpAddressMenuItem(RuntimeRenderingFn renderFn, uint16_t id, MenuItem* next = NULL)
 		: EditableMultiPartMenuItem(MENUTYPE_IPADDRESS, id, 4, renderFn, next) {
@@ -296,10 +300,10 @@ public:
 	void setIpAddress(uint8_t p1, uint8_t p2, uint8_t p3, uint8_t p4);
 
 	/** gets the IP address as four separate bytes */
-	byte* getIpAddress() { return data; }
+	uint8_t* getIpAddress() { return data; }
 	
 	/** sets a single part in the address */
-	void setIpPart(uint8_t part, byte newVal) {
+	void setIpPart(uint8_t part, uint8_t newVal) {
 		if (part > 3) return;
 		data[part] = newVal;
 		setChanged(true);
@@ -328,6 +332,22 @@ struct TimeStorage {
     uint8_t hundreds;
 };
 
+struct DateStorage {
+    uint8_t day;
+    uint8_t month;
+    uint16_t year;
+
+    DateStorage() {
+        year = day = month = 0;
+    }
+
+    DateStorage(int day, int month, int year) {
+        this->day = day;
+        this->month = month;
+        this->year = year;
+    }
+};
+
 class TimeFormattedMenuItem : public EditableMultiPartMenuItem<TimeStorage> {
 private:
     MultiEditWireType format;
@@ -351,6 +371,22 @@ public:
     MultiEditWireType  getFormat() { return format; }	
 
     TimeStorage* getUnderlyingData() {return &data;}
+};
+
+class DateFormattedMenuItem : public EditableMultiPartMenuItem<DateStorage>{
+public:
+    DateFormattedMenuItem(RuntimeRenderingFn renderFn, uint16_t id, MenuItem* next = NULL)
+    : EditableMultiPartMenuItem(MENUTYPE_DATE, id, 3, renderFn, next) {
+        setDate(DateStorage(1, 1, 2020));
+    }
+
+    DateStorage getDate() { return data; }
+
+    void setDate(DateStorage newDate) { data = newDate; }
+
+    void setDateFromString(const char *dateText);
+
+    DateStorage* getUnderlyingData() { return &data; }
 };
 
 /**

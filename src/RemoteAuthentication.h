@@ -12,6 +12,7 @@
 #define _REMOTE_AUTHENTICATION_H_
 
 #include <EepromAbstraction.h>
+#include "tcUtil.h"
 
 #define MAX_PIN_LENGTH 16
 

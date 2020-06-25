@@ -18,7 +18,7 @@
 /**
  * The types of button that can be passed to setButton for button 1 and button 2
  */
-enum ButtonType: byte { BTNTYPE_NONE = 0, BTNTYPE_OK, BTNTYPE_ACCEPT, BTNTYPE_CANCEL, BTNTYPE_CLOSE };
+enum ButtonType: uint8_t { BTNTYPE_NONE = 0, BTNTYPE_OK, BTNTYPE_ACCEPT, BTNTYPE_CANCEL, BTNTYPE_CLOSE };
 
 class BaseDialog;
 /**

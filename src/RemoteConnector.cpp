@@ -6,7 +6,13 @@
  * and remote APIs.
  */
 
+#ifdef __MBED__
+#include <mbed.h>
+#include "tcUtil.h"
+#else
 #include <Arduino.h>
+#endif
+
 #include "RemoteConnector.h"
 #include "RemoteAuthentication.h"
 #include "MenuItems.h"
@@ -164,41 +170,44 @@ void TagValueRemoteConnector::close() {
 }
 
 void TagValueRemoteConnector::tick() {
+    serdebug("HB");
     dealWithHeartbeating();
 
-	if(isConnected() && transport->connected() && isAuthenticated()) {
-		performAnyWrites();
-	}
+    serdebug("WR");
 
-    if(isPairing()) return; // never read anything else when in pairing mode.
-
-    // field if available is kind of like a state machine. Due to limited memory
-    // on some AVR's and problems with the size of virtual tables, it cannot be
-    // implemented as a series of classes that implement an interface.
-    //
-    // Every tick we call the method and it processes whatever data is available
-    // on the socket turning it into a message a field at a time.
-	FieldAndValue* field = transport->fieldIfAvailable();
-	switch(field->fieldType) {
-	case FVAL_NEW_MSG:
-        serdebugMsgHdr("Msg In S: ", remoteNo, field->msgType);
-		processor->newMsg(field->msgType);
-		break;
-	case FVAL_FIELD:
-        serdebugMsgHdr("Fld: ", remoteNo, field->field);
-		processor->fieldUpdate(this, field);
-        break;
-	case FVAL_END_MSG:
-        serdebugMsgHdr("Msg In E: ", remoteNo, field->msgType);
-		processor->fieldUpdate(this, field);
-		ticksLastRead = 0;
-		break;
-	case FVAL_ERROR_PROTO:
-		commsNotify(COMMSERR_PROTOCOL_ERROR);
-		break;
-	default: // not ready for processing yet.
-		break;
-	}
+//	if(isConnected() && transport->connected() && isAuthenticated()) {
+//		performAnyWrites();
+//	}
+//
+//    if(isPairing()) return; // never read anything else when in pairing mode.
+//
+//    // field if available is kind of like a state machine. Due to limited memory
+//    // on some AVR's and problems with the size of virtual tables, it cannot be
+//    // implemented as a series of classes that implement an interface.
+//    //
+//    // Every tick we call the method and it processes whatever data is available
+//    // on the socket turning it into a message a field at a time.
+//	FieldAndValue* field = transport->fieldIfAvailable();
+//	switch(field->fieldType) {
+//	case FVAL_NEW_MSG:
+//        serdebugMsgHdr("Msg In S: ", remoteNo, field->msgType);
+//		processor->newMsg(field->msgType);
+//		break;
+//	case FVAL_FIELD:
+//        serdebugMsgHdr("Fld: ", remoteNo, field->field);
+//		processor->fieldUpdate(this, field);
+//        break;
+//	case FVAL_END_MSG:
+//        serdebugMsgHdr("Msg In E: ", remoteNo, field->msgType);
+//		processor->fieldUpdate(this, field);
+//		ticksLastRead = 0;
+//		break;
+//	case FVAL_ERROR_PROTO:
+//		commsNotify(COMMSERR_PROTOCOL_ERROR);
+//		break;
+//	default: // not ready for processing yet.
+//		break;
+//	}
 }
 
 void TagValueRemoteConnector::setConnected(bool conn) {
@@ -301,6 +310,7 @@ void TagValueRemoteConnector::nextBootstrap() {
 	case MENUTYPE_IPADDRESS:
 	case MENUTYPE_TEXT_VALUE:
     case MENUTYPE_TIME:
+    case MENUTYPE_DATE:
 		encodeMultiEditMenu(parentId, reinterpret_cast<RuntimeMenuItem*>(bootItem));
 		break;
 	case MENUTYPE_LARGENUM_VALUE:
@@ -430,8 +440,11 @@ void TagValueRemoteConnector::encodeMultiEditMenu(int parentId, RuntimeMenuItem*
         TimeFormattedMenuItem* editable = reinterpret_cast<TimeFormattedMenuItem*>(item);
         transport->writeFieldInt(FIELD_EDIT_MODE, editable->getFormat());
     }
+    else if(item->getMenuType() == MENUTYPE_DATE) {
+        transport->writeFieldInt(FIELD_EDIT_MODE, EDITMODE_GREGORIAN_DATE);
+    }
 
-    EditableMultiPartMenuItem<byte[4]>* multipart = reinterpret_cast<EditableMultiPartMenuItem<byte[4]>*>(item);
+    EditableMultiPartMenuItem<uint8_t[4]>* multipart = reinterpret_cast<EditableMultiPartMenuItem<uint8_t[4]>*>(item);
     char sz[20];
     multipart->copyValue(sz, sizeof(sz));
     transport->writeField(FIELD_CURRENT_VAL, sz);
@@ -443,7 +456,7 @@ void TagValueRemoteConnector::encodeMultiEditMenu(int parentId, RuntimeMenuItem*
 void writeFloatValueToTransport(TagValueTransport* transport, FloatMenuItem* item) {
 	char sz[20];
 	sz[0]=0;
-	ltoa((long)item->getFloatValue(), sz, 10);
+	ltoaClrBuff(sz, (long)item->getFloatValue(), 10, NOT_PADDED, sizeof sz);
 	appendChar(sz, '.', sizeof sz);
 	
 	long whole = item->getFloatValue();
@@ -545,6 +558,7 @@ void TagValueRemoteConnector::encodeChangeValue(MenuItem* theItem) {
         break;
 	case MENUTYPE_IPADDRESS:
     case MENUTYPE_TIME:
+    case MENUTYPE_DATE:
 	case MENUTYPE_LARGENUM_VALUE:
 	case MENUTYPE_TEXT_VALUE: {
 		char sz[20];
@@ -788,6 +802,6 @@ void CombinedMessageProcessor::fieldUpdate(TagValueRemoteConnector* connector, F
 		currHandler->fieldUpdateFn(connector, field, &val);
 	}
     else if(mt != MSG_HEARTBEAT) {
-        serdebugF3("Did not proccess(hdlr,auth)", (unsigned int)currHandler, connector->isAuthenticated());
+        serdebugF3("Did not proccess(mt,auth)", field->msgType, connector->isAuthenticated());
     }
 }

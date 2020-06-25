@@ -118,7 +118,7 @@ struct EnumMenuInfo {
 /**
  * These are the names for true / false that can be used in a boolean menu item.
  */
-enum BooleanNaming : byte {
+enum BooleanNaming : uint8_t {
 	NAMING_TRUE_FALSE = 0,
 	NAMING_ON_OFF,
 	NAMING_YES_NO
@@ -188,7 +188,7 @@ struct FloatMenuInfo {
 /** 
  * Each menu item can be in the following states.
  */
-enum Flags : byte {
+enum Flags : uint8_t {
     /** the menu is currently active but not editing */
 	MENUITEM_ACTIVE = 0,
     /** the menu has changed and needs drawing by the renderer */
@@ -226,7 +226,7 @@ enum Flags : byte {
  * MenuItems greater than 200 are runtime menu items.
  * Items between 100 and 200 are non editable regular menu items.
  */
-enum MenuType : byte {
+enum MenuType : uint8_t {
 	/** item is of type AnalogMenuItem */
 	MENUTYPE_INT_VALUE = 1, 
 	/** item is of type EnumMenuItem */
@@ -253,14 +253,16 @@ enum MenuType : byte {
 	MENUTYPE_IPADDRESS = 201,
     /** An item that represents a time */
     MENUTYPE_TIME = 202,
+    /** An item that represents a date */
+    MENUTYPE_DATE = 203,
     /** An item that represent a large editable number */
-    MENUTYPE_LARGENUM_VALUE = 203
+    MENUTYPE_LARGENUM_VALUE = 210
 };
 
 /**
  * this is used in the redering function to indicate what needs to be done in this call.
  */
-enum RenderFnMode : byte {
+enum RenderFnMode : uint8_t {
 	/** render the current value for the item provided */
 	RENDERFN_VALUE,
 	/** render the name part into the buffer */
@@ -651,21 +653,21 @@ class RuntimeMenuItem;
  * Any MenuType with an ID less than 100 is editable as an integer
  */
 inline bool isMenuBasedOnValueItem(MenuItem* item) {
-	return byte(item->getMenuType()) < MENUTYPE_SUB_VALUE;
+	return uint8_t(item->getMenuType()) < MENUTYPE_SUB_VALUE;
 }
 
 /**
  * returns true if the menu item is an editable runtime item
  */
 inline bool isMenuRuntime(MenuItem* t) {
-	return (byte(t->getMenuType()) >= byte(MENUTYPE_RUNTIME_VALUE));
+	return (uint8_t(t->getMenuType()) >= uint8_t(MENUTYPE_RUNTIME_VALUE));
 }
 
 /**
  * Returns true if the menu item is a runtime item type. Otherwise returns false.
  */
 inline bool isMenuRuntimeMultiEdit(MenuItem* t) {
-	return (byte(t->getMenuType()) >= byte(MENUTYPE_TEXT_VALUE));
+	return (uint8_t(t->getMenuType()) >= uint8_t(MENUTYPE_TEXT_VALUE));
 }
 
 /**
