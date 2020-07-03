@@ -39,10 +39,10 @@ void MenuEditingKeyListener::keyPressed(char key, bool held) {
 		else if (editor->getMenuType() == MENUTYPE_TEXT_VALUE) {
 			processMultiEditKeyPress(reinterpret_cast<TextMenuItem*>(editor), key);
 		}
-        else if (editor->getMenuType() == MENUTYPE_LARGENUM_VALUE) {
+        	else if (editor->getMenuType() == MENUTYPE_LARGENUM_VALUE) {
 			processLargeNumberPress(reinterpret_cast<EditableLargeNumberMenuItem*>(editor), key);
 
-        }
+        	}
 		else if (isMenuRuntimeMultiEdit(editor)) {
 			processIntegerMultiEdit(reinterpret_cast<EditableMultiPartMenuItem<uint8_t[4]>*>(editor), key);
 		}
@@ -51,6 +51,41 @@ void MenuEditingKeyListener::keyPressed(char key, bool held) {
 		clearState();
 		// we are not editing, attempt to select an item using 0-9
 		menuMgr.valueChanged(fromKeyToIndex(key));
+	}
+	else if (key == 'A') {
+		MenuItem* itm = menuMgr.getCurrentMenu();
+		bool haveSelected = false;
+		while (itm != NULL) {
+			if (itm->getNext()->isActive()) {
+				itm->getNext()->setActive(false);
+				itm->setActive(true);
+				haveSelected=true;
+				break;
+			} else {
+				itm = itm->getNext();
+			}
+		}
+		if(!haveSelected){
+			menuMgr.valueChanged(0);
+		}
+		
+	}
+	else if (key == 'B') {
+		MenuItem* itm = menuMgr.getCurrentMenu();
+		bool haveSelected = false;
+		while (itm != NULL) {
+			if (itm->isActive()) {
+				itm->setActive(false);
+				itm->getNext()->setActive(true);
+				haveSelected=true;
+				break;
+			} else {
+				itm = itm->getNext();
+			}
+		}
+		if(!haveSelected){
+			menuMgr.valueChanged(1);
+		}
 	}
 	else if (key == '*') {
 		clearState();
