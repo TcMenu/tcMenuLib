@@ -98,12 +98,26 @@ void MenuEditingKeyListener::keyReleased(char key) {
 }
 
 void MenuEditingKeyListener::processSimpleValueKeyPress(ValueMenuItem* item, char key) {
-	clearState();
 	if (isdigit(key)) {
 		unsigned int val = key - '0';
 		if (val > item->getMaximumValue()) val = item->getMaximumValue();
 		item->setCurrentValue(val);
+	} else if (key == 'A') {
+		unsigned int value = item->getCurrentValue();
+		value--;
+		if(value <= item->getMaximumValue()){
+			item->setCurrentValue(value);
+		}
+		return;
+	} else if (key == 'B') {
+		unsigned int value = item->getCurrentValue();
+		value++;
+		if(value <= item->getMaximumValue()){
+			item->setCurrentValue(value);
+		}
+		return;
 	}
+	clearState();
 }
 
 void MenuEditingKeyListener::processIntegerMultiEdit(EditableMultiPartMenuItem<uint8_t[4]>* item, char key) {
