@@ -24,6 +24,7 @@ LiquidCrystalRenderer::LiquidCrystalRenderer(LiquidCrystal& lcd, uint8_t dimX, u
 	this->editChar = '=';
     this->drewTitleThisTime = false;
     this->titleRequired = true;
+    strcpy(this->title, applicationInfo.name);
 }
 
 void LiquidCrystalRenderer::initialise() {
@@ -78,7 +79,7 @@ void LiquidCrystalRenderer::renderList() {
 
 void LiquidCrystalRenderer::renderTitle(bool forceDraw) {
     if(!drewTitleThisTime || forceDraw) {
-        strcpy_P(buffer, applicationInfo.name);
+        strcpy(buffer, title);
         serdebugF2("print app name", buffer);
         uint8_t bufSz = bufferSize;
         uint8_t last = min(bufSz, strlen(buffer));
