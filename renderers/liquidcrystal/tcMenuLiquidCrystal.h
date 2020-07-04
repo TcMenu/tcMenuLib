@@ -35,6 +35,7 @@ private:
 	uint8_t editChar;
     bool drewTitleThisTime;
     bool titleRequired;
+    char title[20];
 public:
 
 	LiquidCrystalRenderer(LiquidCrystal& lcd, uint8_t dimX, uint8_t dimY);
@@ -42,6 +43,7 @@ public:
 	void render() override;
     void initialise() override;
     void setTitleRequired(bool titleRequired) { this->titleRequired = titleRequired; }
+    void setTitle(const char* newTitle) { strcpy(this->title, newTitle); }
 
 	void setEditorChars(char back, char forward, char edit);
 
