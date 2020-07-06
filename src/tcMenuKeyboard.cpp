@@ -56,7 +56,7 @@ void MenuEditingKeyListener::keyPressed(char key, bool held) {
 		MenuItem* itm = menuMgr.getCurrentMenu();
 		bool haveSelected = false;
 		while (itm != NULL) {
-			if (itm->getNext()->isActive()) {
+			if (itm->getNext()!= NULL && itm->getNext()->isActive()) {
 				itm->getNext()->setActive(false);
 				itm->setActive(true);
 				haveSelected=true;
@@ -74,7 +74,7 @@ void MenuEditingKeyListener::keyPressed(char key, bool held) {
 		MenuItem* itm = menuMgr.getCurrentMenu();
 		bool haveSelected = false;
 		while (itm != NULL) {
-			if (itm->isActive()) {
+			if (itm->getNext()!= NULL && itm->isActive()) {
 				itm->setActive(false);
 				itm->getNext()->setActive(true);
 				haveSelected=true;
