@@ -170,44 +170,41 @@ void TagValueRemoteConnector::close() {
 }
 
 void TagValueRemoteConnector::tick() {
-    serdebug("HB");
     dealWithHeartbeating();
 
-    serdebug("WR");
+	if(isConnected() && transport->connected() && isAuthenticated()) {
+		performAnyWrites();
+	}
 
-//	if(isConnected() && transport->connected() && isAuthenticated()) {
-//		performAnyWrites();
-//	}
-//
-//    if(isPairing()) return; // never read anything else when in pairing mode.
-//
-//    // field if available is kind of like a state machine. Due to limited memory
-//    // on some AVR's and problems with the size of virtual tables, it cannot be
-//    // implemented as a series of classes that implement an interface.
-//    //
-//    // Every tick we call the method and it processes whatever data is available
-//    // on the socket turning it into a message a field at a time.
-//	FieldAndValue* field = transport->fieldIfAvailable();
-//	switch(field->fieldType) {
-//	case FVAL_NEW_MSG:
-//        serdebugMsgHdr("Msg In S: ", remoteNo, field->msgType);
-//		processor->newMsg(field->msgType);
-//		break;
-//	case FVAL_FIELD:
-//        serdebugMsgHdr("Fld: ", remoteNo, field->field);
-//		processor->fieldUpdate(this, field);
-//        break;
-//	case FVAL_END_MSG:
-//        serdebugMsgHdr("Msg In E: ", remoteNo, field->msgType);
-//		processor->fieldUpdate(this, field);
-//		ticksLastRead = 0;
-//		break;
-//	case FVAL_ERROR_PROTO:
-//		commsNotify(COMMSERR_PROTOCOL_ERROR);
-//		break;
-//	default: // not ready for processing yet.
-//		break;
-//	}
+    if(isPairing()) return; // never read anything else when in pairing mode.
+
+    // field if available is kind of like a state machine. Due to limited memory
+    // on some AVR's and problems with the size of virtual tables, it cannot be
+    // implemented as a series of classes that implement an interface.
+    //
+    // Every tick we call the method and it processes whatever data is available
+    // on the socket turning it into a message a field at a time.
+	FieldAndValue* field = transport->fieldIfAvailable();
+	switch(field->fieldType) {
+	case FVAL_NEW_MSG:
+        serdebugMsgHdr("Msg In S: ", remoteNo, field->msgType);
+		processor->newMsg(field->msgType);
+		break;
+	case FVAL_FIELD:
+        serdebugMsgHdr("Fld: ", remoteNo, field->field);
+		processor->fieldUpdate(this, field);
+        break;
+	case FVAL_END_MSG:
+        serdebugMsgHdr("Msg In E: ", remoteNo, field->msgType);
+		processor->fieldUpdate(this, field);
+		ticksLastRead = 0;
+		break;
+	case FVAL_ERROR_PROTO:
+		commsNotify(COMMSERR_PROTOCOL_ERROR);
+		break;
+	default: // not ready for processing yet.
+		break;
+	}
 }
 
 void TagValueRemoteConnector::setConnected(bool conn) {
