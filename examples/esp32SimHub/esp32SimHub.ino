@@ -28,6 +28,7 @@
 #include <tcMenuU8g2.h>
 #include <Wire.h>
 #include <JoystickSwitchInput.h>
+#include <IoLogging.h>
 
 #define PULSATING_LED_PIN 13
 
@@ -67,6 +68,8 @@ void setup() {
 
     // and we start on our custom screen by taking the display off the menu
     renderer.takeOverDisplay(simulatorRendering);
+
+    menuGear.setTextValue("N");
 }
 
 // All IoAbstraction and TcMenu sketches need the runLoop to be called very frequently, preferably in the loop
@@ -132,21 +135,28 @@ void simulatorRendering(unsigned int currentValue, RenderPressMode userClicked) 
         width = gfx.getStrWidth("MPH");
         gfx.drawStr(128 - width, 32, "MPH");
         gfx.drawStr(128 - width, 46, "RPM");
-        gfx.drawStr(128 - width, 58, "TMP");
+        gfx.drawStr(128 - width, 58, "RND"); // change to any value you want..
     }
 
     // First we draw the gear indicator, it's in a large font on the left.
-    char szGear[2];
-    szGear[0] = random(9) + '0';
-    szGear[1] = 0;
-
     gfx.setFont(u8g2_font_inr38_mf);
-    gfx.drawStr(0, 72, szGear);
+    gfx.drawStr(0, 72, menuGear.getTextValue());
     gfx.setFont(u8g2_font_6x10_tf);
 
     printIntStatusOnRight(menuSpeed.getCurrentValue(), 32);
     printIntStatusOnRight(menuRPM.getCurrentValue(), 46);
-    printIntStatusOnRight((int)random(80), 58);
+    printIntStatusOnRight((int)random(80), 58); // change to any value you want..
 
     gfx.sendBuffer();
+}
+
+//
+// Callback functions
+//
+
+void CALLBACK_FUNCTION onConnectionChange(int id) {
+    // we registered a call back on the simhub link menu item
+    // this is the menu item that gets set/cleared by simhub.
+    // you can take custom action on it here if needed.
+    serdebugF2("Simhub connection", menuSimHubLink.getBoolean());
 }

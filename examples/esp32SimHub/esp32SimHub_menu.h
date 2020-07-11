@@ -13,6 +13,7 @@
 
 #include <Arduino.h>
 #include <tcMenu.h>
+#include <RuntimeMenuItem.h>
 #include "tcMenuU8g2.h"
 #include <JoystickSwitchInput.h>
 #include "SimhubConnector.h"
@@ -34,8 +35,9 @@ extern ArduinoAnalogDevice analogDevice;
 
 extern AnalogMenuItem menuSettingsTestItem1;
 extern SubMenuItem menuSettings;
-extern AnalogMenuItem menuGear;
+void CALLBACK_FUNCTION onConnectionChange(int id);
 extern BooleanMenuItem menuSimHubLink;
+extern TextMenuItem menuGear;
 extern AnalogMenuItem menuRPM;
 extern AnalogMenuItem menuSpeed;
 

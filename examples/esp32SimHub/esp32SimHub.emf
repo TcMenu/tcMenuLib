@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1594383315,
+    "seconds": 1594449983,
     "nanos": 0
   },
   "codeOptions": {
@@ -103,6 +103,21 @@
     },
     {
       "parentId": 0,
+      "type": "textItem",
+      "item": {
+        "name": "Gear",
+        "eepromAddress": -1,
+        "id": 6,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "",
+        "itemType": "PLAIN_TEXT",
+        "textLength": 2
+      }
+    },
+    {
+      "parentId": 0,
       "type": "boolItem",
       "item": {
         "name": "SimHub Link",
@@ -111,24 +126,8 @@
         "readOnly": false,
         "localOnly": false,
         "visible": true,
+        "functionName": "onConnectionChange",
         "naming": "ON_OFF"
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "analogItem",
-      "item": {
-        "name": "Gear",
-        "eepromAddress": -1,
-        "id": 6,
-        "readOnly": true,
-        "localOnly": false,
-        "visible": true,
-        "functionName": "",
-        "maxValue": 9,
-        "offset": 0,
-        "divisor": 0,
-        "unitName": null
       }
     },
     {
