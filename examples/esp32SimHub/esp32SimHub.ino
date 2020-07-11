@@ -70,6 +70,25 @@ void setup() {
     renderer.takeOverDisplay(simulatorRendering);
 
     menuGear.setTextValue("N");
+
+    //
+    // if you want to test your rendering without simhub connected, uncomment the below code, it will update all the
+    // values a few times a second.
+    //
+    taskManager.scheduleFixedRate(250, [] {
+        menuTyreTemp.setCurrentValue(random(50) + 40);
+        menuRPM.setCurrentValue(random(6000) + 4000);
+        menuSpeed.setCurrentValue(random(120) + 20);
+        auto gear = random(10);
+        if(gear == 0) menuGear.setTextValue("N");
+        else if(gear > 8) menuGear.setTextValue("R");
+        else {
+            char sz[2];
+            sz[0] = gear + '0';
+            sz[1] = 0;
+            menuGear.setTextValue(sz);
+        }
+    });
 }
 
 // All IoAbstraction and TcMenu sketches need the runLoop to be called very frequently, preferably in the loop
@@ -88,14 +107,16 @@ void loop() {
 /**
  * On the right hand side we present a few statistics, each statistic is printed using this method. It
  * determines with width of 5 digits, blanks the previous value and then renders the new value.
- * @param status the statistic to be printed as an integer
+ * @param item the menuitem holding the integer value
  * @param y the vertical baseline position
  */
-void printIntStatusOnRight(int status, int y) {
+void printIntStatusOnRight(AnalogMenuItem item, int y) {
+    if(!item.isChanged()) return;
+    item.setChanged(false);
     char sz[10];
     auto strWidth = gfx.getStrWidth("00000");
     auto x = 128 - (strWidth + width + 3);
-    ltoaClrBuff(sz, status, 5, ' ', sizeof sz);
+    ltoaClrBuff(sz, item.getCurrentValue(), 5, ' ', sizeof sz);
     gfx.setColorIndex(0);
     gfx.drawBox(x, y, strWidth, 14);
     gfx.setColorIndex(1);
@@ -135,17 +156,20 @@ void simulatorRendering(unsigned int currentValue, RenderPressMode userClicked) 
         width = gfx.getStrWidth("MPH");
         gfx.drawStr(128 - width, 32, "MPH");
         gfx.drawStr(128 - width, 46, "RPM");
-        gfx.drawStr(128 - width, 58, "RND"); // change to any value you want..
+        gfx.drawStr(128 - width, 58, "TMP");
     }
 
-    // First we draw the gear indicator, it's in a large font on the left.
-    gfx.setFont(u8g2_font_inr38_mf);
-    gfx.drawStr(0, 72, menuGear.getTextValue());
-    gfx.setFont(u8g2_font_6x10_tf);
+    if(menuGear.isChanged()) {
+        menuGear.setChanged(false);
+        // First we draw the gear indicator, it's in a large font on the left.
+        gfx.setFont(u8g2_font_inr38_mf);
+        gfx.drawStr(0, 72, menuGear.getTextValue());
+        gfx.setFont(u8g2_font_6x10_tf);
+    }
 
-    printIntStatusOnRight(menuSpeed.getCurrentValue(), 32);
-    printIntStatusOnRight(menuRPM.getCurrentValue(), 46);
-    printIntStatusOnRight((int)random(80), 58); // change to any value you want..
+    printIntStatusOnRight(menuSpeed, 32);
+    printIntStatusOnRight(menuRPM, 46);
+    printIntStatusOnRight(menuTyreTemp, 58);
 
     gfx.sendBuffer();
 }

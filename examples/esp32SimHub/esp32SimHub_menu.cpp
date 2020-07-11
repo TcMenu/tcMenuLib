@@ -30,8 +30,10 @@ BackMenuItem menuBackSettings(fnSettingsRtCall, &menuSettingsTestItem1);
 SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, NULL);
 const BooleanMenuInfo PROGMEM minfoSimHubLink = { "SimHub Link", 3, 0xFFFF, 1, onConnectionChange, NAMING_ON_OFF };
 BooleanMenuItem menuSimHubLink(&minfoSimHubLink, false, &menuSettings);
+const AnalogMenuInfo PROGMEM minfoTyreTemp = { "Tyre Temp", 7, 0xFFFF, 255, NO_CALLBACK, 0, 0, "C" };
+AnalogMenuItem menuTyreTemp(&minfoTyreTemp, 0, &menuSimHubLink);
 RENDERING_CALLBACK_NAME_INVOKE(fnGearRtCall, textItemRenderFn, "Gear", -1, NO_CALLBACK)
-TextMenuItem menuGear(fnGearRtCall, 6, 2, &menuSimHubLink);
+TextMenuItem menuGear(fnGearRtCall, 6, 2, &menuTyreTemp);
 const AnalogMenuInfo PROGMEM minfoRPM = { "RPM", 2, 0xFFFF, 32000, NO_CALLBACK, 0, 1, "" };
 AnalogMenuItem menuRPM(&minfoRPM, 0, &menuGear);
 const AnalogMenuInfo PROGMEM minfoSpeed = { "Speed", 1, 0xFFFF, 1000, NO_CALLBACK, 0, 1, "MPH" };
@@ -43,6 +45,7 @@ AnalogMenuItem menuSpeed(&minfoSpeed, 0, &menuRPM);
 void setupMenu() {
     menuSpeed.setReadOnly(true);
     menuRPM.setReadOnly(true);
+    menuTyreTemp.setReadOnly(true);
 
     prepareBasicU8x8Config(gfxConfig);
     renderer.setGraphicsDevice(&gfx, &gfxConfig);

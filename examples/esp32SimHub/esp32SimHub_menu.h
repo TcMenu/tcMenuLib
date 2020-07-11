@@ -37,6 +37,7 @@ extern AnalogMenuItem menuSettingsTestItem1;
 extern SubMenuItem menuSettings;
 void CALLBACK_FUNCTION onConnectionChange(int id);
 extern BooleanMenuItem menuSimHubLink;
+extern AnalogMenuItem menuTyreTemp;
 extern TextMenuItem menuGear;
 extern AnalogMenuItem menuRPM;
 extern AnalogMenuItem menuSpeed;

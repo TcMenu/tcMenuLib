@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1594449983,
+    "seconds": 1594453786,
     "nanos": 0
   },
   "codeOptions": {
@@ -114,6 +114,23 @@
         "functionName": "",
         "itemType": "PLAIN_TEXT",
         "textLength": 2
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "name": "Tyre Temp",
+        "eepromAddress": -1,
+        "id": 7,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "",
+        "maxValue": 255,
+        "offset": 0,
+        "divisor": 0,
+        "unitName": "C"
       }
     },
     {
