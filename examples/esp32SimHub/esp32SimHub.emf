@@ -1,1 +1,165 @@
-{"version":"1.00","projectName":"/Users/dave/Documents/Arduino/tcLibraryDev/lib/tcMenu/examples/esp32SimHub/esp32SimHub.emf","author":"dave","lastEdited":{"seconds":1594124337,"nanos":120805000},"namingRecursive":false,"items":[{"parentId":0,"type":"analogItem","item":{"maxValue":1000,"offset":0,"divisor":1,"unitName":"MPH","name":"Speed","id":1,"eepromAddress":-1,"readOnly":true,"localOnly":false,"visible":true}},{"parentId":0,"type":"analogItem","item":{"maxValue":32000,"offset":0,"divisor":1,"unitName":"","name":"RPM","id":2,"eepromAddress":-1,"readOnly":true,"localOnly":false,"visible":true}},{"parentId":0,"type":"boolItem","item":{"naming":"ON_OFF","name":"SimHub Link","id":3,"eepromAddress":-1,"readOnly":false,"localOnly":false,"visible":true}}],"codeOptions":{"embeddedPlatform":"ARDUINO_ESP32","lastDisplayUuid":"8646497b-1427-415f-8020-1260a1fef57d","lastInputUuid":"89cd7f70-0457-4884-97c2-0db904ccb0ba","lastRemoteUuid":"4123dfc3-5271-4727-81f0-1a21d06b666b","applicationUUID":"4db9fbfe-9fab-4759-b8ff-3e0c6700f475","applicationName":"SimHub Link","lastProperties":[{"name":"DISPLAY_VARIABLE","latestValue":"gfx","subsystem":"DISPLAY"},{"name":"DISPLAY_TYPE","latestValue":"U8G2_SH1106_128X64_NONAME_F_SW_I2C","subsystem":"DISPLAY"},{"name":"DISPLAY_CONFIG","latestValue":"","subsystem":"DISPLAY"},{"name":"SERIAL_PORT","latestValue":"Serial","subsystem":"REMOTE"},{"name":"STATUS_MENUITEM","latestValue":"3","subsystem":"REMOTE"}],"namingRecursive":true,"saveToSrc":false}}
+{
+  "lastEdited": {
+    "seconds": 1594383315,
+    "nanos": 0
+  },
+  "codeOptions": {
+    "applicationUUID": "4db9fbfe-9fab-4759-b8ff-3e0c6700f475",
+    "applicationName": "SimHub Link",
+    "lastInputUuid": "20409bb8-b8a1-4d1d-b632-2cf9b57353e3",
+    "lastDisplayUuid": "8646497b-1427-415f-8020-1260a1fef57d",
+    "lastRemoteUuid": "4123dfc3-5271-4727-81f0-1a21d06b666b",
+    "embeddedPlatform": "ARDUINO_ESP32",
+    "namingRecursive": true,
+    "saveToSrc": false,
+    "lastProperties": [
+      {
+        "name": "PULLUP_LOGIC",
+        "latestValue": "true",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "INTERRUPT_SWITCHES",
+        "latestValue": "false",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SWITCH_IODEVICE",
+        "latestValue": "",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "JOYSTICK_PIN",
+        "latestValue": "A0",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "BUTTON_PIN",
+        "latestValue": "14",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "DISPLAY_VARIABLE",
+        "latestValue": "gfx",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_TYPE",
+        "latestValue": "U8G2_SH1106_128X64_NONAME_F_HW_I2C",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CONFIG",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "SERIAL_PORT",
+        "latestValue": "Serial",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "STATUS_MENUITEM",
+        "latestValue": "3",
+        "subsystem": "REMOTE"
+      }
+    ]
+  },
+  "projectName": "/Users/dave/Documents/Arduino/tcLibraryDev/lib/tcMenu/examples/esp32SimHub/esp32SimHub.emf",
+  "namingRecursive": true,
+  "version": "1.00",
+  "items": [
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "name": "Speed",
+        "eepromAddress": -1,
+        "id": 1,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 1000,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "MPH"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "name": "RPM",
+        "eepromAddress": -1,
+        "id": 2,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 32000,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": ""
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "boolItem",
+      "item": {
+        "name": "SimHub Link",
+        "eepromAddress": -1,
+        "id": 3,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "naming": "ON_OFF"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "name": "Gear",
+        "eepromAddress": -1,
+        "id": 6,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "",
+        "maxValue": 9,
+        "offset": 0,
+        "divisor": 0,
+        "unitName": null
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "name": "Settings",
+        "eepromAddress": -1,
+        "id": 4,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "",
+        "secured": false
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "analogItem",
+      "item": {
+        "name": "Test Item 1",
+        "eepromAddress": -1,
+        "id": 5,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 100,
+        "offset": 0,
+        "divisor": 2,
+        "unitName": ""
+      }
+    }
+  ]
+}

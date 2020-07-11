@@ -6,37 +6,55 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
- */
+*/
 
+#include <Arduino.h>
 #include <tcMenu.h>
 #include "esp32SimHub_menu.h"
 
 // Global variable declarations
 
+const PROGMEM ConnectorLocalInfo applicationInfo = { "SimHub Link", "4db9fbfe-9fab-4759-b8ff-3e0c6700f475" };
 U8g2GfxMenuConfig gfxConfig;
 U8g2MenuRenderer renderer;
+ArduinoAnalogDevice analogDevice;
 SimhubConnector connector;
 
 // Global Menu Item declarations
 
-const PROGMEM BooleanMenuInfo minfoSimHubLink = { "SimHub Link", 3, 0xffff, 1, NO_CALLBACK, NAMING_ON_OFF };
-BooleanMenuItem menuSimHubLink(&minfoSimHubLink, false, NULL);
-const PROGMEM AnalogMenuInfo minfoRPM = { "RPM", 2, 0xffff, 32000, NO_CALLBACK, 0, 1, "" };
+const AnalogMenuInfo PROGMEM minfoSettingsTestItem1 = { "Test Item 1", 5, 0xFFFF, 100, NO_CALLBACK, 0, 2, "" };
+AnalogMenuItem menuSettingsTestItem1(&minfoSettingsTestItem1, 0, NULL);
+const SubMenuInfo PROGMEM minfoSettings = { "Settings", 4, 0xFFFF, 0, NO_CALLBACK };
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings", -1, NO_CALLBACK)
+BackMenuItem menuBackSettings(fnSettingsRtCall, &menuSettingsTestItem1);
+SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, NULL);
+const AnalogMenuInfo PROGMEM minfoGear = { "Gear", 6, 0xFFFF, 9, NO_CALLBACK, 0, 0, "" };
+AnalogMenuItem menuGear(&minfoGear, 0, &menuSettings);
+const BooleanMenuInfo PROGMEM minfoSimHubLink = { "SimHub Link", 3, 0xFFFF, 1, NO_CALLBACK, NAMING_ON_OFF };
+BooleanMenuItem menuSimHubLink(&minfoSimHubLink, false, &menuGear);
+const AnalogMenuInfo PROGMEM minfoRPM = { "RPM", 2, 0xFFFF, 32000, NO_CALLBACK, 0, 1, "" };
 AnalogMenuItem menuRPM(&minfoRPM, 0, &menuSimHubLink);
-const PROGMEM AnalogMenuInfo minfoSpeed = { "Speed", 1, 0xffff, 1000, NO_CALLBACK, 0, 1, "MPH" };
+const AnalogMenuInfo PROGMEM minfoSpeed = { "Speed", 1, 0xFFFF, 1000, NO_CALLBACK, 0, 1, "MPH" };
 AnalogMenuItem menuSpeed(&minfoSpeed, 0, &menuRPM);
-const PROGMEM ConnectorLocalInfo applicationInfo = { "SimHub Link", "4db9fbfe-9fab-4759-b8ff-3e0c6700f475" };
+
 
 // Set up code
 
 void setupMenu() {
+    menuSpeed.setReadOnly(true);
+    menuRPM.setReadOnly(true);
+    menuGear.setReadOnly(true);
+
     prepareBasicU8x8Config(gfxConfig);
     renderer.setGraphicsDevice(&gfx, &gfxConfig);
+    switches.initialise(internalDigitalIo(), true);
+    switches.addSwitch(14, NULL);
+    switches.onRelease(14, [](pinid_t /*key*/, bool held) {
+            menuMgr.onMenuSelect(held);
+        });
+    setupAnalogJoystickEncoder(&analogDevice, A0, [](int val) {
+            menuMgr.valueChanged(val);
+        });
     menuMgr.initWithoutInput(&renderer, &menuSpeed);
     connector.begin(&Serial, 3);
-
-    // Read only and local only function calls
-    menuRPM.setReadOnly(true);
-    menuSpeed.setReadOnly(true);
 }
-

@@ -6,39 +6,37 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
- */
+*/
 
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
 
 #include <Arduino.h>
 #include <tcMenu.h>
-
 #include "tcMenuU8g2.h"
+#include <JoystickSwitchInput.h>
 #include "SimhubConnector.h"
 
-// all define statements needed
-#define DISPLAY_VARIABLE gfx
-#define DISPLAY_TYPE U8G2_SH1106_128X64_NONAME_F_SW_I2C
-#define DISPLAY_CONFIG 
-#define SERIAL_PORT Serial
-#define STATUS_MENUITEM 3
+void setupMenu();  // forward reference of the menu setup function.
+extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app info to the linker.
 
-// all variables that need exporting
-extern U8G2_SH1106_128X64_NONAME_F_SW_I2C gfx;
+// Global variables that need exporting
+
+extern U8G2_SH1106_128X64_NONAME_F_HW_I2C gfx;
 extern U8g2GfxMenuConfig gfxConfig;
 extern U8g2MenuRenderer renderer;
-
-// all menu item forward references.
-extern BooleanMenuItem menuSimHubLink;
-extern AnalogMenuItem menuRPM;
-extern AnalogMenuItem menuSpeed;
-extern const ConnectorLocalInfo applicationInfo;
+extern ArduinoAnalogDevice analogDevice;
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
+// Global Menu Item exports
 
-void setupMenu();
+extern AnalogMenuItem menuSettingsTestItem1;
+extern SubMenuItem menuSettings;
+extern AnalogMenuItem menuGear;
+extern BooleanMenuItem menuSimHubLink;
+extern AnalogMenuItem menuRPM;
+extern AnalogMenuItem menuSpeed;
 
 #endif // MENU_GENERATED_CODE_H
