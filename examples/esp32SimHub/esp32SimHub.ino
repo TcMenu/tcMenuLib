@@ -29,15 +29,19 @@
 #include <Wire.h>
 #include <JoystickSwitchInput.h>
 
+#define PULSATING_LED_PIN 13
+
+// used by the custom renderer, to work out the width of the text being drawn
 int width = 20;
+// used to indicate that this is the first time in to the custom renderer
 bool startedCustomRender = false;
+
+// Display variable that we earlier referred to in the designer
+// Here we've used and SH1106, but you could just as easily used an SSD1306 too (or even any other supported display).
+U8G2_SH1106_128X64_NONAME_F_HW_I2C gfx(U8G2_R0, 16, 15, 4);
 
 // forward declaration of the custom rendering function for when we take over the display
 void simulatorRendering(unsigned int currentValue, RenderPressMode userClicked);
-
-//
-// Here we've used and SH1106, but you could just as easily used an SSD1306 too (or even any other supported display).
-U8G2_SH1106_128X64_NONAME_F_HW_I2C gfx(U8G2_R0, 16, 15, 4);
 
 void setup() {
     // we up the clock speed on the i2c bus to high speed setting 1, 400KHz and start the display
@@ -52,7 +56,7 @@ void setup() {
 
     // here we calibrate the joystick to set the mid point, change the calibration to match your joystick.
     // This MUST be done AFTER setupMenu
-    reinterpret_cast<JoystickSwitchInput*>(switches.getEncoder())->setTolerence(0.436, 0.01);
+    reinterpret_cast<JoystickSwitchInput*>(switches.getEncoder())->setTolerance(0.436, 0.01);
 
     // If we want to have a custom display when the menu is not active, we must provide a reset callback, it
     // is called whenever the menu times out and would otherwise reset to main menu.
