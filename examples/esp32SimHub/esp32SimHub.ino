@@ -25,7 +25,6 @@
  */
 
 #include "esp32SimHub_menu.h"
-#include <tcMenuU8g2.h>
 #include <Wire.h>
 #include <JoystickSwitchInput.h>
 #include <IoLogging.h>
@@ -75,7 +74,7 @@ void setup() {
     // if you want to test your rendering without simhub connected, uncomment the below code, it will update all the
     // values a few times a second.
     //
-    taskManager.scheduleFixedRate(250, [] {
+    /*taskManager.scheduleFixedRate(250, [] {
         menuTyreTemp.setCurrentValue(random(50) + 40);
         menuRPM.setCurrentValue(random(6000) + 4000);
         menuSpeed.setCurrentValue(random(120) + 20);
@@ -88,7 +87,7 @@ void setup() {
             sz[1] = 0;
             menuGear.setTextValue(sz);
         }
-    });
+    });*/
 }
 
 // All IoAbstraction and TcMenu sketches need the runLoop to be called very frequently, preferably in the loop
