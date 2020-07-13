@@ -49,6 +49,6 @@ void setupMenu() {
     prepareBasicU8x8Config(gfxConfig);
     renderer.setGraphicsDevice(&gfx, &gfxConfig);
     switches.initialise(internalDigitalIo(), true);
-    menuMgr.initForEncoder(&renderer, &menuSpeed, 14, 17, 18);
+    menuMgr.initForEncoder(&renderer, &menuSpeed, 17, 14, 18);
     connector.begin(&Serial, 3);
 }
