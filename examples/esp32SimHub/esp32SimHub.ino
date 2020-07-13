@@ -26,15 +26,21 @@
 
 #include "esp32SimHub_menu.h"
 #include <Wire.h>
-#include <JoystickSwitchInput.h>
 #include <IoLogging.h>
-
-#define PULSATING_LED_PIN 13
+#include <AnalogDeviceAbstraction.h>
 
 // used by the custom renderer, to work out the width of the text being drawn
 int width = 20;
 // used to indicate that this is the first time in to the custom renderer
 bool startedCustomRender = false;
+
+// here we pulsate an LED using the ESP32's DAC
+const int dacPin = 25;
+float ledLevel = 0.0;
+float ledAdjustment = 0.01;
+
+// we need access to the analog device of the ESP32
+ArduinoAnalogDevice analogDevice;
 
 // Display variable that we earlier referred to in the designer
 // Here we've used and SH1106, but you could just as easily used an SSD1306 too (or even any other supported display).
@@ -54,10 +60,6 @@ void setup() {
     // initialise the menu library, the following line was automatically added to setup by tcMenu.
     setupMenu();
 
-    // here we calibrate the joystick to set the mid point, change the calibration to match your joystick.
-    // This MUST be done AFTER setupMenu
-    reinterpret_cast<JoystickSwitchInput*>(switches.getEncoder())->setTolerance(0.436, 0.01);
-
     // If we want to have a custom display when the menu is not active, we must provide a reset callback, it
     // is called whenever the menu times out and would otherwise reset to main menu.
     renderer.setResetCallback([] {
@@ -69,6 +71,14 @@ void setup() {
     renderer.takeOverDisplay(simulatorRendering);
 
     menuGear.setTextValue("N");
+
+    analogDevice.initPin(dacPin, DIR_OUT);
+    taskManager.scheduleFixedRate(10, [] {
+        ledLevel += ledAdjustment;
+        if(ledLevel > 0.98) ledAdjustment = -0.01;
+        if(ledLevel < 0.01) ledAdjustment = 0.01;
+        analogDevice.setCurrentFloat(dacPin, ledLevel);
+    });
 
     //
     // if you want to test your rendering without simhub connected, uncomment the below code, it will update all the

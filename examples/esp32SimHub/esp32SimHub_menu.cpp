@@ -17,7 +17,6 @@
 const PROGMEM ConnectorLocalInfo applicationInfo = { "SimHub Link", "4db9fbfe-9fab-4759-b8ff-3e0c6700f475" };
 U8g2GfxMenuConfig gfxConfig;
 U8g2MenuRenderer renderer;
-ArduinoAnalogDevice analogDevice;
 SimhubConnector connector;
 
 // Global Menu Item declarations
@@ -50,13 +49,6 @@ void setupMenu() {
     prepareBasicU8x8Config(gfxConfig);
     renderer.setGraphicsDevice(&gfx, &gfxConfig);
     switches.initialise(internalDigitalIo(), true);
-    switches.addSwitch(14, NULL);
-    switches.onRelease(14, [](pinid_t /*key*/, bool held) {
-            menuMgr.onMenuSelect(held);
-        });
-    setupAnalogJoystickEncoder(&analogDevice, A0, [](int val) {
-            menuMgr.valueChanged(val);
-        });
-    menuMgr.initWithoutInput(&renderer, &menuSpeed);
+    menuMgr.initForEncoder(&renderer, &menuSpeed, 14, 17, 18);
     connector.begin(&Serial, 3);
 }
