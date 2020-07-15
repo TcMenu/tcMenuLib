@@ -19,12 +19,11 @@
     [
       {
         "name": "IoAbstraction",
-        "authors": "DaveTCC",
-        "frameworks": "arduino, mbed"
+        "authors": "DaveTCC"
       }
     ],
     "version": "1.5.0",
-    "license": "LGPL",
+    "license": "LGPL-3.0-or-later",
     "frameworks": "arduino, mbed",
     "platforms": "*"
   }
