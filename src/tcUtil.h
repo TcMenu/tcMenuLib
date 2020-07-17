@@ -7,7 +7,7 @@
 #define _TCUTIL_H
 
 #include <PlatformDetermination.h>
-#ifdef IOA_USING_MBED
+#ifdef IOA_USE_MBED
 #include <mbed.h>
 #define min(x, y) ((x < y)?(x):(y))
 #define max(x, y) ((x > y)?(x):(y))
