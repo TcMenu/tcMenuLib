@@ -6,11 +6,7 @@
 #ifndef _WIFI_STOCK_CONNECTION_LCD_H
 #define _WIFI_STOCK_CONNECTION_LCD_H
 
-#ifdef __MBED__
-#include <mbed.h>
-#else
-#include <Arduino.h>
-#endif
+#include <PlatformDetermination.h>
 
 /**
  * @file wifiAndConnectionIconLCD.h

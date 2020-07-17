@@ -7,6 +7,7 @@
 #define _EDITABLE_LARGE_NUMBER_MENU_ITEM_H_
 
 #include "RuntimeMenuItem.h"
+#include <IoLogging.h>
 
 /**
  * @file EditableLargeNumberMenuItem.h

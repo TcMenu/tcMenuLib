@@ -1,12 +1,7 @@
 #ifndef _TESTFIXTURES_H_
 #define _TESTFIXTURES_H_
 
-#ifdef __MBED__
-#include <mbed.h>
-#else
-#include <Arduino.h>
-#endif
-
+#include <PlatformDetermination.h>
 #include "../tcMenu.h"
 #include "../RuntimeMenuItem.h"
 

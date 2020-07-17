@@ -11,12 +11,7 @@
 #ifndef _TCMENU_REMOTECONNECTOR_H_
 #define _TCMENU_REMOTECONNECTOR_H_
 
-#ifdef __MBED__
-#include <mbed.h>
-#else
-#include <Arduino.h>
-#endif
-
+#include <PlatformDetermination.h>
 #include "RemoteTypes.h"
 #include <tcUtil.h>
 #include "MenuItems.h"

@@ -6,13 +6,12 @@
  * and remote APIs.
  */
 
-#ifdef __MBED__
-#include <mbed.h>
+#include <PlatformDetermination.h>
+#ifdef IOA_USE_MBED
 #include "tcUtil.h"
-#else
-#include <Arduino.h>
 #endif
 
+#include <stdlib.h>
 #include "RemoteConnector.h"
 #include "RemoteAuthentication.h"
 #include "MenuItems.h"

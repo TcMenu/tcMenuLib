@@ -6,7 +6,8 @@
 #ifndef _TCUTIL_H
 #define _TCUTIL_H
 
-#ifdef __MBED__
+#include <PlatformDetermination.h>
+#ifdef IOA_USING_MBED
 #include <mbed.h>
 #define min(x, y) ((x < y)?(x):(y))
 #define max(x, y) ((x > y)?(x):(y))
@@ -17,8 +18,10 @@
 #define strncpy_P(x,y,z) strncpy(x,y,z)
 #define strcpy_P(x,y) strcpy(x,y)
 #define strlen_P(x) strlen(x)
-#else
-#include <Arduino.h>
+#endif
+
+#ifdef IOA_ARDUINO_MBED
+#define ltoa(a,b,c) itoa(a,b,c)
 #endif
 
 #include <BasicIoAbstraction.h>

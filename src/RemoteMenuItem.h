@@ -6,12 +6,7 @@
 #ifndef _REMOTE_MENU_ITEMS_H
 #define _REMOTE_MENU_ITEMS_H
 
-#ifdef __MBED__
-#include <mbed.h>
-#else
-#include <Arduino.h>
-#endif
-
+#include <PlatformDetermination.h>
 #include "MenuItems.h"
 #include <RemoteConnector.h>
 #include <RemoteAuthentication.h>

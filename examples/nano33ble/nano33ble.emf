@@ -1,0 +1,266 @@
+{
+  "lastEdited": {
+    "seconds": 1594988999,
+    "nanos": 0
+  },
+  "codeOptions": {
+    "applicationUUID": "e95fcf8a-8a03-4043-9313-01fd8b8e8707",
+    "applicationName": "Nano 33 BLE Sense",
+    "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
+    "lastDisplayUuid": "d4c84106-fa87-4024-b91e-053e17a52b8f",
+    "lastRemoteUuid": "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb",
+    "embeddedPlatform": "ARDUINO_32",
+    "namingRecursive": true,
+    "saveToSrc": false,
+    "lastProperties": [
+      {
+        "name": "PULLUP_LOGIC",
+        "latestValue": "true",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "INTERRUPT_SWITCHES",
+        "latestValue": "false",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SWITCH_IODEVICE",
+        "latestValue": "",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_A",
+        "latestValue": "5",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_B",
+        "latestValue": "6",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_OK",
+        "latestValue": "4",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "LCD_WIDTH",
+        "latestValue": "20",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "LCD_HEIGHT",
+        "latestValue": "4",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "I2C_ADDRESS",
+        "latestValue": "0x20",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "PIN_LAYOUT",
+        "latestValue": "RS_RW_EN",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "WIRE_VARIABLE",
+        "latestValue": "Wire",
+        "subsystem": "DISPLAY"
+      }
+    ]
+  },
+  "projectName": "Change description",
+  "namingRecursive": true,
+  "version": "1.0",
+  "items": [
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "name": "Temp",
+        "eepromAddress": -1,
+        "id": 1,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "",
+        "maxValue": 2000,
+        "offset": 0,
+        "divisor": 10,
+        "unitName": "C"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "name": "Humidity",
+        "eepromAddress": -1,
+        "id": 3,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "",
+        "maxValue": 1000,
+        "offset": 0,
+        "divisor": 10,
+        "unitName": "%"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "name": "B. Pressure",
+        "eepromAddress": -1,
+        "id": 2,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "",
+        "maxValue": 32000,
+        "offset": 0,
+        "divisor": 10,
+        "unitName": "KPa"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "name": "Accelerometer",
+        "eepromAddress": -1,
+        "id": 4,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "",
+        "secured": false
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "floatItem",
+      "item": {
+        "name": "MagX",
+        "eepromAddress": -1,
+        "id": 5,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "numDecimalPlaces": 2
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "floatItem",
+      "item": {
+        "name": "MagY",
+        "eepromAddress": -1,
+        "id": 6,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "numDecimalPlaces": 2
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "floatItem",
+      "item": {
+        "name": "MagZ",
+        "eepromAddress": -1,
+        "id": 7,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "numDecimalPlaces": 2
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "floatItem",
+      "item": {
+        "name": "AccelX",
+        "eepromAddress": -1,
+        "id": 8,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "numDecimalPlaces": 2
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "floatItem",
+      "item": {
+        "name": "AccelY",
+        "eepromAddress": -1,
+        "id": 9,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "numDecimalPlaces": 2
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "floatItem",
+      "item": {
+        "name": "AccelZ",
+        "eepromAddress": -1,
+        "id": 10,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "",
+        "numDecimalPlaces": 2
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "name": "Analog Readings",
+        "eepromAddress": -1,
+        "id": 11,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "secured": false
+      }
+    },
+    {
+      "parentId": 11,
+      "type": "floatItem",
+      "item": {
+        "name": "In A0",
+        "eepromAddress": -1,
+        "id": 12,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "",
+        "numDecimalPlaces": 2
+      }
+    },
+    {
+      "parentId": 11,
+      "type": "analogItem",
+      "item": {
+        "name": "Output PWM",
+        "eepromAddress": -1,
+        "id": 13,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "onPWMChanged",
+        "maxValue": 100,
+        "offset": 0,
+        "divisor": 0,
+        "unitName": "%"
+      }
+    }
+  ]
+}
