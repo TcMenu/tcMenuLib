@@ -43,7 +43,9 @@ inline void serdebugMsgHdr(const char* tx, int remoteNo, uint16_t msgType) {
 
 void stopPairing();
 
-TagValueRemoteConnector::TagValueRemoteConnector(uint8_t remoteNo) : bootPredicate(MENUTYPE_BACK_VALUE, TM_INVERTED_LOCAL_ONLY), remotePredicate(remoteNo) {
+TagValueRemoteConnector::TagValueRemoteConnector(uint8_t remoteNo) :
+        bootPredicate(MENUTYPE_BACK_VALUE, TM_INVERTED_LOCAL_ONLY),
+        remotePredicate(remoteNo) {
 	this->transport = NULL;
 	this->processor = NULL;
     this->remoteName[0] = 0;
@@ -250,7 +252,7 @@ void TagValueRemoteConnector::performAnyWrites() {
 	}
 	else if(isBootstrapComplete()) {
         MenuItem* item = iterator.nextItem();
-        if(item) {
+        if(item && MENUTYPE_SUB_VALUE != item->getMenuType()) {
             item->setSendRemoteNeeded(remoteNo, false);
             encodeChangeValue(item);
         }
