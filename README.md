@@ -1,8 +1,8 @@
-# TcMenu library for Arduino platform.
+# TcMenu library for Arduino and mbed.
 
 ## Summary
 
-TcMenu is a modular, IoT ready menu library for the Arduino and mbed platform, it uses plugins to support many displays, input devices and provides remote control using a simple protocol over Ethernet and Serial. Menu designs are built using a designer UI and then generated for the platform. Target platform is anything from Arduino Uno upward to ST32F4 boards and beyond. Tested on many Arduino and mbed boards including Uno, Mega2560, SAMD, Nano, STM32F4 and ESP8266/ESP32 boards. Note that this repository contains just the Arduino library to meet the requirements in the Arduino specification. For the main repository see the links below.
+TcMenu is a modular, IoT ready menu library for the Arduino and mbed platform, it uses plugins to support many displays, input devices and provides remote control using a simple protocol over Ethernet and Serial. Menu designs are built using a designer UI and then generated for the platform. Target platform is anything from Arduino Uno upward to ST32F4 boards and beyond. Tested on many Arduino and mbed boards including Uno, Mega2560, SAMD, Nano, STM32F4 and ESP8266/ESP32 boards. Note that this repository contains just the Arduino/mbed library to meet the requirements in the Arduino specification. For the main repository see the links below.
 
 * [TcMenu main repo](https://github.com/davetcc/tcMenu)
 * [TcMenu main page at TheCodersCorner website](https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/)
