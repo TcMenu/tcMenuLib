@@ -11,17 +11,20 @@
 #include <MenuItems.h>
 #include "nano33ble_menu.h"
 
-class SensorManager : Executable{
+/**
+ * Here we have a class that extends `Executable`, meaning that the `exec()` method is called every time the event
+ * is scheduled by task manager. We read the data from the sensors and set them onto menu items.
+ */
+class SensorManager : public Executable {
 private:
     bool initialised{};
 public:
     void initialise() {
         initialised = HTS.begin()  != 0;
         initialised = initialised && BARO.begin();
-        initialised = initialised && taskManager.scheduleFixedRate(1, this, TIME_SECONDS) != TASKMGR_INVALIDID;
     }
 
-    void exec() {
+    void exec() override {
         menuTemp.setFromFloatingPointValue(HTS.readTemperature());
         menuHumidity.setFromFloatingPointValue(HTS.readHumidity());
         menuBPressure.setFromFloatingPointValue(BARO.readPressure());
