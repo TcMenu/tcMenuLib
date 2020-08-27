@@ -1,7 +1,8 @@
-#ifndef _BASE_RENDERER_TESTS_H_
-#define _BASE_RENDERER_TESTS_H_
+#ifndef BASE_DIALOG_TESTS_H
+#define BASE_DIALOG_TESTS_H
 
 #include <AUnit.h>
+#include <tcMenu.h>
 #include <BaseDialog.h>
 #include <RemoteTypes.h>
 #include <RemoteConnector.h>
@@ -33,7 +34,10 @@ public:
 
 	int getValueWhenRenderered() { return valueWhenRenderered; }
 	int getRenderCount() { return renderCount; }
-	const char* getButtonText(int btn) { copyButtonText(szTemp, btn, valueWhenRenderered);  return szTemp; }
+	const char* getButtonText(int btn) {
+	    copyButtonText(szTemp, btn, valueWhenRenderered);
+	    return szTemp;
+	}
 };
 
 const char myHeader[] = "Hello";
@@ -124,4 +128,4 @@ test(testBaseDialogQuestion) {
 	assertFalse(dialog.isInUse());
 }
 
-#endif //_BASE_RENDERER_TESTS_H_
+#endif //BASE_DIALOG_TESTS_H

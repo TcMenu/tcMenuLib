@@ -7,13 +7,6 @@
 #include <MockEepromAbstraction.h>
 #include <MockIoAbstraction.h>
 #include <MenuIterator.h>
-
-#include "menuManagerTests.h"
-#include "authenticationTests.h"
-#include "menuItemTests.h"
-#include "baseDialogTests.h"
-#include "LargeNumberItemTests.h"
-//#include "baseRemoteTests.h"
 #include <tcm_test/testFixtures.h>
 
 using namespace aunit;
@@ -86,7 +79,7 @@ void printMenuItem(MenuItem* menuItem) {
 
 class MenuItemIteratorFixture : public TestOnce {
 public:
-    void assertMenuItem(MenuItem* actual, MenuItem* expected) {
+    bool checkMenuItem(MenuItem* actual, MenuItem* expected) {
         if(expected != actual) {
             Serial.print("Menu items are not equal: expected=");
             printMenuItem(expected);
@@ -94,7 +87,7 @@ public:
             printMenuItem(actual);
             Serial.println();
         }
-        assertTrue(actual == expected);
+        return (actual == expected);
     }
 };
 
@@ -102,18 +95,18 @@ public:
 testF(MenuItemIteratorFixture, testTcUtilGetParentAndVisit) {
     menuMgr.initWithoutInput(&noRenderer, &menuVolume);
 
-    assertMenuItem(getParentRoot(NULL), &menuVolume);
-    assertMenuItem(getParentRoot(&menuVolume), &menuVolume);
-    assertMenuItem(getParentRoot(&menuStatus), &menuVolume);
-    assertMenuItem(getParentRoot(&menuBackSettings), &menuVolume);
-    assertMenuItem(getParentRoot(&menuBackSecondLevel), &menuBackStatus);
+    assertTrue(checkMenuItem(getParentRoot(NULL), &menuVolume));
+    assertTrue(checkMenuItem(getParentRoot(&menuVolume), &menuVolume));
+    assertTrue(checkMenuItem(getParentRoot(&menuStatus), &menuVolume));
+    assertTrue(checkMenuItem(getParentRoot(&menuBackSettings), &menuVolume));
+    assertTrue(checkMenuItem(getParentRoot(&menuBackSecondLevel), &menuBackStatus));
 
     counter = 0;
-    assertMenuItem(getParentRootAndVisit(&menuBackSecondLevel, [](MenuItem* item) { 
+    assertTrue(checkMenuItem(getParentRootAndVisit(&menuBackSecondLevel, [](MenuItem* item) {
         counter++;
 		// below is for debugging
         //Serial.print("Visited");printMenuItem(item);Serial.println();
-    }), &menuBackStatus);
+    }), &menuBackStatus));
     assertEqual(counter, 15);
 }
 
@@ -121,12 +114,12 @@ testF(MenuItemIteratorFixture, testGetItemById) {
     menuMgr.initWithoutInput(&noRenderer, &menuVolume);
 
     assertTrue(getMenuItemById(0) == NULL);
-    assertMenuItem(getMenuItemById(1), &menuVolume);
-    assertMenuItem(getMenuItemById(menuBackStatus.getId()), &menuBackStatus);
-    assertMenuItem(getMenuItemById(101), &menuPressMe);
-    assertMenuItem(getMenuItemById(2), &menuChannel);
-    assertMenuItem(getMenuItemById(7), &menuLHSTemp);
-    assertMenuItem(getMenuItemById(103), &menuCaseTemp);
+    assertTrue(checkMenuItem(getMenuItemById(1), &menuVolume));
+    assertTrue(checkMenuItem(getMenuItemById(menuBackStatus.getId()), &menuBackStatus));
+    assertTrue(checkMenuItem(getMenuItemById(101), &menuPressMe));
+    assertTrue(checkMenuItem(getMenuItemById(2), &menuChannel));
+    assertTrue(checkMenuItem(getMenuItemById(7), &menuLHSTemp));
+    assertTrue(checkMenuItem(getMenuItemById(103), &menuCaseTemp));
 }
 
 void clearAllChangeStatus() {
@@ -148,27 +141,34 @@ testF(MenuItemIteratorFixture, testIterationWithPredicate) {
     for(int i=0;i<3;i++) {
         Serial.print("Type Predicate item iteration ");Serial.println(i);
 
-        assertMenuItem(iterator.nextItem(), &menuSettings);
-        assertMenuItem(iterator.nextItem(), &menuStatus);
-        assertMenuItem(iterator.nextItem(), &menuSecondLevel);
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuSettings));
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuStatus));
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuSecondLevel));
         assertTrue(iterator.nextItem() == NULL);
     }
 
     RemoteNoMenuItemPredicate remotePredicate(0);
     iterator.setPredicate(&remotePredicate);
 
-    // this predicate looks for a remote needing to be set.
+    // this predicate looks for a remote needing to be set, but we need to check that if the local only flag is set
+    // on the item (or a parent submenu), we never send regardless of this state.
     menuVolume.setSendRemoteNeededAll();
     menuPressMe.setSendRemoteNeededAll();
 
-    // prevent menu volume from being sent as it is local only
+    // prevent status and secondLevel (as under status) and volume from being sent.
+    menuStatus.setLocalOnly(true);
     menuVolume.setLocalOnly(true);
-    
-    assertMenuItem(iterator.nextItem(), &menuPressMe);
+
+    // now we set an item to remote send that is actually able to send remotely
+    menu12VStandby.setSendRemoteNeededAll();
+
+    assertTrue(checkMenuItem(iterator.nextItem(), &menuSettings));
+    assertTrue(checkMenuItem(iterator.nextItem(), &menu12VStandby));
     assertTrue(iterator.nextItem() == NULL);
 
     clearAllChangeStatus();
 
+    assertTrue(checkMenuItem(iterator.nextItem(), &menuSettings));
     assertTrue(iterator.nextItem() == NULL);
 }
 
@@ -178,19 +178,36 @@ testF(MenuItemIteratorFixture, testIteratorTypePredicateLocalOnly) {
 
     clearAllChangeStatus();
 
-    MenuItemTypePredicate intPredicate(MENUTYPE_INT_VALUE, TM_REGULAR_LOCAL_ONLY);
+    MenuItemTypePredicate intPredicate(MENUTYPE_INT_VALUE, TM_REGULAR_LOCAL_ONLY | TM_EXTRA_INCLUDE_SUBMENUS);
     MenuItemIterator iterator;
     iterator.setPredicate(&intPredicate);
 
-    menuVolume.setLocalOnly(true);
+    menuVolume.setLocalOnly(false);
     menuContrast.setLocalOnly(true);
+    menuStatus.setLocalOnly(true);
 
     for(int i=0;i<3;i++) {
         Serial.print("Local Int Predicate item iteration ");Serial.println(i);
 
-        assertMenuItem(iterator.nextItem(), &menuLHSTemp);
-        assertMenuItem(iterator.nextItem(), &menuRHSTemp);
-        assertMenuItem(iterator.nextItem(), &menuCaseTemp);
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuVolume));
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuSettings));
+        assertTrue(iterator.nextItem() == NULL);
+    }
+
+    menuVolume.setLocalOnly(true);
+    menuContrast.setLocalOnly(false);
+    menuStatus.setLocalOnly(false);
+
+    for(int i=0;i<3;i++) {
+        Serial.print("Local Int Predicate (secondLevel local only)");Serial.println(i);
+
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuSettings));
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuContrast));
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuStatus));
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuLHSTemp));
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuRHSTemp));
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuSecondLevel));
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuCaseTemp));
         assertTrue(iterator.nextItem() == NULL);
     }
 }
@@ -232,37 +249,37 @@ testF(MenuItemIteratorFixture, testIterationOverAllMenuItems) {
         // are laid out in the file, IE depth first ordering.
 
         // first we get the volume and channel
-        assertMenuItem(iterator.nextItem(),&menuVolume);
-        assertMenuItem(iterator.nextItem(), &menuChannel);
+        assertTrue(checkMenuItem(iterator.nextItem(),&menuVolume));
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuChannel));
         assertTrue(iterator.currentParent() == NULL);
 
         // then traverse into the settings menu (parent is volume)
-        assertMenuItem(iterator.nextItem(), &menuSettings);
-        assertMenuItem(iterator.currentParent(), NULL);
-        assertMenuItem(iterator.nextItem(), &menuBackSettings);
-        assertMenuItem(iterator.currentParent(), &menuSettings);
-        assertMenuItem(iterator.nextItem(), &menu12VStandby);
-        assertMenuItem(iterator.nextItem(), &menuContrast);
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuSettings));
+        assertTrue(checkMenuItem(iterator.currentParent(), NULL));
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuBackSettings));
+        assertTrue(checkMenuItem(iterator.currentParent(), &menuSettings));
+        assertTrue(checkMenuItem(iterator.nextItem(), &menu12VStandby));
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuContrast));
 
         // and then into the status menu, which has a nested submenu
-        assertMenuItem(iterator.nextItem(), &menuStatus);
-        assertMenuItem(iterator.currentParent(), NULL);
-        assertMenuItem(iterator.nextItem(), &menuBackStatus);
-        assertMenuItem(iterator.currentParent(), &menuStatus);
-        assertMenuItem(iterator.nextItem(), &menuLHSTemp);
-        assertMenuItem(iterator.currentParent(), &menuStatus);
-        assertMenuItem(iterator.nextItem(), &menuRHSTemp);
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuStatus));
+        assertTrue(checkMenuItem(iterator.currentParent(), NULL));
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuBackStatus));
+        assertTrue(checkMenuItem(iterator.currentParent(), &menuStatus));
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuLHSTemp));
+        assertTrue(checkMenuItem(iterator.currentParent(), &menuStatus));
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuRHSTemp));
         // nested sub menu of status here
-        assertMenuItem(iterator.nextItem(), &menuSecondLevel);
-        assertMenuItem(iterator.currentParent(), &menuStatus);
-        assertMenuItem(iterator.nextItem(), &menuBackSecondLevel);
-        assertMenuItem(iterator.currentParent(), &menuSecondLevel);
-        assertMenuItem(iterator.nextItem(), &menuPressMe);
-        assertMenuItem(iterator.nextItem(), &menuFloatItem);
-        assertMenuItem(iterator.currentParent(), &menuSecondLevel);
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuSecondLevel));
+        assertTrue(checkMenuItem(iterator.currentParent(), &menuStatus));
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuBackSecondLevel));
+        assertTrue(checkMenuItem(iterator.currentParent(), &menuSecondLevel));
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuPressMe));
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuFloatItem));
+        assertTrue(checkMenuItem(iterator.currentParent(), &menuSecondLevel));
         // exit of nested submenu here.
-        assertMenuItem(iterator.nextItem(), &menuCaseTemp);
-        assertMenuItem(iterator.currentParent(), &menuStatus);
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuCaseTemp));
+        assertTrue(checkMenuItem(iterator.currentParent(), &menuStatus));
         assertTrue(iterator.nextItem() == NULL);
     }
 }
@@ -275,8 +292,8 @@ testF(MenuItemIteratorFixture, testIterationOnSimpleMenu) {
     iterator.reset();
 
     for(int i=0;i<3;i++) {
-        assertMenuItem(iterator.nextItem(), &menuSimple1);
-        assertMenuItem(iterator.nextItem(), &menuSimple2);
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuSimple1));
+        assertTrue(checkMenuItem(iterator.nextItem(), &menuSimple2));
         assertTrue(iterator.nextItem() == NULL);
     }
 }

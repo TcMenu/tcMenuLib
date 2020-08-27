@@ -15,6 +15,9 @@
  * These numeric values have 12 digits, and as many decimal places as required.
  */
 
+#define LARGE_NUM_MAX_DIGITS 12
+#define LARGE_NUM_ALLOC_SIZE (LARGE_NUM_MAX_DIGITS / 2)
+
 /**
  * A structure for very large integers that can be edited using the multipart editor.
  * They are represented as binary coded decimal to 12 dp with as many fraction decimal
@@ -24,7 +27,7 @@
  */
 class LargeFixedNumber {
 private:
-	uint8_t bcdRepresentation[6];
+	uint8_t bcdRepresentation[LARGE_NUM_ALLOC_SIZE];
     bool negative;
     uint8_t fractionDp;
 public:
@@ -43,7 +46,7 @@ public:
 	/**
 	 * @return the number of decimal places needed.
 	 */
-    int decimalPointIndex() { return fractionDp; }
+    int decimalPointIndex() const { return fractionDp; }
 
 	/**
 	 * Set the number of decimal places and zero out any currently held value.
@@ -70,6 +73,7 @@ public:
      */
     void setFromFloat(float value) {
         bool neg = value < 0.0f;
+        value = abs(value);
         uint32_t val = (uint32_t)value;
         uint32_t frc = (value - (float)val) * dpToDivisor(fractionDp);
         setValue(val, frc, neg);
@@ -89,7 +93,7 @@ public:
      * @param start the index to start in the packed data
      * @param end will stop at one before this point
      */
-	void convertToBcdPacked(int32_t value, int start, int end);
+	void convertToBcdPacked(uint32_t value, int start, int end);
 
     /**
      * get a particular digit from the bit packed structure.
@@ -137,7 +141,7 @@ public:
      * @return the whole part of the value
      */
     uint32_t getWhole() {
-        return fromBcdPacked(fractionDp, 12);
+        return fromBcdPacked(fractionDp, LARGE_NUM_MAX_DIGITS);
     }
 
     /**

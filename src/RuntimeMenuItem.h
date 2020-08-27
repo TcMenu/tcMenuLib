@@ -312,7 +312,8 @@ public:
 };
 
 /**
- * The storage for a time field can hold down to hundreds of a second
+ * The storage for a time field can hold down to hundreds of a second, stored as a series of bytes for hours, minutes,
+ * seconds and hundreds.
  */
 struct TimeStorage {
     TimeStorage() {
@@ -332,6 +333,9 @@ struct TimeStorage {
     uint8_t hundreds;
 };
 
+/**
+ * Storage of a date field where the month and day are represented as a single byte, and the year is a 16 bit value.
+ */
 struct DateStorage {
     uint8_t day;
     uint8_t month;
@@ -348,6 +352,12 @@ struct DateStorage {
     }
 };
 
+/**
+ * A runtime menu item that represents time value, either in the 24 hour clock or in the 12 hour clock. Further, the
+ * hundreds can be configured to show as well. It is an extension of the multi part editor that supports editing
+ * times in parts, hours, then minutes and so on.  Instances of this class should use the `dateItemRenderFn` for the
+ * base rendering.
+ */
 class TimeFormattedMenuItem : public EditableMultiPartMenuItem<TimeStorage> {
 private:
     MultiEditWireType format;
@@ -373,11 +383,51 @@ public:
     TimeStorage* getUnderlyingData() {return &data;}
 };
 
+/**
+ * A runtime menu item that represents a date value in the gregorian calendar. It is an extension of the multipart editor
+ * class that supports editing dates in parts, days, month and finally years. It has some very basic support for leap
+ * years. Instances of this class should use the `dateItemRenderFn` for the base rendering.
+ */
 class DateFormattedMenuItem : public EditableMultiPartMenuItem<DateStorage>{
 public:
-    DateFormattedMenuItem(RuntimeRenderingFn renderFn, uint16_t id, MenuItem* next = NULL)
+    enum DateFormatOption { DD_MM_YYYY, MM_DD_YYYY, YYYY_MM_DD };
+private:
+    static char separator;
+    static DateFormatOption dateFormatMode;
+public:
+    DateFormattedMenuItem(RuntimeRenderingFn renderFn, uint16_t id, MenuItem* next = nullptr)
     : EditableMultiPartMenuItem(MENUTYPE_DATE, id, 3, renderFn, next) {
         setDate(DateStorage(1, 1, 2020));
+    }
+
+    /**
+     * sets the global separator for date rendering.
+     * @param sep the new separator character
+     */
+    static void setDateSeparator(char sep) {
+        separator = sep;
+    }
+
+    /**
+     * @return the global separator for date rendering.
+     */
+    static char getDateSeparator() {
+        return separator;
+    }
+
+    /**
+     * Sets the global date formatting for dates, one of the enum DateFormatOption.
+     * @param fmt the new format to use
+     */
+    static void setDateFormatStyle(DateFormatOption fmt) {
+        dateFormatMode = fmt;
+    }
+
+    /**
+     * @return the global date format option in use by all date formatters.
+     */
+    static DateFormatOption getDateFormatStyle() {
+        return dateFormatMode;
     }
 
     DateStorage getDate() { return data; }

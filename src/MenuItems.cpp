@@ -136,7 +136,9 @@ void AnalogMenuItem::copyValue(char * buffer, uint8_t bufferSize) {
 	uint8_t dpNeeded = getDecimalPlacesForDivisor();
 	WholeAndFraction wf = getWholeAndFraction();
 
-	ltoaClrBuff(buffer, wf.whole, 5, NOT_PADDED, bufferSize);
+	buffer[0]=0;
+	if(wf.negative) appendChar(buffer, '-', bufferSize);
+	fastltoa(buffer, wf.whole, 5, NOT_PADDED, bufferSize);
 
 	if (dpNeeded != 0) {
 		appendChar(buffer, '.', sizeof bufferSize);
@@ -148,8 +150,12 @@ void AnalogMenuItem::copyValue(char * buffer, uint8_t bufferSize) {
 
 float AnalogMenuItem::getAsFloatingPointValue() {
 	WholeAndFraction wf = getWholeAndFraction();
+	serdebugF4("getasF ", wf.whole, wf.fraction, wf.negative);
 	float fract = (float(wf.fraction) / float(getActualDecimalDivisor()));
-	return  (wf.whole < 0) ? (wf.whole - fract) : (wf.whole + fract);
+	float whole = (wf.negative) ? -float(wf.whole) : float(wf.whole);
+	serdebugF3("whole, fract ", whole, fract);
+	return (wf.negative) ? (whole - fract) : (whole + fract);
+
 }
 
 uint16_t AnalogMenuItem::getActualDecimalDivisor() {
@@ -163,12 +169,14 @@ WholeAndFraction AnalogMenuItem::getWholeAndFraction() {
 	int calcVal = int16_t(getCurrentValue()) + getOffset();
 	int divisor = getDivisor();
 
+    wf.negative = (calcVal < 0);
+
 	if (divisor < 2) {
 		wf.whole = calcVal;
 		wf.fraction = 0;
 	}
 	else {
-		wf.whole = calcVal / int16_t(divisor);
+		wf.whole = abs(calcVal) / int16_t(divisor);
 		int fractMax = getActualDecimalDivisor();
 		wf.fraction = abs((calcVal % divisor)) * (fractMax / divisor);
 	}
@@ -179,14 +187,27 @@ void AnalogMenuItem::setFromWholeAndFraction(WholeAndFraction wf) {
 	int fractMax = getActualDecimalDivisor();
 	uint16_t divisor = getDivisor();
 	int correctedFraction = wf.fraction / (fractMax / divisor);
-	setCurrentValue(((wf.whole * getDivisor()) + correctedFraction) - getOffset());
+	auto val = (wf.whole * getDivisor());
+	if(wf.negative) {
+        val = -val;
+        val = val - correctedFraction;
+	}
+	else {
+	    val = val + correctedFraction;
+	}
+	setCurrentValue(val - getOffset());
+
 	serdebugF4("setWF ", wf.whole, wf.fraction, getCurrentValue());
 }
 
 void AnalogMenuItem::setFromFloatingPointValue(float value) {
 	WholeAndFraction wf;
+	if(value < 0.0F) {
+	    wf.negative = true;
+	    value = abs(value);
+	}
 	wf.whole = value;
-	wf.fraction = abs(value - float(wf.whole)) * getActualDecimalDivisor();
+	wf.fraction = (value - float(wf.whole)) * getActualDecimalDivisor();
 
 	setFromWholeAndFraction(wf);
 }

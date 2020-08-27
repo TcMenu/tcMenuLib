@@ -4,13 +4,8 @@
 #include <AUnit.h>
 #include <MockEepromAbstraction.h>
 #include "RemoteAuthentication.h"
-
+#include <fixtures_extern.h>
 using namespace aunit;
-
-const char *uuid1 = "07cd8bc6-734d-43da-84e7-6084990becfc"; 
-const char *uuid2 = "07cd8bc6-734d-43da-84e7-6084990becfd";
-const char *uuid3 = "07cd8bc6-734d-43da-84e7-6084990becfe";
-
 
 void printAllAuthenticatorEntries(EepromAuthenticatorManager& authenticator, const char* why) {
 	Serial.print(why);

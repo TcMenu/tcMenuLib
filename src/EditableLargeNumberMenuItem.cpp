@@ -3,6 +3,7 @@
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
+#include <Arduino.h>
 #include <PlatformDetermination.h>
 #include "EditableLargeNumberMenuItem.h"
 
@@ -14,7 +15,7 @@ void LargeFixedNumber::clear() {
 void LargeFixedNumber::setValue(uint32_t whole, uint32_t fraction, bool negative) {
 	clear();
 	convertToBcdPacked(fraction, 0, fractionDp);
-	convertToBcdPacked(whole, fractionDp, 12);
+	convertToBcdPacked(whole, fractionDp, LARGE_NUM_MAX_DIGITS);
 	this->negative = negative;
 }
 
@@ -28,10 +29,10 @@ uint32_t LargeFixedNumber::fromBcdPacked(int start, int end) {
 	return res;
 }
 
-void LargeFixedNumber::convertToBcdPacked(int32_t value, int start, int end) {
+void LargeFixedNumber::convertToBcdPacked(uint32_t value, int start, int end) {
 	int32_t modulo = dpToDivisor((end - start) - 1);
 	for (int i = start; i < end; i++) {
-		setDigit(i, min(9, value / modulo));
+		setDigit(i, min(9, int(value / modulo)));
 		value = value % modulo;
 		modulo /= 10L;
 	}

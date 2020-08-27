@@ -1,6 +1,12 @@
 #ifndef MENU_MANAGER_TEST_H
 #define MENU_MANAGER_TEST_H
 
+#include <AUnit.h>
+#include <MockIoAbstraction.h>
+#include <BaseRenderers.h>
+#include <MockEepromAbstraction.h>
+#include <fixtures_extern.h>
+
 extern MockedIoAbstraction mockIo;
 extern NoRenderer noRenderer; 
 extern MockEepromAbstraction eeprom;

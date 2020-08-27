@@ -5,6 +5,7 @@
 #include <KeyboardManager.h>
 #include <tcMenuKeyboard.h>
 #include <EepromAbstraction.h>
+#include <Ethernet.h>
 
 // Set up ethernet, the usual default settings are chosen. Change to your preferred values or use DHCP.
 byte mac[] = {
@@ -115,6 +116,8 @@ void setup() {
     authManager.copyPinToBuffer(sz, sizeof(sz));
     menuConnectivityChangePin.setTextValue(sz);
     menuConnectivityChangePin.setPasswordField(true);
+
+    menuLargeNum.getLargeNumber()->setFromFloat(1234.567);
 }
 
 void loop() {

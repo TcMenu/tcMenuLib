@@ -163,23 +163,43 @@ int timeItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char
     }
 }
 
+char DateFormattedMenuItem::separator = '/';
+DateFormattedMenuItem::DateFormatOption DateFormattedMenuItem::dateFormatMode = DateFormattedMenuItem::DD_MM_YYYY;
+
 int daysForMonth(DateStorage& theDate) {
     auto month = theDate.month;
     auto year = theDate.year;
     if (month == 4 || month == 6 || month == 9 || month == 11)
         return 30;
-    else if (month == 02) {
+    else if (month == 2) {
         bool isLeap = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
         return isLeap ?  29 : 28;
     }
     else return 31;
 }
 
+int toNaturalDateIndex(int act) {
+    auto fmt = DateFormattedMenuItem::getDateFormatStyle();
+    if(fmt == DateFormattedMenuItem::DD_MM_YYYY) {
+        return act;
+    }
+    else if(fmt == DateFormattedMenuItem::MM_DD_YYYY) {
+        return act == 2 ? 2 : act == 1 ? 0 : 1;
+    }
+    else /* YYYY_MM_DD */ {
+        return act == 1 ? 1 : act == 2 ? 0 : 2;
+    }
+}
+int toNaturalDateField(DateStorage dateStorage, int act) {
+    auto fld = toNaturalDateIndex(act);
+    return fld == 0 ? dateStorage.day : fld == 1 ? dateStorage.month : dateStorage.year;
+}
 int dateItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
     if (item->getMenuType() != MENUTYPE_DATE) return 0;
     auto timeItem = reinterpret_cast<DateFormattedMenuItem*>(item);
     auto idx = row - 1;
     auto data = timeItem->getDate();
+    auto sep = DateFormattedMenuItem::getDateSeparator();
 
     switch(mode) {
         case RENDERFN_NAME: {
@@ -188,30 +208,30 @@ int dateItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char
         }
         case RENDERFN_VALUE: {
             buffer[0] = 0;
-            wrapForEdit(data.day, 0, row, buffer, bufferSize, true);
-            appendChar(buffer, '/', bufferSize);
-            wrapForEdit(data.month, 1, row, buffer, bufferSize, true);
-            appendChar(buffer, '/', bufferSize);
-            wrapForEdit(data.year, 2, row, buffer, bufferSize, false);
+            wrapForEdit(toNaturalDateField(timeItem->getDate(), 0), 0, row, buffer, bufferSize, toNaturalDateIndex(0) != 2);
+            appendChar(buffer, sep, bufferSize);
+            wrapForEdit(toNaturalDateField(timeItem->getDate(), 1), 1, row, buffer, bufferSize, toNaturalDateIndex(1) != 2);
+            appendChar(buffer, sep, bufferSize);
+            wrapForEdit(toNaturalDateField(timeItem->getDate(), 2), 2, row, buffer, bufferSize, toNaturalDateIndex(2) != 2);
             return true;
         }
         case RENDERFN_GETRANGE: {
-            if(idx == 0) return daysForMonth(data);
-            else if(idx == 1) return 12;
-            else if(idx == 2) return 9999;
+            if(idx == toNaturalDateIndex(0)) return daysForMonth(data);
+            else if(idx == toNaturalDateIndex(1)) return 12;
+            else if(idx == toNaturalDateIndex(2)) return 9999;
             else return true;
         }
         case RENDERFN_GETPART: {
-            if(idx == 0) return data.day;
-            else if(idx==1) return data.month;
+            if(idx == toNaturalDateIndex(0)) return data.day;
+            else if(idx==toNaturalDateIndex(1)) return data.month;
             else return data.year;
         }
 
         case RENDERFN_SET_VALUE: {
             int idx = row - 1;
-            if(idx == 0) timeItem->getUnderlyingData()->day = buffer[0];
-            else if(idx == 1) timeItem->getUnderlyingData()->month = buffer[0];
-            else if(idx == 2) timeItem->getUnderlyingData()->year = *((int*)buffer);
+            if(idx == toNaturalDateIndex(0)) timeItem->getUnderlyingData()->day = buffer[0];
+            else if(idx == toNaturalDateIndex(1)) timeItem->getUnderlyingData()->month = buffer[0];
+            else if(idx == toNaturalDateIndex(2)) timeItem->getUnderlyingData()->year = *((int*)buffer);
             return true;
         }
         default: return false;

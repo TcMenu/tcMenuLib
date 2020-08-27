@@ -8,6 +8,7 @@
     use elsewhere.
 */
 
+#include <Arduino.h>
 #include <tcMenu.h>
 #include "colorTftEthernet32_menu.h"
 

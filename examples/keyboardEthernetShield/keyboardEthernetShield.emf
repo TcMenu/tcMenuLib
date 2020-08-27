@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1589221513,
+    "seconds": 1598353698,
     "nanos": 0
   },
   "codeOptions": {
@@ -13,6 +13,36 @@
     "namingRecursive": true,
     "saveToSrc": false,
     "lastProperties": [
+      {
+        "name": "PULLUP_LOGIC",
+        "latestValue": "true",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "INTERRUPT_SWITCHES",
+        "latestValue": "false",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SWITCH_IODEVICE",
+        "latestValue": "io23017",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_A",
+        "latestValue": "6",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_B",
+        "latestValue": "7",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_OK",
+        "latestValue": "5",
+        "subsystem": "INPUT"
+      },
       {
         "name": "LCD_WIDTH",
         "latestValue": "20",
@@ -67,36 +97,6 @@
         "name": "LCD_IO_DEVICE",
         "latestValue": "io23017",
         "subsystem": "DISPLAY"
-      },
-      {
-        "name": "PULLUP_LOGIC",
-        "latestValue": "true",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "INTERRUPT_SWITCHES",
-        "latestValue": "false",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "SWITCH_IODEVICE",
-        "latestValue": "io23017",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "ENCODER_PIN_A",
-        "latestValue": "6",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "ENCODER_PIN_B",
-        "latestValue": "7",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "ENCODER_PIN_OK",
-        "latestValue": "5",
-        "subsystem": "INPUT"
       },
       {
         "name": "LIBRARY_TYPE",

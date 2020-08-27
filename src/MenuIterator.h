@@ -14,7 +14,9 @@
 #ifndef _MENUITERATOR_H
 #define _MENUITERATOR_H
 
-#define MAX_MENU_DEPTH 4
+#ifndef MAX_MENU_DEPTH
+# define MAX_MENU_DEPTH 4
+#endif // MAX_MENU_DEPTH
 
 // forward reference of menu item
 class MenuItem;
@@ -43,7 +45,7 @@ MenuItem* getParentRootAndVisit(MenuItem* current, MenuVisitorFn visitor);
  * @param current the menu item that is currently menu root
  * @return the parent menu item to the present menu item, returns root instead of NULL.
  */
-inline MenuItem* getParentRoot(MenuItem* current) { return getParentRootAndVisit(current, NULL); }
+inline MenuItem* getParentRoot(MenuItem* current) { return getParentRootAndVisit(current, nullptr); }
 
 /**
  * Gets the first match by ID of a menu item in the menu structure.
@@ -101,7 +103,7 @@ public:
      * Constructs the predicate with the remote number we are interested in.
      * @param the number of the remote we want to check for.
      */
-    RemoteNoMenuItemPredicate(int remoteNo) { this->remoteNo = remoteNo; }
+    explicit RemoteNoMenuItemPredicate(int remoteNo) { this->remoteNo = remoteNo; }
 
     /**
      * Matches if the remote number is marked as changed on the item. Remote number from the constructor.
@@ -116,6 +118,10 @@ public:
 #define TM_INVERTED  1
 #define TM_REGULAR_LOCAL_ONLY  8
 #define TM_INVERTED_LOCAL_ONLY  9
+#define TM_EXTRA_INCLUDE_SUBMENUS 16
+#define TM_BIT_INVERT 0U
+#define TM_BIT_LOCAL_ONLY 3U
+#define TM_BIT_INCLUDE_SUBMENU 4U
 
 /**
  * A specialisation of the MenuItemPredicate that matches on a given MenuType. For example sub menus or 
@@ -163,7 +169,7 @@ private:
 public:
     MenuItemIterator() { 
         reset(); 
-        predicate = NULL;
+        predicate = nullptr;
     }
 
     /**

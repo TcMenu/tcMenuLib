@@ -8,6 +8,7 @@
     use elsewhere.
 */
 
+#include <Arduino.h>
 #include <tcMenu.h>
 #include "keyboardEthernetShield_menu.h"
 

@@ -423,21 +423,23 @@ public:
 struct WholeAndFraction {
 public:
 	WholeAndFraction() {
-		this->whole = this->fraction = 0;
+		this->whole = this->fraction = this->negative = 0;
 	}
 
 	WholeAndFraction(const WholeAndFraction& that) {
 		this->whole = that.whole;
 		this->fraction = that.fraction;
+		this->negative = that.negative;
 	}
 
-	WholeAndFraction(int16_t whole, uint16_t fract) {
+	WholeAndFraction(uint16_t whole, uint16_t fract, bool negative) {
 		this->whole = whole;
 		this->fraction = fract;
+		this->negative = negative;
 	}
-	int16_t whole;
-	uint16_t fraction;
-
+	uint32_t whole: 15;
+	uint32_t fraction: 16;
+    uint32_t negative: 1;
 };
 
 /**

@@ -166,7 +166,7 @@ void MenuEditingKeyListener::processAnalogKeyPress(AnalogMenuItem* item, char ke
 	// special handling.
 	if (key < '0' || key > '9') {
 		if (mode == KEYEDIT_ANALOG_EDIT_WHOLE && (key == '#' || key  == '-')) {
-			currentValue.whole = currentValue.whole * -1;
+			currentValue.negative = !currentValue.negative;
 			serdebugF2("Negate to ", currentValue.whole);
 			item->setFromWholeAndFraction(currentValue);
 		}

@@ -4,13 +4,17 @@
 #include <AUnit.h>
 #include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
+#include <fixtures_extern.h>
+#include <tcMenu.h>
 
 void dumpBuffer(LargeFixedNumber* buffer) {
 	Serial.print("Largenumber buffer: ");
 	const uint8_t* underlyingBuffer = buffer->getNumberBuffer();
 	for (int i = 0; i < 6; i++) {
-		Serial.print((unsigned int)underlyingBuffer[i], HEX);
-		Serial.print(", ");
+		Serial.print((unsigned int)(underlyingBuffer[i] & 0x0f));
+        Serial.print(" ");
+		Serial.print((unsigned int)(underlyingBuffer[i] >>4));
+		Serial.print(" ");
 	}
 	Serial.println();
 }
@@ -87,6 +91,14 @@ test(testLargeNumberGetAndSet) {
 
     assertEqual(largeNumber.getWhole(), (uint32_t)9999999L);
     assertEqual(largeNumber.getFraction(), (uint32_t)56734L);
+    assertTrue(largeNumber.isNegative());
+
+    largeNumber.setPrecision(4);
+    largeNumber.setFromFloat(-0.01234F);
+    dumpBuffer(&largeNumber);
+
+    assertEqual(largeNumber.getWhole(), (uint32_t)0);
+    assertEqual(largeNumber.getFraction(), (uint32_t)123);
     assertTrue(largeNumber.isNegative());
 }
 

@@ -25,7 +25,7 @@ SubMenuItem menuSub(&minfoSub, &menuBackSub, NULL);
 const PGM_TCM AnalogMenuInfo minfoAnalog = { "Analog", 1, 2, 255, NO_CALLBACK, 0, 1, "AB" };
 AnalogMenuItem menuAnalog(&minfoAnalog, 0, &menuSub);
 
-const PGM_TCM AnalogMenuInfo minfoAnalog2 = { "Analog2", 2, 4, 100, NO_CALLBACK, 0, 10, "" };
+const PGM_TCM AnalogMenuInfo minfoAnalog2 = { "Analog2", 2, 4, 100, NO_CALLBACK, -10, 10, "" };
 AnalogMenuItem menuAnalog2(&minfoAnalog2, 0, &menuAnalog);
 
 const char enumStrItem1[] PGM_TCM = "ITEM1";

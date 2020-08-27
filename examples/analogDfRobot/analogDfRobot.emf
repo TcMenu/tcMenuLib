@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1589213417,
+    "seconds": 1598353259,
     "nanos": 0
   },
   "codeOptions": {
@@ -9,7 +9,7 @@
     "lastInputUuid": "7daa6a81-dd09-422e-b83c-bda5045abaef",
     "lastDisplayUuid": "bcd5fe34-9e9f-4fcb-9edf-f4e3caca0674",
     "lastRemoteUuid": "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb",
-    "embeddedPlatform": "ARDUINO_AVR",
+    "embeddedPlatform": "ARDUINO_UNO",
     "namingRecursive": false,
     "saveToSrc": false,
     "lastProperties": []

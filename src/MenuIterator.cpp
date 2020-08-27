@@ -6,14 +6,13 @@
 #include <PlatformDetermination.h>
 #include "MenuItems.h"
 #include "tcMenu.h"
-#include "tcUtil.h"
 #include "MenuIterator.h"
 
 MenuItem* recursiveFindParentRootVisit(MenuItem* currentMenu, MenuItem* toFind, MenuItem* parentRoot, MenuVisitorFn fn) {
-    MenuItem* parent = NULL;
+    MenuItem* parent = nullptr;
 	MenuItem* currentRoot = currentMenu;
 
-    while(currentMenu != NULL) {
+    while(currentMenu != nullptr) {
         if(currentMenu->getId() == toFind->getId()) {
             parent = parentRoot;
         }
@@ -40,7 +39,7 @@ MenuItem* recursiveFindParentRootVisit(MenuItem* currentMenu, MenuItem* toFind, 
 }
 
 MenuItem* getParentRootAndVisit(MenuItem* current, MenuVisitorFn visitor) {
-    if(current == NULL) current = menuMgr.getRoot();
+    if(current == nullptr) current = menuMgr.getRoot();
     return  recursiveFindParentRootVisit(menuMgr.getRoot(), current, menuMgr.getRoot(), visitor);
 }
 
@@ -49,11 +48,11 @@ MenuItem* getParentRootAndVisit(MenuItem* current, MenuVisitorFn visitor) {
  * for the ID and short circuiting on the first match.
  */
 MenuItem* recursiveFindById(MenuItem* current, uint16_t id) {
-    while(current != NULL) {
+    while(current != nullptr) {
         if(current->getMenuType() == MENUTYPE_SUB_VALUE) {
-            SubMenuItem* sub = reinterpret_cast<SubMenuItem*>(current);
+            auto sub = reinterpret_cast<SubMenuItem*>(current);
             MenuItem* ret = recursiveFindById(sub->getChild(), id);
-            if(ret != NULL) {
+            if(ret != nullptr) {
                 return ret;
             }
         }
@@ -63,7 +62,7 @@ MenuItem* recursiveFindById(MenuItem* current, uint16_t id) {
 
         current = current->getNext();
     }
-    return NULL;
+    return nullptr;
 }
 
 MenuItem* getMenuItemById(int id) {
@@ -78,14 +77,14 @@ void MenuItemIterator::reset() {
 
 MenuItem* MenuItemIterator::nextItem() {
     
-    MenuItem* toReturn = NULL;
+    MenuItem* toReturn = nullptr;
     while(!toReturn) {
         // if there's no current item we have to either find one or exit with NULL.
-        if(currentItem == NULL) {
+        if(currentItem == nullptr) {
             if(level == 0) {
                 // exhausted all options, clear down and exit.
                 reset();
-                return NULL;
+                return nullptr;
             }
             else {
                 // we are in the menu structure still, pop something off stack.
@@ -97,7 +96,7 @@ MenuItem* MenuItemIterator::nextItem() {
             if(currentItem->getMenuType() == MENUTYPE_SUB_VALUE) {
 
                 // check if there's a predicate match on the submenu.
-                bool predicateMatches = predicate == NULL || predicate->matches(currentItem);
+                bool predicateMatches = predicate == nullptr || predicate->matches(currentItem);
 
                 // if we have to report the submenu back to the callee, then we need to wait until
                 // the next go to do that, otherwise we overwrite the parent too early.
@@ -116,7 +115,7 @@ MenuItem* MenuItemIterator::nextItem() {
                 }
             }
             
-            if(predicate == NULL || predicate->matches(currentItem)) toReturn = currentItem;
+            if(predicate == nullptr || predicate->matches(currentItem)) toReturn = currentItem;
 
             // now try and find the next item, or reset if completely finished.
             currentItem = currentItem->getNext();
@@ -126,7 +125,7 @@ MenuItem* MenuItemIterator::nextItem() {
 }
 
 MenuItem* MenuItemIterator::currentParent() {
-    if(level == 0) return NULL;
+    if(level == 0) return nullptr;
     else return parentItems[level - 1];
 }
 
@@ -140,9 +139,10 @@ bool RemoteNoMenuItemPredicate::matches(MenuItem* item) {
 }
 
 bool MenuItemTypePredicate::matches(MenuItem* item) {
-    if(bitRead(mode, 3) && item->isLocalOnly()) return false;
+    if(bitRead(mode, TM_BIT_LOCAL_ONLY) && item->isLocalOnly()) return false;
+    if(bitRead(mode, TM_BIT_INCLUDE_SUBMENU) && item->getMenuType() == MENUTYPE_SUB_VALUE) return true;
 
-    if(bitRead(mode, 0))
+    if(bitRead(mode, TM_BIT_INVERT))
         return item->getMenuType() != filterType;
     else
         return item->getMenuType() == filterType;
@@ -152,7 +152,7 @@ MenuItem* getItemAtPosition(MenuItem* root, uint8_t pos) {
 	uint8_t i = 0;
 	MenuItem* itm = root;
 
-	while (itm != NULL) {
+	while (itm != nullptr) {
         if(itm->isVisible())
         {
             if (i == pos) {
@@ -169,7 +169,7 @@ MenuItem* getItemAtPosition(MenuItem* root, uint8_t pos) {
 int offsetOfCurrentActive(MenuItem* root) {
 	uint8_t i = 0;
 	MenuItem* itm = root;
-	while (itm != NULL) {
+	while (itm != nullptr) {
         if(itm->isVisible()) {
             if (itm->isActive() || itm->isEditing()) {
                 return i;
