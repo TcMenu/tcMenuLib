@@ -230,4 +230,56 @@ test(testSetLargeIntFromString) {
 	assertFalse(editable.getLargeNumber()->isNegative());
 }
 
+test(LargeNumWithNegativeNotAllowed) {
+    EditableLargeNumberMenuItem editable(largeNumTestCb, 101, 6, 0, false);
+
+    editable.setLargeNumberFromString("15234");
+    assertEqual(editable.getLargeNumber()->getWhole(), (uint32_t)15234);
+    assertEqual(editable.getLargeNumber()->getFraction(), (uint32_t)0);
+    assertNear(editable.getLargeNumber()->getAsFloat(), 15234.0F, 0.00001);
+    assertFalse(editable.getLargeNumber()->isNegative());
+
+    char sz[32];
+    editable.copyValue(sz, sizeof(sz));
+    assertStringCaseEqual("15234", sz);
+
+    editable.beginMultiEdit();
+    assertEqual(9, editable.nextPart());
+    assertEqual(0, editable.getPartValueAsInt());
+    editable.copyValue(sz, sizeof(sz));
+    assertStringCaseEqual("[0]15234", sz);
+
+    assertEqual(9, editable.nextPart());
+    assertEqual(1, editable.getPartValueAsInt());
+    editable.copyValue(sz, sizeof(sz));
+    assertStringCaseEqual("0[1]5234", sz);
+
+    assertEqual(9, editable.nextPart());
+    assertEqual(5, editable.getPartValueAsInt());
+    editable.copyValue(sz, sizeof(sz));
+    assertStringCaseEqual("01[5]234", sz);
+
+    assertEqual(9, editable.nextPart());
+    assertEqual(2, editable.getPartValueAsInt());
+    editable.copyValue(sz, sizeof(sz));
+    assertStringCaseEqual("015[2]34", sz);
+
+    assertEqual(9, editable.nextPart());
+    assertEqual(3, editable.getPartValueAsInt());
+    editable.valueChanged(6);
+    editable.copyValue(sz, sizeof(sz));
+    assertStringCaseEqual("0152[6]4", sz);
+
+    assertEqual(9, editable.nextPart());
+    assertEqual(4, editable.getPartValueAsInt());
+    editable.valueChanged(5);
+    editable.copyValue(sz, sizeof(sz));
+    assertStringCaseEqual("01526[5]", sz);
+    assertEqual(0, editable.nextPart());
+
+    assertFalse(editable.isEditing());
+    editable.copyValue(sz, sizeof(sz));
+    assertStringCaseEqual("15265", sz);
+}
+
 #endif // LARGE_NUMBER_ITEM_TESTS_H

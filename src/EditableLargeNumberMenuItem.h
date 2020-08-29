@@ -19,22 +19,23 @@
 #define LARGE_NUM_ALLOC_SIZE (LARGE_NUM_MAX_DIGITS / 2)
 
 /**
- * A structure for very large integers that can be edited using the multipart editor.
- * They are represented as binary coded decimal to 12 dp with as many fraction decimal
- * places as needed. The whole can be either negative or positive, while the fraction is 
- * an unsigned number in 32 bit form. This provides numbers in the range of at least 9 digits before
- * the dp, and 9 after.
+ * A structure for very large numbers that can be edited using the multipart editor. They are represented as binary
+ * coded decimal to 12 dp with between 0 and 9 fraction decimal places if needed. The whole can be either negative or
+ * positive between 1 and 9 decimal places. Both fraction and whole can be extracted as either a floating point, a
+ * per digit value, or as integers containing whole, fraction and negative flag.
  */
 class LargeFixedNumber {
 private:
 	uint8_t bcdRepresentation[LARGE_NUM_ALLOC_SIZE];
     bool negative;
+    uint8_t totalSize;
     uint8_t fractionDp;
 public:
     /**
-     * Create a default instance with decimal places set to 4
+     * Create a default instance with decimal places set to 4 and total size 12.
      */
     LargeFixedNumber() {
+        totalSize = 12;
 		setPrecision(4);
     }
 
@@ -44,16 +45,20 @@ public:
 	void clear();
 
 	/**
-	 * @return the number of decimal places needed.
+	 * @return the number of decimal places this represents.
 	 */
     int decimalPointIndex() const { return fractionDp; }
 
 	/**
-	 * Set the number of decimal places and zero out any currently held value.
+	 * Set the number of decimal places and optionally the total size then zero out any currently held value. When
+	 * setting this value you should ensure that: fractionDp is not larger than 9, the difference between fractionDp
+	 * and maxDigits is not greater than 9.
 	 * @param dp the new number of decimal places
+	 * @param maxDigits the total number of digits needed.
 	 */
-    void setPrecision(uint8_t dp) {
+    void setPrecision(uint8_t dp, uint8_t maxDigits = 12) {
         fractionDp = dp;
+        totalSize = maxDigits;
         clear();
     }
 
@@ -67,17 +72,10 @@ public:
 
     /**
      * Takes a floating point value and converts it into the internal representation.
-     * This class can nearly always accurately represent a float value unless it exceeds
-     * 12 digits.
+     * This will represent the float within the bounds of the current total digits and decimal precision.
      * @param value the float value to convert
      */
-    void setFromFloat(float value) {
-        bool neg = value < 0.0f;
-        value = abs(value);
-        uint32_t val = (uint32_t)value;
-        uint32_t frc = (value - (float)val) * dpToDivisor(fractionDp);
-        setValue(val, frc, neg);
-    }
+    void setFromFloat(float value);
 
     /**
      * Converts from the BCD packed structure into an integer
@@ -88,7 +86,7 @@ public:
 	uint32_t fromBcdPacked(int start, int end);
 
     /**
-     * Converts from the BCD packed structure into an integer
+     * Converts from an integer into BCD packed.
      * @param value the value to be encoded
      * @param start the index to start in the packed data
      * @param end will stop at one before this point
@@ -116,18 +114,12 @@ public:
      * 
      * @return the current represented value as a floating point number.
      */
-    float getAsFloat() {
-        float fraction = ((float)getFraction() / (float)dpToDivisor(fractionDp));
-		float asFlt = (float)getWhole() + fraction;
-		serdebugF3("fract, asFlt ", fraction, asFlt);
-		if (negative) asFlt = -asFlt;
-		return asFlt;		
-    }
+    float getAsFloat();
 
     /**
      * @return true if negative otherwise false.
      */
-    bool isNegative() { return negative; }
+    bool isNegative() const { return negative; }
 
 	/**
 	 * Sets the negative flag, if true the number becomes a negative value.
@@ -141,7 +133,7 @@ public:
      * @return the whole part of the value
      */
     uint32_t getWhole() {
-        return fromBcdPacked(fractionDp, LARGE_NUM_MAX_DIGITS);
+        return fromBcdPacked(fractionDp, totalSize);
     }
 
     /**
@@ -167,13 +159,24 @@ int largeNumItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, 
 
 /**
  * A multipart editor for very large numbers, either integer or fixed point decimal that exceed the usable range 
- * of a rotary encoder or joystick to set their value. This class works by editing each digit in turn.
+ * of a rotary encoder or joystick to set their value. This class works by editing each digit in turn. This is based
+ * on LargeFixedNumber, see that for more details on the capabilities
+ * @see LargeFixedNumber
  */
 class EditableLargeNumberMenuItem : public EditableMultiPartMenuItem<LargeFixedNumber> {
+private:
+    bool negativeAllowed;
 public:
-	EditableLargeNumberMenuItem(RuntimeRenderingFn renderFn, uint16_t id, int maxDigits, int dps, MenuItem* next = NULL)
+    EditableLargeNumberMenuItem(RuntimeRenderingFn renderFn, uint16_t id, int maxDigits, int dps, bool allowNeg, MenuItem* next = nullptr)
+            : EditableMultiPartMenuItem(MENUTYPE_LARGENUM_VALUE, id, maxDigits + (allowNeg ? 1 : 0), renderFn, next) {
+        data.setPrecision(dps, maxDigits);
+        negativeAllowed = allowNeg;
+    }
+
+	EditableLargeNumberMenuItem(RuntimeRenderingFn renderFn, uint16_t id, int maxDigits, int dps, MenuItem* next = nullptr)
 		: EditableMultiPartMenuItem(MENUTYPE_LARGENUM_VALUE, id, maxDigits + 1, renderFn, next) {
-        data.setPrecision(dps);
+        data.setPrecision(dps, maxDigits);
+        negativeAllowed = true;
 	}
 
     /** gets the large integer value that this class is using */
@@ -181,6 +184,8 @@ public:
 
     /** sets a number from a string in the form whole.fraction */
     void setLargeNumberFromString(const char* largeNum);
+
+    bool isNegativeAllowed() { return negativeAllowed; }
 };
 
 #endif //_EDITABLE_LARGE_NUMBER_MENU_ITEM_H_

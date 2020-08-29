@@ -12,11 +12,11 @@ void LargeFixedNumber::clear() {
 	negative = false;
 }
 
-void LargeFixedNumber::setValue(uint32_t whole, uint32_t fraction, bool negative) {
+void LargeFixedNumber::setValue(uint32_t whole, uint32_t fraction, bool neg) {
 	clear();
 	convertToBcdPacked(fraction, 0, fractionDp);
-	convertToBcdPacked(whole, fractionDp, LARGE_NUM_MAX_DIGITS);
-	this->negative = negative;
+	convertToBcdPacked(whole, fractionDp, totalSize);
+	this->negative = neg;
 }
 
 uint32_t LargeFixedNumber::fromBcdPacked(int start, int end) {
@@ -42,21 +42,48 @@ int LargeFixedNumber::getDigit(int digit) {
 	if (digit > 11) return false;
 	uint8_t r = bcdRepresentation[digit / 2];
 	if ((digit % 2) == 0) {
-		return r & 0x0f;
+		return r & 0x0fU;
 	}
 	else {
-		return (int)(r >> 4);
+		return (int)(r >> 4U);
 	}
 }
 
-void LargeFixedNumber::setDigit(int digit, int val) {
+void LargeFixedNumber::setDigit(int digit, int v) {
+    auto val = uint8_t(v);
 	if (digit > 11) return;
 	if ((digit % 2) == 0) {
 		bcdRepresentation[digit / 2] = (bcdRepresentation[digit / 2] & 0xf0) | val;
 	}
 	else {
-		bcdRepresentation[digit / 2] = (bcdRepresentation[digit / 2] & 0x0f) | (val << 4);
+		bcdRepresentation[digit / 2] = (bcdRepresentation[digit / 2] & 0x0f) | (val << 4U);
 	}
+}
+
+float LargeFixedNumber::getAsFloat() {
+    if(fractionDp == 0) return (float)getWhole();
+
+    float fraction = ((float)getFraction() / (float)dpToDivisor(fractionDp));
+    float asFlt = (float)getWhole() + fraction;
+    serdebugF3("fract, asFlt ", fraction, asFlt);
+    if (negative) asFlt = -asFlt;
+    return asFlt;
+}
+
+void LargeFixedNumber::setFromFloat(float value) {
+    bool neg = value < 0.0f;
+    value = abs(value);
+    uint32_t val;
+    uint32_t frc;
+    if(fractionDp == 0) {
+        val = (uint32_t)value;
+        frc = 0;
+    }
+    else {
+        val = (uint32_t)value;
+        frc = (value - (float) val) * float(dpToDivisor(fractionDp));
+    }
+    setValue(val, frc, neg);
 }
 
 void EditableLargeNumberMenuItem::setLargeNumberFromString(const char* val) {
@@ -86,8 +113,10 @@ void wrapEditor(bool editRow, char val, char* buffer, int bufferSize) {
 
 int largeNumItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
 	if (item->getMenuType() != MENUTYPE_LARGENUM_VALUE) return 0;
-	EditableLargeNumberMenuItem* numItem = reinterpret_cast<EditableLargeNumberMenuItem*>(item);
+	auto numItem = reinterpret_cast<EditableLargeNumberMenuItem*>(item);
+	auto negativeAllowed = numItem->isNegativeAllowed();
 	LargeFixedNumber *num = numItem->getLargeNumber();
+    int numParts = numItem->getNumberOfParts() - (negativeAllowed ? 1 : 0);
 
 	switch (mode) {
 	case RENDERFN_VALUE: {
@@ -96,13 +125,14 @@ int largeNumItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, 
 		bool hadNonZero = false;
 		uint8_t editPosition = 0;
 
-		if (editingMode || num->isNegative()) {
+		if (negativeAllowed && (editingMode ||  num->isNegative())) {
 			wrapEditor(row == 1, num->isNegative() ? '-' : '+', buffer, bufferSize);
+			row = row - 1;
 		}
 
-		row = row - 2;
+		row = row - 1;
 
-		for (int i = num->decimalPointIndex(); i < (numItem->getNumberOfParts() - 1); i++) {
+		for (int i = num->decimalPointIndex(); i < numParts; i++) {
 			char txtVal = num->getDigit(i) + '0';
 			hadNonZero |= txtVal != '0';
 			if (hadNonZero || editingMode) {
@@ -110,7 +140,7 @@ int largeNumItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, 
 			}
 			editPosition++;
 		}
-		appendChar(buffer, '.', bufferSize);
+		if(num->decimalPointIndex() != 0) appendChar(buffer, '.', bufferSize);
 
 		for (int i = 0; i < num->decimalPointIndex(); i++) {
 			char txtVal = num->getDigit(i) + '0';
@@ -120,16 +150,23 @@ int largeNumItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, 
 		return true;
 	}
 	case RENDERFN_GETRANGE: {
-		return row == 1 ? 1 : 9;
+		if(negativeAllowed) {
+		    return row == 1 ? 1 : 9;
+		}
+		else {
+		    return 9;
+		}
 	}
 	case RENDERFN_SET_VALUE: {
 		int idx = row - 1;
-		if (idx == 0) {
-			num->setNegative(buffer[0]);
-			return true;
+		if(negativeAllowed) {
+            if (idx == 0) {
+                num->setNegative(buffer[0]);
+                return true;
+            }
+            idx--;
 		}
-		idx--;
-		int dpIndex = (numItem->getNumberOfParts() - 1) - num->decimalPointIndex();
+		int dpIndex = (numParts) - num->decimalPointIndex();
 		int pos = idx >= dpIndex ? idx - dpIndex : idx + num->decimalPointIndex();
 		num->setDigit(pos, buffer[0]);
 		return true;
@@ -140,11 +177,13 @@ int largeNumItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, 
 	}
 	case RENDERFN_GETPART: {
 		int idx = row - 1;
-		if (idx == 0) {			
-			return num->isNegative();
-		}
-		idx--;
-		int dpIndex = (numItem->getNumberOfParts() - 1) - num->decimalPointIndex();
+		if(negativeAllowed) {
+            if (idx == 0) {
+                return num->isNegative();
+            }
+            idx--;
+        }
+		int dpIndex = (numParts) - num->decimalPointIndex();
 		int pos =  idx >= dpIndex ? idx - dpIndex : idx + num->decimalPointIndex();
 		return num->getDigit(pos);
 	}
