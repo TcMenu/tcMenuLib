@@ -5,7 +5,7 @@
 #include <MockIoAbstraction.h>
 #include <BaseRenderers.h>
 #include <MockEepromAbstraction.h>
-#include <fixtures_extern.h>
+#include "fixtures_extern.h"
 
 extern MockedIoAbstraction mockIo;
 extern NoRenderer noRenderer; 

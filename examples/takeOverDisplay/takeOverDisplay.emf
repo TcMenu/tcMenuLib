@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1589221216,
+    "seconds": 1599238176,
     "nanos": 0
   },
   "codeOptions": {
@@ -252,6 +252,64 @@
         "localOnly": true,
         "visible": true,
         "functionName": "onSaveSettings"
+      }
+    },
+    {
+      "parentId": 3,
+      "type": "largeNumItem",
+      "item": {
+        "name": "PositiveInts",
+        "eepromAddress": -1,
+        "id": 15,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "decimalPlaces": 0,
+        "digitsAllowed": 9,
+        "negativeAllowed": false
+      }
+    },
+    {
+      "parentId": 3,
+      "type": "largeNumItem",
+      "item": {
+        "name": "Num6x4",
+        "eepromAddress": -1,
+        "id": 16,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "decimalPlaces": 4,
+        "digitsAllowed": 10,
+        "negativeAllowed": true
+      }
+    },
+    {
+      "parentId": 3,
+      "type": "textItem",
+      "item": {
+        "name": "Time",
+        "eepromAddress": -1,
+        "id": 17,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "itemType": "TIME_12H",
+        "textLength": 10
+      }
+    },
+    {
+      "parentId": 3,
+      "type": "textItem",
+      "item": {
+        "name": "Date",
+        "eepromAddress": -1,
+        "id": 18,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "itemType": "GREGORIAN_DATE",
+        "textLength": 10
       }
     },
     {

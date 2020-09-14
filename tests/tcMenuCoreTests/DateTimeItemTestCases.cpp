@@ -3,7 +3,7 @@
 #include <RuntimeMenuItem.h>
 #include <RemoteMenuItem.h>
 #include <RemoteAuthentication.h>
-#include <fixtures_extern.h>
+#include "fixtures_extern.h"
 #include <tcUtil.h>
 
 void printMenuItem(MenuItem* menuItem);

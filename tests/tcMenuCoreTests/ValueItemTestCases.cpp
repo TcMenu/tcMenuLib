@@ -1,7 +1,7 @@
 
 #include <AUnit.h>
 #include <RuntimeMenuItem.h>
-#include <fixtures_extern.h>
+#include "fixtures_extern.h"
 #include <tcUtil.h>
 
 test(testCoreAndBooleanMenuItem) {

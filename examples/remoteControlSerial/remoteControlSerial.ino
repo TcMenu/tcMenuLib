@@ -5,6 +5,8 @@
  * For more details see the README.md file in this directory.
  */
 
+Adafruit_PCD8544 gfx = Adafruit_PCD8544(35, 34, 38, 37, 36);
+
 //
 // This function is registered in setup to be called every 200 millis by task manager.
 // It updates the analog voltage menu items to show the values on each of the analog pins.
@@ -21,6 +23,14 @@ void setup() {
     // for 32 bit boards we should wait for serial before proceeding.
     while(!Serial);
     Serial.begin(115200);
+
+    // as said earlier, it is our responsibility to provide a display that
+    // is fully configured.
+    gfx.begin();
+	gfx.setRotation(0);
+    gfx.setContrast(50);
+	gfx.clearDisplay();
+    gfx.display();
 
     // for serial communication, we only need to setup the speed here.
     // in this example I am using a bluetooth module with serial1, you could switch to

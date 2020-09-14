@@ -4,7 +4,7 @@
 #include <AUnit.h>
 #include <MockEepromAbstraction.h>
 #include "RemoteAuthentication.h"
-#include <fixtures_extern.h>
+#include "fixtures_extern.h"
 using namespace aunit;
 
 void printAllAuthenticatorEntries(EepromAuthenticatorManager& authenticator, const char* why) {

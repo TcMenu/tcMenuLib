@@ -4,7 +4,7 @@
 #include <AUnit.h>
 #include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
-#include <fixtures_extern.h>
+#include "fixtures_extern.h"
 #include <tcMenu.h>
 
 void dumpBuffer(LargeFixedNumber* buffer) {

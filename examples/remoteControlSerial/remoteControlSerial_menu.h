@@ -11,10 +11,12 @@
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
 
+#include <Arduino.h>
 #include <tcMenu.h>
 #include <RuntimeMenuItem.h>
-#include <LiquidCrystalIO.h>
-#include "tcMenuLiquidCrystal.h"
+#include "Adafruit_GFX.h"
+#include "Adafruit_PCD8544.h"
+#include "tcMenuAdaFruitGfx.h"
 #include <RemoteConnector.h>
 #include "SerialTransport.h"
 
@@ -23,8 +25,9 @@ extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app inf
 
 // Global variables that need exporting
 
-extern LiquidCrystal lcd;
-extern LiquidCrystalRenderer renderer;
+extern Adafruit_PCD8544 gfx;
+extern AdaColorGfxMenuConfig gfxConfig;
+extern AdaFruitGfxMenuRenderer renderer;
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION

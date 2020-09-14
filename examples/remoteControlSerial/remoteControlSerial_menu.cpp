@@ -8,14 +8,15 @@
     use elsewhere.
 */
 
+#include <Arduino.h>
 #include <tcMenu.h>
 #include "remoteControlSerial_menu.h"
 
 // Global variable declarations
 
 const PROGMEM ConnectorLocalInfo applicationInfo = { "Remote Ctrl", "f018e07a-f33f-42d2-b3a0-689a1bf6849c" };
-LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
-LiquidCrystalRenderer renderer(lcd, 16, 2);
+AdaColorGfxMenuConfig gfxConfig;
+AdaFruitGfxMenuRenderer renderer;
 
 // Global Menu Item declarations
 
@@ -44,10 +45,9 @@ void setupMenu() {
     menuA1Voltage.setReadOnly(true);
     menuA2Voltage.setReadOnly(true);
 
-    lcd.begin(16, 2);
-    lcd.configureBacklightPin(10);
-    lcd.backlight();
-    switches.initialise(ioUsingArduino(), true);
+    prepareAdaMonoGfxConfigLoRes(&gfxConfig);
+    renderer.setGraphicsDevice(&gfx, &gfxConfig);
+    switches.initialise(internalDigitalIo(), true);
     menuMgr.initForEncoder(&renderer, &menuA0Voltage, 2, 3, A3);
     remoteServer.begin(&Serial1, &applicationInfo);
 }
