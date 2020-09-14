@@ -8,6 +8,7 @@
     use elsewhere.
 */
 
+#include <Arduino.h>
 #include <tcMenu.h>
 #include "esp8266WifiOled_menu.h"
 
@@ -71,7 +72,7 @@ void setupMenu() {
 
     prepareBasicU8x8Config(gfxConfig);
     renderer.setGraphicsDevice(&gfx, &gfxConfig);
-    switches.initialise(io8574, true);
-    menuMgr.initForEncoder(&renderer, &menuTomatoTemp, 0, 1, 2);
+    switches.initialise(ioUsingArduino(), true);
+    menuMgr.initForEncoder(&renderer, &menuTomatoTemp, 12, 13, 14);
     remoteServer.begin(&server, &applicationInfo);
 }

@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1589264073,
+    "seconds": 1600093325,
     "nanos": 0
   },
   "codeOptions": {
@@ -25,22 +25,22 @@
       },
       {
         "name": "SWITCH_IODEVICE",
-        "latestValue": "io8574",
+        "latestValue": "",
         "subsystem": "INPUT"
       },
       {
         "name": "ENCODER_PIN_A",
-        "latestValue": "0",
+        "latestValue": "12",
         "subsystem": "INPUT"
       },
       {
         "name": "ENCODER_PIN_B",
-        "latestValue": "1",
+        "latestValue": "13",
         "subsystem": "INPUT"
       },
       {
         "name": "ENCODER_PIN_OK",
-        "latestValue": "2",
+        "latestValue": "14",
         "subsystem": "INPUT"
       },
       {
