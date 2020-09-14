@@ -88,7 +88,6 @@ void onCommsChange(CommunicationInfo info) {
 //
 void setup() {
     Serial.begin(115200);
-    Wire.begin();
 
     // set up the inbuilt ESP rom to use for load and store.
     EEPROM.begin(512);
@@ -110,6 +109,7 @@ void setup() {
     menuAuthKeyMgr.setLocalOnly(true);
 
     // start up the display.
+    gfx.setBusClock(400000);
     gfx.begin();
     
 
