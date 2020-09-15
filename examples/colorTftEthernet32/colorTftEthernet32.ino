@@ -199,12 +199,38 @@ void CALLBACK_FUNCTION onSaveRom(int /*id*/) {
     menuMgr.save(eeprom);
 }
 
+bool starting = true;
 
+void myRenderCallback(unsigned int encoderVal, RenderPressMode pressType) {
+    if(pressType == RPRESS_HELD)
+    {
+        // if the encoder / select button is held, we go back to the menu.
+        renderer.giveBackDisplay();
+    }
+    else if(starting)
+    {
+        // you need to handle the clearing and preparation of the display when you're first called.
+        // the easiest way is to set a flag such as this and then prepare the display.
+        starting = false;
+        switches.getEncoder()->changePrecision(1000, 500);
+        gfx.setCursor(0, 0);
+        gfx.fillRect(0, 0, gfx.width(), gfx.height(), BLACK);
+        gfx.setFont(nullptr);
+        gfx.setTextSize(2);
+        gfx.print("Encoder ");
+    }
+    else
+    {
+        GFXcanvas1 canvas(100, 20);
+        canvas.fillScreen(BLACK);
+        canvas.setCursor(0,0);
+        canvas.print(encoderVal);
+        canvas.setTextSize(2);
+        gfx.drawBitmap(0, 35, canvas.getBuffer(), 100, 20, WHITE, BLACK);
+    }
+}
 
-
-
-
-
-
-
-
+void CALLBACK_FUNCTION onTakeDisplay(int id) {
+    starting = true;
+    renderer.takeOverDisplay(myRenderCallback);
+}

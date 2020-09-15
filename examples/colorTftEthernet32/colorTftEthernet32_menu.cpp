@@ -20,12 +20,14 @@ EthernetServer server(3333);
 
 // Global Menu Item declarations
 
+const AnyMenuInfo minfoTakeDisplay = { "Take display", 17, 0xFFFF, 0, onTakeDisplay };
+ActionMenuItem menuTakeDisplay(&minfoTakeDisplay, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnIpAddressRtCall, ipAddressRenderFn, "Ip Address", 10, NO_CALLBACK)
 IpAddressMenuItem menuIpAddress(fnIpAddressRtCall, 15, NULL);
 const SubMenuInfo minfoConnectivity = { "Connectivity", 14, 0xFFFF, 0, NO_CALLBACK };
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NO_CALLBACK)
 BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuIpAddress);
-SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL);
+SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, &menuTakeDisplay);
 const FloatMenuInfo minfoVoltA1 = { "Volt A1", 9, 0xFFFF, 2, NO_CALLBACK };
 FloatMenuItem menuVoltA1(&minfoVoltA1, NULL);
 const FloatMenuInfo minfoVoltA0 = { "Volt A0", 8, 0xFFFF, 2, NO_CALLBACK };

@@ -36,6 +36,8 @@ extern EthernetServer server;
 
 // Global Menu Item exports
 
+void CALLBACK_FUNCTION onTakeDisplay(int id);
+extern ActionMenuItem menuTakeDisplay;
 extern IpAddressMenuItem menuIpAddress;
 extern SubMenuItem menuConnectivity;
 extern FloatMenuItem menuVoltA1;

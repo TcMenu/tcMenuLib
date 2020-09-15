@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1598353677,
+    "seconds": 1600168153,
     "nanos": 0
   },
   "codeOptions": {
@@ -284,6 +284,19 @@
         "visible": true,
         "itemType": "IP_ADDRESS",
         "textLength": 20
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "actionMenu",
+      "item": {
+        "name": "Take display",
+        "eepromAddress": -1,
+        "id": 17,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "onTakeDisplay"
       }
     }
   ]
