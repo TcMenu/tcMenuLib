@@ -41,7 +41,7 @@
 // We create a U8G2 1106 display driver that gets used by tcMenu
 // Change to your preffered choice of display!
 //
-U8G2_SH1106_128X64_NONAME_F_SW_I2C gfx(U8G2_R0, 5, 4);
+U8G2_SSD1306_128X32_UNIVISION_F_SW_I2C gfx(U8G2_R2, /* clock=*/ 5, /* data=*/ 4, /* reset=*/ 16);   // Adafruit Feather M0 Basic Proto + FeatherWing OLED
 
 //
 // ESP boards tend to have few pins available for general purpose use, to make things easier
@@ -98,25 +98,27 @@ void setup() {
     // queried for authentication requests, and any additional pairs are stored there too.
     // first we initialise the authManager, then pass it to the class.
     // Always call BEFORE setupMenu()
-    authManager.initialise(eeprom, 100);
-    remoteServer.setAuthenticator(&authManager);
+    //authManager.initialise(eeprom, 100);
+    //remoteServer.setAuthenticator(&authManager);
 
     // Here we add two additional menus for managing the connectivity and authentication keys.
     // In the future, there will be an option to autogenerate these from the designer.
-    menuIpAddress.setNext(&menuAuthKeyMgr);
-    menuRemoteMonitor.addConnector(remoteServer.getRemoteConnector(0));
-    menuRemoteMonitor.registerCommsNotification(onCommsChange);
-    menuAuthKeyMgr.setLocalOnly(true);
+    //menuIpAddress.setNext(&menuAuthKeyMgr);
+    //menuRemoteMonitor.addConnector(remoteServer.getRemoteConnector(0));
+    //menuRemoteMonitor.registerCommsNotification(onCommsChange);
+    //menuAuthKeyMgr.setLocalOnly(true);
 
+    serdebugF("start dsiaply");
     // start up the display.
-    gfx.setBusClock(400000);
     gfx.begin();
-    
+
+    serdebugF("start load");
 
     // because we are initialising wifi from the menu entries, we need to load the eeprom
     // values very early, in this case, set the root item first, before calling load.
     menuMgr.setRootMenu(&menuTomatoTemp);
-    menuMgr.load(*eeprom);
+    menuMgr.load(*eeprom, 0xd00d);
+    serdebugF("end load");
 
     // this sketch assumes you've successfully connected to the Wifi before, does not
     // call begin.. You can initialise the wifi whichever way you wish here.

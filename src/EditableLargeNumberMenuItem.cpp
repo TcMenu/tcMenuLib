@@ -30,7 +30,7 @@ uint32_t LargeFixedNumber::fromBcdPacked(int start, int end) {
 }
 
 void LargeFixedNumber::convertToBcdPacked(uint32_t value, int start, int end) {
-	int32_t modulo = dpToDivisor((end - start) - 1);
+	uint32_t modulo = dpToDivisor((end - start) - 1);
 	for (int i = start; i < end; i++) {
 		setDigit(i, min(9, int(value / modulo)));
 		value = value % modulo;
