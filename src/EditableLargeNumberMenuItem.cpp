@@ -3,7 +3,6 @@
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
-#include <Arduino.h>
 #include <PlatformDetermination.h>
 #include "EditableLargeNumberMenuItem.h"
 
