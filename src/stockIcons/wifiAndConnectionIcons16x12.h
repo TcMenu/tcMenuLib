@@ -55,6 +55,16 @@ const uint8_t iconConnected[] PROGMEM = {
    0x01, 0x80, 0x01, 0x80, 0x01, 0x80, 0x81, 0x81, 0x01, 0x80, 0xfe, 0x7f 
 };
 
+static uint8_t iconEthernetConn[] PROGMEM = {
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3f, 0x00, 0x61, 0xfe, 0x31,
+        0x00, 0x61, 0x00, 0x3f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+};
+
+static uint8_t iconEthernetNone[] PROGMEM = {
+        0x00, 0x00, 0x00, 0x18, 0x00, 0x0c, 0x00, 0x3f, 0x00, 0x63, 0xfe, 0x31,
+        0xc0, 0x61, 0x60, 0x3f, 0x30, 0x00, 0x18, 0x00, 0x0c, 0x00, 0x00, 0x00
+};
+
 /** 
  * Defines a set of 5 icons for wifi, not connected and then various signal strength. 0 is no connection, 4 is good signal.
  * Usually used with a TitleWidget on a medium to high resolution display. the icons are 16 x 12 pixels.
@@ -67,4 +77,9 @@ const uint8_t* const iconsWifi[]  PROGMEM = { iconWifiNotConnected, iconWifiOneB
  */
 const uint8_t* const iconsConnection[] PROGMEM = { iconConnectionNone, iconConnected };
 
+
+/**
+ * Defines a set of two icons to show the wired ethernet connected and disconnected state
+ */
+ const uint8_t* const iconsEthernetConnection[] PROGMEM = { iconEthernetNone, iconEthernetConn };
 #endif
