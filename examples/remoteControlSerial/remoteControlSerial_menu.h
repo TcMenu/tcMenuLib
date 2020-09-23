@@ -14,8 +14,6 @@
 #include <Arduino.h>
 #include <tcMenu.h>
 #include <RuntimeMenuItem.h>
-#include "Adafruit_GFX.h"
-#include "Adafruit_PCD8544.h"
 #include "tcMenuAdaFruitGfx.h"
 #include <RemoteConnector.h>
 #include "SerialTransport.h"
@@ -37,9 +35,10 @@ extern AdaFruitGfxMenuRenderer renderer;
 void CALLBACK_FUNCTION onPushMe(int id);
 extern ActionMenuItem menuPushMe;
 extern EnumMenuItem menuFood;
-extern TextMenuItem menuMyText;
-extern AnalogMenuItem menuA2Voltage;
-extern AnalogMenuItem menuA1Voltage;
-extern AnalogMenuItem menuA0Voltage;
+extern TextMenuItem menuText;
+extern AnalogMenuItem menuA2;
+extern AnalogMenuItem menuA1;
+extern AnalogMenuItem menuA0;
+extern SubMenuItem menuAnalogIn;
 
 #endif // MENU_GENERATED_CODE_H

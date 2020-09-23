@@ -15,6 +15,7 @@
 // Global variable declarations
 
 const PROGMEM ConnectorLocalInfo applicationInfo = { "Remote Ctrl", "f018e07a-f33f-42d2-b3a0-689a1bf6849c" };
+Adafruit_PCD8544 gfx(35, 34, 38, 37, 36);
 AdaColorGfxMenuConfig gfxConfig;
 AdaFruitGfxMenuRenderer renderer;
 
@@ -28,26 +29,32 @@ const char enumStrFood_2[] PROGMEM  = "Salad";
 const char* const enumStrFood[] PROGMEM  = { enumStrFood_0, enumStrFood_1, enumStrFood_2 };
 const EnumMenuInfo PROGMEM minfoFood = { "Food", 5, 0xFFFF, 2, NO_CALLBACK, enumStrFood };
 EnumMenuItem menuFood(&minfoFood, 0, &menuPushMe);
-RENDERING_CALLBACK_NAME_INVOKE(fnMyTextRtCall, textItemRenderFn, "MyText", -1, NO_CALLBACK)
-TextMenuItem menuMyText(fnMyTextRtCall, 4, 10, &menuFood);
-const AnalogMenuInfo PROGMEM minfoA2Voltage = { "A2 Voltage", 3, 0xFFFF, 1024, NO_CALLBACK, 0, 200, "V" };
-AnalogMenuItem menuA2Voltage(&minfoA2Voltage, 0, &menuMyText);
-const AnalogMenuInfo PROGMEM minfoA1Voltage = { "A1 Voltage", 2, 0xFFFF, 1024, NO_CALLBACK, 0, 200, "V" };
-AnalogMenuItem menuA1Voltage(&minfoA1Voltage, 0, &menuA2Voltage);
-const AnalogMenuInfo PROGMEM minfoA0Voltage = { "A0 Voltage", 1, 0xFFFF, 1024, NO_CALLBACK, 0, 200, "V" };
-AnalogMenuItem menuA0Voltage(&minfoA0Voltage, 0, &menuA1Voltage);
+RENDERING_CALLBACK_NAME_INVOKE(fnTextRtCall, textItemRenderFn, "Text", -1, NO_CALLBACK)
+TextMenuItem menuText(fnTextRtCall, 4, 10, &menuFood);
+const AnalogMenuInfo PROGMEM minfoA2 = { "A2", 3, 0xFFFF, 1024, NO_CALLBACK, 0, 200, "V" };
+AnalogMenuItem menuA2(&minfoA2, 0, NULL);
+const AnalogMenuInfo PROGMEM minfoA1 = { "A1", 2, 0xFFFF, 1024, NO_CALLBACK, 0, 200, "V" };
+AnalogMenuItem menuA1(&minfoA1, 0, &menuA2);
+const AnalogMenuInfo PROGMEM minfoA0 = { "A0", 8, 0xFFFF, 1024, NO_CALLBACK, 0, 200, "V" };
+AnalogMenuItem menuA0(&minfoA0, 0, &menuA1);
+const SubMenuInfo PROGMEM minfoAnalogIn = { "Analog In", 7, 0xFFFF, 0, NO_CALLBACK };
+RENDERING_CALLBACK_NAME_INVOKE(fnAnalogInRtCall, backSubItemRenderFn, "Analog In", -1, NO_CALLBACK)
+BackMenuItem menuBackAnalogIn(fnAnalogInRtCall, &menuA0);
+SubMenuItem menuAnalogIn(&minfoAnalogIn, &menuBackAnalogIn, &menuText);
 
 
 // Set up code
 
 void setupMenu() {
-    menuA0Voltage.setReadOnly(true);
-    menuA1Voltage.setReadOnly(true);
-    menuA2Voltage.setReadOnly(true);
+    menuA0.setReadOnly(true);
+    menuA1.setReadOnly(true);
+    menuA2.setReadOnly(true);
 
     prepareAdaMonoGfxConfigLoRes(&gfxConfig);
+    gfx.setRotation(0);
+    gfx.begin();
     renderer.setGraphicsDevice(&gfx, &gfxConfig);
     switches.initialise(internalDigitalIo(), true);
-    menuMgr.initForEncoder(&renderer, &menuA0Voltage, 2, 3, A3);
+    menuMgr.initForEncoder(&renderer, &menuAnalogIn, 2, 3, A3);
     remoteServer.begin(&Serial1, &applicationInfo);
 }

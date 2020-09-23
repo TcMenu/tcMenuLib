@@ -1,13 +1,13 @@
 {
   "lastEdited": {
-    "seconds": 1599599684,
+    "seconds": 1600838808,
     "nanos": 0
   },
   "codeOptions": {
     "applicationUUID": "f018e07a-f33f-42d2-b3a0-689a1bf6849c",
     "applicationName": "Remote Ctrl",
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
-    "lastDisplayUuid": "bcd5fe34-9e9f-4fcb-9edf-f4e3caca0674",
+    "lastDisplayUuid": "4dcb12ec-13d8-4466-b8b6-bd575eae4612",
     "lastRemoteUuid": "1e38dc42-672d-4c1c-a393-2c7632bf6c5c",
     "embeddedPlatform": "ARDUINO_AVR",
     "namingRecursive": false,
@@ -44,6 +44,61 @@
         "subsystem": "INPUT"
       },
       {
+        "name": "DISPLAY_VARIABLE",
+        "latestValue": "gfx",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_TYPE",
+        "latestValue": "Adafruit_PCD8544",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CONFIG",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_WIDTH",
+        "latestValue": "84",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_HEIGHT",
+        "latestValue": "48",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_RESET_PIN",
+        "latestValue": "36",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CS_PIN",
+        "latestValue": "37",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_RS_PIN",
+        "latestValue": "38",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_DATA_PIN",
+        "latestValue": "34",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CLOCK_PIN",
+        "latestValue": "35",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_ROTATION",
+        "latestValue": "0",
+        "subsystem": "DISPLAY"
+      },
+      {
         "name": "SERIAL_PORT",
         "latestValue": "Serial1",
         "subsystem": "REMOTE"
@@ -56,11 +111,24 @@
   "items": [
     {
       "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "name": "Analog In",
+        "eepromAddress": -1,
+        "id": 7,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "secured": false
+      }
+    },
+    {
+      "parentId": 7,
       "type": "analogItem",
       "item": {
-        "name": "A0 Voltage",
+        "name": "A0",
         "eepromAddress": -1,
-        "id": 1,
+        "id": 8,
         "readOnly": true,
         "localOnly": false,
         "visible": true,
@@ -71,10 +139,10 @@
       }
     },
     {
-      "parentId": 0,
+      "parentId": 7,
       "type": "analogItem",
       "item": {
-        "name": "A1 Voltage",
+        "name": "A1",
         "eepromAddress": -1,
         "id": 2,
         "readOnly": true,
@@ -87,10 +155,10 @@
       }
     },
     {
-      "parentId": 0,
+      "parentId": 7,
       "type": "analogItem",
       "item": {
-        "name": "A2 Voltage",
+        "name": "A2",
         "eepromAddress": -1,
         "id": 3,
         "readOnly": true,
@@ -106,7 +174,7 @@
       "parentId": 0,
       "type": "textItem",
       "item": {
-        "name": "MyText",
+        "name": "Text",
         "eepromAddress": -1,
         "id": 4,
         "readOnly": false,

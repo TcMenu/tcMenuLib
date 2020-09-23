@@ -5,8 +5,6 @@
  * For more details see the README.md file in this directory.
  */
 
-Adafruit_PCD8544 gfx = Adafruit_PCD8544(35, 34, 38, 37, 36);
-
 //
 // This function is registered in setup to be called every 200 millis by task manager.
 // It updates the analog voltage menu items to show the values on each of the analog pins.
@@ -14,23 +12,15 @@ Adafruit_PCD8544 gfx = Adafruit_PCD8544(35, 34, 38, 37, 36);
 // item updated on the display, but it's also marked as needing sending remotely as well.
 //
 void updateAnalogMenuItems() {
-    menuA0Voltage.setCurrentValue(analogRead(A0));
-    menuA1Voltage.setCurrentValue(analogRead(A1));
-    menuA2Voltage.setCurrentValue(analogRead(A2));
+    menuA0.setCurrentValue(analogRead(A0));
+    menuA1.setCurrentValue(analogRead(A1));
+    menuA2.setCurrentValue(analogRead(A2));
 }
 
 void setup() {
     // for 32 bit boards we should wait for serial before proceeding.
     while(!Serial);
     Serial.begin(115200);
-
-    // as said earlier, it is our responsibility to provide a display that
-    // is fully configured.
-    gfx.begin();
-	gfx.setRotation(0);
-    gfx.setContrast(50);
-	gfx.clearDisplay();
-    gfx.display();
 
     // for serial communication, we only need to setup the speed here.
     // in this example I am using a bluetooth module with serial1, you could switch to
@@ -43,6 +33,10 @@ void setup() {
 
     // added by designer to initialise the menu.
     setupMenu();
+
+    // we used the simple ada graphics plugin so in this case we only need to do any additional
+    // set up after setupMenu has been called.
+    gfx.setContrast(50);
 
     // task manager is asked to schedule the udpate function below every 200ms
     taskManager.scheduleFixedRate(200, updateAnalogMenuItems);
