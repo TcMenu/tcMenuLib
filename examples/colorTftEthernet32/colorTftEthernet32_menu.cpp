@@ -15,6 +15,7 @@
 // Global variable declarations
 
 const PROGMEM ConnectorLocalInfo applicationInfo = { "Ada32 Ethernet", "22813e5e-88b1-42d5-9601-4831b2be369b" };
+Adafruit_ST7735 gfx(6, 7, 3);
 AdaFruitGfxMenuRenderer renderer;
 EthernetServer server(3333);
 
@@ -70,6 +71,8 @@ AnalogMenuItem menuVoltage(&minfoVoltage, 0, &menuCurrent);
 void setupMenu() {
 
 
+    gfx.initR(INITR_BLACKTAB);
+    gfx.setRotation(1);
     renderer.setGraphicsDevice(&gfx, &colorConfig);
     switches.initialise(io8574, true);
     menuMgr.initForEncoder(&renderer, &menuVoltage, 7, 6, 5);

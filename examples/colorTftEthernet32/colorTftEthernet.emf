@@ -1,13 +1,13 @@
 {
   "lastEdited": {
-    "seconds": 1600168153,
+    "seconds": 1600858418,
     "nanos": 0
   },
   "codeOptions": {
     "applicationUUID": "22813e5e-88b1-42d5-9601-4831b2be369b",
     "applicationName": "Ada32 Ethernet",
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
-    "lastDisplayUuid": "7c486068-9879-459f-89ee-9522366524a3",
+    "lastDisplayUuid": "4dcb12ec-13d8-4466-b8b6-bd575eae4612",
     "lastRemoteUuid": "0877131c-e03e-426b-8eaf-228e01f5e7f1",
     "embeddedPlatform": "ARDUINO_32",
     "namingRecursive": false,
@@ -59,8 +59,43 @@
         "subsystem": "DISPLAY"
       },
       {
-        "name": "DISPLAY_BUFFERED",
-        "latestValue": "false",
+        "name": "DISPLAY_WIDTH",
+        "latestValue": "160",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_HEIGHT",
+        "latestValue": "128",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_RESET_PIN",
+        "latestValue": "3",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CS_PIN",
+        "latestValue": "6",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_RS_PIN",
+        "latestValue": "7",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_DATA_PIN",
+        "latestValue": "-1",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CLOCK_PIN",
+        "latestValue": "-1",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_ROTATION",
+        "latestValue": "0",
         "subsystem": "DISPLAY"
       },
       {
