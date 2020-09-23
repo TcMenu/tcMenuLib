@@ -13,15 +13,6 @@
 #include <Wire.h>
 #include <IoAbstractionWire.h>
 
-// the width and height of the attached OLED display.
-#define OLED_WIDTH 128
-#define OLED_HEIGHT 64
-
-// Here we declare the variable using exactly the name that we used in the 
-// designers code generator panel for the graphics variable. The name and
-// type must match exactly
-U8G2_SSD1306_128X64_NONAME_F_SW_I2C gfx(U8G2_R0, 5, 4);
-
 // this is the interrupt pin connection from the PCF8574 back to the ESP8266 board.
 #define IO_INTERRUPT_PIN 12
 
@@ -40,9 +31,6 @@ void setup() {
     Wire.begin();
 
     Serial.begin(115200);
-
-    // start up the display. Important, the rendering expects this has been done.
-    gfx.begin();
 
     // This is added by tcMenu Designer automatically during the first setup.
     setupMenu();

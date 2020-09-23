@@ -1,13 +1,13 @@
 {
   "lastEdited": {
-    "seconds": 1589263036,
+    "seconds": 1600877424,
     "nanos": 0
   },
   "codeOptions": {
     "applicationUUID": "fddaa423-cb5c-4024-8f67-a9742f4457f3",
     "applicationName": "Simple U8G2 Toaster",
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
-    "lastDisplayUuid": "8646497b-1427-415f-8020-1260a1fef57d",
+    "lastDisplayUuid": "fd998437-c4b2-4386-ba88-d0ae7c20620b",
     "lastRemoteUuid": "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb",
     "embeddedPlatform": "ARDUINO_ESP8266",
     "namingRecursive": true,
@@ -54,8 +54,33 @@
         "subsystem": "DISPLAY"
       },
       {
-        "name": "DISPLAY_CONFIG",
-        "latestValue": "",
+        "name": "DISPLAY_ROTATION",
+        "latestValue": "U8G2_R0",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CLOCK_PIN",
+        "latestValue": "4",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_DATA_PIN",
+        "latestValue": "5",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_RESET_PIN",
+        "latestValue": "U8X8_PIN_NONE",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CS_PIN",
+        "latestValue": "U8X8_PIN_NONE",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_RS_PIN",
+        "latestValue": "U8X8_PIN_NONE",
         "subsystem": "DISPLAY"
       }
     ]

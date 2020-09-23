@@ -8,12 +8,14 @@
     use elsewhere.
 */
 
+#include <Arduino.h>
 #include <tcMenu.h>
 #include "simpleU8g2_menu.h"
 
 // Global variable declarations
 
 const PROGMEM ConnectorLocalInfo applicationInfo = { "Simple U8G2 Toaster", "fddaa423-cb5c-4024-8f67-a9742f4457f3" };
+U8G2_SSD1306_128X64_NONAME_F_SW_I2C gfx(U8G2_R0, 4, 5, U8X8_PIN_NONE);
 U8g2GfxMenuConfig gfxConfig;
 U8g2MenuRenderer renderer;
 
@@ -45,6 +47,7 @@ void setupMenu() {
 
 
     prepareBasicU8x8Config(gfxConfig);
+    gfx.begin();
     renderer.setGraphicsDevice(&gfx, &gfxConfig);
     switches.initialise(io8574, true);
     menuMgr.initForEncoder(&renderer, &menuToasterPower, 0, 1, 2);
