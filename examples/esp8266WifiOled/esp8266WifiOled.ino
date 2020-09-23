@@ -33,15 +33,6 @@
 // this is the interrupt pin connection from the PCF8574 back to the ESP8266 board.
 #define IO_INTERRUPT_PIN 12
 
-// the width and height of the attached OLED display.
-#define OLED_WIDTH 128
-#define OLED_HEIGHT 64
-
-//
-// We create a U8G2 1106 display driver that gets used by tcMenu
-// Change to your preffered choice of display!
-//
-U8G2_SSD1306_128X32_UNIVISION_F_SW_I2C gfx(U8G2_R2, /* clock=*/ 5, /* data=*/ 4, /* reset=*/ 16);   // Adafruit Feather M0 Basic Proto + FeatherWing OLED
 
 //
 // ESP boards tend to have few pins available for general purpose use, to make things easier
@@ -98,19 +89,15 @@ void setup() {
     // queried for authentication requests, and any additional pairs are stored there too.
     // first we initialise the authManager, then pass it to the class.
     // Always call BEFORE setupMenu()
-    //authManager.initialise(eeprom, 100);
-    //remoteServer.setAuthenticator(&authManager);
+    authManager.initialise(eeprom, 100);
+    remoteServer.setAuthenticator(&authManager);
 
     // Here we add two additional menus for managing the connectivity and authentication keys.
     // In the future, there will be an option to autogenerate these from the designer.
-    //menuIpAddress.setNext(&menuAuthKeyMgr);
-    //menuRemoteMonitor.addConnector(remoteServer.getRemoteConnector(0));
-    //menuRemoteMonitor.registerCommsNotification(onCommsChange);
-    //menuAuthKeyMgr.setLocalOnly(true);
-
-    serdebugF("start dsiaply");
-    // start up the display.
-    gfx.begin();
+    menuIpAddress.setNext(&menuAuthKeyMgr);
+    menuRemoteMonitor.addConnector(remoteServer.getRemoteConnector(0));
+    menuRemoteMonitor.registerCommsNotification(onCommsChange);
+    menuAuthKeyMgr.setLocalOnly(true);
 
     serdebugF("start load");
 

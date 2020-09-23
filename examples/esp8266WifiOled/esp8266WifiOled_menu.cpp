@@ -15,6 +15,7 @@
 // Global variable declarations
 
 const PROGMEM ConnectorLocalInfo applicationInfo = { "ESP8266 Greenhouse", "01b9cb76-c108-4be3-a133-6159f8f1c9c1" };
+U8G2_SSD1306_128X32_UNIVISION_F_SW_I2C gfx(U8G2_R2, 5, 4, 16);
 U8g2GfxMenuConfig gfxConfig;
 U8g2MenuRenderer renderer;
 ArduinoAnalogDevice analogDevice;
@@ -72,10 +73,11 @@ void setupMenu() {
     menuIpAddress.setReadOnly(true);
 
     prepareBasicU8x8Config(gfxConfig);
+    gfx.begin();
     renderer.setGraphicsDevice(&gfx, &gfxConfig);
-    switches.initialise(ioUsingArduino(), true);
+    switches.initialise(internalDigitalIo(), true);
     switches.addSwitch(13, NULL);
-    switches.onRelease(13, [](uint8_t /*key*/, bool held) {
+    switches.onRelease(13, [](pinid_t /*key*/, bool held) {
             menuMgr.onMenuSelect(held);
         });
     setupAnalogJoystickEncoder(&analogDevice, A0, [](int val) {
