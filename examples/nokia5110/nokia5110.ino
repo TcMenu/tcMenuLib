@@ -20,6 +20,9 @@
 // you can turn on and off tcmenu logging in the below file (within IoAbstraction)
 #include <IoLogging.h>
 
+// a few forward references
+void addWidgetToTitleArea();
+
 // We are going to load and save using the inbuilt AVR EEPROM storage
 AvrEeprom eeprom;
 
@@ -39,23 +42,10 @@ byte mac[] = {
 RemoteMenuItem menuRemoteMonitor(1001, 2);
 EepromAuthenicationInfoMenuItem menuAuthKeyMgr(1002, &authManager, &menuRemoteMonitor);
 
-// when we use the Ada graphics support, the designer only generates an export definition
-// for the graphics variable. It is our responsibility to both declare it and initialise
-// the display. Here we're using software SPI, it's a small display so there's no issue.
-Adafruit_PCD8544 gfx = Adafruit_PCD8544(35, 34, 38, 37, 36);
-
 // used the the dialog further down, dialog headers are always from progmem / constant.
 const char warningPgm[] PROGMEM = "Warning!";
 
 void setup() {
-    // as said earlier, it is our responsibility to provide a display that
-    // is fully configured.
-    gfx.begin();
-	gfx.setRotation(0);
-    gfx.setContrast(50);
-	gfx.clearDisplay();
-    gfx.display();
-
     // start serial, second line for hardware usb on 32 bit boards.
     while(!Serial);
     Serial.begin(115200);
@@ -90,6 +80,10 @@ void setup() {
 
     // initialise the menu
     setupMenu();
+
+    // because we are using the simple adafruit configuration option, tcMenu will set up the display for us.
+    // it's less configurable but supports most of the popular choices. You can tweak the settings after setupMenu().
+    gfx.setContrast(60);
 
     // and print out the IP address
     char sz[20];
@@ -181,6 +175,31 @@ void addWidgetToTitleArea() {
     // and give the renderer our widget.
     renderer.setFirstWidget(&connectedWidget);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

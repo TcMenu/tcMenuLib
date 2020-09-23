@@ -13,6 +13,7 @@
  */
 
 #include "tcMenuLiquidCrystal.h"
+#include "tcUtil.h"
 
 extern const ConnectorLocalInfo applicationInfo;
 
@@ -35,7 +36,7 @@ void LiquidCrystalRenderer::initialise() {
         serdebugF2("Title widget present max=", wid->getMaxValue());
         for(int i = 0; i < wid->getMaxValue(); i++) {
             serdebugF2("Creating char ", charNo);
-            lcd->createCharPgm((byte)charNo, wid->getIcon(i));
+            lcd->createCharPgm((uint8_t)charNo, wid->getIcon(i));
             charNo++;
         }
         wid = wid->getNext();
@@ -81,7 +82,7 @@ void LiquidCrystalRenderer::renderTitle(bool forceDraw) {
         strcpy_P(buffer, applicationInfo.name);
         serdebugF2("print app name", buffer);
         uint8_t bufSz = bufferSize;
-        uint8_t last = min(bufSz, strlen(buffer));
+        uint8_t last = min(bufSz, (uint8_t)strlen(buffer));
         for(uint8_t i = last; i < bufSz; i++) {
             buffer[i] = ' ';
         }

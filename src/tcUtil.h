@@ -9,10 +9,12 @@
 #include <PlatformDetermination.h>
 #ifdef IOA_USE_MBED
 #include <mbed.h>
-#define min(x, y) ((x < y)?(x):(y))
-#define max(x, y) ((x > y)?(x):(y))
-#define highByte(x) (x >> 8)
-#define lowByte(x) (x & 0xff)
+#ifndef TCMENU_MBED_NO_MINMAX
+#define min(x, y) (((x) < (y))?(x):(y))
+#define max(x, y) (((x) > (y))?(x):(y))
+#endif //TCMENU_MBED_NO_MINMAX
+#define highByte(x) ((x) >> 8)
+#define lowByte(x) ((x) & 0xff)
 #define ltoa(a,b,c) itoa(a,b,c)
 #define strcmp_P(x,y) strcmp(x,y)
 #define strncpy_P(x,y,z) strncpy(x,y,z)

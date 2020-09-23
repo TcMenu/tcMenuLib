@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1598353698,
+    "seconds": 1600195058,
     "nanos": 0
   },
   "codeOptions": {
@@ -202,7 +202,8 @@
         "localOnly": false,
         "visible": true,
         "decimalPlaces": 4,
-        "digitsAllowed": 8
+        "digitsAllowed": 8,
+        "negativeAllowed": true
       }
     },
     {
