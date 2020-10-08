@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1600877424,
+    "seconds": 1601471552,
     "nanos": 0
   },
   "codeOptions": {
@@ -12,6 +12,7 @@
     "embeddedPlatform": "ARDUINO_ESP8266",
     "namingRecursive": true,
     "saveToSrc": false,
+    "useCppMain": false,
     "lastProperties": [
       {
         "name": "PULLUP_LOGIC",
@@ -25,22 +26,22 @@
       },
       {
         "name": "SWITCH_IODEVICE",
-        "latestValue": "io8574",
+        "latestValue": "",
         "subsystem": "INPUT"
       },
       {
         "name": "ENCODER_PIN_A",
-        "latestValue": "0",
+        "latestValue": "13",
         "subsystem": "INPUT"
       },
       {
         "name": "ENCODER_PIN_B",
-        "latestValue": "1",
+        "latestValue": "12",
         "subsystem": "INPUT"
       },
       {
         "name": "ENCODER_PIN_OK",
-        "latestValue": "2",
+        "latestValue": "14",
         "subsystem": "INPUT"
       },
       {
@@ -50,7 +51,7 @@
       },
       {
         "name": "DISPLAY_TYPE",
-        "latestValue": "U8G2_SSD1306_128X64_NONAME_F_SW_I2C",
+        "latestValue": "U8G2_SH1106_128X64_NONAME_F_SW_I2C",
         "subsystem": "DISPLAY"
       },
       {
@@ -60,12 +61,12 @@
       },
       {
         "name": "DISPLAY_CLOCK_PIN",
-        "latestValue": "4",
+        "latestValue": "5",
         "subsystem": "DISPLAY"
       },
       {
         "name": "DISPLAY_DATA_PIN",
-        "latestValue": "5",
+        "latestValue": "4",
         "subsystem": "DISPLAY"
       },
       {

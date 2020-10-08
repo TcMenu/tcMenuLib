@@ -1,8 +1,7 @@
 #ifndef TCLIBRARYDEV_FIXTURES_EXTERN_H
 #define TCLIBRARYDEV_FIXTURES_EXTERN_H
 
-#include <MenuItems.h>
-#include <RuntimeMenuItem.h>
+#include <tcMenu.h>
 #include <MockEepromAbstraction.h>
 
 extern AnalogMenuItem menuNumTwoDp;

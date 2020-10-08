@@ -25,7 +25,7 @@ class BaseDialog;
  */
 
 /** the frequency at which the screen is redrawn (only if needed). */
-#define SCREEN_DRAW_INTERVAL 250
+#define SCREEN_DRAW_INTERVAL 100
 /** the number of ticks the menu should reset to defaults after not being used */
 #define SECONDS_IN_TICKS (1000 / SCREEN_DRAW_INTERVAL)
 /** The maximum number of ticks that */
@@ -49,6 +49,34 @@ enum RenderPressMode: uint8_t { RPRESS_NONE = 0, RPRESS_PRESSED = 1, RPRESS_HELD
  * @param userClicked if the user clicked the select button
  */
 typedef void (*RendererCallbackFn)(unsigned int currentValue, RenderPressMode userClicked);
+
+class BaseMenuRenderer;
+
+/**
+ * By implementing this interface, you can take over the screen and handle reset events an OO fashion. Along with being
+ * able to take over the display using a drawing function that's called frequently, you can also implement this class and
+ * pass it to the renderer instead. It then handles all attempts to take over the display and also the reset callback.
+ */
+class CustomDrawing {
+public:
+    virtual ~CustomDrawing() = default;
+    /**
+     * Called when the display is taken over before any calls to renderLoop. You can set up anything you need here.
+     * @param currentRenderer the renderer object that sent this event.
+     */
+    virtual void started(BaseMenuRenderer* currentRenderer) = 0;
+    /**
+     * Called when the menu has become inactive, IE after the idle time out has triggered.
+     */
+    virtual void reset() = 0;
+    /**
+     * After takeOverDisplay is called, you'll first get the started event, then this loop will be called repeatedly,
+     * you should check if anything needs painting, and redraw display sections if need be.
+     * @param currentValue the current value of the encoder, or simulated encoder.
+     * @param userClick the selection state, eg of the select button.
+     */
+    virtual void renderLoop(unsigned int currentValue, RenderPressMode userClick) = 0;
+};
 
 /**
  * Used to indicate when the renderer is about to be reset, you could use this to do custom rendering
@@ -225,13 +253,20 @@ class RemoteMenuItem; // forward reference.
  * and in this loop any rendering or event callbacks should be handled. 
  */
 class BaseMenuRenderer : public MenuRenderer, Executable {
+public:
+    enum DisplayTakeoverMode { NOT_TAKEN_OVER, TAKEN_OVER_FN, START_CUSTOM_DRAW, RUNNING_CUSTOM_DRAW };
 protected:
 	uint8_t lastOffset;
 	uint16_t ticksToReset;
     uint16_t resetValInTicks;
 	MenuRedrawState redrawMode;
 	TitleWidget* firstWidget;
-    ResetCallbackFn resetCallback;
+	union {
+        ResetCallbackFn resetCallback;
+        CustomDrawing *customDrawing;
+    };
+    bool isCustomDrawing;
+	DisplayTakeoverMode displayTakenMode;
     BaseDialog* dialog;
 
 	RenderPressMode renderFnPressType;
@@ -266,9 +301,24 @@ public:
 
     /**
      * Sets the callback that will receive reset events when the menu has not been edited
-     * for some time.
+     * for some time. You can optionally use an instance of CustomDrawing instead of this,
+     * and that will be notified of both reset events and take over display events.
      */
-    void setResetCallback(ResetCallbackFn resetFn) { resetCallback = resetFn; }
+    void setResetCallback(ResetCallbackFn resetFn) {
+        isCustomDrawing = false;
+        resetCallback = resetFn;
+    }
+
+    /**
+     * Sets the CustomDrawing implementation that will handle both the reset event and also
+     * any custom drawing that needs to be done. The reset method will be called whenever
+     * the display times out back to it's defaults, the started will be called when the
+     * display is first taken over, followed by renderLoop until it's given back.
+     */
+    void setCustomDrawingHandler(CustomDrawing* customDrawingParam) {
+        isCustomDrawing= true;
+        customDrawing = customDrawingParam;
+    }
 
     /**
      * Called by taskManager when we are scheduled
@@ -305,21 +355,19 @@ public:
 
 	/**
 	 * In order to take over the display, provide a callback function that will receive
-	 * the regular render call backs instead of this renderer.
+	 * the regular render call backs instead of this renderer. If you have already registered
+	 * a custom drawing class that implements CustomDrawing by calling setCustomDrawing(..)
+	 * then you can omit the display function parameter, and your custom drawing class will
+	 * be called instead.
 	 * @param displayFn the callback to render the display
 	 */
-	void takeOverDisplay(RendererCallbackFn displayFn);
+	void takeOverDisplay(RendererCallbackFn displayFn = nullptr);
 
 	/**
 	 * Call this method to clear custom display rendering after a call to takeOverDisplay.
 	 * It will cause a complete repaint of the display.
 	 */
 	void giveBackDisplay();
-
-	/**
-	 * Returns a pointer to the rendering callback
-	 */
-	RendererCallbackFn getRenderingCallback() { return renderCallback; }
 
 	/**
 	 * Used to reset the display to it's default state, root menu, nothing being edited
@@ -338,14 +386,14 @@ public:
 	 */
 	void redrawRequirement(MenuRedrawState state) { if (state > redrawMode) redrawMode = state; }
 
+    /**
+     * Convert a menu item into a textual representation in the buffer
+     * @param item the menu item
+     * @param justification use either JUSTIFY_TEXT_LEFT or JUSTIFY_TEXT_RIGHT
+     */
+    void menuValueToText(MenuItem* item, MenuDrawJustification justification);
+
 protected:
-	/**
-	 * Convert a menu item into a textual representation in the buffer
-	 * @param item the menu item
-	 * @param justification use either JUSTIFY_TEXT_LEFT or JUSTIFY_TEXT_RIGHT
-	 */
-	void menuValueToText(MenuItem* item, MenuDrawJustification justification);
-	
 	/**
 	 * set up a countdown to default back to the submenu
 	 */

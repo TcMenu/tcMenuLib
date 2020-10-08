@@ -22,6 +22,8 @@ BaseMenuRenderer::BaseMenuRenderer(int bufferSize) : MenuRenderer(RENDERER_TYPE_
 	this->lastOffset = 0;
     this->firstWidget = NULL;
     this->dialog = NULL;
+    isCustomDrawing = false;
+    displayTakenMode = NOT_TAKEN_OVER;
     MenuRenderer::theInstance = this;
 }
 
@@ -40,7 +42,7 @@ bool BaseMenuRenderer::tryTakeSelectIfNeeded(int currentReading, RenderPressMode
 	menuAltered();
 
 	BaseDialog* dialog = getDialog();
-	if (renderCallback != NULL || (dialog != NULL && dialog->isInUse()) ) {
+	if (displayTakenMode != NOT_TAKEN_OVER || (dialog != NULL && dialog->isInUse()) ) {
 		// When there's a dialog, or render function, just record the change until exec().
 		renderFnPressType = pressType;
 		return true;
@@ -52,14 +54,21 @@ bool BaseMenuRenderer::tryTakeSelectIfNeeded(int currentReading, RenderPressMode
 
 void BaseMenuRenderer::exec() {
 
-	if(dialog!=NULL && dialog->isInUse()) {
+	if(dialog!=nullptr && dialog->isInUse()) {
 		dialog->dialogRendering(menuMgr.getCurrentRangeValue(), renderFnPressType);
     }
-    else if(getRenderingCallback()) {
-		renderCallback(menuMgr.getCurrentRangeValue(), renderFnPressType);
-	}
-	else {
-		render();
+	else if(displayTakenMode == NOT_TAKEN_OVER) {
+        render();
+    }
+    else if(displayTakenMode == START_CUSTOM_DRAW) {
+        customDrawing->started(this);
+        displayTakenMode = RUNNING_CUSTOM_DRAW;
+    }
+    else if(displayTakenMode == RUNNING_CUSTOM_DRAW) {
+        customDrawing->renderLoop(menuMgr.getCurrentRangeValue(), renderFnPressType);
+    }
+	else if(displayTakenMode == TAKEN_OVER_FN) {
+	    renderCallback(menuMgr.getCurrentRangeValue(), renderFnPressType);
 	}
 }
 
@@ -70,7 +79,14 @@ void BaseMenuRenderer::resetToDefault() {
 
     // once the menu has been reset, if the reset callback is present
     // then we call it.
-    if(resetCallback) resetCallback();
+    if(resetCallback) {
+        if(isCustomDrawing) {
+            customDrawing->reset();
+        }
+        else {
+            resetCallback();
+        }
+    };
 }
 
 void BaseMenuRenderer::countdownToDefaulting() {
@@ -210,15 +226,18 @@ void BaseMenuRenderer::menuValueRuntime(RuntimeMenuItem* item, MenuDrawJustifica
 }
 
 void BaseMenuRenderer::takeOverDisplay(RendererCallbackFn displayFn) {
+    if(displayFn == nullptr && isCustomDrawing == false) return;
 	// when we set this, we are stopping tcMenu rendering and letting this take over
 	renderFnPressType = RPRESS_NONE;
+    displayTakenMode = displayFn ? TAKEN_OVER_FN : START_CUSTOM_DRAW;
 	renderCallback = displayFn;
 }
 
 void BaseMenuRenderer::giveBackDisplay() {
 	// clear off the rendering callback.
 	renderFnPressType = RPRESS_NONE;
-	renderCallback = NULL;
+	renderCallback = nullptr;
+	displayTakenMode = NOT_TAKEN_OVER;
 	menuMgr.setCurrentMenu(menuMgr.getRoot());
 	menuAltered();
 }

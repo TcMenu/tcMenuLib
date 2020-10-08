@@ -72,7 +72,7 @@ void setupMenu() {
 
 
     gfx.initR(INITR_BLACKTAB);
-    gfx.setRotation(1);
+    gfx.setRotation(0);
     renderer.setGraphicsDevice(&gfx, &colorConfig);
     switches.initialise(io8574, true);
     menuMgr.initForEncoder(&renderer, &menuVoltage, 7, 6, 5);

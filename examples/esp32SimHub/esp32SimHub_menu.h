@@ -14,7 +14,7 @@
 #include <Arduino.h>
 #include <tcMenu.h>
 #include <RuntimeMenuItem.h>
-#include "tcMenuU8g2.h"
+#include "tcMenuAdaFruitGfx.h"
 #include "SimhubConnector.h"
 
 void setupMenu();  // forward reference of the menu setup function.
@@ -22,15 +22,20 @@ extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app inf
 
 // Global variables that need exporting
 
-extern U8G2_SH1106_128X64_NONAME_F_HW_I2C gfx;
-extern U8g2GfxMenuConfig gfxConfig;
-extern U8g2MenuRenderer renderer;
+extern Adafruit_ILI9341 gfx;
+extern AdaColorGfxMenuConfig gfxConfig;
+extern AdaFruitGfxMenuRenderer renderer;
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
 // Global Menu Item exports
 
+void CALLBACK_FUNCTION onShowDash(int id);
+extern ActionMenuItem menuShowDashboard;
+extern AnalogMenuItem menuLap;
+void CALLBACK_FUNCTION onDashChanged(int id);
+extern EnumMenuItem menuDashboard;
 extern AnalogMenuItem menuSettingsTestItem1;
 extern SubMenuItem menuSettings;
 void CALLBACK_FUNCTION onConnectionChange(int id);

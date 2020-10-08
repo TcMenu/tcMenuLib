@@ -16,11 +16,6 @@
 // this is the interrupt pin connection from the PCF8574 back to the ESP8266 board.
 #define IO_INTERRUPT_PIN 12
 
-// as we've attached the rotary encoder to an I2C PCF8574 device we need to
-// declare it here. We've told the designer that we would when we set the
-// switch IO device.
-IoAbstractionRef io8574 = ioFrom8574(0x20, IO_INTERRUPT_PIN);
-
 //
 // In a tcMenu application, before calling setupMenu it's your responsibility to ensure
 // that the display you're going to use is ready for drawing. You also need to start

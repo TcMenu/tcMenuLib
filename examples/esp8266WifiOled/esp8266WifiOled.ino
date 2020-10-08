@@ -104,7 +104,7 @@ void setup() {
     // because we are initialising wifi from the menu entries, we need to load the eeprom
     // values very early, in this case, set the root item first, before calling load.
     menuMgr.setRootMenu(&menuTomatoTemp);
-    menuMgr.load(*eeprom, 0xd00d);
+    menuMgr.load(*eeprom);
     serdebugF("end load");
 
     // this sketch assumes you've successfully connected to the Wifi before, does not

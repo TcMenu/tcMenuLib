@@ -15,10 +15,9 @@
 // Global variable declarations
 
 const PROGMEM ConnectorLocalInfo applicationInfo = { "ESP8266 Greenhouse", "01b9cb76-c108-4be3-a133-6159f8f1c9c1" };
-U8G2_SSD1306_128X32_UNIVISION_F_SW_I2C gfx(U8G2_R2, 5, 4, 16);
+U8G2_SH1106_128X64_NONAME_F_SW_I2C gfx(U8G2_R0, 5, 4, 16);
 U8g2GfxMenuConfig gfxConfig;
 U8g2MenuRenderer renderer;
-ArduinoAnalogDevice analogDevice;
 WiFiServer server(3333);
 
 // Global Menu Item declarations
@@ -76,13 +75,6 @@ void setupMenu() {
     gfx.begin();
     renderer.setGraphicsDevice(&gfx, &gfxConfig);
     switches.initialise(internalDigitalIo(), true);
-    switches.addSwitch(13, NULL);
-    switches.onRelease(13, [](pinid_t /*key*/, bool held) {
-            menuMgr.onMenuSelect(held);
-        });
-    setupAnalogJoystickEncoder(&analogDevice, A0, [](int val) {
-            menuMgr.valueChanged(val);
-        });
-    menuMgr.initWithoutInput(&renderer, &menuTomatoTemp);
+    menuMgr.initForEncoder(&renderer, &menuTomatoTemp, 13, 12, 14);
     remoteServer.begin(&server, &applicationInfo);
 }

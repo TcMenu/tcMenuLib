@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1594988999,
+    "seconds": 1601893739,
     "nanos": 0
   },
   "codeOptions": {
@@ -12,6 +12,7 @@
     "embeddedPlatform": "ARDUINO_32",
     "namingRecursive": true,
     "saveToSrc": false,
+    "useCppMain": false,
     "lastProperties": [
       {
         "name": "PULLUP_LOGIC",

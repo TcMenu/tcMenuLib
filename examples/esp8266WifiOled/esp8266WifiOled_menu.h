@@ -15,7 +15,6 @@
 #include <tcMenu.h>
 #include <RuntimeMenuItem.h>
 #include "tcMenuU8g2.h"
-#include <JoystickSwitchInput.h>
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
 
@@ -24,10 +23,9 @@ extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app inf
 
 // Global variables that need exporting
 
-extern U8G2_SSD1306_128X32_UNIVISION_F_SW_I2C gfx;
+extern U8G2_SH1106_128X64_NONAME_F_SW_I2C gfx;
 extern U8g2GfxMenuConfig gfxConfig;
 extern U8g2MenuRenderer renderer;
-extern ArduinoAnalogDevice analogDevice;
 extern WiFiServer server;
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
