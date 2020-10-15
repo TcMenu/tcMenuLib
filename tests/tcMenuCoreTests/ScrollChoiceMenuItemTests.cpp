@@ -53,7 +53,8 @@ test(testValueAtPositionEeeprom) {
 
     eeprom.serDebugContents(0, 35);
 
-    ScrollChoiceMenuItem choice(101, enumItemRenderFn, 0, &eeprom, 15, 10, 2, nullptr);
+    menuMgr.setEepromRef(&eeprom);
+    ScrollChoiceMenuItem choice(101, enumItemRenderFn, 0, 15, 10, 2, nullptr);
 
     // test the two valid cases
 

@@ -268,28 +268,15 @@ void myActionCb(int id) {
     actionCbCount++;
 }
 
-RENDERING_CALLBACK_NAME_INVOKE(rtActionMenuFn, backSubItemRenderFn, "Lights", 235, myActionCb)
-ActionMenuItem rtActionItem(101, rtActionMenuFn);
-
 test(testActionMenuItem) {
     char sz[20];
     menuPressMe.copyNameToBuffer(sz, sizeof(sz));
     assertStringCaseEqual("Press me", sz);
-    assertTrue(isMenuRuntime(&menuPressMe));
+    assertTrue(!isMenuRuntime(&menuPressMe));
     assertTrue(menuPressMe.getMenuType() == MENUTYPE_ACTION_VALUE);
     assertEqual((uint16_t)7, menuSub.getId());
     assertEqual((uint16_t)-1, menuSub.getEepromPosition());
     auto oldCbCount = actionCbCount;
-    menuPressMe.runCallback();
-    assertEqual(oldCbCount + 1, actionCbCount);
-
-    rtActionItem.copyNameToBuffer(sz, sizeof(sz));
-    assertStringCaseEqual("Lights", sz);
-    assertTrue(isMenuRuntime(&rtActionItem));
-    assertTrue(rtActionItem.getMenuType() == MENUTYPE_ACTION_VALUE);
-    assertEqual((uint16_t)101, rtActionItem.getId());
-    assertEqual((uint16_t)235, rtActionItem.getEepromPosition());
-    oldCbCount = actionCbCount;
-    rtActionItem.runCallback();
+    menuPressMe.triggerCallback();
     assertEqual(oldCbCount + 1, actionCbCount);
 }
