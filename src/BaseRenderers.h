@@ -393,6 +393,11 @@ public:
      */
     void menuValueToText(MenuItem* item, MenuDrawJustification justification);
 
+    /**
+     * Completely invalidate all drawing and instigate a complete redraw of all elements.
+     */
+    void invalidateAll() { redrawMode = MENUDRAW_COMPLETE_REDRAW; }
+
 protected:
 	/**
 	 * set up a countdown to default back to the submenu

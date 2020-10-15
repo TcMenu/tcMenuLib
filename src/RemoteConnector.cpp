@@ -24,6 +24,7 @@
 #include "BaseDialog.h"
 #include "BaseRenderers.h"
 #include "EditableLargeNumberMenuItem.h"
+#include "ScrollChoiceMenuItem.h"
 
 const char PGM_TCM pmemBootStartText[] = "START";
 const char PGM_TCM pmemBootEndText[] = "END";
@@ -324,6 +325,12 @@ void TagValueRemoteConnector::nextBootstrap() {
 	case MENUTYPE_ACTION_VALUE:
 		encodeActionMenu(parentId, (ActionMenuItem*)bootItem);
 		break;
+	case MENUTYPE_COLOR_VALUE:
+	    encodeColorMenuItem(parentId, reinterpret_cast<Rgb32MenuItem*>(bootItem));
+	    break;
+	case MENUTYPE_SCROLLER_VALUE:
+	    encodeScrollMenuItem(parentId, reinterpret_cast<ScrollChoiceMenuItem*>(bootItem));
+	    break;
 	default:
 		break;
 	}
@@ -410,6 +417,31 @@ void TagValueRemoteConnector::encodeAnalogItem(int parentId, AnalogMenuItem* ite
     transport->writeFieldInt(FIELD_ANALOG_OFF, item->getOffset());
     transport->writeFieldInt(FIELD_ANALOG_DIV, item->getDivisor());
     transport->writeFieldInt(FIELD_CURRENT_VAL, item->getCurrentValue());
+    transport->endMsg();
+}
+
+void TagValueRemoteConnector::encodeScrollMenuItem(int id, ScrollChoiceMenuItem *pItem) {
+    if(!prepareWriteMsg(MSG_BOOT_SCROLL_CHOICE)) return;
+    encodeBaseMenuFields(id, pItem);
+    transport->writeFieldInt(FIELD_NO_CHOICES, pItem->getNumberOfRows());
+    transport->writeFieldInt(FIELD_WIDTH, pItem->getItemWidth());
+    transport->writeFieldInt(FIELD_EDIT_MODE, pItem->getMemMode());
+
+    char sz[32];
+    pItem->copyTransportText(sz, sizeof(sz));
+
+    transport->writeField(FIELD_CURRENT_VAL, sz);
+
+    transport->endMsg();
+}
+
+void TagValueRemoteConnector::encodeColorMenuItem(int id, Rgb32MenuItem *pItem) {
+    if(!prepareWriteMsg(MSG_BOOT_RGB_COLOR)) return;
+    encodeBaseMenuFields(id, pItem);
+    transport->writeFieldInt(FIELD_ALPHA, pItem->isAlphaInUse());
+    char sz[12];
+    pItem->getUnderlying()->asHtmlString(sz, sizeof sz, true);
+    transport->writeField(FIELD_CURRENT_VAL, sz);
     transport->endMsg();
 }
 
@@ -545,7 +577,8 @@ void TagValueRemoteConnector::encodeActionMenu(int parentId, ActionMenuItem* ite
 }
 
 void TagValueRemoteConnector::encodeChangeValue(MenuItem* theItem) {
-	if(!prepareWriteMsg(MSG_CHANGE_INT)) return;
+    char sz[32];
+    if(!prepareWriteMsg(MSG_CHANGE_INT)) return;
     transport->writeFieldInt(FIELD_ID, theItem->getId());
     switch(theItem->getMenuType()) {
     case MENUTYPE_ENUM_VALUE:
@@ -558,8 +591,21 @@ void TagValueRemoteConnector::encodeChangeValue(MenuItem* theItem) {
     case MENUTYPE_TIME:
     case MENUTYPE_DATE:
 	case MENUTYPE_LARGENUM_VALUE:
+	case MENUTYPE_COLOR_VALUE: {
+	    auto rgb = reinterpret_cast<Rgb32MenuItem*>(theItem);
+	    rgb->getUnderlying()->asHtmlString(sz, sizeof sz, true);
+	    transport->writeField(FIELD_CURRENT_VAL, sz);
+	    transport->writeFieldInt(FIELD_CHANGE_TYPE, CHANGE_ABSOLUTE);
+	    break;
+	}
+	case MENUTYPE_SCROLLER_VALUE: {
+	    auto sc = reinterpret_cast<ScrollChoiceMenuItem*>(theItem);
+	    sc->copyTransportText(sz, sizeof sz);
+	    transport->writeField(FIELD_CURRENT_VAL, sz);
+	    transport->writeFieldInt(FIELD_CHANGE_TYPE, CHANGE_ABSOLUTE);
+	    break;
+	}
 	case MENUTYPE_TEXT_VALUE: {
-		char sz[20];
 		((RuntimeMenuItem*)theItem)->copyValue(sz, sizeof(sz));
 		transport->writeField(FIELD_CURRENT_VAL, sz);
         transport->writeFieldInt(FIELD_CHANGE_TYPE, CHANGE_ABSOLUTE); // menu host always sends absolute!

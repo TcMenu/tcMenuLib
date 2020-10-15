@@ -10,7 +10,25 @@
 #include "BaseRenderers.h"
 #include "BaseDialog.h"
 
-MenuRenderer* MenuRenderer::theInstance = NULL;
+MenuRenderer* MenuRenderer::theInstance = nullptr;
+
+class RenderingMenuMgrObserver : public MenuManagerObserver {
+public:
+    void structureHasChanged() override {
+        auto myRenderer = MenuRenderer::getInstance();
+        if(myRenderer->getRendererType() == RENDERER_TYPE_BASE) {
+            serdebugF("Completely invalidate the display");
+            reinterpret_cast<BaseMenuRenderer*>(myRenderer)->invalidateAll();
+        }
+    }
+
+    bool menuEditStarting(MenuItem *item) override {
+        return true;
+    }
+
+    void menuEditEnded(MenuItem *item) override {}
+} menuMgrListener;
+
 
 BaseMenuRenderer::BaseMenuRenderer(int bufferSize) : MenuRenderer(RENDERER_TYPE_BASE, bufferSize) {
 	ticksToReset = 0;
@@ -35,6 +53,7 @@ void BaseMenuRenderer::initialise() {
 	resetToDefault();
 
 	taskManager.scheduleFixedRate(SCREEN_DRAW_INTERVAL, this);
+	menuMgr.addChangeNotification(&menuMgrListener);
 }
 
 bool BaseMenuRenderer::tryTakeSelectIfNeeded(int currentReading, RenderPressMode pressType) {

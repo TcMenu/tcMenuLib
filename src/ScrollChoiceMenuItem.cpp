@@ -82,6 +82,21 @@ void ScrollChoiceMenuItem::valueAtPosition(char *buffer, size_t bufferSize, int 
     }
 }
 
+void ScrollChoiceMenuItem::copyTransportText(char *buffer, size_t bufferSize) {
+    ltoaClrBuff(buffer, getCurrentValue(), 3, NOT_PADDED, bufferSize);
+    appendChar(buffer, '-', bufferSize);
+    size_t len = strlen(buffer);
+    copyValue(&buffer[len], (int)(bufferSize - len));
+    buffer[bufferSize - 1] = 0;
+}
+
+long parseIntUntilSeparator(const char* ptr, int& offset);
+
+void ScrollChoiceMenuItem::setFromRemote(const char *buffer) {
+    int pos = 0;
+    setCurrentValue((int)parseIntUntilSeparator(buffer, pos));
+}
+
 int enumItemRenderFn(RuntimeMenuItem *item, uint8_t row, RenderFnMode mode, char *buffer, int bufferSize) {
     if (item->getMenuType() != MENUTYPE_SCROLLER_VALUE) return 0;
     auto scrollItem = reinterpret_cast<ScrollChoiceMenuItem*>(item);

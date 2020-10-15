@@ -18,6 +18,7 @@
 #include "RuntimeMenuItem.h"
 #include "MessageProcessors.h"
 #include "MenuIterator.h"
+#include "ScrollChoiceMenuItem.h"
 
 #define TAG_VAL_PROTOCOL 0x01
 #define START_OF_MESSAGE 0x01
@@ -327,7 +328,21 @@ public:
      */
     void encodeAcknowledgement(uint32_t correlation, AckResponseStatus status);
 
-	/**
+    /**
+     * Encodes a color RGB to the remote as a boot command.
+     * @param id the parent ID
+     * @param pItem the item to be transferred
+     */
+    void encodeColorMenuItem(int id, Rgb32MenuItem *pItem);
+
+    /**
+     * Encodes a scroll choice to the remote as a boot command
+     * @param id parent id
+     * @param pItem the item to be sent
+     */
+    void encodeScrollMenuItem(int id, ScrollChoiceMenuItem *pItem);
+
+    /**
 	 * Called frequently to perform all functions, this is arranged interally by
 	 * registering a taskManager task.
 	 */

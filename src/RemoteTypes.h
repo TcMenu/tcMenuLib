@@ -43,7 +43,7 @@ enum AckResponseStatus {
 /**
  * Converts a message field as two separate entities into a single word.
  */
-#define msgFieldToWord(a,b)  ( (((uint16_t)a)<<8) | ((uint16_t)b) )
+#define msgFieldToWord(a,b)  ( (((uint16_t)(a))<<8U) | ((uint16_t)(b)) )
 
 /*
  * Definitions for an unknown field key or part thereof.
@@ -81,6 +81,10 @@ enum AckResponseStatus {
 #define MSG_BOOT_LARGENUM msgFieldToWord('B', 'N')
 /** Message type definition for floating point bootstrap message */
 #define MSG_BOOT_FLOAT msgFieldToWord('B','F')
+/** Message type definition for RGB color bootstrap message */
+#define MSG_BOOT_RGB_COLOR msgFieldToWord('B', 'R')
+/** Message type definition for scroll bootstrap message */
+#define MSG_BOOT_SCROLL_CHOICE msgFieldToWord('B', 'Z')
 /** Message type definition for remote status bootstrap message */
 #define MSG_BOOT_REMOTE msgFieldToWord('B','R')
 /** Message type definition for ip address field bootstrap */
@@ -124,6 +128,8 @@ enum AckResponseStatus {
 #define FIELD_BUFFER      msgFieldToWord('B', 'U')
 #define FIELD_MODE        msgFieldToWord('M', 'O')
 #define FIELD_EDIT_MODE   msgFieldToWord('E', 'M')
+#define FIELD_ALPHA       msgFieldToWord('R', 'A')
+#define FIELD_WIDTH       msgFieldToWord('W', 'I')
 
 #define FIELD_PREPEND_CHOICE 'C'
 #define FIELD_PREPEND_NAMECHOICE 'c'

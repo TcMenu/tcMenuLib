@@ -68,6 +68,9 @@ test(testValueAtPositionEeeprom) {
 
     choice.valueAtPosition(buffer, sizeof buffer, 2);
     assertStringCaseEqual("", buffer);
+
+    choice.copyTransportText(buffer, sizeof buffer);
+    assertStringCaseEqual("0-computer12", buffer);
 }
 
 bool renderingInvoked = false;
@@ -116,6 +119,9 @@ test(testValueAtPositionCustom) {
     choice.setCurrentValue(1);
     assertTrue(renderingInvoked);
     assertEqual(1, choice.getCurrentValue());
+
+    choice.copyTransportText(buffer, sizeof buffer);
+    assertStringCaseEqual("1-1", buffer);
 }
 
 int colorCbCount = 0;

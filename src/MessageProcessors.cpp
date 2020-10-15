@@ -178,6 +178,16 @@ bool processValueChangeField(FieldAndValue* field, MessageProcessorInfo* info) {
 		numItem->setLargeNumberFromString(field->value);
 		serdebugF2("Large num change: ", field->value);
 	}
+    else if(info->value.item->getMenuType() == MENUTYPE_COLOR_VALUE) {
+        auto rgb = reinterpret_cast<Rgb32MenuItem*>(info->value.item);
+        rgb->setColorData(RgbColor32(field->value));
+        serdebugF4("RGB change ", rgb->getUnderlying()->red, rgb->getUnderlying()->green, rgb->getUnderlying()->blue );
+    }
+    else if(info->value.item->getMenuType() == MENUTYPE_SCROLLER_VALUE) {
+        auto sc = reinterpret_cast<ScrollChoiceMenuItem*>(info->value.item);
+        sc->setFromRemote(field->value);
+        serdebugF2("Scroller change ", sc->getCurrentValue());
+    }
     return true;
 }
 

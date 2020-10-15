@@ -106,10 +106,16 @@ public:
 
     int getItemWidth() const { return itemSize; }
 
+    EnumMemMode getMemMode() const { return memMode; }
+
     /**
      * @return integer of the current choice
      */
     int getCurrentValue() { return itemPosition; }
+
+    void copyTransportText(char *string, size_t i);
+
+    void setFromRemote(const char* buffer);
 };
 
 /**
@@ -193,7 +199,11 @@ public:
      * copy the color data provided as the latest
      * @param other the new color data
      */
-    void setColorData(const RgbColor32& other) { data = other; }
+    void setColorData(const RgbColor32& other) {
+        data = other;
+        setSendRemoteNeededAll();
+        setChanged(true);
+    }
 
     /**
      * @return true if the alpha channel is in use for this menuitem, otherwise false.
