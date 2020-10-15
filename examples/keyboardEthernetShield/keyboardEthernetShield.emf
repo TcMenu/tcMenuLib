@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1601463009,
+    "seconds": 1602694110,
     "nanos": 0
   },
   "codeOptions": {
@@ -310,6 +310,138 @@
         "localOnly": false,
         "visible": true,
         "functionName": "onSaveToEeprom"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "name": "Additional",
+        "eepromAddress": -1,
+        "id": 14,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "secured": false
+      }
+    },
+    {
+      "parentId": 14,
+      "type": "rgbItem",
+      "item": {
+        "name": "RGB",
+        "eepromAddress": 34,
+        "id": 15,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "includeAlphaChannel": true
+      }
+    },
+    {
+      "parentId": 14,
+      "type": "scrollItem",
+      "item": {
+        "name": "Rom Choice",
+        "eepromAddress": 30,
+        "id": 19,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "itemWidth": 10,
+        "numEntries": 9,
+        "variable": "",
+        "eepromOffset": 500,
+        "choiceMode": "ARRAY_IN_EEPROM"
+      }
+    },
+    {
+      "parentId": 14,
+      "type": "scrollItem",
+      "item": {
+        "name": "Num Choices",
+        "eepromAddress": 32,
+        "id": 17,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "itemWidth": 10,
+        "numEntries": 30,
+        "variable": null,
+        "eepromOffset": 0,
+        "choiceMode": "CUSTOM_RENDERFN"
+      }
+    },
+    {
+      "parentId": 14,
+      "type": "runtimeList",
+      "item": {
+        "name": "Count List",
+        "eepromAddress": -1,
+        "id": 18,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "",
+        "initialRows": 20
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "name": "Rom Choices",
+        "eepromAddress": -1,
+        "id": 20,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "secured": false
+      }
+    },
+    {
+      "parentId": 20,
+      "type": "scrollItem",
+      "item": {
+        "name": "Item Num",
+        "eepromAddress": -1,
+        "id": 21,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "onItemChange",
+        "itemWidth": 7,
+        "numEntries": 10,
+        "variable": "romSpaceNames",
+        "eepromOffset": 0,
+        "choiceMode": "ARRAY_IN_RAM"
+      }
+    },
+    {
+      "parentId": 20,
+      "type": "textItem",
+      "item": {
+        "name": "Value",
+        "eepromAddress": -1,
+        "id": 22,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "itemType": "PLAIN_TEXT",
+        "textLength": 10
+      }
+    },
+    {
+      "parentId": 20,
+      "type": "actionMenu",
+      "item": {
+        "name": "Save",
+        "eepromAddress": -1,
+        "id": 23,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "onSaveValue"
       }
     }
   ]

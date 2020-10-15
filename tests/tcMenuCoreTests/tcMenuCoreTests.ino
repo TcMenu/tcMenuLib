@@ -7,6 +7,11 @@
 #include <MockEepromAbstraction.h>
 #include <MockIoAbstraction.h>
 #include <MenuIterator.h>
+
+// here we set the pressMe menu item callback to our standard action callback.
+void myActionCb(int id);
+#define PRESSMECALLBACK myActionCb
+
 #include <tcm_test/testFixtures.h>
 
 using namespace aunit;

@@ -12,6 +12,13 @@ byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xEE
 };
 
+//
+// Some constant character definitions that we use around the code
+//
+const char pgmListPressed[] PROGMEM = "List Item Pressed";
+const char pgmHeaderSavedItem[] PROGMEM = "Saved Item";
+const char * romSpaceNames = "item 01item 02item 03item 04item 05item 06item 07item 08item 09item 10 ";
+
 // In the designer UI we configured io23017 as an IoExpander variable for both the input and display.
 // We must now create it as an MCP23017 expander. Address is 0x20 with interrupt pin connected to pin 2.
 // make sure you've arranged for !RESET pin to be held HIGH!!
@@ -73,6 +80,7 @@ void setup() {
 	//
 	Serial.begin(115200);
 	Wire.begin();
+	menuMgr.setEepromRef(&eeprom);
 
 	// now we enable authentication using EEPROM authentication. Where the EEPROM is
 	// queried for authentication requests, and any additional pairs are stored there too.
@@ -99,7 +107,7 @@ void setup() {
 	setupKeyboard();
 
 	// here we use the EEPROM to load back the last set of values.
-	menuMgr.load(eeprom, 0xf8f3);
+	menuMgr.load(0xf8f3);
 
 	// and print out the IP address
 	char sz[20];
@@ -140,8 +148,16 @@ void CALLBACK_FUNCTION onAnalog1(int /*id*/) {
 }
 
 
+const char pgmSavedText[] PROGMEM = "Saved all setttings";
+
 void CALLBACK_FUNCTION onSaveToEeprom(int /*id*/) {
 	menuMgr.save(eeprom, 0xf8f3);
+	auto dlg = renderer.getDialog();
+	if(dlg && !dlg->isInUse()) {
+	    dlg->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
+	    dlg->show(pgmSavedText, true, nullptr);
+	    dlg->copyIntoBuffer("");
+	}
 }
 
 const char pgmPinTooShort[] PROGMEM = "Pin too short";
@@ -161,16 +177,76 @@ void CALLBACK_FUNCTION onChangePin(int /*id*/) {
     }
 }
 
+void CALLBACK_FUNCTION onItemChange(int id) {
+    auto itemNo = menuRomChoicesItemNum.getCurrentValue();
+    char sz[12];
+    auto itemSize = menuAdditionalRomChoice.getItemWidth();
+    eeprom.readIntoMemArray((uint8_t*)sz, menuAdditionalRomChoice.getEepromStart() + (itemNo * itemSize), 10);
+    menuRomChoicesValue.setTextValue(sz);
+}
 
 
+void CALLBACK_FUNCTION onSaveValue(int id) {
+    auto itemNo = menuRomChoicesItemNum.getCurrentValue();
+    auto itemSize = menuAdditionalRomChoice.getItemWidth();
+    auto position = menuAdditionalRomChoice.getEepromStart() + (itemNo * itemSize);
+    eeprom.writeArrayToRom(position, (const uint8_t*)menuRomChoicesValue.getTextValue(), 10);
 
+    if(renderer.getDialog()->isInUse()) return;
+    renderer.getDialog()->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
+    renderer.getDialog()->show(pgmHeaderSavedItem, true);
+    renderer.getDialog()->copyIntoBuffer(menuRomChoicesValue.getTextValue());
+}
 
+//
+// Here we handle the custom rendering for the number choices Scroll Choice menu item. We basically get called back
+// every time it needs more data. For example when the name is required, when any index value is required or when
+// it will be saved to EEPROM or invoked.
+//
+int CALLBACK_FUNCTION fnAdditionalNumChoicesRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize) {
+    switch(mode) {
+        case RENDERFN_EEPROM_POS:
+           return 32;
+        case RENDERFN_INVOKE:
+            serdebugF2("Num Choice changed to ", row);
+            return true;
+        case RENDERFN_NAME:
+            strcpy(buffer, "Num Choices");
+            return true;
+        case RENDERFN_VALUE:
+            buffer[0] = 'V'; buffer[1]=0;
+            fastltoa(buffer, row, 3, NOT_PADDED, bufferSize);
+            return true;
+        default: return false;
+    }
+}
 
-
-
-
-
-
-
-
-
+//
+// Here we handle the custom rendering for the runtime list menu item that just counts. We basically get called back
+// every time it needs more data. For example when the name is required, when any index value is required or when
+// it will be saved to EEPROM or invoked.
+//
+int CALLBACK_FUNCTION fnAdditionalCountListRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize) {
+    switch(mode) {
+        case RENDERFN_INVOKE: {
+            // when the user selects an item in the list, we get this callback. Row is the offset of the selection
+            renderer.getDialog()->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
+            renderer.getDialog()->show(pgmListPressed, true);
+            char sz[10];
+            ltoaClrBuff(sz, row, 3, NOT_PADDED, sizeof sz);
+            renderer.getDialog()->copyIntoBuffer(sz);
+            return true;
+        }
+        case RENDERFN_NAME:
+            // Called whenever the name of the menu item is needed
+            strcpy(buffer, "List Item");
+            return true;
+        case RENDERFN_VALUE:
+            // Called whenever the value of a given row is needed.
+            buffer[0] = 'V'; buffer[1]=0;
+            fastltoa(buffer, row, 3, NOT_PADDED, bufferSize);
+            return true;
+        case RENDERFN_EEPROM_POS: return 0xFFFF; // lists are generally not saved to EEPROM
+        default: return false;
+    }
+}

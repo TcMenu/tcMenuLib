@@ -17,6 +17,7 @@
 #include <LiquidCrystalIO.h>
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
+#include <ScrollChoiceMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
 #include "tcMenuLiquidCrystal.h"
 
@@ -36,6 +37,19 @@ extern EthernetServer server;
 
 // Global Menu Item exports
 
+void CALLBACK_FUNCTION onSaveValue(int id);
+extern ActionMenuItem menuRomChoicesSave;
+extern TextMenuItem menuRomChoicesValue;
+void CALLBACK_FUNCTION onItemChange(int id);
+extern ScrollChoiceMenuItem menuRomChoicesItemNum;
+extern SubMenuItem menuRomChoices;
+int fnAdditionalCountListRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize);
+extern ListRuntimeMenuItem menuAdditionalCountList;
+int fnAdditionalNumChoicesRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize);
+extern ScrollChoiceMenuItem menuAdditionalNumChoices;
+extern ScrollChoiceMenuItem menuAdditionalRomChoice;
+extern Rgb32MenuItem menuAdditionalRGB;
+extern SubMenuItem menuAdditional;
 void CALLBACK_FUNCTION onSaveToEeprom(int id);
 extern ActionMenuItem menuConnectivitySaveToEEPROM;
 extern TextMenuItem menuConnectivityText;

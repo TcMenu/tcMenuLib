@@ -22,6 +22,7 @@ enum MenuEditingKeyMode: uint8_t {
 };
 
 class EditableLargeNumberMenuItem;
+class ScrollChoiceMenuItem;
 
 /**
  * An implementation of the key listener that can be used with TcMenu to edit menu items and control
@@ -42,14 +43,15 @@ private:
 	MenuEditingKeyMode mode;
 public:
 	MenuEditingKeyListener() {
-		currentEditor = NULL;
+		currentEditor = nullptr;
 		mode = KEYEDIT_NONE;
 	}
     void keyPressed(char key, bool held) override;
     void keyReleased(char key) override;
 private:
 	void processSimpleValueKeyPress(ValueMenuItem* item, char key);
-	void processAnalogKeyPress(AnalogMenuItem* item, char key);
+    void processScrollValueKeyPress(ScrollChoiceMenuItem* item, char key);
+    void processAnalogKeyPress(AnalogMenuItem* item, char key);
 	void processMultiEditKeyPress(TextMenuItem* item, char key);
 	void processIntegerMultiEdit(EditableMultiPartMenuItem<uint8_t[4]>* item, char key);
     void processLargeNumberPress(EditableLargeNumberMenuItem*, char key);

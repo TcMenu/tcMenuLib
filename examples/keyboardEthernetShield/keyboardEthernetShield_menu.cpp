@@ -21,6 +21,27 @@ EthernetServer server(3333);
 
 // Global Menu Item declarations
 
+const AnyMenuInfo PROGMEM minfoRomChoicesSave = { "Save", 23, 0xFFFF, 0, onSaveValue };
+ActionMenuItem menuRomChoicesSave(&minfoRomChoicesSave, NULL);
+RENDERING_CALLBACK_NAME_INVOKE(fnRomChoicesValueRtCall, textItemRenderFn, "Value", -1, NO_CALLBACK)
+TextMenuItem menuRomChoicesValue(fnRomChoicesValueRtCall, 22, 10, &menuRomChoicesSave);
+extern const char* romSpaceNames;
+RENDERING_CALLBACK_NAME_INVOKE(fnRomChoicesItemNumRtCall, enumItemRenderFn, "Item Num", -1, onItemChange)
+ScrollChoiceMenuItem menuRomChoicesItemNum(21, fnRomChoicesItemNumRtCall, 0, romSpaceNames, 7, 10, &menuRomChoicesValue);
+const SubMenuInfo PROGMEM minfoRomChoices = { "Rom Choices", 20, 0xFFFF, 0, NO_CALLBACK };
+RENDERING_CALLBACK_NAME_INVOKE(fnRomChoicesRtCall, backSubItemRenderFn, "Rom Choices", -1, NO_CALLBACK)
+BackMenuItem menuBackRomChoices(fnRomChoicesRtCall, &menuRomChoicesItemNum);
+SubMenuItem menuRomChoices(&minfoRomChoices, &menuBackRomChoices, NULL);
+ListRuntimeMenuItem menuAdditionalCountList(18, 20, fnAdditionalCountListRtCall, NULL);
+ScrollChoiceMenuItem menuAdditionalNumChoices(17, fnAdditionalNumChoicesRtCall, 0, 30, &menuAdditionalCountList);
+RENDERING_CALLBACK_NAME_INVOKE(fnAdditionalRomChoiceRtCall, enumItemRenderFn, "Rom Choice", 30, NO_CALLBACK)
+ScrollChoiceMenuItem menuAdditionalRomChoice(19, fnAdditionalRomChoiceRtCall, 0, 500, 10, 9, &menuAdditionalNumChoices);
+RENDERING_CALLBACK_NAME_INVOKE(fnAdditionalRGBRtCall, rgbAlphaItemRenderFn, "RGB", 34, NO_CALLBACK)
+Rgb32MenuItem menuAdditionalRGB(15, fnAdditionalRGBRtCall, true,&menuAdditionalRomChoice);
+const SubMenuInfo PROGMEM minfoAdditional = { "Additional", 14, 0xFFFF, 0, NO_CALLBACK };
+RENDERING_CALLBACK_NAME_INVOKE(fnAdditionalRtCall, backSubItemRenderFn, "Additional", -1, NO_CALLBACK)
+BackMenuItem menuBackAdditional(fnAdditionalRtCall, &menuAdditionalRGB);
+SubMenuItem menuAdditional(&minfoAdditional, &menuBackAdditional, &menuRomChoices);
 const AnyMenuInfo PROGMEM minfoConnectivitySaveToEEPROM = { "Save to EEPROM", 10, 0xFFFF, 0, onSaveToEeprom };
 ActionMenuItem menuConnectivitySaveToEEPROM(&minfoConnectivitySaveToEEPROM, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityTextRtCall, textItemRenderFn, "Text", 16, NO_CALLBACK)
@@ -32,7 +53,7 @@ TextMenuItem menuConnectivityChangePin(fnConnectivityChangePinRtCall, 11, 15, &m
 const SubMenuInfo PROGMEM minfoConnectivity = { "Connectivity", 6, 0xFFFF, 0, NO_CALLBACK };
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NO_CALLBACK)
 BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuConnectivityChangePin);
-SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL);
+SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, &menuAdditional);
 const char enumStrFruits_0[] PROGMEM  = "Apples";
 const char enumStrFruits_1[] PROGMEM  = "Oranges";
 const char enumStrFruits_2[] PROGMEM  = "Pears";

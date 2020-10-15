@@ -5,11 +5,13 @@
 #include <KeyboardManager.h>
 #include <tcMenuKeyboard.h>
 #include <EepromAbstraction.h>
+#include <Ethernet.h>
 
 // Set up ethernet, the usual default settings are chosen. Change to your preferred values or use DHCP.
 byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xEE
 };
+const char * romSpaceNames = "item 01item 02item 03item 04item 05item 06item 07item 08item 09item 10 ";
 
 // In the designer UI we configured io23017 as an IoExpander variable for both the input and display.
 // We must now create it as an MCP23017 expander. Address is 0x20 with interrupt pin connected to pin 2.
@@ -115,6 +117,8 @@ void setup() {
     authManager.copyPinToBuffer(sz, sizeof(sz));
     menuConnectivityChangePin.setTextValue(sz);
     menuConnectivityChangePin.setPasswordField(true);
+
+    menuLargeNum.getLargeNumber()->setFromFloat(1234.567);
 }
 
 void loop() {
@@ -137,8 +141,16 @@ void CALLBACK_FUNCTION onAnalog1(int /*id*/) {
 }
 
 
+const char pgmSavedText[] PROGMEM = "Saved all setttings";
+
 void CALLBACK_FUNCTION onSaveToEeprom(int /*id*/) {
 	menuMgr.save(eeprom, 0xf8f3);
+	auto dlg = renderer.getDialog();
+	if(dlg && !dlg->isInUse()) {
+	    dlg->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
+	    dlg->show(pgmSavedText, true, nullptr);
+	    dlg->copyIntoBuffer("");
+	}
 }
 
 const char pgmPinTooShort[] PROGMEM = "Pin too short";
@@ -158,11 +170,30 @@ void CALLBACK_FUNCTION onChangePin(int /*id*/) {
     }
 }
 
+// see tcMenu list documentation on thecoderscorner.com
+int CALLBACK_FUNCTION fnAdditionalCountListRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize) {
+   switch(mode) {
+    case RENDERFN_INVOKE:
+        // TODO - your code to invoke goes here - row is the index of the item
+        return true;
+    case RENDERFN_NAME:
+        // TODO - each row has it's own name - 0xff is the parent item
+        ltoaClrBuff(buffer, row, 3, NOT_PADDED, bufferSize);
+        return true;
+    case RENDERFN_VALUE:
+        // TODO - each row can has its own value - 0xff is the parent item
+        buffer[0] = 'V'; buffer[1]=0;
+        fastltoa(buffer, row, 3, NOT_PADDED, bufferSize);
+        return true;
+    case RENDERFN_EEPROM_POS: return 0xFFFF; // lists are generally not saved to EEPROM
+    default: return false;
+    }
+}
 
+void CALLBACK_FUNCTION onItemChange(int id) {
+    // TODO - your menu change code
+}
 
-
-
-
-
-
-
+void CALLBACK_FUNCTION onSaveValue(int id) {
+    // TODO - your menu change code
+}

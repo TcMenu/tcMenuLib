@@ -100,6 +100,16 @@ protected:
 };
 
 /**
+ * Provides the extents of the text as a Coord which is easier to work with.
+ * @param graphics the graphics object as a pointer
+ * @param text the text to measure
+ * @param x starting location X
+ * @param y starting location Y
+ * @return the coord object containing width and height
+ */
+Coord textExtents(Adafruit_GFX* graphics, const char* text, int16_t x, int16_t y);
+
+/**
  * The default graphics configuration for Ada GFX that needs no fonts and uses reasonable spacing options
  * for 100 - 150 dpi displays.
  */

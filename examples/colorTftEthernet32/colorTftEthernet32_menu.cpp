@@ -37,6 +37,14 @@ const SubMenuInfo minfoStatus = { "Status", 7, 0xFFFF, 0, NO_CALLBACK };
 RENDERING_CALLBACK_NAME_INVOKE(fnStatusRtCall, backSubItemRenderFn, "Status", -1, NO_CALLBACK)
 BackMenuItem menuBackStatus(fnStatusRtCall, &menuVoltA0);
 SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuConnectivity);
+const AnyMenuInfo minfoSaveItem = { "Save item", 23, 0xFFFF, 0, onSaveItem };
+ActionMenuItem menuSaveItem(&minfoSaveItem, NULL);
+RENDERING_CALLBACK_NAME_INVOKE(fnItemTextRtCall, textItemRenderFn, "Item Text", -1, NO_CALLBACK)
+TextMenuItem menuItemText(fnItemTextRtCall, 21, 10, &menuSaveItem);
+const SubMenuInfo minfoRomValues = { "Rom Values", 20, 0xFFFF, 0, NO_CALLBACK };
+RENDERING_CALLBACK_NAME_INVOKE(fnRomValuesRtCall, backSubItemRenderFn, "Rom Values", -1, NO_CALLBACK)
+BackMenuItem menuBackRomValues(fnRomValuesRtCall, &menuItemNo);
+SubMenuItem menuRomValues(&minfoRomValues, &menuBackRomValues, NULL);
 const BooleanMenuInfo minfoTempCheck = { "Temp Check", 13, 9, 1, NO_CALLBACK, NAMING_ON_OFF };
 BooleanMenuItem menuTempCheck(&minfoTempCheck, false, NULL);
 const AnyMenuInfo minfoHiddenItem = { "Hidden item", 16, 0xFFFF, 0, NO_CALLBACK };
@@ -46,7 +54,7 @@ BooleanMenuItem menuSCircuitProtect(&minfoSCircuitProtect, false, &menuHiddenIte
 const SubMenuInfo minfoAdvanced = { "Advanced", 11, 0xFFFF, 0, NO_CALLBACK };
 RENDERING_CALLBACK_NAME_INVOKE(fnAdvancedRtCall, backSubItemRenderFn, "Advanced", -1, NO_CALLBACK)
 BackMenuItem menuBackAdvanced(fnAdvancedRtCall, &menuSCircuitProtect);
-SubMenuItem menuAdvanced(&minfoAdvanced, &menuBackAdvanced, NULL);
+SubMenuItem menuAdvanced(&minfoAdvanced, &menuBackAdvanced, &menuRGB);
 const AnyMenuInfo minfoSaveAll = { "Save all", 10, 0xFFFF, 0, onSaveRom };
 ActionMenuItem menuSaveAll(&minfoSaveAll, &menuAdvanced);
 const BooleanMenuInfo minfoPwrDelay = { "Pwr Delay", 5, 0xFFFF, 1, NO_CALLBACK, NAMING_YES_NO };

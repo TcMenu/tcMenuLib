@@ -120,6 +120,8 @@ void BaseMenuRenderer::menuValueToText(MenuItem* item,	MenuDrawJustification jus
     case MENUTYPE_TIME:
     case MENUTYPE_DATE:
 	case MENUTYPE_RUNTIME_LIST:
+	case MENUTYPE_COLOR_VALUE:
+	case MENUTYPE_SCROLLER_VALUE:
 	case MENUTYPE_RUNTIME_VALUE:
 	case MENUTYPE_LARGENUM_VALUE:
 			menuValueRuntime(reinterpret_cast<RuntimeMenuItem*>(item), justification);

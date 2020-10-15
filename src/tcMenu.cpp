@@ -6,6 +6,7 @@
 #include <PlatformDetermination.h>
 #include "tcMenu.h"
 #include "RuntimeMenuItem.h"
+#include "ScrollChoiceMenuItem.h"
 #include "MenuIterator.h"
 #include "SecuredMenuPopup.h"
 #include <IoAbstraction.h>
@@ -16,7 +17,7 @@ void MenuManager::initForUpDownOk(MenuRenderer* renderer, MenuItem* root, pinid_
 	this->renderer = renderer;
 	this->currentRoot = this->rootMenu = root;
 
-	switches.addSwitch(pinOk, NULL);
+	switches.addSwitch(pinOk, nullptr);
     switches.onRelease(pinOk, [](pinid_t /*key*/, bool held) { menuMgr.onMenuSelect(held); });
 	setupUpDownButtonEncoder(pinUp, pinDown, [](int value) {menuMgr.valueChanged(value); });
 	renderer->initialise();
@@ -26,7 +27,7 @@ void MenuManager::initForEncoder(MenuRenderer* renderer,  MenuItem* root, pinid_
 	this->renderer = renderer;
 	this->currentRoot = this->rootMenu = root;
 
-	switches.addSwitch(encoderButton, NULL);
+	switches.addSwitch(encoderButton, nullptr);
     switches.onRelease(encoderButton, [](pinid_t /*key*/, bool held) { menuMgr.onMenuSelect(held); });
 	setupRotaryEncoderWithInterrupt(encoderPinA, encoderPinB, [](int value) {menuMgr.valueChanged(value); });
 
@@ -46,8 +47,8 @@ void MenuManager::setNextButton(pinid_t nextButtonPin) {
 }
 
 void MenuManager::performDirectionMove(bool dirIsBack) {
-    if(currentEditor != NULL && isMenuRuntimeMultiEdit(currentEditor)) {
-        EditableMultiPartMenuItem<void*>* editableItem = reinterpret_cast<EditableMultiPartMenuItem<void*>*>(currentEditor);
+    if(currentEditor != nullptr && isMenuRuntimeMultiEdit(currentEditor)) {
+        auto editableItem = reinterpret_cast<EditableMultiPartMenuItem<void*>*>(currentEditor);
 		
         int editorRange = dirIsBack ? editableItem->previousPart() : editableItem->nextPart();
 		if (editorRange != 0) {
@@ -57,15 +58,15 @@ void MenuManager::performDirectionMove(bool dirIsBack) {
             stopEditingCurrentItem(false);
         }
     }
-    else if(currentEditor != NULL) {
+    else if(currentEditor != nullptr) {
         stopEditingCurrentItem(false);
     }
-    else if(currentEditor == NULL && dirIsBack) {
+    else if(currentEditor == nullptr && dirIsBack) {
         setCurrentMenu(getParentAndReset());
     }
-    else if(currentEditor == NULL && !dirIsBack) {
+    else if(currentEditor == nullptr && !dirIsBack) {
         MenuItem* currentActive = menuMgr.findCurrentActive();
-        if(currentActive != NULL && currentActive->getMenuType() == MENUTYPE_SUB_VALUE) {
+        if(currentActive != nullptr && currentActive->getMenuType() == MENUTYPE_SUB_VALUE) {
             setCurrentMenu(currentActive);
         }
     }
@@ -97,6 +98,9 @@ void MenuManager::valueChanged(int value) {
 	else if (currentEditor && isMenuRuntimeMultiEdit(currentEditor)) {
 		reinterpret_cast<EditableMultiPartMenuItem<void*>*>(currentEditor)->valueChanged(value);
 	}
+	else if(currentEditor && currentEditor->getMenuType() == MENUTYPE_SCROLLER_VALUE) {
+	    reinterpret_cast<ScrollChoiceMenuItem*>(currentEditor)->setCurrentValue(value);
+	}
 	else {
 		serdebugF2("valueChanged V=", value);
 		if (menuMgr.getCurrentMenu()->getMenuType() == MENUTYPE_RUNTIME_LIST) {
@@ -118,14 +122,14 @@ void MenuManager::onMenuSelect(bool held) {
 	if (renderer->tryTakeSelectIfNeeded(0, held ? RPRESS_HELD : RPRESS_PRESSED)) return;
 
 	if (held) {
-        if (currentEditor != NULL && isMenuRuntimeMultiEdit(currentEditor)) {
+        if (currentEditor != nullptr && isMenuRuntimeMultiEdit(currentEditor)) {
             setCurrentMenu(currentRoot);
         }
         else {
             setCurrentMenu(getParentAndReset());
         }
     }
-	else if (getCurrentEditor() != NULL) {
+	else if (getCurrentEditor() != nullptr) {
 		stopEditingCurrentItem(true);
 	}
 	else  {
@@ -135,13 +139,13 @@ void MenuManager::onMenuSelect(bool held) {
 }
 
 void MenuManager::actionOnCurrentItem(MenuItem* toEdit) {
-	BaseMenuRenderer* baseRenderer = reinterpret_cast<BaseMenuRenderer*>(renderer);
+	auto* baseRenderer = reinterpret_cast<BaseMenuRenderer*>(renderer);
 
 	// if there's a new item specified in toEdit, it means we need to change
 	// the current editor (if it's possible to edit that value)
 	if (toEdit->getMenuType() == MENUTYPE_SUB_VALUE) {
 	    SubMenuItem* subMenu = reinterpret_cast<SubMenuItem*>(toEdit);
-		if (subMenu->isSecured() && authenticationManager != NULL) {
+		if (subMenu->isSecured() && authenticationManager != nullptr) {
 			serdebugF2("Submenu is secured: ", toEdit->getId());
 			SecuredMenuPopup* popup = secureMenuInstance();
 			popup->start(subMenu);
@@ -154,7 +158,7 @@ void MenuManager::actionOnCurrentItem(MenuItem* toEdit) {
 	}
 	else if (toEdit->getMenuType() == MENUTYPE_RUNTIME_LIST) {
 		if (menuMgr.getCurrentMenu() == toEdit) {
-			ListRuntimeMenuItem* listItem = reinterpret_cast<ListRuntimeMenuItem*>(toEdit);
+			auto* listItem = reinterpret_cast<ListRuntimeMenuItem*>(toEdit);
 			serdebugF2("List select: ", listItem->getActiveIndex());
 			if (listItem->getActiveIndex() == 0) {
 				menuMgr.setCurrentMenu(menuMgr.getParentAndReset());
@@ -183,7 +187,7 @@ void MenuManager::actionOnCurrentItem(MenuItem* toEdit) {
 void MenuManager::stopEditingCurrentItem(bool doMultiPartNext) {
 
 	if (doMultiPartNext && isMenuRuntimeMultiEdit(menuMgr.getCurrentEditor())) {
-		EditableMultiPartMenuItem<void*>* editableItem = reinterpret_cast<EditableMultiPartMenuItem<void*>*>(menuMgr.getCurrentEditor());
+		auto* editableItem = reinterpret_cast<EditableMultiPartMenuItem<void*>*>(menuMgr.getCurrentEditor());
 
 		// unless we've run out of parts to edit, stay in edit mode, moving to next part.
 		int editorRange = editableItem->nextPart();
@@ -195,13 +199,13 @@ void MenuManager::stopEditingCurrentItem(bool doMultiPartNext) {
 
 	currentEditor->setEditing(false);
 
-    if(itemCommittedHook) itemCommittedHook(currentEditor->getId());
+    notifyEditEnd(currentEditor);
 	
-    currentEditor = NULL;
+    currentEditor = nullptr;
 	setItemsInCurrentMenu(itemCount(menuMgr.getCurrentMenu()) - 1, offsetOfCurrentActive(menuMgr.getCurrentMenu()));
 
 	if (renderer->getRendererType() == RENDERER_TYPE_BASE) {
-		BaseMenuRenderer* baseRenderer = reinterpret_cast<BaseMenuRenderer*>(renderer);
+		auto* baseRenderer = reinterpret_cast<BaseMenuRenderer*>(renderer);
 		baseRenderer->redrawRequirement(MENUDRAW_EDITOR_CHANGE);
 	}
 }
@@ -218,7 +222,7 @@ MenuItem* MenuManager::getParentAndReset() {
  */
 MenuItem* MenuManager::findCurrentActive() {
 	MenuItem* itm = getCurrentMenu();
-	while (itm != NULL) {
+	while (itm != nullptr) {
 		if (itm->isActive()) {
 			return itm;
 		}
@@ -230,23 +234,32 @@ MenuItem* MenuManager::findCurrentActive() {
 
 void MenuManager::setupForEditing(MenuItem* item) {
 	// if the item is NULL, or it's read only, then it can't be edited.
-	if (item == NULL || item->isReadOnly()) return;
+	if (item == nullptr || item->isReadOnly()) return;
 
 	MenuType ty = item->getMenuType();
 	if ((ty == MENUTYPE_ENUM_VALUE || ty == MENUTYPE_INT_VALUE)) {
 		// these are the only types we can edit with a rotary encoder & LCD.
+		if(!notifyEditStarting(item)) return;
 		currentEditor = item;
 		currentEditor->setEditing(true);
 		switches.changeEncoderPrecision(item->getMaximumValue(), reinterpret_cast<ValueMenuItem*>(currentEditor)->getCurrentValue());
 	}
 	else if (ty == MENUTYPE_BOOLEAN_VALUE) {
 		// we don't actually edit boolean items, just toggle them instead
-		BooleanMenuItem* boolItem = (BooleanMenuItem*)item;
+        if(!notifyEditStarting(item)) return;
+        auto* boolItem = (BooleanMenuItem*)item;
 		boolItem->setBoolean(!boolItem->getBoolean());
 	}
+	else if (ty == MENUTYPE_SCROLLER_VALUE) {
+        if(!notifyEditStarting(item)) return;
+        currentEditor = item;
+        currentEditor->setEditing(true);
+	    switches.changeEncoderPrecision(item->getMaximumValue(), reinterpret_cast<ScrollChoiceMenuItem*>(item)->getCurrentValue());
+	}
 	else if (isMenuRuntimeMultiEdit(item)) {
-		currentEditor = item;
-		EditableMultiPartMenuItem<void*>* editableItem = reinterpret_cast<EditableMultiPartMenuItem<void*>*>(item);
+        if(!notifyEditStarting(item)) return;
+        currentEditor = item;
+        auto* editableItem = reinterpret_cast<EditableMultiPartMenuItem<void*>*>(item);
 		editableItem->beginMultiEdit();
 		int range = editableItem->nextPart();
 		switches.changeEncoderPrecision(range, editableItem->getPartValueAsInt());
@@ -254,9 +267,9 @@ void MenuManager::setupForEditing(MenuItem* item) {
 }
 
 void MenuManager::setCurrentEditor(MenuItem * editor) {
-	if (currentEditor != NULL) {
+	if (currentEditor != nullptr) {
 		currentEditor->setEditing(false);
-		currentEditor->setActive(editor == NULL);
+		currentEditor->setActive(editor == nullptr);
 	}
 	currentEditor = editor;
 }
@@ -265,9 +278,9 @@ void MenuManager::setCurrentMenu(MenuItem * theItem) {
 	serdebugF2("setCurrentMenu: ", theItem->getId());
 
 	if (renderer->getRendererType() != RENDERER_TYPE_BASE) return;
-	BaseMenuRenderer* baseRenderer = reinterpret_cast<BaseMenuRenderer*>(renderer);
+	auto* baseRenderer = reinterpret_cast<BaseMenuRenderer*>(renderer);
 
-	menuMgr.setCurrentEditor(NULL);
+	menuMgr.setCurrentEditor(nullptr);
 
 	getParentAndReset();
 
@@ -278,6 +291,68 @@ void MenuManager::setCurrentMenu(MenuItem * theItem) {
 }
 
 SecuredMenuPopup* MenuManager::secureMenuInstance() {
-	if (securedMenuPopup == NULL) securedMenuPopup = new SecuredMenuPopup(authenticationManager);
+	if (securedMenuPopup == nullptr) securedMenuPopup = new SecuredMenuPopup(authenticationManager);
 	return securedMenuPopup;
+}
+
+MenuManager::MenuManager() : structureNotifier() {
+    this->currentEditor = nullptr;
+    this->currentRoot = nullptr;
+    this->renderer = nullptr;
+    this->rootMenu = nullptr;
+    this->securedMenuPopup = nullptr;
+    this->authenticationManager = nullptr;
+    this->eepromRef = nullptr;
+}
+
+void MenuManager::addMenuAfter(MenuItem *existing, MenuItem* toAdd) {
+    if(existing->getNext()) {
+        toAdd->setNext(nullptr);
+        existing->setNext(toAdd);
+    }
+    else {
+        toAdd->setNext(existing->getNext());
+        existing->setNext(toAdd);
+    }
+}
+
+void MenuManager::addChangeNotification(MenuManagerObserver *observer) {
+    for(auto & i : structureNotifier) {
+        if(i == nullptr) i = observer;
+    }
+}
+
+void MenuManager::load(uint16_t magicKey, TimerFn onEepromEmpty) {
+    if(!loadMenuStructure(eepromRef, magicKey) && onEepromEmpty != nullptr) {
+        onEepromEmpty();
+    }
+}
+
+void MenuManager::load(EepromAbstraction &eeprom, uint16_t magicKey, TimerFn onEepromEmpty) {
+    eepromRef = &eeprom;
+    if(!loadMenuStructure(&eeprom, magicKey) && onEepromEmpty != nullptr) {
+        onEepromEmpty();
+    }
+}
+
+void MenuManager::notifyEditEnd(MenuItem *item) {
+    for(auto & obs : structureNotifier) {
+        if(obs != nullptr) obs->menuEditEnded(item);
+    }
+}
+
+bool MenuManager::notifyEditStarting(MenuItem *item) {
+    bool goAhead = true;
+    for(auto & obs : structureNotifier) {
+        if(obs != nullptr) {
+            goAhead = goAhead && obs->menuEditStarting(item);
+        }
+    }
+    return goAhead;
+}
+
+void MenuManager::notifyStructureChanged() {
+    for(auto & i : structureNotifier) {
+        if(i != nullptr) i->structureHasChanged();
+    }
 }

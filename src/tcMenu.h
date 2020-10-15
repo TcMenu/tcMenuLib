@@ -3,8 +3,8 @@
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
-#ifndef __MENU_MANAGER_H
-#define __MENU_MANAGER_H
+#ifndef TCMENU_MANAGER_H
+#define TCMENU_MANAGER_H
 
 #include <IoAbstraction.h>
 #include "tcUtil.h"
@@ -27,6 +27,58 @@ class MenuRenderer;
 
 class SecuredMenuPopup;
 
+/**
+ * Used with the change notification method on MenuManager to be notified when there is an important event on the
+ * menu.. Implement this class in order to receive edit and structure change notifications.
+ */
+class MenuManagerObserver {
+public:
+    /**
+     * Indicates that the menu structure has changed in a way that requires a new bootstrap and complete redraw. For
+     * example when a new menu item is added, or when static values such as the name or info block data change.
+     */
+    virtual void structureHasChanged()=0;
+
+    /**
+     * This method is called when editing is started with the menu manager, you can prevent editing by returning false.
+     * @param item the item that is about to start editing
+     * @return true to allow editing, otherwise false
+     */
+    virtual bool menuEditStarting(MenuItem* item)=0;
+
+    /**
+     * This method indicates that editing has completed editing, it is different to the menu item callback in that
+     * it is only called when the menu is edited. You cannot prevent completion, but you could present a dialog
+     * if the value was incorrectly adjusted.
+     * @param item the item that has finished editing.
+     */
+    virtual void menuEditEnded(MenuItem* item)=0;
+};
+
+/**
+ * This is used to simulate the old commit hook callback.
+ */
+class CommitCallbackObserver : public MenuManagerObserver {
+private:
+    MenuCallbackFn commitCb;
+public:
+    CommitCallbackObserver(MenuCallbackFn callbackFn) {
+        commitCb = callbackFn;
+    }
+
+    void structureHasChanged() override {}
+    bool menuEditStarting(MenuItem*) override { return true; }
+    void menuEditEnded(MenuItem* item) override { commitCb(item->getId()); }
+};
+
+#ifndef MAX_MENU_NOTIFIERS
+#define MAX_MENU_NOTIFIERS 4
+#endif
+
+/**
+ * MenuManager ties together all the parts of the menu app, it looks after the menu structure that's being presented,
+ * the renderer, security, and optionally an eeprom.
+ */
 class MenuManager {
 private:
 	MenuItem* rootMenu;
@@ -35,18 +87,10 @@ private:
 	MenuItem* currentEditor;
 	SecuredMenuPopup* securedMenuPopup;
 	AuthenticationManager *authenticationManager;
-    MenuCallbackFn itemCommittedHook;
-
+    EepromAbstraction* eepromRef;
+    MenuManagerObserver* structureNotifier[MAX_MENU_NOTIFIERS];
 public:
-	MenuManager() {
-		this->currentEditor = NULL;
-		this->currentRoot = NULL;
-		this->renderer = NULL;
-		this->rootMenu = NULL;
-		this->securedMenuPopup = NULL;
-		this->authenticationManager = NULL;
-        this->itemCommittedHook = NULL;
-	}
+	MenuManager();
 
 	/**
 	 * Initialise the menu manager to use a hardware rotary encoder
@@ -116,7 +160,9 @@ public:
      * callback.
      * @param commitCallback the callback to be notified when there is a commit event. 
      */
-    void setItemCommittedHook(MenuCallbackFn commitCallback) { itemCommittedHook = commitCallback; }
+    void setItemCommittedHook(MenuCallbackFn commitCallback) {
+        addChangeNotification(new CommitCallbackObserver(commitCallback));
+    }
 
 	/** 
 	 * called when the rotary encoder has moved to a new position to update the menu
@@ -144,16 +190,45 @@ public:
 	 */
 	void setItemsInCurrentMenu(int size, int offs = 0) { switches.changeEncoderPrecision(size, offs); }
 
+	EepromAbstraction* getEepromAbstraction() { return eepromRef; }
+
+	/**
+	 * Sets the global eeprom reference that tcMenu and other apps can use throughout the program.
+	 * @param globalRom
+	 */
+	void setEepromRef(EepromAbstraction* globalRom) {
+	    eepromRef = globalRom;
+	}
+
 	/**
 	 * Used during initialisation to load the previously stored state. Only if the magic key matches at location 0.
+	 * It will also set the global eeprom variable like calling setEepromRef().
 	 */
-	void load(EepromAbstraction& eeprom, uint16_t magicKey = 0xfade) { loadMenuStructure(eeprom, magicKey); }
+	void load(EepromAbstraction& eeprom, uint16_t magicKey = 0xfade, TimerFn onEepromEmpty = nullptr);
+
+
+    /**
+     * Used during initialisation to load the previously stored state. Only if the magic key matches at location 0.
+     * This version requires that you have first set the eeprom abstraction using setEepromRef().
+     */
+    void load(uint16_t magicKey = 0xfade, TimerFn onEepromEmpty = nullptr);
+
+
+    /**
+	 * Saves the menu using the EEPROM ref that was set up either during load, or by calling setEepromRef(). To use
+	 * this version you must ensure the eeprom was previously set.
+	 * The magic key is saved first, followed by each item that has an eeprom location set. Only changes are saved because
+	 * before each write we check if the value has actually changed.
+	 * @param magicKey the key that indicates the values are valid.
+	 */
+	void save(uint16_t magicKey = 0xfade) { if(eepromRef) saveMenuStructure(eepromRef); }
 
 	/**
 	 * Call to save all item values into eeprom. The magic key is saved at location 0 if not already set. This is a
-	 * lazy save that reads the eeprom values first, and only saves to eeprom when there are changes.
+	 * lazy save that reads the eeprom values first, and only saves to eeprom when there are changes. Use this version
+	 * when you want to override the eeprom used
 	 */
-	void save(EepromAbstraction& eeprom, uint16_t magicKey = 0xfade) { saveMenuStructure(eeprom, magicKey); }
+	void save(EepromAbstraction& eeprom, uint16_t magicKey = 0xfade) { saveMenuStructure(&eeprom, magicKey); }
 
 	/**
 	 * Find the menu item that is currently active.
@@ -202,7 +277,7 @@ public:
 	 * equivalent function as the encoder.
 	 */
 	int getCurrentRangeValue() {
-		return switches.getEncoder() != NULL ? switches.getEncoder()->getCurrentReading() : 0;
+		return switches.getEncoder() != nullptr ? switches.getEncoder()->getCurrentReading() : 0;
 	}
 
 	/**
@@ -213,9 +288,32 @@ public:
 	SecuredMenuPopup* secureMenuInstance();
 
 	void stopEditingCurrentItem(bool checkMultiPart);
+
+	/**
+	 * Adds a menu item into the tree directly after the existing item provided. Never add an item that's already in
+	 * the tree. Don't forget to call menuStructureChanged() after you're done adding items
+	 * @param existing where in the tree the new item is to be added.
+	 * @param toAdd the item that should be added, must not be in the tree already.
+	 */
+	void addMenuAfter(MenuItem* existing, MenuItem* toAdd);
+
+	/**
+	 * Call this method after making any structural change to the menu tree. For example adding a new menu item,
+	 * changing the item name or size parameters, modifying an info block, etc.
+	 */
+    void notifyStructureChanged();
+
+    /**
+     * Adds an observer that will be notified of structure changes in the menu
+     * @param observer to be notified of structure changes.
+     */
+    void addChangeNotification(MenuManagerObserver* observer);
 protected:
 	void setupForEditing(MenuItem* item);
 	void actionOnCurrentItem(MenuItem * toEdit);
+
+    void notifyEditEnd(MenuItem *pItem);
+    bool notifyEditStarting(MenuItem *pItem);
 };
 
 /**

@@ -20,7 +20,7 @@
  * @param eeprom  the EEPROM device to save to
  * @param magicKey the magic key to store, will be validated on loading back.
  */
-void saveMenuStructure(EepromAbstraction& eeprom, uint16_t magicKey = 0xfade);
+void saveMenuStructure(EepromAbstraction* eeprom, uint16_t magicKey = 0xfade);
 
 /**
  * Loads a menu structure back from EEPROM storage into the menu items, but only if the magic key in the first two
@@ -28,6 +28,6 @@ void saveMenuStructure(EepromAbstraction& eeprom, uint16_t magicKey = 0xfade);
  * @param eeprom  the EEPROM storage to load from
  * @param magicKey the key to check against, only loaded if the key matches.
  */
-void loadMenuStructure(EepromAbstraction& eeprom, uint16_t magicKey = 0xfade);
+bool loadMenuStructure(EepromAbstraction* eeprom, uint16_t magicKey = 0xfade);
 
 #endif //_EEPROM_ITEM_STORAGE_H_

@@ -233,8 +233,6 @@ enum MenuType : uint8_t {
 	MENUTYPE_ENUM_VALUE = 2,
 	/** item is of type BooleanMenuItem */
 	MENUTYPE_BOOLEAN_VALUE = 3,
-	/** item is of type SubMenuItem */
-	MENUTYPE_SUB_VALUE = 100,
 	/** item is of type FloatMenuItem */
 	MENUTYPE_FLOAT_VALUE = 101,
 	/** item is of type ActionMenuItem */
@@ -247,7 +245,11 @@ enum MenuType : uint8_t {
 	MENUTYPE_BACK_VALUE = 152,
 	/** item is of type ActivateSubMenuItem */
 	MENUTYPE_ACTIVATE_SUBMENU = 153,
-	/** item is of type TextMenuItem */
+	/** item is of type ScrollChoiceMenuItem */
+	MENUTYPE_SCROLLER_VALUE = 154,
+    /** item is of type SubMenuItem */
+    MENUTYPE_SUB_VALUE = 155,
+    /** item is of type TextMenuItem */
 	MENUTYPE_TEXT_VALUE = 200,
 	/** item is an IP address and is editable per segment */
 	MENUTYPE_IPADDRESS = 201,
@@ -256,7 +258,9 @@ enum MenuType : uint8_t {
     /** An item that represents a date */
     MENUTYPE_DATE = 203,
     /** An item that represent a large editable number */
-    MENUTYPE_LARGENUM_VALUE = 210
+    MENUTYPE_LARGENUM_VALUE = 210,
+    /** Represents an RGBA color picker, where alpha is optional */
+    MENUTYPE_COLOR_VALUE = 211
 };
 
 /**
@@ -385,7 +389,7 @@ public:
 	/** returns true if this item requires a pin to display, , currently only available locally */
 	bool isVisible() { return bitRead(flags, MENUITEM_PIN_VISIBLE); }
 
-	/** gets the next menu (sibling) at this level */
+    /** gets the next menu (sibling) at this level */
 	MenuItem* getNext() { return next; }
 	void setNext(MenuItem* next) { this->next = next; }
 
@@ -576,29 +580,6 @@ public:
 };
 
 /**
- * The implementation of a Menuitem that can contain more menu items as children. 
- */
-class SubMenuItem : public MenuItem {
-private:
-	MenuItem* child;
-public:
-	/**
-	 * Create an instance of the class
-	 * 
-	 * @param info a SubMenuInfo structure
-	 * @param child the first child item - (normally a BackMenuItem)
-	 * @param next the next menu in the chain if there is one, or NULL.
-	 */
-	SubMenuItem(const SubMenuInfo* info, MenuItem* child, MenuItem* next) : MenuItem(MENUTYPE_SUB_VALUE, (const AnyMenuInfo*)info, next) {this->child = child;}
-
-	/**
-	 * return the first child item
-	 */
-	MenuItem* getChild() { return child; }
-    void setChild(MenuItem* child) { this->child = child; }
-};
-
-/**
  * FloatMenuItem is for situations where absolute accuracy of the value is not important, for example showing
  * a calculated value from some sensors.
  * @see FloatMenuInfo
@@ -641,7 +622,7 @@ class ActionMenuItem : public MenuItem {
 public:
 	/**
 	 * Create an instance of the class
-	 * 
+	 *
 	 * @param info a AnyMenuInfo structure
 	 * @param next the next menu in the chain if there is one, or NULL.
 	 */
@@ -655,7 +636,8 @@ class RuntimeMenuItem;
  * Any MenuType with an ID less than 100 is editable as an integer
  */
 inline bool isMenuBasedOnValueItem(MenuItem* item) {
-	return uint8_t(item->getMenuType()) < MENUTYPE_SUB_VALUE;
+	auto ty =  uint8_t(item->getMenuType());
+	return ty == MENUTYPE_INT_VALUE || ty == MENUTYPE_ENUM_VALUE || ty == MENUTYPE_BOOLEAN_VALUE;
 }
 
 /**

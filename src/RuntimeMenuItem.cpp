@@ -238,12 +238,23 @@ int dateItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char
     }
 }
 
-int backSubItemRenderFn(RuntimeMenuItem* /*item*/, uint8_t /*row*/, RenderFnMode mode, char* buffer, int /*bufferSize*/) {
+int backSubItemRenderFn(RuntimeMenuItem* item, uint8_t /*row*/, RenderFnMode mode, char* buffer, int bufferSize) {
 	switch (mode) {
-	case RENDERFN_VALUE:
-		buffer[0] = 0;
-		return true;
-    default: return false;
+	    case RENDERFN_NAME:
+	        if(item->getMenuType() == MENUTYPE_SUB_VALUE && ((SubMenuItem*)item)->getNamePGMUnsafe()) {
+	            const char* name = ((SubMenuItem*)item)->getNamePGMUnsafe();
+                safeProgCpy(buffer, name, bufferSize);
+	        }
+	        else {
+	            buffer[0] = 0;
+	        }
+	        return true;
+	    case RENDERFN_EEPROM_POS:
+	        return -1;
+	    case RENDERFN_VALUE:
+            buffer[0] = 0;
+            return true;
+        default: return false;
 	}
 }
 
@@ -265,7 +276,7 @@ int findPositionInEditorSet(char ch) {
 
 int textItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
 	if (item->getMenuType() != MENUTYPE_TEXT_VALUE) return 0;
-	TextMenuItem* txtItem = reinterpret_cast<TextMenuItem*>(item);
+	auto txtItem = reinterpret_cast<TextMenuItem*>(item);
 
 	switch (mode) {
 	case RENDERFN_VALUE: {

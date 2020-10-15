@@ -3,10 +3,10 @@
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
- /**
-  * @file RuntimeMenuItem.h
-  * Contains definitions of menu items that can be fully defined at runtime with no need for prog mem structures.
-  */
+/**
+ * @file RuntimeMenuItem.h
+ * Contains definitions of menu items that can be fully defined at runtime with no need for prog mem structures.
+ */
 
 #ifndef _RUNTIME_MENUITEM_H_
 #define _RUNTIME_MENUITEM_H_
@@ -75,7 +75,9 @@ public:
 	uint8_t getNumberOfParts() { return noOfParts; }
 	void copyRuntimeName(char* buffer, int bufferSize) { renderFn(this, itemPosition, RENDERFN_NAME, buffer, bufferSize); }
 
-	void setNumberOfRows(uint8_t rows) { 
+    uint8_t getNumberOfRows() { return noOfParts; }
+
+    void setNumberOfRows(uint8_t rows) {
 		noOfParts = rows; 
 		setChanged(true); 
 		setSendRemoteNeededAll(); 
@@ -103,12 +105,55 @@ public:
 	 */
 	BackMenuItem(RuntimeRenderingFn renderFn, MenuItem* next) 
 		: RuntimeMenuItem(MENUTYPE_BACK_VALUE, nextRandomId(), renderFn, 0, 1, next) { }
+};
 
+/**
+ * The implementation of a Menuitem that can contain more menu items as children.
+ */
+class SubMenuItem : public RuntimeMenuItem {
+private:
+    MenuItem* child;
+    const char* pgmNamePtr;
+public:
+    /**
+     * Create an instance of SubMenuItem using the traditional SubMenuInfo block, this is no longer used, but we
+     * still support it as a means of working with the name.
+     * @deprecated use the other constructor, this constructor will be removed in a future version
+     * @param info a SubMenuInfo structure
+     * @param id the item ID
+     * @param child the first child item - (normally a BackMenuItem)
+     * @param next the next menu in the chain if there is one, or NULL.
+     */
+    SubMenuItem(const SubMenuInfo* info, MenuItem* child, MenuItem* next = nullptr)
+                : RuntimeMenuItem(MENUTYPE_SUB_VALUE, get_info_uint(&info->id), backSubItemRenderFn, 0, 1, next) {
+        this->child = child;
+        this->pgmNamePtr = info->name;
+    }
 
+    /**
+     * Create an instance of SubMenuItem using the runtime method, which can easily be created during system runtime.
+     * @param id the ID of the item
+     * @param renderFn the callback function for this item
+     * @param child the first child item in the sub menu
+     * @param next the next menu in the chain if there i one, or NULL.
+     */
+    SubMenuItem(uint16_t id, RuntimeRenderingFn renderFn, MenuItem* child, MenuItem* next = nullptr)
+            : RuntimeMenuItem(MENUTYPE_SUB_VALUE, id, renderFn,
+                              0, 1, next) {
+        this->child = child;
+        this->pgmNamePtr = nullptr;
+    }
+
+    /**
+     * return the first child item
+     */
+    MenuItem* getChild() { return child; }
+    void setChild(MenuItem* firstChildItem) { this->child = firstChildItem; }
+
+    const char* getNamePGMUnsafe() { return pgmNamePtr; }
 };
 
 #define LIST_PARENT_ITEM_POS 0xff
-
 
 /**
  * A menu item that represents a list of items and can be defined at runtime. This takes an ID that 
@@ -222,7 +267,11 @@ public:
 		uint8_t sz[2];
 		sz[0] = lowByte(newVal);
 		sz[1] = highByte(newVal);
-		return renderFn(this, itemPosition, RENDERFN_SET_VALUE, reinterpret_cast<char*>(sz), sizeof(sz));
+		bool valueUpdated = renderFn(this, itemPosition, RENDERFN_SET_VALUE, reinterpret_cast<char*>(sz), sizeof(sz));
+		if(valueUpdated) {
+            runCallback();
+        }
+		return valueUpdated;
 	}
 };
 
@@ -237,7 +286,7 @@ class TextMenuItem : public EditableMultiPartMenuItem<char*> {
 private:
     bool passwordField;
 public:
-	TextMenuItem(RuntimeRenderingFn customRenderFn, uint16_t id, int size, MenuItem* next = NULL)
+    TextMenuItem(RuntimeRenderingFn customRenderFn, uint16_t id, int size, MenuItem* next = NULL)
 		: EditableMultiPartMenuItem(MENUTYPE_TEXT_VALUE, id, size, customRenderFn, next) {
 		data = new char[size];
 		memset(data, 0, size);
@@ -248,7 +297,7 @@ public:
         this->passwordField = pwd;
     }
 
-    bool isPasswordField() {
+    bool isPasswordField() const {
         return this->passwordField;
     }
 
@@ -289,7 +338,7 @@ int findPositionInEditorSet(char ch);
  */
 class IpAddressMenuItem : public EditableMultiPartMenuItem<uint8_t[4]> {
 public:
-	IpAddressMenuItem(RuntimeRenderingFn renderFn, uint16_t id, MenuItem* next = NULL)
+    IpAddressMenuItem(RuntimeRenderingFn renderFn, uint16_t id, MenuItem* next = NULL)
 		: EditableMultiPartMenuItem(MENUTYPE_IPADDRESS, id, 4, renderFn, next) {
 		setIpAddress(127, 0, 0, 1);
 	}
@@ -362,7 +411,7 @@ class TimeFormattedMenuItem : public EditableMultiPartMenuItem<TimeStorage> {
 private:
     MultiEditWireType format;
 public:
-	TimeFormattedMenuItem(RuntimeRenderingFn renderFn, uint16_t id, MultiEditWireType format, MenuItem* next = NULL)
+    TimeFormattedMenuItem(RuntimeRenderingFn renderFn, uint16_t id, MultiEditWireType format, MenuItem* next = NULL)
 		: EditableMultiPartMenuItem(MENUTYPE_TIME, id, format == EDITMODE_TIME_HUNDREDS_24H ? 4 : 3, renderFn, next) {
 		setTime(TimeStorage(12, 0));
         this->format = format;

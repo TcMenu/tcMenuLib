@@ -223,3 +223,11 @@ void CALLBACK_FUNCTION onTakeDisplay(int id) {
     starting = true;
     renderer.takeOverDisplay(myRenderCallback);
 }
+
+void CALLBACK_FUNCTION onRgbChanged(int id) {
+    // TODO - your menu change code
+}
+
+void CALLBACK_FUNCTION onSaveItem(int id) {
+    // TODO - your menu change code
+}

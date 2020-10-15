@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1601464065,
+    "seconds": 1602516900,
     "nanos": 0
   },
   "codeOptions": {
@@ -254,6 +254,61 @@
         "localOnly": false,
         "visible": true,
         "naming": "ON_OFF"
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "",
+      "item": null
+    },
+    {
+      "parentId": 4,
+      "type": "",
+      "item": null
+    },
+    {
+      "parentId": 4,
+      "type": "subMenu",
+      "item": {
+        "name": "Rom Values",
+        "eepromAddress": -1,
+        "id": 20,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "secured": false
+      }
+    },
+    {
+      "parentId": 20,
+      "type": "",
+      "item": null
+    },
+    {
+      "parentId": 20,
+      "type": "textItem",
+      "item": {
+        "name": "Item Text",
+        "eepromAddress": -1,
+        "id": 21,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "itemType": "PLAIN_TEXT",
+        "textLength": 10
+      }
+    },
+    {
+      "parentId": 20,
+      "type": "actionMenu",
+      "item": {
+        "name": "Save item",
+        "eepromAddress": -1,
+        "id": 23,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "onSaveItem"
       }
     },
     {

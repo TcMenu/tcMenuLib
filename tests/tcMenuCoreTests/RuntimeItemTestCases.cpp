@@ -206,8 +206,6 @@ test(testTextRuntimeItem) {
     textItem.copyValue(sz, sizeof(sz));
     assertStringCaseEqual("Goodbye", sz);
 
-    renderActivateCalled = false;
-
     assertEqual(uint8_t(10), textItem.beginMultiEdit());
     assertTrue(textItem.isEditing());
     assertEqual(ALLOWABLE_CHARS_ENCODER_SIZE, textItem.nextPart());
@@ -234,11 +232,64 @@ test(testTextRuntimeItem) {
     textItem.copyValue(sz, sizeof(sz));
     assertStringCaseEqual("0o1[d]bye", sz);
 
-    assertFalse(renderActivateCalled);
+    renderActivateCalled = false;
     textItem.stopMultiEdit();
     assertTrue(renderActivateCalled);
     assertFalse(textItem.isEditing());
     textItem.copyValue(sz, sizeof(sz));
     assertStringCaseEqual("0o1dbye", sz);
+}
 
+RENDERING_CALLBACK_NAME_INVOKE(rtSubMenuFn, backSubItemRenderFn, "My Sub", 0xffff, NULL)
+SubMenuItem rtSubMenu(101, rtSubMenuFn, &menuVolume, &menuContrast);
+
+test(testSubMenuItem) {
+    char sz[20];
+    menuSub.copyNameToBuffer(sz, sizeof(sz));
+    assertStringCaseEqual("Settings", sz);
+    assertTrue(&menuBackSub == menuSub.getChild());
+    assertTrue(isMenuRuntime(&menuSub));
+    assertTrue(menuSub.getMenuType() == MENUTYPE_SUB_VALUE);
+    assertEqual((uint16_t)7, menuSub.getId());
+    assertEqual((uint16_t)-1, menuSub.getEepromPosition());
+
+    rtSubMenu.copyNameToBuffer(sz, sizeof(sz));
+    assertStringCaseEqual("My Sub", sz);
+    assertTrue(&menuVolume == rtSubMenu.getChild());
+    assertTrue(&menuContrast == rtSubMenu.getNext());
+    assertTrue(isMenuRuntime(&rtSubMenu));
+    assertTrue(rtSubMenu.getMenuType() == MENUTYPE_SUB_VALUE);
+    assertEqual((uint16_t)101, rtSubMenu.getId());
+    assertEqual((uint16_t)-1, rtSubMenu.getEepromPosition());
+}
+
+int actionCbCount = 0;
+void myActionCb(int id) {
+    actionCbCount++;
+}
+
+RENDERING_CALLBACK_NAME_INVOKE(rtActionMenuFn, backSubItemRenderFn, "Lights", 235, myActionCb)
+ActionMenuItem rtActionItem(101, rtActionMenuFn);
+
+test(testActionMenuItem) {
+    char sz[20];
+    menuPressMe.copyNameToBuffer(sz, sizeof(sz));
+    assertStringCaseEqual("Press me", sz);
+    assertTrue(isMenuRuntime(&menuPressMe));
+    assertTrue(menuPressMe.getMenuType() == MENUTYPE_ACTION_VALUE);
+    assertEqual((uint16_t)7, menuSub.getId());
+    assertEqual((uint16_t)-1, menuSub.getEepromPosition());
+    auto oldCbCount = actionCbCount;
+    menuPressMe.runCallback();
+    assertEqual(oldCbCount + 1, actionCbCount);
+
+    rtActionItem.copyNameToBuffer(sz, sizeof(sz));
+    assertStringCaseEqual("Lights", sz);
+    assertTrue(isMenuRuntime(&rtActionItem));
+    assertTrue(rtActionItem.getMenuType() == MENUTYPE_ACTION_VALUE);
+    assertEqual((uint16_t)101, rtActionItem.getId());
+    assertEqual((uint16_t)235, rtActionItem.getEepromPosition());
+    oldCbCount = actionCbCount;
+    rtActionItem.runCallback();
+    assertEqual(oldCbCount + 1, actionCbCount);
 }
