@@ -11,6 +11,12 @@
 byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xEE
 };
+
+//
+// Some constant character definitions that we use around the code
+//
+const char pgmListPressed[] PROGMEM = "List Item Pressed";
+const char pgmHeaderSavedItem[] PROGMEM = "Saved Item";
 const char * romSpaceNames = "item 01item 02item 03item 04item 05item 06item 07item 08item 09item 10 ";
 
 // In the designer UI we configured io23017 as an IoExpander variable for both the input and display.
@@ -74,6 +80,7 @@ void setup() {
 	//
 	Serial.begin(115200);
 	Wire.begin();
+	menuMgr.setEepromRef(&eeprom);
 
 	// now we enable authentication using EEPROM authentication. Where the EEPROM is
 	// queried for authentication requests, and any additional pairs are stored there too.
@@ -100,7 +107,7 @@ void setup() {
 	setupKeyboard();
 
 	// here we use the EEPROM to load back the last set of values.
-	menuMgr.load(eeprom, 0xf8f3);
+	menuMgr.load(0xf8f3);
 
 	// and print out the IP address
 	char sz[20];
@@ -170,30 +177,27 @@ void CALLBACK_FUNCTION onChangePin(int /*id*/) {
     }
 }
 
-// see tcMenu list documentation on thecoderscorner.com
-int CALLBACK_FUNCTION fnAdditionalCountListRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize) {
-   switch(mode) {
-    case RENDERFN_INVOKE:
-        // TODO - your code to invoke goes here - row is the index of the item
-        return true;
-    case RENDERFN_NAME:
-        // TODO - each row has it's own name - 0xff is the parent item
-        ltoaClrBuff(buffer, row, 3, NOT_PADDED, bufferSize);
-        return true;
-    case RENDERFN_VALUE:
-        // TODO - each row can has its own value - 0xff is the parent item
-        buffer[0] = 'V'; buffer[1]=0;
-        fastltoa(buffer, row, 3, NOT_PADDED, bufferSize);
-        return true;
-    case RENDERFN_EEPROM_POS: return 0xFFFF; // lists are generally not saved to EEPROM
-    default: return false;
-    }
+void CALLBACK_FUNCTION onItemChange(int id) {
+    auto itemNo = menuRomChoicesItemNum.getCurrentValue();
+    char sz[12];
+    auto itemSize = menuAdditionalRomChoice.getItemWidth();
+    eeprom.readIntoMemArray((uint8_t*)sz, menuAdditionalRomChoice.getEepromStart() + (itemNo * itemSize), 10);
+    menuRomChoicesValue.setTextValue(sz);
 }
 
-void CALLBACK_FUNCTION onItemChange(int id) {
-    // TODO - your menu change code
-}
 
 void CALLBACK_FUNCTION onSaveValue(int id) {
-    // TODO - your menu change code
+    auto itemNo = menuRomChoicesItemNum.getCurrentValue();
+    auto itemSize = menuAdditionalRomChoice.getItemWidth();
+    auto position = menuAdditionalRomChoice.getEepromStart() + (itemNo * itemSize);
+    eeprom.writeArrayToRom(position, (const uint8_t*)menuRomChoicesValue.getTextValue(), 10);
+
+    if(renderer.getDialog()->isInUse()) return;
+    renderer.getDialog()->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
+    renderer.getDialog()->show(pgmHeaderSavedItem, true);
+    renderer.getDialog()->copyIntoBuffer(menuRomChoicesValue.getTextValue());
 }
+
+
+
+

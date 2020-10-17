@@ -82,7 +82,7 @@ enum AckResponseStatus {
 /** Message type definition for floating point bootstrap message */
 #define MSG_BOOT_FLOAT msgFieldToWord('B','F')
 /** Message type definition for RGB color bootstrap message */
-#define MSG_BOOT_RGB_COLOR msgFieldToWord('B', 'R')
+#define MSG_BOOT_RGB_COLOR msgFieldToWord('B', 'K')
 /** Message type definition for scroll bootstrap message */
 #define MSG_BOOT_SCROLL_CHOICE msgFieldToWord('B', 'Z')
 /** Message type definition for remote status bootstrap message */
