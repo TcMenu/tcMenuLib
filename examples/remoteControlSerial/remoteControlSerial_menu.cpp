@@ -21,8 +21,11 @@ AdaFruitGfxMenuRenderer renderer;
 
 // Global Menu Item declarations
 
+extern const char* choiceRamArray;
+RENDERING_CALLBACK_NAME_INVOKE(fnChoiceRtCall, enumItemRenderFn, "Choice", -1, NO_CALLBACK)
+ScrollChoiceMenuItem menuChoice(9, fnChoiceRtCall, 0, choiceRamArray, 5, 4, NULL);
 const AnyMenuInfo PROGMEM minfoPushMe = { "Push Me", 6, 0xFFFF, 0, onPushMe };
-ActionMenuItem menuPushMe(&minfoPushMe, NULL);
+ActionMenuItem menuPushMe(&minfoPushMe, &menuChoice);
 const char enumStrFood_0[] PROGMEM  = "Pizza";
 const char enumStrFood_1[] PROGMEM  = "Pasta";
 const char enumStrFood_2[] PROGMEM  = "Salad";
@@ -51,8 +54,8 @@ void setupMenu() {
     menuA2.setReadOnly(true);
 
     prepareAdaMonoGfxConfigLoRes(&gfxConfig);
-    gfx.setRotation(0);
     gfx.begin();
+    gfx.setRotation(0);
     renderer.setGraphicsDevice(&gfx, &gfxConfig);
     switches.initialise(internalDigitalIo(), true);
     menuMgr.initForEncoder(&renderer, &menuAnalogIn, 2, 3, A3);

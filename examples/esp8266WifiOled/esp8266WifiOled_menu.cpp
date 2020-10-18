@@ -32,8 +32,13 @@ const SubMenuInfo PROGMEM minfoConnectivity = { "Connectivity", 9, 0xFFFF, 0, NO
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NO_CALLBACK)
 BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuSSID);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL);
+const AnyMenuInfo PROGMEM minfoLoadFiles = { "Load Files", 15, 0xFFFF, 0, onLoadFiles };
+ActionMenuItem menuLoadFiles(&minfoLoadFiles, NULL);
+extern const char* fileChoicesArray;
+RENDERING_CALLBACK_NAME_INVOKE(fnFileRtCall, enumItemRenderFn, "File", -1, onFileChoice)
+ScrollChoiceMenuItem menuFile(14, fnFileRtCall, 0, fileChoicesArray, 10, 1, &menuLoadFiles);
 const BooleanMenuInfo PROGMEM minfoSecretEntry = { "Secret Entry", 13, 0xFFFF, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
-BooleanMenuItem menuSecretEntry(&minfoSecretEntry, false, NULL);
+BooleanMenuItem menuSecretEntry(&minfoSecretEntry, false, &menuFile);
 const AnyMenuInfo PROGMEM minfoSaveAll = { "Save All", 8, 0xFFFF, 0, onSaveAll };
 ActionMenuItem menuSaveAll(&minfoSaveAll, &menuSecretEntry);
 const char enumStrWinOpening_0[] PROGMEM  = "NARROW";

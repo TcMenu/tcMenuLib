@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1600838808,
+    "seconds": 1603019484,
     "nanos": 0
   },
   "codeOptions": {
@@ -12,6 +12,7 @@
     "embeddedPlatform": "ARDUINO_AVR",
     "namingRecursive": false,
     "saveToSrc": false,
+    "useCppMain": false,
     "lastProperties": [
       {
         "name": "PULLUP_LOGIC",
@@ -212,6 +213,23 @@
         "localOnly": false,
         "visible": true,
         "functionName": "onPushMe"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "scrollItem",
+      "item": {
+        "name": "Choice",
+        "eepromAddress": -1,
+        "id": 9,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "itemWidth": 5,
+        "numEntries": 4,
+        "variable": "choiceRamArray",
+        "eepromOffset": 0,
+        "choiceMode": "ARRAY_IN_RAM"
       }
     }
   ]

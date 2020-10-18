@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1601464775,
+    "seconds": 1603022031,
     "nanos": 0
   },
   "codeOptions": {
@@ -227,6 +227,37 @@
         "localOnly": false,
         "visible": false,
         "naming": "TRUE_FALSE"
+      }
+    },
+    {
+      "parentId": 5,
+      "type": "scrollItem",
+      "item": {
+        "name": "File",
+        "eepromAddress": -1,
+        "id": 14,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "onFileChoice",
+        "itemWidth": 10,
+        "numEntries": 1,
+        "variable": "fileChoicesArray",
+        "eepromOffset": 200,
+        "choiceMode": "ARRAY_IN_RAM"
+      }
+    },
+    {
+      "parentId": 5,
+      "type": "actionMenu",
+      "item": {
+        "name": "Load Files",
+        "eepromAddress": -1,
+        "id": 15,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "onLoadFiles"
       }
     },
     {

@@ -6,28 +6,30 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
- */
+*/
 
+#include <Arduino.h>
 #include <tcMenu.h>
 #include "keyboardEthernetShield_menu.h"
 
 // Global variable declarations
 
+const PROGMEM ConnectorLocalInfo applicationInfo = { "Keyboard Ethernet", "b6ee8e21-449c-4f8a-bab6-a89e3f2c68d9" };
 LiquidCrystal lcd(8, 9, 10, 11, 12, 13);
 LiquidCrystalRenderer renderer(lcd, 20, 4);
 EthernetServer server(3333);
 
 // Global Menu Item declarations
 
-const PROGMEM AnyMenuInfo minfoRomChoicesSave = { "Save", 23, 0xffff, 0, onSaveValue };
+const AnyMenuInfo PROGMEM minfoRomChoicesSave = { "Save", 23, 0xFFFF, 0, onSaveValue };
 ActionMenuItem menuRomChoicesSave(&minfoRomChoicesSave, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnRomChoicesValueRtCall, textItemRenderFn, "Value", -1, NO_CALLBACK)
 TextMenuItem menuRomChoicesValue(fnRomChoicesValueRtCall, 22, 10, &menuRomChoicesSave);
 extern const char* romSpaceNames;
 RENDERING_CALLBACK_NAME_INVOKE(fnRomChoicesItemNumRtCall, enumItemRenderFn, "Item Num", -1, onItemChange)
 ScrollChoiceMenuItem menuRomChoicesItemNum(21, fnRomChoicesItemNumRtCall, 0, romSpaceNames, 7, 10, &menuRomChoicesValue);
+const SubMenuInfo PROGMEM minfoRomChoices = { "Rom Choices", 20, 0xFFFF, 0, NO_CALLBACK };
 RENDERING_CALLBACK_NAME_INVOKE(fnRomChoicesRtCall, backSubItemRenderFn, "Rom Choices", -1, NO_CALLBACK)
-const PROGMEM SubMenuInfo minfoRomChoices = { "Rom Choices", 20, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackRomChoices(fnRomChoicesRtCall, &menuRomChoicesItemNum);
 SubMenuItem menuRomChoices(&minfoRomChoices, &menuBackRomChoices, NULL);
 ListRuntimeMenuItem menuAdditionalCountList(18, 20, fnAdditionalCountListRtCall, NULL);
@@ -36,11 +38,11 @@ RENDERING_CALLBACK_NAME_INVOKE(fnAdditionalRomChoiceRtCall, enumItemRenderFn, "R
 ScrollChoiceMenuItem menuAdditionalRomChoice(19, fnAdditionalRomChoiceRtCall, 0, 500, 10, 9, &menuAdditionalNumChoices);
 RENDERING_CALLBACK_NAME_INVOKE(fnAdditionalRGBRtCall, rgbAlphaItemRenderFn, "RGB", 34, NO_CALLBACK)
 Rgb32MenuItem menuAdditionalRGB(15, fnAdditionalRGBRtCall, true, &menuAdditionalRomChoice);
+const SubMenuInfo PROGMEM minfoAdditional = { "Additional", 14, 0xFFFF, 0, NO_CALLBACK };
 RENDERING_CALLBACK_NAME_INVOKE(fnAdditionalRtCall, backSubItemRenderFn, "Additional", -1, NO_CALLBACK)
-const PROGMEM SubMenuInfo minfoAdditional = { "Additional", 14, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackAdditional(fnAdditionalRtCall, &menuAdditionalRGB);
 SubMenuItem menuAdditional(&minfoAdditional, &menuBackAdditional, &menuRomChoices);
-const PROGMEM AnyMenuInfo minfoConnectivitySaveToEEPROM = { "Save to EEPROM", 10, 0xffff, 0, onSaveToEeprom };
+const AnyMenuInfo PROGMEM minfoConnectivitySaveToEEPROM = { "Save to EEPROM", 10, 0xFFFF, 0, onSaveToEeprom };
 ActionMenuItem menuConnectivitySaveToEEPROM(&minfoConnectivitySaveToEEPROM, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityTextRtCall, textItemRenderFn, "Text", 16, NO_CALLBACK)
 TextMenuItem menuConnectivityText(fnConnectivityTextRtCall, 9, 10, &menuConnectivitySaveToEEPROM);
@@ -48,46 +50,44 @@ RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityIpAddressRtCall, ipAddressRenderFn,
 IpAddressMenuItem menuConnectivityIpAddress(fnConnectivityIpAddressRtCall, 7, &menuConnectivityText);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityChangePinRtCall, textItemRenderFn, "Change Pin", -1, onChangePin)
 TextMenuItem menuConnectivityChangePin(fnConnectivityChangePinRtCall, 11, 15, &menuConnectivityIpAddress);
+const SubMenuInfo PROGMEM minfoConnectivity = { "Connectivity", 6, 0xFFFF, 0, NO_CALLBACK };
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NO_CALLBACK)
-const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 6, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuConnectivityChangePin);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, &menuAdditional);
-const char enumStrFruits_0[] PROGMEM = "Apples";
-const char enumStrFruits_1[] PROGMEM = "Oranges";
-const char enumStrFruits_2[] PROGMEM = "Pears";
-const char enumStrFruits_3[] PROGMEM = "Plums";
-const char enumStrFruits_4[] PROGMEM = "Grapes";
+const char enumStrFruits_0[] PROGMEM  = "Apples";
+const char enumStrFruits_1[] PROGMEM  = "Oranges";
+const char enumStrFruits_2[] PROGMEM  = "Pears";
+const char enumStrFruits_3[] PROGMEM  = "Plums";
+const char enumStrFruits_4[] PROGMEM  = "Grapes";
 const char* const enumStrFruits[] PROGMEM  = { enumStrFruits_0, enumStrFruits_1, enumStrFruits_2, enumStrFruits_3, enumStrFruits_4 };
-const PROGMEM EnumMenuInfo minfoFruits = { "Fruits", 8, 26, 4, NO_CALLBACK, enumStrFruits };
+const EnumMenuInfo PROGMEM minfoFruits = { "Fruits", 8, 26, 4, NO_CALLBACK, enumStrFruits };
 EnumMenuItem menuFruits(&minfoFruits, 0, &menuConnectivity);
-const PROGMEM AnalogMenuInfo minfoFiths = { "Fiths", 5, 6, 200, onFiths, 0, 5, "A" };
+const AnalogMenuInfo PROGMEM minfoFiths = { "Fiths", 5, 6, 200, onFiths, 0, 5, "A" };
 AnalogMenuItem menuFiths(&minfoFiths, 0, &menuFruits);
 RENDERING_CALLBACK_NAME_INVOKE(fnLargeNumRtCall, largeNumItemRenderFn, "Large Num", -1, NO_CALLBACK)
 EditableLargeNumberMenuItem menuLargeNum(fnLargeNumRtCall, 12, 8, 4, &menuFiths);
-const PROGMEM AnalogMenuInfo minfoDecimalTens = { "DecimalTens", 4, 28, 1000, NO_CALLBACK, 0, 10, "V" };
+const AnalogMenuInfo PROGMEM minfoDecimalTens = { "DecimalTens", 4, 28, 1000, NO_CALLBACK, 0, 10, "V" };
 AnalogMenuItem menuDecimalTens(&minfoDecimalTens, 0, &menuLargeNum);
-const PROGMEM AnalogMenuInfo minfoInteger = { "Integer", 3, 4, 1000, onInteger, 100, 1, "" };
+const AnalogMenuInfo PROGMEM minfoInteger = { "Integer", 3, 4, 1000, onInteger, 100, 1, "" };
 AnalogMenuItem menuInteger(&minfoInteger, 0, &menuDecimalTens);
-const PROGMEM BooleanMenuInfo minfoHiddenItem = { "Hidden item", 13, 0xffff, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
+const BooleanMenuInfo PROGMEM minfoHiddenItem = { "Hidden item", 13, 0xFFFF, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
 BooleanMenuItem menuHiddenItem(&minfoHiddenItem, false, &menuInteger);
-const PROGMEM AnalogMenuInfo minfoAnalog1 = { "Analog1", 2, 2, 255, onAnalog1, -180, 2, "dB" };
+const AnalogMenuInfo PROGMEM minfoAnalog1 = { "Analog1", 2, 2, 255, onAnalog1, -180, 2, "dB" };
 AnalogMenuItem menuAnalog1(&minfoAnalog1, 0, &menuHiddenItem);
 RENDERING_CALLBACK_NAME_INVOKE(fnTimeRtCall, timeItemRenderFn, "Time", 8, NO_CALLBACK)
-TimeFormattedMenuItem menuTime(fnTimeRtCall, 1, (MultiEditWireType)3, &menuAnalog1);
-const PROGMEM ConnectorLocalInfo applicationInfo = { "Keyboard Ethernet", "b6ee8e21-449c-4f8a-bab6-a89e3f2c68d9" };
+TimeFormattedMenuItem menuTime(fnTimeRtCall, 1, (MultiEditWireType)EDITMODE_TIME_12H, &menuAnalog1);
+
 
 // Set up code
 
 void setupMenu() {
+    menuHiddenItem.setVisible(false);
+    menuConnectivity.setSecured(true);
+    menuConnectivity.setLocalOnly(true);
+
     lcd.setIoAbstraction(io23017);
     lcd.begin(20, 4);
     switches.initialise(io23017, true);
     menuMgr.initForEncoder(&renderer, &menuTime, 6, 7, 5);
     remoteServer.begin(&server, &applicationInfo);
-
-    // Read only and local only function calls
-    menuConnectivity.setLocalOnly(true);
-    menuConnectivity.setSecured(true);
-    menuHiddenItem.setVisible(false);
 }
-

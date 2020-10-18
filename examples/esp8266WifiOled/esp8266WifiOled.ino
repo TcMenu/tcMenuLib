@@ -24,6 +24,7 @@
 // contains the graphical widget title components.
 #include "stockIcons/wifiAndConnectionIcons16x12.h"
 
+char fileChoicesArray[255]{};
 
 // here we define the heater and window pins on the PCF8574
 // 0, 1 are A and B from encoder, 2 is OK button.
@@ -286,22 +287,19 @@ void CALLBACK_FUNCTION onSaveAll(int id) {
 
 }
 
+void CALLBACK_FUNCTION onFileChoice(int id) {
+    Serial.print("file chosen: ");
+    auto entryNum = menuFile.getCurrentValue();
+    char sz[12];
+    menuFile.valueAtPosition(sz, sizeof(sz), entryNum);
+    Serial.println(sz);
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void CALLBACK_FUNCTION onLoadFiles(int id) {
+    strcpy(fileChoicesArray, "MyDocument");
+    strcpy(&fileChoicesArray[10], "SecretFile");
+    strcpy(&fileChoicesArray[20], "AnotherFle");
+    strcpy(&fileChoicesArray[30], "MenuItem");
+    strcpy(&fileChoicesArray[40], "MyDocument");
+    menuFile.setNumberOfRows(5);
+}

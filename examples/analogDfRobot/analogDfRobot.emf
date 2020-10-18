@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1599491778,
+    "seconds": 1603018679,
     "nanos": 0
   },
   "codeOptions": {
@@ -12,6 +12,7 @@
     "embeddedPlatform": "ARDUINO_UNO",
     "namingRecursive": false,
     "saveToSrc": false,
+    "useCppMain": false,
     "lastProperties": []
   },
   "projectName": "Uses the DF Robot shield for both input and display",
@@ -102,6 +103,23 @@
         "visible": true,
         "itemType": "PLAIN_TEXT",
         "textLength": 6
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "scrollItem",
+      "item": {
+        "name": "Choose Item",
+        "eepromAddress": 18,
+        "id": 8,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "itemWidth": 10,
+        "numEntries": 20,
+        "variable": null,
+        "eepromOffset": 0,
+        "choiceMode": "CUSTOM_RENDERFN"
       }
     },
     {

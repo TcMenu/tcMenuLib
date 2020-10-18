@@ -17,6 +17,7 @@
 #include <LiquidCrystalIO.h>
 #include "tcMenuLiquidCrystal.h"
 #include <DfRobotInputAbstraction.h>
+#include <ScrollChoiceMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
 
 void setupMenu();  // forward reference of the menu setup function.
@@ -33,6 +34,8 @@ extern LiquidCrystalRenderer renderer;
 // Global Menu Item exports
 
 extern AnalogMenuItem menuCommits;
+int fnChooseItemRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize);
+extern ScrollChoiceMenuItem menuChooseItem;
 extern TextMenuItem menuText;
 extern EditableLargeNumberMenuItem menuLgeNum;
 void CALLBACK_FUNCTION onLed2(int id);

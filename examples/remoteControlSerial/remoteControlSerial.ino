@@ -5,6 +5,10 @@
  * For more details see the README.md file in this directory.
  */
 
+// in our code we defined a scroll that is based on items in RAM, we therefore need to create the array in ram
+// with the same name we provided in the sketch, it is arranged of a flat array of width by number of items.
+const char * choiceRamArray = "item1item2item3item4 ";
+
 //
 // This function is registered in setup to be called every 200 millis by task manager.
 // It updates the analog voltage menu items to show the values on each of the analog pins.
@@ -55,4 +59,3 @@ void CALLBACK_FUNCTION onPushMe(int /*id*/) {
     bool ledCurrent = digitalRead(LED_BUILTIN);
     digitalWrite(LED_BUILTIN, !ledCurrent);
 }
-

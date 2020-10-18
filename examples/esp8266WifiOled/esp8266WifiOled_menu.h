@@ -17,6 +17,7 @@
 #include "tcMenuU8g2.h"
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
+#include <ScrollChoiceMenuItem.h>
 
 void setupMenu();  // forward reference of the menu setup function.
 extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app info to the linker.
@@ -37,6 +38,10 @@ extern IpAddressMenuItem menuIpAddress;
 extern TextMenuItem menuPwd;
 extern TextMenuItem menuSSID;
 extern SubMenuItem menuConnectivity;
+void CALLBACK_FUNCTION onLoadFiles(int id);
+extern ActionMenuItem menuLoadFiles;
+void CALLBACK_FUNCTION onFileChoice(int id);
+extern ScrollChoiceMenuItem menuFile;
 extern BooleanMenuItem menuSecretEntry;
 void CALLBACK_FUNCTION onSaveAll(int id);
 extern ActionMenuItem menuSaveAll;

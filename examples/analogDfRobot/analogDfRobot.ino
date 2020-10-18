@@ -43,3 +43,25 @@ void CALLBACK_FUNCTION onLed2(int id) {
     // Called whenever you change the LED2 menu item..
 }
 
+
+// When dealing with custom rendering, either using lists or custom choices, we have to do everything from scratch. We need
+// to handle the EEPROM storage location, the item name, the value etc.
+// see tcMenu list documentation on thecoderscorner.com
+int CALLBACK_FUNCTION fnChooseItemRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize) {
+   switch(mode) {
+    case RENDERFN_INVOKE:
+        // we don't want to do anything on a selection, ignore it.
+        return true;
+    case RENDERFN_NAME:
+        // here we return the name for the scroll item        
+        strcpy(buffer, "Choose");
+        return true;
+    case RENDERFN_VALUE:
+        // here we define the text value for each possible setting, we just set it to V followed by the row
+        buffer[0] = 'V'; buffer[1]=0;
+        fastltoa(buffer, row, 3, NOT_PADDED, bufferSize);
+        return true;
+    case RENDERFN_EEPROM_POS: return 18; // Choices are saved to rom, we copy the value from the designer. 
+    default: return false;
+    }
+}
