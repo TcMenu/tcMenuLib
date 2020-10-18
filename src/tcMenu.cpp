@@ -314,7 +314,10 @@ void MenuManager::addMenuAfter(MenuItem *existing, MenuItem* toAdd, bool silent)
 
 void MenuManager::addChangeNotification(MenuManagerObserver *observer) {
     for(auto & i : structureNotifier) {
-        if(i == nullptr) i = observer;
+        if(i == nullptr) {
+            i = observer;
+            return;
+        }
     }
 }
 
@@ -333,7 +336,9 @@ void MenuManager::load(EepromAbstraction &eeprom, uint16_t magicKey, TimerFn onE
 
 void MenuManager::notifyEditEnd(MenuItem *item) {
     for(auto & obs : structureNotifier) {
-        if(obs != nullptr) obs->menuEditEnded(item);
+        if(obs != nullptr) {
+            obs->menuEditEnded(item);
+        }
     }
 }
 
@@ -349,6 +354,8 @@ bool MenuManager::notifyEditStarting(MenuItem *item) {
 
 void MenuManager::notifyStructureChanged() {
     for(auto & i : structureNotifier) {
-        if(i != nullptr) i->structureHasChanged();
+        if(i != nullptr) {
+            i->structureHasChanged();
+        }
     }
 }

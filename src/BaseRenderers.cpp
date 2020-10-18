@@ -46,7 +46,7 @@ BaseMenuRenderer::BaseMenuRenderer(int bufferSize) : MenuRenderer(RENDERER_TYPE_
 }
 
 void BaseMenuRenderer::initialise() {
-	ticksToReset = MAX_TICKS;
+	ticksToReset = resetValInTicks;
 	renderCallback = NULL;
 	redrawMode = MENUDRAW_COMPLETE_REDRAW;
 

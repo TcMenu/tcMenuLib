@@ -75,13 +75,14 @@ private:
     bool editStartedCalled{};
     bool editEndedCalled{};
     bool startReturnValue{};
+    bool originalCommitCalled{};
 public:
     TestMenuMgrObserver() = default;
 
     void setStartReturn(bool toReturn) { startReturnValue = toReturn; }
 
     void reset() {
-        structureChangedCalled = editStartedCalled = editEndedCalled = false;
+        structureChangedCalled = editStartedCalled = editEndedCalled = originalCommitCalled = false;
     }
 
     void structureHasChanged() override {
@@ -97,10 +98,19 @@ public:
         editEndedCalled = true;
     }
 
+    void originalCommitWasCalled() {
+        originalCommitCalled = true;
+    }
+
     bool didTriggerStructure() const { return structureChangedCalled; }
     bool didTriggerStartEdit() const { return editStartedCalled; }
     bool didTriggerEndEdit() const { return editEndedCalled; }
+    bool didOriginalCommitTrigger() const { return originalCommitCalled; }
 } menuMgrObserver;
+
+void originalCommitCb(int itemId) {
+    menuMgrObserver.originalCommitWasCalled();
+}
 
 const PROGMEM AnyMenuInfo testActionInfo = { "ActTest", 2394, 0xffff,  0, NO_CALLBACK };
 ActionMenuItem testActionItem(&testActionInfo, nullptr);
@@ -112,6 +122,7 @@ test(addingItemsAndMenuCallbacks) {
     menuMgr.setRootMenu(&textMenuItem1);
     menuMgr.initWithoutInput(&noRenderer, &textMenuItem1);
     menuMgr.addChangeNotification(&menuMgrObserver);
+    menuMgr.setItemCommittedHook(originalCommitCb);
 
     // first we add some menu items at the end of the menu and test the structure change call is made
     menuMgr.addMenuAfter(&menuNumTwoDp, &testActionItem, true);
@@ -135,6 +146,7 @@ test(addingItemsAndMenuCallbacks) {
     menuMgr.onMenuSelect(false);
 
     assertTrue(menuMgrObserver.didTriggerEndEdit());
+    assertTrue(menuMgrObserver.didOriginalCommitTrigger());
     assertTrue(menuMgrObserver.didTriggerStartEdit());
     assertTrue(boolItem1.getBoolean() != currentMenuValue);
 
@@ -157,6 +169,7 @@ test(addingItemsAndMenuCallbacks) {
     menuMgr.valueChanged(1); // we are now editing, change the actual enum
     menuMgr.onMenuSelect(false); // stop editing
     assertTrue(menuMgrObserver.didTriggerEndEdit());
+    assertTrue(menuMgrObserver.didOriginalCommitTrigger());
     assertEqual((uint16_t)1, menuEnum1.getCurrentValue());
 
     // lastly try an enum item that does not go into editing because the callback returned false.
@@ -166,6 +179,5 @@ test(addingItemsAndMenuCallbacks) {
     menuMgr.onMenuSelect(false);
     assertTrue(menuMgrObserver.didTriggerStartEdit());
     assertFalse(menuEnum1.isEditing());
-
 }
 

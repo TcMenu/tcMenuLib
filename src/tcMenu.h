@@ -68,7 +68,9 @@ public:
 
     void structureHasChanged() override {}
     bool menuEditStarting(MenuItem*) override { return true; }
-    void menuEditEnded(MenuItem* item) override { commitCb(item->getId()); }
+    void menuEditEnded(MenuItem* item) override {
+        commitCb(item->getId());
+    }
 };
 
 #ifndef MAX_MENU_NOTIFIERS
