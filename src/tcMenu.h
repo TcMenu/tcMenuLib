@@ -223,7 +223,7 @@ public:
 	 * before each write we check if the value has actually changed.
 	 * @param magicKey the key that indicates the values are valid.
 	 */
-	void save(uint16_t magicKey = 0xfade) { if(eepromRef) saveMenuStructure(eepromRef); }
+	void save(uint16_t magicKey = 0xfade) { if(eepromRef) saveMenuStructure(eepromRef, magicKey); }
 
 	/**
 	 * Call to save all item values into eeprom. The magic key is saved at location 0 if not already set. This is a
