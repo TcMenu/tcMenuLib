@@ -1,5 +1,3 @@
-#ifndef MENU_MANAGER_TEST_H
-#define MENU_MANAGER_TEST_H
 
 #include <AUnit.h>
 #include <MockIoAbstraction.h>
@@ -71,4 +69,103 @@ test(saveAndLoadFromMenu) {
     assertFalse(eeprom.hasErrorOccurred());
 }
 
-#endif
+class TestMenuMgrObserver : public MenuManagerObserver {
+private:
+    bool structureChangedCalled{};
+    bool editStartedCalled{};
+    bool editEndedCalled{};
+    bool startReturnValue{};
+public:
+    TestMenuMgrObserver() = default;
+
+    void setStartReturn(bool toReturn) { startReturnValue = toReturn; }
+
+    void reset() {
+        structureChangedCalled = editStartedCalled = editEndedCalled = false;
+    }
+
+    void structureHasChanged() override {
+        structureChangedCalled = true;
+    }
+
+    bool menuEditStarting(MenuItem *item) override {
+        editStartedCalled = true;
+        return startReturnValue;
+    }
+
+    void menuEditEnded(MenuItem *item) override {
+        editEndedCalled = true;
+    }
+
+    bool didTriggerStructure() const { return structureChangedCalled; }
+    bool didTriggerStartEdit() const { return editStartedCalled; }
+    bool didTriggerEndEdit() const { return editEndedCalled; }
+} menuMgrObserver;
+
+const PROGMEM AnyMenuInfo testActionInfo = { "ActTest", 2394, 0xffff,  0, NO_CALLBACK };
+ActionMenuItem testActionItem(&testActionInfo, nullptr);
+
+const PROGMEM AnyMenuInfo testActionInfo2 = { "ActTest", 2394, 0xffff,  0, NO_CALLBACK };
+ActionMenuItem testActionItem2(&testActionInfo2, nullptr);
+
+test(addingItemsAndMenuCallbacks) {
+    menuMgr.setRootMenu(&textMenuItem1);
+    menuMgr.initWithoutInput(&noRenderer, &textMenuItem1);
+    menuMgr.addChangeNotification(&menuMgrObserver);
+
+    // first we add some menu items at the end of the menu and test the structure change call is made
+    menuMgr.addMenuAfter(&menuNumTwoDp, &testActionItem, true);
+    assertFalse(menuMgrObserver.didTriggerStructure());
+    menuMgr.addMenuAfter(&menuNumTwoDp, &testActionItem2);
+    assertTrue(menuMgrObserver.didTriggerStructure());
+
+    assertEqual(&testActionItem2, menuNumTwoDp.getNext());
+    assertEqual(&testActionItem, testActionItem2.getNext());
+    assertTrue(testActionItem.getNext() == nullptr);
+
+    // put back as it was before.
+    menuNumTwoDp.setNext(nullptr);
+
+    // now we test that when editing a bool, we get a commit callback.
+    menuMgrObserver.reset();
+    menuMgrObserver.setStartReturn(true);
+    auto currentMenuValue = boolItem1.getBoolean();
+    menuMgr.valueChanged(1); // boolItem1
+    assertTrue(boolItem1.isActive());
+    menuMgr.onMenuSelect(false);
+
+    assertTrue(menuMgrObserver.didTriggerEndEdit());
+    assertTrue(menuMgrObserver.didTriggerStartEdit());
+    assertTrue(boolItem1.getBoolean() != currentMenuValue);
+
+    // and now we test that when we return false in the start edit callback, we do not start editing.
+    menuMgrObserver.reset();
+    menuMgrObserver.setStartReturn(false);
+    menuMgr.onMenuSelect(false);
+    assertTrue(menuMgrObserver.didTriggerStartEdit());
+    assertFalse(menuMgrObserver.didTriggerEndEdit());
+    assertTrue(boolItem1.getBoolean() != currentMenuValue);
+
+    // now we move on to test an enum (integer) item and ensure we get the edit callbacks.
+    menuMgrObserver.reset();
+    menuMgrObserver.setStartReturn(true);
+    menuMgr.valueChanged(2); //  select menuEnum1
+    menuMgr.onMenuSelect(false); // start edit
+    assertTrue(menuMgrObserver.didTriggerStartEdit());
+    assertTrue(menuEnum1.isEditing());
+
+    menuMgr.valueChanged(1); // we are now editing, change the actual enum
+    menuMgr.onMenuSelect(false); // stop editing
+    assertTrue(menuMgrObserver.didTriggerEndEdit());
+    assertEqual((uint16_t)1, menuEnum1.getCurrentValue());
+
+    // lastly try an enum item that does not go into editing because the callback returned false.
+    menuMgrObserver.reset();
+    menuMgrObserver.setStartReturn(false);
+    menuMgr.valueChanged(2); // menuEnum1
+    menuMgr.onMenuSelect(false);
+    assertTrue(menuMgrObserver.didTriggerStartEdit());
+    assertFalse(menuEnum1.isEditing());
+
+}
+

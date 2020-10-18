@@ -249,6 +249,7 @@ void MenuManager::setupForEditing(MenuItem* item) {
         if(!notifyEditStarting(item)) return;
         auto* boolItem = (BooleanMenuItem*)item;
 		boolItem->setBoolean(!boolItem->getBoolean());
+		notifyEditEnd(item);
 	}
 	else if (ty == MENUTYPE_SCROLLER_VALUE) {
         if(!notifyEditStarting(item)) return;
@@ -305,15 +306,10 @@ MenuManager::MenuManager() : structureNotifier() {
     this->eepromRef = nullptr;
 }
 
-void MenuManager::addMenuAfter(MenuItem *existing, MenuItem* toAdd) {
-    if(existing->getNext()) {
-        toAdd->setNext(nullptr);
-        existing->setNext(toAdd);
-    }
-    else {
-        toAdd->setNext(existing->getNext());
-        existing->setNext(toAdd);
-    }
+void MenuManager::addMenuAfter(MenuItem *existing, MenuItem* toAdd, bool silent) {
+    toAdd->setNext(existing->getNext());
+    existing->setNext(toAdd);
+    if(!silent) notifyStructureChanged();
 }
 
 void MenuManager::addChangeNotification(MenuManagerObserver *observer) {

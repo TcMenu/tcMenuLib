@@ -291,15 +291,16 @@ public:
 
 	/**
 	 * Adds a menu item into the tree directly after the existing item provided. Never add an item that's already in
-	 * the tree. Don't forget to call menuStructureChanged() after you're done adding items
+	 * the tree. Don't forget that if you use silent, to call menuStructureChanged() after you're done adding items.
 	 * @param existing where in the tree the new item is to be added.
 	 * @param toAdd the item that should be added, must not be in the tree already.
+	 * @param silent do not run the structure changed callback.
 	 */
-	void addMenuAfter(MenuItem* existing, MenuItem* toAdd);
+	void addMenuAfter(MenuItem* existing, MenuItem* toAdd, bool silent = false);
 
 	/**
 	 * Call this method after making any structural change to the menu tree. For example adding a new menu item,
-	 * changing the item name or size parameters, modifying an info block, etc.
+	 * changing the item name or static data such as size parameters. For example: modifying an items name, etc.
 	 */
     void notifyStructureChanged();
 

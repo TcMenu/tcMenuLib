@@ -2,6 +2,7 @@
 #define _TCMENU_FIXTURES_H_
 
 #include "tcUtil.h"
+#include "MenuItems.h"
 #include "RuntimeMenuItem.h"
 
 const PGM_TCM AnalogMenuInfo minfoNumTwoDp = { "TwoDpNum", 23, 32, 30000, NO_CALLBACK, 0, 100, "" };
