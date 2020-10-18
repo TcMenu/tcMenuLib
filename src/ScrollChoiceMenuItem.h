@@ -171,7 +171,6 @@ class Rgb32MenuItem : public EditableMultiPartMenuItem<RgbColor32> {
 private:
     bool alphaChannel;
 public:
-    constexpr const static RuntimeRenderingFn DEFAULT_RENDER_FN = rgbAlphaItemRenderFn;
 
     /**
      * Creates a color data menu item that can be edited, optionally including an alpha channel
