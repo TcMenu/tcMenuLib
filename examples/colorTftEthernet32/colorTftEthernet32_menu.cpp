@@ -23,12 +23,23 @@ EthernetServer server(3333);
 
 const AnyMenuInfo minfoTakeDisplay = { "Take display", 17, 0xFFFF, 0, onTakeDisplay };
 ActionMenuItem menuTakeDisplay(&minfoTakeDisplay, NULL);
+const AnyMenuInfo minfoSaveItem = { "Save item", 23, 0xFFFF, 0, onSaveItem };
+ActionMenuItem menuSaveItem(&minfoSaveItem, NULL);
+RENDERING_CALLBACK_NAME_INVOKE(fnRomTextRtCall, textItemRenderFn, "Rom Text", -1, NO_CALLBACK)
+TextMenuItem menuRomText(fnRomTextRtCall, 21, 10, &menuSaveItem);
+ScrollChoiceMenuItem menuRomLocation(24, fnRomLocationRtCall, 0, 10, &menuRomText);
+RENDERING_CALLBACK_NAME_INVOKE(fnRomChoiceRtCall, enumItemRenderFn, "Rom Choice", 14, NO_CALLBACK)
+ScrollChoiceMenuItem menuRomChoice(25, fnRomChoiceRtCall, 0, 1024, 10, 10, &menuRomLocation);
+const SubMenuInfo minfoRomValues = { "Rom Values", 20, 0xFFFF, 0, NO_CALLBACK };
+RENDERING_CALLBACK_NAME_INVOKE(fnRomValuesRtCall, backSubItemRenderFn, "Rom Values", -1, NO_CALLBACK)
+BackMenuItem menuBackRomValues(fnRomValuesRtCall, &menuRomChoice);
+SubMenuItem menuRomValues(&minfoRomValues, &menuBackRomValues, &menuTakeDisplay);
 RENDERING_CALLBACK_NAME_INVOKE(fnIpAddressRtCall, ipAddressRenderFn, "Ip Address", 10, NO_CALLBACK)
 IpAddressMenuItem menuIpAddress(fnIpAddressRtCall, 15, NULL);
 const SubMenuInfo minfoConnectivity = { "Connectivity", 14, 0xFFFF, 0, NO_CALLBACK };
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NO_CALLBACK)
 BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuIpAddress);
-SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, &menuTakeDisplay);
+SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, &menuRomValues);
 const FloatMenuInfo minfoVoltA1 = { "Volt A1", 9, 0xFFFF, 2, NO_CALLBACK };
 FloatMenuItem menuVoltA1(&minfoVoltA1, NULL);
 const FloatMenuInfo minfoVoltA0 = { "Volt A0", 8, 0xFFFF, 2, NO_CALLBACK };
@@ -37,16 +48,10 @@ const SubMenuInfo minfoStatus = { "Status", 7, 0xFFFF, 0, NO_CALLBACK };
 RENDERING_CALLBACK_NAME_INVOKE(fnStatusRtCall, backSubItemRenderFn, "Status", -1, NO_CALLBACK)
 BackMenuItem menuBackStatus(fnStatusRtCall, &menuVoltA0);
 SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuConnectivity);
-const AnyMenuInfo minfoSaveItem = { "Save item", 23, 0xFFFF, 0, onSaveItem };
-ActionMenuItem menuSaveItem(&minfoSaveItem, NULL);
-RENDERING_CALLBACK_NAME_INVOKE(fnItemTextRtCall, textItemRenderFn, "Item Text", -1, NO_CALLBACK)
-TextMenuItem menuItemText(fnItemTextRtCall, 21, 10, &menuSaveItem);
-const SubMenuInfo minfoRomValues = { "Rom Values", 20, 0xFFFF, 0, NO_CALLBACK };
-RENDERING_CALLBACK_NAME_INVOKE(fnRomValuesRtCall, backSubItemRenderFn, "Rom Values", -1, NO_CALLBACK)
-BackMenuItem menuBackRomValues(fnRomValuesRtCall, &menuItemNo);
-SubMenuItem menuRomValues(&minfoRomValues, &menuBackRomValues, NULL);
+RENDERING_CALLBACK_NAME_INVOKE(fnRGBRtCall, rgbAlphaItemRenderFn, "RGB", 16, onRgbChanged)
+Rgb32MenuItem menuRGB(26, fnRGBRtCall, false,NULL);
 const BooleanMenuInfo minfoTempCheck = { "Temp Check", 13, 9, 1, NO_CALLBACK, NAMING_ON_OFF };
-BooleanMenuItem menuTempCheck(&minfoTempCheck, false, NULL);
+BooleanMenuItem menuTempCheck(&minfoTempCheck, false, &menuRGB);
 const AnyMenuInfo minfoHiddenItem = { "Hidden item", 16, 0xFFFF, 0, NO_CALLBACK };
 ActionMenuItem menuHiddenItem(&minfoHiddenItem, &menuTempCheck);
 const BooleanMenuInfo minfoSCircuitProtect = { "S-Circuit Protect", 12, 8, 1, NO_CALLBACK, NAMING_ON_OFF };
@@ -54,7 +59,7 @@ BooleanMenuItem menuSCircuitProtect(&minfoSCircuitProtect, false, &menuHiddenIte
 const SubMenuInfo minfoAdvanced = { "Advanced", 11, 0xFFFF, 0, NO_CALLBACK };
 RENDERING_CALLBACK_NAME_INVOKE(fnAdvancedRtCall, backSubItemRenderFn, "Advanced", -1, NO_CALLBACK)
 BackMenuItem menuBackAdvanced(fnAdvancedRtCall, &menuSCircuitProtect);
-SubMenuItem menuAdvanced(&minfoAdvanced, &menuBackAdvanced, &menuRGB);
+SubMenuItem menuAdvanced(&minfoAdvanced, &menuBackAdvanced, NULL);
 const AnyMenuInfo minfoSaveAll = { "Save all", 10, 0xFFFF, 0, onSaveRom };
 ActionMenuItem menuSaveAll(&minfoSaveAll, &menuAdvanced);
 const BooleanMenuInfo minfoPwrDelay = { "Pwr Delay", 5, 0xFFFF, 1, NO_CALLBACK, NAMING_YES_NO };
@@ -80,7 +85,7 @@ void setupMenu() {
 
 
     gfx.initR(INITR_BLACKTAB);
-    gfx.setRotation(0);
+    gfx.setRotation(1);
     renderer.setGraphicsDevice(&gfx, &colorConfig);
     switches.initialise(io8574, true);
     menuMgr.initForEncoder(&renderer, &menuVoltage, 7, 6, 5);

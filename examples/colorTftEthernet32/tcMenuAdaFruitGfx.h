@@ -50,6 +50,10 @@ extern const ConnectorLocalInfo applicationInfo;
  */ 
 typedef struct ColorGfxMenuConfig<const GFXfont*> AdaColorGfxMenuConfig;
 
+void drawCookieCutBitmap(Adafruit_GFX* gfx, int16_t x, int16_t y, const uint8_t *bitmap, int16_t w,
+                         int16_t h, int16_t totalWidth, int16_t xStart, int16_t yStart,
+                         uint16_t fgColor, uint16_t bgColor);
+
 /**
  * A basic renderer that can use the AdaFruit_GFX library to render information onto a suitable
  * display. It is your responsibility to fully initialise and prepare the display before passing

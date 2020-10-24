@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1602516900,
+    "seconds": 1603533153,
     "nanos": 0
   },
   "codeOptions": {
@@ -96,7 +96,7 @@
       },
       {
         "name": "DISPLAY_ROTATION",
-        "latestValue": "0",
+        "latestValue": "1",
         "subsystem": "DISPLAY"
       },
       {
@@ -257,58 +257,17 @@
       }
     },
     {
-      "parentId": 4,
-      "type": "",
-      "item": null
-    },
-    {
-      "parentId": 4,
-      "type": "",
-      "item": null
-    },
-    {
-      "parentId": 4,
-      "type": "subMenu",
+      "parentId": 11,
+      "type": "rgbItem",
       "item": {
-        "name": "Rom Values",
-        "eepromAddress": -1,
-        "id": 20,
+        "name": "RGB",
+        "eepromAddress": 16,
+        "id": 26,
         "readOnly": false,
         "localOnly": false,
         "visible": true,
-        "secured": false
-      }
-    },
-    {
-      "parentId": 20,
-      "type": "",
-      "item": null
-    },
-    {
-      "parentId": 20,
-      "type": "textItem",
-      "item": {
-        "name": "Item Text",
-        "eepromAddress": -1,
-        "id": 21,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "itemType": "PLAIN_TEXT",
-        "textLength": 10
-      }
-    },
-    {
-      "parentId": 20,
-      "type": "actionMenu",
-      "item": {
-        "name": "Save item",
-        "eepromAddress": -1,
-        "id": 23,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "functionName": "onSaveItem"
+        "functionName": "onRgbChanged",
+        "includeAlphaChannel": false
       }
     },
     {
@@ -375,6 +334,82 @@
         "visible": true,
         "itemType": "IP_ADDRESS",
         "textLength": 20
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "name": "Rom Values",
+        "eepromAddress": -1,
+        "id": 20,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "",
+        "secured": false
+      }
+    },
+    {
+      "parentId": 20,
+      "type": "scrollItem",
+      "item": {
+        "name": "Rom Choice",
+        "eepromAddress": 14,
+        "id": 25,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "itemWidth": 10,
+        "numEntries": 10,
+        "variable": null,
+        "eepromOffset": 1024,
+        "choiceMode": "ARRAY_IN_EEPROM"
+      }
+    },
+    {
+      "parentId": 20,
+      "type": "scrollItem",
+      "item": {
+        "name": "Rom Location",
+        "eepromAddress": -1,
+        "id": 24,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "",
+        "itemWidth": 10,
+        "numEntries": 10,
+        "variable": null,
+        "eepromOffset": 0,
+        "choiceMode": "CUSTOM_RENDERFN"
+      }
+    },
+    {
+      "parentId": 20,
+      "type": "textItem",
+      "item": {
+        "name": "Rom Text",
+        "eepromAddress": -1,
+        "id": 21,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "itemType": "PLAIN_TEXT",
+        "textLength": 10
+      }
+    },
+    {
+      "parentId": 20,
+      "type": "actionMenu",
+      "item": {
+        "name": "Save item",
+        "eepromAddress": -1,
+        "id": 23,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "onSaveItem"
       }
     },
     {

@@ -37,7 +37,7 @@ ScrollChoiceMenuItem menuAdditionalNumChoices(17, fnAdditionalNumChoicesRtCall, 
 RENDERING_CALLBACK_NAME_INVOKE(fnAdditionalRomChoiceRtCall, enumItemRenderFn, "Rom Choice", 30, NO_CALLBACK)
 ScrollChoiceMenuItem menuAdditionalRomChoice(19, fnAdditionalRomChoiceRtCall, 0, 500, 10, 9, &menuAdditionalNumChoices);
 RENDERING_CALLBACK_NAME_INVOKE(fnAdditionalRGBRtCall, rgbAlphaItemRenderFn, "RGB", 34, NO_CALLBACK)
-Rgb32MenuItem menuAdditionalRGB(15, fnAdditionalRGBRtCall, true, &menuAdditionalRomChoice);
+Rgb32MenuItem menuAdditionalRGB(15, fnAdditionalRGBRtCall, true,&menuAdditionalRomChoice);
 const SubMenuInfo PROGMEM minfoAdditional = { "Additional", 14, 0xFFFF, 0, NO_CALLBACK };
 RENDERING_CALLBACK_NAME_INVOKE(fnAdditionalRtCall, backSubItemRenderFn, "Additional", -1, NO_CALLBACK)
 BackMenuItem menuBackAdditional(fnAdditionalRtCall, &menuAdditionalRGB);

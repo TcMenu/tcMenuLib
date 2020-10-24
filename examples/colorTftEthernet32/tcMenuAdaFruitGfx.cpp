@@ -402,3 +402,53 @@ void AdaGfxDialog::drawButton(Adafruit_GFX* gfx, AdaColorGfxMenuConfig* config, 
     gfx->print(title);
 }
 
+
+/** A couple of helper functions that we'll submit for inclusion once a bit more testing is done */
+
+/**************************************************************************/
+/*!
+   @brief      Draw a RAM-resident 1-bit image at the specified (x,y) position,
+   from image data that may be wider or taller than the desired width and height.
+   Imagine a cookie dough rolled out, where you can cut a rectangle out of it.
+   It uses the specified foreground (for set bits) and background (unset bits) colors.
+   This is particularly useful for GFXCanvas1 operations, where you can allocate the
+   largest canvas needed and then use it for all drawing operations.
+
+    @param    x   Top left corner x coordinate
+    @param    y   Top left corner y coordinate
+    @param    bitmap  byte array with monochrome bitmap
+    @param    w   width of the portion you want to draw
+    @param    h   Height of the portion you want to draw
+    @param    totalWidth actual width of the bitmap
+    @param    xStart X position of the image in the data
+    @param    yStart Y position of the image in the data
+    @param    color 16-bit 5-6-5 Color to draw pixels with
+    @param    bg 16-bit 5-6-5 Color to draw background with
+*/
+/**************************************************************************/
+void drawCookieCutBitmap(Adafruit_GFX* gfx, int16_t x, int16_t y, const uint8_t *bitmap, int16_t w,
+                         int16_t h, int16_t totalWidth, int16_t xStart, int16_t yStart,
+                         uint16_t fgColor, uint16_t bgColor) {
+
+    // total width here is different to the width we are drawing, imagine rolling out a long
+    // line of dough and cutting cookies from it. The cookie is the part of the image we want
+    uint16_t byteWidth = (totalWidth + 7) / 8; // Bitmap scanline pad = whole byte
+    uint16_t yEnd = h + yStart;
+    uint16_t xEnd = w + xStart;
+    uint8_t byte;
+
+    gfx->startWrite();
+
+    for (uint16_t j = yStart; j < yEnd; j++, y++) {
+        byte = bitmap[size_t(((j * byteWidth) + xStart) / 8)];
+        for (uint16_t i = xStart; i < xEnd; i++) {
+            if (i & 7U)
+                byte <<= 1U;
+            else
+                byte = bitmap[size_t((j * byteWidth) + i / 8)];
+            gfx->writePixel(x + (i - xStart), y, (byte & 0x80U) ? fgColor : bgColor);
+        }
+    }
+
+    gfx->endWrite();
+}

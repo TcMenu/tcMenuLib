@@ -268,10 +268,8 @@ public:
         canvas->setCursor(padding, titleExtents.y - 1);
         canvas->print(renderer->getBuffer());
         auto startX = (parameters->isTitleLeftAlign()) ? screenLoc.x + titleExtents.x + 5 : screenLoc.x;
-        myGfx->drawCookieCutBitmap(
-                startX, screenLoc.y, canvas->getBuffer(), valueWidth, titleExtents.y,
-                canvas->width(), 0, 0,
-                parameters->getFgColor(item, updateCountDown > 1),
+        drawCookieCutBitmap(myGfx, startX, screenLoc.y, canvas->getBuffer(), valueWidth, titleExtents.y,
+                canvas->width(), 0, 0,parameters->getFgColor(item, updateCountDown > 1),
                 parameters->getBgColor(item, updateCountDown > 1));
     }
 

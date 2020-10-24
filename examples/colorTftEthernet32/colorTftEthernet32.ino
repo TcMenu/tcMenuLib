@@ -7,12 +7,13 @@
 #include <Fonts/FreeSans9pt7b.h>
 #include <Ethernet.h>
 #include <SPI.h>
+#include <IoLogging.h>
 
 // contains the graphical widget title components.
 #include "stockIcons/wifiAndConnectionIcons16x12.h"
 
 /*
- * Shows how to use adagraphics with a TFT panel and an ethernet module.
+ * Shows how to use adafruit graphics with a TFT panel and an ethernet module.
  * This is a 32 bit example, which by default targets 32 bit devices.
  * Assumed board for this is a SAMD based MKR board.
  * 
@@ -44,7 +45,7 @@ IoAbstractionRef io8574 = ioFrom8574(0x20, 0); // on addr 0x20 and interrupt pin
 ArduinoAnalogDevice analogDevice(12, 10);
 
 // Here we create two additional menus, that will be added manually to handle the connectivity
-// status and authentication keys. In a future version these will be added to th desinger.
+// status and authentication keys. In a future version these will be added to th designer.
 RemoteMenuItem menuRemoteMonitor(1001, 2);
 EepromAuthenicationInfoMenuItem menuAuthKeyMgr(1002, &authManager, &menuRemoteMonitor);
 
@@ -87,7 +88,7 @@ void prepareCustomConfiguration() {
     //colorConfig.editIcon = myEditIcon;
     //colorConfig.activeIcon = myActiveIcon;
     //colorConfig.editIconWidth = myEditWidth;
-    //colorConfig.editIconHeight = myEditheight;
+    //colorConfig.editIconHeight = myEditHeight;
     colorConfig.editIcon = NULL;
     colorConfig.activeIcon = NULL;
 }
@@ -104,6 +105,9 @@ void onCommsChange(CommunicationInfo info) {
 void setup() {
     // we used an i2c device (io8574) so must initialise wire too
     Wire.begin();
+
+    // We should set the eeprom that menu manager will use as early as possible
+    menuMgr.setEepromRef(&eeprom);
 
     // now we enable authentication using EEPROM authentication. Where the EEPROM is
     // queried for authentication requests, and any additional pairs are stored there too.
@@ -140,7 +144,7 @@ void setup() {
     setupMenu();
 
     // and then load back the previous state
-    menuMgr.load(eeprom);
+    menuMgr.load();
 
     // spin up the Ethernet library
     byte* rawIp = menuIpAddress.getIpAddress();
@@ -152,7 +156,6 @@ void setup() {
     Serial.print("Ethernet available on ");Serial.println(sz);
 
     taskManager.scheduleFixedRate(2250, [] {
-        Serial.print(".");
         float a1Value = analogDevice.getCurrentFloat(A1);
         menuVoltA1.setFloatValue(a1Value * 3.3);
     });
@@ -185,10 +188,12 @@ void CALLBACK_FUNCTION onLimitMode(int /*id*/) {
 
 void CALLBACK_FUNCTION onSaveRom(int /*id*/) {
     // save out the state, in a real system we could detect power down for this.
-    menuMgr.save(eeprom);
+    menuMgr.save();
 }
 
 bool starting = true;
+
+const char pgmHeaderSavedItem[] PROGMEM = "Rom Item Saved";
 
 void myRenderCallback(unsigned int encoderVal, RenderPressMode pressType) {
     if(pressType == RPRESS_HELD)
@@ -219,15 +224,57 @@ void myRenderCallback(unsigned int encoderVal, RenderPressMode pressType) {
     }
 }
 
-void CALLBACK_FUNCTION onTakeDisplay(int id) {
+void CALLBACK_FUNCTION onTakeDisplay(int /*id*/) {
     starting = true;
     renderer.takeOverDisplay(myRenderCallback);
 }
 
-void CALLBACK_FUNCTION onRgbChanged(int id) {
-    // TODO - your menu change code
+void CALLBACK_FUNCTION onRgbChanged(int /*id*/) {
+    auto colorData = menuRGB.getColorData();
+    serdebugF4("RGB changed: ", colorData.red, colorData.green, colorData.blue);
 }
 
-void CALLBACK_FUNCTION onSaveItem(int id) {
-    // TODO - your menu change code
+void CALLBACK_FUNCTION onSaveItem(int /*id*/) {
+    auto itemNo = menuRomLocation.getCurrentValue();
+    auto itemSize = menuRomChoice.getItemWidth();
+    auto position = menuRomChoice.getEepromStart() + (itemNo * itemSize);
+    eeprom.writeArrayToRom(position, (const uint8_t*)menuRomText.getTextValue(), 10);
+
+    if(renderer.getDialog()->isInUse()) return;
+    renderer.getDialog()->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
+    renderer.getDialog()->show(pgmHeaderSavedItem, true);
+    renderer.getDialog()->copyIntoBuffer(menuRomText.getTextValue());
+}
+
+void CALLBACK_FUNCTION onRomLocationChange(int /*id*/) {
+    auto itemNo = menuRomLocation.getCurrentValue();
+    char sz[12];
+    auto itemSize = menuRomChoice.getItemWidth();
+    eeprom.readIntoMemArray((uint8_t*)sz, menuRomChoice.getEepromStart() + (itemNo * itemSize), 10);
+    menuRomText.setTextValue(sz);
+    serdebugF2("Rom data was ", sz)
+}
+
+//
+// Here we handle the custom rendering for the runtime list menu item that just counts. We basically get called back
+// every time it needs more data. For example when the name is required, when any index value is required or when
+// it will be saved to EEPROM or invoked.
+//
+int CALLBACK_FUNCTION fnRomLocationRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize) {
+   switch(mode) {
+    case RENDERFN_INVOKE:
+        onRomLocationChange(item->getId());
+        return true;
+    case RENDERFN_NAME:
+        // TODO - each row has it's own name - 0xff is the parent item
+        strncpy(buffer, "Rom Location", bufferSize);
+        return true;
+    case RENDERFN_VALUE:
+        // TODO - each row can has its own value - 0xff is the parent item
+        strncpy(buffer, "Item ", bufferSize);
+        fastltoa(buffer, row, 3, NOT_PADDED, bufferSize);
+        return true;
+    case RENDERFN_EEPROM_POS: return 0xFFFF; // lists are generally not saved to EEPROM
+    default: return false;
+    }
 }

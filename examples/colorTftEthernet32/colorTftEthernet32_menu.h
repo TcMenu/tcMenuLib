@@ -17,6 +17,7 @@
 #include "tcMenuAdaFruitGfx.h"
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
+#include <ScrollChoiceMenuItem.h>
 
 void setupMenu();  // forward reference of the menu setup function.
 extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app info to the linker.
@@ -36,15 +37,20 @@ extern EthernetServer server;
 
 void CALLBACK_FUNCTION onTakeDisplay(int id);
 extern ActionMenuItem menuTakeDisplay;
+void CALLBACK_FUNCTION onSaveItem(int id);
+extern ActionMenuItem menuSaveItem;
+extern TextMenuItem menuRomText;
+int fnRomLocationRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize);
+extern ScrollChoiceMenuItem menuRomLocation;
+extern ScrollChoiceMenuItem menuRomChoice;
+extern SubMenuItem menuRomValues;
 extern IpAddressMenuItem menuIpAddress;
 extern SubMenuItem menuConnectivity;
 extern FloatMenuItem menuVoltA1;
 extern FloatMenuItem menuVoltA0;
 extern SubMenuItem menuStatus;
-void CALLBACK_FUNCTION onSaveItem(int id);
-extern ActionMenuItem menuSaveItem;
-extern TextMenuItem menuItemText;
-extern SubMenuItem menuRomValues;
+void CALLBACK_FUNCTION onRgbChanged(int id);
+extern Rgb32MenuItem menuRGB;
 extern BooleanMenuItem menuTempCheck;
 extern ActionMenuItem menuHiddenItem;
 extern BooleanMenuItem menuSCircuitProtect;
