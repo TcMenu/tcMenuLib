@@ -11,13 +11,13 @@
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
 
+#include <Arduino.h>
 #include <tcMenu.h>
 #include <SSD1306Ascii.h>
 #include <RuntimeMenuItem.h>
 #include <SSD1306AsciiAvrI2c.h>
 #include "ssd1306asciiRenderer.h"
-#include <RemoteConnector.h>
-#include "SerialTransport.h"
+#include <DfRobotInputAbstraction.h>
 
 void setupMenu();  // forward reference of the menu setup function.
 extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app info to the linker.

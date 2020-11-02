@@ -8,6 +8,7 @@
     use elsewhere.
 */
 
+#include <Arduino.h>
 #include <tcMenu.h>
 #include "takeOverDisplay_menu.h"
 
@@ -28,8 +29,16 @@ const SubMenuInfo PROGMEM minfoConnectivity = { "Connectivity", 11, 0xFFFF, 0, N
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NO_CALLBACK)
 BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuConnectivityChangePin);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL);
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsDateRtCall, dateItemRenderFn, "Date", -1, NO_CALLBACK)
+DateFormattedMenuItem menuSettingsDate(fnSettingsDateRtCall, 18, NULL);
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsTimeRtCall, timeItemRenderFn, "Time", -1, NO_CALLBACK)
+TimeFormattedMenuItem menuSettingsTime(fnSettingsTimeRtCall, 17, (MultiEditWireType)EDITMODE_TIME_12H, &menuSettingsDate);
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsNum6x4RtCall, largeNumItemRenderFn, "Num6x4", -1, NO_CALLBACK)
+EditableLargeNumberMenuItem menuSettingsNum6x4(fnSettingsNum6x4RtCall, 16, 10, 4, &menuSettingsTime);
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsPositiveIntsRtCall, largeNumItemRenderFn, "PositiveInts", -1, NO_CALLBACK)
+EditableLargeNumberMenuItem menuSettingsPositiveInts(fnSettingsPositiveIntsRtCall, 15, 9, 0, false, &menuSettingsNum6x4);
 const AnyMenuInfo PROGMEM minfoSettingsSaveSettings = { "Save Settings", 6, 0xFFFF, 0, onSaveSettings };
-ActionMenuItem menuSettingsSaveSettings(&minfoSettingsSaveSettings, NULL);
+ActionMenuItem menuSettingsSaveSettings(&minfoSettingsSaveSettings, &menuSettingsPositiveInts);
 const AnalogMenuInfo PROGMEM minfoSettingsPower = { "Power", 5, 5, 250, NO_CALLBACK, 0, 10, "W" };
 AnalogMenuItem menuSettingsPower(&minfoSettingsPower, 0, &menuSettingsSaveSettings);
 const BooleanMenuInfo PROGMEM minfoSettingsEnabled = { "Enabled", 4, 2, 1, NO_CALLBACK, NAMING_TRUE_FALSE };

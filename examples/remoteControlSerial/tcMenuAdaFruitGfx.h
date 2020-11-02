@@ -50,6 +50,10 @@ extern const ConnectorLocalInfo applicationInfo;
  */ 
 typedef struct ColorGfxMenuConfig<const GFXfont*> AdaColorGfxMenuConfig;
 
+void drawCookieCutBitmap(Adafruit_GFX* gfx, int16_t x, int16_t y, const uint8_t *bitmap, int16_t w,
+                         int16_t h, int16_t totalWidth, int16_t xStart, int16_t yStart,
+                         uint16_t fgColor, uint16_t bgColor);
+
 /**
  * A basic renderer that can use the AdaFruit_GFX library to render information onto a suitable
  * display. It is your responsibility to fully initialise and prepare the display before passing
@@ -98,6 +102,16 @@ protected:
     void internalRender(int currentValue) override;
     void drawButton(Adafruit_GFX* gfx, AdaColorGfxMenuConfig* config, const char* title, uint8_t num, bool active);
 };
+
+/**
+ * Provides the extents of the text as a Coord which is easier to work with.
+ * @param graphics the graphics object as a pointer
+ * @param text the text to measure
+ * @param x starting location X
+ * @param y starting location Y
+ * @return the coord object containing width and height
+ */
+Coord textExtents(Adafruit_GFX* graphics, const char* text, int16_t x, int16_t y);
 
 /**
  * The default graphics configuration for Ada GFX that needs no fonts and uses reasonable spacing options

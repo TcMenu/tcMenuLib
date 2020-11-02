@@ -8,6 +8,7 @@
     use elsewhere.
 */
 
+#include <Arduino.h>
 #include <tcMenu.h>
 #include "unoSsd1306Ascii_menu.h"
 
@@ -51,7 +52,7 @@ void setupMenu() {
     menuStatusTemprature.setReadOnly(true);
 
     renderer.setGraphicsDevice(&gfx);
-    switches.initialise(ioUsingArduino(), true);
-    menuMgr.initForEncoder(&renderer, &menuBrightness, 2, 3, A3);
-    remoteServer.begin(&Serial, &applicationInfo);
+    pinMode(A0, INPUT);
+    switches.initialise(inputFromDfRobotShield(), false);
+    menuMgr.initForUpDownOk(&renderer, &menuBrightness, DF_KEY_DOWN, DF_KEY_UP, DF_KEY_SELECT);
 }

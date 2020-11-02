@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1603019484,
+    "seconds": 1604329022,
     "nanos": 0
   },
   "codeOptions": {
@@ -36,7 +36,7 @@
       },
       {
         "name": "ENCODER_PIN_B",
-        "latestValue": "3",
+        "latestValue": "6",
         "subsystem": "INPUT"
       },
       {

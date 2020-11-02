@@ -74,6 +74,6 @@ void setupMenu() {
     gfx.setRotation(0);
     renderer.setGraphicsDevice(&gfx, &gfxConfig);
     switches.initialise(internalDigitalIo(), true);
-    menuMgr.initForEncoder(&renderer, &menuHall, 2, 3, A3);
+    menuMgr.initForEncoder(&renderer, &menuHall, 2, 6, A3);
     remoteServer.begin(&server, &applicationInfo);
 }

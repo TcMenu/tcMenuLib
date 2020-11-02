@@ -11,11 +11,13 @@
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
 
+#include <Arduino.h>
 #include <tcMenu.h>
 #include <RuntimeMenuItem.h>
 #include <LiquidCrystalIO.h>
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
+#include <EditableLargeNumberMenuItem.h>
 #include "tcMenuLiquidCrystal.h"
 
 void setupMenu();  // forward reference of the menu setup function.
@@ -38,6 +40,10 @@ extern IpAddressMenuItem menuConnectivityIPAddress;
 void CALLBACK_FUNCTION onChangePin(int id);
 extern TextMenuItem menuConnectivityChangePin;
 extern SubMenuItem menuConnectivity;
+extern DateFormattedMenuItem menuSettingsDate;
+extern TimeFormattedMenuItem menuSettingsTime;
+extern EditableLargeNumberMenuItem menuSettingsNum6x4;
+extern EditableLargeNumberMenuItem menuSettingsPositiveInts;
 void CALLBACK_FUNCTION onSaveSettings(int id);
 extern ActionMenuItem menuSettingsSaveSettings;
 extern AnalogMenuItem menuSettingsPower;

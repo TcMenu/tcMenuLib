@@ -9,6 +9,7 @@ int currentCommits = 0;
 
 void setup() {
     Serial.begin(115200);
+    Serial.println("Starting");
     gfx.begin(&SH1106_128x64, I2C_ADDRESS);
     gfx.clear();
     menuMgr.setItemCommittedHook([](int id) {

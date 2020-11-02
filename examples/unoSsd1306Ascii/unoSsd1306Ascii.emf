@@ -1,49 +1,19 @@
 {
   "lastEdited": {
-    "seconds": 1603017995,
+    "seconds": 1604330054,
     "nanos": 0
   },
   "codeOptions": {
     "applicationUUID": "c4858c2f-4134-4597-a7a0-b6719631a99b",
     "applicationName": "Uno1306Ascii",
-    "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
+    "lastInputUuid": "7daa6a81-dd09-422e-b83c-bda5045abaef",
     "lastDisplayUuid": "1ec1b247-cc51-49d7-aa5c-dd0d4530751d",
-    "lastRemoteUuid": "1e38dc42-672d-4c1c-a393-2c7632bf6c5c",
+    "lastRemoteUuid": "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb",
     "embeddedPlatform": "ARDUINO_AVR",
     "namingRecursive": true,
     "saveToSrc": true,
     "useCppMain": false,
     "lastProperties": [
-      {
-        "name": "PULLUP_LOGIC",
-        "latestValue": "true",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "INTERRUPT_SWITCHES",
-        "latestValue": "false",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "SWITCH_IODEVICE",
-        "latestValue": "",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "ENCODER_PIN_A",
-        "latestValue": "2",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "ENCODER_PIN_B",
-        "latestValue": "3",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "ENCODER_PIN_OK",
-        "latestValue": "A3",
-        "subsystem": "INPUT"
-      },
       {
         "name": "DISPLAY_VARIABLE",
         "latestValue": "gfx",
@@ -68,11 +38,6 @@
         "name": "ITEM_FONT",
         "latestValue": "System5x7",
         "subsystem": "DISPLAY"
-      },
-      {
-        "name": "SERIAL_PORT",
-        "latestValue": "Serial",
-        "subsystem": "REMOTE"
       }
     ]
   },
