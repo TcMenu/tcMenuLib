@@ -116,11 +116,14 @@ struct EnumMenuInfo {
 };
 
 /**
- * These are the names for true / false that can be used in a boolean menu item.
+ * This indicates the preferred terminology to use to describe a boolean value. Such as On/Yes/True etc.
  */
 enum BooleanNaming : uint8_t {
+    /** prefer the use of true / false */
 	NAMING_TRUE_FALSE = 0,
+	/** prefer the use of On / Off */
 	NAMING_ON_OFF,
+	/** prefer the user of Yes and No */
 	NAMING_YES_NO
 };
 
