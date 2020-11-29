@@ -36,9 +36,16 @@ bool isItemActionable(MenuItem* item);
 /**
  * an enumeration of possible values that are given to either custom render functions or used internally
  * by renderers to describe the state of the select button. Values should be self explanatory. High
- * compatability with bool for determining if the button is pressed.
+ * compatibility with bool for determining if the button is pressed.
  */
-enum RenderPressMode: uint8_t { RPRESS_NONE = 0, RPRESS_PRESSED = 1, RPRESS_HELD = 2 };
+enum RenderPressMode: uint8_t {
+    /** The select button is not pressed */
+    RPRESS_NONE = 0,
+    /** The select button has been pressed */
+    RPRESS_PRESSED = 1,
+    /** The selected button is held down */
+    RPRESS_HELD = 2
+};
 
 /**
  * Used to take over rendering for a period of time. Normally one calls renderer.takeOverDisplay(..) 
