@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1603533153,
+    "seconds": 1606647553,
     "nanos": 0
   },
   "codeOptions": {
@@ -21,7 +21,7 @@
       },
       {
         "name": "INTERRUPT_SWITCHES",
-        "latestValue": "false",
+        "latestValue": "true",
         "subsystem": "INPUT"
       },
       {

@@ -49,7 +49,7 @@ RENDERING_CALLBACK_NAME_INVOKE(fnStatusRtCall, backSubItemRenderFn, "Status", -1
 BackMenuItem menuBackStatus(fnStatusRtCall, &menuVoltA0);
 SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuConnectivity);
 RENDERING_CALLBACK_NAME_INVOKE(fnRGBRtCall, rgbAlphaItemRenderFn, "RGB", 16, onRgbChanged)
-Rgb32MenuItem menuRGB(26, fnRGBRtCall, false,NULL);
+Rgb32MenuItem menuRGB(26, fnRGBRtCall, false, NULL);
 const BooleanMenuInfo minfoTempCheck = { "Temp Check", 13, 9, 1, NO_CALLBACK, NAMING_ON_OFF };
 BooleanMenuItem menuTempCheck(&minfoTempCheck, false, &menuRGB);
 const AnyMenuInfo minfoHiddenItem = { "Hidden item", 16, 0xFFFF, 0, NO_CALLBACK };
@@ -87,7 +87,7 @@ void setupMenu() {
     gfx.initR(INITR_BLACKTAB);
     gfx.setRotation(1);
     renderer.setGraphicsDevice(&gfx, &colorConfig);
-    switches.initialise(io8574, true);
+    switches.initialiseInterrupt(io8574, true);
     menuMgr.initForEncoder(&renderer, &menuVoltage, 7, 6, 5);
     remoteServer.begin(&server, &applicationInfo);
 }
