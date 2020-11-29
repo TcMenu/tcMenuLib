@@ -53,6 +53,17 @@ EepromAuthenicationInfoMenuItem menuAuthKeyMgr(1002, &authManager, &menuRemoteMo
 // are in the standard icon set we included at the top.
 TitleWidget connectedWidget(iconsConnection, 2, 16, 12);
 
+// Start 2nd Encoder
+// Here, we use a second rotary encoder to adjust one of the menu items, the button toggles a boolean item
+// Here are the fields for the second rotary encoder
+// If you only want one encoder you can comment these fields out.
+const int encoder2Click = 0;
+const int encoder2APin = 2;
+const int encoder2BPin = 3;
+HardwareRotaryEncoder *secondEncoder;
+const int ledPin = 1;
+// End 2nd Encoder
+
 //
 // here we provide a completely custom configuration of color and spacing
 //
@@ -159,6 +170,27 @@ void setup() {
         float a1Value = analogDevice.getCurrentFloat(A1);
         menuVoltA1.setFloatValue(a1Value * 3.3);
     });
+
+    // Start 2nd encoder
+    Serial.println("Setting up second encoder now");
+
+    ioDevicePinMode(switches.getIoAbstraction(), ledPin, OUTPUT);
+
+    // here we want the encoder set to the range of values that menuCurrent takes, this is just for example,
+    // and you could set the range to anything that is required. We use the callback to update the menu item.
+    secondEncoder = new HardwareRotaryEncoder(encoder2APin, encoder2BPin, [](int encoderValue) {
+        menuCurrent.setCurrentValue(encoderValue);
+    });
+    secondEncoder->changePrecision(menuCurrent.getMaximumValue(), menuCurrent.getCurrentValue());
+    switches.setEncoder(1, secondEncoder); // put it into the 2nd available encoder slot.
+
+    // now, when the additional encoder button is released, we toggle the state of menuPwrDelay.
+    // it will repeat at 25 * 20 millis before acceleration kicks in.
+    switches.addSwitch(encoder2Click, [](pinid_t pin, bool held) {
+        menuPwrDelay.setBoolean(!menuPwrDelay.getBoolean());
+        ioDeviceDigitalWriteS(switches.getIoAbstraction(), ledPin, menuPwrDelay.getBoolean());
+    }, 25);
+    // End 2nd encoder
 }
 
 void loop() {
