@@ -108,11 +108,11 @@ public:
 	 * Initialise for up down and OK button, instead of using hardware changeEncoderPrecision
 	 * @param renderer the renderer used for drawing
 	 * @param root the first menu item
-	 * @param upPin the button on up
 	 * @param downPin the button for down
+	 * @param upPin the button on up
 	 * @param okPin the OK button for the menu select / edit action
 	 */
-	void initForUpDownOk(MenuRenderer* renderer, MenuItem* root, pinid_t upPin, pinid_t downPin, pinid_t okPin);
+	void initForUpDownOk(MenuRenderer* renderer, MenuItem* root, pinid_t downPin, pinid_t upPin, pinid_t okPin);
 
 	/**
 	 * Initialise in situations where local input is not needed or where a custom type of input is needed
@@ -190,7 +190,7 @@ public:
 	 * @param size the number of items
 	 * @param offs the offset within the items
 	 */
-	void setItemsInCurrentMenu(int size, int offs = 0) { switches.changeEncoderPrecision(size, offs); }
+	void setItemsInCurrentMenu(int size, int offs = 0);
 
 	EepromAbstraction* getEepromAbstraction() { return eepromRef; }
 

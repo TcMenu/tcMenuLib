@@ -13,7 +13,7 @@
 
 MenuManager menuMgr;
 
-void MenuManager::initForUpDownOk(MenuRenderer* renderer, MenuItem* root, pinid_t pinUp, pinid_t pinDown, pinid_t pinOk) {
+void MenuManager::initForUpDownOk(MenuRenderer* renderer, MenuItem* root, pinid_t pinDown, pinid_t pinUp, pinid_t pinOk) {
 	this->renderer = renderer;
 	this->currentRoot = this->rootMenu = root;
 
@@ -70,7 +70,6 @@ void MenuManager::performDirectionMove(bool dirIsBack) {
             setCurrentMenu(currentActive);
         }
     }
-
 }
 
 void MenuManager::initWithoutInput(MenuRenderer* renderer, MenuItem* root) {
@@ -204,6 +203,7 @@ void MenuManager::stopEditingCurrentItem(bool doMultiPartNext) {
     currentEditor = nullptr;
 	setItemsInCurrentMenu(itemCount(menuMgr.getCurrentMenu()) - 1, offsetOfCurrentActive(menuMgr.getCurrentMenu()));
 
+
 	if (renderer->getRendererType() == RENDERER_TYPE_BASE) {
 		auto* baseRenderer = reinterpret_cast<BaseMenuRenderer*>(renderer);
 		baseRenderer->redrawRequirement(MENUDRAW_EDITOR_CHANGE);
@@ -243,6 +243,7 @@ void MenuManager::setupForEditing(MenuItem* item) {
 		currentEditor = item;
 		currentEditor->setEditing(true);
 		switches.changeEncoderPrecision(item->getMaximumValue(), reinterpret_cast<ValueMenuItem*>(currentEditor)->getCurrentValue());
+		switches.getEncoder()->setUserIntention(CHANGE_VALUE);
 	}
 	else if (ty == MENUTYPE_BOOLEAN_VALUE) {
 		// we don't actually edit boolean items, just toggle them instead
@@ -259,6 +260,7 @@ void MenuManager::setupForEditing(MenuItem* item) {
 	}
 	else if (isMenuRuntimeMultiEdit(item)) {
         if(!notifyEditStarting(item)) return;
+        switches.getEncoder()->setUserIntention(CHANGE_VALUE);
         currentEditor = item;
         auto* editableItem = reinterpret_cast<EditableMultiPartMenuItem<void*>*>(item);
 		editableItem->beginMultiEdit();
@@ -358,4 +360,11 @@ void MenuManager::notifyStructureChanged() {
             i->structureHasChanged();
         }
     }
+}
+
+void MenuManager::setItemsInCurrentMenu(int size, int offs) {
+    auto enc = switches.getEncoder();
+    if(!enc) return;
+    enc->changePrecision(size, offs);
+    enc->setUserIntention(SCROLL_THROUGH_ITEMS);
 }
