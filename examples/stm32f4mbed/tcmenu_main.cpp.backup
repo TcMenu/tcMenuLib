@@ -1,0 +1,11 @@
+#include <mbed.h>
+
+void setup() {
+}
+
+int main() {
+    setup();
+    while(1) {
+        taskManager.runLoop();
+    }
+}

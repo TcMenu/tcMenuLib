@@ -1,0 +1,348 @@
+{
+  "lastEdited": {
+    "seconds": 1607154119,
+    "nanos": 0
+  },
+  "codeOptions": {
+    "applicationUUID": "f5325e26-a7f6-40ff-876e-47afa06df532",
+    "applicationName": "Demo mbed",
+    "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
+    "lastDisplayUuid": "8a15d500-410f-489d-b3dc-540b05e630ed",
+    "lastRemoteUuid": "27e7a502-330e-4570-9f8e-bd26ac88051f",
+    "embeddedPlatform": "MBED_RTOS",
+    "namingRecursive": false,
+    "saveToSrc": false,
+    "useCppMain": true,
+    "lastProperties": [
+      {
+        "name": "PULLUP_LOGIC",
+        "latestValue": "true",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "INTERRUPT_SWITCHES",
+        "latestValue": "false",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SWITCH_IODEVICE",
+        "latestValue": "",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_A",
+        "latestValue": "PE_2",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_B",
+        "latestValue": "PE_5",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_OK",
+        "latestValue": "PE_4",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SERIAL_BUS",
+        "latestValue": "spi",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_VARIABLE",
+        "latestValue": "gfx",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_TYPE",
+        "latestValue": "SSD_1306",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CONFIG",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_WIDTH",
+        "latestValue": "128",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_HEIGHT",
+        "latestValue": "64",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "BUS_TYPE",
+        "latestValue": "SPI",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_RESET_PIN",
+        "latestValue": "PF_12",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CS_PIN",
+        "latestValue": "PF_13",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_RS_PIN",
+        "latestValue": "PD_15",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_ROTATION",
+        "latestValue": "0",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "LISTEN_PORT",
+        "latestValue": "3333",
+        "subsystem": "REMOTE"
+      }
+    ]
+  },
+  "projectName": "Mbed demo project",
+  "namingRecursive": false,
+  "version": "1.0",
+  "items": [
+    {
+      "parentId": 0,
+      "type": "textItem",
+      "item": {
+        "name": "RTCDate",
+        "eepromAddress": -1,
+        "id": 1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "itemType": "GREGORIAN_DATE",
+        "textLength": 5
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "textItem",
+      "item": {
+        "name": "RTCTime",
+        "eepromAddress": -1,
+        "id": 2,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "itemType": "TIME_12H",
+        "textLength": 5
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "name": "Editing",
+        "eepromAddress": -1,
+        "id": 3,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "secured": false
+      }
+    },
+    {
+      "parentId": 3,
+      "type": "analogItem",
+      "item": {
+        "name": "Tenths",
+        "eepromAddress": 2,
+        "id": 4,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "onTenthsChaned",
+        "maxValue": 1000,
+        "offset": 0,
+        "divisor": 10,
+        "unitName": "tn"
+      }
+    },
+    {
+      "parentId": 3,
+      "type": "enumItem",
+      "item": {
+        "name": "Foods",
+        "eepromAddress": 4,
+        "id": 5,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "onFoodChange",
+        "enumEntries": [
+          "Salad",
+          "Pasta",
+          "Pizza",
+          "Casserole",
+          "Soup"
+        ]
+      }
+    },
+    {
+      "parentId": 3,
+      "type": "boolItem",
+      "item": {
+        "name": "Power",
+        "eepromAddress": 6,
+        "id": 6,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "naming": "ON_OFF"
+      }
+    },
+    {
+      "parentId": 3,
+      "type": "largeNumItem",
+      "item": {
+        "name": "Frequency",
+        "eepromAddress": 7,
+        "id": 7,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "onFrequencyChanged",
+        "decimalPlaces": 0,
+        "digitsAllowed": 8,
+        "negativeAllowed": true
+      }
+    },
+    {
+      "parentId": 3,
+      "type": "rgbItem",
+      "item": {
+        "name": "RGB",
+        "eepromAddress": 15,
+        "id": 8,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "",
+        "includeAlphaChannel": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "name": "Other",
+        "eepromAddress": -1,
+        "id": 9,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "secured": false
+      }
+    },
+    {
+      "parentId": 9,
+      "type": "scrollItem",
+      "item": {
+        "name": "Choices",
+        "eepromAddress": 19,
+        "id": 10,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "itemWidth": 10,
+        "numEntries": 4,
+        "variable": "choicesItems",
+        "eepromOffset": 0,
+        "choiceMode": "ARRAY_IN_RAM"
+      }
+    },
+    {
+      "parentId": 9,
+      "type": "runtimeList",
+      "item": {
+        "name": "CountingList",
+        "eepromAddress": -1,
+        "id": 11,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "initialRows": 10
+      }
+    },
+    {
+      "parentId": 9,
+      "type": "floatItem",
+      "item": {
+        "name": "Avg Temp",
+        "eepromAddress": -1,
+        "id": 12,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "numDecimalPlaces": 1
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "name": "Connectivity",
+        "eepromAddress": -1,
+        "id": 13,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "secured": false
+      }
+    },
+    {
+      "parentId": 13,
+      "type": "textItem",
+      "item": {
+        "name": "IP",
+        "eepromAddress": -1,
+        "id": 14,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "itemType": "IP_ADDRESS",
+        "textLength": 5
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "name": "Commits",
+        "eepromAddress": -1,
+        "id": 15,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 32767,
+        "offset": 0,
+        "divisor": 0,
+        "unitName": null
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "textItem",
+      "item": {
+        "name": "Edit",
+        "eepromAddress": -1,
+        "id": 16,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "itemType": "PLAIN_TEXT",
+        "textLength": 16
+      }
+    }
+  ]
+}
