@@ -69,7 +69,7 @@ void setup() {
 
     // here we load an item very early because we need to initialise it before the menu starts.
     // be very careful not to use any menu infrastructure during the callback.
-    loadMenuItem(&eeprom, menuIP, 0xd00d);
+    loadMenuItem(&eeprom, &menuIP, 0xd00d);
 
     // spin up the Ethernet library, get the IP address from the menu
     byte* rawIp = menuIP.getIpAddress();
