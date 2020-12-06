@@ -67,11 +67,9 @@ void setup() {
     menuRemoteMonitor.registerCommsNotification(onCommsChange);
     menuAuthKeyMgr.setLocalOnly(true);
 
-    // we can load the menu back from eeprom, the second parameter is an
-    // optional override of the magic key. This key is saved out with the
-    // menu, and the values are only loaded when the key matches.
-    menuMgr.setRootMenu(&menuHall);
-    menuMgr.load(eeprom, 0xd00d);
+    // here we load an item very early because we need to initialise it before the menu starts.
+    // be very careful not to use any menu infrastructure during the callback.
+    loadMenuItem(&eeprom, menuIP, 0xd00d);
 
     // spin up the Ethernet library, get the IP address from the menu
     byte* rawIp = menuIP.getIpAddress();
@@ -80,6 +78,11 @@ void setup() {
 
     // initialise the menu
     setupMenu();
+
+    // we can load the menu back from eeprom, the second parameter is an
+    // optional override of the magic key. This key is saved out with the
+    // menu, and the values are only loaded when the key matches.
+    menuMgr.load(eeprom, 0xd00d);
 
     // because we are using the simple adafruit configuration option, tcMenu will set up the display for us.
     // it's less configurable but supports most of the popular choices. You can tweak the settings after setupMenu().

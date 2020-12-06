@@ -72,71 +72,77 @@ void saveMenuStructure(EepromAbstraction* eeprom, uint16_t magicKey) {
 	saveRecursively(eeprom, menuMgr.getRoot());
 }
 
+void loadSingleItem(EepromAbstraction* eeprom, MenuItem* nextMenuItem) {
+    if (nextMenuItem->getEepromPosition() == 0xffff) {
+        // ignore this one, not got an eeprom entry..
+    }
+    else if (nextMenuItem->getMenuType() == MENUTYPE_TEXT_VALUE) {
+        auto textItem = reinterpret_cast<TextMenuItem*>(nextMenuItem);
+        eeprom->readIntoMemArray((uint8_t*)textItem->getTextValue(), textItem->getEepromPosition(), textItem->textLength());
+        textItem->cleanUpArray();
+        textItem->setSendRemoteNeededAll();
+        textItem->setChanged(true);
+        textItem->triggerCallback();
+    }
+    else if (nextMenuItem->getMenuType() == MENUTYPE_TIME) {
+        auto timeItem = reinterpret_cast<TimeFormattedMenuItem*>(nextMenuItem);
+        eeprom->readIntoMemArray((uint8_t*)timeItem->getUnderlyingData(), timeItem->getEepromPosition(), 4);
+        timeItem->setSendRemoteNeededAll();
+        timeItem->setChanged(true);
+        timeItem->triggerCallback();
+    }
+    else if (nextMenuItem->getMenuType() == MENUTYPE_DATE) {
+        auto dateItem = reinterpret_cast<DateFormattedMenuItem*>(nextMenuItem);
+        eeprom->readIntoMemArray((uint8_t*)dateItem->getUnderlyingData(), dateItem->getEepromPosition(), 4);
+        dateItem->setSendRemoteNeededAll();
+        dateItem->setChanged(true);
+        dateItem->triggerCallback();
+    }
+    else if (nextMenuItem->getMenuType() == MENUTYPE_IPADDRESS) {
+        auto ipItem = reinterpret_cast<IpAddressMenuItem*>(nextMenuItem);
+        eeprom->readIntoMemArray(ipItem->getIpAddress(), ipItem->getEepromPosition(), 4);
+        ipItem->setSendRemoteNeededAll();
+        ipItem->setChanged(true);
+        ipItem->triggerCallback();
+    }
+    else if (nextMenuItem->getMenuType() == MENUTYPE_SCROLLER_VALUE) {
+        auto scroller = reinterpret_cast<ScrollChoiceMenuItem*>(nextMenuItem);
+        scroller->setCurrentValue(eeprom->read16(scroller->getEepromPosition()));
+    }
+    else if (nextMenuItem->getMenuType() == MENUTYPE_COLOR_VALUE) {
+        auto rgb = reinterpret_cast<Rgb32MenuItem*>(nextMenuItem);
+        auto data = rgb->getUnderlying();
+        data->red = eeprom->read8(rgb->getEepromPosition());
+        data->green = eeprom->read8(rgb->getEepromPosition() + 1);
+        data->blue = eeprom->read8(rgb->getEepromPosition() + 2);
+        data->alpha = eeprom->read8(rgb->getEepromPosition() + 3);
+    }
+    else if (nextMenuItem->getMenuType() == MENUTYPE_LARGENUM_VALUE) {
+        auto numItem = reinterpret_cast<EditableLargeNumberMenuItem*>(nextMenuItem);
+        numItem->getLargeNumber()->setNegative(eeprom->read8(numItem->getEepromPosition()));
+        eeprom->readIntoMemArray(numItem->getLargeNumber()->getNumberBuffer(), numItem->getEepromPosition() + 1, 6);
+    }
+    else if (nextMenuItem->getMenuType() == MENUTYPE_INT_VALUE) {
+        auto intItem = (AnalogMenuItem*)nextMenuItem;
+        intItem->setCurrentValue(eeprom->read16(intItem->getEepromPosition()));
+    }
+    else if (nextMenuItem->getMenuType() == MENUTYPE_ENUM_VALUE) {
+        auto valItem = (EnumMenuItem*)nextMenuItem;
+        valItem->setCurrentValue(eeprom->read16(valItem->getEepromPosition()));
+    }
+    else if (nextMenuItem->getMenuType() == MENUTYPE_BOOLEAN_VALUE) {
+        auto valItem = (BooleanMenuItem*)nextMenuItem;
+        valItem->setCurrentValue(eeprom->read8(valItem->getEepromPosition()));
+    }
+}
+
 void loadRecursively(EepromAbstraction* eeprom, MenuItem* nextMenuItem) {
 	while (nextMenuItem) {
 		if (nextMenuItem->getMenuType() == MENUTYPE_SUB_VALUE) {
 			loadRecursively(eeprom, ((SubMenuItem*)nextMenuItem)->getChild());
 		}
-		else if (nextMenuItem->getEepromPosition() == 0xffff) {
-			// ignore this one, not got an eeprom entry..
-		}
-		else if (nextMenuItem->getMenuType() == MENUTYPE_TEXT_VALUE) {
-			auto textItem = reinterpret_cast<TextMenuItem*>(nextMenuItem);
-			eeprom->readIntoMemArray((uint8_t*)textItem->getTextValue(), textItem->getEepromPosition(), textItem->textLength());
-			textItem->cleanUpArray();
-			textItem->setSendRemoteNeededAll();
-			textItem->setChanged(true);
-			textItem->triggerCallback();
-		}
-		else if (nextMenuItem->getMenuType() == MENUTYPE_TIME) {
-			auto timeItem = reinterpret_cast<TimeFormattedMenuItem*>(nextMenuItem);
-			eeprom->readIntoMemArray((uint8_t*)timeItem->getUnderlyingData(), timeItem->getEepromPosition(), 4);
-			timeItem->setSendRemoteNeededAll();
-			timeItem->setChanged(true);
-			timeItem->triggerCallback();
-		}
-		else if (nextMenuItem->getMenuType() == MENUTYPE_DATE) {
-            auto dateItem = reinterpret_cast<DateFormattedMenuItem*>(nextMenuItem);
-            eeprom->readIntoMemArray((uint8_t*)dateItem->getUnderlyingData(), dateItem->getEepromPosition(), 4);
-            dateItem->setSendRemoteNeededAll();
-            dateItem->setChanged(true);
-            dateItem->triggerCallback();
-        }
-		else if (nextMenuItem->getMenuType() == MENUTYPE_IPADDRESS) {
-			auto ipItem = reinterpret_cast<IpAddressMenuItem*>(nextMenuItem);
-			eeprom->readIntoMemArray(ipItem->getIpAddress(), ipItem->getEepromPosition(), 4);
-			ipItem->setSendRemoteNeededAll();
-			ipItem->setChanged(true);
-			ipItem->triggerCallback();
-		}
-		else if (nextMenuItem->getMenuType() == MENUTYPE_SCROLLER_VALUE) {
-		    auto scroller = reinterpret_cast<ScrollChoiceMenuItem*>(nextMenuItem);
-		    scroller->setCurrentValue(eeprom->read16(scroller->getEepromPosition()));
-		}
-        else if (nextMenuItem->getMenuType() == MENUTYPE_COLOR_VALUE) {
-            auto rgb = reinterpret_cast<Rgb32MenuItem*>(nextMenuItem);
-            auto data = rgb->getUnderlying();
-            data->red = eeprom->read8(rgb->getEepromPosition());
-            data->green = eeprom->read8(rgb->getEepromPosition() + 1);
-            data->blue = eeprom->read8(rgb->getEepromPosition() + 2);
-            data->alpha = eeprom->read8(rgb->getEepromPosition() + 3);
-        }
-		else if (nextMenuItem->getMenuType() == MENUTYPE_LARGENUM_VALUE) {
-			auto numItem = reinterpret_cast<EditableLargeNumberMenuItem*>(nextMenuItem);
-			numItem->getLargeNumber()->setNegative(eeprom->read8(numItem->getEepromPosition()));
-			eeprom->readIntoMemArray(numItem->getLargeNumber()->getNumberBuffer(), numItem->getEepromPosition() + 1, 6);
-		}
-		else if (nextMenuItem->getMenuType() == MENUTYPE_INT_VALUE) {
-			auto intItem = (AnalogMenuItem*)nextMenuItem;
-			intItem->setCurrentValue(eeprom->read16(intItem->getEepromPosition()));
-		}
-		else if (nextMenuItem->getMenuType() == MENUTYPE_ENUM_VALUE) {
-			auto valItem = (EnumMenuItem*)nextMenuItem;
-			valItem->setCurrentValue(eeprom->read16(valItem->getEepromPosition()));
-		}
-		else if (nextMenuItem->getMenuType() == MENUTYPE_BOOLEAN_VALUE) {
-			auto valItem = (BooleanMenuItem*)nextMenuItem;
-			valItem->setCurrentValue(eeprom->read8(valItem->getEepromPosition()));
+		else {
+		    loadSingleItem(eeprom, nextMenuItem);
 		}
 		nextMenuItem = nextMenuItem->getNext();
 	}
@@ -153,4 +159,14 @@ bool loadMenuStructure(EepromAbstraction* eeprom, uint16_t magicKey) {
 		serdebugF2("EEPROM Key NOT found ", magicKey);
 		return false;
 	}
+}
+
+bool loadMenuItem(EepromAbstraction* eeprom, MenuItem* theItem, uint16_t magicKey) {
+    if (eeprom->read16(0) == magicKey) {
+        loadSingleItem(eeprom, theItem);
+        return true;
+    }
+    else {
+        return false;
+    }
 }

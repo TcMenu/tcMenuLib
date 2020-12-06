@@ -93,9 +93,11 @@ void setup() {
     menuRemoteMonitor.registerCommsNotification(onCommsChange);
     menuAuthKeyMgr.setLocalOnly(true);
 
-    // here we use the EEPROM to load back the last set of values.
-    menuMgr.setRootMenu(&menuTime);
-    menuMgr.load(eeprom);
+    // here we need to access the ip address before the menu is fully initialised, so we just load the item
+    // be careful not to use any infrastructure of the menu in its callback
+    if(!loadMenuItem(&eeprom, &menuConnectivityIPAddress)) {
+        menuConnectivityIPAddress.setIpAddress(192, 168, 0, 200);
+    }
 
     // spin up the Ethernet library, get the IP address from the menu
     byte* rawIp = menuConnectivityIPAddress.getIpAddress();
@@ -107,6 +109,8 @@ void setup() {
 
     // this is put in by the menu designer and must be called (always ensure devices are setup first).
     setupMenu();
+
+    menuMgr.load(eeprom);
 
     // and print out the IP address
     char sz[20];

@@ -13,6 +13,8 @@
 
 #include "EepromAbstraction.h"
 
+class MenuItem;
+
 /**
  * Save a menu structure to the EEPROM storage device passed in, such that all editable menu items with valid EEPROM
  * address (IE not -1). The eeprom structure will be saved after the first two bytes which are the magic key. This key
@@ -29,5 +31,15 @@ void saveMenuStructure(EepromAbstraction* eeprom, uint16_t magicKey = 0xfade);
  * @param magicKey the key to check against, only loaded if the key matches.
  */
 bool loadMenuStructure(EepromAbstraction* eeprom, uint16_t magicKey = 0xfade);
+
+/**
+ * Loads a single menu item back from storage, this can be used to selectively load critical menu items before
+ * the setupMenu() call is made, but care must be taken to ensure that the callbacks for these items do not rely
+ * on any menu infrastructure whatsoever.
+ * @param eeprom  the EEPROM storage to load from
+ * @param theItem the menu item to try and load if the magic key matches
+ * @param magicKey the key to check against, only loaded if the key matches.
+ */
+bool loadMenuItem(EepromAbstraction* eeprom, MenuItem* theItem, uint16_t magicKey = 0xfade);
 
 #endif //_EEPROM_ITEM_STORAGE_H_

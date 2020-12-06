@@ -20,6 +20,7 @@
 #include <RemoteMenuItem.h>
 #include <MockIoAbstraction.h>
 #include <ESP8266WiFi.h>
+#include <EepromItemStorage.h>
 
 // contains the graphical widget title components.
 #include "stockIcons/wifiAndConnectionIcons16x12.h"
@@ -80,11 +81,11 @@ void onCommsChange(CommunicationInfo info) {
 //
 void setup() {
     Serial.begin(115200);
+    Serial.println("Starting NodeMCU example");
 
     // set up the inbuilt ESP rom to use for load and store.
     EEPROM.begin(512);
     eeprom = new ArduinoEEPROMAbstraction(&EEPROM);
-
 
     // now we enable authentication using EEPROM authentication. Where the EEPROM is
     // queried for authentication requests, and any additional pairs are stored there too.
@@ -100,13 +101,10 @@ void setup() {
     menuRemoteMonitor.registerCommsNotification(onCommsChange);
     menuAuthKeyMgr.setLocalOnly(true);
 
-    serdebugF("start load");
-
-    // because we are initialising wifi from the menu entries, we need to load the eeprom
-    // values very early, in this case, set the root item first, before calling load.
-    menuMgr.setRootMenu(&menuTomatoTemp);
-    menuMgr.load(*eeprom);
-    serdebugF("end load");
+    // because we are initialising wifi from the menu entries, we need to load the WiFi
+    // specific eeprom values very early, so we just load the two items we need.
+    loadMenuItem(eeprom, &menuSSID);
+    loadMenuItem(eeprom, &menuPwd);
 
     // this sketch assumes you've successfully connected to the Wifi before, does not
     // call begin.. You can initialise the wifi whichever way you wish here.
@@ -121,6 +119,14 @@ void setup() {
         WiFi.mode(WIFI_STA);
         serdebugF("Connecting to Wifi using settings from connectivity menu");
     }
+
+    renderer.setFirstWidget(&wifiWidget);
+
+    // initialise the menu.
+    setupMenu();
+
+    // load back the core menu items
+    menuMgr.load(*eeprom);
 
     // now monitor the wifi level every second and report it in a widget.
     taskManager.scheduleFixedRate(1000, [] {
@@ -139,11 +145,6 @@ void setup() {
             wifiWidget.setCurrentState(0);
         }
     });
-
-    renderer.setFirstWidget(&wifiWidget);
-
-    // initialise the menu.
-    setupMenu();
 
     //
     // here we simulate the temperature changing.
