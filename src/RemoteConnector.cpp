@@ -587,10 +587,6 @@ void TagValueRemoteConnector::encodeChangeValue(MenuItem* theItem) {
         transport->writeFieldInt(FIELD_CHANGE_TYPE, CHANGE_ABSOLUTE); // menu host always sends absolute!
         transport->writeFieldInt(FIELD_CURRENT_VAL, ((ValueMenuItem*)theItem)->getCurrentValue());
         break;
-	case MENUTYPE_IPADDRESS:
-    case MENUTYPE_TIME:
-    case MENUTYPE_DATE:
-	case MENUTYPE_LARGENUM_VALUE:
 	case MENUTYPE_COLOR_VALUE: {
 	    auto rgb = reinterpret_cast<Rgb32MenuItem*>(theItem);
 	    rgb->getUnderlying()->asHtmlString(sz, sizeof sz, true);
@@ -605,7 +601,11 @@ void TagValueRemoteConnector::encodeChangeValue(MenuItem* theItem) {
 	    transport->writeFieldInt(FIELD_CHANGE_TYPE, CHANGE_ABSOLUTE);
 	    break;
 	}
-	case MENUTYPE_TEXT_VALUE: {
+    case MENUTYPE_IPADDRESS:
+    case MENUTYPE_TIME:
+    case MENUTYPE_DATE:
+    case MENUTYPE_LARGENUM_VALUE:
+    case MENUTYPE_TEXT_VALUE: {
 		((RuntimeMenuItem*)theItem)->copyValue(sz, sizeof(sz));
 		transport->writeField(FIELD_CURRENT_VAL, sz);
         transport->writeFieldInt(FIELD_CHANGE_TYPE, CHANGE_ABSOLUTE); // menu host always sends absolute!
