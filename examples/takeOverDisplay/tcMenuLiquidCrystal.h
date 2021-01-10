@@ -29,6 +29,7 @@
 class LiquidCrystalRenderer : public BaseGraphicalRenderer {
 private:
     LiquidCrystal* lcd;
+    NullItemDisplayPropertiesFactory propertiesFactory;
     char backChar;
     char forwardChar;
     char editChar;
@@ -44,8 +45,9 @@ public:
     BaseDialog* getDialog() override;
 
     void drawingCommand(RenderDrawingCommand command) override;
-    void drawWidget(Coord where, TitleWidget *widget) override;
-    void drawMenuItem(MenuItem *theItem, GridPosition::GridDrawingMode mode, Coord where, Coord areaSize) override;
+    void drawWidget(Coord where, TitleWidget* widget, color_t colorFg, color_t colorBg) override;
+    void drawMenuItem(GridPositionRowCacheEntry* entry, Coord where, Coord areaSize) override;
+    ItemDisplayPropertiesFactory &getDisplayPropertiesFactory() override { return propertiesFactory; }
 };
 
 class LiquidCrystalDialog : public BaseDialog {

@@ -27,9 +27,9 @@ RENDERING_CALLBACK_NAME_INVOKE(fnTextRtCall, textItemRenderFn, "Text", 4, NO_CAL
 TextMenuItem menuText(fnTextRtCall, 6, 6, &menuChooseItem);
 RENDERING_CALLBACK_NAME_INVOKE(fnLgeNumRtCall, largeNumItemRenderFn, "LgeNum", 10, NO_CALLBACK)
 EditableLargeNumberMenuItem menuLgeNum(fnLgeNumRtCall, 5, 8, 4, &menuText);
-const BooleanMenuInfo PROGMEM minfoLED2 = { "LED 2", 4, 3, 1, onLed2, NAMING_ON_OFF };
+const BooleanMenuInfo PROGMEM minfoLED2 = { "L2", 4, 3, 1, onLed2, NAMING_ON_OFF };
 BooleanMenuItem menuLED2(&minfoLED2, false, NULL);
-const BooleanMenuInfo PROGMEM minfoLED1 = { "LED 1", 3, 2, 1, onLed1, NAMING_ON_OFF };
+const BooleanMenuInfo PROGMEM minfoLED1 = { "L1", 3, 2, 1, onLed1, NAMING_ON_OFF };
 BooleanMenuItem menuLED1(&minfoLED1, false, &menuLED2);
 const SubMenuInfo PROGMEM minfoLEDStates = { "LED States", 2, 0xFFFF, 0, NO_CALLBACK };
 RENDERING_CALLBACK_NAME_INVOKE(fnLEDStatesRtCall, backSubItemRenderFn, "LED States", -1, NO_CALLBACK)

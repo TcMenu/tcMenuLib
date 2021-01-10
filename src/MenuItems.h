@@ -650,7 +650,7 @@ void copyMenuItemValue(MenuItem* item, char* buffer, size_t bufferSize);
  * @param item the item to be copied
  * @param buffer the buffer to copy into
  * @param bufferSize the size of the buffer
- * @param additionalSep optional provide the separator character
+ * @param additionalSep optional provide the separator character (use '\0' for no additional separator)
  */
 void copyMenuItemNameAndValue(MenuItem* item, char* buffer, size_t bufferSize, char additionalSep = ':');
 

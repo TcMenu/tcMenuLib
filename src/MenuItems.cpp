@@ -248,7 +248,7 @@ const char FALSE_STR[] PGM_TCM= "FALSE";
 
 void copyMenuItemNameAndValue(MenuItem* item, char* buffer, size_t bufferSize, char additionalSep) {
     item->copyNameToBuffer(buffer, bufferSize);
-    appendChar(buffer, additionalSep, bufferSize);
+    if(additionalSep != 0) appendChar(buffer, additionalSep, bufferSize);
     appendChar(buffer, ' ', bufferSize);
 
     int pos = strlen(buffer);
@@ -257,11 +257,7 @@ void copyMenuItemNameAndValue(MenuItem* item, char* buffer, size_t bufferSize, c
 
 void copyMenuItemValue(MenuItem* item, char* buffer, size_t bufferSize) {
     buffer[0] = 0;
-    if(isMenuRuntime(item)) {
-        auto* rtItem = reinterpret_cast<RuntimeMenuItem*>(item);
-        rtItem->copyValue(buffer, bufferSize);
-    }
-    else if(item->getMenuType() == MENUTYPE_ENUM_VALUE) {
+    if(item->getMenuType() == MENUTYPE_ENUM_VALUE) {
         auto* enItem = reinterpret_cast<EnumMenuItem*>(item);
         char sz[20];
         enItem->copyEnumStrToBuffer(buffer, bufferSize, enItem->getCurrentValue());
@@ -310,5 +306,9 @@ void copyMenuItemValue(MenuItem* item, char* buffer, size_t bufferSize) {
     }
     else if(item->getMenuType() == MENUTYPE_TITLE_ITEM) {
         buffer[0] = 0;
+    }
+    else if(isMenuRuntime(item)) {
+        auto* rtItem = reinterpret_cast<RuntimeMenuItem*>(item);
+        rtItem->copyValue(buffer, bufferSize);
     }
 }

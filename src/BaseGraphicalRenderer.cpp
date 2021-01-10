@@ -100,7 +100,8 @@ void BaseGraphicalRenderer::render() {
         int activeIndex = findActiveItem();
         int totalHeight = calculateHeightTo(activeIndex, rootItem);
         int startRow = 0;
-        while (totalHeight > (height + 1)) {
+        int adjust = lastRowExactFit ? 0 : 1;
+        while (totalHeight > (height + adjust)) {
             totalHeight -= heightOfRow(startRow, 1);
             startRow++;
         }
@@ -150,7 +151,6 @@ bool BaseGraphicalRenderer::drawTheMenuItems(uint8_t locRedrawMode, int startRow
                 }
                 else {
                     drawMenuItem(itemCfg, Coord(0, ypos), Coord(width, itemHeight));
-                    serdebugF4("after draw item (pos,id,chg)", i, item->getId(), item->isChanged());
                 }
                 if(itemCfg->getPosition().getDrawingMode() == GridPosition::DRAW_TITLE_ITEM && itemCfg->getPosition().getRow() == 0) {
                     didDrawTitle = true;
@@ -165,8 +165,6 @@ bool BaseGraphicalRenderer::drawTheMenuItems(uint8_t locRedrawMode, int startRow
 }
 
 void BaseGraphicalRenderer::renderList() {
-    serdebugF("list render start");
-
     auto* runList = reinterpret_cast<ListRuntimeMenuItem*>(menuMgr.getCurrentMenu());
     auto* itemProps = getDisplayPropertiesFactory().configFor(runList, ItemDisplayProperties::COMPTYPE_ITEM);
     auto* titleProps = getDisplayPropertiesFactory().configFor(runList, ItemDisplayProperties::COMPTYPE_TITLE);
@@ -203,7 +201,6 @@ void BaseGraphicalRenderer::renderList() {
     runList->asParent();
     runList->setChanged(false);
     titleOnDisplay = true;
-    serdebugF("list render finished");
 }
 
 GridPosition::GridDrawingMode modeFromItem(MenuItem* item) {
@@ -328,7 +325,7 @@ int BaseGraphicalRenderer::calculateHeightTo(int index, MenuItem *pItem) {
 int BaseGraphicalRenderer::findActiveItem() {
     for(bsize_t i=0;i<itemOrderByRow.count();i++) {
         auto* possibleActive = itemOrderByRow.itemAtIndex(i);
-        if(possibleActive->getMenuItem()->isActive()) return i;
+        if(possibleActive->getMenuItem()->isActive()) return possibleActive->getPosition().getRow();
     }
     return 0; // default to the title (back menu item)
 }

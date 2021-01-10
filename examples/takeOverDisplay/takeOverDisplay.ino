@@ -4,6 +4,7 @@
 #include <TaskManager.h>
 #include <RemoteAuthentication.h>
 #include <RemoteMenuItem.h>
+#include <IoLogging.h>
 
 // contains the graphical widget title components.
 #include "stockIcons/wifiAndConnectionIconsLCD.h"
@@ -116,15 +117,14 @@ void setup() {
     // and print out the IP address
     char sz[20];
     menuConnectivityIPAddress.copyValue(sz, sizeof(sz));
-    Serial.print("Device IP is: "); Serial.println(sz);
+    serdebugF2("Device IP is: ", sz);
 
 	authManager.copyPinToBuffer(sz, sizeof(sz));
 	menuConnectivityChangePin.setTextValue(sz);
 	menuConnectivityChangePin.setPasswordField(true);
 
     switches.addSwitch(4, [](uint8_t, bool held) {
-        Serial.print("Extra switch ");
-        Serial.println(held ? "held" : "pressed");
+        serdebugF2("Extra switch ", (held ? "held" : "pressed"));
     }, 20, true);
 }
 
@@ -146,8 +146,7 @@ void CALLBACK_FUNCTION onFoodChoice(int /*id*/) {
     int enumVal = menuFood.getCurrentValue();
     menuFood.copyEnumStrToBuffer(enumStr, sizeof(enumStr), enumVal);
 
-    Serial.print("Changed food choice to ");
-    Serial.println(enumStr);
+    serdebugF2("Changed food choice to ", enumStr);
     
     // and put it into a text menu item
     menuText.setTextValue(enumStr);
@@ -232,13 +231,12 @@ void CALLBACK_FUNCTION onInfoDlg(int /*id*/) {
 //
 void onFinished(ButtonType btn, void* /*userData*/) {
     if(btn == BTNTYPE_ACCEPT) {
-        Serial.print("Food chosen was ");
         char sz[20];
         menuFood.copyEnumStrToBuffer(sz, sizeof(sz), menuFood.getCurrentValue());
-        Serial.println(sz);
+        serdebugF2("Chosen food ", sz);
     }
     else {
-        Serial.println("User did not choose to proceed.");
+        serdebugF("User did not choose to proceed.");
     }
 }
 

@@ -163,6 +163,8 @@ private:
     ItemDisplayProperties props = ItemDisplayProperties(0, {}, MenuPadding(0), nullptr, 1, 0, 1, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT);
     BtreeList<uint16_t, GridPositionWithId> gridByItem;
 public:
+    NullItemDisplayPropertiesFactory() : gridByItem(4) {}
+
     ItemDisplayProperties* configFor(MenuItem* pItem, ItemDisplayProperties::ComponentType compType) override {
         return &props;
     }

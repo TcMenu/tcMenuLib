@@ -101,23 +101,24 @@ void MenuManager::valueChanged(int value) {
 	else if(currentEditor && currentEditor->getMenuType() == MENUTYPE_SCROLLER_VALUE) {
 	    reinterpret_cast<ScrollChoiceMenuItem*>(currentEditor)->setCurrentValue(value);
 	}
+    else if (menuMgr.getCurrentMenu()->getMenuType() == MENUTYPE_RUNTIME_LIST) {
+        reinterpret_cast<ListRuntimeMenuItem*>(menuMgr.getCurrentMenu())->setActiveIndex(value);
+    }
 	else {
-		serdebugF2("valueChanged V=", value);
-		if (menuMgr.getCurrentMenu()->getMenuType() == MENUTYPE_RUNTIME_LIST) {
-			reinterpret_cast<ListRuntimeMenuItem*>(menuMgr.getCurrentMenu())->setActiveIndex(value);
-		}
-		else {
-			MenuItem* currentActive = menuMgr.findCurrentActive();
-			currentActive->setActive(false);
-			if(renderer->getRendererType() == RENDER_TYPE_CONFIGURABLE) {
-			    currentActive = reinterpret_cast<BaseGraphicalRenderer*>(renderer)->getMenuItemAtIndex(value);
-			    if(currentActive) currentActive->setActive(true);
-			}
-			else {
-                currentActive = getItemAtPosition(currentRoot, value);
+        MenuItem* currentActive = menuMgr.findCurrentActive();
+        currentActive->setActive(false);
+        if(renderer->getRendererType() == RENDER_TYPE_CONFIGURABLE) {
+            currentActive = reinterpret_cast<BaseGraphicalRenderer*>(renderer)->getMenuItemAtIndex(value);
+            if(currentActive) {
                 currentActive->setActive(true);
+                serdebugF3("Change active (V, ID) ", value, currentActive->getId());
             }
-		}
+        }
+        else {
+            currentActive = getItemAtPosition(currentRoot, value);
+            currentActive->setActive(true);
+            serdebugF3("Legacy set active (V, ID) ", value, currentActive->getId());
+        }
 	}
 }
 

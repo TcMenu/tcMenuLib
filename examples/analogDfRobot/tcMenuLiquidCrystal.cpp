@@ -7,7 +7,7 @@
  * LiquidCrystalIO renderer that renders menus onto this type of display. This file is a plugin file and should not
  * be directly edited, it will be replaced each time the project is built. If you want to edit this file in place,
  * make sure to rename it first.
- * 
+ *
  * LIBRARY REQUIREMENT
  * This renderer is designed for use with this library: https://github.com/davetcc/LiquidCrystalIO
  */
@@ -29,7 +29,7 @@ void LiquidCrystalRenderer::initialise() {
     // we iterate over each widget then over each each icon.
     TitleWidget* wid = firstWidget;
     int charNo = 0;
-    while(wid != nullptr) {
+    while(wid != NULL) {
         serdebugF2("Title widget present max=", wid->getMaxValue());
         for(int i = 0; i < wid->getMaxValue(); i++) {
             serdebugF2("Creating char ", charNo);
@@ -39,8 +39,7 @@ void LiquidCrystalRenderer::initialise() {
         wid = wid->getNext();
     }
     lcd->clear();
-    MenuPadding padding = {0};
-    setStandardRowSize(1, 1, padding);
+
     BaseGraphicalRenderer::initialise();
 }
 
@@ -55,7 +54,7 @@ void LiquidCrystalRenderer::setEditorChars(char back, char forward, char edit) {
     editChar = edit;
 }
 
-void LiquidCrystalRenderer::drawWidget(Coord where, TitleWidget *widget) {
+void LiquidCrystalRenderer::drawWidget(Coord where, TitleWidget *widget, color_t, color_t) {
     char ch = char(widget->getHeight() + widget->getCurrentState());
     serdebugF4("draw widget", where.x, where.y, (int)ch);
     lcd->setCursor(where.x, where.y);
@@ -63,21 +62,61 @@ void LiquidCrystalRenderer::drawWidget(Coord where, TitleWidget *widget) {
     lcd->write(ch);
 }
 
-void LiquidCrystalRenderer::drawMenuItem(MenuItem *theItem, GridPosition::GridDrawingMode mode, Coord where, Coord areaSize) {
-    theItem->setChanged(false);
-    lcd->setCursor(where.x, where.y);
+bool itemNeedsValue(GridPosition::GridJustification justification) {
+    return (justification == GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE ||
+            justification == GridPosition::JUSTIFY_CENTER_WITH_VALUE ||
+            justification == GridPosition::JUSTIFY_RIGHT_WITH_VALUE);
+}
 
-    buffer[0] = theItem->isEditing() ? editChar : (theItem->isActive() ? forwardChar : ' ');
-    int offs = 1;
-    uint8_t finalPos = theItem->copyNameToBuffer(buffer, offs, bufferSize);
-    for(uint8_t i = finalPos; i < bufferSize; ++i)  buffer[i] = 32;
-    buffer[bufferSize] = 0;
+int calculateOffset(GridPosition::GridJustification just, int totalLen, const char* sz) {
+    int len = strlen(sz);
+    if(len > totalLen || just == GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE || just == GridPosition::JUSTIFY_LEFT_NO_VALUE) return 0;
 
-    if (isItemActionable(theItem)) {
-        buffer[bufferSize - 1] = forwardChar;
+    if(just == GridPosition::JUSTIFY_RIGHT_WITH_VALUE || just == GridPosition::JUSTIFY_RIGHT_NO_VALUE) {
+        return (totalLen - len) - 1;
     }
     else {
+        // must be centered in this case.
+        return (totalLen - len) / 2;
+    }
+}
+
+void copyIntoBuffer(char* buffer, const char* source, int offset, int bufferLen) {
+    int len = strlen(source);
+    for(int i=0; i<len; i++) {
+        auto pos = offset+i;
+        if(pos >= bufferLen) return;
+        buffer[pos] = source[i];
+    }
+}
+
+void LiquidCrystalRenderer::drawMenuItem(GridPositionRowCacheEntry* entry, Coord where, Coord areaSize) {
+    auto* theItem = entry->getMenuItem();
+    theItem->setChanged(false);
+
+    buffer[0] = theItem->isEditing() ? editChar : (theItem->isActive() ? forwardChar : ' ');
+
+    if(entry->getPosition().getJustification() == GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT) {
+        lcd->setCursor(where.x, where.y);
+        int offs = 1;
+        uint8_t finalPos = theItem->copyNameToBuffer(buffer, offs, bufferSize);
+        for(uint8_t i = finalPos; i < areaSize.x; ++i)  buffer[i] = 32;
+        buffer[bufferSize] = 0;
         menuValueToText(theItem, JUSTIFY_TEXT_RIGHT);
+    }
+    else {
+        char sz[20];
+        for(uint8_t i = 1; i < (uint8_t)areaSize.x; ++i)  buffer[i] = 32;
+        buffer[areaSize.x] = 0;
+        if(itemNeedsValue(entry->getPosition().getJustification())) {
+            copyMenuItemNameAndValue(theItem, sz, sizeof sz, 0);
+        }
+        else {
+            theItem->copyNameToBuffer(sz, sizeof sz);
+        }
+        int position = calculateOffset(entry->getPosition().getJustification(), areaSize.x, sz);
+        copyIntoBuffer(&buffer[1], sz, position, bufferSize - 1);
+        lcd->setCursor(where.x, where.y);
     }
     serdebugF3("Buffer: ", where.y, buffer);
     lcd->print(buffer);
