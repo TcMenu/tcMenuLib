@@ -9,6 +9,7 @@
 #include "ScrollChoiceMenuItem.h"
 #include "MenuIterator.h"
 #include "SecuredMenuPopup.h"
+#include "BaseGraphicalRenderer.h"
 #include <IoAbstraction.h>
 
 MenuManager menuMgr;
@@ -67,7 +68,7 @@ void MenuManager::performDirectionMove(bool dirIsBack) {
     else if(currentEditor == nullptr && !dirIsBack) {
         MenuItem* currentActive = menuMgr.findCurrentActive();
         if(currentActive != nullptr && currentActive->getMenuType() == MENUTYPE_SUB_VALUE) {
-            setCurrentMenu(currentActive);
+            actionOnSubMenu(currentActive);
         }
     }
 }
@@ -108,8 +109,14 @@ void MenuManager::valueChanged(int value) {
 		else {
 			MenuItem* currentActive = menuMgr.findCurrentActive();
 			currentActive->setActive(false);
-			currentActive = getItemAtPosition(currentRoot, value);
-			currentActive->setActive(true);
+			if(renderer->getRendererType() == RENDER_TYPE_CONFIGURABLE) {
+			    currentActive = reinterpret_cast<BaseGraphicalRenderer*>(renderer)->getMenuItemAtIndex(value);
+			    if(currentActive) currentActive->setActive(true);
+			}
+			else {
+                currentActive = getItemAtPosition(currentRoot, value);
+                currentActive->setActive(true);
+            }
 		}
 	}
 }
@@ -137,23 +144,28 @@ void MenuManager::onMenuSelect(bool held) {
 	}
 }
 
+void MenuManager::actionOnSubMenu(MenuItem* nextSub) {
+	SubMenuItem* subMenu = reinterpret_cast<SubMenuItem*>(nextSub);
+	if (subMenu->isSecured() && authenticationManager != nullptr) {
+		serdebugF2("Submenu is secured: ", nextSub->getId());
+		SecuredMenuPopup* popup = secureMenuInstance();
+		popup->start(subMenu);
+		currentRoot = popup->getRootItem();
+		auto* baseRenderer = reinterpret_cast<BaseMenuRenderer*>(renderer);
+		baseRenderer->prepareNewSubmenu();
+	}
+	else {
+		menuMgr.setCurrentMenu(subMenu->getChild());
+	}
+}
+
 void MenuManager::actionOnCurrentItem(MenuItem* toEdit) {
 	auto* baseRenderer = reinterpret_cast<BaseMenuRenderer*>(renderer);
 
 	// if there's a new item specified in toEdit, it means we need to change
 	// the current editor (if it's possible to edit that value)
 	if (toEdit->getMenuType() == MENUTYPE_SUB_VALUE) {
-	    SubMenuItem* subMenu = reinterpret_cast<SubMenuItem*>(toEdit);
-		if (subMenu->isSecured() && authenticationManager != nullptr) {
-			serdebugF2("Submenu is secured: ", toEdit->getId());
-			SecuredMenuPopup* popup = secureMenuInstance();
-			popup->start(subMenu);
-			currentRoot = popup->getRootItem();
-			baseRenderer->prepareNewSubmenu();
-		}
-		else {
-			menuMgr.setCurrentMenu(subMenu->getChild());
-		}
+		actionOnSubMenu(toEdit);
 	}
 	else if (toEdit->getMenuType() == MENUTYPE_RUNTIME_LIST) {
 		if (menuMgr.getCurrentMenu() == toEdit) {
@@ -204,7 +216,7 @@ void MenuManager::stopEditingCurrentItem(bool doMultiPartNext) {
 	setItemsInCurrentMenu(itemCount(menuMgr.getCurrentMenu()) - 1, offsetOfCurrentActive(menuMgr.getCurrentMenu()));
 
 
-	if (renderer->getRendererType() == RENDERER_TYPE_BASE) {
+	if (renderer->getRendererType() != RENDER_TYPE_NOLOCAL) {
 		auto* baseRenderer = reinterpret_cast<BaseMenuRenderer*>(renderer);
 		baseRenderer->redrawRequirement(MENUDRAW_EDITOR_CHANGE);
 	}
@@ -227,6 +239,12 @@ MenuItem* MenuManager::findCurrentActive() {
 			return itm;
 		}
 		itm = itm->getNext();
+	}
+
+	// there's a special case for the title menu on the main page that needs to be checked against.
+	if(renderer->getRendererType() == RENDER_TYPE_CONFIGURABLE) {
+	    auto* pItem = reinterpret_cast<BaseGraphicalRenderer*>(renderer)->getMenuItemAtIndex(0);
+	    if(pItem && pItem->isActive()) return pItem;
 	}
 
 	return getCurrentMenu();
@@ -280,7 +298,7 @@ void MenuManager::setCurrentEditor(MenuItem * editor) {
 void MenuManager::setCurrentMenu(MenuItem * theItem) {
 	serdebugF2("setCurrentMenu: ", theItem->getId());
 
-	if (renderer->getRendererType() != RENDERER_TYPE_BASE) return;
+	if (renderer->getRendererType() == RENDER_TYPE_NOLOCAL) return;
 	auto* baseRenderer = reinterpret_cast<BaseMenuRenderer*>(renderer);
 
 	menuMgr.setCurrentEditor(nullptr);

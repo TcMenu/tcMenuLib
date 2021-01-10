@@ -4,6 +4,9 @@
  * See the readme file for more info.
  */
 #include "analogDfRobot_menu.h"
+#include "AnalogDeviceAbstraction.h"
+
+ArduinoAnalogDevice analog;
 
 void setup() {
     // first we setup the menu
@@ -11,11 +14,12 @@ void setup() {
 
     // we are going to toggle the built in LED, so set it as output.
     pinMode(LED_BUILTIN, OUTPUT);
+    analog.initPin(A1, DIR_IN);
 
     // now we read the value of A0 every 200millis and set it onto a menu item
     menuValueA0.setReadOnly(true);
     taskManager.scheduleFixedRate(200, [] {
-        menuValueA0.setCurrentValue(analogRead(A0));
+        menuValueA0.setCurrentValue(int(analog.getCurrentFloat(A1) * 100.0));
     });
 
     // Finally we set up back (left) and next (right) functionality.

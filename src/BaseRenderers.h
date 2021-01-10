@@ -167,7 +167,7 @@ public:
 	void setNext(TitleWidget* next) {this->next = next;}
 };
 
-enum RendererType: uint8_t { RENDER_TYPE_NOLOCAL, RENDERER_TYPE_BASE };
+enum RendererType: uint8_t { RENDER_TYPE_NOLOCAL, RENDER_TYPE_BASE, RENDER_TYPE_CONFIGURABLE };
 
 /** 
  * Each display must have a renderer, even if it is the NoRenderer, the NoRenderer is for situations
@@ -283,17 +283,17 @@ public:
 	 * constructs the renderer with a given buffer size 
 	 * @param bufferSize size of text buffer to create
 	 */
-	BaseMenuRenderer(int bufferSize);
+	BaseMenuRenderer(int bufferSize, RendererType rType = RENDER_TYPE_BASE);
 	
 	/** 
 	 * Destructs the class removing the allocated buffer
 	 */
-	virtual ~BaseMenuRenderer() {delete buffer;}
+	~BaseMenuRenderer() override {delete buffer;}
 	
 	/**
 	 * Initialise the render setting up tasks
 	 */
-	virtual void initialise();
+	void initialise() override;
 
     /** 
      * Adjust the default reset interval of 30 seconds. Maximum value is 60 seconds.
@@ -330,7 +330,7 @@ public:
     /**
      * Called by taskManager when we are scheduled
      */
-    virtual void exec();
+    void exec() override;
 
 	/**
 	 * This is the rendering call that must be implemented by subclasses. Generally
@@ -346,7 +346,7 @@ public:
 	 * @param editor the current editor
 	 * @return Ah it
 	 */
-	virtual bool tryTakeSelectIfNeeded(int currentReading, RenderPressMode pressMode);
+	bool tryTakeSelectIfNeeded(int currentReading, RenderPressMode pressMode) override;
 
 	/**
 	 * For menu systems that support title widgets, this will allow the first widget.
@@ -410,14 +410,6 @@ protected:
 	 * set up a countdown to default back to the submenu
 	 */
 	void countdownToDefaulting();
-	
-private:
-	void menuValueAnalog(AnalogMenuItem* item, MenuDrawJustification justification);
-	void menuValueEnum(EnumMenuItem* item, MenuDrawJustification justification);
-	void menuValueBool(BooleanMenuItem* item, MenuDrawJustification justification);
-	void menuValueRuntime(RuntimeMenuItem* item, MenuDrawJustification justification);
-	void menuValueFloat(FloatMenuItem* item, MenuDrawJustification justification);
 };
-
 
 #endif

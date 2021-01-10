@@ -238,3 +238,77 @@ void ValueMenuItem::setCurrentValue(uint16_t val, bool silent) {
 	currentValue = val;
     if(!silent)	triggerCallback();
 }
+
+const char ON_STR[] PGM_TCM   = "ON";
+const char OFF_STR[] PGM_TCM  = "OFF";
+const char YES_STR[] PGM_TCM  = "YES";
+const char NO_STR[] PGM_TCM   = " NO";
+const char TRUE_STR[] PGM_TCM = " TRUE";
+const char FALSE_STR[] PGM_TCM= "FALSE";
+
+void copyMenuItemNameAndValue(MenuItem* item, char* buffer, size_t bufferSize, char additionalSep) {
+    item->copyNameToBuffer(buffer, bufferSize);
+    appendChar(buffer, additionalSep, bufferSize);
+    appendChar(buffer, ' ', bufferSize);
+
+    int pos = strlen(buffer);
+    copyMenuItemValue(item, buffer + pos, bufferSize - pos);
+}
+
+void copyMenuItemValue(MenuItem* item, char* buffer, size_t bufferSize) {
+    buffer[0] = 0;
+    if(isMenuRuntime(item)) {
+        auto* rtItem = reinterpret_cast<RuntimeMenuItem*>(item);
+        rtItem->copyValue(buffer, bufferSize);
+    }
+    else if(item->getMenuType() == MENUTYPE_ENUM_VALUE) {
+        auto* enItem = reinterpret_cast<EnumMenuItem*>(item);
+        char sz[20];
+        enItem->copyEnumStrToBuffer(buffer, bufferSize, enItem->getCurrentValue());
+    }
+    else if(item->getMenuType() == MENUTYPE_BOOLEAN_VALUE) {
+        auto* boolItem = reinterpret_cast<BooleanMenuItem*>(item);
+        BooleanNaming naming = boolItem->getBooleanNaming();
+        const char* val;
+        switch(naming) {
+            case NAMING_ON_OFF:
+                val = boolItem->getBoolean() ? ON_STR : OFF_STR;
+                break;
+            case NAMING_YES_NO:
+                val = boolItem->getBoolean() ? YES_STR : NO_STR;
+                break;
+            default:
+                val = boolItem->getBoolean() ? TRUE_STR : FALSE_STR;
+                break;
+        }
+        safeProgCpy(buffer, val, bufferSize);
+    }
+    else if(item->getMenuType() == MENUTYPE_FLOAT_VALUE) {
+        auto* flItem = reinterpret_cast<FloatMenuItem*>(item);
+
+        fastltoa(buffer, long(flItem->getFloatValue()), 10, NOT_PADDED, bufferSize);
+        appendChar(buffer, '.', bufferSize);
+
+        long dpDivisor = dpToDivisor(flItem->getDecimalPlaces());
+        long whole = flItem->getFloatValue();
+        long fraction = abs((flItem->getFloatValue() - whole) * dpDivisor);
+        fastltoa_mv(buffer, fraction, dpDivisor, '0', bufferSize);
+    }
+    else if(item->getMenuType() == MENUTYPE_INT_VALUE) {
+        auto* anItem = reinterpret_cast<AnalogMenuItem*>(item);
+        anItem->copyValue(buffer, bufferSize);
+    }
+    else if(item->getMenuType() == MENUTYPE_ACTION_VALUE || item->getMenuType() == MENUTYPE_SUB_VALUE) {
+        appendChar(buffer, '>', bufferSize);
+        appendChar(buffer, '>', bufferSize);
+    }
+    else if(item->getMenuType() == MENUTYPE_BACK_VALUE) {
+        buffer[0]=0;
+        if(item->isActive()) {
+            strncpy(buffer, "[..]", bufferSize);
+        }
+    }
+    else if(item->getMenuType() == MENUTYPE_TITLE_ITEM) {
+        buffer[0] = 0;
+    }
+}

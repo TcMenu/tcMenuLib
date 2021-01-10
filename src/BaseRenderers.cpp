@@ -16,7 +16,7 @@ class RenderingMenuMgrObserver : public MenuManagerObserver {
 public:
     void structureHasChanged() override {
         auto myRenderer = MenuRenderer::getInstance();
-        if(myRenderer->getRendererType() == RENDERER_TYPE_BASE) {
+        if(myRenderer->getRendererType() != RENDER_TYPE_NOLOCAL) {
             serdebugF("Completely invalidate the display");
             reinterpret_cast<BaseMenuRenderer*>(myRenderer)->invalidateAll();
         }
@@ -30,7 +30,7 @@ public:
 } menuMgrListener;
 
 
-BaseMenuRenderer::BaseMenuRenderer(int bufferSize) : MenuRenderer(RENDERER_TYPE_BASE, bufferSize) {
+BaseMenuRenderer::BaseMenuRenderer(int bufferSize, RendererType rType) : MenuRenderer(rType, bufferSize) {
 	ticksToReset = 0;
     lastOffset = 0;
     resetValInTicks = 30 * SECONDS_IN_TICKS;
@@ -50,7 +50,7 @@ void BaseMenuRenderer::initialise() {
 	renderCallback = NULL;
 	redrawMode = MENUDRAW_COMPLETE_REDRAW;
 
-	resetToDefault();
+    menuMgr.setCurrentMenu(menuMgr.getRoot());
 
 	taskManager.scheduleFixedRate(SCREEN_DRAW_INTERVAL, this);
 	menuMgr.addChangeNotification(&menuMgrListener);
@@ -119,127 +119,12 @@ void BaseMenuRenderer::countdownToDefaulting() {
 }
 
 void BaseMenuRenderer::menuValueToText(MenuItem* item,	MenuDrawJustification justification) {
-	switch (item->getMenuType()) {
-	case MENUTYPE_INT_VALUE:
-		menuValueAnalog((AnalogMenuItem*)item, justification);
-		break;
-	case MENUTYPE_ENUM_VALUE:
-		menuValueEnum((EnumMenuItem*)item, justification);
-		break;
-	case MENUTYPE_BOOLEAN_VALUE:
-		menuValueBool((BooleanMenuItem*)item, justification);
-		break;
-	case MENUTYPE_SUB_VALUE:
-	case MENUTYPE_ACTION_VALUE:
-		if (justification == JUSTIFY_TEXT_LEFT) buffer[0] = 0;
-		break;
-	case MENUTYPE_BACK_VALUE:
-	case MENUTYPE_TEXT_VALUE:
-	case MENUTYPE_IPADDRESS:
-    case MENUTYPE_TIME:
-    case MENUTYPE_DATE:
-	case MENUTYPE_RUNTIME_LIST:
-	case MENUTYPE_COLOR_VALUE:
-	case MENUTYPE_SCROLLER_VALUE:
-	case MENUTYPE_RUNTIME_VALUE:
-	case MENUTYPE_LARGENUM_VALUE:
-			menuValueRuntime(reinterpret_cast<RuntimeMenuItem*>(item), justification);
-		break;
-	case MENUTYPE_FLOAT_VALUE:
-		menuValueFloat((FloatMenuItem*)item, justification);
-		break;
-	default:
-		strcpy(buffer, "???");
-		break;
-	}
-
-}
-
-void BaseMenuRenderer::menuValueAnalog(AnalogMenuItem* item, MenuDrawJustification justification) {
-	char itoaBuf[12];
-	item->copyValue(itoaBuf, sizeof(itoaBuf));
-
 	if(justification == JUSTIFY_TEXT_LEFT) {
-		strcpy(buffer, itoaBuf);
-	}
-	else {
-		uint8_t numLen = strlen(itoaBuf);
-		uint8_t startPlace = bufferSize - numLen;
-		strcpy(buffer + startPlace, itoaBuf);
-	}
-}
-
-void BaseMenuRenderer::menuValueEnum(EnumMenuItem* item, MenuDrawJustification justification) {
-	if(justification == JUSTIFY_TEXT_LEFT) {
-		item->copyEnumStrToBuffer(buffer, bufferSize,item->getCurrentValue());
-	}
-	else {
-		uint8_t count = item->getLengthOfEnumStr(item->getCurrentValue());
-        if(count > bufferSize) count = bufferSize;
-		item->copyEnumStrToBuffer(buffer + (bufferSize - count), count + 1, item->getCurrentValue());
-	}
-}
-
-const char ON_STR[] PGM_TCM   = "ON";
-const char OFF_STR[] PGM_TCM  = "OFF";
-const char YES_STR[] PGM_TCM  = "YES";
-const char NO_STR[] PGM_TCM   = " NO";
-const char TRUE_STR[] PGM_TCM = " TRUE";
-const char FALSE_STR[] PGM_TCM= "FALSE";
-
-void BaseMenuRenderer::menuValueBool(BooleanMenuItem* item, MenuDrawJustification justification) {
-	BooleanNaming naming = item->getBooleanNaming();
-	const char* val;
-	switch(naming) {
-	case NAMING_ON_OFF:
-		val = item->getBoolean() ? ON_STR : OFF_STR;
-		break;
-	case NAMING_YES_NO:
-		val = item->getBoolean() ? YES_STR : NO_STR;
-		break;
-	default:
-		val = item->getBoolean() ? TRUE_STR : FALSE_STR;
-		break;
-	}
-
-	if(justification == JUSTIFY_TEXT_LEFT) {
-		safeProgCpy(buffer, val, bufferSize);
-	}
-	else {
-		uint8_t len = safeProgStrLen(val);
-        if(len > bufferSize) len = bufferSize;
-		safeProgCpy(buffer + (bufferSize - len), val, bufferSize);
-	}
-}
-
-void BaseMenuRenderer::menuValueFloat(FloatMenuItem* item, MenuDrawJustification justification) {
-	char sz[20];
-	sz[0]=0;
-	ltoaClrBuff(sz, long(item->getFloatValue()), 10, NOT_PADDED, sizeof(sz));
-	appendChar(sz, '.', sizeof sz);
-	
-	long dpDivisor = dpToDivisor(item->getDecimalPlaces());
-	long whole = item->getFloatValue();
-	long fract = abs((item->getFloatValue() - whole) * dpDivisor);
-	fastltoa_mv(sz, fract, dpDivisor, '0', sizeof sz);
-
-	if(justification == JUSTIFY_TEXT_LEFT) {
-		strcpy(buffer, sz);
-	}
-	else {
-		uint8_t count = strlen(sz);
-		int cpy = bufferSize - count;
-		strcpy(buffer + cpy, sz);
-	}
-}
-
-void BaseMenuRenderer::menuValueRuntime(RuntimeMenuItem* item, MenuDrawJustification justification) {
-	if(justification == JUSTIFY_TEXT_LEFT) {
-		item->copyValue(buffer, bufferSize);
+		copyMenuItemValue(item, buffer, bufferSize);
 	}
 	else {
 		char sz[20];
-		item->copyValue(sz, sizeof(sz));
+		copyMenuItemValue(item, sz, sizeof(sz));
 		uint8_t count = strlen(sz);
 		int cpy = bufferSize - count;
 		strcpy(buffer + cpy, sz);
@@ -272,7 +157,10 @@ void BaseMenuRenderer::prepareNewSubmenu() {
 		menuMgr.setItemsInCurrentMenu(listMenu->getNumberOfParts());
 	}
 	else {
-		menuMgr.setItemsInCurrentMenu(itemCount(menuMgr.getCurrentMenu()) - 1);
+		int items = itemCount(menuMgr.getCurrentMenu()) - 1;
+        if(rendererType == RENDER_TYPE_CONFIGURABLE && menuMgr.getCurrentMenu() == menuMgr.getRoot()) items++;
+		serdebugF3("Prepare sub ", menuMgr.getCurrentMenu()->getId(), items);
+		menuMgr.setItemsInCurrentMenu(items);
 	}
 	redrawRequirement(MENUDRAW_COMPLETE_REDRAW);
 }

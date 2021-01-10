@@ -21,6 +21,7 @@
 #include <MockIoAbstraction.h>
 #include <ESP8266WiFi.h>
 #include <EepromItemStorage.h>
+#include "appicons.h"
 
 // contains the graphical widget title components.
 #include "stockIcons/wifiAndConnectionIcons16x12.h"
@@ -122,6 +123,24 @@ void setup() {
 
     renderer.setFirstWidget(&wifiWidget);
 
+    auto iconHeater = new DrawableIcon(Coord(APPICON_HEAT_WIDTH, APPICON_HEAT_HEIGHT), DrawableIcon::ICON_XBITMAP, WHITE, appIconHeatOff, appIconHeatOn);
+    auto iconLock = new DrawableIcon(Coord(APPICON_LOCK_WIDTH, APPICON_LOCK_HEIGHT), DrawableIcon::ICON_XBITMAP, WHITE, appIconLockOpen, appIconLockClosed);
+    auto iconSettings = new DrawableIcon(Coord(APPICON_SETTINGS_WIDTH, APPICON_SETTINGS_HEIGHT), DrawableIcon::ICON_XBITMAP, WHITE, appIconSettings);
+
+    auto renderConfig = renderer.getConfigurationList();
+    renderConfig->add(GridPositionWithId(
+            menuElectricHeater.getId(),
+            GridPosition(GridPosition::DRAW_AS_ICON_ONLY, 3, 2, 3, 26),
+            iconHeater));
+    renderConfig->add(GridPositionWithId(
+            menuLockDoor.getId(),
+            GridPosition(GridPosition::DRAW_AS_ICON_ONLY, 3, 3, 3, 26),
+            iconLock));
+    renderConfig->add(GridPositionWithId(
+            menuSetup.getId(),
+            GridPosition(GridPosition::DRAW_AS_ICON_ONLY, 3, 1, 3, 26),
+            iconSettings));
+
     // initialise the menu.
     setupMenu();
 
@@ -185,7 +204,7 @@ bool windowOpen = false;
 // and then repeatedly called by rescheduling itself until the window is closed
 //
 void windowOpenFn() {
-    if(menuWindowOpen.getBoolean()) {
+    if(menuWinOpening.getCurrentValue() > 0) {
         windowOpen = !windowOpen;
         // 0 is narrow opening, 1 is wide. We simulate this by adjusting the speed of the call.
         int windowDelay = menuWinOpening.getCurrentValue() == 0 ? 500 : 250;
@@ -217,14 +236,6 @@ void heaterOnFn() {
 //
 // Below are the call back methods that are executed when a menu item changes.
 //
-
-void CALLBACK_FUNCTION onWindowOpen(int /*id*/) {
-    Serial.print("Window is ");
-    Serial.println(menuWindowOpen.getBoolean() ? "Open" : "Closed");
-    if(menuWindowOpen.getBoolean()) {
-        windowOpenFn();
-    }
-}
 
 const char heaterOnHighWarningPgm[] PROGMEM = "Set heater to";
 
@@ -260,8 +271,12 @@ void CALLBACK_FUNCTION onHeaterPower(int /*id*/) {
 }
 
 void CALLBACK_FUNCTION onWindowOpening(int /*id*/) {
+    uint16_t opening = menuWinOpening.getCurrentValue();
     Serial.print("Window setting changed");
-    Serial.println(menuWinOpening.getCurrentValue());
+    Serial.println(opening > 0 ? "Open" : "Closed");
+    if(opening > 0) {
+        windowOpenFn();
+    }
 }
 
 void CALLBACK_FUNCTION onElectricHeater(int /*id*/) {
@@ -303,4 +318,8 @@ void CALLBACK_FUNCTION onLoadFiles(int id) {
     strcpy(&fileChoicesArray[30], "MenuItem");
     strcpy(&fileChoicesArray[40], "MyDocument");
     menuFile.setNumberOfRows(5);
+}
+
+void CALLBACK_FUNCTION onLockDoor(int id) {
+    // Here we'd actually handle the door lock
 }

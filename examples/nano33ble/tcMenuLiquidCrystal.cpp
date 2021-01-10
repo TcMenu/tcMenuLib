@@ -46,7 +46,7 @@ void LiquidCrystalRenderer::initialise() {
 }
 
 LiquidCrystalRenderer::~LiquidCrystalRenderer() { 
-    delete this->buffer; 
+    delete this->buffer;
     if(dialog) delete dialog;
 }
 

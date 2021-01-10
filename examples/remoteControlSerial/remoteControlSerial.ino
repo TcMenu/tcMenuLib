@@ -23,8 +23,8 @@ void updateAnalogMenuItems() {
 
 void setup() {
     // for 32 bit boards we should wait for serial before proceeding.
-    while(!Serial);
     Serial.begin(115200);
+    while(!Serial);
 
     // for serial communication, we only need to setup the speed here.
     // in this example I am using a bluetooth module with serial1, you could switch to
@@ -58,4 +58,28 @@ void loop() {
 void CALLBACK_FUNCTION onPushMe(int /*id*/) {
     bool ledCurrent = digitalRead(LED_BUILTIN);
     digitalWrite(LED_BUILTIN, !ledCurrent);
+}
+
+// see tcMenu list documentation on thecoderscorner.com
+// https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
+int CALLBACK_FUNCTION fnRtListRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize) {
+   switch(mode) {
+    case RENDERFN_INVOKE:
+        serdebugF2("List item selected:", row);
+        return true;
+    case RENDERFN_NAME:
+        if(row == LIST_PARENT_ITEM_POS) {
+            strcpy(buffer, "MyList");
+        } else {
+            strcpy(buffer, "Name");
+            fastltoa(buffer, row, 3, NOT_PADDED, bufferSize);
+        }
+        return true;
+    case RENDERFN_VALUE:
+        buffer[0] = 'V'; buffer[1]=0;
+        fastltoa(buffer, row, 3, NOT_PADDED, bufferSize);
+        return true;
+    case RENDERFN_EEPROM_POS: return 0xFFFF; // lists are generally not saved to EEPROM
+    default: return false;
+    }
 }

@@ -21,9 +21,18 @@ AdaFruitGfxMenuRenderer renderer;
 
 // Global Menu Item declarations
 
+RENDERING_CALLBACK_NAME_INVOKE(fnRGBRtCall, rgbAlphaItemRenderFn, "RGB", -1, NO_CALLBACK)
+Rgb32MenuItem menuRGB(14, fnRGBRtCall, true, NULL);
+RENDERING_CALLBACK_NAME_INVOKE(fnLgeNmRtCall, largeNumItemRenderFn, "LgeNm", -1, NO_CALLBACK)
+EditableLargeNumberMenuItem menuLgeNm(fnLgeNmRtCall, 13, 8, 3, &menuRGB);
+ListRuntimeMenuItem menuRtList(12, 9, fnRtListRtCall, &menuLgeNm);
+const SubMenuInfo PROGMEM minfoRuntimes = { "Runtimes", 10, 0xFFFF, 0, NO_CALLBACK };
+RENDERING_CALLBACK_NAME_INVOKE(fnRuntimesRtCall, backSubItemRenderFn, "Runtimes", -1, NO_CALLBACK)
+BackMenuItem menuBackRuntimes(fnRuntimesRtCall, &menuRtList);
+SubMenuItem menuRuntimes(&minfoRuntimes, &menuBackRuntimes, NULL);
 extern const char* choiceRamArray;
 RENDERING_CALLBACK_NAME_INVOKE(fnChoiceRtCall, enumItemRenderFn, "Choice", -1, NO_CALLBACK)
-ScrollChoiceMenuItem menuChoice(9, fnChoiceRtCall, 0, choiceRamArray, 5, 4, NULL);
+ScrollChoiceMenuItem menuChoice(9, fnChoiceRtCall, 0, choiceRamArray, 5, 4, &menuRuntimes);
 const AnyMenuInfo PROGMEM minfoPushMe = { "Push Me", 6, 0xFFFF, 0, onPushMe };
 ActionMenuItem menuPushMe(&minfoPushMe, &menuChoice);
 const char enumStrFood_0[] PROGMEM  = "Pizza";

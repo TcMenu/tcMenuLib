@@ -33,7 +33,7 @@ RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Conne
 BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuSSID);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL);
 const AnyMenuInfo PROGMEM minfoLoadFiles = { "Load Files", 15, 0xFFFF, 0, onLoadFiles };
-ActionMenuItem menuLoadFiles(&minfoLoadFiles, NULL);
+ActionMenuItem menuLoadFiles(&minfoLoadFiles, &menuConnectivity);
 extern const char* fileChoicesArray;
 RENDERING_CALLBACK_NAME_INVOKE(fnFileRtCall, enumItemRenderFn, "File", -1, onFileChoice)
 ScrollChoiceMenuItem menuFile(14, fnFileRtCall, 0, fileChoicesArray, 10, 1, &menuLoadFiles);
@@ -43,8 +43,9 @@ const AnyMenuInfo PROGMEM minfoSaveAll = { "Save All", 8, 0xFFFF, 0, onSaveAll }
 ActionMenuItem menuSaveAll(&minfoSaveAll, &menuSecretEntry);
 const char enumStrWinOpening_0[] PROGMEM  = "NARROW";
 const char enumStrWinOpening_1[] PROGMEM  = "WIDE";
-const char* const enumStrWinOpening[] PROGMEM  = { enumStrWinOpening_0, enumStrWinOpening_1 };
-const EnumMenuInfo PROGMEM minfoWinOpening = { "Win Opening", 7, 6, 1, onWindowOpening, enumStrWinOpening };
+const char enumStrWinOpening_2[] PROGMEM  = "CLOSED";
+const char* const enumStrWinOpening[] PROGMEM  = { enumStrWinOpening_0, enumStrWinOpening_1, enumStrWinOpening_2 };
+const EnumMenuInfo PROGMEM minfoWinOpening = { "Win Opening", 7, 6, 2, onWindowOpening, enumStrWinOpening };
 EnumMenuItem menuWinOpening(&minfoWinOpening, 0, &menuSaveAll);
 const char enumStrHeaterPower_0[] PROGMEM  = "LOW";
 const char enumStrHeaterPower_1[] PROGMEM  = "MEDIUM";
@@ -55,13 +56,13 @@ EnumMenuItem menuHeaterPower(&minfoHeaterPower, 0, &menuWinOpening);
 const SubMenuInfo PROGMEM minfoSetup = { "Setup", 5, 0xFFFF, 0, NO_CALLBACK };
 RENDERING_CALLBACK_NAME_INVOKE(fnSetupRtCall, backSubItemRenderFn, "Setup", -1, NO_CALLBACK)
 BackMenuItem menuBackSetup(fnSetupRtCall, &menuHeaterPower);
-SubMenuItem menuSetup(&minfoSetup, &menuBackSetup, &menuConnectivity);
+SubMenuItem menuSetup(&minfoSetup, &menuBackSetup, NULL);
+const BooleanMenuInfo PROGMEM minfoLockDoor = { "Lock Door", 16, 38, 1, onLockDoor, NAMING_YES_NO };
+BooleanMenuItem menuLockDoor(&minfoLockDoor, false, &menuSetup);
 const BooleanMenuInfo PROGMEM minfoElectricHeater = { "Electric Heater", 4, 3, 1, onElectricHeater, NAMING_ON_OFF };
-BooleanMenuItem menuElectricHeater(&minfoElectricHeater, false, &menuSetup);
-const BooleanMenuInfo PROGMEM minfoWindowOpen = { "Window Open", 3, 2, 1, onWindowOpen, NAMING_YES_NO };
-BooleanMenuItem menuWindowOpen(&minfoWindowOpen, false, &menuElectricHeater);
+BooleanMenuItem menuElectricHeater(&minfoElectricHeater, false, &menuLockDoor);
 const AnalogMenuInfo PROGMEM minfoCucumberTemp = { "Cucumber Temp", 2, 0xFFFF, 255, NO_CALLBACK, -20, 4, "C" };
-AnalogMenuItem menuCucumberTemp(&minfoCucumberTemp, 0, &menuWindowOpen);
+AnalogMenuItem menuCucumberTemp(&minfoCucumberTemp, 0, &menuElectricHeater);
 const AnalogMenuInfo PROGMEM minfoTomatoTemp = { "Tomato Temp", 1, 0xFFFF, 255, NO_CALLBACK, -20, 4, "C" };
 AnalogMenuItem menuTomatoTemp(&minfoTomatoTemp, 0, &menuCucumberTemp);
 

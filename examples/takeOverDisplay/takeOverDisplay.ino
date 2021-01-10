@@ -46,7 +46,8 @@ EepromAuthenicationInfoMenuItem menuAuthKeyMgr(1002, &authManager, &menuRemoteMo
 // We add a title widget that shows when a user is connected to the device. Connection icons
 // are in the standard icon set we included at the top.
 // Yes even on LCD we now support title widgets, but they eat up a few of your custom chars.
-TitleWidget connectedWidget(iconsConnection, 2, 16, 12);
+// The width must always be 1, and the height is the first custom character that is used.
+TitleWidget connectedWidget(iconsConnection, 2, 1, 0);
 
 
 // when there's a change in communication status (client connects for example) this gets called.

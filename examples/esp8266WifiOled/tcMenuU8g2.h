@@ -19,9 +19,8 @@
 
 #include <tcMenu.h>
 #include <tcUtil.h>
-#include <BaseRenderers.h>
 #include <U8g2lib.h>
-#include <GfxMenuConfig.h>
+#include <BaseGraphicalRenderer.h>
 #include <BaseDialog.h>
 #include <tcUtil.h>
 
@@ -54,40 +53,45 @@ typedef struct ColorGfxMenuConfig<const uint8_t*> U8g2GfxMenuConfig;
  * just call prepareAdaColorDefaultGfxConfig(..) passing it a pointer to your config object. Again the
  * designer UI takes care of this.
  */
-class U8g2MenuRenderer : public BaseMenuRenderer {
+class U8g2MenuRenderer : public BaseGraphicalRenderer {
 private:
 	U8G2* u8g2;
-	U8g2GfxMenuConfig *gfxConfig;
+	ItemDisplayPropertiesFactory *displayPropsFactory;
 	int16_t titleHeight;
     int16_t itemHeight;
+    bool redrawNeeded;
 public:
-	U8g2MenuRenderer(uint8_t bufferSize = 20) : BaseMenuRenderer(bufferSize) {
+	U8g2MenuRenderer(uint8_t bufferSize = 20) : BaseGraphicalRenderer(bufferSize, 1, 1, false) {
 		this->u8g2 = NULL;
-		this->gfxConfig = NULL;
+		this->displayPropsFactory = NULL;
 	}
+    ~U8g2MenuRenderer() override = default;
 
 	void setGraphicsDevice(U8G2* u8g2, U8g2GfxMenuConfig *gfxConfig);
+	void setGraphicsDevice(U8G2* u8g2, ItemDisplayPropertiesFactory *gfxConfig);
 
-	virtual ~U8g2MenuRenderer();
-	virtual void render();
+	void recalculateTitleAndRowHeights();
+
+    void drawWidget(Coord where, TitleWidget *widget) override;
+    void drawMenuItem(MenuItem *theItem, GridPosition::GridDrawingMode mode, Coord where, Coord areaSize) override;
+    void drawingCommand(RenderDrawingCommand command) override;
 
     U8G2* getGraphics() { return u8g2; }
     U8g2GfxMenuConfig* getGfxConfig() { return gfxConfig; }
     BaseDialog* getDialog() override;
 private:
     void drawBitmap(int x, int y, int w, int h, const unsigned char *bmp);
-	void renderMenuItem(int yPos, int menuHeight, MenuItem* item);
-	void renderTitleArea();
-	bool renderWidgets(bool forceDraw);
-    void renderListMenu(int titleHeight);
+    void drawTitleArea(MenuItem* pItem, Coord where, Coord size);
+    void drawTextualItem(MenuItem *pItem, Coord where, Coord size);
+    void drawIconItem(MenuItem *pItem, Coord where, Coord size, bool withText);
+    void drawSlider(AnalogMenuItem *pItem, Coord where, Coord size);
+
+    int drawCoreLineItem(MenuItem *pItem, const Coord &where, const Coord &size);
 };
 
 class U8g2Dialog : public BaseDialog {
 public:
-    U8g2Dialog() {
-        U8g2MenuRenderer* r = reinterpret_cast<U8g2MenuRenderer*>(MenuRenderer::getInstance());
-        bitWrite(flags, DLG_FLAG_SMALLDISPLAY, (r->getGraphics()->getDisplayWidth() < 100));
-    }
+    U8g2Dialog();
 protected:
     void internalRender(int currentValue) override;
     void drawButton(U8G2* gfx, U8g2GfxMenuConfig* config, const char* title, uint8_t num, bool active);

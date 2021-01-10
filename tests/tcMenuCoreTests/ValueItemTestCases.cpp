@@ -53,6 +53,15 @@ test(testCoreAndBooleanMenuItem) {
     assertFalse(boolItem1.getBoolean());
     boolItem1.setBoolean(true);
     assertTrue(boolItem1.getBoolean());
+
+    char buffer[20];
+    boolItem1.setBoolean(false);
+    copyMenuItemNameAndValue(&boolItem1, buffer, sizeof(buffer));
+    assertStringCaseEqual("Bool1: FALSE", buffer);
+
+    boolItem1.setBoolean(true);
+    copyMenuItemNameAndValue(&boolItem1, buffer, sizeof(buffer));
+    assertStringCaseEqual("Bool1:  TRUE", buffer);
 }
 
 bool checkWholeFraction(AnalogMenuItem* item, int16_t whole, int16_t fract, bool neg = false) {
@@ -66,56 +75,68 @@ bool checkWholeFraction(AnalogMenuItem* item, int16_t whole, int16_t fract, bool
     return true;
 }
 
-test(testAnalogEnumMenuItem) {
-        assertEqual(MENUTYPE_ENUM_VALUE, menuEnum1.getMenuType());
-        assertEqual(MENUTYPE_INT_VALUE, menuAnalog.getMenuType());
+test(testEnumMenuItem) {
+    assertEqual(MENUTYPE_ENUM_VALUE, menuEnum1.getMenuType());
 
-        char sz[10];
-        // try getting all the strings.
-        menuEnum1.copyEnumStrToBuffer(sz, sizeof(sz), 0);
-        assertStringCaseEqual(sz, "ITEM1");
-        menuEnum1.copyEnumStrToBuffer(sz, sizeof(sz), 1);
-        assertStringCaseEqual(sz, "ITEM2");
-        menuEnum1.copyEnumStrToBuffer(sz, sizeof(sz), 2);
-        assertStringCaseEqual(sz, "ITEM3");
+    char sz[20];
+    // try getting all the strings.
+    menuEnum1.copyEnumStrToBuffer(sz, sizeof(sz), 0);
+    assertStringCaseEqual(sz, "ITEM1");
+    menuEnum1.copyEnumStrToBuffer(sz, sizeof(sz), 1);
+    assertStringCaseEqual(sz, "ITEM2");
+    menuEnum1.copyEnumStrToBuffer(sz, sizeof(sz), 2);
+    assertStringCaseEqual(sz, "ITEM3");
 
-        // try with limited string buffer and ensure properly terminated
-        menuEnum1.copyEnumStrToBuffer(sz, 4, 2);
-        assertStringCaseEqual(sz, "ITE");
+    menuEnum1.setCurrentValue(1);
+    copyMenuItemNameAndValue(&menuEnum1, sz, sizeof sz);
+    assertStringCaseEqual("Enum1: ITEM2", sz);
 
-        // verify the others.
-        assertEqual(5, menuEnum1.getLengthOfEnumStr(0));
-        assertEqual(5, menuEnum1.getLengthOfEnumStr(1));
-        assertEqual(uint16_t(2), menuEnum1.getMaximumValue());
+    // try with limited string buffer and ensure properly terminated
+    menuEnum1.copyEnumStrToBuffer(sz, 4, 2);
+    assertStringCaseEqual(sz, "ITE");
 
-        assertEqual((uint16_t)255U, menuAnalog.getMaximumValue());
-        assertEqual(0, menuAnalog.getOffset());
-        assertEqual((uint16_t)1U, menuAnalog.getDivisor());
-        assertEqual(2, menuAnalog.unitNameLength());
-        menuAnalog.copyUnitToBuffer(sz);
-        assertStringCaseEqual("AB", sz);
+    // verify the others.
+    assertEqual(5, menuEnum1.getLengthOfEnumStr(0));
+    assertEqual(5, menuEnum1.getLengthOfEnumStr(1));
+    assertEqual(uint16_t(2), menuEnum1.getMaximumValue());
+}
 
-        assertEqual(uint8_t(0), menuAnalog.getDecimalPlacesForDivisor());
+test(testAnalogMenuItem) {
+    assertEqual(MENUTYPE_INT_VALUE, menuAnalog.getMenuType());
 
-        menuAnalog.setCurrentValue(192);
-        assertEqual((uint16_t)192U, menuAnalog.getCurrentValue());
-        assertTrue(checkWholeFraction(&menuAnalog, 192, 0));
-        assertEqual((uint16_t)192U, menuAnalog.getCurrentValue());
-        assertNear(float(192.0), menuAnalog.getAsFloatingPointValue(), float(0.0001));
-        menuAnalog.setCurrentValue(0);
-        assertTrue(checkWholeFraction(&menuAnalog, 0, 0));
-        assertNear(float(0.0), menuAnalog.getAsFloatingPointValue(), float(0.0001));
-        menuAnalog.setFromFloatingPointValue(21.3);
-        assertNear(float(21.0), menuAnalog.getAsFloatingPointValue(), float(0.0001));
-        assertTrue(checkWholeFraction(&menuAnalog, 21, 0));
-        menuAnalog.copyValue(sz, sizeof sz);
-        assertStringCaseEqual("21AB", sz);
-        menuAnalog.setFromFloatingPointValue(21.3);
-        assertNear(float(21.0), menuAnalog.getAsFloatingPointValue(), float(0.0001));
-        assertTrue(checkWholeFraction(&menuAnalog, 21, 0));
+    char sz[20];
+    menuAnalog.setCurrentValue(25);
+    copyMenuItemNameAndValue(&menuAnalog, sz, sizeof(sz));
+    assertStringCaseEqual(sz, "Analog: 25AB");
 
-        menuAnalog2.setFromFloatingPointValue(-0.2);
-        assertNear(-0.2F, menuAnalog2.getAsFloatingPointValue(), 0.0001F);
+    assertEqual((uint16_t)255U, menuAnalog.getMaximumValue());
+    assertEqual(0, menuAnalog.getOffset());
+    assertEqual((uint16_t)1U, menuAnalog.getDivisor());
+    assertEqual(2, menuAnalog.unitNameLength());
+    menuAnalog.copyUnitToBuffer(sz);
+    assertStringCaseEqual("AB", sz);
+
+    assertEqual(uint8_t(0), menuAnalog.getDecimalPlacesForDivisor());
+
+    menuAnalog.setCurrentValue(192);
+    assertEqual((uint16_t)192U, menuAnalog.getCurrentValue());
+    assertTrue(checkWholeFraction(&menuAnalog, 192, 0));
+    assertEqual((uint16_t)192U, menuAnalog.getCurrentValue());
+    assertNear(float(192.0), menuAnalog.getAsFloatingPointValue(), float(0.0001));
+    menuAnalog.setCurrentValue(0);
+    assertTrue(checkWholeFraction(&menuAnalog, 0, 0));
+    assertNear(float(0.0), menuAnalog.getAsFloatingPointValue(), float(0.0001));
+    menuAnalog.setFromFloatingPointValue(21.3);
+    assertNear(float(21.0), menuAnalog.getAsFloatingPointValue(), float(0.0001));
+    assertTrue(checkWholeFraction(&menuAnalog, 21, 0));
+    menuAnalog.copyValue(sz, sizeof sz);
+    assertStringCaseEqual("21AB", sz);
+    menuAnalog.setFromFloatingPointValue(21.3);
+    assertNear(float(21.0), menuAnalog.getAsFloatingPointValue(), float(0.0001));
+    assertTrue(checkWholeFraction(&menuAnalog, 21, 0));
+
+    menuAnalog2.setFromFloatingPointValue(-0.2);
+    assertNear(-0.2F, menuAnalog2.getAsFloatingPointValue(), 0.0001F);
 }
 
 test(testAnalogValuesWithFractions) {

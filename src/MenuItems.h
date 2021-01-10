@@ -252,6 +252,8 @@ enum MenuType : uint8_t {
 	MENUTYPE_SCROLLER_VALUE = 154,
     /** item is of type SubMenuItem */
     MENUTYPE_SUB_VALUE = 155,
+    /** represents the title item, never sent remotely, only for display */
+    MENUTYPE_TITLE_ITEM = 156,
     /** item is of type TextMenuItem */
 	MENUTYPE_TEXT_VALUE = 200,
 	/** item is an IP address and is editable per segment */
@@ -634,6 +636,23 @@ public:
 
 // forward reference
 class RuntimeMenuItem;
+
+/**
+ * Copies the textual representation suitable for display on a device into the provided buffer safely.
+ * @param item the item who's value is to be copied
+ * @param buffer the buffer for the copy
+ * @param bufferSize size of the buffer
+ */
+void copyMenuItemValue(MenuItem* item, char* buffer, size_t bufferSize);
+
+/**
+ * Copies both the name and textual value representation suitable for display on a device into the buffer safely.
+ * @param item the item to be copied
+ * @param buffer the buffer to copy into
+ * @param bufferSize the size of the buffer
+ * @param additionalSep optional provide the separator character
+ */
+void copyMenuItemNameAndValue(MenuItem* item, char* buffer, size_t bufferSize, char additionalSep = ':');
 
 /**
  * Any MenuType with an ID less than 100 is editable as an integer

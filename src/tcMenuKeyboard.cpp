@@ -19,7 +19,7 @@ int fromKeyToIndex(char ch) {
 
 void MenuEditingKeyListener::keyPressed(char key, bool held) {
     // we must have a locally available base renderer.
-    if (menuMgr.getRenderer()->getRendererType() != RENDERER_TYPE_BASE) return;
+    if (menuMgr.getRenderer()->getRendererType() == RENDER_TYPE_NOLOCAL) return;
     auto *renderer = reinterpret_cast<BaseMenuRenderer *>(menuMgr.getRenderer());
 
     // no matter what this always resets the state.

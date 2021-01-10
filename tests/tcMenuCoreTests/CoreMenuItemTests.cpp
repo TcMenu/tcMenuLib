@@ -17,10 +17,10 @@ test(testIpAddressItem) {
 	assertEqual(ipItem.getId(), uint16_t(2039));
 	assertEqual(ipItem.getEepromPosition(), uint16_t(102));
 
-	char sz[20];
-	ipItem.copyNameToBuffer(sz, sizeof(sz));
-	assertStringCaseEqual("HelloWorld", sz);
-	ipItem.copyValue(sz, sizeof(sz));
+	char sz[32];
+	copyMenuItemNameAndValue(&ipItem, sz, sizeof(sz), '[');
+	assertStringCaseEqual("HelloWorld[ 192.168.0.96", sz);
+	copyMenuItemValue(&ipItem, sz, sizeof(sz));
 	assertStringCaseEqual("192.168.0.96", sz);
 
 	assertEqual(uint8_t(4), ipItem.beginMultiEdit());
@@ -73,7 +73,7 @@ test(testSettingIpItemDirectly) {
 
 }
 
-test(testFloatAndActionTypes) {
+test(testFloatType) {
 	menuFloatItem.clearSendRemoteNeededAll();
 	menuFloatItem.setChanged(false);
 	menuFloatItem.setFloatValue(1.001);
@@ -81,6 +81,13 @@ test(testFloatAndActionTypes) {
 	assertTrue(menuFloatItem.isChanged());
 	assertTrue(menuFloatItem.isSendRemoteNeeded(0));
 	assertEqual(4, menuFloatItem.getDecimalPlaces());
+	char sz[20];
+	copyMenuItemNameAndValue(&menuFloatItem, sz, sizeof(sz));
+	assertEqual("FloatItem: 1.0010", sz);
+
+	menuFloatItem.setFloatValue(234.456722);
+    copyMenuItemValue(&menuFloatItem, sz, sizeof(sz));
+	assertEqual("234.4567", sz);
 
 	assertFalse(isMenuRuntime(&menuFloatItem));
 	assertFalse(isMenuBasedOnValueItem(&menuFloatItem));

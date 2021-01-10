@@ -22,12 +22,11 @@ MockEepromAbstraction eeprom(400);
 char szData[10] = { "123456789" };
 const char PROGMEM pgmMyName[]  = "UnitTest";
 int counter = 0;
+const PROGMEM ConnectorLocalInfo applicationInfo = { "DfRobot", "2ba37227-a412-40b7-94e7-42caf9bb0ff4" };
 
 void setup() {
     Serial.begin(115200);
     while(!Serial);
-
-    Serial.println("Starting tcMenu tests");
 
     menuMgr.initWithoutInput(&noRenderer, &menuVolume);
 }
@@ -115,6 +114,18 @@ testF(MenuItemIteratorFixture, testTcUtilGetParentAndVisit) {
         //Serial.print("Visited");printMenuItem(item);Serial.println();
     }), &menuBackStatus));
     assertEqual(counter, 15);
+}
+
+testF(MenuItemIteratorFixture, testIteratorGetSubMenu) {
+    menuMgr.initWithoutInput(&noRenderer, &menuVolume);
+    // passing in null returns null
+    assertTrue(getSubMenuFor(nullptr) == nullptr);
+    // root is presented as null
+    assertTrue(getSubMenuFor(&menuVolume) == nullptr);
+    // now check both menu levels including providing a submenu within a submenu
+    assertTrue(checkMenuItem(getSubMenuFor(&menuPressMe), &menuSecondLevel));
+    assertTrue(checkMenuItem(getSubMenuFor(&menuSecondLevel), &menuStatus));
+    assertTrue(checkMenuItem(getSubMenuFor(&menuBackSettings), &menuSettings));
 }
 
 testF(MenuItemIteratorFixture, testGetItemById) {

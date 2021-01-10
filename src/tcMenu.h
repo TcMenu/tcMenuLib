@@ -314,6 +314,7 @@ public:
 protected:
 	void setupForEditing(MenuItem* item);
 	void actionOnCurrentItem(MenuItem * toEdit);
+    void actionOnSubMenu(MenuItem* nextSub);
 
     void notifyEditEnd(MenuItem *pItem);
     bool notifyEditStarting(MenuItem *pItem);

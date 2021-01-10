@@ -203,7 +203,7 @@ test(testTextRuntimeItem) {
     char sz[20];
     textItem.copyNameToBuffer(sz, sizeof(sz));
     assertStringCaseEqual("HelloWorld", sz);
-    textItem.copyValue(sz, sizeof(sz));
+    copyMenuItemValue(&textItem, sz, sizeof(sz));
     assertStringCaseEqual("Goodbye", sz);
 
     assertEqual(uint8_t(10), textItem.beginMultiEdit());
@@ -279,4 +279,7 @@ test(testActionMenuItem) {
     auto oldCbCount = actionCbCount;
     menuPressMe.triggerCallback();
     assertEqual(oldCbCount + 1, actionCbCount);
+
+    copyMenuItemNameAndValue(&menuPressMe, sz, sizeof sz);
+    assertStringCaseEqual("Press me: >>", sz);
 }

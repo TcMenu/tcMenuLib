@@ -79,6 +79,15 @@ void setup() {
         analogDevice.setCurrentFloat(dacPin, ledLevel);
     });
 
+    setTitlePressedCallback([](int id) {
+        auto* dlg = renderer.getDialog();
+        if(dlg && !dlg->isInUse()) {
+            dlg->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
+            dlg->show(applicationInfo.name, true);
+            dlg->copyIntoBuffer("by theCodersCorner");
+        }
+    });
+
     //
     // if you want to test your rendering without simhub connected, uncomment the below code, it will update all the
     // values a few times a second.

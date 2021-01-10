@@ -48,6 +48,13 @@ MenuItem* getParentRootAndVisit(MenuItem* current, MenuVisitorFn visitor);
 inline MenuItem* getParentRoot(MenuItem* current) { return getParentRootAndVisit(current, nullptr); }
 
 /**
+ * Finds the submenu that a particular menu item belongs to, or nullptr
+ * @param current the menuitem that we are searching for
+ * @return the submenu or nullptr if it was in the root.
+ */
+MenuItem* getSubMenuFor(MenuItem* current);
+
+/**
  * Gets the first match by ID of a menu item in the menu structure.
  * @param the ID to locate the menu item  for
  * @return the menu item associated or NULL.

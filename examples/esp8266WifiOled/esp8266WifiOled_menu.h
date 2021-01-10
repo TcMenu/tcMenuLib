@@ -50,10 +50,10 @@ extern EnumMenuItem menuWinOpening;
 void CALLBACK_FUNCTION onHeaterPower(int id);
 extern EnumMenuItem menuHeaterPower;
 extern SubMenuItem menuSetup;
+void CALLBACK_FUNCTION onLockDoor(int id);
+extern BooleanMenuItem menuLockDoor;
 void CALLBACK_FUNCTION onElectricHeater(int id);
 extern BooleanMenuItem menuElectricHeater;
-void CALLBACK_FUNCTION onWindowOpen(int id);
-extern BooleanMenuItem menuWindowOpen;
 extern AnalogMenuItem menuCucumberTemp;
 extern AnalogMenuItem menuTomatoTemp;
 

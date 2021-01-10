@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1603022031,
+    "seconds": 1609248445,
     "nanos": 0
   },
   "codeOptions": {
@@ -131,20 +131,6 @@
       "parentId": 0,
       "type": "boolItem",
       "item": {
-        "name": "Window Open",
-        "eepromAddress": 2,
-        "id": 3,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "functionName": "onWindowOpen",
-        "naming": "YES_NO"
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "boolItem",
-      "item": {
         "name": "Electric Heater",
         "eepromAddress": 3,
         "id": 4,
@@ -153,6 +139,20 @@
         "visible": true,
         "functionName": "onElectricHeater",
         "naming": "ON_OFF"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "boolItem",
+      "item": {
+        "name": "Lock Door",
+        "eepromAddress": 38,
+        "id": 16,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "onLockDoor",
+        "naming": "YES_NO"
       }
     },
     {
@@ -199,7 +199,8 @@
         "functionName": "onWindowOpening",
         "enumEntries": [
           "NARROW",
-          "WIDE"
+          "WIDE",
+          "CLOSED"
         ]
       }
     },
@@ -261,7 +262,7 @@
       }
     },
     {
-      "parentId": 0,
+      "parentId": 5,
       "type": "subMenu",
       "item": {
         "name": "Connectivity",

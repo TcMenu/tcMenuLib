@@ -1,6 +1,7 @@
 
 #include <PlatformDetermination.h>
 #include "GfxMenuConfig.h"
+#include <MenuIterator.h>
 
 void prepareDefaultGfxConfig(ColorGfxMenuConfig<void*>* config) {
 	makePadding(config->titlePadding, 5, 5, 20, 5);
@@ -50,3 +51,43 @@ const uint8_t loResEditingIcon[] PROGMEM = { 0x7c, 0x06, 0x18, 0x18, 0x06, 0x7c 
  * The low resolution icon for indicating active status
  */
 const uint8_t loResActiveIcon[] PROGMEM = { 0x20, 0x60, 0xfe, 0xfe, 0x60, 0x20 };
+
+ItemDisplayProperties *ConfigurableItemDisplayPropertiesFactory::configFor(MenuItem *pItem, ItemDisplayProperties::ComponentType compType) {
+    // make sure that we never return null, in the worst case, provide a default row for this.
+    if(displayProperties.count()==0) {
+        uint16_t defaultColors[] = { RGB(255,255,255), RGB(0,0,0), RGB(255, 255, 255), RGB(255, 255, 255)};
+        setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, defaultColors, MenuPadding(0), nullptr,
+                                    1, 2, 10, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT);
+    }
+
+    ItemDisplayProperties *pConf = nullptr;
+    if(pItem != nullptr) {
+        pConf = displayProperties.getByKey(MakePropsKey(pItem->getId(), false, compType));
+        if(pConf) return pConf;
+        auto* pSubMenu = getSubMenuFor(pItem);
+        uint16_t subId = pSubMenu ? pSubMenu->getId() : 0;
+        pConf = displayProperties.getByKey(MakePropsKey(subId, true, compType));
+        if(pConf) return pConf;
+    }
+    pConf = displayProperties.getByKey(MakePropsKey(MENUID_NOTSET, false, compType));
+    if(pConf) return pConf;
+    return displayProperties.getByKey(MakePropsKey(MENUID_NOTSET, false, ItemDisplayProperties::COMPTYPE_ITEM));
+
+}
+
+void ConfigurableItemDisplayPropertiesFactory::setDrawingProperties(uint32_t key, color_t *palette, MenuPadding pad,
+                                                                    const void *font, uint8_t mag, uint8_t spacing,
+                                                                    uint8_t requiredHeight, GridPosition::GridJustification just) {
+    auto* pDisplayProperties = displayProperties.getByKey(key);
+    if(pDisplayProperties) {
+        pDisplayProperties->setColors(palette);
+        pDisplayProperties->setFontInfo(font, mag);
+        pDisplayProperties->setPadding(pad);
+        pDisplayProperties->setRequiredHeight(requiredHeight);
+        pDisplayProperties->setSpaceAfter(spacing);
+        pDisplayProperties->setDefaultJustification(just);
+    }
+    else {
+        displayProperties.add(ItemDisplayProperties(key, palette, pad, font, mag, spacing, requiredHeight, just));
+    }
+}

@@ -190,3 +190,20 @@ uint8_t itemCount(MenuItem* item, bool includeNonVisible) {
 	}
 	return count;
 }
+
+MenuItem* getSubRecurse(MenuItem* toSearch, MenuItem* subMenu, MenuItem* current) {
+    while(toSearch) {
+        if(current->getId() == toSearch->getId()) return subMenu;
+        if(toSearch->getMenuType() == MENUTYPE_SUB_VALUE) {
+            subMenu = getSubRecurse(reinterpret_cast<SubMenuItem*>(toSearch)->getChild(), toSearch, current);
+            if(subMenu) return subMenu;
+        }
+        toSearch = toSearch->getNext();
+    }
+    return nullptr;
+}
+
+MenuItem* getSubMenuFor(MenuItem* current) {
+    if(current == nullptr) return nullptr;
+    return getSubRecurse(menuMgr.getRoot(), nullptr, current);
+}

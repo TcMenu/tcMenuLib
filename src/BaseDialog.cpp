@@ -38,7 +38,7 @@ void BaseDialog::hide() {
 
     // stop the renderer from doing any more rendering, and tell it to reset the menu
     setInUse(false);
-    if(MenuRenderer::getInstance()->getRendererType() == RENDERER_TYPE_BASE) {
+    if(MenuRenderer::getInstance()->getRendererType() != RENDER_TYPE_NOLOCAL) {
         ((BaseMenuRenderer*)MenuRenderer::getInstance())->giveBackDisplay();
     }
 

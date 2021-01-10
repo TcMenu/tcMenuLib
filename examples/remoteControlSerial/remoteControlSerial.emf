@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1604329022,
+    "seconds": 1607374956,
     "nanos": 0
   },
   "codeOptions": {
@@ -230,6 +230,60 @@
         "variable": "choiceRamArray",
         "eepromOffset": 0,
         "choiceMode": "ARRAY_IN_RAM"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "name": "Runtimes",
+        "eepromAddress": -1,
+        "id": 10,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "secured": false
+      }
+    },
+    {
+      "parentId": 10,
+      "type": "runtimeList",
+      "item": {
+        "name": "RtList",
+        "eepromAddress": -1,
+        "id": 12,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "initialRows": 9
+      }
+    },
+    {
+      "parentId": 10,
+      "type": "largeNumItem",
+      "item": {
+        "name": "LgeNm",
+        "eepromAddress": -1,
+        "id": 13,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "decimalPlaces": 3,
+        "digitsAllowed": 8,
+        "negativeAllowed": true
+      }
+    },
+    {
+      "parentId": 10,
+      "type": "rgbItem",
+      "item": {
+        "name": "RGB",
+        "eepromAddress": -1,
+        "id": 14,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "includeAlphaChannel": true
       }
     }
   ]

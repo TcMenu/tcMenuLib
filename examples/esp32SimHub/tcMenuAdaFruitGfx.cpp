@@ -45,231 +45,183 @@ void AdaFruitGfxMenuRenderer::setGraphicsDevice(Adafruit_GFX* graphics, AdaColor
 	}
 
 	this->graphics = graphics;
-	this->gfxConfig = gfxConfig;
+
+	auto factory = displayPropertiesFactory;
+	// TEXT, BACKGROUND, HIGHLIGHT1, HIGHLIGHT2, SELECTED_FG, SELECTED_BG
+	color_t paletteItems[] { gfxConfig->fgItemColor, gfxConfig->bgItemColor, gfxConfig->bgSelectColor, gfxConfig->fgSelectColor};
+	color_t titleItems[] { gfxConfig->fgTitleColor, gfxConfig->bgTitleColor, gfxConfig->fgTitleColor, gfxConfig->fgSelectColor};
+
+	factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ACTION, paletteItems, gfxConfig->itemPadding, gfxConfig->itemFont, gfxConfig->itemFontMagnification);
+	factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, paletteItems, gfxConfig->itemPadding, gfxConfig->itemFont, gfxConfig->itemFontMagnification);
+	factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_TITLE, titleItems, gfxConfig->titlePadding, gfxConfig->itemFont, gfxConfig->itemFontMagnification, 4);
+    factory.setSelectedColors(gfxConfig->bgSelectColor, gfxConfig->fgSelectColor);
+
+	factory.addImageToCache(DrawableIcon(SPECIAL_ID_EDIT_ICON, Coord(gfxConfig->editIconWidth, gfxConfig->editIconHeight), DrawableIcon::ICON_XBITMAP, gfxConfig->editIcon));
+	factory.addImageToCache(DrawableIcon(SPECIAL_ID_ACTIVE_ICON, Coord(gfxConfig->editIconWidth, gfxConfig->editIconHeight), DrawableIcon::ICON_XBITMAP, gfxConfig->activeIcon));
+
+    setDisplayDimensions(graphics->width(), graphics->height());
+    recalculateTitleAndRowHeights();
 }
 
-AdaFruitGfxMenuRenderer::~AdaFruitGfxMenuRenderer() {
+void AdaFruitGfxMenuRenderer::recalculateTitleAndRowHeights() {
+    auto* pCfg = displayPropertiesFactory.configFor(nullptr, ItemDisplayProperties::COMPTYPE_TITLE);
+    graphics->setFont((const GFXfont*)pCfg->getFont());
+    graphics->setTextSize(pCfg->getFontMagnification());
+    int titleY = textExtents(graphics, "Ag", 30,30).y + pCfg->getPadding().top + pCfg->getPadding().bottom;
+    MenuPadding widgetPadding = pCfg->getPadding();
+
+    pCfg = displayPropertiesFactory.configFor(nullptr, ItemDisplayProperties::COMPTYPE_ITEM);
+    graphics->setFont((const GFXfont*)pCfg->getFont());
+    graphics->setTextSize(pCfg->getFontMagnification());
+    int rowY = textExtents(graphics, "Ag", 30, 30).y + pCfg->getPadding().top + pCfg->getPadding().bottom;
+
+    setStandardRowSize(rowY, titleY, widgetPadding);
 }
 
-void AdaFruitGfxMenuRenderer::renderTitleArea() {
-	if(menuMgr.getCurrentMenu() == menuMgr.getRoot()) {
-		safeProgCpy(buffer, applicationInfo.name, bufferSize);
-	}
-	else {
-		menuMgr.getCurrentMenu()->copyNameToBuffer(buffer, bufferSize);
-	}
+void AdaFruitGfxMenuRenderer::drawWidget(Coord where, TitleWidget *widget, color_t colFg, color_t colBg) {
+    serdebugF3("Drawing widget pos,icon: ", where.x, widget->getCurrentState());
 
-    serdebugF3("Render title, fontMag: ", buffer, gfxConfig->titleFontMagnification);
+    graphics->fillRect(where.x, where.y, widget->getWidth(), widget->getHeight(), colFg);
 
-    graphics->setFont(gfxConfig->titleFont);
-	graphics->setTextSize(gfxConfig->titleFontMagnification);
-
-	int fontYStart = gfxConfig->titlePadding.top;
-	Coord extents = textExtents(graphics, buffer, 0, gfxConfig->titleFont ? graphics->height() : 0);
-	titleHeight = extents.y + gfxConfig->titlePadding.top + gfxConfig->titlePadding.bottom;
-	if (gfxConfig->titleFont) {
-	 	fontYStart = titleHeight - (gfxConfig->titlePadding.bottom);
-	}
-
-    serdebugF3("titleHeight, fontYStart: ",  titleHeight, fontYStart);
-
-	graphics->fillRect(0, 0, graphics->width(), titleHeight, gfxConfig->bgTitleColor);
-	graphics->setTextColor(gfxConfig->fgTitleColor);
-	graphics->setCursor(gfxConfig->titlePadding.left, fontYStart);
-	graphics->print(buffer);
-	titleHeight += gfxConfig->titleBottomMargin;
+    graphics->drawXBitmap(where.x, where.y, widget->getCurrentIcon(), widget->getWidth(), widget->getHeight(), colBg);
 }
 
-bool AdaFruitGfxMenuRenderer::renderWidgets(bool forceDraw) {
-	TitleWidget* widget = firstWidget;
-	int xPos = graphics->width() - gfxConfig->widgetPadding.right;
-    bool redrawNeeded = forceDraw;
-	while(widget) {
-		xPos -= widget->getWidth();
-
-		if(widget->isChanged() || forceDraw) {
-            redrawNeeded = true;
-
-            serdebugF3("Drawing widget pos,icon: ", xPos, widget->getCurrentState());
-
-        	graphics->fillRect(xPos, gfxConfig->widgetPadding.top, widget->getWidth(), widget->getHeight(), gfxConfig->bgTitleColor);
-
-			graphics->drawXBitmap(xPos, gfxConfig->widgetPadding.top, widget->getCurrentIcon(), widget->getWidth(), widget->getHeight(),
-								 gfxConfig->widgetColor);
-		}
-
-		widget = widget->getNext();
-		xPos -= gfxConfig->widgetPadding.left;
-	}
-    return redrawNeeded;
-}
-
-void AdaFruitGfxMenuRenderer::renderListMenu(int titleHeight) {
-    ListRuntimeMenuItem* runList = reinterpret_cast<ListRuntimeMenuItem*>(menuMgr.getCurrentMenu());
-	
-    uint8_t maxY = uint8_t((graphics->height() - titleHeight) / itemHeight);
-	maxY = min(maxY, runList->getNumberOfParts());
-	uint8_t currentActive = runList->getActiveIndex();
-	
-	uint8_t offset = 0;
-	if (currentActive >= maxY) {
-		offset = (currentActive+1) - maxY;
-	}
-
-    int yPos = titleHeight;
-	for (int i = 0; i < maxY; i++) {
-		uint8_t current = offset + i;
-		RuntimeMenuItem* toDraw = (current==0) ? runList->asBackMenu() : runList->getChildItem(current - 1);
-		renderMenuItem(yPos, itemHeight, toDraw);
-        yPos += itemHeight;
-	}
-
-	// reset the list item to a normal list again.
-	runList->asParent();
-}
-
-void AdaFruitGfxMenuRenderer::render() {
- 	if (graphics == NULL) return;
-
-	uint8_t locRedrawMode = redrawMode;
-	redrawMode = MENUDRAW_NO_CHANGE;
-    bool requiresUpdate = false;
-
-	countdownToDefaulting();
-
-	if (locRedrawMode == MENUDRAW_COMPLETE_REDRAW) {
-	    // pre-populate the font.
-        graphics->setFont(gfxConfig->itemFont);
-        graphics->setTextSize(gfxConfig->itemFontMagnification);
-        int yLocation = gfxConfig->itemFont ? graphics->height() : 0;
-        Coord itemExtents = textExtents(graphics, "Aaygj", gfxConfig->itemPadding.left, yLocation);
-
-       	itemHeight = itemExtents.y + gfxConfig->itemPadding.top + gfxConfig->itemPadding.bottom;
-        serdebugF2("Redraw all, new item height ", itemHeight);
-
-		graphics->fillScreen(gfxConfig->bgItemColor);
-		renderTitleArea();
-
-        taskManager.yieldForMicros(0);
-
-        renderWidgets(true);
-
-        taskManager.yieldForMicros(0);
-        requiresUpdate = true;
-	}
-	else {
-		requiresUpdate = renderWidgets(false);
-	}
-
-	graphics->setFont(gfxConfig->itemFont);
-	graphics->setTextSize(gfxConfig->itemFontMagnification);
-	int maxItemsY = ((graphics->height()-titleHeight) / itemHeight);
-
-    if(menuMgr.getCurrentMenu()->getMenuType() == MENUTYPE_RUNTIME_LIST) {
-        if(menuMgr.getCurrentMenu()->isChanged() || locRedrawMode != MENUDRAW_NO_CHANGE) {
-            requiresUpdate = true;
-            renderListMenu(titleHeight);
-        }
+void AdaFruitGfxMenuRenderer::drawMenuItem(GridPositionRowCacheEntry* entry, Coord where, Coord areaSize) {
+    redrawNeeded = true;
+    switch(entry->getPosition().getDrawingMode()) {
+        case GridPosition::DRAW_TEXTUAL_ITEM:
+        case GridPosition::DRAW_INTEGER_AS_UP_DOWN:
+            drawTextualItem(entry, where, areaSize);
+            break;
+        case GridPosition::DRAW_INTEGER_AS_SCROLL:
+            if(entry->getMenuItem()->getMenuType() != MENUTYPE_INT_VALUE) return; // disallowed
+            drawSlider(entry, reinterpret_cast<AnalogMenuItem*>(entry->getMenuItem()), where, areaSize);
+            break;
+        case GridPosition::DRAW_AS_ICON_ONLY:
+        case GridPosition::DRAW_AS_ICON_TEXT:
+            //drawIconItem(theItem, where, areaSize, mode == GridPosition::DRAW_AS_ICON_TEXT);
+            break;
+        case GridPosition::DRAW_TITLE_ITEM:
+            drawTitleArea(entry, where, areaSize);
+            break;
     }
-    else {
-        MenuItem* item = menuMgr.getCurrentMenu();
-        int activeOffset = offsetOfCurrentActive(item);
-        // first we find the first currently active item in our single linked list
-        if (activeOffset >= maxItemsY) {
-            uint8_t toOffsetBy = (activeOffset - maxItemsY) + 1;
+}
 
-            if(lastOffset != toOffsetBy) locRedrawMode = MENUDRAW_COMPLETE_REDRAW;
-            lastOffset = toOffsetBy;
-
-			while (item != NULL && toOffsetBy) {
-                if(item->isVisible()) toOffsetBy = toOffsetBy - 1;
-				item = item->getNext();
-			}
-		}
-        else {
-            if(lastOffset != 0xff) locRedrawMode = MENUDRAW_COMPLETE_REDRAW;
-            lastOffset = 0xff;
+void AdaFruitGfxMenuRenderer::drawingCommand(BaseGraphicalRenderer::RenderDrawingCommand command) {
+    switch(command) {
+        case DRAW_COMMAND_CLEAR: {
+            auto* pCfg = displayPropertiesFactory.configFor(nullptr, ItemDisplayProperties::COMPTYPE_ITEM);
+            graphics->fillScreen(pCfg->getColor(ItemDisplayProperties::BACKGROUND));
+            serdebugF("cls");
+            break;
         }
-
-        // and then we start drawing items until we run out of screen or items
-        int ypos = titleHeight;
-        while (item && (ypos + itemHeight) <= graphics->height() ) {
-            if(item->isVisible())
-            {
-                if (locRedrawMode != MENUDRAW_NO_CHANGE || item->isChanged()) {
-                    requiresUpdate = true;
-
-                    taskManager.yieldForMicros(0);
-
-                    renderMenuItem(ypos, itemHeight, item);
-                }
-                ypos += itemHeight;
+        case DRAW_COMMAND_START:
+            break;
+        case DRAW_COMMAND_ENDED:
+            if(redrawNeeded) {
+                refreshDisplayIfNeeded(graphics, requiresUpdate);
+                redrawNeeded = false;
             }
-            item = item->getNext();
-        }
+            break;
     }
-
-    refreshDisplayIfNeeded(graphics, requiresUpdate);
 }
 
-void AdaFruitGfxMenuRenderer::renderMenuItem(int yPos, int menuHeight, MenuItem* item) {
-	int icoWid = gfxConfig->editIconWidth;
-	int icoHei = gfxConfig->editIconHeight;
+int AdaFruitGfxMenuRenderer::drawCoreLineItem(GridPositionRowCacheEntry* entry, DrawableIcon* icon, const Coord &where, const Coord &size) {
+    auto pad = entry->getDisplayProperties()->getPadding();
+    serdebugF4("Drawing at: ", where.y, size.x, size.y);
 
-	item->setChanged(false); // we are drawing the item so it's no longer changed.
+    entry->getMenuItem()->setChanged(false); // we are drawing the item so it's no longer changed.
 
-    int imgMiddleY = yPos + ((menuHeight - icoHei) / 2);
-	if(item->isEditing()) {
-		graphics->fillRect(0, yPos, graphics->width(), menuHeight, gfxConfig->bgSelectColor);
-		graphics->drawXBitmap(gfxConfig->itemPadding.left, imgMiddleY, gfxConfig->editIcon, icoWid, icoHei, gfxConfig->fgSelectColor);
-		graphics->setTextColor(gfxConfig->fgSelectColor);
-        serdebugF("Item Editing");
-	}
-	else if(item->isActive()) {
-		graphics->setTextColor(gfxConfig->fgSelectColor);
-		graphics->fillRect(0, yPos, graphics->width(), menuHeight, gfxConfig->bgSelectColor);
-		graphics->drawXBitmap(gfxConfig->itemPadding.left, imgMiddleY, gfxConfig->activeIcon, icoWid, icoHei, gfxConfig->fgSelectColor);
-        serdebugF("Item Active");
-	}
-	else {
-		graphics->fillRect(0, yPos, graphics->width(), menuHeight, gfxConfig->bgItemColor);
-		graphics->setTextColor(gfxConfig->fgItemColor);
-        serdebugF("Item Normal");
-	}
+    auto bgColor = entry->getDisplayProperties()->getColor(ItemDisplayProperties::BACKGROUND);
+    auto textColor = entry->getDisplayProperties()->getColor(ItemDisplayProperties::TEXT);
 
-    taskManager.yieldForMicros(0);
-
-	int textPos = gfxConfig->itemPadding.left + icoWid + gfxConfig->itemPadding.left;
-	
-	int drawingPositionY = yPos + gfxConfig->itemPadding.top;
-	if (gfxConfig->itemFont) {
-		drawingPositionY = yPos + (menuHeight - (gfxConfig->itemPadding.bottom));
-	}
-	graphics->setCursor(textPos, drawingPositionY);
-	item->copyNameToBuffer(buffer, bufferSize);
-
-    serdebugF4("Printing menu item (name, ypos, drawingPositionY)", buffer, yPos, drawingPositionY);
-
-	graphics->print(buffer);
-
-    if(isItemActionable(item)) {
-        int rightOffset = graphics->width() - (gfxConfig->itemPadding.right + icoWid);
-		graphics->drawXBitmap(rightOffset, imgMiddleY, gfxConfig->activeIcon, icoWid, icoHei, gfxConfig->fgSelectColor);
-        buffer[0] = 0;
-    }
-    else if(item->getMenuType() == MENUTYPE_BACK_VALUE) {
-        safeProgCpy(buffer, MENU_BACK_TEXT, bufferSize);
+    int imgMiddleY = where.y + ((size.y - icon->getDimensions().y) / 2);
+    if(entry->getMenuItem()->isEditing() || entry->getMenuItem()->isActive()) {
+        graphics->fillRect(where.x, where.y, size.x, size.y, bgColor);
+        graphics->drawXBitmap(pad.left, imgMiddleY, icon->getIcon(false), icon->getDimensions().x, icon->getDimensions().y, textColor);
+        graphics->setTextColor(textColor);
     }
     else {
-	    menuValueToText(item, JUSTIFY_TEXT_LEFT);
+        graphics->fillRect(where.x, where.y, size.x, size.y, bgColor);
+        graphics->setTextColor(textColor);
     }
-	Coord coord = textExtents(graphics, buffer, textPos, yPos);
-	int16_t right = graphics->width() - (coord.x + gfxConfig->itemPadding.right);
-	graphics->setCursor(right, drawingPositionY);
- 	graphics->print(buffer);
-    serdebugF2("Value ", buffer);
+    return imgMiddleY;
+}
 
-    taskManager.yieldForMicros(0);
+void AdaFruitGfxMenuRenderer::drawTextualItem(GridPositionRowCacheEntry* entry, Coord where, Coord size) {
+    graphics->setFont(static_cast<const GFXfont *>(entry->getDisplayProperties()->getFont()));
+    graphics->setTextSize(entry->getDisplayProperties()->getFontMagnification());
+
+    auto* icon = displayPropertiesFactory.iconForMenuItem(entry->getMenuItem()->isEditing() ? SPECIAL_ID_EDIT_ICON :SPECIAL_ID_ACTIVE_ICON);
+    int imgMiddleY = drawCoreLineItem(entry, icon, where, size);
+
+    MenuPadding pad = entry->getDisplayProperties()->getPadding();
+    int textPos = where.x + pad.left + icon->getDimensions().x + pad.left;
+
+    int drawingPositionY = where.y;
+    if(entry->getDisplayProperties()->getFont()) {
+      drawingPositionY += (size.y - (pad.bottom));
+    }
+    graphics->setCursor(textPos, drawingPositionY);
+    entry->getMenuItem()->copyNameToBuffer(buffer, bufferSize);
+    serdebugF4("item: ", buffer, size.y, where.y);
+
+    graphics->print(buffer);
+
+    if(isItemActionable(entry->getMenuItem())) {
+        int rightOffset = size.x - (pad.right + icon->getDimensions().x);
+        graphics->setTextColor(entry->getDisplayProperties()->getColor(ItemDisplayProperties::HIGHLIGHT1));
+        graphics->drawXBitmap(rightOffset, imgMiddleY, icon->getIcon(false),
+                              icon->getDimensions().x, icon->getDimensions().y,
+                              entry->getDisplayProperties()->getColor(ItemDisplayProperties::HIGHLIGHT1));
+    }
+
+    copyMenuItemValue(entry->getMenuItem(), buffer, bufferSize);
+
+    int16_t right = size.x - (textExtents(graphics, buffer, 0, 20).x + pad.right);
+    graphics->setCursor(right, drawingPositionY);
+    graphics->print(buffer);
+}
+
+void AdaFruitGfxMenuRenderer::drawSlider(GridPositionRowCacheEntry* entry, AnalogMenuItem* pItem, Coord where, Coord size) {
+    auto* icon = displayPropertiesFactory.iconForMenuItem(entry->getMenuItem()->isEditing() ? SPECIAL_ID_EDIT_ICON :SPECIAL_ID_ACTIVE_ICON);
+    graphics->setFont(static_cast<const GFXfont *>(entry->getDisplayProperties()->getFont()));
+    graphics->setTextSize(entry->getDisplayProperties()->getFontMagnification());
+    drawCoreLineItem(entry, icon, where, size);
+    MenuPadding pad = entry->getDisplayProperties()->getPadding();
+
+    int sliderStartX = where.x + pad.left + icon->getDimensions().x + pad.left;
+    int maximumSliderArea = size.x - (sliderStartX + pad.right);
+    int filledAreaX = analogRangeToScreen(pItem, maximumSliderArea);
+    int filledHeight = size.y - (pad.bottom + pad.top);
+    graphics->fillRect(sliderStartX, where.y + pad.top, filledAreaX, filledHeight, entry->getDisplayProperties()->getColor(ItemDisplayProperties::HIGHLIGHT1));
+    int drawingPositionY = where.y;
+    if(entry->getDisplayProperties()->getFont()) drawingPositionY += (size.y - (pad.bottom));
+    copyMenuItemNameAndValue(pItem, buffer, bufferSize);
+    int textStart = sliderStartX + (maximumSliderArea - textExtents(graphics, buffer, 10, 30).x) / 2;
+    graphics->setCursor(textStart, drawingPositionY);
+    graphics->print(buffer);
+}
+
+void AdaFruitGfxMenuRenderer::drawTitleArea(GridPositionRowCacheEntry* entry, Coord where, Coord size) {
+    graphics->setFont(static_cast<const GFXfont *>(entry->getDisplayProperties()->getFont()));
+    graphics->setTextSize(entry->getDisplayProperties()->getFontMagnification());
+    MenuPadding pad = entry->getDisplayProperties()->getPadding();
+
+    int fontYStart = where.y + pad.top;
+    if (entry->getDisplayProperties()->getFont()) {
+        fontYStart = where.y - (pad.bottom);
+    }
+
+    graphics->fillRect(where.x, where.y, size.x, size.y, entry->getDisplayProperties()->getColor(ItemDisplayProperties::BACKGROUND));
+    graphics->setTextColor(entry->getDisplayProperties()->getColor(ItemDisplayProperties::TEXT));
+    graphics->setCursor(where.x, fontYStart);
+
+    auto* pItem = entry->getMenuItem();
+    pItem->copyNameToBuffer(buffer, bufferSize);
+    if(pItem->isActive()) graphics->print('>');
+    graphics->print(buffer);
+    if(pItem->getMenuType() == MENUTYPE_BACK_VALUE && pItem->isActive()) graphics->print(" [..]");
 }
 
 void prepareAdaColorDefaultGfxConfig(AdaColorGfxMenuConfig* config) { 
@@ -335,69 +287,71 @@ BaseDialog* AdaFruitGfxMenuRenderer::getDialog() {
 
 void AdaGfxDialog::internalRender(int currentValue) {
     AdaFruitGfxMenuRenderer* adaRenderer = reinterpret_cast<AdaFruitGfxMenuRenderer*>(MenuRenderer::getInstance());
-    AdaColorGfxMenuConfig* gfxConfig = adaRenderer->getGfxConfig();
     Adafruit_GFX* graphics = adaRenderer->getGraphics();
 
+    auto& fact = adaRenderer->getDisplayPropertiesFactory();
+    auto* pItemCfg = fact.configFor(nullptr, ItemDisplayProperties::COMPTYPE_ITEM);
+    auto* pTitleCfg = fact.configFor(nullptr, ItemDisplayProperties::COMPTYPE_TITLE);
     if(needsDrawing == MENUDRAW_COMPLETE_REDRAW) {
-        graphics->fillScreen(gfxConfig->bgItemColor);
+        graphics->fillScreen(pItemCfg->getColor(ItemDisplayProperties::BACKGROUND));
     }
 
-    graphics->setFont(gfxConfig->itemFont);
-	graphics->setTextSize(gfxConfig->itemFontMagnification);
+    graphics->setFont(static_cast<const GFXfont *>(pItemCfg->getFont()));
+	graphics->setTextSize(pItemCfg->getFontMagnification());
 
     char data[20];
     safeProgCpy(data, headerPgm, sizeof(data));
 
-	int fontYStart = gfxConfig->itemPadding.top;
-	Coord extents = textExtents(graphics, data, 0, gfxConfig->itemFont ? graphics->height() : 0);
-	int dlgNextDraw = extents.y + gfxConfig->titlePadding.top + gfxConfig->titlePadding.bottom;
-	if (gfxConfig->itemFont) {
-	 	fontYStart = dlgNextDraw - (gfxConfig->titlePadding.bottom);
+	int fontYStart = pItemCfg->getPadding().top;
+	Coord extents = textExtents(graphics, data, 0, pItemCfg->getFont() ? graphics->height() : 0);
+	int dlgNextDraw = extents.y + pTitleCfg->getPadding().top + pTitleCfg->getPadding().bottom;
+	if (pItemCfg->getFont()) {
+	 	fontYStart = dlgNextDraw - (pTitleCfg->getPadding().bottom);
 	}
 
-	graphics->fillRect(0, 0, graphics->width(), dlgNextDraw, gfxConfig->bgTitleColor);
-	graphics->setTextColor(gfxConfig->fgTitleColor);
-	graphics->setCursor(gfxConfig->titlePadding.left, fontYStart);
+	graphics->fillRect(0, 0, graphics->width(), dlgNextDraw, pTitleCfg->getColor(ItemDisplayProperties::BACKGROUND));
+	graphics->setTextColor(pTitleCfg->getColor(ItemDisplayProperties::TEXT));
+	graphics->setCursor(pTitleCfg->getPadding().left, fontYStart);
 	graphics->print(data);
 
-	dlgNextDraw += gfxConfig->titleBottomMargin;
+	dlgNextDraw += pTitleCfg->getSpaceAfter();
 
     int startingPosition = dlgNextDraw;
-    fontYStart = dlgNextDraw + gfxConfig->itemPadding.top;
-	dlgNextDraw = dlgNextDraw + extents.y + gfxConfig->titlePadding.top + gfxConfig->titlePadding.bottom;
-	if (gfxConfig->itemFont) {
-	 	fontYStart = dlgNextDraw - (gfxConfig->titlePadding.bottom);
+    fontYStart = dlgNextDraw + pItemCfg->getPadding().top;
+	dlgNextDraw = dlgNextDraw + extents.y + pTitleCfg->getPadding().top + pTitleCfg->getPadding().bottom;
+	if (pItemCfg->getFont()) {
+	 	fontYStart = dlgNextDraw - (pTitleCfg->getPadding().bottom);
 	}
-    graphics->fillRect(0, startingPosition, graphics->width(), dlgNextDraw, gfxConfig->bgItemColor);
-	graphics->setTextColor(gfxConfig->fgItemColor);
-	graphics->setCursor(gfxConfig->titlePadding.left, fontYStart);
+    graphics->fillRect(0, startingPosition, graphics->width(), dlgNextDraw, pItemCfg->getColor(ItemDisplayProperties::BACKGROUND));
+	graphics->setTextColor(pItemCfg->getColor(ItemDisplayProperties::TEXT));
+	graphics->setCursor(pTitleCfg->getPadding().left, fontYStart);
 
 	graphics->print(MenuRenderer::getInstance()->getBuffer());
     
     bool active;
     if(button1 != BTNTYPE_NONE) {
         active = copyButtonText(data, 0, currentValue);
-        drawButton(graphics, gfxConfig, data, 0, active);
+        drawButton(graphics, pTitleCfg, data, 0, active);
     }
     if(button2 != BTNTYPE_NONE) {
         active = copyButtonText(data, 1, currentValue);
-        drawButton(graphics, gfxConfig, data, 1, active);
+        drawButton(graphics, pTitleCfg, data, 1, active);
     }
 
     refreshDisplayIfNeeded(graphics, true);
 }
-void AdaGfxDialog::drawButton(Adafruit_GFX* gfx, AdaColorGfxMenuConfig* config, const char* title, uint8_t num, bool active) {
-	Coord extents = textExtents(gfx, title, 0, config->itemFont ? gfx->height() : 0);
-    int itemHeight = ( extents.y + config->itemPadding.top + config->itemPadding.bottom);
+void AdaGfxDialog::drawButton(Adafruit_GFX* gfx, ItemDisplayProperties* props, const char* title, uint8_t num, bool active) {
+	Coord extents = textExtents(gfx, title, 0, props->getFont() ? gfx->height() : 0);
+    int itemHeight = ( extents.y + props->getPadding().top + props->getPadding().bottom);
     int start = gfx->height() - itemHeight;
-    int fontYStart = start + config->itemPadding.top;
-	if (config->itemFont) {
+    int fontYStart = start + props->getPadding().top;
+	if (props->getFont()) {
         fontYStart += extents.y;
 	}
     int buttonWidth = gfx->width() / 2;
     int xOffset = (num == 0) ? 0 : buttonWidth;
-    gfx->fillRect(xOffset, start, buttonWidth, itemHeight, active ? config->bgSelectColor : config->bgItemColor);
-	gfx->setTextColor(active ? config->fgSelectColor : config->fgItemColor);
+    gfx->fillRect(xOffset, start, buttonWidth, itemHeight, props->getColor(active ? ItemDisplayProperties::HIGHLIGHT2 : ItemDisplayProperties::BACKGROUND));
+	gfx->setTextColor(props->getColor(ItemDisplayProperties::TEXT));
     gfx->setCursor(xOffset + ((buttonWidth - extents.x) / 2), fontYStart);
     gfx->print(title);
 }
@@ -447,6 +401,54 @@ void drawCookieCutBitmap(Adafruit_GFX* gfx, int16_t x, int16_t y, const uint8_t 
             else
                 byte = bitmap[size_t((j * byteWidth) + i / 8)];
             gfx->writePixel(x + (i - xStart), y, (byte & 0x80U) ? fgColor : bgColor);
+        }
+    }
+
+    gfx->endWrite();
+}
+
+/**************************************************************************/
+/*!
+   @brief      Draw a RAM-resident 2-bit image at the specified (x,y) position,
+   from image data that may be wider or taller than the desired width and height.
+   Imagine a cookie dough rolled out, where you can cut a rectangle out of it.
+   It uses the specified foreground (for set bits) and background (unset bits) colors.
+   This is particularly useful for GFXCanvas2 operations, where you can allocate the
+   largest canvas needed and then use it for all drawing operations.
+
+    @param    x   Top left corner x coordinate
+    @param    y   Top left corner y coordinate
+    @param    bitmap  byte array with monochrome bitmap
+    @param    w   width of the portion you want to draw
+    @param    h   Height of the portion you want to draw
+    @param    totalWidth actual width of the bitmap
+    @param    xStart X position of the image in the data
+    @param    yStart Y position of the image in the data
+    @param    palette an array of 4 colours
+*/
+/**************************************************************************/
+void drawCookieCutBitmap2(Adafruit_GFX* gfx, int16_t x, int16_t y, const uint8_t *bitmap, int16_t w,
+                          int16_t h, int16_t totalWidth, int16_t xStart, int16_t yStart,
+                          uint16_t* palette) {
+
+    // total width here is different to the width we are drawing, imagine rolling out a long
+    // line of dough and cutting cookies from it. The cookie is the part of the image we want
+    uint16_t byteWidth = (totalWidth + 3) / 4; // Bitmap scanline pad = whole byte
+    uint16_t yEnd = h + yStart;
+    uint16_t xEnd = w + xStart;
+    uint8_t byte;
+
+    gfx->startWrite();
+
+    for (uint16_t j = yStart; j < yEnd; j++, y++) {
+        byte = bitmap[size_t(((j * byteWidth) + xStart) / 8)];
+        for (uint16_t i = xStart; i < xEnd; i++) {
+            if (i & 3U)
+                byte <<= 2U;
+            else
+                byte = bitmap[size_t((j * byteWidth) + i / 8)];
+            auto col = (byte & 0xC0U) >> 6U;
+            gfx->writePixel(x + (i - xStart), y,  palette[col]);
         }
     }
 

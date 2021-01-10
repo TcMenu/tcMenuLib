@@ -40,4 +40,7 @@ static const char *uuid3 = "07cd8bc6-734d-43da-84e7-6084990becfe";
 
 void printMenuItem(MenuItem* menuItem);
 
+extern const char pgmMyName[];
+extern NoRenderer noRenderer;
+
 #endif //TCLIBRARYDEV_FIXTURES_EXTERN_H
