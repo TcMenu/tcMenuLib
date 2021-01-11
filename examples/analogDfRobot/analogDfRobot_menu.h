@@ -39,9 +39,9 @@ extern ScrollChoiceMenuItem menuChooseItem;
 extern TextMenuItem menuText;
 extern EditableLargeNumberMenuItem menuLgeNum;
 void CALLBACK_FUNCTION onLed2(int id);
-extern BooleanMenuItem menuLED2;
+extern BooleanMenuItem menuL2;
 void CALLBACK_FUNCTION onLed1(int id);
-extern BooleanMenuItem menuLED1;
+extern BooleanMenuItem menuL1;
 extern SubMenuItem menuLEDStates;
 extern AnalogMenuItem menuValueA0;
 

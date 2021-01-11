@@ -121,25 +121,21 @@ void setup() {
         serdebugF("Connecting to Wifi using settings from connectivity menu");
     }
 
+    // here we set the first widget that will be displayed in the title area.
     renderer.setFirstWidget(&wifiWidget);
 
-    auto iconHeater = new DrawableIcon(Coord(APPICON_HEAT_WIDTH, APPICON_HEAT_HEIGHT), DrawableIcon::ICON_XBITMAP, WHITE, appIconHeatOff, appIconHeatOn);
-    auto iconLock = new DrawableIcon(Coord(APPICON_LOCK_WIDTH, APPICON_LOCK_HEIGHT), DrawableIcon::ICON_XBITMAP, WHITE, appIconLockOpen, appIconLockClosed);
-    auto iconSettings = new DrawableIcon(Coord(APPICON_SETTINGS_WIDTH, APPICON_SETTINGS_HEIGHT), DrawableIcon::ICON_XBITMAP, WHITE, appIconSettings);
+    // now we add three icons into the icon cache, we should add one for each menu item that we give a grid position
+    // that draws as an image.
+    auto& props = static_cast<ConfigurableItemDisplayPropertiesFactory&>(renderer.getDisplayPropertiesFactory());
+    props.addImageToCache(DrawableIcon(menuElectricHeater.getId(), Coord(APPICON_HEAT_WIDTH, APPICON_HEAT_HEIGHT), DrawableIcon::ICON_XBITMAP, appIconHeatOff, appIconHeatOn));
+    props.addImageToCache(DrawableIcon(menuLockDoor.getId(), Coord(APPICON_LOCK_WIDTH, APPICON_LOCK_HEIGHT), DrawableIcon::ICON_XBITMAP, appIconLockOpen, appIconLockClosed));
+    props.addImageToCache(DrawableIcon(menuSetup.getId(), Coord(APPICON_SETTINGS_WIDTH, APPICON_SETTINGS_HEIGHT), DrawableIcon::ICON_XBITMAP, appIconSettings));
 
-    auto renderConfig = renderer.getConfigurationList();
-    renderConfig->add(GridPositionWithId(
-            menuElectricHeater.getId(),
-            GridPosition(GridPosition::DRAW_AS_ICON_ONLY, 3, 2, 3, 26),
-            iconHeater));
-    renderConfig->add(GridPositionWithId(
-            menuLockDoor.getId(),
-            GridPosition(GridPosition::DRAW_AS_ICON_ONLY, 3, 3, 3, 26),
-            iconLock));
-    renderConfig->add(GridPositionWithId(
-            menuSetup.getId(),
-            GridPosition(GridPosition::DRAW_AS_ICON_ONLY, 3, 1, 3, 26),
-            iconSettings));
+    // here we override the drawing grid for some menu items, we tell the renderer to draw as icons in a three position
+    // grid, with a fixed height.
+    props.addGridPosition(&menuElectricHeater, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE,3, 2, 3, 26));
+    props.addGridPosition(&menuLockDoor, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 3, 3, 26));
+    props.addGridPosition(&menuSetup, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 1, 3, 26));
 
     // initialise the menu.
     setupMenu();

@@ -8,11 +8,13 @@ const char pgmCancelText[] PROGMEM = "Cancel";
 const char pgmHeaderNotAuth[] PROGMEM = "Pin incorrect";
 
 RENDERING_CALLBACK_NAME_INVOKE(fnpopupPasswordRtCall, textItemRenderFn, "Password", -1, NULL)
+RENDERING_CALLBACK_NAME_INVOKE(fnpopupSubmenuSecured, backSubItemRenderFn, "Enter PIN", -1, NULL)
 
 SecuredMenuPopup::SecuredMenuPopup(AuthenticationManager * authentication) 
-	: pinEntryItem(fnpopupPasswordRtCall, nextRandomId(), MAX_PIN_LENGTH, &actionProceedItem),
-		actionProceedItem(secPopupActionRenderFn, 1, &actionCancelItem),
-		actionCancelItem(secPopupActionRenderFn, 0, NULL) {
+	: backMenuItem(fnpopupSubmenuSecured, &pinEntryItem),
+	  pinEntryItem(fnpopupPasswordRtCall, nextRandomId(), MAX_PIN_LENGTH, &actionProceedItem),
+	  actionProceedItem(secPopupActionRenderFn, 1, &actionCancelItem),
+	  actionCancelItem(secPopupActionRenderFn, 0, NULL) {
 
 	this->authentication = authentication;
 }
@@ -27,7 +29,7 @@ MenuItem* SecuredMenuPopup::start(SubMenuItem* securedMenu) {
 	pinEntryItem.setPasswordField(true);
 	pinEntryItem.setActive(true);
 	pinEntryItem.setEditing(false);
-	return &pinEntryItem;
+	return &backMenuItem;
 }
 
 int secPopupActionRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {

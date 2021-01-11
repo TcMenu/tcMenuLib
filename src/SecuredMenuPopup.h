@@ -29,6 +29,7 @@ public:
  */
 class SecuredMenuPopup {
 private:
+    BackMenuItem backMenuItem;
 	TextMenuItem pinEntryItem;
 	ActivateSubMenuItem actionProceedItem;
 	ActivateSubMenuItem actionCancelItem;
@@ -39,7 +40,7 @@ public:
 	MenuItem* start(SubMenuItem* securedMenu);
 
 	MenuItem* getRootItem() {
-		return &pinEntryItem;
+		return &backMenuItem;
 	}
 
 	bool doesPinMatch() {

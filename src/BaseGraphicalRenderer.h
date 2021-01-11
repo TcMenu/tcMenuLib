@@ -151,6 +151,9 @@ public:
      * Gets the menu item at a given index, which may be different to the order in the tree.
      */
     MenuItem* getMenuItemAtIndex(uint16_t idx);
+
+    BaseDialog* getDialog() override;
+
 private:
     bool drawTheMenuItems(uint8_t locRedrawMode, int startRow);
     void renderList();

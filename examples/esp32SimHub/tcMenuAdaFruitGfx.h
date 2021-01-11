@@ -40,9 +40,6 @@
 #define WHITE 0xffff
 #endif
 
-#define SPECIAL_ID_EDIT_ICON 0xfffe
-#define SPECIAL_ID_ACTIVE_ICON 0xfffd
-
 extern const unsigned char PROGMEM loResEditingIcon[];
 extern const unsigned char PROGMEM loResActiveIcon[];
 

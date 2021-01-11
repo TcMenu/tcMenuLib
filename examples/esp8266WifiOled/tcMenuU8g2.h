@@ -56,46 +56,36 @@ typedef struct ColorGfxMenuConfig<const uint8_t*> U8g2GfxMenuConfig;
 class U8g2MenuRenderer : public BaseGraphicalRenderer {
 private:
 	U8G2* u8g2;
-	ItemDisplayPropertiesFactory *displayPropsFactory;
-	int16_t titleHeight;
-    int16_t itemHeight;
+	ConfigurableItemDisplayPropertiesFactory propertiesFactory;
     bool redrawNeeded;
 public:
-	U8g2MenuRenderer(uint8_t bufferSize = 20) : BaseGraphicalRenderer(bufferSize, 1, 1, false) {
-		this->u8g2 = NULL;
-		this->displayPropsFactory = NULL;
+	U8g2MenuRenderer(uint8_t bufferSize = 20) : BaseGraphicalRenderer(bufferSize, 1, 1, false, applicationInfo.name) {
+		this->u8g2 = nullptr;
 	}
     ~U8g2MenuRenderer() override = default;
 
 	void setGraphicsDevice(U8G2* u8g2, U8g2GfxMenuConfig *gfxConfig);
-	void setGraphicsDevice(U8G2* u8g2, ItemDisplayPropertiesFactory *gfxConfig);
+	void setGraphicsDevice(U8G2* u8g2);
 
-	void recalculateTitleAndRowHeights();
-
-    void drawWidget(Coord where, TitleWidget *widget) override;
-    void drawMenuItem(MenuItem *theItem, GridPosition::GridDrawingMode mode, Coord where, Coord areaSize) override;
+    void drawWidget(Coord where, TitleWidget *widget, color_t fg, color_t bg) override;
+    void drawMenuItem(GridPositionRowCacheEntry* entry, Coord where, Coord areaSize) override;
     void drawingCommand(RenderDrawingCommand command) override;
 
+    ItemDisplayPropertiesFactory &getDisplayPropertiesFactory() override {
+        return propertiesFactory;
+    }
+
     U8G2* getGraphics() { return u8g2; }
-    U8g2GfxMenuConfig* getGfxConfig() { return gfxConfig; }
-    BaseDialog* getDialog() override;
 private:
     void drawBitmap(int x, int y, int w, int h, const unsigned char *bmp);
-    void drawTitleArea(MenuItem* pItem, Coord where, Coord size);
-    void drawTextualItem(MenuItem *pItem, Coord where, Coord size);
-    void drawIconItem(MenuItem *pItem, Coord where, Coord size, bool withText);
-    void drawSlider(AnalogMenuItem *pItem, Coord where, Coord size);
+    void drawTextualItem(GridPositionRowCacheEntry* entry, Coord where, Coord size);
+    void drawIconItem(GridPositionRowCacheEntry* pEntry, Coord where, Coord size);
+    void drawSlider(GridPositionRowCacheEntry* pEntry, Coord where, Coord size);
 
-    int drawCoreLineItem(MenuItem *pItem, const Coord &where, const Coord &size);
+    void internalDrawText(GridPositionRowCacheEntry* pEntry, Coord where, Coord size, int leftOffset, bool xorMode);
+    int drawCoreLineItem(GridPositionRowCacheEntry* pEntry, const Coord &where, const Coord &size);
 };
 
-class U8g2Dialog : public BaseDialog {
-public:
-    U8g2Dialog();
-protected:
-    void internalRender(int currentValue) override;
-    void drawButton(U8G2* gfx, U8g2GfxMenuConfig* config, const char* title, uint8_t num, bool active);
-};
 
 /**
  * Provides a basic graphics configuration suitable for low / medium resolution displays

@@ -61,7 +61,7 @@ bool BaseMenuRenderer::tryTakeSelectIfNeeded(int currentReading, RenderPressMode
 	menuAltered();
 
 	BaseDialog* dialog = getDialog();
-	if (displayTakenMode != NOT_TAKEN_OVER || (dialog != NULL && dialog->isInUse()) ) {
+	if (displayTakenMode != NOT_TAKEN_OVER || (dialog != NULL && dialog->isRenderNeeded()) ) {
 		// When there's a dialog, or render function, just record the change until exec().
 		renderFnPressType = pressType;
 		return true;
@@ -73,7 +73,7 @@ bool BaseMenuRenderer::tryTakeSelectIfNeeded(int currentReading, RenderPressMode
 
 void BaseMenuRenderer::exec() {
 
-	if(dialog!=nullptr && dialog->isInUse()) {
+	if(dialog!=nullptr && dialog->isRenderNeeded()) {
 		dialog->dialogRendering(menuMgr.getCurrentRangeValue(), renderFnPressType);
     }
 	else if(displayTakenMode == NOT_TAKEN_OVER) {
@@ -109,6 +109,10 @@ void BaseMenuRenderer::resetToDefault() {
 }
 
 void BaseMenuRenderer::countdownToDefaulting() {
+    if(dialog != nullptr && dialog->isInUse()) {
+        ticksToReset = resetValInTicks;
+        return;
+    }
 	if (ticksToReset == 0) {
 		resetToDefault();
 		ticksToReset = MAX_TICKS;

@@ -31,13 +31,15 @@ typedef void (*CompletedHandlerFn)(ButtonType buttonPressed, void* yourData);
 #define DLG_FLAG_SMALLDISPLAY 0
 #define DLG_FLAG_INUSE 1
 #define DLG_FLAG_CAN_SEND_REMOTE 2 
-#define DLG_FLAG_REMOTE_0 3
-#define DLG_FLAG_REMOTE_1 4
-#define DLG_FLAG_REMOTE_2 5
-#define DLG_FLAG_REMOTE_3 6
-#define DLG_FLAG_REMOTE_4 7
+#define DLG_FLAG_MENUITEM_BASED 3
+#define DLG_FLAG_NEEDS_RENDERING 4
+#define DLG_FLAG_REMOTE_0 8
+#define DLG_FLAG_REMOTE_1 9
+#define DLG_FLAG_REMOTE_2 10
+#define DLG_FLAG_REMOTE_3 11
+#define DLG_FLAG_REMOTE_4 12
 
-#define DLG_FLAG_REMOTE_MASK 0xf8
+#define DLG_FLAG_REMOTE_MASK 0xff00
 
 #define DLG_VISIBLE 'S'
 #define DLG_HIDDEN 'H'
@@ -60,14 +62,14 @@ protected:
     ButtonType button1;
     ButtonType button2;
     uint8_t lastBtnVal;
-    uint8_t flags;
+    uint16_t flags;
     MenuRedrawState needsDrawing;
 public:
     /**
      * Create the base dialog and clear down all the fields
      */
     BaseDialog();
-    virtual ~BaseDialog() {}
+    virtual ~BaseDialog() = default;
 
     /**
      * Sets the buttons that are available for pressing. One of the ButtonType definitions.
@@ -94,7 +96,10 @@ public:
      * Copy text into the buffer, that will be displayed along with the header.
      * @param sz the text to copy
      */
-    void copyIntoBuffer(const char* sz);
+    virtual void copyIntoBuffer(const char* sz);
+
+    /** overriden in other types to handle show and hide differently */
+    virtual void internalSetVisible(bool visible);
 
     /**
      * Close the current dialog by taking off the display and clearing the inuse flag.
@@ -115,6 +120,8 @@ public:
      */
     void dialogRendering(unsigned int currentValue, bool userClicked);
 
+    bool isMenuItemBased() { return bitRead(flags, DLG_FLAG_MENUITEM_BASED); }
+    bool isRenderNeeded() { return bitRead(flags, DLG_FLAG_NEEDS_RENDERING); }
     bool isRemoteUpdateNeeded(int remote) { return bitRead(flags, remote + DLG_FLAG_REMOTE_0) && bitRead(flags, DLG_FLAG_CAN_SEND_REMOTE); }
     void setRemoteUpdateNeeded(int remote, bool b) { bitWrite(flags, remote + DLG_FLAG_REMOTE_0, b); }
     void setRemoteUpdateNeededAll() { flags |= DLG_FLAG_REMOTE_MASK; }
@@ -123,6 +130,23 @@ public:
 
     void encodeMessage(TagValueRemoteConnector* remote);
     void remoteAction(ButtonType type);
+
+    /**
+     * Copies button text into the buffer provided by data, based on the button
+     * number (0 or 1) and the current value of the encoder.
+     * @param data the buffer to copy into, must fit at least the largest button copyButtonText
+     * @param buttonNum the button number either 0, 1
+     * @param currentValue current value from encoder.
+     * @return true if this button is active, otherwise false.
+     */
+    bool copyButtonText(char* data, int buttonNum, int currentValue, bool isActive);
+
+    /**
+     * Perform the action of the button numbered in the parameter. For example if button 1 is set to OK, then OK is
+     * pressed.
+     * @param btnNum
+     */
+    void actionPerformed(int btnNum);
 protected:
     /**
      * Sets the inuse flag to true or false
@@ -152,15 +176,48 @@ protected:
      */
     ButtonType findActiveBtn(unsigned int currentValue);
 
-    /**
-     * Copies button text into the buffer provided by data, based on the button
-     * number (0 or 1) and the current value of the encoder.
-     * @param data the buffer to copy into, must fit at least the largest button copyButtonText
-     * @param buttonNum the button number either 0, 1
-     * @param currentValue current value from encoder.
-     * @return true if this button is active, otherwise false.
-     */
-    bool copyButtonText(char* data, int buttonNum, int currentValue);
+};
+
+/**
+ * This menu type is reserved only for use within dialogs, never use this button outside of that purpose. Button numbers
+ * 0..7 are reserved and should never be used by application code. Use 7..255 in application code.
+ */
+class LocalDialogButtonMenuItem : public RuntimeMenuItem {
+private:
+    uint8_t buttonNumber;
+public:
+    LocalDialogButtonMenuItem(RuntimeRenderingFn renderFn, int id, int btnNum, MenuItem* next)
+            : RuntimeMenuItem(MENUTYPE_RUNTIME_VALUE, id, renderFn, 0, 1, next) {
+        setLocalOnly(true);
+        buttonNumber = btnNum;
+    }
+    int getButtonNumber() { return  buttonNumber; }
+};
+
+/**
+ * This is an extended dialog based on MenuItem's that are presented to the user, you can add additional menu items that
+ * go after the message text and before the first dialog button. there will always be either one or two buttons below
+ * that content, as a means to dismiss the dialog. The user can also dismiss (equivalent of cancel) by selecting the
+ * back menu item.
+ */
+class MenuBasedDialog : public BaseDialog {
+private:
+    BackMenuItem backItem;
+    TextMenuItem bufferItem;
+    LocalDialogButtonMenuItem btn1Item;
+    LocalDialogButtonMenuItem btn2Item;
+public:
+    MenuBasedDialog();
+    ~MenuBasedDialog() override = default;
+
+    void internalSetVisible(bool visible) override;
+    void copyIntoBuffer(const char *sz) override;
+    const char* getHeaderText() { return headerPgm; }
+
+    void insertMenuItem(MenuItem* item);
+protected:
+    /** not used in this implementation */
+    void internalRender(int currentValue) override {}
 };
 
 #endif //_BASE_DIALOG_H_

@@ -20,6 +20,9 @@
  */
 typedef uint16_t color_t;
 
+#define SPECIAL_ID_EDIT_ICON 0xfffe
+#define SPECIAL_ID_ACTIVE_ICON 0xfffd
+
 /**
  * Holds the graphical configuration of how to render a menu onto a both mono and colour displays. If you don't intend
  * to override this initially just call the factory method provided with your renderer.
@@ -184,7 +187,13 @@ public:
 
     void addGridPosition(MenuItem* pItem, const GridPosition& position) {
         if(!pItem) return;
-        gridByItem.add(GridPositionWithId(pItem->getId(), position));
+        auto* grid = gridByItem.getByKey(pItem->getId());
+        if(grid) {
+            grid->setNewPosition(position);
+        }
+        else {
+            gridByItem.add(GridPositionWithId(pItem->getId(), position));
+        }
     }
 };
 
@@ -223,7 +232,13 @@ public:
 
     void addGridPosition(MenuItem* pItem, const GridPosition& position) {
         if(!pItem) return;
-        gridByItem.add(GridPositionWithId(pItem->getId(), position));
+        auto* grid = gridByItem.getByKey(pItem->getId());
+        if(grid) {
+            grid->setNewPosition(position);
+        }
+        else {
+            gridByItem.add(GridPositionWithId(pItem->getId(), position));
+        }
     }
 
     void addImageToCache(const DrawableIcon& toAdd) {

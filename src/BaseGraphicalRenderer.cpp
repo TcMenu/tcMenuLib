@@ -4,6 +4,7 @@
  */
 
 #include "BaseGraphicalRenderer.h"
+#include "BaseDialog.h"
 
 int appTitleRenderingFn(RuntimeMenuItem *item, uint8_t, RenderFnMode mode, char *buffer, int bufferSize);
 
@@ -191,7 +192,7 @@ void BaseGraphicalRenderer::renderList() {
 
     for (int i = 0; i < maxY; i++) {
         uint8_t current = offset + i;
-        RuntimeMenuItem* toDraw = (current==0) ? runList->asBackMenu() : runList->getChildItem(current - 1);
+        RuntimeMenuItem* toDraw = runList->getChildItem(current);
         GridPositionRowCacheEntry itemEntry(toDraw, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, current + 1, rowHeight), itemProps);
         drawMenuItem(&itemEntry, Coord(0, totalTitleHeight + (i * totalRowHeight)), Coord(width, rowHeight));
         taskManager.yieldForMicros(0);
@@ -264,8 +265,16 @@ void BaseGraphicalRenderer::recalculateDisplayOrder(MenuItem *root, bool safeMod
     if(areRowsOutOfOrder() && !safeMode) recalculateDisplayOrder(item, true);
 
     if(itemOrderByRow.count() == 0) return;
-    itemOrderByRow.itemAtIndex(0)->getMenuItem()->setActive(true);
-    for(bsize_t i=1; i<itemOrderByRow.count(); i++) itemOrderByRow.itemAtIndex(i)->getMenuItem()->setActive(false);
+    bool selectedYet = false;
+    for(bsize_t i=0; i<itemOrderByRow.count(); i++) {
+        auto* entry = itemOrderByRow.itemAtIndex(i);
+        bool skip = i < 3 && (entry->getMenuItem()->isReadOnly() || entry->getPosition().getDrawingMode() == GridPosition::DRAW_TITLE_ITEM);
+        if(!skip && !selectedYet) {
+            entry->getMenuItem()->setActive(true);
+            selectedYet = true;
+        }
+        else entry->getMenuItem()->setActive(false);
+    }
 }
 
 bool BaseGraphicalRenderer::areRowsOutOfOrder() {
@@ -286,8 +295,13 @@ void BaseGraphicalRenderer::redrawAllWidgets(bool forceRedraw) {
     if(!titleOnDisplay || itemOrderByRow.count() == 0) return;
     if(itemOrderByRow.itemAtIndex(0)->getPosition().getDrawingMode() != GridPosition::DRAW_TITLE_ITEM) return;
 
-    color_t widFg = itemOrderByRow.itemAtIndex(0)->getDisplayProperties()->getColor(ItemDisplayProperties::HIGHLIGHT1);
-    color_t widBg = itemOrderByRow.itemAtIndex(0)->getDisplayProperties()->getColor(ItemDisplayProperties::BACKGROUND);
+    color_t widFg, widBg;
+    widFg = itemOrderByRow.itemAtIndex(0)->getDisplayProperties()->getColor(ItemDisplayProperties::HIGHLIGHT1);
+    widBg = itemOrderByRow.itemAtIndex(0)->getDisplayProperties()->getColor(ItemDisplayProperties::BACKGROUND);
+    if(itemOrderByRow.itemAtIndex(0)->getMenuItem()->isActive()) {
+        widFg = getDisplayPropertiesFactory().getSelectedColor(ItemDisplayProperties::TEXT);
+        widBg = getDisplayPropertiesFactory().getSelectedColor(ItemDisplayProperties::BACKGROUND);
+    }
 
     auto* widget = this->firstWidget;
     int widgetRight = width;
@@ -349,4 +363,11 @@ ItemDisplayProperties::ComponentType BaseGraphicalRenderer::toComponentType(Grid
             bool isAction = (pMenuItem->getMenuType() == MENUTYPE_ACTION_VALUE || pMenuItem->getMenuType() == MENUTYPE_SUB_VALUE);
             return isAction ? ItemDisplayProperties::COMPTYPE_ACTION : ItemDisplayProperties::COMPTYPE_ITEM;
     }
+}
+
+BaseDialog* BaseGraphicalRenderer::getDialog() {
+    if(dialog == nullptr) {
+        dialog = new MenuBasedDialog();
+    }
+    return dialog;
 }

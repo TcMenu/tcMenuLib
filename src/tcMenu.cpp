@@ -224,10 +224,12 @@ void MenuManager::stopEditingCurrentItem(bool doMultiPartNext) {
 }
 
 MenuItem* MenuManager::getParentAndReset() {
-	return getParentRootAndVisit(menuMgr.getCurrentMenu(), [](MenuItem* curr) {
+	auto* pItem = getParentRootAndVisit(menuMgr.getCurrentMenu(), [](MenuItem* curr) {
 		curr->setActive(false);
 		curr->setEditing(false);
 	});
+	if(pItem == nullptr) pItem = menuMgr.getRoot();
+	return pItem;
 }
 
 /**

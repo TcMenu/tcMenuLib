@@ -166,6 +166,10 @@ public:
 
     const GridPosition& getPosition() { return thePosition; }
     uint16_t getKey() const { return menuId; }
+
+    void setNewPosition(GridPosition newPosition) {
+        thePosition = newPosition;
+    }
 };
 
 /**

@@ -12,8 +12,8 @@ void setup() {
     auto& factory = static_cast<NullItemDisplayPropertiesFactory&>(renderer.getDisplayPropertiesFactory());
     // we now create a grid for the two led controls in the submenu, this shows how to override the default grid for a few items.
     // In most cases the automatic rendering works fine when a few items are overriden as long as the row you request hasn't yet been taken.
-    factory.addGridPosition(&menuLED1, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE, 2, 1, 1, 1));
-    factory.addGridPosition(&menuLED2, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_RIGHT_WITH_VALUE, 2, 2, 1, 1));
+    factory.addGridPosition(&menuL1, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE, 2, 1, 1, 1));
+    factory.addGridPosition(&menuL2, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_RIGHT_WITH_VALUE, 2, 2, 1, 1));
     // first we setup the menu
     setupMenu();
 
@@ -44,7 +44,7 @@ void loop() {
 }
 
 void CALLBACK_FUNCTION onLed1(int id) {
-    digitalWrite(LED_BUILTIN, menuLED1.getBoolean());
+    digitalWrite(LED_BUILTIN, menuL1.getBoolean());
 }
 
 void CALLBACK_FUNCTION onLed2(int id) {
