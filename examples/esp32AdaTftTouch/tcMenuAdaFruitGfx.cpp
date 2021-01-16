@@ -12,8 +12,6 @@
  * This library requires the AdaGfx library along with a suitable driver.
  */
 
-#include <tcMenuAdaFruitGfx.h>
-
 #include "tcMenuAdaFruitGfx.h"
 
 extern const ConnectorLocalInfo applicationInfo;
@@ -21,53 +19,73 @@ extern const ConnectorLocalInfo applicationInfo;
 int drawingCount = 0;
 
 #if DISPLAY_HAS_MEMBUFFER == true
-    #define refreshDisplayIfNeeded(gr, needUpd) {if(needUpd) reinterpret_cast<Adafruit_ILI9341*>(gr)->display();}
+#define refreshDisplayIfNeeded(gr, needUpd) {if(needUpd) reinterpret_cast<Adafruit_ILI9341*>(gr)->display();}
 #else
-    #define refreshDisplayIfNeeded(g, n)
+#define refreshDisplayIfNeeded(g, n)
 #endif
-
-Coord textExtents(Adafruit_GFX* graphics, const char* text, int16_t x, int16_t y) {
-	int16_t x1, y1;
-	uint16_t w, h;
-	graphics->getTextBounds((char*)text, x, y, &x1, &y1, &w, &h);
-
-    serdebugF4("Textbounds (y1, w, h): ", y1, w, h);
-	return Coord(w, h);
-}
 
 void AdaFruitGfxMenuRenderer::setGraphicsDevice(Adafruit_GFX* gfx, AdaColorGfxMenuConfig *gfxConfig) {
 
-	if (gfxConfig->editIcon == nullptr || gfxConfig->activeIcon == nullptr) {
-		gfxConfig->editIcon = defEditingIcon;
-		gfxConfig->activeIcon = defActiveIcon;
-		gfxConfig->editIconWidth = 16;
-		gfxConfig->editIconHeight = 12;
-	}
+    if (gfxConfig->editIcon == nullptr || gfxConfig->activeIcon == nullptr) {
+        gfxConfig->editIcon = defEditingIcon;
+        gfxConfig->activeIcon = defActiveIcon;
+        gfxConfig->editIconWidth = 16;
+        gfxConfig->editIconHeight = 12;
+    }
 
-	graphics = gfx;
+    graphics = gfx;
 
-	auto& factory = propertiesFactory;
-	// TEXT, BACKGROUND, HIGHLIGHT1, HIGHLIGHT2, SELECTED_FG, SELECTED_BG
-	color_t paletteItems[] { gfxConfig->fgItemColor, gfxConfig->bgItemColor, gfxConfig->bgSelectColor, gfxConfig->fgSelectColor};
-	color_t titleItems[] { gfxConfig->fgTitleColor, gfxConfig->bgTitleColor, gfxConfig->fgTitleColor, gfxConfig->fgSelectColor};
+    auto& factory = propertiesFactory;
+    // TEXT, BACKGROUND, HIGHLIGHT1, HIGHLIGHT2, SELECTED_FG, SELECTED_BG
+    color_t paletteItems[] { gfxConfig->fgItemColor, gfxConfig->bgItemColor, gfxConfig->bgSelectColor, gfxConfig->fgSelectColor};
+    color_t titleItems[] { gfxConfig->fgTitleColor, gfxConfig->bgTitleColor, gfxConfig->fgTitleColor, gfxConfig->fgSelectColor};
 
-	int titleHeight = heightForFontPadding(gfxConfig->titleFont, gfxConfig->titleFontMagnification, gfxConfig->titlePadding);
-	int itemHeight = heightForFontPadding(gfxConfig->itemFont, gfxConfig->itemFontMagnification, gfxConfig->itemPadding);
-	factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ACTION, paletteItems, gfxConfig->itemPadding, gfxConfig->itemFont, gfxConfig->itemFontMagnification, 0, itemHeight, GridPosition::JUSTIFY_LEFT_NO_VALUE);
-	factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, paletteItems, gfxConfig->itemPadding, gfxConfig->itemFont, gfxConfig->itemFontMagnification, 0, itemHeight, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT);
-	factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_TITLE, titleItems, gfxConfig->titlePadding, gfxConfig->itemFont, gfxConfig->itemFontMagnification, gfxConfig->titleBottomMargin, titleHeight, GridPosition::JUSTIFY_LEFT_NO_VALUE);
+    int titleHeight = heightForFontPadding(gfxConfig->titleFont, gfxConfig->titleFontMagnification, gfxConfig->titlePadding);
+    int itemHeight = heightForFontPadding(gfxConfig->itemFont, gfxConfig->itemFontMagnification, gfxConfig->itemPadding);
+    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ACTION, paletteItems, gfxConfig->itemPadding, gfxConfig->itemFont, gfxConfig->itemFontMagnification, 0, itemHeight, GridPosition::JUSTIFY_LEFT_NO_VALUE);
+    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, paletteItems, gfxConfig->itemPadding, gfxConfig->itemFont, gfxConfig->itemFontMagnification, 0, itemHeight, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT);
+    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_TITLE, titleItems, gfxConfig->titlePadding, gfxConfig->titleFont, gfxConfig->titleFontMagnification, gfxConfig->titleBottomMargin, titleHeight, GridPosition::JUSTIFY_LEFT_NO_VALUE);
     factory.setSelectedColors(gfxConfig->bgSelectColor, gfxConfig->fgSelectColor);
 
-	factory.addImageToCache(DrawableIcon(SPECIAL_ID_EDIT_ICON, Coord(gfxConfig->editIconWidth, gfxConfig->editIconHeight), DrawableIcon::ICON_XBITMAP, gfxConfig->editIcon));
-	factory.addImageToCache(DrawableIcon(SPECIAL_ID_ACTIVE_ICON, Coord(gfxConfig->editIconWidth, gfxConfig->editIconHeight), DrawableIcon::ICON_XBITMAP, gfxConfig->activeIcon));
+    factory.addImageToCache(DrawableIcon(SPECIAL_ID_EDIT_ICON, Coord(gfxConfig->editIconWidth, gfxConfig->editIconHeight), DrawableIcon::ICON_XBITMAP, gfxConfig->editIcon));
+    factory.addImageToCache(DrawableIcon(SPECIAL_ID_ACTIVE_ICON, Coord(gfxConfig->editIconWidth, gfxConfig->editIconHeight), DrawableIcon::ICON_XBITMAP, gfxConfig->activeIcon));
 
     setDisplayDimensions(graphics->width(), graphics->height());
 }
 
-int AdaFruitGfxMenuRenderer::heightForFontPadding(const GFXfont* font, int mag, const MenuPadding& padding) {
+
+void AdaFruitGfxMenuRenderer::setGraphicsDevice(Adafruit_GFX *gfx, const GFXfont* itemFont, const GFXfont* titleFont, bool needEditingIcons, int rotation) {
+    if(gfx == graphics) return;
+    graphics = gfx;
+    graphics->setRotation(rotation);
+    setDisplayDimensions(graphics->width(), graphics->height());
+
+    auto& factory = propertiesFactory;
+
+    if(needEditingIcons) {
+        factory.addImageToCache(DrawableIcon(SPECIAL_ID_EDIT_ICON, Coord(16, 12),DrawableIcon::ICON_XBITMAP, defEditingIcon));
+        factory.addImageToCache(DrawableIcon(SPECIAL_ID_ACTIVE_ICON, Coord(16, 12),DrawableIcon::ICON_XBITMAP, defActiveIcon));
+    }
+
+    color_t titlePalette[] = {BLACK, RGB(20,132,255), RGB(192,192,192), RGB(0,133,255)};
+    color_t itemPalette[] = {WHITE, RGB(0,64,135), RGB(20,133,255), RGB(31,100,178)};
+    factory.setSelectedColors(RGB(31, 88, 100), WHITE);
+    MenuPadding titlePadding(3);
+    MenuPadding itemPadding(2);
+    int titleHeight = heightForFontPadding(titleFont, 1, titlePadding);
+    int itemHeight = heightForFontPadding(itemFont, 1, itemPadding);
+    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_TITLE, titlePalette, titlePadding, titleFont, 1, 4, titleHeight, GridPosition::JUSTIFY_LEFT_NO_VALUE );
+    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, itemPalette, itemPadding, itemFont, 1, 1, itemHeight, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT );
+    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ACTION, itemPalette, itemPadding, itemFont, 1, 1, itemHeight, GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE );
+}
+
+int AdaFruitGfxMenuRenderer::heightForFontPadding(const GFXfont* font, int mag, MenuPadding& padding) {
     graphics->setFont((const GFXfont*)font);
     graphics->setTextSize(mag);
-    return textExtents(graphics, "(Ag", 30,30).y + padding.top + padding.bottom;
+    Coord sizeInfo = getHeightAndBaselineForFont(graphics, font);
+    int hei = sizeInfo.y + padding.top + padding.bottom;
+    padding.bottom += sizeInfo.x; // add the baseline to padding.
+    return hei;
 }
 
 void AdaFruitGfxMenuRenderer::drawWidget(Coord where, TitleWidget *widget, color_t colFg, color_t colBg) {
@@ -146,6 +164,7 @@ void AdaFruitGfxMenuRenderer::internalDrawText(GridPositionRowCacheEntry* pEntry
 
     const auto *font = static_cast<const GFXfont *>(pEntry->getDisplayProperties()->getFont());
     graphics->setFont(font);
+    graphics->setTextSize(pEntry->getDisplayProperties()->getFontMagnification());
     if(pEntry->getMenuItem()->isActive() || pEntry->getMenuItem()->isEditing()) {
         graphics->setTextColor(propertiesFactory.getSelectedColor(ItemDisplayProperties::TEXT));
     }
@@ -153,17 +172,18 @@ void AdaFruitGfxMenuRenderer::internalDrawText(GridPositionRowCacheEntry* pEntry
         graphics->setTextColor(pEntry->getDisplayProperties()->getColor(ItemDisplayProperties::TEXT));
     }
 
+    int yCursor = font ? ((where.y + size.y) - padding.bottom) : (where.y + padding.top);
+
     if(just == GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT) {
         // special case, title left, value right.
-        int drawingPositionY = where.y + (size.y - padding.bottom);
-        graphics->setCursor(where.x + padding.left, drawingPositionY);
+        graphics->setCursor(where.x + padding.left, yCursor);
         pEntry->getMenuItem()->copyNameToBuffer(buffer, bufferSize);
         serdebugF4("item: ", buffer, size.y, where.y);
         graphics->print(buffer);
 
         copyMenuItemValue(pEntry->getMenuItem(), buffer, bufferSize);
-        int16_t right = size.x - (textExtents(graphics, buffer, 0, 30).x + padding.right);
-        graphics->setCursor(right, drawingPositionY);
+        int16_t right = where.x + size.x - (textExtents(graphics, buffer, 0, 30).x + padding.right);
+        graphics->setCursor(right, yCursor);
         graphics->print(buffer);
     }
     else {
@@ -173,14 +193,13 @@ void AdaFruitGfxMenuRenderer::internalDrawText(GridPositionRowCacheEntry* pEntry
         else
             pEntry->getMenuItem()->copyNameToBuffer(sz, sizeof sz);
 
-        int startPosition = 0;
+        int startPosition = padding.left;
         if(just == GridPosition::JUSTIFY_RIGHT_WITH_VALUE || just == GridPosition::JUSTIFY_RIGHT_NO_VALUE) {
             startPosition = size.x - (textExtents(graphics, sz, 0, 30).x + padding.right);
         }
         else if(just == GridPosition::JUSTIFY_CENTER_WITH_VALUE || just == GridPosition::JUSTIFY_CENTER_NO_VALUE) {
             startPosition = ((size.x - textExtents(graphics, sz, 0, 30).x) / 2) + padding.right;
         }
-        int yCursor = font ? ((where.y + size.y) - padding.bottom) : (where.y + padding.top);
         graphics->setCursor(startPosition + where.x, yCursor);
         graphics->print(sz);
         serdebugF4("intTx ", sz, startPosition + where.x, (where.y + size.y) - padding.bottom);
@@ -195,7 +214,7 @@ void AdaFruitGfxMenuRenderer::drawTextualItem(GridPositionRowCacheEntry* pEntry,
     auto* editIcon = propertiesFactory.iconForMenuItem(SPECIAL_ID_ACTIVE_ICON);
     int iconOffset = (editIcon) ? editIcon->getDimensions().x + padding.left : 0;
 
-    internalDrawText(pEntry, where, size);
+    internalDrawText(pEntry, Coord(where.x + iconOffset, where.y), Coord(size.x - iconOffset, size.y));
 }
 
 void AdaFruitGfxMenuRenderer::drawSlider(GridPositionRowCacheEntry* entry, AnalogMenuItem* pItem, Coord where, Coord size) {
@@ -250,23 +269,23 @@ void prepareAdaColorDefaultGfxConfig(AdaColorGfxMenuConfig* config) {
 }
 
 void prepareAdaMonoGfxConfigLoRes(AdaColorGfxMenuConfig* config) {
-	makePadding(config->titlePadding, 2, 1, 1, 1);
-	makePadding(config->itemPadding, 1, 1, 1, 1);
-	makePadding(config->widgetPadding, 2, 2, 0, 2);
+    makePadding(config->titlePadding, 2, 1, 1, 1);
+    makePadding(config->itemPadding, 1, 1, 1, 1);
+    makePadding(config->widgetPadding, 2, 2, 0, 2);
 
-	config->bgTitleColor = BLACK;
-	config->fgTitleColor = WHITE;
-	config->titleFont = NULL;
-	config->titleBottomMargin = 2;
-	config->widgetColor = WHITE;
-	config->titleFontMagnification = 1;
+    config->bgTitleColor = BLACK;
+    config->fgTitleColor = WHITE;
+    config->titleFont = NULL;
+    config->titleBottomMargin = 2;
+    config->widgetColor = WHITE;
+    config->titleFontMagnification = 1;
 
-	config->bgItemColor = WHITE;
-	config->fgItemColor = BLACK;
-	config->bgSelectColor = BLACK;
-	config->fgSelectColor = WHITE;
-	config->itemFont = NULL;
-	config->itemFontMagnification = 1;
+    config->bgItemColor = WHITE;
+    config->fgItemColor = BLACK;
+    config->bgSelectColor = BLACK;
+    config->fgSelectColor = WHITE;
+    config->itemFont = NULL;
+    config->itemFontMagnification = 1;
 
     config->editIcon = loResEditingIcon;
     config->activeIcon = loResActiveIcon;
@@ -275,28 +294,63 @@ void prepareAdaMonoGfxConfigLoRes(AdaColorGfxMenuConfig* config) {
 }
 
 void prepareAdaMonoGfxConfigOled(AdaColorGfxMenuConfig* config) {
-	makePadding(config->titlePadding, 2, 1, 1, 1);
-	makePadding(config->itemPadding, 1, 1, 1, 1);
-	makePadding(config->widgetPadding, 2, 2, 0, 2);
+    makePadding(config->titlePadding, 2, 1, 1, 1);
+    makePadding(config->itemPadding, 1, 1, 1, 1);
+    makePadding(config->widgetPadding, 2, 2, 0, 2);
 
-	config->bgTitleColor = WHITE;
-	config->fgTitleColor = BLACK;
-	config->titleFont = NULL;
-	config->titleBottomMargin = 2;
-	config->widgetColor = BLACK;
-	config->titleFontMagnification = 1;
+    config->bgTitleColor = WHITE;
+    config->fgTitleColor = BLACK;
+    config->titleFont = NULL;
+    config->titleBottomMargin = 2;
+    config->widgetColor = BLACK;
+    config->titleFontMagnification = 1;
 
-	config->bgItemColor = BLACK;
-	config->fgItemColor = WHITE;
-	config->bgSelectColor = WHITE;
-	config->fgSelectColor = BLACK;
-	config->itemFont = NULL;
-	config->itemFontMagnification = 1;
+    config->bgItemColor = BLACK;
+    config->fgItemColor = WHITE;
+    config->bgSelectColor = WHITE;
+    config->fgSelectColor = BLACK;
+    config->itemFont = NULL;
+    config->itemFontMagnification = 1;
 
     config->editIcon = loResEditingIcon;
     config->activeIcon = loResActiveIcon;
     config->editIconHeight = 6;
     config->editIconWidth = 8;
+}
+
+//
+// helper functions
+//
+
+Coord textExtents(Adafruit_GFX* graphics, const char* text, int16_t x, int16_t y) {
+    int16_t x1, y1;
+    uint16_t w, h;
+    graphics->getTextBounds((char*)text, x, y, &x1, &y1, &w, &h);
+
+    serdebugF4("Textbounds (y1, w, h): ", y1, w, h);
+    return Coord(w, h);
+}
+
+Coord getHeightAndBaselineForFont(Adafruit_GFX* gfx, const GFXfont* font) {
+    if(font == nullptr) {
+        // for the default font, the starting offset is 0, and we calculate the height.
+        return Coord(0, textExtents(gfx, "(Ag)", 10, 20).y);
+    }
+    else {
+        // we need to work out the biggest glyph and maximum extent beyond the baseline, we use 'Ay(' for this
+        const char sz[] = "AgyjK(";
+        int height = 0;
+        int baseline = 0;
+        const char* current = sz;
+        while(*current && (*current < font->last)) {
+            int glIdx = *current - font->first;
+            auto &g = font->glyph[glIdx];
+            if (g.height > height) height = g.height;
+            baseline = g.height + g.yOffset;
+            current++;
+        }
+        return Coord(baseline, height);
+    }
 }
 
 /** A couple of helper functions that we'll submit for inclusion once a bit more testing is done */
@@ -396,3 +450,4 @@ void drawCookieCutBitmap2(Adafruit_GFX* gfx, int16_t x, int16_t y, const uint8_t
 
     gfx->endWrite();
 }
+

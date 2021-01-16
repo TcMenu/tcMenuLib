@@ -124,6 +124,45 @@ void BaseGraphicalRenderer::render() {
     drawingCommand(DRAW_COMMAND_ENDED);
 }
 
+GridPositionRowCacheEntry* BaseGraphicalRenderer::findRowCol(int idx, int row, int col) {
+    while(idx < itemOrderByRow.count()) {
+        auto* ent = itemOrderByRow.itemAtIndex(idx);
+        if(ent->getPosition().getRow() == row && ent->getPosition().getGridPosition() == col) {
+            return ent;
+        }
+        idx++;
+    }
+    return nullptr;
+}
+
+GridPositionRowCacheEntry* BaseGraphicalRenderer::findMenuEntryAndDimensions(const Coord& screenPos, Coord& localStart, Coord& localSize) {
+    int rowStartY = 0;
+    for(int i=lastOffset; i<itemOrderByRow.count(); i++) {
+        int rowHeight = heightOfRow(i, 1);
+        int rowEndY = rowStartY + rowHeight;
+
+        if(screenPos.y > rowStartY && screenPos.y < rowEndY) {
+            auto* pEntry = itemOrderByRow.itemAtIndex(i);
+            localStart.y = rowStartY;
+            localSize.y = rowHeight;
+            if(pEntry->getPosition().getGridSize() == 1) {
+                localStart.x = 0;
+                localSize.x = width;
+            }
+            else {
+                int colWidth = width / pEntry->getPosition().getGridSize();
+                int column = (screenPos.x / colWidth);
+                localStart.x = column * colWidth;
+                localSize.x = colWidth;
+                return findRowCol(i, pEntry->getPosition().getRow(), column);
+            }
+        }
+    }
+
+    // we did not find anything at that point.
+    return nullptr;
+}
+
 bool BaseGraphicalRenderer::drawTheMenuItems(uint8_t locRedrawMode, int startRow) {
     int16_t ypos = 0;
     int lastRow = 0;

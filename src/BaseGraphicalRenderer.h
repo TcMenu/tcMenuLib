@@ -145,7 +145,20 @@ public:
      */
     int findActiveItem();
 
+    /**
+     * @return the total number of items in the current menu
+     */
     int getTotalItemsInMenu() { return itemOrderByRow.count(); }
+
+    /**
+     * Provides the menu item grid position and dimensions of it, given a screen position. Usually used by touch screen
+     * implementations. Note that this will return nullptr if no entry is found.
+     * @param screenPos the raw screen position
+     * @param localStart the local menu item start position
+     * @param localSize the local menu item size
+     * @return the grid cache entry or nullptr if no item was found.
+     */
+    GridPositionRowCacheEntry* findMenuEntryAndDimensions(const Coord& screenPos, Coord& localStart, Coord& localSize);
 
     /**
      * Gets the menu item at a given index, which may be different to the order in the tree.
@@ -154,18 +167,18 @@ public:
 
     BaseDialog* getDialog() override;
 
+    int getWidth() { return width;}
+    int getHeight() { return height;}
 private:
     bool drawTheMenuItems(uint8_t locRedrawMode, int startRow);
     void renderList();
     void recalculateDisplayOrder(MenuItem *pItem, bool safeMode);
     void redrawAllWidgets(bool forceRedraw);
     int heightOfRow(int row, int col);
-
     bool areRowsOutOfOrder();
     int calculateHeightTo(int index, MenuItem *pItem);
-
-
     ItemDisplayProperties::ComponentType toComponentType(GridPosition::GridDrawingMode mode, MenuItem* pMenuItem);
+    GridPositionRowCacheEntry *findRowCol(int idx, int row, int col);
 };
 
 inline int analogRangeToScreen(AnalogMenuItem* item, int screenWidth) {

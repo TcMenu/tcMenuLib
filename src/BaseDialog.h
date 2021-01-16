@@ -141,6 +141,10 @@ public:
      */
     bool copyButtonText(char* data, int buttonNum, int currentValue, bool isActive);
 
+    bool copyButtonText(char* data, int buttonNum, int currentValue) {
+        copyButtonText(data, buttonNum, currentValue, buttonNum == currentValue);
+    }
+
     /**
      * Perform the action of the button numbered in the parameter. For example if button 1 is set to OK, then OK is
      * pressed.

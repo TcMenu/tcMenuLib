@@ -50,12 +50,6 @@ void setup() {
     SPI.begin(18, 19, 23);
     SPI.setFrequency(20000000);
 
-    pinMode(lcdBacklightPin, OUTPUT);
-    digitalWrite(lcdBacklightPin, LOW);
-
-    // we up the clock speed on the i2c bus to high speed setting 1, 400KHz and start the display
-    gfx.begin();
-
     // we start the serial bus at 115200 so it's ready for our connector to use
     Serial.begin(115200);
 

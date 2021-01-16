@@ -5,11 +5,11 @@
 
 /**
  * @file tcMenuU8g2.h
- * 
+ *
  * U8g2 renderer that renders menus onto this type of display. This file is a plugin file and should not
  * be directly edited, it will be replaced each time the project is built. If you want to edit this file in place,
  * make sure to rename it first.
- * 
+ *
  * LIBRARY REQUIREMENT
  * This library requires the u8g2 library available for download from your IDE library manager.
  */
@@ -145,7 +145,7 @@ void U8g2MenuRenderer::drawIconItem(GridPositionRowCacheEntry* pEntry, Coord whe
     if(pIcon == nullptr || pIcon->getIconType() != DrawableIcon::ICON_XBITMAP) return;
 
     int xStart = where.x + ((size.x - pIcon->getDimensions().x) / 2);
-    int yStart = where.y + ((size.y - pIcon->getDimensions().y) / 2);
+    int yStart = where.y + pEntry->getDisplayProperties()->getPadding().top;
 
     bool sel = false;
     if(pItem->getMenuType() == MENUTYPE_BOOLEAN_VALUE) {
@@ -180,12 +180,6 @@ void U8g2MenuRenderer::drawTextualItem(GridPositionRowCacheEntry* pEntry, Coord 
     int iconOffset = (editIcon) ? editIcon->getDimensions().x + padding.left : 0;
 
     internalDrawText(pEntry, where, size, iconOffset, false);
-}
-
-bool itemNeedsValue(GridPosition::GridJustification justification) {
-    return (justification == GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE ||
-            justification == GridPosition::JUSTIFY_CENTER_WITH_VALUE ||
-            justification == GridPosition::JUSTIFY_RIGHT_WITH_VALUE);
 }
 
 void U8g2MenuRenderer::internalDrawText(GridPositionRowCacheEntry* pEntry, Coord where, Coord size, int leftOffset, bool modeXor) {

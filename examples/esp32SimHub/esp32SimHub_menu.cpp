@@ -15,7 +15,7 @@
 // Global variable declarations
 
 const PROGMEM ConnectorLocalInfo applicationInfo = { "SimHub Link", "4db9fbfe-9fab-4759-b8ff-3e0c6700f475" };
-Adafruit_ILI9341 gfx(22, 17, 16);
+Adafruit_ILI9341 gfx(22, 21);
 AdaColorGfxMenuConfig gfxConfig;
 AdaFruitGfxMenuRenderer renderer;
 SimhubConnector connector;
@@ -62,6 +62,6 @@ void setupMenu() {
     gfx.setRotation(1);
     renderer.setGraphicsDevice(&gfx, &gfxConfig);
     switches.initialise(internalDigitalIo(), true);
-    menuMgr.initForEncoder(&renderer, &menuSpeed, 36, 37, 21);
+    menuMgr.initWithoutInput(&renderer, &menuSpeed);
     connector.begin(&Serial, 3);
 }

@@ -1,0 +1,373 @@
+{
+  "lastEdited": {
+    "seconds": 1610554714,
+    "nanos": 0
+  },
+  "codeOptions": {
+    "applicationUUID": "4656c798-10c6-4110-8e03-b9c51ed8fffb",
+    "applicationName": "ESP Amplifier",
+    "lastInputUuid": "89cd7f70-0457-4884-97c2-0db904ccb0ba",
+    "lastDisplayUuid": "4dcb12ec-13d8-4466-b8b6-bd575eae4612",
+    "lastRemoteUuid": "46c30011-cac6-4598-a7b8-b0630d55daab",
+    "embeddedPlatform": "ARDUINO_ESP32",
+    "namingRecursive": true,
+    "saveToSrc": false,
+    "useCppMain": true,
+    "lastProperties": [
+      {
+        "name": "DISPLAY_VARIABLE",
+        "latestValue": "gfx",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_TYPE",
+        "latestValue": "Adafruit_ILI9341",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CONFIG",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_WIDTH",
+        "latestValue": "320",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_HEIGHT",
+        "latestValue": "240",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_RESET_PIN",
+        "latestValue": "-1",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CS_PIN",
+        "latestValue": "22",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_RS_PIN",
+        "latestValue": "21",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_DATA_PIN",
+        "latestValue": "-1",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CLOCK_PIN",
+        "latestValue": "-1",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_ROTATION",
+        "latestValue": "1",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "LISTEN_PORT",
+        "latestValue": "3333",
+        "subsystem": "REMOTE"
+      }
+    ]
+  },
+  "projectName": "An amplifier starting point for ESP32 boards",
+  "namingRecursive": true,
+  "version": "1.0",
+  "items": [
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "name": "Volume",
+        "eepromAddress": 2,
+        "id": 1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "onVolumeChanged",
+        "maxValue": 255,
+        "offset": -180,
+        "divisor": 2,
+        "unitName": "dB"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "scrollItem",
+      "item": {
+        "name": "Channels",
+        "eepromAddress": 4,
+        "id": 2,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "onChannelChanged",
+        "itemWidth": 16,
+        "numEntries": 3,
+        "variable": null,
+        "eepromOffset": 150,
+        "choiceMode": "ARRAY_IN_EEPROM"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "boolItem",
+      "item": {
+        "name": "Direct",
+        "eepromAddress": 6,
+        "id": 3,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "onAudioDirect",
+        "naming": "TRUE_FALSE"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "boolItem",
+      "item": {
+        "name": "Mute",
+        "eepromAddress": -1,
+        "id": 4,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "onMuteSound",
+        "naming": "TRUE_FALSE"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "name": "Settings",
+        "eepromAddress": -1,
+        "id": 5,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "secured": false
+      }
+    },
+    {
+      "parentId": 5,
+      "type": "subMenu",
+      "item": {
+        "name": "Channel Names",
+        "eepromAddress": -1,
+        "id": 7,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "secured": false
+      }
+    },
+    {
+      "parentId": 5,
+      "type": "analogItem",
+      "item": {
+        "name": "Line 1 adj",
+        "eepromAddress": 9,
+        "id": 8,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 20,
+        "offset": -10,
+        "divisor": 2,
+        "unitName": "dB"
+      }
+    },
+    {
+      "parentId": 5,
+      "type": "analogItem",
+      "item": {
+        "name": "Line 2 adj",
+        "eepromAddress": 11,
+        "id": 9,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 20,
+        "offset": -10,
+        "divisor": 2,
+        "unitName": "dB"
+      }
+    },
+    {
+      "parentId": 5,
+      "type": "analogItem",
+      "item": {
+        "name": "Line 3 adj",
+        "eepromAddress": 13,
+        "id": 10,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 20,
+        "offset": -10,
+        "divisor": 2,
+        "unitName": "dB"
+      }
+    },
+    {
+      "parentId": 5,
+      "type": "analogItem",
+      "item": {
+        "name": "Warm up time",
+        "eepromAddress": 7,
+        "id": 11,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 300,
+        "offset": 0,
+        "divisor": 10,
+        "unitName": "s"
+      }
+    },
+    {
+      "parentId": 5,
+      "type": "analogItem",
+      "item": {
+        "name": "Valve Heating",
+        "eepromAddress": 15,
+        "id": 17,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 600,
+        "offset": 0,
+        "divisor": 10,
+        "unitName": "s"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "name": "Status",
+        "eepromAddress": -1,
+        "id": 6,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "secured": false
+      }
+    },
+    {
+      "parentId": 6,
+      "type": "enumItem",
+      "item": {
+        "name": "Amp Status",
+        "eepromAddress": -1,
+        "id": 14,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "enumEntries": [
+          "Warm up",
+          "Warm Valves",
+          "Ready",
+          "DC Protection",
+          "Overloaded",
+          "Overheated"
+        ]
+      }
+    },
+    {
+      "parentId": 6,
+      "type": "analogItem",
+      "item": {
+        "name": "Left VU",
+        "eepromAddress": -1,
+        "id": 15,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 30000,
+        "offset": -20000,
+        "divisor": 1000,
+        "unitName": "dB"
+      }
+    },
+    {
+      "parentId": 6,
+      "type": "analogItem",
+      "item": {
+        "name": "Right VU",
+        "eepromAddress": -1,
+        "id": 16,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 30000,
+        "offset": -20000,
+        "divisor": 1000,
+        "unitName": "dB"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "name": "Connectivity",
+        "eepromAddress": -1,
+        "id": 12,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "secured": false
+      }
+    },
+    {
+      "parentId": 12,
+      "type": "textItem",
+      "item": {
+        "name": "IP address",
+        "eepromAddress": -1,
+        "id": 13,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "itemType": "IP_ADDRESS",
+        "textLength": 5
+      }
+    },
+    {
+      "parentId": 12,
+      "type": "textItem",
+      "item": {
+        "name": "SSID",
+        "eepromAddress": 17,
+        "id": 18,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "itemType": "PLAIN_TEXT",
+        "textLength": 20
+      }
+    },
+    {
+      "parentId": 12,
+      "type": "textItem",
+      "item": {
+        "name": "Passcode",
+        "eepromAddress": 37,
+        "id": 19,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "itemType": "PLAIN_TEXT",
+        "textLength": 20
+      }
+    }
+  ]
+}
