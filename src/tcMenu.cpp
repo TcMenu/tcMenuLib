@@ -232,6 +232,20 @@ MenuItem* MenuManager::getParentAndReset() {
 	return pItem;
 }
 
+bool MenuManager::activateMenuItem(MenuItem *item) {
+    if(renderer->getRendererType() == RENDER_TYPE_CONFIGURABLE) {
+        auto* r = reinterpret_cast<BaseGraphicalRenderer*>(renderer);
+        for(int i=0; i<r->getTotalItemsInMenu(); i++) {
+            auto* pItem = r->getMenuItemAtIndex(i);
+            if(pItem != nullptr && pItem->getId() == item->getId()) {
+                valueChanged(i);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 /**
  * Finds teh currently active menu item with the selected SubMenuItem
  */
@@ -264,7 +278,7 @@ void MenuManager::setupForEditing(MenuItem* item) {
 		currentEditor = item;
 		currentEditor->setEditing(true);
 		switches.changeEncoderPrecision(item->getMaximumValue(), reinterpret_cast<ValueMenuItem*>(currentEditor)->getCurrentValue());
-		switches.getEncoder()->setUserIntention(CHANGE_VALUE);
+		if(switches.getEncoder()) switches.getEncoder()->setUserIntention(CHANGE_VALUE);
 	}
 	else if (ty == MENUTYPE_BOOLEAN_VALUE) {
 		// we don't actually edit boolean items, just toggle them instead

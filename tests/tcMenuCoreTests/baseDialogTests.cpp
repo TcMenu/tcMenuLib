@@ -35,7 +35,7 @@ public:
 	int getValueWhenRenderered() { return valueWhenRenderered; }
 	int getRenderCount() { return renderCount; }
 	const char* getButtonText(int btn) {
-	    copyButtonText(szTemp, btn, valueWhenRenderered);
+	    copyButtonText(szTemp, btn, valueWhenRenderered, lastBtnVal == btn);
 	    return szTemp;
 	}
 };

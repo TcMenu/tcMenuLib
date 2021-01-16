@@ -64,6 +64,10 @@ bool checkPropertiesBasics(ItemDisplayProperties* props, const char* name, const
 }
 
 test(testEmptyItemPropertiesFactory) {
+    assertEqual((size_t)4, sizeof GridPosition);
+    assertEqual((size_t)4, sizeof Coord);
+    assertEqual((size_t)2, sizeof MenuPadding);
+
     ConfigurableItemDisplayPropertiesFactory factory;
     auto *config = factory.configFor(nullptr, ItemDisplayProperties::COMPTYPE_TITLE);
     assertTrue(checkPropertiesBasics(config, "empty not null", nullptr, 1, RGB(0, 0, 0), RGB(255, 255, 255), 2, 10, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT));
@@ -445,7 +449,7 @@ test(testScrollingWithMoreThanOneItemOnRow) {
     assertTrue(renderer.checkCommands(true, true, true));
     assertEqual((bsize_t)0, renderer.getWidgetRecordings().count());
     assertEqual(6, renderer.getTotalItemsInMenu());
-    assertEqual(5, renderer.getMenuItemRecordings().count());
+    assertEqual((bsize_t)5, renderer.getMenuItemRecordings().count());
 
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(0), Coord(0, 0), Coord(320, 20), pointer1, GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 0, &textMenuItem1));
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(1), Coord(0, 25), Coord(160, 35), pointer1, GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_WITH_VALUE, 0, &boolItem1));
@@ -461,7 +465,7 @@ test(testScrollingWithMoreThanOneItemOnRow) {
     renderer.exec();
     assertTrue(renderer.checkCommands(true, true, true));
     assertEqual((bsize_t)0, renderer.getWidgetRecordings().count());
-    assertEqual(5, renderer.getMenuItemRecordings().count());
+    assertEqual((bsize_t)5, renderer.getMenuItemRecordings().count());
 
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(1), Coord(0, 0), Coord(160, 35), pointer1, GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_WITH_VALUE, 0, &boolItem1));
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(101), Coord(160, 0), Coord(160, 35), pointer1, GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 0, &menuSub));
@@ -538,7 +542,7 @@ test(testListRendering) {
 
     renderer.resetCommandStates();
     renderer.exec();
-    assertEqual(4, renderer.getMenuItemRecordings().count());
+    assertEqual((bsize_t)4, renderer.getMenuItemRecordings().count());
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(0), Coord(0, 0), Coord(320, 30), pointer2, GridPosition::DRAW_TITLE_ITEM, GridPosition::JUSTIFY_CENTER_NO_VALUE, 0, &runtimeItem));
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(1), Coord(0, 40), Coord(320, 20), pointer1, GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 0, &runtimeItem));
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(2), Coord(0, 65), Coord(320, 20), pointer1, GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 0, &runtimeItem));

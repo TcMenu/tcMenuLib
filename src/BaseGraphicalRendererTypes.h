@@ -105,15 +105,17 @@ public:
     };
 private:
     /** the number of columns in the grid */
-    uint32_t gridSize: 4;
+    uint32_t gridSize: 3;
     /** the position in the columns */
-    uint32_t gridPosition: 4;
+    uint32_t gridPosition: 3;
+    /** not yet implemented in any renderers, the number of rows this item takes up. */
+    uint32_t gridRowSpan: 3;
     /** the height or 0 if not overridden. Between 0..255*/
-    uint32_t gridHeight: 8;
+    uint32_t gridHeight: 9;
     /** the row ordering for the item */
-    uint32_t rowPosition: 8;
+    uint32_t rowPosition: 7;
     /** the drawing mode that should be used */
-    uint32_t drawingMode: 5;
+    uint32_t drawingMode: 4;
     /** the text justification that should be used */
     uint32_t justification: 3;
 public:
@@ -149,6 +151,12 @@ public:
     int getRow() const { return rowPosition; }
 };
 
+inline bool itemNeedsValue(GridPosition::GridJustification justification) {
+    return (justification == GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE ||
+            justification == GridPosition::JUSTIFY_CENTER_WITH_VALUE ||
+            justification == GridPosition::JUSTIFY_RIGHT_WITH_VALUE);
+}
+
 /**
  * Represents a grid position along with the menuID and also the drawable icon, if one exists. It is stored in the list
  * of drawing instructions in the base graphical renderer, and then read when a new menu is displayed in order to reorder
@@ -178,13 +186,22 @@ public:
  */
 class DrawableIcon {
 public:
-    enum IconType {
+    enum IconType: byte {
         ICON_XBITMAP, ICON_MONO, ICON_PALLETE4, ICON_NATIVE
+    };
+    enum MemoryLocation: byte {
+        /** Indication that this image is in progmem, this is the default */
+        STORED_IN_ROM,
+        /** This image is in RAM, if it can be supported by the display. EG board with progmem, driver support */
+        STORED_IN_RAM,
+        /** Not yet supported, will provide for loading images from external storage in the next version */
+        LOAD_FROM_STORAGE
     };
 private:
     uint16_t menuId;
     Coord dimensions;
     IconType iconType;
+    MemoryLocation location;
     const uint8_t* normalIcon;
     const uint8_t* selectedIcon;
 
@@ -192,13 +209,13 @@ public:
     /**
      * Creates an empty drawable icon, used mainly by collection support
      */
-    DrawableIcon() : menuId(0), dimensions(0,0), iconType(ICON_XBITMAP), normalIcon(nullptr), selectedIcon(nullptr) {}
+    DrawableIcon() : menuId(0), dimensions(0,0), iconType(ICON_XBITMAP), location(STORED_IN_ROM), normalIcon(nullptr), selectedIcon(nullptr) {}
 
     /**
      * Copy constructor to copy an existing drawable icon
      */
     DrawableIcon(const DrawableIcon& other) : menuId(other.menuId), dimensions(other.dimensions), iconType(other.iconType),
-                                              normalIcon(other.normalIcon), selectedIcon(other.selectedIcon) {}
+                 location(other.location), normalIcon(other.normalIcon), selectedIcon(other.selectedIcon) {}
 
     /**
      * Create a drawable icon providing the size, icon type, and image data
@@ -209,7 +226,7 @@ public:
      * @param selected the image in the selected state.
      */
     DrawableIcon(uint16_t id, const Coord& size, IconType ty, const uint8_t* normal, const uint8_t* selected = nullptr)
-            : menuId(id), dimensions(size), iconType(ty), normalIcon(normal), selectedIcon(selected) { }
+            : menuId(id), dimensions(size), iconType(ty), location(STORED_IN_ROM), normalIcon(normal), selectedIcon(selected) { }
 
     /**
      * Get the icon data for the current state
@@ -238,6 +255,5 @@ public:
         return menuId;
     }
 };
-
 
 #endif //TCMENU_GRAPHICALRENDERERTYPES_H
