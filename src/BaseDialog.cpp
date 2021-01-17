@@ -205,6 +205,7 @@ MenuBasedDialog::MenuBasedDialog() :
         bufferItem(dialogTextRenderFn, nextRandomId(), 20, nullptr),
         btn1Item(dialogButtonRenderFn, nextRandomId(), 0, nullptr),
         btn2Item(dialogButtonRenderFn, nextRandomId(), 1, nullptr) {
+    flags = 0;
     bitWrite(flags, DLG_FLAG_SMALLDISPLAY, false);
     bitWrite(flags, DLG_FLAG_MENUITEM_BASED, true);
     bufferItem.setReadOnly(true);

@@ -79,9 +79,11 @@ private:
     MenuItem *currentRootMenu;
     const char* pgmTitle;
     bool lastRowExactFit;
+    bool useSliderForAnalog;
 protected:
     TitleMode titleMode = TITLE_FIRST_ROW;
     bool titleOnDisplay = false;
+    bool hasTouchScreen;
     uint16_t width, height;
 public:
     BaseGraphicalRenderer(int bufferSize, int wid, int hei, bool lastRowExact, const char* appTitle) : BaseMenuRenderer(bufferSize, RENDER_TYPE_CONFIGURABLE) {
@@ -91,12 +93,20 @@ public:
         currentRootMenu = nullptr;
         lastRowExactFit = lastRowExact;
         pgmTitle = appTitle;
+        useSliderForAnalog = true;
+        hasTouchScreen = false;
     }
 
     void setTitleMode(TitleMode mode) {
         titleMode = mode;
         redrawMode = MENUDRAW_COMPLETE_REDRAW;
     }
+
+    void setUseSliderForAnalog(bool useSlider) {
+        useSliderForAnalog = useSlider;
+    }
+
+    void setHasTouchInterface(bool hasTouch) { hasTouchScreen = hasTouch; }
 
     void render() override;
 
@@ -146,6 +156,11 @@ public:
     int findActiveItem();
 
     /**
+     * Find the most appropriate item to activate and set it active, used during the display of new menus
+     */
+    void activateFirstAppropriateItem();
+
+    /**
      * @return the total number of items in the current menu
      */
     int getTotalItemsInMenu() { return itemOrderByRow.count(); }
@@ -191,5 +206,15 @@ inline int analogRangeToScreen(AnalogMenuItem* item, int screenWidth) {
  * @param cb the callback to fire when the title is selected
  */
 void setTitlePressedCallback(MenuCallbackFn cb);
+
+/**
+ * This method takes an existing graphics configuration and converts it into the new display properties format, its
+ * designer as a bridge between the old config object method and the new more supportable properties definitions.
+ * @param factory the properties factory that we wish to populate
+ * @param gfxConfig the graphics configuration to convert
+ * @param titleHeight the height of the title
+ * @param itemHeight the height of a standard item
+ */
+void preparePropertiesFromConfig(ConfigurableItemDisplayPropertiesFactory& factory, const ColorGfxMenuConfig<const void*>* gfxConfig, int titleHeight, int itemHeight);
 
 #endif //TCMENU_BASEGRAPHICALRENDERER_H

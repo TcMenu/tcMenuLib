@@ -31,12 +31,14 @@ public:
 private:
     AnalogMenuItem* levelTrims[NUM_CHANNELS]{};
     bool audioDirect;
-
+    bool muted = true;
 public:
     explicit AmplifierController(AnalogMenuItem* trims[NUM_CHANNELS]) {
         for(int i=0; i<NUM_CHANNELS; i++) {
             levelTrims[i] = trims[i];
         }
+        menuMute.setBoolean(true);
+        setAmpStatus(WARMING_UP);
     }
 
     uint8_t getChannelInt() {
@@ -58,17 +60,20 @@ public:
         auto vol = menuVolume.getCurrentValue() + trim;
         auto volToWrite = menuMute.getBoolean() ? 0 : vol;
         serdebugF2("write volume to bus", volToWrite);
-        onChannelChanged(); // mute going on turns off all channels
     }
 
     void onChannelChanged() {
-        auto ch = (menuMute.getBoolean()) ? 0 : (1 << getChannelInt());
-        onVolumeChanged(); // apply the new trim
+        auto ch = (muted) ? 0 : (1 << getChannelInt());
+        onVolumeChanged();
         serdebugF2("write channel to bus", ch);
     }
 
     void onAudioDirect(bool direct) {
         audioDirect = direct;
+    }
+
+    void onMute(bool mute) {
+        muted = mute;
     }
 };
 

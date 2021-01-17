@@ -12,6 +12,7 @@
  * This library requires the AdaGfx library along with a suitable driver.
  */
 
+#include <ScrollChoiceMenuItem.h>
 #include "tcMenuAdaFruitGfx.h"
 
 extern const ConnectorLocalInfo applicationInfo;
@@ -35,24 +36,17 @@ void AdaFruitGfxMenuRenderer::setGraphicsDevice(Adafruit_GFX* gfx, AdaColorGfxMe
 
     graphics = gfx;
 
-    auto& factory = propertiesFactory;
-    // TEXT, BACKGROUND, HIGHLIGHT1, HIGHLIGHT2, SELECTED_FG, SELECTED_BG
-    color_t paletteItems[] { gfxConfig->fgItemColor, gfxConfig->bgItemColor, gfxConfig->bgSelectColor, gfxConfig->fgSelectColor};
-    color_t titleItems[] { gfxConfig->fgTitleColor, gfxConfig->bgTitleColor, gfxConfig->fgTitleColor, gfxConfig->fgSelectColor};
-
     int titleHeight = heightForFontPadding(gfxConfig->titleFont, gfxConfig->titleFontMagnification, gfxConfig->titlePadding);
     int itemHeight = heightForFontPadding(gfxConfig->itemFont, gfxConfig->itemFontMagnification, gfxConfig->itemPadding);
-    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ACTION, paletteItems, gfxConfig->itemPadding, gfxConfig->itemFont, gfxConfig->itemFontMagnification, 0, itemHeight, GridPosition::JUSTIFY_LEFT_NO_VALUE);
-    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, paletteItems, gfxConfig->itemPadding, gfxConfig->itemFont, gfxConfig->itemFontMagnification, 0, itemHeight, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT);
-    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_TITLE, titleItems, gfxConfig->titlePadding, gfxConfig->titleFont, gfxConfig->titleFontMagnification, gfxConfig->titleBottomMargin, titleHeight, GridPosition::JUSTIFY_LEFT_NO_VALUE);
-    factory.setSelectedColors(gfxConfig->bgSelectColor, gfxConfig->fgSelectColor);
 
-    factory.addImageToCache(DrawableIcon(SPECIAL_ID_EDIT_ICON, Coord(gfxConfig->editIconWidth, gfxConfig->editIconHeight), DrawableIcon::ICON_XBITMAP, gfxConfig->editIcon));
-    factory.addImageToCache(DrawableIcon(SPECIAL_ID_ACTIVE_ICON, Coord(gfxConfig->editIconWidth, gfxConfig->editIconHeight), DrawableIcon::ICON_XBITMAP, gfxConfig->activeIcon));
+    preparePropertiesFromConfig(propertiesFactory, reinterpret_cast<const ColorGfxMenuConfig<const void *>*>(gfxConfig), titleHeight, itemHeight);
 
     setDisplayDimensions(graphics->width(), graphics->height());
 }
 
+void AdaFruitGfxMenuRenderer::setGraphicsDevice(Adafruit_GFX *gfx) {
+    setGraphicsDevice(gfx, nullptr, nullptr, true, 0);
+}
 
 void AdaFruitGfxMenuRenderer::setGraphicsDevice(Adafruit_GFX *gfx, const GFXfont* itemFont, const GFXfont* titleFont, bool needEditingIcons, int rotation) {
     if(gfx == graphics) return;
@@ -74,7 +68,7 @@ void AdaFruitGfxMenuRenderer::setGraphicsDevice(Adafruit_GFX *gfx, const GFXfont
     MenuPadding itemPadding(2);
     int titleHeight = heightForFontPadding(titleFont, 1, titlePadding);
     int itemHeight = heightForFontPadding(itemFont, 1, itemPadding);
-    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_TITLE, titlePalette, titlePadding, titleFont, 1, 4, titleHeight, GridPosition::JUSTIFY_LEFT_NO_VALUE );
+    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_TITLE, titlePalette, titlePadding, titleFont, 1, 4, titleHeight, GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE );
     factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, itemPalette, itemPadding, itemFont, 1, 1, itemHeight, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT );
     factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ACTION, itemPalette, itemPadding, itemFont, 1, 1, itemHeight, GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE );
 }
@@ -93,7 +87,6 @@ void AdaFruitGfxMenuRenderer::drawWidget(Coord where, TitleWidget *widget, color
     redrawNeeded = true;
 
     graphics->fillRect(where.x, where.y, widget->getWidth(), widget->getHeight(), colBg);
-
     graphics->drawXBitmap(where.x, where.y, widget->getCurrentIcon(), widget->getWidth(), widget->getHeight(), colFg);
 }
 
@@ -101,9 +94,11 @@ void AdaFruitGfxMenuRenderer::drawMenuItem(GridPositionRowCacheEntry* entry, Coo
     redrawNeeded = true;
     switch(entry->getPosition().getDrawingMode()) {
         case GridPosition::DRAW_TEXTUAL_ITEM:
-        case GridPosition::DRAW_INTEGER_AS_UP_DOWN:
         case GridPosition::DRAW_TITLE_ITEM:
             drawTextualItem(entry, where, areaSize);
+            break;
+        case GridPosition::DRAW_INTEGER_AS_UP_DOWN:
+            drawUpDownItem(entry, where, areaSize);
             break;
         case GridPosition::DRAW_INTEGER_AS_SCROLL:
             if(entry->getMenuItem()->getMenuType() != MENUTYPE_INT_VALUE) return; // disallowed
@@ -158,11 +153,43 @@ int AdaFruitGfxMenuRenderer::drawCoreLineItem(GridPositionRowCacheEntry* entry, 
     return imgMiddleY;
 }
 
+void AdaFruitGfxMenuRenderer::drawUpDownItem(GridPositionRowCacheEntry *entry, Coord where, Coord size) {
+    auto padding = entry->getDisplayProperties()->getPadding();
+    auto* icon = propertiesFactory.iconForMenuItem(entry->getMenuItem()->isEditing() ? SPECIAL_ID_EDIT_ICON :SPECIAL_ID_ACTIVE_ICON);
+    int iconOffset = (icon) ? icon->getDimensions().x + padding.left : 0;
+
+    drawCoreLineItem(entry, icon, where, size);
+
+    if(hasTouchScreen && (entry->getMenuItem()->isActive() || entry->getMenuItem()->isEditing())) {
+        int buttonSize = size.y - 1;
+        int half = buttonSize / 2;
+        int downButtonLocation = where.x + iconOffset;
+        int upButtonLocation = (size.x + where.x) - (padding.right + buttonSize);
+        int textStartX = iconOffset + size.y + padding.left;
+        auto hl = entry->getDisplayProperties()->getColor(ItemDisplayProperties::HIGHLIGHT1);
+        auto txtCol = entry->getDisplayProperties()->getColor(ItemDisplayProperties::TEXT);
+        graphics->fillRect(downButtonLocation, where.y, size.y, size.y, hl);
+        graphics->fillRect(upButtonLocation, where.y, size.y, size.y, hl);
+        graphics->fillTriangle(downButtonLocation, where.y + half, downButtonLocation + buttonSize, where.y,
+                               downButtonLocation + buttonSize, where.y + buttonSize, txtCol);
+        graphics->fillTriangle(upButtonLocation, where.y, upButtonLocation, where.y + buttonSize, upButtonLocation + buttonSize,
+                               where.y + half, txtCol);
+
+        internalDrawText(entry, Coord(where.x + textStartX, where.y),
+                         Coord(size.x - (((buttonSize + padding.right) * 2) + iconOffset), size.y));
+    }
+    else {
+        internalDrawText(entry, Coord(where.x + iconOffset, where.y), Coord(size.x - iconOffset, size.y));
+    }
+}
+
+
 void AdaFruitGfxMenuRenderer::internalDrawText(GridPositionRowCacheEntry* pEntry, Coord where, Coord size) {
     GridPosition::GridJustification just = pEntry->getPosition().getJustification();
     auto padding = pEntry->getDisplayProperties()->getPadding();
 
     const auto *font = static_cast<const GFXfont *>(pEntry->getDisplayProperties()->getFont());
+    graphics->setTextWrap(false);
     graphics->setFont(font);
     graphics->setTextSize(pEntry->getDisplayProperties()->getFontMagnification());
     if(pEntry->getMenuItem()->isActive() || pEntry->getMenuItem()->isEditing()) {
@@ -182,7 +209,7 @@ void AdaFruitGfxMenuRenderer::internalDrawText(GridPositionRowCacheEntry* pEntry
         graphics->print(buffer);
 
         copyMenuItemValue(pEntry->getMenuItem(), buffer, bufferSize);
-        int16_t right = where.x + size.x - (textExtents(graphics, buffer, 0, 30).x + padding.right);
+        int16_t right = where.x + size.x - (textExtents(graphics, buffer, 6, 30).x + padding.right);
         graphics->setCursor(right, yCursor);
         graphics->print(buffer);
     }
@@ -207,12 +234,11 @@ void AdaFruitGfxMenuRenderer::internalDrawText(GridPositionRowCacheEntry* pEntry
 }
 
 void AdaFruitGfxMenuRenderer::drawTextualItem(GridPositionRowCacheEntry* pEntry, Coord where, Coord size) {
-    auto* icon = propertiesFactory.iconForMenuItem(pEntry->getMenuItem()->isEditing() ? SPECIAL_ID_EDIT_ICON :SPECIAL_ID_ACTIVE_ICON);
-    drawCoreLineItem(pEntry, icon, where, size);
     auto padding = pEntry->getDisplayProperties()->getPadding();
+    auto* icon = propertiesFactory.iconForMenuItem(pEntry->getMenuItem()->isEditing() ? SPECIAL_ID_EDIT_ICON :SPECIAL_ID_ACTIVE_ICON);
+    int iconOffset = (icon) ? icon->getDimensions().x + padding.left : 0;
+    drawCoreLineItem(pEntry, icon, where, size);
 
-    auto* editIcon = propertiesFactory.iconForMenuItem(SPECIAL_ID_ACTIVE_ICON);
-    int iconOffset = (editIcon) ? editIcon->getDimensions().x + padding.left : 0;
 
     internalDrawText(pEntry, Coord(where.x + iconOffset, where.y), Coord(size.x - iconOffset, size.y));
 }

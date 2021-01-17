@@ -80,6 +80,7 @@ public:
     }
     ~AdaFruitGfxMenuRenderer() override = default;
     void setGraphicsDevice(Adafruit_GFX* graphics, AdaColorGfxMenuConfig *gfxConfig);
+    void setGraphicsDevice(Adafruit_GFX *graphics);
     void setGraphicsDevice(Adafruit_GFX *graphics, const GFXfont* itemFont, const GFXfont* titleFont, bool needEditingIcons, int rotation);
 
     void drawWidget(Coord where, TitleWidget *widget, color_t colorFg, color_t colorBg) override;
@@ -94,9 +95,12 @@ private:
     int drawCoreLineItem(GridPositionRowCacheEntry* entry, DrawableIcon* icon, const Coord &where, const Coord &size);
     void drawTextualItem(GridPositionRowCacheEntry* entry, Coord where, Coord size);
     void drawSlider(GridPositionRowCacheEntry* entry, AnalogMenuItem* pItem, Coord where, Coord size);
+    void drawUpDownItem(GridPositionRowCacheEntry* entry, Coord where, Coord size);
     void internalDrawText(GridPositionRowCacheEntry *entry, Coord where, Coord size);
 
     void drawIconItem(GridPositionRowCacheEntry *pEntry, Coord where, Coord size);
+
+    void drawButton(char button, Coord where, int buttonSize);
 };
 
 /**

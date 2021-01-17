@@ -8,9 +8,9 @@
 #include "AmplifierController.h"
 
 #define YPOS_PIN 32
-#define XNEG_PIN 2
-#define XPOS_PIN 33
-#define YNEG_PIN 4
+#define XNEG_PIN 33
+#define XPOS_PIN 2
+#define YNEG_PIN 0
 
 bool connectedToWifi = false;
 EepromAuthenticatorManager authManager;
@@ -18,15 +18,12 @@ TitleWidget wifiWidget(iconsWifi, 5, 16, 12, nullptr);
 AnalogMenuItem* adjustMenuItems[] = {&menuSettingsLine1Adj, &menuSettingsLine2Adj, &menuSettingsLine3Adj};
 AmplifierController controller(adjustMenuItems);
 ArduinoAnalogDevice analogDevice;
-MenuResistiveTouchScreen touchScreen(&analogDevice, internalDigitalIo(), XPOS_PIN, XNEG_PIN, YPOS_PIN, YNEG_PIN,
-                                     &renderer, BaseResistiveTouchScreen::LANDSCAPE);
-MenuTouchScreenEncoder tsEncoder(&renderer);
+MenuResistiveTouchScreen* pTouchScreen;
 
 void prepareWifiForUse();
 
 void setup() {
     SPI.begin();
-    SPI.setFrequency(20000000);
     Serial.begin(115200);
 
     EEPROM.begin(512);
@@ -49,7 +46,10 @@ void setup() {
         menuDirect.setBoolean(true);
     });
 
-    touchScreen.init(&tsEncoder);
+    pTouchScreen = new MenuResistiveTouchScreen(&analogDevice, internalDigitalIo(), XPOS_PIN, XNEG_PIN, YPOS_PIN,
+                                                YNEG_PIN, &renderer, BaseResistiveTouchScreen::LANDSCAPE);
+    pTouchScreen->calibrateMinMaxValues(0.27F, 0.92F, 0.04F, 0.93F);
+    pTouchScreen->start();
 }
 
 void powerDownCapture() {
@@ -108,5 +108,5 @@ void CALLBACK_FUNCTION onAudioDirect(int id) {
 }
 
 void CALLBACK_FUNCTION onMuteSound(int id) {
-    controller.onVolumeChanged();
+    controller.onMute(menuMute.getBoolean());
 }

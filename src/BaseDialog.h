@@ -142,7 +142,7 @@ public:
     bool copyButtonText(char* data, int buttonNum, int currentValue, bool isActive);
 
     bool copyButtonText(char* data, int buttonNum, int currentValue) {
-        copyButtonText(data, buttonNum, currentValue, buttonNum == currentValue);
+        return copyButtonText(data, buttonNum, currentValue, buttonNum == currentValue);
     }
 
     /**

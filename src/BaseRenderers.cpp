@@ -60,8 +60,7 @@ bool BaseMenuRenderer::tryTakeSelectIfNeeded(int currentReading, RenderPressMode
 	// always set the menu as altered.
 	menuAltered();
 
-	BaseDialog* dialog = getDialog();
-	if (displayTakenMode != NOT_TAKEN_OVER || (dialog != NULL && dialog->isRenderNeeded()) ) {
+	if (displayTakenMode != NOT_TAKEN_OVER || (dialog != nullptr && dialog->isRenderNeeded()) ) {
 		// When there's a dialog, or render function, just record the change until exec().
 		renderFnPressType = pressType;
 		return true;

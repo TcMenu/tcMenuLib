@@ -62,20 +62,6 @@ public:
     virtual void touched(const TouchNotification& notification)=0;
 };
 
-class MenuResistiveTouchScreen : public BaseResistiveTouchScreen {
-private:
-    BaseGraphicalRenderer* renderer;
-    TouchObserver* observer;
-    int updateTicks;
-public:
-    MenuResistiveTouchScreen(AnalogDevice *device, BasicIoAbstraction *pins, pinid_t xpPin, pinid_t xnPin,
-                             pinid_t ypPin, pinid_t ynPin, BaseGraphicalRenderer* renderer, TouchRotation rotation);
-
-    void init(TouchObserver* obs);
-
-    uint32_t sendEvent(float locationX, float locationY, float touchPressure, TouchState touched) override;
-};
-
 class MenuTouchScreenEncoder : public TouchObserver {
 private:
     BaseGraphicalRenderer *renderer;
@@ -87,7 +73,17 @@ public:
     void touched(const TouchNotification& notification) override;
 };
 
+class MenuResistiveTouchScreen : public BaseResistiveTouchScreen {
+private:
+    MenuTouchScreenEncoder encoder;
+    BaseGraphicalRenderer* renderer;
+    TouchObserver* observer;
+    int updateTicks;
+public:
+    MenuResistiveTouchScreen(AnalogDevice *device, BasicIoAbstraction *pins, pinid_t xpPin, pinid_t xnPin,
+                             pinid_t ypPin, pinid_t ynPin, BaseGraphicalRenderer* renderer, TouchRotation rotation);
 
-
+    uint32_t sendEvent(float locationX, float locationY, float touchPressure, TouchState touched) override;
+};
 
 #endif //TCMENU_MENUTOUCHSCREENENCODER_H

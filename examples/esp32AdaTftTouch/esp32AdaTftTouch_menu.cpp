@@ -82,7 +82,7 @@ AnalogMenuItem menuVolume(&minfoVolume, 0, &menuChannels);
 void setupMenu() {
     menuConnectivityIPAddress.setReadOnly(true);
 
-    gfx.begin();
+    gfx.begin(20000000);
     gfx.setRotation(1);
     renderer.setGraphicsDevice(&gfx, nullptr, nullptr, true, 1);
     menuMgr.initWithoutInput(&renderer, &menuVolume);

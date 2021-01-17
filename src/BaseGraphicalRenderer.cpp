@@ -137,17 +137,22 @@ GridPositionRowCacheEntry* BaseGraphicalRenderer::findRowCol(int idx, int row, i
 
 GridPositionRowCacheEntry* BaseGraphicalRenderer::findMenuEntryAndDimensions(const Coord& screenPos, Coord& localStart, Coord& localSize) {
     int rowStartY = 0;
+    auto* icon = getDisplayPropertiesFactory().iconForMenuItem(SPECIAL_ID_ACTIVE_ICON);
+    int iconWidth = icon ? icon->getDimensions().x : 0;
+
     for(int i=lastOffset; i<itemOrderByRow.count(); i++) {
         int rowHeight = heightOfRow(i, 1);
         int rowEndY = rowStartY + rowHeight;
+        auto* pEntry = itemOrderByRow.itemAtIndex(i);
 
         if(screenPos.y > rowStartY && screenPos.y < rowEndY) {
-            auto* pEntry = itemOrderByRow.itemAtIndex(i);
             localStart.y = rowStartY;
             localSize.y = rowHeight;
             if(pEntry->getPosition().getGridSize() == 1) {
-                localStart.x = 0;
-                localSize.x = width;
+                auto iconAdjust = iconWidth + pEntry->getDisplayProperties()->getPadding().left;
+                localStart.x = iconAdjust;
+                localSize.x = width - iconAdjust;
+                return pEntry;
             }
             else {
                 int colWidth = width / pEntry->getPosition().getGridSize();
@@ -157,6 +162,7 @@ GridPositionRowCacheEntry* BaseGraphicalRenderer::findMenuEntryAndDimensions(con
                 return findRowCol(i, pEntry->getPosition().getRow(), column);
             }
         }
+        rowStartY += rowHeight + pEntry->getDisplayProperties()->getSpaceAfter();
     }
 
     // we did not find anything at that point.
@@ -243,10 +249,10 @@ void BaseGraphicalRenderer::renderList() {
     titleOnDisplay = true;
 }
 
-GridPosition::GridDrawingMode modeFromItem(MenuItem* item) {
+GridPosition::GridDrawingMode modeFromItem(MenuItem* item, bool useSlider) {
     switch(item->getMenuType()) {
         case MENUTYPE_INT_VALUE:
-            return GridPosition::DRAW_INTEGER_AS_SCROLL;
+            return useSlider ? GridPosition::DRAW_INTEGER_AS_SCROLL : GridPosition::DRAW_INTEGER_AS_UP_DOWN;
         case MENUTYPE_ENUM_VALUE:
         case MENUTYPE_SCROLLER_VALUE:
             return GridPosition::DRAW_INTEGER_AS_UP_DOWN;
@@ -290,7 +296,7 @@ void BaseGraphicalRenderer::recalculateDisplayOrder(MenuItem *root, bool safeMod
                 itemOrderByRow.add(GridPositionRowCacheEntry(item, conf->getPosition(), getDisplayPropertiesFactory().configFor(item, compType)));
             } else {
                 serdebugF3("Add manual id at row", item->getId(), row);
-                auto mode = modeFromItem(item);
+                auto mode = modeFromItem(item, useSliderForAnalog);
                 auto* itemProps = getDisplayPropertiesFactory().configFor(item, toComponentType(mode, item));
                 itemOrderByRow.add(GridPositionRowCacheEntry(item, GridPosition(mode, itemProps->getDefaultJustification(), 1, 1, row, 0), itemProps));
 
@@ -303,6 +309,10 @@ void BaseGraphicalRenderer::recalculateDisplayOrder(MenuItem *root, bool safeMod
 
     if(areRowsOutOfOrder() && !safeMode) recalculateDisplayOrder(item, true);
 
+    activateFirstAppropriateItem();
+}
+
+void BaseGraphicalRenderer::activateFirstAppropriateItem() {
     if(itemOrderByRow.count() == 0) return;
     bool selectedYet = false;
     for(bsize_t i=0; i<itemOrderByRow.count(); i++) {
@@ -399,8 +409,7 @@ ItemDisplayProperties::ComponentType BaseGraphicalRenderer::toComponentType(Grid
         case GridPosition::DRAW_AS_ICON_ONLY:
         case GridPosition::DRAW_AS_ICON_TEXT:
         default:
-            bool isAction = (pMenuItem->getMenuType() == MENUTYPE_ACTION_VALUE || pMenuItem->getMenuType() == MENUTYPE_SUB_VALUE);
-            return isAction ? ItemDisplayProperties::COMPTYPE_ACTION : ItemDisplayProperties::COMPTYPE_ITEM;
+            return isItemActionable(pMenuItem) ? ItemDisplayProperties::COMPTYPE_ACTION : ItemDisplayProperties::COMPTYPE_ITEM;
     }
 }
 
@@ -409,4 +418,19 @@ BaseDialog* BaseGraphicalRenderer::getDialog() {
         dialog = new MenuBasedDialog();
     }
     return dialog;
+}
+
+void preparePropertiesFromConfig(ConfigurableItemDisplayPropertiesFactory& factory, const ColorGfxMenuConfig<const void*>* gfxConfig, int titleHeight, int itemHeight) {
+    // TEXT, BACKGROUND, HIGHLIGHT1, HIGHLIGHT2, SELECTED_FG, SELECTED_BG
+    color_t paletteItems[] { gfxConfig->fgItemColor, gfxConfig->bgItemColor, gfxConfig->bgSelectColor, gfxConfig->fgSelectColor};
+    color_t titleItems[] { gfxConfig->fgTitleColor, gfxConfig->bgTitleColor, gfxConfig->fgTitleColor, gfxConfig->fgSelectColor};
+
+    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ACTION, paletteItems, gfxConfig->itemPadding, gfxConfig->itemFont, gfxConfig->itemFontMagnification, 0, itemHeight, GridPosition::JUSTIFY_LEFT_NO_VALUE);
+    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, paletteItems, gfxConfig->itemPadding, gfxConfig->itemFont, gfxConfig->itemFontMagnification, 0, itemHeight, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT);
+    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_TITLE, titleItems, gfxConfig->titlePadding, gfxConfig->titleFont, gfxConfig->titleFontMagnification, gfxConfig->titleBottomMargin, titleHeight, GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE);
+    factory.setSelectedColors(gfxConfig->bgSelectColor, gfxConfig->fgSelectColor);
+
+    factory.addImageToCache(DrawableIcon(SPECIAL_ID_EDIT_ICON, Coord(gfxConfig->editIconWidth, gfxConfig->editIconHeight), DrawableIcon::ICON_XBITMAP, gfxConfig->editIcon));
+    factory.addImageToCache(DrawableIcon(SPECIAL_ID_ACTIVE_ICON, Coord(gfxConfig->editIconWidth, gfxConfig->editIconHeight), DrawableIcon::ICON_XBITMAP, gfxConfig->activeIcon));
+
 }
