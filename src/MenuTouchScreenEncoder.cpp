@@ -43,16 +43,11 @@ bool isTouchActionable(MenuItem* pItem) {
 }
 
 void MenuTouchScreenEncoder::touched(const TouchNotification &evt) {
-    serdebugF4("Touch at (x,y,mode)", evt.getItemPosition().x, evt.getItemPosition().y, evt.isWithinItem())
+    serdebugF4("Touch at (x,y,mode)", evt.getCursorPosition().x, evt.getCursorPosition().y, evt.isWithinItem())
     if(evt.isWithinItem()) {
-        if(menuMgr.getCurrentEditor()) {
-            if(evt.getEntry()->getMenuItem() != menuMgr.getCurrentEditor()) {
-                menuMgr.stopEditingCurrentItem(false);
-            }
-            else {
-                // deal with editing here
-                return;
-            }
+        if(menuMgr.getCurrentEditor() && evt.getEntry()->getMenuItem() != menuMgr.getCurrentEditor()) {
+            // stop editing, selected outside of item
+            menuMgr.stopEditingCurrentItem(false);
         }
         else {
             bool wasActive = evt.getEntry()->getMenuItem()->isActive();
@@ -69,13 +64,15 @@ void MenuTouchScreenEncoder::touched(const TouchNotification &evt) {
             else {
                 GridPosition::GridDrawingMode drawingMode = evt.getEntry()->getPosition().getDrawingMode();
                 if(drawingMode == GridPosition::DRAW_INTEGER_AS_UP_DOWN && wasActive) {
+                    if(!evt.getEntry()->getMenuItem()->isEditing()) menuMgr.onMenuSelect(false);
                     int increment = 0;
-                    auto xPos = evt.getItemPosition().x;
-                    if(xPos > evt.getItemStart().x && xPos < (evt.getItemStart().x + evt.getItemSize().y)) {
+                    auto xPos = evt.getCursorPosition().x;
+                    auto buttonSize = evt.getItemSize().y;
+                    if(xPos > 0 && xPos < buttonSize) {
                         // down button pressed
                         increment = -1;
                     }
-                    else if(xPos > (evt.getItemSize().x - evt.getItemSize().y)) {
+                    else if(xPos > (evt.getItemSize().x - buttonSize)) {
                         // up button pressed
                         increment = 1;
                     }
@@ -89,9 +86,10 @@ void MenuTouchScreenEncoder::touched(const TouchNotification &evt) {
                     }
                 }
                 else if(drawingMode == GridPosition::DRAW_INTEGER_AS_SCROLL && wasActive) {
+                    if(!evt.getEntry()->getMenuItem()->isEditing()) menuMgr.onMenuSelect(false);
                     auto* analog = reinterpret_cast<AnalogMenuItem*>(evt.getEntry()->getMenuItem());
                     float correction =  float(analog->getMaximumValue()) / float(evt.getItemSize().x);
-                    float percentage = evt.getItemPosition().x * correction;
+                    float percentage = evt.getCursorPosition().x * correction;
                     analog->setCurrentValue(percentage);
                 }
             }

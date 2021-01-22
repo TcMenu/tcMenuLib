@@ -106,7 +106,7 @@ void AdaFruitGfxMenuRenderer::drawMenuItem(GridPositionRowCacheEntry* entry, Coo
             break;
         case GridPosition::DRAW_AS_ICON_ONLY:
         case GridPosition::DRAW_AS_ICON_TEXT:
-            //drawIconItem(theItem, where, areaSize, mode == GridPosition::DRAW_AS_ICON_TEXT);
+            drawIconItem(entry, where, areaSize);
             break;
     }
 }
@@ -216,7 +216,7 @@ void AdaFruitGfxMenuRenderer::internalDrawText(GridPositionRowCacheEntry* pEntry
     else {
         char sz[32];
         if(itemNeedsValue(just))
-            copyMenuItemNameAndValue(pEntry->getMenuItem(), sz, sizeof sz, ':');
+            copyMenuItemNameAndValue(pEntry->getMenuItem(), sz, sizeof sz, 0);
         else
             pEntry->getMenuItem()->copyNameToBuffer(sz, sizeof sz);
 

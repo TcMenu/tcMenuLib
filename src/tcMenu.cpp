@@ -324,12 +324,14 @@ void MenuManager::setCurrentMenu(MenuItem * theItem) {
 
 	MenuItem* root = theItem;
 	currentRoot = root;
+
+    baseRenderer->prepareNewSubmenu();
+
 	if(renderer->getRendererType() == RENDER_TYPE_CONFIGURABLE) {
 	    reinterpret_cast<BaseGraphicalRenderer*>(renderer)->activateFirstAppropriateItem();
 	} else {
         root->setActive(true);
 	}
-	baseRenderer->prepareNewSubmenu();
 }
 
 SecuredMenuPopup* MenuManager::secureMenuInstance() {

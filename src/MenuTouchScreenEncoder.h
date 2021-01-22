@@ -20,28 +20,23 @@
 class TouchNotification {
 private:
     GridPositionRowCacheEntry* pEntry;
-    Coord itemPosition;
-    Coord itemStart;
+    Coord cursorPosition;
     Coord itemSize;
     bool withinItem;
     BaseResistiveTouchScreen::TouchState touchState;
 public:
     TouchNotification(const Coord& rawCoords,  BaseResistiveTouchScreen::TouchState touchState)
-            : pEntry(nullptr), itemPosition(rawCoords), itemStart(0,0), itemSize(0,0), withinItem(false), touchState(touchState) {}
+            : pEntry(nullptr), cursorPosition(rawCoords), itemSize(0, 0), withinItem(false), touchState(touchState) {}
 
     TouchNotification(GridPositionRowCacheEntry* ent, const Coord& local, const Coord& localStart, const Coord& localSize, BaseResistiveTouchScreen::TouchState touchState)
-            : pEntry(ent), itemPosition(local), itemStart(localStart), itemSize(localSize), withinItem(true), touchState(touchState) {}
+            : pEntry(ent), cursorPosition(local), itemSize(localSize), withinItem(true), touchState(touchState) {}
 
     GridPositionRowCacheEntry* getEntry() const {
         return pEntry;
     }
 
-    const Coord &getItemPosition() const {
-        return itemPosition;
-    }
-
-    const Coord &getItemStart() const {
-        return itemStart;
+    const Coord &getCursorPosition() const {
+        return cursorPosition;
     }
 
     const Coord &getItemSize() const {

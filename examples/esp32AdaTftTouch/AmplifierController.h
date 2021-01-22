@@ -14,8 +14,8 @@
 #define NUM_CHANNELS 4
 #endif // NUM_CHANNELS
 
-//                                            1234567890123456 1234567890123456 1234567890123456 1234567890123456
-const char pgmDefaultChannelNames[] PROGMEM = "Turntable\0     Auxiliary\0      USB Audio\0      Storage\0";
+//                                             1234567890123456 1234567890123456 1234567890123456 1234567890123456
+const char pgmDefaultChannelNames[] PROGMEM = "Turntable\0      Auxiliary\0      USB Audio\0      Storage\0";
 
 
 class AmplifierController  {

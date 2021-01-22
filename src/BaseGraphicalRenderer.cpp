@@ -267,15 +267,12 @@ void BaseGraphicalRenderer::recalculateDisplayOrder(MenuItem *root, bool safeMod
     itemOrderByRow.clear();
     if(root == nullptr || root->getMenuType() == MENUTYPE_RUNTIME_LIST) return;
 
-    uint8_t row = 0;
-
     if(root == menuMgr.getRoot() && titleMode != NO_TITLE) {
         serdebugF("Add title");
         auto* myProps = getDisplayPropertiesFactory().configFor(nullptr, ItemDisplayProperties::COMPTYPE_TITLE);
         appTitleMenuItem.setTitleHeaderPgm(pgmTitle);
         itemOrderByRow.add(GridPositionRowCacheEntry(&appTitleMenuItem,
                                                      GridPosition(GridPosition::DRAW_TITLE_ITEM, myProps->getDefaultJustification(), 0), myProps));
-        row++;
     }
 
     auto* item = root;
@@ -284,7 +281,6 @@ void BaseGraphicalRenderer::recalculateDisplayOrder(MenuItem *root, bool safeMod
         auto* myProps = getDisplayPropertiesFactory().configFor(root, ItemDisplayProperties::COMPTYPE_TITLE);
         itemOrderByRow.add(GridPositionRowCacheEntry(root, GridPosition(GridPosition::DRAW_TITLE_ITEM, myProps->getDefaultJustification(), 0), myProps));
         item = root->getNext();
-        row++;
     }
 
     while(item != nullptr) {
@@ -295,19 +291,22 @@ void BaseGraphicalRenderer::recalculateDisplayOrder(MenuItem *root, bool safeMod
                 auto compType = toComponentType(conf->getPosition().getDrawingMode(), item);
                 itemOrderByRow.add(GridPositionRowCacheEntry(item, conf->getPosition(), getDisplayPropertiesFactory().configFor(item, compType)));
             } else {
+                // We just find the first unused row and put the next item there.
+                int row = 0;
+                while(itemOrderByRow.getByKey(rowCol(row, 1)) != nullptr) row++;
                 serdebugF3("Add manual id at row", item->getId(), row);
                 auto mode = modeFromItem(item, useSliderForAnalog);
                 auto* itemProps = getDisplayPropertiesFactory().configFor(item, toComponentType(mode, item));
                 itemOrderByRow.add(GridPositionRowCacheEntry(item, GridPosition(mode, itemProps->getDefaultJustification(), 1, 1, row, 0), itemProps));
-
-                // we cannot use a row that's already been used by an override, so we make sure we select an empty row here.
-                while(++row < 100 && itemOrderByRow.getByKey(row) != nullptr);
             }
         }
         item = item->getNext();
     }
 
-    if(areRowsOutOfOrder() && !safeMode) recalculateDisplayOrder(item, true);
+    // here we try again, but this time we turn off any custom grids.
+    if(areRowsOutOfOrder() && !safeMode) {
+        recalculateDisplayOrder(root, true);
+    }
 
     activateFirstAppropriateItem();
 }

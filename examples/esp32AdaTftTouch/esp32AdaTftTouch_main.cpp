@@ -6,7 +6,7 @@
 #include <Fonts/FreeSans18pt7b.h>
 #include <Fonts/FreeSans12pt7b.h>
 #include "AmplifierController.h"
-
+#include "app_icondata.h"
 #define YPOS_PIN 32
 #define XNEG_PIN 33
 #define XPOS_PIN 2
@@ -48,8 +48,18 @@ void setup() {
 
     pTouchScreen = new MenuResistiveTouchScreen(&analogDevice, internalDigitalIo(), XPOS_PIN, XNEG_PIN, YPOS_PIN,
                                                 YNEG_PIN, &renderer, BaseResistiveTouchScreen::LANDSCAPE);
-    pTouchScreen->calibrateMinMaxValues(0.27F, 0.92F, 0.04F, 0.93F);
+    pTouchScreen->calibrateMinMaxValues(0.18F, 0.92F, 0.05F, 0.92F);
     pTouchScreen->start();
+
+    auto& factory = reinterpret_cast<ConfigurableItemDisplayPropertiesFactory&>(renderer.getDisplayPropertiesFactory());
+    const Coord iconSize(APPICONS_WIDTH, APPICONS_HEIGHT);
+    factory.addImageToCache(DrawableIcon(menuSettings.getId(), iconSize, DrawableIcon::ICON_XBITMAP, settingsIcon40Bits));
+    factory.addImageToCache(DrawableIcon(menuStatus.getId(), iconSize, DrawableIcon::ICON_XBITMAP, statusIcon40Bits));
+    factory.addImageToCache(DrawableIcon(menuMute.getId(), iconSize, DrawableIcon::ICON_XBITMAP, muteOffIcon40Bits, muteOnIcon40Bits));
+
+    factory.addGridPosition(&menuSettings, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 1, 4, 45));
+    factory.addGridPosition(&menuStatus, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 2, 4, 45));
+    factory.addGridPosition(&menuMute, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 3, 4, 45));
 }
 
 void powerDownCapture() {
