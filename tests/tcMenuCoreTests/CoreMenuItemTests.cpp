@@ -82,14 +82,32 @@ test(testFloatType) {
 	assertTrue(menuFloatItem.isSendRemoteNeeded(0));
 	assertEqual(4, menuFloatItem.getDecimalPlaces());
 	char sz[20];
-	copyMenuItemNameAndValue(&menuFloatItem, sz, sizeof(sz));
+
+    //
+    // Be very careful adding test cases for float here, float is really inaccurate, and the maximum number of digits
+    // that can be represented (even relatively accurately - avoiding edge cases) is around 7 digits.
+    //
+
+    copyMenuItemNameAndValue(&menuFloatItem, sz, sizeof(sz));
 	assertEqual("FloatItem: 1.0010", sz);
 
 	menuFloatItem.setFloatValue(234.456722);
     copyMenuItemValue(&menuFloatItem, sz, sizeof(sz));
 	assertEqual("234.4567", sz);
 
-	assertFalse(isMenuRuntime(&menuFloatItem));
+    menuFloatItem.setFloatValue(-938.4567);
+    copyMenuItemValue(&menuFloatItem, sz, sizeof(sz));
+    assertEqual("-938.4567", sz);
+
+    menuFloatItem.setFloatValue(-0.001);
+    copyMenuItemValue(&menuFloatItem, sz, sizeof(sz));
+    assertEqual("-0.0010", sz);
+
+    menuFloatItem.setFloatValue(-0.0);
+    copyMenuItemValue(&menuFloatItem, sz, sizeof(sz));
+    assertEqual("0.0000", sz);
+
+    assertFalse(isMenuRuntime(&menuFloatItem));
 	assertFalse(isMenuBasedOnValueItem(&menuFloatItem));
 	assertFalse(isMenuRuntimeMultiEdit(&menuFloatItem));
 }
