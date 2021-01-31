@@ -20,6 +20,8 @@
  */
 enum ButtonType: uint8_t { BTNTYPE_NONE = 0, BTNTYPE_OK, BTNTYPE_ACCEPT, BTNTYPE_CANCEL, BTNTYPE_CLOSE };
 
+#define CUSTOM_DIALOG_BUTTON_START 10
+
 class BaseDialog;
 /**
  * If you need to capture the finished state of the dialog, then you create a function to this spec
@@ -27,6 +29,7 @@ class BaseDialog;
  * `void completedCallback(ButtonType buttonPressed);`
  */
 typedef void (*CompletedHandlerFn)(ButtonType buttonPressed, void* yourData);
+typedef void (*DialogButtonHandler)(uint8_t buttonNum, void* yourData);
 
 #define DLG_FLAG_SMALLDISPLAY 0
 #define DLG_FLAG_INUSE 1
@@ -64,6 +67,8 @@ protected:
     uint8_t lastBtnVal;
     uint16_t flags;
     MenuRedrawState needsDrawing;
+    DialogButtonHandler buttonHandler;
+
 public:
     /**
      * Create the base dialog and clear down all the fields
@@ -79,6 +84,13 @@ public:
      * @param defVal optionally, set which button is active (0 based).
      */
     void setButtons(ButtonType btn1, ButtonType btn2, int defVal = 0);
+
+    /**
+     * Register a dialog button handler that will be notified when buttons are pressed. Only custom
+     * added buttons are sent to this callback.
+     * @param handler the custom button callback
+     */
+    void registerButtonPressHandler(DialogButtonHandler handler) { buttonHandler = handler; }
 
     /**
      * Create a dialog that takes over the display and presents the header and

@@ -7,6 +7,7 @@
  */
 
 #include <PlatformDetermination.h>
+#include "tcMenuVersion.h"
 #ifdef IOA_USE_MBED
 #include "tcUtil.h"
 #endif
@@ -489,9 +490,7 @@ void writeFloatValueToTransport(TagValueTransport* transport, FloatMenuItem* ite
 	ltoaClrBuff(sz, (long)item->getFloatValue(), 10, NOT_PADDED, sizeof sz);
 	appendChar(sz, '.', sizeof sz);
 	
-	long whole = item->getFloatValue();
-	long fract = abs((item->getFloatValue() - whole) * 1000000L);
-	fastltoa_mv(sz, fract, 1000000L, '0', sizeof sz);
+	fastftoa(sz, item->getFloatValue(), item->getDecimalPlaces(), sizeof sz);
 	transport->writeField(FIELD_CURRENT_VAL, sz);
 }
 

@@ -102,6 +102,18 @@ void fastltoa_mv(char* str, long val, long divisor, char padChar, int len);
 void fastltoa(char* str, long val, uint8_t dp, char padChar, int len);
 
 /**
+ * A very simple floating point string function based on the fastltoa above. It can print
+ * floating point values up to 9 whole digits and 9 decimal places. Note this function
+ * appends the floating point value at the end of the string, to put the value at the
+ * beginning, ensure the string is zero length.
+ * @param sz the string to append to,
+ * @param fl the float to convert
+ * @param dp the numer of decimal places (max 9)
+ * @param strSize the string maximum length (usually from sizeof)
+ */
+void fastftoa(char* sz, float fl, int dp, int strSize);
+
+/**
  * converts decimal places into a suitable divisor, eg: 2 -> 100, 4 -> 10000
  */
 long dpToDivisor(int dp);

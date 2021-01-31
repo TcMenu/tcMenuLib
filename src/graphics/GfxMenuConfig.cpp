@@ -3,6 +3,8 @@
 #include "GfxMenuConfig.h"
 #include <MenuIterator.h>
 
+namespace tcgfx {
+
 void prepareDefaultGfxConfig(ColorGfxMenuConfig<void*>* config) {
 	makePadding(config->titlePadding, 5, 5, 20, 5);
 	makePadding(config->itemPadding, 5, 5, 3, 5);
@@ -91,3 +93,5 @@ void ConfigurableItemDisplayPropertiesFactory::setDrawingProperties(uint32_t key
         displayProperties.add(ItemDisplayProperties(key, palette, pad, font, mag, spacing, requiredHeight, just));
     }
 }
+
+} // namespace

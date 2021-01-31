@@ -15,9 +15,9 @@
 // Global variable declarations
 
 const PROGMEM ConnectorLocalInfo applicationInfo = { "ESP Amplifier", "4656c798-10c6-4110-8e03-b9c51ed8fffb" };
-Adafruit_ILI9341 gfx(22, 21, -1);
-AdaColorGfxMenuConfig gfxConfig;
-AdaFruitGfxMenuRenderer renderer;
+TFT_eSPI tft;
+TfteSpiDrawable drawable(&tft, 45);
+GraphicsDeviceRenderer renderer(20, applicationInfo.name, &drawable);
 WiFiServer server(3333);
 
 // Global Menu Item declarations
@@ -82,9 +82,9 @@ AnalogMenuItem menuVolume(&minfoVolume, 0, &menuChannels);
 void setupMenu() {
     menuConnectivityIPAddress.setReadOnly(true);
 
-    gfx.begin(20000000);
-    gfx.setRotation(1);
-    renderer.setGraphicsDevice(&gfx, nullptr, nullptr, true, 1);
+    tft.begin();
+    tft.setRotation(1);
+    renderer.prepareDisplay(false, nullptr, 4, nullptr, 4, true);
     menuMgr.initWithoutInput(&renderer, &menuVolume);
     remoteServer.begin(&server, &applicationInfo);
 }

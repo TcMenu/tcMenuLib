@@ -259,7 +259,6 @@ void copyMenuItemValue(MenuItem* item, char* buffer, size_t bufferSize) {
     buffer[0] = 0;
     if(item->getMenuType() == MENUTYPE_ENUM_VALUE) {
         auto* enItem = reinterpret_cast<EnumMenuItem*>(item);
-        char sz[20];
         enItem->copyEnumStrToBuffer(buffer, bufferSize, enItem->getCurrentValue());
     }
     else if(item->getMenuType() == MENUTYPE_BOOLEAN_VALUE) {
@@ -281,14 +280,7 @@ void copyMenuItemValue(MenuItem* item, char* buffer, size_t bufferSize) {
     }
     else if(item->getMenuType() == MENUTYPE_FLOAT_VALUE) {
         auto* flItem = reinterpret_cast<FloatMenuItem*>(item);
-
-        fastltoa(buffer, long(flItem->getFloatValue()), 10, NOT_PADDED, bufferSize);
-        appendChar(buffer, '.', bufferSize);
-
-        long dpDivisor = dpToDivisor(flItem->getDecimalPlaces());
-        long whole = flItem->getFloatValue();
-        long fraction = abs((flItem->getFloatValue() - whole) * dpDivisor);
-        fastltoa_mv(buffer, fraction, dpDivisor, '0', bufferSize);
+        fastftoa(buffer, flItem->getFloatValue(), flItem->getDecimalPlaces(), bufferSize);
     }
     else if(item->getMenuType() == MENUTYPE_INT_VALUE) {
         auto* anItem = reinterpret_cast<AnalogMenuItem*>(item);

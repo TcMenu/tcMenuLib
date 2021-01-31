@@ -16,6 +16,10 @@ void myActionCb(int id);
 
 using namespace aunit;
 
+const char *uuid1 = "07cd8bc6-734d-43da-84e7-6084990becfc";
+const char *uuid2 = "07cd8bc6-734d-43da-84e7-6084990becfd";
+const char *uuid3 = "07cd8bc6-734d-43da-84e7-6084990becfe";
+
 MockedIoAbstraction mockIo;
 NoRenderer noRenderer; 
 MockEepromAbstraction eeprom(400);

@@ -17,7 +17,8 @@
 const PROGMEM ConnectorLocalInfo applicationInfo = { "ESP8266 Greenhouse", "01b9cb76-c108-4be3-a133-6159f8f1c9c1" };
 U8G2_SH1106_128X64_NONAME_F_SW_I2C gfx(U8G2_R0, 5, 4, 16);
 U8g2GfxMenuConfig gfxConfig;
-U8g2MenuRenderer renderer;
+U8g2Drawable drawable(&gfx, &Wire);
+GraphicsDeviceRenderer renderer(20, applicationInfo.name, &drawable);
 WiFiServer server(3333);
 
 // Global Menu Item declarations
@@ -79,7 +80,8 @@ void setupMenu() {
 
     prepareBasicU8x8Config(gfxConfig);
     gfx.begin();
-    renderer.setGraphicsDevice(&gfx, &gfxConfig);
+    //renderer.setGraphicsConfiguration(&gfxConfig);
+    renderer.prepareDisplay(true);
     switches.initialise(internalDigitalIo(), true);
     menuMgr.initForEncoder(&renderer, &menuTomatoTemp, 13, 12, 14);
     remoteServer.begin(&server, &applicationInfo);

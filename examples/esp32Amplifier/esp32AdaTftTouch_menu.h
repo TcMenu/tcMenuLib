@@ -14,7 +14,7 @@
 #include <Arduino.h>
 #include <tcMenu.h>
 #include <RuntimeMenuItem.h>
-#include "tcMenuAdaFruitGfx.h"
+#include "tcMenuTfteSpi.h"
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
 #include <ScrollChoiceMenuItem.h>
@@ -24,9 +24,8 @@ extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app inf
 
 // Global variables that need exporting
 
-extern Adafruit_ILI9341 gfx;
-extern AdaColorGfxMenuConfig gfxConfig;
-extern AdaFruitGfxMenuRenderer renderer;
+extern TFT_eSPI tft;
+extern GraphicsDeviceRenderer renderer;
 extern WiFiServer server;
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type

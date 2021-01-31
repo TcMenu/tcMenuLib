@@ -1,9 +1,10 @@
-
 #include <Arduino.h>
 #include <AUnit.h>
-#include <GfxMenuConfig.h>
-#include <BaseGraphicalRenderer.h>
+#include <graphics/GfxMenuConfig.h>
+#include <graphics/BaseGraphicalRenderer.h>
 #include "fixtures_extern.h"
+
+using namespace tcgfx;
 
 color_t palette1[] = {RGB(0,0,0),RGB(255,255,255),RGB(1,2,3),RGB(3,2,1)};
 color_t palette2[] = {RGB(55,55,55),RGB(66,66,66),RGB(77,77,77),RGB(0,0,0)};
@@ -64,9 +65,9 @@ bool checkPropertiesBasics(ItemDisplayProperties* props, const char* name, const
 }
 
 test(testEmptyItemPropertiesFactory) {
-    assertEqual((size_t)4, sizeof GridPosition);
-    assertEqual((size_t)4, sizeof Coord);
-    assertEqual((size_t)2, sizeof MenuPadding);
+    assertEqual(4, (int)sizeof(GridPosition));
+    assertEqual(4, (int)sizeof(Coord));
+    assertEqual(2, (int)sizeof(MenuPadding));
 
     ConfigurableItemDisplayPropertiesFactory factory;
     auto *config = factory.configFor(nullptr, ItemDisplayProperties::COMPTYPE_TITLE);

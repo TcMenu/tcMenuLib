@@ -34,7 +34,7 @@ int testBasicRuntimeFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, ch
 }
 
 test(testBasicRuntimeMenuItem) {
-    RuntimeMenuItem item(MENUTYPE_RUNTIME_VALUE, 22, testBasicRuntimeFn, 222, NULL);
+    RuntimeMenuItem item(MENUTYPE_RUNTIME_VALUE, 22, testBasicRuntimeFn, 222, 1, NULL);
 
     assertEqual(item.getId(), uint16_t(22));
     assertEqual(item.getEepromPosition(), uint16_t(44));

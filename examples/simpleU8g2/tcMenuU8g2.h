@@ -21,7 +21,7 @@
 #include <tcUtil.h>
 #include <BaseRenderers.h>
 #include <U8g2lib.h>
-#include <GfxMenuConfig.h>
+#include <graphics/GfxMenuConfig.h>
 #include <BaseDialog.h>
 #include <tcUtil.h>
 

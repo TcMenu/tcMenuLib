@@ -24,7 +24,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_PCD8544.h>
 #include <gfxfont.h>
-#include <GfxMenuConfig.h>
+#include <graphics/GfxMenuConfig.h>
 #include <BaseDialog.h>
 
 #define DISPLAY_HAS_MEMBUFFER true

@@ -71,10 +71,16 @@ void ScrollChoiceMenuItem::valueAtPosition(char *buffer, size_t bufferSize, int 
         serdebugF2("Cached ", idx);
     }
     else if(memMode == EEPROM_BASED) {
-        EepromPosition position = eepromStart + (idx * itemSize);
-        menuMgr.getEepromAbstraction()->readIntoMemArray((uint8_t *) buffer, position, safeSize);
+        if(!menuMgr.getEepromAbstraction()) {
+            strncpy(buffer, "!ROM", bufferSize);
+            serdebugF("No Rom set");
+        }
+        else {
+            EepromPosition position = eepromStart + (idx * itemSize);
+            menuMgr.getEepromAbstraction()->readIntoMemArray((uint8_t *) buffer, position, safeSize);
+            serdebugF3("Rom ", idx, position);
+        }
         buffer[safeSize] = 0;
-        serdebugF3("Rom ", idx, position);
     }
     else if(memMode == CUSTOM){
         renderFn(this, idx, RENDERFN_VALUE, buffer, bufferSize);

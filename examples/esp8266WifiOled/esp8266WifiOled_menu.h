@@ -26,7 +26,7 @@ extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app inf
 
 extern U8G2_SH1106_128X64_NONAME_F_SW_I2C gfx;
 extern U8g2GfxMenuConfig gfxConfig;
-extern U8g2MenuRenderer renderer;
+extern GraphicsDeviceRenderer renderer;
 extern WiFiServer server;
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type

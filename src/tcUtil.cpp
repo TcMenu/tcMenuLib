@@ -71,6 +71,25 @@ void fastltoa_mv(char* str, long val, long divisor, char padChar, int len) {
     str[i] = (char)0;
 }
 
+void fastftoa(char* sz, float fl, int dp, int strSize) {
+    bool neg = false;
+    if(fl < 0.0F) {
+        fl = fl * -1.0F;
+        neg = true;
+    }
+
+    // here we get the whole and fractonal parts, knowing its always positive, lastly, we
+    // multiply it up by decimal places to turn it into an int, then we can present it as "[-]whole.fraction"
+    auto whole = (int32_t)fl;
+    fl = fl - float(whole);
+    auto fraction = int32_t(fl * (float)dpToDivisor(dp));
+
+    if(neg) appendChar(sz, '-', strSize);
+    fastltoa(sz, whole, 9, NOT_PADDED, strSize);
+    appendChar(sz, '.', strSize);
+    fastltoa(sz, fraction, dp, '0', strSize);
+}
+
 #if defined __AVR__ || defined ESP_H
 char szGlobalBuffer[16];
 #endif

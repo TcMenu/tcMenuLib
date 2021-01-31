@@ -2,11 +2,11 @@
 #include "esp32AdaTftTouch_menu.h"
 #include <stockIcons/wifiAndConnectionIcons16x12.h>
 #include <ArduinoEEPROMAbstraction.h>
-#include <MenuTouchScreenEncoder.h>
-#include <Fonts/FreeSans18pt7b.h>
-#include <Fonts/FreeSans12pt7b.h>
+#include <graphics/MenuTouchScreenEncoder.h>
 #include "AmplifierController.h"
 #include "app_icondata.h"
+#include "TouchCalibrator.h"
+
 #define YPOS_PIN 32
 #define XNEG_PIN 33
 #define XPOS_PIN 2
@@ -23,6 +23,7 @@ MenuResistiveTouchScreen* pTouchScreen;
 void prepareWifiForUse();
 
 void setup() {
+    SPI.setFrequency(20000000);
     SPI.begin();
     Serial.begin(115200);
 
@@ -34,9 +35,6 @@ void setup() {
 
     renderer.setFirstWidget(&wifiWidget);
 
-    renderer.setGraphicsDevice(&gfx, &FreeSans12pt7b, &FreeSans18pt7b, true, 1);
-    menuVolume.setCurrentValue(60);
-
     setupMenu();
 
     menuMgr.load(MENU_MAGIC_KEY, [] {
@@ -47,19 +45,35 @@ void setup() {
     });
 
     pTouchScreen = new MenuResistiveTouchScreen(&analogDevice, internalDigitalIo(), XPOS_PIN, XNEG_PIN, YPOS_PIN,
-                                                YNEG_PIN, &renderer, BaseResistiveTouchScreen::LANDSCAPE);
-    pTouchScreen->calibrateMinMaxValues(0.18F, 0.92F, 0.05F, 0.92F);
+                                                YNEG_PIN, &renderer, MenuResistiveTouchScreen::LANDSCAPE);
+    pTouchScreen->calibrateMinMaxValues(0.240F, 0.895F, 0.09F, 0.88F);
     pTouchScreen->start();
 
-    auto& factory = reinterpret_cast<ConfigurableItemDisplayPropertiesFactory&>(renderer.getDisplayPropertiesFactory());
+    renderer.setCustomDrawingHandler(new TouchScreenCalibrator(pTouchScreen));
+    renderer.prepareDisplay(false, nullptr, 4, nullptr, 4, true);
+
+    // first we get the graphics factory
+    auto & factory = renderer.getGraphicsPropertiesFactory();
+
+    // now we add the icons that we want to use with certain menu items
     const Coord iconSize(APPICONS_WIDTH, APPICONS_HEIGHT);
     factory.addImageToCache(DrawableIcon(menuSettings.getId(), iconSize, DrawableIcon::ICON_XBITMAP, settingsIcon40Bits));
     factory.addImageToCache(DrawableIcon(menuStatus.getId(), iconSize, DrawableIcon::ICON_XBITMAP, statusIcon40Bits));
     factory.addImageToCache(DrawableIcon(menuMute.getId(), iconSize, DrawableIcon::ICON_XBITMAP, muteOffIcon40Bits, muteOnIcon40Bits));
 
-    factory.addGridPosition(&menuSettings, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 1, 4, 45));
-    factory.addGridPosition(&menuStatus, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 2, 4, 45));
-    factory.addGridPosition(&menuMute, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 3, 4, 45));
+    // and now we define that row 3 of the main menu will have three columns, drawn as icons
+    factory.addGridPosition(&menuSettings, GridPosition(GridPosition::DRAW_AS_ICON_ONLY,
+                                                        GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 1, 4, 45));
+    factory.addGridPosition(&menuStatus, GridPosition(GridPosition::DRAW_AS_ICON_ONLY,
+                                                      GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 2, 4, 45));
+    factory.addGridPosition(&menuMute, GridPosition(GridPosition::DRAW_AS_ICON_ONLY,
+                                                    GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 3, 4, 45));
+
+    // here is how we completely redefine the drawing of a specific item, you can also define for submenu or default
+    color_t specialPalette[] { ILI9341_WHITE, ILI9341_RED, ILI9341_BLACK, ILI9341_BLUE};
+    factory.setDrawingPropertiesForItem(ItemDisplayProperties::COMPTYPE_TITLE, menuStatus.getId(), specialPalette,
+                                        MenuPadding(4), nullptr, 4, 10, 30,
+                                        GridPosition::JUSTIFY_CENTER_WITH_VALUE );
 }
 
 void powerDownCapture() {

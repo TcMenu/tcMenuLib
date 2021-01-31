@@ -19,12 +19,21 @@
 
 #include <tcMenu.h>
 #include <tcUtil.h>
+#include <Wire.h>
 #include <U8g2lib.h>
-#include <BaseGraphicalRenderer.h>
+#include <graphics/BaseGraphicalRenderer.h>
+#include <graphics/GraphicsDeviceRenderer.h>
 #include <BaseDialog.h>
 #include <tcUtil.h>
 
-extern const ConnectorLocalInfo applicationInfo;
+/**
+ * If you DONT want task manager yield code in I2C
+ */
+#ifndef WANT_TASK_MANAGER_FRIENDLY_YIELD
+#define WANT_TASK_MANAGER_FRIENDLY_YIELD 1
+#endif // WANT_TASK_MANAGER_FRIENDLY_YIELD
+
+using namespace tcgfx;
 
 /**
  * A standard menu render configuration that describes how to renderer each item and the title.
@@ -43,6 +52,12 @@ typedef struct ColorGfxMenuConfig<const uint8_t*> U8g2GfxMenuConfig;
 #endif
 
 /**
+ * This is used to draw to I2C including a task manager yield to improve performance on slower I2C devices.
+ * Not really needed for SPI as we are talking in low order millis for a full refresh.
+ */
+uint8_t u8g2_byte_with_yield(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr);
+
+/**
  * A basic renderer that can use the AdaFruit_GFX library to render information onto a suitable
  * display. It is your responsibility to fully initialise and prepare the display before passing
  * it to this renderer. The usual procedure is to create a display variable globally in your
@@ -53,37 +68,26 @@ typedef struct ColorGfxMenuConfig<const uint8_t*> U8g2GfxMenuConfig;
  * just call prepareAdaColorDefaultGfxConfig(..) passing it a pointer to your config object. Again the
  * designer UI takes care of this.
  */
-class U8g2MenuRenderer : public BaseGraphicalRenderer {
+class U8g2Drawable : public DeviceDrawable {
 private:
 	U8G2* u8g2;
-	ConfigurableItemDisplayPropertiesFactory propertiesFactory;
-    bool redrawNeeded;
+#if WANT_TASK_MANAGER_FRIENDLY_YIELD == 1
+    static TwoWire* pWire;
+    friend uint8_t u8g2_byte_with_yield(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr);
+#endif // WANT_TASK_MANAGER_FRIENDLY_YIELD
 public:
-	U8g2MenuRenderer(uint8_t bufferSize = 20) : BaseGraphicalRenderer(bufferSize, 1, 1, false, applicationInfo.name) {
-		this->u8g2 = nullptr;
-	}
-    ~U8g2MenuRenderer() override = default;
+    U8g2Drawable(U8G2* u8g2, TwoWire* wire = nullptr);
+    ~U8g2Drawable() override = default;
 
-	void setGraphicsDevice(U8G2* u8g2, U8g2GfxMenuConfig *gfxConfig);
-	void setGraphicsDevice(U8G2* u8g2);
+    Coord getDisplayDimensions() override {  return Coord(u8g2->getWidth(), u8g2->getHeight()); }
+    DeviceDrawable *getSubDeviceFor(int width, int height, int bitsPerPx, color_t *palette) override { return nullptr; }
 
-    void drawWidget(Coord where, TitleWidget *widget, color_t fg, color_t bg) override;
-    void drawMenuItem(GridPositionRowCacheEntry* entry, Coord where, Coord areaSize) override;
-    void drawingCommand(RenderDrawingCommand command) override;
-
-    ItemDisplayPropertiesFactory &getDisplayPropertiesFactory() override {
-        return propertiesFactory;
-    }
-
-    U8G2* getGraphics() { return u8g2; }
-private:
-    void drawBitmap(int x, int y, int w, int h, const unsigned char *bmp);
-    void drawTextualItem(GridPositionRowCacheEntry* entry, Coord where, Coord size);
-    void drawIconItem(GridPositionRowCacheEntry* pEntry, Coord where, Coord size);
-    void drawSlider(GridPositionRowCacheEntry* pEntry, Coord where, Coord size);
-
-    void internalDrawText(GridPositionRowCacheEntry* pEntry, Coord where, Coord size, int leftOffset, bool xorMode);
-    int drawCoreLineItem(GridPositionRowCacheEntry* pEntry, const Coord &where, const Coord &size);
+    void drawText(const Coord &where, const void *font, int mag, color_t textColor, const char *text) override;
+    void drawBitmap(const Coord &where, const DrawableIcon *icon, color_t defColor, bool selected) override;
+    void drawXBitmap(const Coord &where, const Coord &size, const uint8_t *data, color_t fgColor, color_t bgColor) override;
+    void drawBox(const Coord &where, const Coord &size, color_t color, bool filled) override;
+    void transaction(bool isStarting, bool redrawNeeded) override;
+    Coord textExtents(const void *font, int mag, const char *text, int *baseline) override;
 };
 
 

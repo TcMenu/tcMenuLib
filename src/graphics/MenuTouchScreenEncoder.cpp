@@ -6,32 +6,42 @@
 #include "MenuTouchScreenEncoder.h"
 #include "ScrollChoiceMenuItem.h"
 
+using namespace iotouch;
+namespace tcgfx {
+
 MenuResistiveTouchScreen::MenuResistiveTouchScreen(AnalogDevice *device, BasicIoAbstraction *pins, pinid_t xpPin, pinid_t xnPin, pinid_t ypPin, pinid_t ynPin,
                                                    BaseGraphicalRenderer* renderer, BaseResistiveTouchScreen::TouchRotation rotation)
         : BaseResistiveTouchScreen(device, pins, xpPin, xnPin, ypPin, ynPin, rotation),
-          encoder(renderer), renderer(renderer), observer(&encoder), updateTicks(0) {
+          currentlySelected(nullptr), localStart(0,0), localSize(0,0), encoder(renderer), renderer(renderer),
+          observer(&encoder), lastX(0.0F), lastY(0.0F), currentState(NOT_TOUCHED) {
     renderer->setHasTouchInterface(true);
 }
 
-uint32_t MenuResistiveTouchScreen::sendEvent(float locationX, float locationY, float touchPressure,
-                                             BaseResistiveTouchScreen::TouchState touched) {
-    if(touched != TOUCHED && touched != HELD) {
-        updateTicks = 0;
-        return 100;
+void MenuResistiveTouchScreen::sendEvent(float locationX, float locationY, float touchPressure, TouchState touched) {
+    // record the settings for non event users.
+    lastX = locationX;
+    lastY = locationY;
+    currentState = touched;
+
+    // if we are not in a touched state, there's nothing to do.
+    if(touched == NOT_TOUCHED) {
+        currentlySelected = nullptr;
+        return;
     }
-    else if(observer) {
-        Coord raw = Coord(float(renderer->getWidth()) * locationX, float(renderer->getHeight()) * locationY);
-        Coord localStart(0,0), localSize(0,0);
-        GridPositionRowCacheEntry* pEntry = renderer->findMenuEntryAndDimensions(raw, localStart, localSize);
-        if(!pEntry) {
-            observer->touched(TouchNotification(raw, touched));
-        }
-        else {
-            observer->touched(TouchNotification(pEntry, Coord(raw.x - localStart.x, raw.y - localStart.y), localStart, localSize, touched));
-        }
-        int nextExec = updateTicks == 0 ? 500 : (updateTicks < 4) ? 200 : (updateTicks < 15) ? 100 : 50;
-        updateTicks++;
-        return nextExec;
+
+    Coord raw = Coord((int)(float(renderer->getWidth()) * locationX), (int)(float(renderer->getHeight()) * locationY));
+    if(touched == TOUCHED) {
+        currentlySelected = renderer->findMenuEntryAndDimensions(raw, localStart, localSize);
+        setUsedForScrolling(currentlySelected == nullptr || currentlySelected->getPosition().getDrawingMode() == GridPosition::DRAW_INTEGER_AS_SCROLL);
+    }
+    if(currentlySelected) {
+        // find the local size and ensure it does not drop below 0 in either dimension!
+        int locX = max(0, (int)(raw.x - localStart.x));
+        int locY = max(0, (int)(raw.y - localStart.y));
+        observer->touched(TouchNotification(currentlySelected, Coord(locX, locY), localStart, localSize, touched));
+    }
+    else {
+        observer->touched(TouchNotification(raw, touched));
     }
 }
 
@@ -57,7 +67,7 @@ void MenuTouchScreenEncoder::touched(const TouchNotification &evt) {
             }
 
             auto menuType = evt.getEntry()->getMenuItem()->getMenuType();
-            auto held = evt.getTouchState() == BaseResistiveTouchScreen::HELD;
+            auto held = evt.getTouchState() == HELD;
             if(isTouchActionable(evt.getEntry()->getMenuItem()) && !held) {
                 menuMgr.onMenuSelect(false);
             }
@@ -103,3 +113,5 @@ void MenuTouchScreenEncoder::touched(const TouchNotification &evt) {
         // deal with click completely outside of item area
     }
 }
+
+} // namespace tcgfx

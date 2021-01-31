@@ -84,6 +84,9 @@ void setup() {
     Serial.begin(115200);
     Serial.println("Starting NodeMCU example");
 
+    Wire.begin();
+    //Wire.setClock(400000);
+
     // set up the inbuilt ESP rom to use for load and store.
     EEPROM.begin(512);
     eeprom = new ArduinoEEPROMAbstraction(&EEPROM);
@@ -124,6 +127,9 @@ void setup() {
     // here we set the first widget that will be displayed in the title area.
     renderer.setFirstWidget(&wifiWidget);
 
+    // initialise the menu.
+    setupMenu();
+
     // now we add three icons into the icon cache, we should add one for each menu item that we give a grid position
     // that draws as an image.
     auto& props = static_cast<ConfigurableItemDisplayPropertiesFactory&>(renderer.getDisplayPropertiesFactory());
@@ -136,9 +142,6 @@ void setup() {
     props.addGridPosition(&menuElectricHeater, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE,3, 2, 3, 26));
     props.addGridPosition(&menuLockDoor, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 3, 3, 26));
     props.addGridPosition(&menuSetup, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 1, 3, 26));
-
-    // initialise the menu.
-    setupMenu();
 
     // load back the core menu items
     menuMgr.load(*eeprom);

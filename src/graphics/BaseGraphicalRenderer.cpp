@@ -6,6 +6,8 @@
 #include "BaseGraphicalRenderer.h"
 #include "BaseDialog.h"
 
+namespace tcgfx {
+
 int appTitleRenderingFn(RuntimeMenuItem *item, uint8_t, RenderFnMode mode, char *buffer, int bufferSize);
 
 class RuntimeTitleMenuItem : public RuntimeMenuItem {
@@ -124,42 +126,45 @@ void BaseGraphicalRenderer::render() {
     drawingCommand(DRAW_COMMAND_ENDED);
 }
 
-GridPositionRowCacheEntry* BaseGraphicalRenderer::findRowCol(int idx, int row, int col) {
-    while(idx < itemOrderByRow.count()) {
-        auto* ent = itemOrderByRow.itemAtIndex(idx);
-        if(ent->getPosition().getRow() == row && ent->getPosition().getGridPosition() == col) {
-            return ent;
-        }
-        idx++;
-    }
-    return nullptr;
-}
-
 GridPositionRowCacheEntry* BaseGraphicalRenderer::findMenuEntryAndDimensions(const Coord& screenPos, Coord& localStart, Coord& localSize) {
+    if((dialog!=nullptr && dialog->isRenderNeeded()) || displayTakenMode != NOT_TAKEN_OVER) {
+        return nullptr;
+    }
+
     int rowStartY = 0;
     auto* icon = getDisplayPropertiesFactory().iconForMenuItem(SPECIAL_ID_ACTIVE_ICON);
     int iconWidth = icon ? icon->getDimensions().x : 0;
 
     for(int i=lastOffset; i<itemOrderByRow.count(); i++) {
-        int rowHeight = heightOfRow(i, 1);
-        int rowEndY = rowStartY + rowHeight;
         auto* pEntry = itemOrderByRow.itemAtIndex(i);
+        int rowHeight = heightOfRow(pEntry->getPosition().getRow(), 1);
+        int rowEndY = rowStartY + rowHeight;
 
+        // this seems odd but we are only doing this loop to find the heights, so we
+        // only check all the first entries in the row. There is code further down to
+        // deal with columns.
+        if(pEntry->getPosition().getGridPosition() != 1) {
+            continue;
+        }
+
+        // if we are within the y bounds of of item
         if(screenPos.y > rowStartY && screenPos.y < rowEndY) {
             localStart.y = rowStartY;
             localSize.y = rowHeight;
             if(pEntry->getPosition().getGridSize() == 1) {
+                // single column row, so we must be within the item
                 auto iconAdjust = iconWidth + pEntry->getDisplayProperties()->getPadding().left;
                 localStart.x = iconAdjust;
                 localSize.x = width - iconAdjust;
                 return pEntry;
             }
             else {
+                // multi column row, so we must work out which column we are in.
                 int colWidth = width / pEntry->getPosition().getGridSize();
                 int column = (screenPos.x / colWidth);
                 localStart.x = column * colWidth;
                 localSize.x = colWidth;
-                return findRowCol(i, pEntry->getPosition().getRow(), column);
+                return itemOrderByRow.getByKey(rowCol(pEntry->getPosition().getRow(), column + 1));
             }
         }
         rowStartY += rowHeight + pEntry->getDisplayProperties()->getSpaceAfter();
@@ -201,8 +206,8 @@ bool BaseGraphicalRenderer::drawTheMenuItems(uint8_t locRedrawMode, int startRow
                 if(itemCfg->getPosition().getDrawingMode() == GridPosition::DRAW_TITLE_ITEM && itemCfg->getPosition().getRow() == 0) {
                     didDrawTitle = true;
                 }
-                lastRow = itemCfg->getPosition().getRow();
             }
+            lastRow = itemCfg->getPosition().getRow();
             addAmount = itemHeight + itemCfg->getDisplayProperties()->getSpaceAfter();
         }
     }
@@ -343,13 +348,8 @@ void BaseGraphicalRenderer::redrawAllWidgets(bool forceRedraw) {
     if(!titleOnDisplay || itemOrderByRow.count() == 0) return;
     if(itemOrderByRow.itemAtIndex(0)->getPosition().getDrawingMode() != GridPosition::DRAW_TITLE_ITEM) return;
 
-    color_t widFg, widBg;
-    widFg = itemOrderByRow.itemAtIndex(0)->getDisplayProperties()->getColor(ItemDisplayProperties::HIGHLIGHT1);
-    widBg = itemOrderByRow.itemAtIndex(0)->getDisplayProperties()->getColor(ItemDisplayProperties::BACKGROUND);
-    if(itemOrderByRow.itemAtIndex(0)->getMenuItem()->isActive()) {
-        widFg = getDisplayPropertiesFactory().getSelectedColor(ItemDisplayProperties::TEXT);
-        widBg = getDisplayPropertiesFactory().getSelectedColor(ItemDisplayProperties::BACKGROUND);
-    }
+    auto widFg = itemOrderByRow.itemAtIndex(0)->getDisplayProperties()->getColor(ItemDisplayProperties::HIGHLIGHT1);
+    auto widBg = itemOrderByRow.itemAtIndex(0)->getDisplayProperties()->getColor(ItemDisplayProperties::BACKGROUND);
 
     auto* widget = this->firstWidget;
     int widgetRight = width;
@@ -433,3 +433,5 @@ void preparePropertiesFromConfig(ConfigurableItemDisplayPropertiesFactory& facto
     factory.addImageToCache(DrawableIcon(SPECIAL_ID_ACTIVE_ICON, Coord(gfxConfig->editIconWidth, gfxConfig->editIconHeight), DrawableIcon::ICON_XBITMAP, gfxConfig->activeIcon));
 
 }
+
+} // namespace tcgfx

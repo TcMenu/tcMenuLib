@@ -34,13 +34,13 @@ extern AnalogMenuItem menuVolume;
 extern int idOfCallback;
 extern MockEepromAbstraction eeprom;
 
-static const char *uuid1 = "07cd8bc6-734d-43da-84e7-6084990becfc";
-static const char *uuid2 = "07cd8bc6-734d-43da-84e7-6084990becfd";
-static const char *uuid3 = "07cd8bc6-734d-43da-84e7-6084990becfe";
-
 void printMenuItem(MenuItem* menuItem);
 
 extern const char pgmMyName[];
 extern NoRenderer noRenderer;
+
+extern const char *uuid1;
+extern const char *uuid2;
+extern const char *uuid3;
 
 #endif //TCLIBRARYDEV_FIXTURES_EXTERN_H

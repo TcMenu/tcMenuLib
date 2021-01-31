@@ -5,11 +5,13 @@
 
 #include "tcMenu.h"
 #include "tcUtil.h"
-#include "BaseGraphicalRenderer.h"
+#include "graphics/BaseGraphicalRenderer.h"
 #include <BaseRenderers.h>
 #include <RemoteConnector.h>
 #include <BaseDialog.h>
 #include <SwitchInput.h>
+
+using namespace tcgfx;
 
 const char buttonOK[] PROGMEM = "ok";
 const char buttonCancel[] PROGMEM = "cancel";
@@ -20,6 +22,7 @@ BaseDialog::BaseDialog() {
     headerPgm = nullptr;
     bitWrite(flags, DLG_FLAG_INUSE, false);
     button1 = button2 = BTNTYPE_NONE;
+    buttonHandler = nullptr;
 }
 
 void BaseDialog::show(const char* headerPgm, bool allowRemote, CompletedHandlerFn completedHandler) {
@@ -64,11 +67,14 @@ ButtonType BaseDialog::findActiveBtn(unsigned int currentValue) {
 }
 
 void BaseDialog::actionPerformed(int btnNum) {
-    // must be done before hide, which resets the encoder
-    ButtonType btn = findActiveBtn(btnNum);
-    serdebugF2("User clicked button: ", btn);
-    hide();
-    if(completedHandler) completedHandler(btn, userData);
+    if(btnNum < CUSTOM_DIALOG_BUTTON_START) {
+        // must be done before hide, which resets the encoder
+        ButtonType btn = findActiveBtn(btnNum);
+        serdebugF2("User clicked button: ", btn);
+        hide();
+        if (completedHandler) completedHandler(btn, userData);
+    }
+    else if(buttonHandler) buttonHandler(btnNum, userData);
 }
 
 void BaseDialog::dialogRendering(unsigned int currentValue, bool userClicked) {

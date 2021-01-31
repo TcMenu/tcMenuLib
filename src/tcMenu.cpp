@@ -9,8 +9,10 @@
 #include "ScrollChoiceMenuItem.h"
 #include "MenuIterator.h"
 #include "SecuredMenuPopup.h"
-#include "BaseGraphicalRenderer.h"
+#include "graphics/BaseGraphicalRenderer.h"
 #include <IoAbstraction.h>
+
+using namespace tcgfx;
 
 MenuManager menuMgr;
 
@@ -224,6 +226,11 @@ void MenuManager::stopEditingCurrentItem(bool doMultiPartNext) {
 }
 
 MenuItem* MenuManager::getParentAndReset() {
+    if(menuMgr.getCurrentMenu()->getMenuType() == MENUTYPE_RUNTIME_LIST) {
+        auto* sub = getSubMenuFor(menuMgr.getCurrentMenu());
+        if(sub) return reinterpret_cast<SubMenuItem*>(sub)->getChild();
+    }
+
 	auto* pItem = getParentRootAndVisit(menuMgr.getCurrentMenu(), [](MenuItem* curr) {
 		curr->setActive(false);
 		curr->setEditing(false);

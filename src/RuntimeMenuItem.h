@@ -497,7 +497,14 @@ public:
 long parseIntUntilSeparator(const char* ptr, int& offset);
 
 /**
- * This macro defines a rendering callback that will be often used with remote types, it takes as it's parameters
+ * Invokes a menu callback if it is safe to do so
+ * @param cb callback to make
+ * @param id menuId
+ */
+inline void invokeIfSafe(MenuCallbackFn cb, MenuItem* pItem) { if(cb && pItem) cb(pItem->getId()); }
+
+/**
+ * This macro defines MenuItem*
  * a parent function for the type in question, the variable containing the progmem name and the call back method
  * or NULL if there's no callback.
  */
@@ -508,8 +515,8 @@ int fnName(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, 
 	case RENDERFN_NAME: \
 		safeProgCpy(buffer, fnName##Pgm, buffSize); \
 		return true; \
-	case RENDERFN_INVOKE: \
-		if(invoke) (reinterpret_cast<MenuCallbackFn>(invoke))(int(item->getId())); \
+    case RENDERFN_INVOKE: \
+		invokeIfSafe(invoke, item); \
 		return true; \
 	case RENDERFN_EEPROM_POS: \
 		return eepromPosition; \

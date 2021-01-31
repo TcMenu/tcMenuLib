@@ -17,17 +17,7 @@
  */
 #define MAX_VALUE_LEN 40
 
-/**
- * A helper to generate the major minor version numbers used in the protocol
- */
-#define majorminor(maj, min) ((maj * 100) + min)
-
-/**
- * Definition of the current API version
- */
-#define API_VERSION majorminor(1, 3)
-
-enum AckResponseStatus { 
+enum AckResponseStatus {
     // warnings
     ACK_VALUE_RANGE = -1 , 
     // success
