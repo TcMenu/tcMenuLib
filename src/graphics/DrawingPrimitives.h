@@ -85,6 +85,7 @@ namespace tcgfx {
         Coord& operator = (const Coord& other) {
             this->x = other.x;
             this->y = other.y;
+            return *this;
         }
 
         int32_t x: 16;

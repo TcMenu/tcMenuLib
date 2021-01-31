@@ -40,8 +40,10 @@ void setup() {
     menuMgr.load(MENU_MAGIC_KEY, [] {
         // when the eeprom is not initialised, put sensible defaults in there.
         menuMgr.getEepromAbstraction()->writeArrayToRom(150, reinterpret_cast<const uint8_t *>(pgmDefaultChannelNames), sizeof pgmDefaultChannelNames);
-        menuVolume.setCurrentValue(20);
-        menuDirect.setBoolean(true);
+        // At this point during setup, things are not initialised so use the silent version of the menu set methods.
+        // Otherwise, you'll potentially be calling code that isn't initialised.
+        menuVolume.setCurrentValue(20, true);
+        menuDirect.setBoolean(true, true);
     });
 
     pTouchScreen = new MenuResistiveTouchScreen(&analogDevice, internalDigitalIo(), XPOS_PIN, XNEG_PIN, YPOS_PIN,
@@ -74,6 +76,9 @@ void setup() {
     factory.setDrawingPropertiesForItem(ItemDisplayProperties::COMPTYPE_TITLE, menuStatus.getId(), specialPalette,
                                         MenuPadding(4), nullptr, 4, 10, 30,
                                         GridPosition::JUSTIFY_CENTER_WITH_VALUE );
+
+    // If your app relies on getting the callbacks after a menu manager's load has finished then this does the callbacks
+    triggerAllChangedCallbacks();
 }
 
 void powerDownCapture() {

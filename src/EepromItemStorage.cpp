@@ -7,6 +7,7 @@
 #include "tcMenu.h"
 #include "EditableLargeNumberMenuItem.h"
 #include "ScrollChoiceMenuItem.h"
+#include "MenuIterator.h"
 
 void saveRecursively(EepromAbstraction* eeprom, MenuItem* nextMenuItem) {
 	while (nextMenuItem) {
@@ -80,34 +81,26 @@ void loadSingleItem(EepromAbstraction* eeprom, MenuItem* nextMenuItem) {
         auto textItem = reinterpret_cast<TextMenuItem*>(nextMenuItem);
         eeprom->readIntoMemArray((uint8_t*)textItem->getTextValue(), textItem->getEepromPosition(), textItem->textLength());
         textItem->cleanUpArray();
-        textItem->setSendRemoteNeededAll();
         textItem->setChanged(true);
-        textItem->triggerCallback();
     }
     else if (nextMenuItem->getMenuType() == MENUTYPE_TIME) {
         auto timeItem = reinterpret_cast<TimeFormattedMenuItem*>(nextMenuItem);
         eeprom->readIntoMemArray((uint8_t*)timeItem->getUnderlyingData(), timeItem->getEepromPosition(), 4);
-        timeItem->setSendRemoteNeededAll();
         timeItem->setChanged(true);
-        timeItem->triggerCallback();
     }
     else if (nextMenuItem->getMenuType() == MENUTYPE_DATE) {
         auto dateItem = reinterpret_cast<DateFormattedMenuItem*>(nextMenuItem);
         eeprom->readIntoMemArray((uint8_t*)dateItem->getUnderlyingData(), dateItem->getEepromPosition(), 4);
-        dateItem->setSendRemoteNeededAll();
         dateItem->setChanged(true);
-        dateItem->triggerCallback();
     }
     else if (nextMenuItem->getMenuType() == MENUTYPE_IPADDRESS) {
         auto ipItem = reinterpret_cast<IpAddressMenuItem*>(nextMenuItem);
         eeprom->readIntoMemArray(ipItem->getIpAddress(), ipItem->getEepromPosition(), 4);
-        ipItem->setSendRemoteNeededAll();
         ipItem->setChanged(true);
-        ipItem->triggerCallback();
     }
     else if (nextMenuItem->getMenuType() == MENUTYPE_SCROLLER_VALUE) {
         auto scroller = reinterpret_cast<ScrollChoiceMenuItem*>(nextMenuItem);
-        scroller->setCurrentValue(eeprom->read16(scroller->getEepromPosition()));
+        scroller->setCurrentValue(eeprom->read16(scroller->getEepromPosition()), true);
     }
     else if (nextMenuItem->getMenuType() == MENUTYPE_COLOR_VALUE) {
         auto rgb = reinterpret_cast<Rgb32MenuItem*>(nextMenuItem);
@@ -116,23 +109,25 @@ void loadSingleItem(EepromAbstraction* eeprom, MenuItem* nextMenuItem) {
         data->green = eeprom->read8(rgb->getEepromPosition() + 1);
         data->blue = eeprom->read8(rgb->getEepromPosition() + 2);
         data->alpha = eeprom->read8(rgb->getEepromPosition() + 3);
+        rgb->setChanged(true);
     }
     else if (nextMenuItem->getMenuType() == MENUTYPE_LARGENUM_VALUE) {
         auto numItem = reinterpret_cast<EditableLargeNumberMenuItem*>(nextMenuItem);
         numItem->getLargeNumber()->setNegative(eeprom->read8(numItem->getEepromPosition()));
         eeprom->readIntoMemArray(numItem->getLargeNumber()->getNumberBuffer(), numItem->getEepromPosition() + 1, 6);
+        numItem->setChanged(true);
     }
     else if (nextMenuItem->getMenuType() == MENUTYPE_INT_VALUE) {
         auto intItem = (AnalogMenuItem*)nextMenuItem;
-        intItem->setCurrentValue(eeprom->read16(intItem->getEepromPosition()));
+        intItem->setCurrentValue(eeprom->read16(intItem->getEepromPosition()), true);
     }
     else if (nextMenuItem->getMenuType() == MENUTYPE_ENUM_VALUE) {
         auto valItem = (EnumMenuItem*)nextMenuItem;
-        valItem->setCurrentValue(eeprom->read16(valItem->getEepromPosition()));
+        valItem->setCurrentValue(eeprom->read16(valItem->getEepromPosition()), true);
     }
     else if (nextMenuItem->getMenuType() == MENUTYPE_BOOLEAN_VALUE) {
         auto valItem = (BooleanMenuItem*)nextMenuItem;
-        valItem->setCurrentValue(eeprom->read8(valItem->getEepromPosition()));
+        valItem->setCurrentValue(eeprom->read8(valItem->getEepromPosition()), true);
     }
 }
 
@@ -169,4 +164,12 @@ bool loadMenuItem(EepromAbstraction* eeprom, MenuItem* theItem, uint16_t magicKe
     else {
         return false;
     }
+}
+
+void triggerAllChangedCallbacks() {
+    getParentRootAndVisit(menuMgr.getRoot(), [](MenuItem* item) {
+        if(item->isChanged() && item->getEepromPosition() != 0xffff) {
+            item->triggerCallback();
+        }
+    });
 }

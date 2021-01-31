@@ -33,13 +33,19 @@ void saveMenuStructure(EepromAbstraction* eeprom, uint16_t magicKey = 0xfade);
 bool loadMenuStructure(EepromAbstraction* eeprom, uint16_t magicKey = 0xfade);
 
 /**
- * Loads a single menu item back from storage, this can be used to selectively load critical menu items before
- * the setupMenu() call is made, but care must be taken to ensure that the callbacks for these items do not rely
- * on any menu infrastructure whatsoever.
+ * Loads a single menu item back from storage, this can be used to selectively load items from the EEPROM. Mainly for
+ * cases when you want to selectively load a few items from ROM.
  * @param eeprom  the EEPROM storage to load from
  * @param theItem the menu item to try and load if the magic key matches
  * @param magicKey the key to check against, only loaded if the key matches.
  */
 bool loadMenuItem(EepromAbstraction* eeprom, MenuItem* theItem, uint16_t magicKey = 0xfade);
+
+/**
+ * This will trigger callbacks in a controlled manner, for only items that would be loaded from EEPROM, and only if
+ * the item is marked as changed. This is much safer than the previous option, which was to run all callbacks as
+ * part of the load call, when most of the system may not have started yet.
+ */
+void triggerAllChangedCallbacks();
 
 #endif //_EEPROM_ITEM_STORAGE_H_
