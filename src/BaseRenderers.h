@@ -24,10 +24,14 @@ class BaseDialog;
  * a renderer.
  */
 
+#ifndef TC_DISPLAY_UPDATES_PER_SECOND
+#define TC_DISPLAY_UPDATES_PER_SECOND 4
+#endif // TC_DISPLAY_UPDATES_PER_SECOND
+
 /** the frequency at which the screen is redrawn (only if needed). */
-#define SCREEN_DRAW_INTERVAL 100
+#define SCREEN_DRAW_INTERVAL (1000 / TC_DISPLAY_UPDATES_PER_SECOND)
 /** the number of ticks the menu should reset to defaults after not being used */
-#define SECONDS_IN_TICKS (1000 / SCREEN_DRAW_INTERVAL)
+#define SECONDS_IN_TICKS TC_DISPLAY_UPDATES_PER_SECOND
 /** The maximum number of ticks that */
 #define MAX_TICKS 0xffff
 

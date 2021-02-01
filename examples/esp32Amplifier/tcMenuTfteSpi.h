@@ -15,6 +15,8 @@
 #ifndef TCMENU_PLUGIN_TCMENUTFTESPI_H
 #define TCMENU_PLUGIN_TCMENUTFTESPI_H
 
+#define TC_DISPLAY_UPDATES_PER_SECOND 8
+
 #include <Arduino.h>
 #include <graphics/GraphicsDeviceRenderer.h>
 #include <TFT_eSPI.h>
