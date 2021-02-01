@@ -99,8 +99,8 @@ namespace tcgfx {
          * @param renderer the graphics renderer that is in use
          * @param rotation the rotation of the touch interface
          */
-        MenuResistiveTouchScreen(AnalogDevice *device, BasicIoAbstraction *pins, pinid_t xpPin, pinid_t xnPin,
-                                 pinid_t ypPin, pinid_t ynPin, BaseGraphicalRenderer* renderer, TouchRotation rotation);
+        MenuResistiveTouchScreen(pinid_t xpPin, pinid_t xnPin, pinid_t ypPin, pinid_t ynPin, BaseGraphicalRenderer* renderer,
+                                 TouchRotation rotation);
 
         void sendEvent(float locationX, float locationY, float touchPressure, iotouch::TouchState touched) override;
 

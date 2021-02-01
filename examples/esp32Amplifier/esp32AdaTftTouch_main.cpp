@@ -3,6 +3,8 @@
 #include <stockIcons/wifiAndConnectionIcons16x12.h>
 #include <ArduinoEEPROMAbstraction.h>
 #include <graphics/MenuTouchScreenEncoder.h>
+#include <BaseDialog.h>
+#include <tcMenuVersion.h>
 #include "AmplifierController.h"
 #include "app_icondata.h"
 #include "TouchCalibrator.h"
@@ -12,13 +14,14 @@
 #define XPOS_PIN 2
 #define YNEG_PIN 0
 
+const char pgmVersionHeader[] PROGMEM = "tcMenu Version";
+
 bool connectedToWifi = false;
 EepromAuthenticatorManager authManager;
 TitleWidget wifiWidget(iconsWifi, 5, 16, 12, nullptr);
 AnalogMenuItem* adjustMenuItems[] = {&menuSettingsLine1Adj, &menuSettingsLine2Adj, &menuSettingsLine3Adj};
 AmplifierController controller(adjustMenuItems);
-ArduinoAnalogDevice analogDevice;
-MenuResistiveTouchScreen* pTouchScreen;
+MenuResistiveTouchScreen touchScreen(XPOS_PIN, XNEG_PIN, YPOS_PIN, YNEG_PIN, &renderer, MenuResistiveTouchScreen::LANDSCAPE);
 
 void prepareWifiForUse();
 
@@ -46,12 +49,10 @@ void setup() {
         menuDirect.setBoolean(true, true);
     });
 
-    pTouchScreen = new MenuResistiveTouchScreen(&analogDevice, internalDigitalIo(), XPOS_PIN, XNEG_PIN, YPOS_PIN,
-                                                YNEG_PIN, &renderer, MenuResistiveTouchScreen::LANDSCAPE);
-    pTouchScreen->calibrateMinMaxValues(0.240F, 0.895F, 0.09F, 0.88F);
-    pTouchScreen->start();
+    touchScreen.calibrateMinMaxValues(0.240F, 0.895F, 0.09F, 0.88F);
+    touchScreen.start();
 
-    renderer.setCustomDrawingHandler(new TouchScreenCalibrator(pTouchScreen));
+    renderer.setCustomDrawingHandler(new TouchScreenCalibrator(&touchScreen));
     renderer.prepareDisplay(false, nullptr, 4, nullptr, 4, true);
 
     // first we get the graphics factory
@@ -77,7 +78,17 @@ void setup() {
                                         MenuPadding(4), nullptr, 4, 10, 30,
                                         GridPosition::JUSTIFY_CENTER_WITH_VALUE );
 
-    // If your app relies on getting the callbacks after a menu manager's load has finished then this does the callbacks
+    setTitlePressedCallback([](int) {
+        BaseDialog* dlg = MenuRenderer::getInstance()->getDialog();
+        if(!dlg || dlg->isInUse()) return;
+        dlg->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
+        char sz[25];
+        tccore::copyTcMenuVersion(sz, sizeof sz);
+        dlg->copyIntoBuffer(sz);
+        dlg->show(pgmVersionHeader, false);
+    });
+
+    // If your app relies on getting the callbacks after a menuMgr.load(..) has finished then this does the callbacks
     triggerAllChangedCallbacks();
 }
 

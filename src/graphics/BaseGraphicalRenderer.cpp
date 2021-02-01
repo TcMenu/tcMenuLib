@@ -47,6 +47,7 @@ int appTitleRenderingFn(RuntimeMenuItem *item, uint8_t, RenderFnMode mode, char 
                 auto cb = pTitleItem->getCallback();
                 cb(item->getId());
             }
+            return true;
         case RENDERFN_VALUE: {
             buffer[0] = '^'; buffer[1] = 0;
             return true;

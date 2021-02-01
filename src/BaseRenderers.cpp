@@ -201,7 +201,8 @@ BaseDialog* NoRenderer::getDialog() {
 
 bool isItemActionable(MenuItem* item) {
 	if (item->getMenuType() == MENUTYPE_SUB_VALUE || item->getMenuType() == MENUTYPE_ACTION_VALUE 
-		|| item->getMenuType() == MENUTYPE_ACTIVATE_SUBMENU || item->getMenuType() == MENUTYPE_RUNTIME_VALUE) return true;
+		|| item->getMenuType() == MENUTYPE_ACTIVATE_SUBMENU || item->getMenuType() == MENUTYPE_RUNTIME_VALUE
+        || item->getMenuType() == MENUTYPE_TITLE_ITEM) return true;
 
 	if (item->getMenuType() == MENUTYPE_RUNTIME_LIST) {
 		return reinterpret_cast<ListRuntimeMenuItem*>(item)->isActingAsParent();

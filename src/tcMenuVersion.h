@@ -6,13 +6,14 @@
 #ifndef TCMENU_VERSION_H
 #define TCMENU_VERSION_H
 
+#include "tcUtil.h"
+
 namespace tccore {
 
 // here we define the version as both a string and separate field
-#define TCMENU_MAJOR 1
-#define TCMENU_MINOR 8
+#define TCMENU_MAJOR 2
+#define TCMENU_MINOR 0
 #define TCMENU_PATCH 0
-#define TCMENU_VERSION_STR "1.8.0"
 
 /**
  * A helper to generate the major minor version numbers used in the protocol
@@ -23,6 +24,15 @@ namespace tccore {
  * Definition of the current API version
  */
 #define API_VERSION majorminor(TCMENU_MAJOR, TCMENU_MINOR)
+
+    inline void copyTcMenuVersion(char* buffer, size_t bufferSize) {
+        buffer[0] = 'V'; buffer[1]=0;
+        fastltoa(buffer, TCMENU_MAJOR, 3, NOT_PADDED, bufferSize);
+        appendChar(buffer, '.', bufferSize);
+        fastltoa(buffer, TCMENU_MINOR, 3, NOT_PADDED, bufferSize);
+        appendChar(buffer, '.', bufferSize);
+        fastltoa(buffer, TCMENU_PATCH, 3, NOT_PADDED, bufferSize);
+    }
 
 }
 

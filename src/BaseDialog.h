@@ -59,7 +59,7 @@ class TagValueRemoteConnector; // forward reference
  */
 class BaseDialog {
 protected:
-    const char *headerPgm;
+    char header[20];
     CompletedHandlerFn completedHandler;
     void* userData;
     ButtonType button1;
@@ -94,10 +94,16 @@ public:
 
     /**
      * Create a dialog that takes over the display and presents the header and
-     * buffer, with the buttons set up as per `setButtons`
+     * buffer, the header text is in program memory, with the buttons set up as per `setButtons`
      */
     void show(const char* headerPgm, bool allowRemote, CompletedHandlerFn completedHandler = NULL);
-    
+
+    /**
+     * Create a dialog that takes over the display and presents the header and
+     * buffer, the header text is in RAM, with the buttons set up as per `setButtons`
+     */
+    void showRam(const char* headerRam, bool allowRemote, CompletedHandlerFn completedHandler = NULL);
+
     /**
      * You can set an item of data that will be passed to the callback when executed.
      * @param data a pointer to your own data that will be given back to you in the call back.
@@ -192,6 +198,7 @@ protected:
      */
     ButtonType findActiveBtn(unsigned int currentValue);
 
+    void internalShow(bool allowRemote, CompletedHandlerFn completedHandler);
 };
 
 /**
@@ -228,9 +235,11 @@ public:
 
     void internalSetVisible(bool visible) override;
     void copyIntoBuffer(const char *sz) override;
-    const char* getHeaderText() { return headerPgm; }
 
     void insertMenuItem(MenuItem* item);
+
+    void copyHeader(char *buffer, int bufferSize);
+
 protected:
     /** not used in this implementation */
     void internalRender(int currentValue) override {}

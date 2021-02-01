@@ -337,10 +337,10 @@ void TagValueRemoteConnector::nextBootstrap() {
 	}
 }
 
-void TagValueRemoteConnector::encodeDialogMsg(uint8_t mode, uint8_t btn1, uint8_t btn2, const char* hdrPgm, const char* b1) {
+void TagValueRemoteConnector::encodeDialogMsg(uint8_t mode, uint8_t btn1, uint8_t btn2, const char* header, const char* b1) {
 	if(!prepareWriteMsg(MSG_DIALOG)) return;
-    
-    char buffer[20];
+
+	char buffer[2];
     buffer[0]=mode;
     buffer[1]=0;
     transport->writeField(FIELD_MODE, buffer);
@@ -349,8 +349,7 @@ void TagValueRemoteConnector::encodeDialogMsg(uint8_t mode, uint8_t btn1, uint8_
     transport->writeFieldInt(FIELD_BUTTON2, btn2);
     
     if(mode == 'S') {
-        safeProgCpy(buffer, hdrPgm, sizeof(buffer));
-        transport->writeField(FIELD_HEADER, buffer);    
+        transport->writeField(FIELD_HEADER, header);
         transport->writeField(FIELD_BUFFER, b1);
     }
     transport->endMsg();

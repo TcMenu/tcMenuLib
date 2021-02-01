@@ -18,20 +18,29 @@ const char buttonCancel[] PROGMEM = "cancel";
 const char buttonClose[] PROGMEM = "close";
 const char buttonAccept[] PROGMEM = "accept";
 
-BaseDialog::BaseDialog() {
-    headerPgm = nullptr;
+BaseDialog::BaseDialog() : header{0} {
     bitWrite(flags, DLG_FLAG_INUSE, false);
     button1 = button2 = BTNTYPE_NONE;
     buttonHandler = nullptr;
 }
 
 void BaseDialog::show(const char* headerPgm, bool allowRemote, CompletedHandlerFn completedHandler) {
+    safeProgCpy(this->header, headerPgm, sizeof(this->header));
+    internalShow(allowRemote, completedHandler);
+}
+
+void BaseDialog::showRam(const char* headerRam, bool allowRemote, CompletedHandlerFn completedHandler) {
+    strncpy(this->header, headerRam, sizeof(this->header));
+    this->header[sizeof(this->header) - 1] = 0;
+    internalShow(allowRemote, completedHandler);
+}
+
+void BaseDialog::internalShow(bool allowRemote, CompletedHandlerFn completedHandler) {
     serdebugF("showing new dialog");
     setInUse(true);
     setRemoteAllowed(allowRemote);
     setRemoteUpdateNeededAll();
-    this->headerPgm = headerPgm;
-    this->completedHandler = completedHandler;
+    BaseDialog::completedHandler = completedHandler;
     internalSetVisible(true);
     needsDrawing = MENUDRAW_COMPLETE_REDRAW;
 }
@@ -54,7 +63,7 @@ void BaseDialog::hide() {
     // clear down all structures.
     button1 = button2 = BTNTYPE_NONE;
     setNeedsDrawing(false);
-    headerPgm = nullptr;
+    header[0] = 0;
 }
 
 ButtonType BaseDialog::findActiveBtn(unsigned int currentValue) {
@@ -154,7 +163,7 @@ void BaseDialog::setButtons(ButtonType btn1, ButtonType btn2, int defVal) {
 }
 
 void BaseDialog::encodeMessage(TagValueRemoteConnector* remote) {
-    remote->encodeDialogMsg(isInUse() ? DLG_VISIBLE : DLG_HIDDEN, button1, button2, headerPgm, MenuRenderer::getInstance()->getBuffer());
+    remote->encodeDialogMsg(isInUse() ? DLG_VISIBLE : DLG_HIDDEN, button1, button2, header, MenuRenderer::getInstance()->getBuffer());
 }
 
 void BaseDialog::remoteAction(ButtonType btn) {
@@ -174,7 +183,7 @@ int dialogBackRenderFn(RuntimeMenuItem* item, uint8_t /*row*/, RenderFnMode mode
         case RENDERFN_INVOKE:
             dlg->remoteAction(BTNTYPE_CANCEL);
         case RENDERFN_NAME:
-            safeProgCpy(buffer, dlg->getHeaderText(), bufferSize);
+            dlg->copyHeader(buffer, bufferSize);
             return true;
         case RENDERFN_EEPROM_POS:
             return -1;
@@ -255,4 +264,9 @@ void MenuBasedDialog::insertMenuItem(MenuItem* item) {
 
     item->setNext(bufferItem.getNext());
     bufferItem.setNext(item);
+}
+
+void MenuBasedDialog::copyHeader(char *buffer, int bufferSize) {
+    strncpy(buffer, header, bufferSize);
+    buffer[bufferSize - 1] = 0;
 }
