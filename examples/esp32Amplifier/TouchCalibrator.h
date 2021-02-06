@@ -6,7 +6,7 @@
 #define TCMENU_ESP_AMPLIFIER_TOUCH_CALIBRATOR_H
 
 #include <Arduino.h>
-#include "esp32AdaTftTouch_menu.h"
+#include "esp32Amplifier_menu.h"
 #include <graphics/BaseGraphicalRenderer.h>
 #include <graphics/MenuTouchScreenEncoder.h>
 

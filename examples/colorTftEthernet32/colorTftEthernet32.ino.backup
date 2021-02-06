@@ -7,12 +7,13 @@
 #include <Fonts/FreeSans9pt7b.h>
 #include <Ethernet.h>
 #include <SPI.h>
+#include <IoLogging.h>
 
 // contains the graphical widget title components.
 #include "stockIcons/wifiAndConnectionIcons16x12.h"
 
 /*
- * Shows how to use adagraphics with a TFT panel and an ethernet module.
+ * Shows how to use adafruit graphics with a TFT panel and an ethernet module.
  * This is a 32 bit example, which by default targets 32 bit devices.
  * Assumed board for this is a SAMD based MKR board.
  * 
@@ -44,7 +45,7 @@ IoAbstractionRef io8574 = ioFrom8574(0x20, 0); // on addr 0x20 and interrupt pin
 ArduinoAnalogDevice analogDevice(12, 10);
 
 // Here we create two additional menus, that will be added manually to handle the connectivity
-// status and authentication keys. In a future version these will be added to th desinger.
+// status and authentication keys. In a future version these will be added to th designer.
 RemoteMenuItem menuRemoteMonitor(1001, 2);
 EepromAuthenicationInfoMenuItem menuAuthKeyMgr(1002, &authManager, &menuRemoteMonitor);
 
@@ -52,45 +53,16 @@ EepromAuthenicationInfoMenuItem menuAuthKeyMgr(1002, &authManager, &menuRemoteMo
 // are in the standard icon set we included at the top.
 TitleWidget connectedWidget(iconsConnection, 2, 16, 12);
 
-//
-// here we provide a completely custom configuration of color and spacing
-//
-void prepareCustomConfiguration() {
-    // first we set the spacing around title, items and widgets. The make padding function follows the
-    // same standard as CSS. Top, right, bottom, left.
-	makePadding(colorConfig.titlePadding, 6, 3, 6, 3); // top, right, bottom & left
-	makePadding(colorConfig.itemPadding, 3, 3, 3, 3);   // top, right, bottom & left
-	makePadding(colorConfig.widgetPadding, 6, 8, 0, 3);// top, right, bottom & left
-
-    // and then the foreground, background and font of the title
-	colorConfig.bgTitleColor = RGB(50, 100, 200);
-	colorConfig.fgTitleColor = RGB(0, 0, 0);
-	colorConfig.titleFont = &FreeSans9pt7b;
-	colorConfig.titleBottomMargin = 10; // the space between title and items.
-
-    // and then the colours for items.
-	colorConfig.bgItemColor = RGB(0, 0, 0);
-	colorConfig.fgItemColor = RGB(222, 222, 222);
-	colorConfig.itemFont = NULL;
-
-    // and when items are selected.
-	colorConfig.bgSelectColor = RGB(0, 50, 200);
-	colorConfig.fgSelectColor = RGB(255, 255, 255);
-	colorConfig.widgetColor = RGB(30, 30, 30);
-
-    // you can set the size scaling of the fonts
-	colorConfig.titleFontMagnification = 1;
-	colorConfig.itemFontMagnification = 1;
-
-    // and if you really want to, provide alternative bitmaps for the edit / active icon
-    // otherwise both icons must be set to NULL.
-    //colorConfig.editIcon = myEditIcon;
-    //colorConfig.activeIcon = myActiveIcon;
-    //colorConfig.editIconWidth = myEditWidth;
-    //colorConfig.editIconHeight = myEditheight;
-    colorConfig.editIcon = NULL;
-    colorConfig.activeIcon = NULL;
-}
+// Start 2nd Encoder
+// Here, we use a second rotary encoder to adjust one of the menu items, the button toggles a boolean item
+// Here are the fields for the second rotary encoder
+// If you only want one encoder you can comment these fields out.
+const int encoder2Click = 0;
+const int encoder2APin = 2;
+const int encoder2BPin = 3;
+HardwareRotaryEncoder *secondEncoder;
+const int ledPin = 1;
+// End 2nd Encoder
 
 // when there's a change in communication status (client connects for example) this gets called.
 void onCommsChange(CommunicationInfo info) {
@@ -104,6 +76,9 @@ void onCommsChange(CommunicationInfo info) {
 void setup() {
     // we used an i2c device (io8574) so must initialise wire too
     Wire.begin();
+
+    // We should set the eeprom that menu manager will use as early as possible
+    menuMgr.setEepromRef(&eeprom);
 
     // now we enable authentication using EEPROM authentication. Where the EEPROM is
     // queried for authentication requests, and any additional pairs are stored there too.
@@ -123,10 +98,6 @@ void setup() {
     analogDevice.initPin(A0, DIR_OUT);
     analogDevice.initPin(A1, DIR_IN);
 
-    // we have our own graphics configuration. it must be initialised
-    // before calling setupMenu..
-    prepareCustomConfiguration();
-
     // here we make the menuitem "hidden item" invisible. It will not be displayed.
     // here it is done before setupMenu is called, so there's no need to refresh the
     // display. If it's done after initialisation, the menu must be reset by calling
@@ -140,7 +111,7 @@ void setup() {
     setupMenu();
 
     // and then load back the previous state
-    menuMgr.load(eeprom);
+    menuMgr.load();
 
     // spin up the Ethernet library
     byte* rawIp = menuIpAddress.getIpAddress();
@@ -152,10 +123,30 @@ void setup() {
     Serial.print("Ethernet available on ");Serial.println(sz);
 
     taskManager.scheduleFixedRate(2250, [] {
-        Serial.print(".");
         float a1Value = analogDevice.getCurrentFloat(A1);
         menuVoltA1.setFloatValue(a1Value * 3.3);
     });
+
+    // Start 2nd encoder
+    Serial.println("Setting up second encoder now");
+
+    ioDevicePinMode(switches.getIoAbstraction(), ledPin, OUTPUT);
+
+    // here we want the encoder set to the range of values that menuCurrent takes, this is just for example,
+    // and you could set the range to anything that is required. We use the callback to update the menu item.
+    secondEncoder = new HardwareRotaryEncoder(encoder2APin, encoder2BPin, [](int encoderValue) {
+        menuCurrent.setCurrentValue(encoderValue);
+    });
+    secondEncoder->changePrecision(menuCurrent.getMaximumValue(), menuCurrent.getCurrentValue());
+    switches.setEncoder(1, secondEncoder); // put it into the 2nd available encoder slot.
+
+    // now, when the additional encoder button is released, we toggle the state of menuPwrDelay.
+    // it will repeat at 25 * 20 millis before acceleration kicks in.
+    switches.addSwitch(encoder2Click, [](pinid_t pin, bool held) {
+        menuPwrDelay.setBoolean(!menuPwrDelay.getBoolean());
+        ioDeviceDigitalWriteS(switches.getIoAbstraction(), ledPin, menuPwrDelay.getBoolean());
+    }, 25);
+    // End 2nd encoder
 }
 
 void loop() {
@@ -185,10 +176,12 @@ void CALLBACK_FUNCTION onLimitMode(int /*id*/) {
 
 void CALLBACK_FUNCTION onSaveRom(int /*id*/) {
     // save out the state, in a real system we could detect power down for this.
-    menuMgr.save(eeprom);
+    menuMgr.save();
 }
 
 bool starting = true;
+
+const char pgmHeaderSavedItem[] PROGMEM = "Rom Item Saved";
 
 void myRenderCallback(unsigned int encoderVal, RenderPressMode pressType) {
     if(pressType == RPRESS_HELD)
@@ -219,23 +212,57 @@ void myRenderCallback(unsigned int encoderVal, RenderPressMode pressType) {
     }
 }
 
-void CALLBACK_FUNCTION onTakeDisplay(int id) {
+void CALLBACK_FUNCTION onTakeDisplay(int /*id*/) {
     starting = true;
     renderer.takeOverDisplay(myRenderCallback);
 }
 
-void CALLBACK_FUNCTION onRgbChanged(int id) {
-    // TODO - your menu change code
+void CALLBACK_FUNCTION onRgbChanged(int /*id*/) {
+    auto colorData = menuRGB.getColorData();
+    serdebugF4("RGB changed: ", colorData.red, colorData.green, colorData.blue);
 }
 
-void CALLBACK_FUNCTION onRomValuesSubOpen(int id) {
-    // TODO - your menu change code
+void CALLBACK_FUNCTION onSaveItem(int /*id*/) {
+    auto itemNo = menuRomLocation.getCurrentValue();
+    auto itemSize = menuRomChoice.getItemWidth();
+    auto position = menuRomChoice.getEepromStart() + (itemNo * itemSize);
+    eeprom.writeArrayToRom(position, (const uint8_t*)menuRomText.getTextValue(), 10);
+
+    if(renderer.getDialog()->isInUse()) return;
+    renderer.getDialog()->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
+    renderer.getDialog()->show(pgmHeaderSavedItem, true);
+    renderer.getDialog()->copyIntoBuffer(menuRomText.getTextValue());
 }
 
-void CALLBACK_FUNCTION onSaveItem(int id) {
-    // TODO - your menu change code
+void CALLBACK_FUNCTION onRomLocationChange(int /*id*/) {
+    auto itemNo = menuRomLocation.getCurrentValue();
+    char sz[12];
+    auto itemSize = menuRomChoice.getItemWidth();
+    eeprom.readIntoMemArray((uint8_t*)sz, menuRomChoice.getEepromStart() + (itemNo * itemSize), 10);
+    menuRomText.setTextValue(sz);
+    serdebugF2("Rom data was ", sz)
 }
 
-void CALLBACK_FUNCTION onRomLocationChange(int id) {
+//
+// Here we handle the custom rendering for the runtime list menu item that just counts. We basically get called back
+// every time it needs more data. For example when the name is required, when any index value is required or when
+// it will be saved to EEPROM or invoked.
+//
+int CALLBACK_FUNCTION fnRomLocationRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize) {
+   switch(mode) {
+    case RENDERFN_INVOKE:
+        onRomLocationChange(item->getId());
+        return true;
+    case RENDERFN_NAME:
+        // TODO - each row has it's own name - 0xff is the parent item
+        strncpy(buffer, "Rom Location", bufferSize);
+        return true;
+    case RENDERFN_VALUE:
+        // TODO - each row can has its own value - 0xff is the parent item
+        strncpy(buffer, "Item ", bufferSize);
+        fastltoa(buffer, row, 3, NOT_PADDED, bufferSize);
+        return true;
+    case RENDERFN_EEPROM_POS: return 0xFFFF; // lists are generally not saved to EEPROM
+    default: return false;
+    }
 }
-

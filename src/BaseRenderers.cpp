@@ -33,7 +33,7 @@ public:
 BaseMenuRenderer::BaseMenuRenderer(int bufferSize, RendererType rType) : MenuRenderer(rType, bufferSize) {
 	ticksToReset = 0;
     lastOffset = 0;
-    resetValInTicks = 30 * SECONDS_IN_TICKS;
+    resetValInTicks = 30 * TC_DISPLAY_UPDATES_PER_SECOND;
 	renderCallback = NULL;
     resetCallback = NULL;
 	redrawMode = MENUDRAW_COMPLETE_REDRAW;
@@ -42,6 +42,7 @@ BaseMenuRenderer::BaseMenuRenderer(int bufferSize, RendererType rType) : MenuRen
     this->dialog = NULL;
     isCustomDrawing = false;
     displayTakenMode = NOT_TAKEN_OVER;
+    updatesPerSecond = TC_DISPLAY_UPDATES_PER_SECOND;
     MenuRenderer::theInstance = this;
 }
 
@@ -52,7 +53,10 @@ void BaseMenuRenderer::initialise() {
 
     menuMgr.setCurrentMenu(menuMgr.getRoot());
 
-	taskManager.scheduleFixedRate(SCREEN_DRAW_INTERVAL, this);
+    if(updatesPerSecond == 0) updatesPerSecond = TC_DISPLAY_UPDATES_PER_SECOND;
+    int refreshInterval = 1000 / updatesPerSecond;
+
+	taskManager.scheduleFixedRate(refreshInterval, this);
 	menuMgr.addChangeNotification(&menuMgrListener);
 }
 

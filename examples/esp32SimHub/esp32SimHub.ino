@@ -30,8 +30,6 @@
 #include <AnalogDeviceAbstraction.h>
 #include "DashCustomDrawing.h"
 #include "RobotoMonoBold60pt.h"
-#include "Fonts/FreeSans18pt7b.h"
-#include "Fonts/FreeSans9pt7b.h"
 
 // here we pulsate an LED using the ESP32's DAC
 const int dacPin = 32;
@@ -204,3 +202,8 @@ void CALLBACK_FUNCTION onDashChanged(int id) {
 void CALLBACK_FUNCTION onShowDash(int id) {
     renderer.takeOverDisplay();
 }
+
+
+
+
+

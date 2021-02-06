@@ -9,13 +9,11 @@
  * make sure to rename it first.
  *
  * LIBRARY REQUIREMENT
- * This library requires the AdaGfx library along with a suitable driver.
+1 * This library requires the AdaGfx library along with a suitable driver.
  */
 
 #ifndef TCMENU_PLUGIN_TCMENUTFTESPI_H
 #define TCMENU_PLUGIN_TCMENUTFTESPI_H
-
-#define TC_DISPLAY_UPDATES_PER_SECOND 8
 
 #include <Arduino.h>
 #include <graphics/GraphicsDeviceRenderer.h>

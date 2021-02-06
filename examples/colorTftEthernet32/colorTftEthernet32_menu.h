@@ -6,64 +6,94 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
-*/
+ */
 
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
 
 #include <Arduino.h>
 #include <tcMenu.h>
-#include <RuntimeMenuItem.h>
+
 #include "tcMenuAdaFruitGfx.h"
+#include <Fonts/FreeSans18pt7b.h>
+#include <Fonts/FreeSans9pt7b.h>
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
+#include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 
-void setupMenu();  // forward reference of the menu setup function.
-extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app info to the linker.
+// all define statements needed
+#define DISPLAY_VARIABLE gfx
+#define DISPLAY_TYPE Adafruit_ST7735
+#define DISPLAY_CONFIG 
+#define DISPLAY_WIDTH 160
+#define DISPLAY_HEIGHT 128
+#define DISPLAY_RESET_PIN 3
+#define DISPLAY_CS_PIN 6
+#define DISPLAY_RS_PIN 7
+#define DISPLAY_DATA_PIN -1
+#define DISPLAY_CLOCK_PIN -1
+#define DISPLAY_ROTATION 1
+#define DISPLAY_TITLE_FONT FreeSans18pt7b
+#define DISPLAY_ITEM_FONT FreeSans9pt7b
+#define UPDATES_PER_SEC 5
+#define PULLUP_LOGIC true
+#define INTERRUPT_SWITCHES true
+#define SWITCH_IODEVICE io8574
+#define ENCODER_PIN_A 7
+#define ENCODER_PIN_B 6
+#define ENCODER_PIN_OK 5
+#define LIBRARY_TYPE ETHERNET_2
+#define LISTEN_PORT 3333
 
-// Global variables that need exporting
-
+// all variables that need exporting
 extern Adafruit_ST7735 gfx;
-extern AdaColorGfxMenuConfig colorConfig;
-extern AdaFruitGfxMenuRenderer renderer;
+extern AdafruitDrawable gfxDrawable;
+extern GraphicsDeviceRenderer renderer;
 extern IoAbstractionRef io8574;
 extern EthernetServer server;
 
-// Callback functions must always include CALLBACK_FUNCTION after the return type
-#define CALLBACK_FUNCTION
-
-// Global Menu Item exports
-
-void CALLBACK_FUNCTION onTakeDisplay(int id);
+// all menu item forward references.
 extern ActionMenuItem menuTakeDisplay;
-void CALLBACK_FUNCTION onSaveItem(int id);
 extern ActionMenuItem menuSaveItem;
 extern TextMenuItem menuRomText;
-int fnRomLocationRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize);
 extern ScrollChoiceMenuItem menuRomLocation;
 extern ScrollChoiceMenuItem menuRomChoice;
+extern BackMenuItem menuBackRomValues;
 extern SubMenuItem menuRomValues;
 extern IpAddressMenuItem menuIpAddress;
+extern BackMenuItem menuBackConnectivity;
 extern SubMenuItem menuConnectivity;
 extern FloatMenuItem menuVoltA1;
 extern FloatMenuItem menuVoltA0;
+extern BackMenuItem menuBackStatus;
 extern SubMenuItem menuStatus;
-void CALLBACK_FUNCTION onRgbChanged(int id);
 extern Rgb32MenuItem menuRGB;
 extern BooleanMenuItem menuTempCheck;
 extern ActionMenuItem menuHiddenItem;
 extern BooleanMenuItem menuSCircuitProtect;
+extern BackMenuItem menuBackAdvanced;
 extern SubMenuItem menuAdvanced;
-void CALLBACK_FUNCTION onSaveRom(int id);
 extern ActionMenuItem menuSaveAll;
 extern BooleanMenuItem menuPwrDelay;
+extern BackMenuItem menuBackSettings;
 extern SubMenuItem menuSettings;
-void CALLBACK_FUNCTION onLimitMode(int id);
 extern EnumMenuItem menuLimit;
-void CALLBACK_FUNCTION onCurrentChange(int id);
 extern AnalogMenuItem menuCurrent;
-void CALLBACK_FUNCTION onVoltageChange(int id);
 extern AnalogMenuItem menuVoltage;
+
+// Callback functions must always include CALLBACK_FUNCTION after the return type
+#define CALLBACK_FUNCTION
+
+int fnRomLocationRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
+void CALLBACK_FUNCTION onCurrentChange(int id);
+void CALLBACK_FUNCTION onLimitMode(int id);
+void CALLBACK_FUNCTION onRgbChanged(int id);
+void CALLBACK_FUNCTION onSaveItem(int id);
+void CALLBACK_FUNCTION onSaveRom(int id);
+void CALLBACK_FUNCTION onTakeDisplay(int id);
+void CALLBACK_FUNCTION onVoltageChange(int id);
+
+void setupMenu();
 
 #endif // MENU_GENERATED_CODE_H

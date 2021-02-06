@@ -1,5 +1,16 @@
+/**
+ * This presents an amplifier control panel onto an ESP32.
+ *
+ * YPOS_PIN 32
+ * XNEG_PIN 33
+ * XPOS_PIN 2
+ * YNEG_PIN 0
+ *
+ * Screen setup for 320x240 LANDSCAPE.
+ */
+
 #include <Arduino.h>
-#include "esp32AdaTftTouch_menu.h"
+#include "esp32Amplifier_menu.h"
 #include <stockIcons/wifiAndConnectionIcons16x12.h>
 #include <ArduinoEEPROMAbstraction.h>
 #include <graphics/MenuTouchScreenEncoder.h>
@@ -9,11 +20,6 @@
 #include "app_icondata.h"
 #include "TouchCalibrator.h"
 
-#define YPOS_PIN 32
-#define XNEG_PIN 33
-#define XPOS_PIN 2
-#define YNEG_PIN 0
-
 const char pgmVersionHeader[] PROGMEM = "tcMenu Version";
 
 bool connectedToWifi = false;
@@ -21,7 +27,6 @@ EepromAuthenticatorManager authManager;
 TitleWidget wifiWidget(iconsWifi, 5, 16, 12, nullptr);
 AnalogMenuItem* adjustMenuItems[] = {&menuSettingsLine1Adj, &menuSettingsLine2Adj, &menuSettingsLine3Adj};
 AmplifierController controller(adjustMenuItems);
-MenuResistiveTouchScreen touchScreen(XPOS_PIN, XNEG_PIN, YPOS_PIN, YNEG_PIN, &renderer, MenuResistiveTouchScreen::LANDSCAPE);
 
 void prepareWifiForUse();
 
@@ -50,7 +55,6 @@ void setup() {
     });
 
     touchScreen.calibrateMinMaxValues(0.240F, 0.895F, 0.09F, 0.88F);
-    touchScreen.start();
 
     renderer.setCustomDrawingHandler(new TouchScreenCalibrator(&touchScreen));
     renderer.prepareDisplay(false, nullptr, 4, nullptr, 4, true);
@@ -150,3 +154,7 @@ void CALLBACK_FUNCTION onAudioDirect(int id) {
 void CALLBACK_FUNCTION onMuteSound(int id) {
     controller.onMute(menuMute.getBoolean());
 }
+
+
+
+

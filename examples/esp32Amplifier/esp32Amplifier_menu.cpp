@@ -6,18 +6,17 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
-*/
+ */
 
-#include <Arduino.h>
 #include <tcMenu.h>
-#include "esp32AdaTftTouch_menu.h"
+#include "esp32Amplifier_menu.h"
 
 // Global variable declarations
 
-const PROGMEM ConnectorLocalInfo applicationInfo = { "ESP Amplifier", "4656c798-10c6-4110-8e03-b9c51ed8fffb" };
 TFT_eSPI tft;
-TfteSpiDrawable drawable(&tft, 45);
-GraphicsDeviceRenderer renderer(20, applicationInfo.name, &drawable);
+TfteSpiDrawable tftDrawable(&tft, 45);
+GraphicsDeviceRenderer renderer(30, applicationInfo.name, &tftDrawable);
+MenuResistiveTouchScreen touchScreen(2, 33, 32, 0, &renderer, MenuResistiveTouchScreen::LANDSCAPE);
 WiFiServer server(3333);
 
 // Global Menu Item declarations
@@ -28,63 +27,67 @@ RENDERING_CALLBACK_NAME_INVOKE(fnConnectivitySSIDRtCall, textItemRenderFn, "SSID
 TextMenuItem menuConnectivitySSID(fnConnectivitySSIDRtCall, 18, 20, &menuConnectivityPasscode);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityIPAddressRtCall, ipAddressRenderFn, "IP address", -1, NO_CALLBACK)
 IpAddressMenuItem menuConnectivityIPAddress(fnConnectivityIPAddressRtCall, 13, &menuConnectivitySSID);
-const SubMenuInfo PROGMEM minfoConnectivity = { "Connectivity", 12, 0xFFFF, 0, NO_CALLBACK };
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NO_CALLBACK)
+const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 12, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuConnectivityIPAddress);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL);
-const AnalogMenuInfo PROGMEM minfoStatusRightVU = { "Right VU", 16, 0xFFFF, 30000, NO_CALLBACK, -20000, 1000, "dB" };
+const PROGMEM AnalogMenuInfo minfoStatusRightVU = { "Right VU", 16, 0xffff, 30000, NO_CALLBACK, -20000, 1000, "dB" };
 AnalogMenuItem menuStatusRightVU(&minfoStatusRightVU, 0, NULL);
-const AnalogMenuInfo PROGMEM minfoStatusLeftVU = { "Left VU", 15, 0xFFFF, 30000, NO_CALLBACK, -20000, 1000, "dB" };
+const PROGMEM AnalogMenuInfo minfoStatusLeftVU = { "Left VU", 15, 0xffff, 30000, NO_CALLBACK, -20000, 1000, "dB" };
 AnalogMenuItem menuStatusLeftVU(&minfoStatusLeftVU, 0, &menuStatusRightVU);
-const char enumStrStatusAmpStatus_0[] PROGMEM  = "Warm up";
-const char enumStrStatusAmpStatus_1[] PROGMEM  = "Warm Valves";
-const char enumStrStatusAmpStatus_2[] PROGMEM  = "Ready";
-const char enumStrStatusAmpStatus_3[] PROGMEM  = "DC Protection";
-const char enumStrStatusAmpStatus_4[] PROGMEM  = "Overloaded";
-const char enumStrStatusAmpStatus_5[] PROGMEM  = "Overheated";
+const char enumStrStatusAmpStatus_0[] PROGMEM = "Warm up";
+const char enumStrStatusAmpStatus_1[] PROGMEM = "Warm Valves";
+const char enumStrStatusAmpStatus_2[] PROGMEM = "Ready";
+const char enumStrStatusAmpStatus_3[] PROGMEM = "DC Protection";
+const char enumStrStatusAmpStatus_4[] PROGMEM = "Overloaded";
+const char enumStrStatusAmpStatus_5[] PROGMEM = "Overheated";
 const char* const enumStrStatusAmpStatus[] PROGMEM  = { enumStrStatusAmpStatus_0, enumStrStatusAmpStatus_1, enumStrStatusAmpStatus_2, enumStrStatusAmpStatus_3, enumStrStatusAmpStatus_4, enumStrStatusAmpStatus_5 };
-const EnumMenuInfo PROGMEM minfoStatusAmpStatus = { "Amp Status", 14, 0xFFFF, 5, NO_CALLBACK, enumStrStatusAmpStatus };
+const PROGMEM EnumMenuInfo minfoStatusAmpStatus = { "Amp Status", 14, 0xffff, 5, NO_CALLBACK, enumStrStatusAmpStatus };
 EnumMenuItem menuStatusAmpStatus(&minfoStatusAmpStatus, 0, &menuStatusLeftVU);
-const SubMenuInfo PROGMEM minfoStatus = { "Status", 6, 0xFFFF, 0, NO_CALLBACK };
 RENDERING_CALLBACK_NAME_INVOKE(fnStatusRtCall, backSubItemRenderFn, "Status", -1, NO_CALLBACK)
+const PROGMEM SubMenuInfo minfoStatus = { "Status", 6, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackStatus(fnStatusRtCall, &menuStatusAmpStatus);
 SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuConnectivity);
-const AnalogMenuInfo PROGMEM minfoSettingsValveHeating = { "Valve Heating", 17, 15, 600, NO_CALLBACK, 0, 10, "s" };
+const PROGMEM AnalogMenuInfo minfoSettingsValveHeating = { "Valve Heating", 17, 15, 600, NO_CALLBACK, 0, 10, "s" };
 AnalogMenuItem menuSettingsValveHeating(&minfoSettingsValveHeating, 0, NULL);
-const AnalogMenuInfo PROGMEM minfoSettingsWarmUpTime = { "Warm up time", 11, 7, 300, NO_CALLBACK, 0, 10, "s" };
+const PROGMEM AnalogMenuInfo minfoSettingsWarmUpTime = { "Warm up time", 11, 7, 300, NO_CALLBACK, 0, 10, "s" };
 AnalogMenuItem menuSettingsWarmUpTime(&minfoSettingsWarmUpTime, 0, &menuSettingsValveHeating);
-const AnalogMenuInfo PROGMEM minfoSettingsLine3Adj = { "Line 3 adj", 10, 13, 20, NO_CALLBACK, -10, 2, "dB" };
+const PROGMEM AnalogMenuInfo minfoSettingsLine3Adj = { "Line 3 adj", 10, 13, 20, NO_CALLBACK, -10, 2, "dB" };
 AnalogMenuItem menuSettingsLine3Adj(&minfoSettingsLine3Adj, 0, &menuSettingsWarmUpTime);
-const AnalogMenuInfo PROGMEM minfoSettingsLine2Adj = { "Line 2 adj", 9, 11, 20, NO_CALLBACK, -10, 2, "dB" };
+const PROGMEM AnalogMenuInfo minfoSettingsLine2Adj = { "Line 2 adj", 9, 11, 20, NO_CALLBACK, -10, 2, "dB" };
 AnalogMenuItem menuSettingsLine2Adj(&minfoSettingsLine2Adj, 0, &menuSettingsLine3Adj);
-const AnalogMenuInfo PROGMEM minfoSettingsLine1Adj = { "Line 1 adj", 8, 9, 20, NO_CALLBACK, -10, 2, "dB" };
+const PROGMEM AnalogMenuInfo minfoSettingsLine1Adj = { "Line 1 adj", 8, 9, 20, NO_CALLBACK, -10, 2, "dB" };
 AnalogMenuItem menuSettingsLine1Adj(&minfoSettingsLine1Adj, 0, &menuSettingsLine2Adj);
-const SubMenuInfo PROGMEM minfoSettingsChannelNames = { "Channel Names", 7, 0xFFFF, 0, NO_CALLBACK };
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsChannelNamesRtCall, backSubItemRenderFn, "Channel Names", -1, NO_CALLBACK)
+const PROGMEM SubMenuInfo minfoSettingsChannelNames = { "Channel Names", 7, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackSettingsChannelNames(fnSettingsChannelNamesRtCall, NULL);
 SubMenuItem menuSettingsChannelNames(&minfoSettingsChannelNames, &menuBackSettingsChannelNames, &menuSettingsLine1Adj);
-const SubMenuInfo PROGMEM minfoSettings = { "Settings", 5, 0xFFFF, 0, NO_CALLBACK };
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings", -1, NO_CALLBACK)
+const PROGMEM SubMenuInfo minfoSettings = { "Settings", 5, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackSettings(fnSettingsRtCall, &menuSettingsChannelNames);
 SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, &menuStatus);
-const BooleanMenuInfo PROGMEM minfoMute = { "Mute", 4, 0xFFFF, 1, onMuteSound, NAMING_TRUE_FALSE };
+const PROGMEM BooleanMenuInfo minfoMute = { "Mute", 4, 0xffff, 1, onMuteSound, NAMING_TRUE_FALSE };
 BooleanMenuItem menuMute(&minfoMute, false, &menuSettings);
-const BooleanMenuInfo PROGMEM minfoDirect = { "Direct", 3, 6, 1, onAudioDirect, NAMING_TRUE_FALSE };
+const PROGMEM BooleanMenuInfo minfoDirect = { "Direct", 3, 6, 1, onAudioDirect, NAMING_TRUE_FALSE };
 BooleanMenuItem menuDirect(&minfoDirect, false, &menuMute);
 RENDERING_CALLBACK_NAME_INVOKE(fnChannelsRtCall, enumItemRenderFn, "Channels", 4, onChannelChanged)
 ScrollChoiceMenuItem menuChannels(2, fnChannelsRtCall, 0, 150, 16, 3, &menuDirect);
-const AnalogMenuInfo PROGMEM minfoVolume = { "Volume", 1, 2, 255, onVolumeChanged, -180, 2, "dB" };
+const PROGMEM AnalogMenuInfo minfoVolume = { "Volume", 1, 2, 255, onVolumeChanged, -180, 2, "dB" };
 AnalogMenuItem menuVolume(&minfoVolume, 0, &menuChannels);
-
+const PROGMEM ConnectorLocalInfo applicationInfo = { "ESP Amplifier", "4656c798-10c6-4110-8e03-b9c51ed8fffb" };
 
 // Set up code
 
 void setupMenu() {
-    menuConnectivityIPAddress.setReadOnly(true);
-
     tft.begin();
     tft.setRotation(1);
+    renderer.setUpdatesPerSecond(UPDATES_PER_SEC);
     renderer.prepareDisplay(false, nullptr, 4, nullptr, 4, true);
+    touchScreen.start();
     menuMgr.initWithoutInput(&renderer, &menuVolume);
     remoteServer.begin(&server, &applicationInfo);
+
+    // Read only and local only function calls
+    menuConnectivityIPAddress.setReadOnly(true);
 }
+

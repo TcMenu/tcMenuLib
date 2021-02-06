@@ -79,37 +79,21 @@ public:
         return Coord(graphics->width(), graphics->height());
     }
 
-    DeviceDrawable *getSubDeviceFor(int width, int height, int bitsPerPx, color_t *palette) override {
+    DeviceDrawable *getSubDeviceFor(const Coord& where, const Coord& size, const color_t *palette, int paletteSize) override {
         // not yet supported on this library, too slow when tested with GfxCanvas (on an ESP32!)
         return nullptr;
     }
 
     void transaction(bool isStarting, bool redrawNeeded) override;
 
-    void drawText(const Coord &where, const void *font, int mag, color_t textColor, const char *text) override;
-    void drawBitmap(const Coord &where, const DrawableIcon *icon, color_t defColor, bool selected) override;
-    void drawXBitmap(const Coord &where, const Coord &size, const uint8_t *data, color_t fgColor, color_t bgColor) override;
-    void drawBox(const Coord &where, const Coord &size, color_t color, bool filled) override;
-    void drawCircle(const Coord& where, int radius, color_t color, bool filled) override;
-    void drawPolygon(const Coord points[], int numPoints, color_t color, bool filled) override;
+    void drawText(const Coord &where, const void *font, int mag, const char *text) override;
+    void drawBitmap(const Coord &where, const DrawableIcon *icon, bool selected) override;
+    void drawXBitmap(const Coord &where, const Coord &size, const uint8_t *data) override;
+    void drawBox(const Coord &where, const Coord &size, bool filled) override;
+    void drawCircle(const Coord& where, int radius, bool filled) override;
+    void drawPolygon(const Coord points[], int numPoints, bool filled) override;
 
     Coord textExtents(const void *font, int mag, const char *text, int *baseline) override;
 };
-
-/**
- * The default graphics configuration for Ada GFX that needs no fonts and uses reasonable spacing options
- * for 100 - 150 dpi displays.
- */
-void prepareAdaColorDefaultGfxConfig(AdaColorGfxMenuConfig* config);
-
-/**
- * A graphics configuration suitable for lower resolution displays such as the 5110, these settings may be appropriate
- */
-void prepareAdaMonoGfxConfigLoRes(AdaColorGfxMenuConfig* config);
-
-/**
- * A graphics configuration suitable for oled screens using the adafruit driver.
- */
-void prepareAdaMonoGfxConfigOled(AdaColorGfxMenuConfig* config);
 
 #endif /* _TCMENU_TCMENUADAFRUITGFX_H_ */

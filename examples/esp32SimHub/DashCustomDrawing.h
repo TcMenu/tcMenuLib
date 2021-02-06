@@ -238,8 +238,9 @@ public:
 
     void paintTitle(Adafruit_GFX *myGfx) {
         myGfx->setFont(parameters->getFont());
-        titleExtents = textExtents(myGfx, titleText, 0, myGfx->height() - 20);
-        valueWidth = textExtents(myGfx, "0", 0, myGfx->height() - 20).x * numChars;
+        int baseline;
+        titleExtents = gfxDrawable.textExtents(parameters->getFont(), 1, titleText, &baseline);
+        valueWidth = gfxDrawable.textExtents(parameters->getFont(), 1,"0", &baseline).x * numChars;
         valueWidth = int(valueWidth * 1.20);
 
         if(!parameters->isTitleDrawn()) return;
@@ -262,7 +263,8 @@ public:
         canvas->setFont(parameters->getFont());
         auto padding = 0;
         if(!parameters->isValueLeftAlign()) {
-            Coord valueLen = textExtents(canvas, renderer->getBuffer(), 0, canvas->height());
+            int baseline;
+            Coord valueLen = gfxDrawable.textExtents(parameters->getFont(), 1, renderer->getBuffer(), &baseline);
             padding = valueWidth - (valueLen.x + 4);
         }
         canvas->setCursor(padding, titleExtents.y - 1);
@@ -355,7 +357,6 @@ public:
             stop();
             return;
         }
-serdebugF("renderloop")
         if (ledsChanged) drawLeds();
 
         for(int i = 0; i < drawingItems.count(); i++) {

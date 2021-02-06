@@ -6,55 +6,76 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
-*/
+ */
 
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
 
 #include <Arduino.h>
 #include <tcMenu.h>
-#include <RuntimeMenuItem.h>
+
 #include "tcMenuTfteSpi.h"
+#include <graphics/MenuTouchScreenEncoder.h>
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
+#include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 
-void setupMenu();  // forward reference of the menu setup function.
-extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app info to the linker.
+// all define statements needed
+#define DISPLAY_VARIABLE tft
+#define DISPLAY_ROTATION 1
+#define UPDATES_PER_SEC 10
+#define DOUBLE_BUFFER_ROWS 45
+#define TITLE_FONT_NUM 4
+#define ITEM_FONT_NUM 4
+#define XPLUS_PIN 2
+#define XMINUS_PIN 33
+#define YPLUS_PIN 32
+#define YMINUS_PIN 0
+#define TOUCH_ROTATION LANDSCAPE
+#define LISTEN_PORT 3333
 
-// Global variables that need exporting
-
+// all variables that need exporting
 extern TFT_eSPI tft;
+extern TfteSpiDrawable tftDrawable;
 extern GraphicsDeviceRenderer renderer;
+extern MenuResistiveTouchScreen touchScreen;
 extern WiFiServer server;
 
-// Callback functions must always include CALLBACK_FUNCTION after the return type
-#define CALLBACK_FUNCTION
-
-// Global Menu Item exports
-
+// all menu item forward references.
 extern TextMenuItem menuConnectivityPasscode;
 extern TextMenuItem menuConnectivitySSID;
 extern IpAddressMenuItem menuConnectivityIPAddress;
+extern BackMenuItem menuBackConnectivity;
 extern SubMenuItem menuConnectivity;
 extern AnalogMenuItem menuStatusRightVU;
 extern AnalogMenuItem menuStatusLeftVU;
 extern EnumMenuItem menuStatusAmpStatus;
+extern BackMenuItem menuBackStatus;
 extern SubMenuItem menuStatus;
 extern AnalogMenuItem menuSettingsValveHeating;
 extern AnalogMenuItem menuSettingsWarmUpTime;
 extern AnalogMenuItem menuSettingsLine3Adj;
 extern AnalogMenuItem menuSettingsLine2Adj;
 extern AnalogMenuItem menuSettingsLine1Adj;
+extern BackMenuItem menuBackSettingsChannelNames;
 extern SubMenuItem menuSettingsChannelNames;
+extern BackMenuItem menuBackSettings;
 extern SubMenuItem menuSettings;
-void CALLBACK_FUNCTION onMuteSound(int id);
 extern BooleanMenuItem menuMute;
-void CALLBACK_FUNCTION onAudioDirect(int id);
 extern BooleanMenuItem menuDirect;
-void CALLBACK_FUNCTION onChannelChanged(int id);
 extern ScrollChoiceMenuItem menuChannels;
-void CALLBACK_FUNCTION onVolumeChanged(int id);
 extern AnalogMenuItem menuVolume;
+extern const ConnectorLocalInfo applicationInfo;
+
+// Callback functions must always include CALLBACK_FUNCTION after the return type
+#define CALLBACK_FUNCTION
+
+void CALLBACK_FUNCTION onAudioDirect(int id);
+void CALLBACK_FUNCTION onChannelChanged(int id);
+void CALLBACK_FUNCTION onMuteSound(int id);
+void CALLBACK_FUNCTION onVolumeChanged(int id);
+
+void setupMenu();
 
 #endif // MENU_GENERATED_CODE_H

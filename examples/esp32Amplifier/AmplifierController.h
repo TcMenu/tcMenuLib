@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <tcMenu.h>
 #include <IoLogging.h>
-#include "esp32AdaTftTouch_menu.h"
+#include "esp32Amplifier_menu.h"
 
 #ifndef MENU_MAGIC_KEY
 #define MENU_MAGIC_KEY 0xfade

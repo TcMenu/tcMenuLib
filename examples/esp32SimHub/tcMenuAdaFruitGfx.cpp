@@ -25,60 +25,62 @@ void AdafruitDrawable::transaction(bool isStarting, bool redrawNeeded) {
     if(!isStarting) refreshDisplayIfNeeded(graphics, redrawNeeded);
 }
 
-void AdafruitDrawable::drawText(const Coord &where, const void *font, int mag, color_t textColor, const char *sz) {
+void AdafruitDrawable::drawText(const Coord &where, const void *font, int mag, const char *sz) {
     graphics->setTextWrap(false);
     int baseline=0;
     Coord exts = textExtents(font, mag, "(;y", &baseline);
     int yCursor = font ? (where.y + (exts.y - baseline)) : where.y;
     graphics->setCursor(where.x, yCursor);
+    graphics->setTextColor(drawColor);
     graphics->print(sz);
 }
 
-void AdafruitDrawable::drawBitmap(const Coord &where, const DrawableIcon *icon, color_t defColor, bool selected) {
+void AdafruitDrawable::drawBitmap(const Coord &where, const DrawableIcon *icon, bool selected) {
     if(icon->getIconType() == DrawableIcon::ICON_XBITMAP) {
-        graphics->drawXBitmap(where.x, where.y, icon->getIcon(selected), icon->getDimensions().x, icon->getDimensions().y, defColor);
+        graphics->fillRect(where.x, where.y, icon->getDimensions().x, icon->getDimensions().y, backgroundColor);
+        graphics->drawXBitmap(where.x, where.y, icon->getIcon(selected), icon->getDimensions().x, icon->getDimensions().y, drawColor);
     }
     else if(icon->getIconType() == DrawableIcon::ICON_NATIVE) {
         graphics->drawRGBBitmap(where.x, where.y, (const uint16_t*)icon->getIcon(selected), icon->getDimensions().x, icon->getDimensions().y);
     }
     else if(icon->getIconType() == DrawableIcon::ICON_MONO) {
-        graphics->drawBitmap(where.x, where.y, icon->getIcon(selected), icon->getDimensions().x, icon->getDimensions().y, defColor);
+        graphics->drawBitmap(where.x, where.y, icon->getIcon(selected), icon->getDimensions().x, icon->getDimensions().y, drawColor, backgroundColor);
     }
 }
 
-void AdafruitDrawable::drawXBitmap(const Coord &where, const Coord &size, const uint8_t *data, color_t fgColor, color_t bgColor) {
-    graphics->fillRect(where.x, where.y, size.x, size.y, bgColor);
-    graphics->drawXBitmap(where.x, where.y, data, size.x, size.y, fgColor);
+void AdafruitDrawable::drawXBitmap(const Coord &where, const Coord &size, const uint8_t *data) {
+    graphics->fillRect(where.x, where.y, size.x, size.y, backgroundColor);
+    graphics->drawXBitmap(where.x, where.y, data, size.x, size.y, drawColor);
 }
 
-void AdafruitDrawable::drawBox(const Coord &where, const Coord &size, color_t col, bool filled) {
+void AdafruitDrawable::drawBox(const Coord &where, const Coord &size, bool filled) {
     if(filled) {
-        graphics->fillRect(where.x, where.y, size.x, size.y, col);
+        graphics->fillRect(where.x, where.y, size.x, size.y, drawColor);
     }
     else {
-        graphics->drawRect(where.x, where.y, size.x, size.y, col);
+        graphics->drawRect(where.x, where.y, size.x, size.y, drawColor);
     }
 }
 
-void AdafruitDrawable::drawCircle(const Coord& where, int radius, color_t color, bool filled) {
+void AdafruitDrawable::drawCircle(const Coord& where, int radius, bool filled) {
     if(filled) {
-        graphics->fillCircle(where.x, where.y, radius, color);
+        graphics->fillCircle(where.x, where.y, radius, drawColor);
     }
     else {
-        graphics->drawCircle(where.x, where.y, radius, color);
+        graphics->drawCircle(where.x, where.y, radius, drawColor);
     }
 }
 
-void AdafruitDrawable::drawPolygon(const Coord points[], int numPoints, color_t color, bool filled) {
+void AdafruitDrawable::drawPolygon(const Coord points[], int numPoints, bool filled) {
     if(numPoints == 2) {
-        graphics->drawLine(points[0].x, points[0].y, points[1].x, points[1].y, color);
+        graphics->drawLine(points[0].x, points[0].y, points[1].x, points[1].y, drawColor);
     }
     else if(numPoints == 3) {
         if(filled) {
-            graphics->fillTriangle(points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y, color);
+            graphics->fillTriangle(points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y, drawColor);
         }
         else {
-            graphics->drawTriangle(points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y, color);
+            graphics->drawTriangle(points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y, drawColor);
         }
     }
 }
@@ -113,60 +115,6 @@ Coord AdafruitDrawable::textExtents(const void *f, int mag, const char *text, in
         if(baseline) *baseline = bl;
         return Coord(w, height);
     }
-}
-
-void prepareAdaColorDefaultGfxConfig(AdaColorGfxMenuConfig* config) {
-    prepareDefaultGfxConfig((ColorGfxMenuConfig<void*>*)config);
-}
-
-void prepareAdaMonoGfxConfigLoRes(AdaColorGfxMenuConfig* config) {
-    makePadding(config->titlePadding, 2, 1, 1, 1);
-    makePadding(config->itemPadding, 1, 1, 1, 1);
-    makePadding(config->widgetPadding, 2, 2, 0, 2);
-
-    config->bgTitleColor = BLACK;
-    config->fgTitleColor = WHITE;
-    config->titleFont = NULL;
-    config->titleBottomMargin = 2;
-    config->widgetColor = WHITE;
-    config->titleFontMagnification = 1;
-
-    config->bgItemColor = WHITE;
-    config->fgItemColor = BLACK;
-    config->bgSelectColor = BLACK;
-    config->fgSelectColor = WHITE;
-    config->itemFont = NULL;
-    config->itemFontMagnification = 1;
-
-    config->editIcon = loResEditingIcon;
-    config->activeIcon = loResActiveIcon;
-    config->editIconHeight = 6;
-    config->editIconWidth = 8;
-}
-
-void prepareAdaMonoGfxConfigOled(AdaColorGfxMenuConfig* config) {
-    makePadding(config->titlePadding, 2, 1, 1, 1);
-    makePadding(config->itemPadding, 1, 1, 1, 1);
-    makePadding(config->widgetPadding, 2, 2, 0, 2);
-
-    config->bgTitleColor = WHITE;
-    config->fgTitleColor = BLACK;
-    config->titleFont = NULL;
-    config->titleBottomMargin = 2;
-    config->widgetColor = BLACK;
-    config->titleFontMagnification = 1;
-
-    config->bgItemColor = BLACK;
-    config->fgItemColor = WHITE;
-    config->bgSelectColor = WHITE;
-    config->fgSelectColor = BLACK;
-    config->itemFont = NULL;
-    config->itemFontMagnification = 1;
-
-    config->editIcon = loResEditingIcon;
-    config->activeIcon = loResActiveIcon;
-    config->editIconHeight = 6;
-    config->editIconWidth = 8;
 }
 
 //

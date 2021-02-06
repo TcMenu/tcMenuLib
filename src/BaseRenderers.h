@@ -28,11 +28,7 @@ class BaseDialog;
 #define TC_DISPLAY_UPDATES_PER_SECOND 4
 #endif // TC_DISPLAY_UPDATES_PER_SECOND
 
-/** the frequency at which the screen is redrawn (only if needed). */
-#define SCREEN_DRAW_INTERVAL (1000 / TC_DISPLAY_UPDATES_PER_SECOND)
-/** the number of ticks the menu should reset to defaults after not being used */
-#define SECONDS_IN_TICKS TC_DISPLAY_UPDATES_PER_SECOND
-/** The maximum number of ticks that */
+/** The maximum number of screen ticks */
 #define MAX_TICKS 0xffff
 
 bool isItemActionable(MenuItem* item);
@@ -268,6 +264,7 @@ public:
     enum DisplayTakeoverMode { NOT_TAKEN_OVER, TAKEN_OVER_FN, START_CUSTOM_DRAW, RUNNING_CUSTOM_DRAW };
 protected:
 	uint8_t lastOffset;
+	uint8_t updatesPerSecond;
 	uint16_t ticksToReset;
     uint16_t resetValInTicks;
 	MenuRedrawState redrawMode;
@@ -295,9 +292,19 @@ public:
 	~BaseMenuRenderer() override {delete buffer;}
 	
 	/**
-	 * Initialise the render setting up tasks
+	 * Initialise the render setting up the refresh task at the update frequency provided (or leave blank for default).
+	 * @param updatesPerSecond the number of times to update the display per second, set to 0 or leave blank for default
 	 */
 	void initialise() override;
+
+	/**
+	 * Set the number of updates per second for the display, use caution not to set too high, never set to 0.
+	 * @param updatesSec the number of updates.
+	 */
+	void setUpdatesPerSecond(int updatesSec) {
+	    updatesPerSecond = updatesSec;
+        resetValInTicks = 30 * updatesSec;
+    }
 
     /** 
      * Adjust the default reset interval of 30 seconds. Maximum value is 60 seconds.
@@ -306,8 +313,7 @@ public:
      * @param resetTime
      */
     void setResetIntervalTimeSeconds(uint16_t interval) { 
-        unsigned int ticks = interval * SECONDS_IN_TICKS;
-        resetValInTicks = ticks; 
+        resetValInTicks = interval * updatesPerSecond;
     }
 
     /**

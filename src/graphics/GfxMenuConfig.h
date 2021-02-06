@@ -415,12 +415,6 @@ namespace tcgfx {
     };
 
     /**
-     * This is an internal method, used by display specific plugins. Prefer to use the
-     * mehtod shipped with the plugin. This is for higher resolution colour displays.
-     */
-    void prepareDefaultGfxConfig(ColorGfxMenuConfig<void*>* config);
-
-    /**
      * The default editing icon for approx 100-150 dpi resolution displays
      */
     extern const unsigned char PROGMEM loResEditingIcon[];
