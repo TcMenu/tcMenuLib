@@ -50,7 +50,10 @@ int LargeFixedNumber::getDigit(int digit) {
 
 void LargeFixedNumber::setDigit(int digit, int v) {
     auto val = uint8_t(v);
+    // prevent exceeding array
 	if (digit > 11) return;
+	// prevent writing invalid digits - use 0 instead.
+	if(v < 0 || v > 9) v = 0;
 	if ((digit % 2) == 0) {
 		bcdRepresentation[digit / 2] = (bcdRepresentation[digit / 2] & 0xf0) | val;
 	}
