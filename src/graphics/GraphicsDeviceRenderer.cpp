@@ -291,7 +291,7 @@ void GraphicsDeviceRenderer::prepareDisplay(bool mono, const void* itemFont, int
     auto* titlePalette = mono ? defaultTitlePaletteMono : defaultTitlePalette;
     auto* itemPalette = mono ? defaultItemPaletteMono : defaultItemPalette;
 
-    if(needEditingIcons && itemHeight < 14) {
+    if(needEditingIcons && itemHeight > 12) {
         factory.addImageToCache(DrawableIcon(SPECIAL_ID_EDIT_ICON, Coord(16, 12),DrawableIcon::ICON_XBITMAP, defEditingIcon));
         factory.addImageToCache(DrawableIcon(SPECIAL_ID_ACTIVE_ICON, Coord(16, 12),DrawableIcon::ICON_XBITMAP, defActiveIcon));
     }
