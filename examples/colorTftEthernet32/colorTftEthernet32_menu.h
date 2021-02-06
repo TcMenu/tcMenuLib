@@ -15,7 +15,6 @@
 #include <tcMenu.h>
 
 #include "tcMenuAdaFruitGfx.h"
-#include <Fonts/FreeSans18pt7b.h>
 #include <Fonts/FreeSans9pt7b.h>
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
@@ -34,8 +33,8 @@
 #define DISPLAY_DATA_PIN -1
 #define DISPLAY_CLOCK_PIN -1
 #define DISPLAY_ROTATION 1
-#define DISPLAY_TITLE_FONT FreeSans18pt7b
-#define DISPLAY_ITEM_FONT FreeSans9pt7b
+#define DISPLAY_TITLE_FONT FreeSans9pt7b
+#define DISPLAY_ITEM_FONT NULL
 #define UPDATES_PER_SEC 5
 #define PULLUP_LOGIC true
 #define INTERRUPT_SWITCHES true

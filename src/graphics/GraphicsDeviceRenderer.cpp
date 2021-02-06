@@ -276,15 +276,6 @@ void GraphicsDeviceRenderer::prepareDisplay(bool mono, const void* itemFont, int
 
     auto& factory = propertiesFactory;
 
-    if(needEditingIcons && width > 128) {
-        factory.addImageToCache(DrawableIcon(SPECIAL_ID_EDIT_ICON, Coord(16, 12),DrawableIcon::ICON_XBITMAP, defEditingIcon));
-        factory.addImageToCache(DrawableIcon(SPECIAL_ID_ACTIVE_ICON, Coord(16, 12),DrawableIcon::ICON_XBITMAP, defActiveIcon));
-    }
-    else {
-        factory.addImageToCache(DrawableIcon(SPECIAL_ID_EDIT_ICON, Coord(8, 6),DrawableIcon::ICON_XBITMAP, loResEditingIcon));
-        factory.addImageToCache(DrawableIcon(SPECIAL_ID_ACTIVE_ICON, Coord(8, 6),DrawableIcon::ICON_XBITMAP, loResActiveIcon));
-    }
-
     if(mono) {
         factory.setSelectedColors(0, 2);
     }
@@ -299,6 +290,16 @@ void GraphicsDeviceRenderer::prepareDisplay(bool mono, const void* itemFont, int
     int itemHeight = heightForFontPadding(itemFont, itemMag, itemPadding);
     auto* titlePalette = mono ? defaultTitlePaletteMono : defaultTitlePalette;
     auto* itemPalette = mono ? defaultItemPaletteMono : defaultItemPalette;
+
+    if(needEditingIcons && itemHeight < 14) {
+        factory.addImageToCache(DrawableIcon(SPECIAL_ID_EDIT_ICON, Coord(16, 12),DrawableIcon::ICON_XBITMAP, defEditingIcon));
+        factory.addImageToCache(DrawableIcon(SPECIAL_ID_ACTIVE_ICON, Coord(16, 12),DrawableIcon::ICON_XBITMAP, defActiveIcon));
+    }
+    else {
+        factory.addImageToCache(DrawableIcon(SPECIAL_ID_EDIT_ICON, Coord(8, 6),DrawableIcon::ICON_XBITMAP, loResEditingIcon));
+        factory.addImageToCache(DrawableIcon(SPECIAL_ID_ACTIVE_ICON, Coord(8, 6),DrawableIcon::ICON_XBITMAP, loResActiveIcon));
+    }
+
 
     factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_TITLE, titlePalette, titlePadding, titleFont, titleMag, medResOrBetter ? 3 : 1, titleHeight, GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE );
     factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, itemPalette, itemPadding, itemFont, itemMag, 1, itemHeight, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT );
