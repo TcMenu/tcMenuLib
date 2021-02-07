@@ -6,35 +6,62 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
-*/
+ */
 
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
 
 #include <Arduino.h>
 #include <tcMenu.h>
+
 #include "tcMenuU8g2.h"
+#include <RuntimeMenuItem.h>
+#include <EditableLargeNumberMenuItem.h>
 
-void setupMenu();  // forward reference of the menu setup function.
-extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app info to the linker.
+// all define statements needed
+#define DISPLAY_VARIABLE gfx
+#define DISPLAY_TYPE U8G2_SH1106_128X64_NONAME_F_SW_I2C
+#define DISPLAY_ROTATION U8G2_R0
+#define YIELDING_WIRE_CB true
+#define DISPLAY_CLOCK_PIN 5
+#define DISPLAY_DATA_PIN 4
+#define DISPLAY_RESET_PIN U8X8_PIN_NONE
+#define DISPLAY_CS_PIN U8X8_PIN_NONE
+#define DISPLAY_RS_PIN U8X8_PIN_NONE
+#define DISPLAY_TITLE_FONT NULL
+#define DISPLAY_ITEM_FONT NULL
+#define UPDATES_PER_SEC 10
+#define PULLUP_LOGIC true
+#define INTERRUPT_SWITCHES false
+#define SWITCH_IODEVICE 
+#define ENCODER_PIN_A 13
+#define ENCODER_PIN_B 12
+#define ENCODER_PIN_OK 14
 
-// Global variables that need exporting
-
+// all variables that need exporting
 extern U8G2_SH1106_128X64_NONAME_F_SW_I2C gfx;
-extern U8g2GfxMenuConfig gfxConfig;
-extern U8g2MenuRenderer renderer;
+extern GraphicsDeviceRenderer renderer;
 
-// Callback functions must always include CALLBACK_FUNCTION after the return type
-#define CALLBACK_FUNCTION
-
-// Global Menu Item exports
-
+// all menu item forward references.
+extern ActionMenuItem menuSettingsSaveSettings;
+extern EditableLargeNumberMenuItem menuSettingsSerialNumber;
+extern TextMenuItem menuSettingsUserName;
 extern BooleanMenuItem menuSettingsSafetyLock;
+extern BackMenuItem menuBackSettings;
 extern SubMenuItem menuSettings;
-void CALLBACK_FUNCTION onStartToasting(int id);
 extern ActionMenuItem menuStartToasting;
 extern BooleanMenuItem menuFrozen;
 extern EnumMenuItem menuType;
 extern AnalogMenuItem menuToasterPower;
+extern const ConnectorLocalInfo applicationInfo;
+
+// Callback functions must always include CALLBACK_FUNCTION after the return type
+#define CALLBACK_FUNCTION
+
+void CALLBACK_FUNCTION onNameChanged(int id);
+void CALLBACK_FUNCTION onSaveSettings(int id);
+void CALLBACK_FUNCTION onStartToasting(int id);
+
+void setupMenu();
 
 #endif // MENU_GENERATED_CODE_H

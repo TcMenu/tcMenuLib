@@ -19,18 +19,26 @@
 
 #include <tcMenu.h>
 #include <tcUtil.h>
-#include <BaseRenderers.h>
+#include <Wire.h>
 #include <U8g2lib.h>
-#include <graphics/GfxMenuConfig.h>
+#include <graphics/BaseGraphicalRenderer.h>
+#include <graphics/GraphicsDeviceRenderer.h>
 #include <BaseDialog.h>
 #include <tcUtil.h>
 
-extern const ConnectorLocalInfo applicationInfo;
+/**
+ * If you DONT want task manager yield code in I2C
+ */
+#ifndef WANT_TASK_MANAGER_FRIENDLY_YIELD
+#define WANT_TASK_MANAGER_FRIENDLY_YIELD 1
+#endif // WANT_TASK_MANAGER_FRIENDLY_YIELD
+
+using namespace tcgfx;
 
 /**
  * A standard menu render configuration that describes how to renderer each item and the title.
  * Specialised for u8g2 fonts.
- */ 
+ */
 typedef struct ColorGfxMenuConfig<const uint8_t*> U8g2GfxMenuConfig;
 
 // some colour displays don't create this value
@@ -44,59 +52,45 @@ typedef struct ColorGfxMenuConfig<const uint8_t*> U8g2GfxMenuConfig;
 #endif
 
 /**
+ * This is used to draw to I2C including a task manager yield to improve performance on slower I2C devices.
+ * Not really needed for SPI as we are talking in low order millis for a full refresh.
+ */
+uint8_t u8g2_byte_with_yield(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr);
+
+/**
  * A basic renderer that can use the AdaFruit_GFX library to render information onto a suitable
  * display. It is your responsibility to fully initialise and prepare the display before passing
  * it to this renderer. The usual procedure is to create a display variable globally in your
  * sketch and then provide that as the parameter to setGraphicsDevice. If you are using the
  * designer you provide the display variable name in the code generation parameters.
- * 
+ *
  * You can also override many elements of the display using AdaColorGfxMenuConfig, to use the defaults
  * just call prepareAdaColorDefaultGfxConfig(..) passing it a pointer to your config object. Again the
  * designer UI takes care of this.
  */
-class U8g2MenuRenderer : public BaseMenuRenderer {
+class U8g2Drawable : public DeviceDrawable {
 private:
 	U8G2* u8g2;
-	U8g2GfxMenuConfig *gfxConfig;
-	int16_t titleHeight;
-    int16_t itemHeight;
+#if WANT_TASK_MANAGER_FRIENDLY_YIELD == 1
+    static TwoWire* pWire;
+    friend uint8_t u8g2_byte_with_yield(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr);
+#endif // WANT_TASK_MANAGER_FRIENDLY_YIELD
 public:
-	U8g2MenuRenderer(uint8_t bufferSize = 20) : BaseMenuRenderer(bufferSize) {
-		this->u8g2 = NULL;
-		this->gfxConfig = NULL;
-	}
+    explicit U8g2Drawable(U8G2* u8g2, TwoWire* wire = nullptr);
+    ~U8g2Drawable() override = default;
 
-	void setGraphicsDevice(U8G2* u8g2, U8g2GfxMenuConfig *gfxConfig);
+    DeviceDrawable* getSubDeviceFor(const Coord &where, const Coord &size, const color_t *palette, int paletteSize) override {return nullptr; }
 
-	virtual ~U8g2MenuRenderer();
-	virtual void render();
+    void drawText(const Coord &where, const void *font, int mag, const char *text) override;
+    void drawBitmap(const Coord &where, const DrawableIcon *icon, bool selected) override;
+    void drawXBitmap(const Coord &where, const Coord &size, const uint8_t *data) override;
+    void drawBox(const Coord &where, const Coord &size, bool filled) override;
+    void drawCircle(const Coord &where, int radius, bool filled) override;
+    void drawPolygon(const Coord *points, int numPoints, bool filled) override;
 
-    U8G2* getGraphics() { return u8g2; }
-    U8g2GfxMenuConfig* getGfxConfig() { return gfxConfig; }
-    BaseDialog* getDialog() override;
-private:
-    void drawBitmap(int x, int y, int w, int h, const unsigned char *bmp);
-	void renderMenuItem(int yPos, int menuHeight, MenuItem* item);
-	void renderTitleArea();
-	bool renderWidgets(bool forceDraw);
-    void renderListMenu(int titleHeight);
+    Coord getDisplayDimensions() override {  return Coord(u8g2->getWidth(), u8g2->getHeight()); }
+    void transaction(bool isStarting, bool redrawNeeded) override;
+    Coord textExtents(const void *font, int mag, const char *text, int *baseline) override;
 };
-
-class U8g2Dialog : public BaseDialog {
-public:
-    U8g2Dialog() {
-        U8g2MenuRenderer* r = reinterpret_cast<U8g2MenuRenderer*>(MenuRenderer::getInstance());
-        bitWrite(flags, DLG_FLAG_SMALLDISPLAY, (r->getGraphics()->getDisplayWidth() < 100));
-    }
-protected:
-    void internalRender(int currentValue) override;
-    void drawButton(U8G2* gfx, U8g2GfxMenuConfig* config, const char* title, uint8_t num, bool active);
-};
-
-/**
- * Provides a basic graphics configuration suitable for low / medium resolution displays
- * @param config usually a global variable holding the graphics configuration.
- */
-void prepareBasicU8x8Config(U8g2GfxMenuConfig& config);
 
 #endif // _TCMENU_U8G2_H_
