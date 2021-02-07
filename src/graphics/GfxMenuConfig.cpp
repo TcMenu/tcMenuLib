@@ -2,6 +2,7 @@
 #include <PlatformDetermination.h>
 #include "GfxMenuConfig.h"
 #include <MenuIterator.h>
+#include <tcMenu.h>
 
 namespace tcgfx {
 
@@ -44,7 +45,7 @@ ItemDisplayProperties *ConfigurableItemDisplayPropertiesFactory::configFor(MenuI
     if(pItem != nullptr) {
         pConf = displayProperties.getByKey(MakePropsKey(pItem->getId(), false, compType));
         if(pConf) return pConf;
-        auto* pSubMenu = getSubMenuFor(pItem);
+        auto* pSubMenu = menuMgr.getCurrentSubMenu();
         uint16_t subId = pSubMenu ? pSubMenu->getId() : 0;
         pConf = displayProperties.getByKey(MakePropsKey(subId, true, compType));
         if(pConf) return pConf;

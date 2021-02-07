@@ -198,6 +198,59 @@ void CALLBACK_FUNCTION onSaveValue(int id) {
     renderer.getDialog()->copyIntoBuffer(menuRomChoicesValue.getTextValue());
 }
 
+//
+// Here we handle the custom rendering for the number choices Scroll Choice menu item. We basically get called back
+// every time it needs more data. For example when the name is required, when any index value is required or when
+// it will be saved to EEPROM or invoked.
+//
+int CALLBACK_FUNCTION fnAdditionalNumChoicesRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize) {
+    switch(mode) {
+        case RENDERFN_EEPROM_POS:
+           return 32;
+        case RENDERFN_INVOKE:
+            serdebugF2("Num Choice changed to ", row);
+            return true;
+        case RENDERFN_NAME:
+            strcpy(buffer, "Num Choices");
+            return true;
+        case RENDERFN_VALUE:
+            buffer[0] = 'V'; buffer[1]=0;
+            fastltoa(buffer, row, 3, NOT_PADDED, bufferSize);
+            return true;
+        default: return false;
+    }
+}
+
+//
+// Here we handle the custom rendering for the runtime list menu item that just counts. We basically get called back
+// every time it needs more data. For example when the name is required, when any index value is required or when
+// it will be saved to EEPROM or invoked.
+//
+int CALLBACK_FUNCTION fnAdditionalCountListRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize) {
+    switch(mode) {
+        case RENDERFN_INVOKE: {
+            // when the user selects an item in the list, we get this callback. Row is the offset of the selection
+            renderer.getDialog()->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
+            renderer.getDialog()->show(pgmListPressed, true);
+            char sz[10];
+            ltoaClrBuff(sz, row, 3, NOT_PADDED, sizeof sz);
+            renderer.getDialog()->copyIntoBuffer(sz);
+            return true;
+        }
+        case RENDERFN_NAME:
+            // Called whenever the name of the menu item is needed
+            strcpy(buffer, "List Item");
+            return true;
+        case RENDERFN_VALUE:
+            // Called whenever the value of a given row is needed.
+            buffer[0] = 'V'; buffer[1]=0;
+            fastltoa(buffer, row, 3, NOT_PADDED, bufferSize);
+            return true;
+        case RENDERFN_EEPROM_POS: return 0xFFFF; // lists are generally not saved to EEPROM
+        default: return false;
+    }
+}
+
 
 
 

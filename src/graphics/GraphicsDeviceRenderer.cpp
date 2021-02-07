@@ -44,7 +44,7 @@ void GraphicsDeviceRenderer::drawWidget(Coord where, TitleWidget *widget, color_
     drawable->drawXBitmap(where, Coord(widget->getWidth(), widget->getHeight()), widget->getCurrentIcon());
 }
 
-void GraphicsDeviceRenderer::drawMenuItem(GridPositionRowCacheEntry *entry, Coord where, Coord areaSize) {
+void GraphicsDeviceRenderer::drawMenuItem(GridPositionRowCacheEntry *entry, Coord where, Coord areaSize, bool drawAll) {
     redrawNeeded = true;
 
     // icons never use double buffer drawing because they use a lot of BPP
@@ -54,10 +54,18 @@ void GraphicsDeviceRenderer::drawMenuItem(GridPositionRowCacheEntry *entry, Coor
         return;
     }
 
+    // if we are drawing everything, then we need to clear out the areas in between items.
+    if(drawAll && entry->getDisplayProperties()->getSpaceAfter() > 0) {
+        auto* bgConfig = propertiesFactory.configFor(menuMgr.getCurrentSubMenu(), ItemDisplayProperties::COMPTYPE_ITEM);
+        drawable->setDrawColor(bgConfig->getColor(ItemDisplayProperties::BACKGROUND));
+        drawable->drawBox(Coord(where.x, where.y + areaSize.y), Coord(areaSize.x, entry->getDisplayProperties()->getSpaceAfter()), true);
+    }
+
     auto* subDevice = rootDrawable->getSubDeviceFor(where, areaSize, entry->getDisplayProperties()->getPalette(), 6);
     if(subDevice) {
         subDevice->startDraw();
     }
+
     drawable = subDevice ? subDevice : rootDrawable;
     const Coord& wh = subDevice ? zeroPointCoord : where;
     switch(drawingMode) {
@@ -304,6 +312,12 @@ void GraphicsDeviceRenderer::prepareDisplay(bool mono, const void* itemFont, int
     factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_TITLE, titlePalette, titlePadding, titleFont, titleMag, medResOrBetter ? 3 : 1, titleHeight, GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE );
     factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, itemPalette, itemPadding, itemFont, itemMag, 1, itemHeight, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT );
     factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ACTION, itemPalette, itemPadding, itemFont, itemMag, 1, itemHeight, GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE );
+}
+
+void GraphicsDeviceRenderer::fillWithBackgroundTo(int endPoint) {
+    auto* bgConfig = propertiesFactory.configFor(menuMgr.getCurrentSubMenu(), ItemDisplayProperties::COMPTYPE_ITEM);
+    drawable->setDrawColor(bgConfig->getColor(ItemDisplayProperties::BACKGROUND));
+    drawable->drawBox(Coord(0, endPoint), Coord(width, height-endPoint), true);
 }
 
 } // namespace tcgfx

@@ -62,12 +62,6 @@ void LiquidCrystalRenderer::drawWidget(Coord where, TitleWidget *widget, color_t
     lcd->write(ch);
 }
 
-bool itemNeedsValue(GridPosition::GridJustification justification) {
-    return (justification == GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE ||
-            justification == GridPosition::JUSTIFY_CENTER_WITH_VALUE ||
-            justification == GridPosition::JUSTIFY_RIGHT_WITH_VALUE);
-}
-
 int calculateOffset(GridPosition::GridJustification just, int totalLen, const char* sz) {
     int len = strlen(sz);
     if(len > totalLen || just == GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE || just == GridPosition::JUSTIFY_LEFT_NO_VALUE) return 0;
@@ -132,53 +126,19 @@ void LiquidCrystalRenderer::drawingCommand(RenderDrawingCommand command) {
     }
 }
 
-BaseDialog* LiquidCrystalRenderer::getDialog() {
-    if(dialog == NULL) {
-        dialog = new LiquidCrystalDialog(this);
+void LiquidCrystalRenderer::fillWithBackgroundTo(int endPoint) {
+    char sz[25];
+    memset(sz, ' ', sizeof sz);
+    sz[20]=0;
+    for(int i=endPoint;i<height;i++) {
+        lcd->setCursor(0, i);
+        lcd->print(sz);
     }
-    return dialog;
 }
 
-// dialog
-
-void LiquidCrystalDialog::internalRender(int currentValue) {
-    LiquidCrystalRenderer* lcdRender = ((LiquidCrystalRenderer*)MenuRenderer::getInstance());
-    LiquidCrystal* lcd = lcdRender->getLCD();
-    if(needsDrawing == MENUDRAW_COMPLETE_REDRAW) {
-        lcd->clear();
+BaseDialog* LiquidCrystalRenderer::getDialog() {
+    if(dialog == NULL) {
+        dialog = new MenuBasedDialog();
     }
-
-    char data[20];
-    strncpy_P(data, headerPgm, sizeof(data));
-    data[sizeof(data)-1]=0;
-    lcd->setCursor(0,0);
-    lcd->print(data);
-
-    // we can only print the buffer on a newline when there's enough rows.
-    // so on 16x2 we have to show the buffer over the header. It's all we
-    // can do.
-    int nextY = 3;
-    if(isCompressedMode()) {
-        int len = strlen(lcdRender->getBuffer());
-        int startX = lcdRender->getBufferSize() - len;
-        lcd->setCursor(startX,0);
-        lcd->print(lcdRender->getBuffer());
-        nextY = 1;
-    }
-    else {
-        lcd->setCursor(0,1);
-        lcd->print(lcdRender->getBuffer());
-    }
-
-    if(button1 != BTNTYPE_NONE) {
-        copyButtonText(data, 0, currentValue);
-        lcd->setCursor(0, nextY);
-        lcd->print(data);
-    }
-    if(button2 != BTNTYPE_NONE) {
-        copyButtonText(data, 1, currentValue);
-        int startX = lcdRender->getBufferSize() - strlen(data);
-        lcd->setCursor(startX, nextY);
-        lcd->print(data);
-    }
+    return dialog;
 }

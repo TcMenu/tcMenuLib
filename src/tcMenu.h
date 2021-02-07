@@ -85,7 +85,8 @@ class MenuManager {
 private:
 	MenuItem* rootMenu;
 	MenuRenderer* renderer;
-	MenuItem* currentRoot;
+	MenuItem* currentFirstRoot;
+	MenuItem* currentSubMenu;
 	MenuItem* currentEditor;
 	SecuredMenuPopup* securedMenuPopup;
 	AuthenticationManager *authenticationManager;
@@ -273,9 +274,11 @@ public:
 	void setCurrentMenu(MenuItem* theItem);
 
 	/**
-	 * Get the current sub menu that is being rendered
+	 * Get the first menu item in the linked list that is being rendered
 	 */
-	MenuItem* getCurrentMenu() { return currentRoot; }
+	MenuItem* getCurrentMenu() { return currentFirstRoot; }
+
+	MenuItem* getCurrentSubMenu() { return currentSubMenu; }
 
 	/**
 	 * Get the parent of the current menu clearing all active flags too

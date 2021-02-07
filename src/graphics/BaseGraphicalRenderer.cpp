@@ -102,9 +102,11 @@ void BaseGraphicalRenderer::render() {
     else {
         // first we find the first currently active rootItem in our single linked list
         int activeIndex = findActiveItem();
-        int totalHeight = calculateHeightTo(activeIndex, rootItem);
+        uint16_t totalHeight = calculateHeightTo(activeIndex, rootItem);
         int startRow = 0;
-        int adjust = lastRowExactFit ? 0 : 1;
+        uint16_t adjust = lastRowExactFit ? 0 : 1;
+        bool drawCompleteScreen = locRedrawMode != MENUDRAW_NO_CHANGE;
+
         while (totalHeight > (height + adjust)) {
             totalHeight -= heightOfRow(startRow, 1);
             startRow++;
@@ -114,12 +116,12 @@ void BaseGraphicalRenderer::render() {
         if(locRedrawMode != MENUDRAW_COMPLETE_REDRAW && lastOffset != startRow) {
             locRedrawMode = MENUDRAW_COMPLETE_REDRAW;
             serdebugF3("Screen Row moved ", lastOffset, startRow);
-            drawingCommand(DRAW_COMMAND_CLEAR);
+            drawCompleteScreen = true;
         }
         lastOffset = startRow;
 
         // and then we start drawing items until we run out of screen or items
-        forceDrawWidgets = drawTheMenuItems(locRedrawMode, startRow);
+        forceDrawWidgets = drawTheMenuItems(startRow, drawCompleteScreen);
         titleOnDisplay = (titleMode != NO_TITLE) && startRow == 0;
     }
 
@@ -136,7 +138,7 @@ GridPositionRowCacheEntry* BaseGraphicalRenderer::findMenuEntryAndDimensions(con
     auto* icon = getDisplayPropertiesFactory().iconForMenuItem(SPECIAL_ID_ACTIVE_ICON);
     int iconWidth = icon ? icon->getDimensions().x : 0;
 
-    for(int i=lastOffset; i<itemOrderByRow.count(); i++) {
+    for(bsize_t i=lastOffset; i<itemOrderByRow.count(); i++) {
         auto* pEntry = itemOrderByRow.itemAtIndex(i);
         int rowHeight = heightOfRow(pEntry->getPosition().getRow(), 1);
         int rowEndY = rowStartY + rowHeight;
@@ -175,11 +177,12 @@ GridPositionRowCacheEntry* BaseGraphicalRenderer::findMenuEntryAndDimensions(con
     return nullptr;
 }
 
-bool BaseGraphicalRenderer::drawTheMenuItems(uint8_t locRedrawMode, int startRow) {
-    int16_t ypos = 0;
+bool BaseGraphicalRenderer::drawTheMenuItems(int startRow, bool drawEveryLine) {
+    uint16_t ypos = 0;
     int lastRow = 0;
     int addAmount = 0;
     bool didDrawTitle = false;
+    uint16_t totalHeight = 0;
 
     for(bsize_t i=startRow; i < itemOrderByRow.count(); i++) {
         auto* itemCfg = itemOrderByRow.itemAtIndex(i);
@@ -187,30 +190,36 @@ bool BaseGraphicalRenderer::drawTheMenuItems(uint8_t locRedrawMode, int startRow
         if(item->isVisible())
         {
             if(lastRow != itemCfg->getPosition().getRow()) ypos += addAmount;
-            int itemHeight = (int)itemCfg->getPosition().getGridHeight();
-            if(itemHeight == 0) itemHeight = itemCfg->getDisplayProperties()->getRequiredHeight();
-            auto extentsY = (lastRowExactFit) ? ypos + itemHeight : ypos;
+            totalHeight = ypos + itemCfg->getHeight();
+            auto extentsY = (lastRowExactFit) ? totalHeight : ypos;
             if(extentsY > height) break;
 
-            if (locRedrawMode != MENUDRAW_NO_CHANGE || item->isChanged()) {
+            if (drawEveryLine || item->isChanged()) {
                 serdebugF4("draw item (pos,id,chg)", i, item->getId(), item->isChanged());
                 item->setChanged(false);
                 taskManager.yieldForMicros(0);
                 if(itemCfg->getPosition().getGridSize() > 1) {
                     int colWidth = width / itemCfg->getPosition().getGridSize();
                     int colOffset = colWidth * (itemCfg->getPosition().getGridPosition() - 1);
-                    drawMenuItem(itemCfg, Coord(colOffset, ypos), Coord(colWidth, itemHeight));
+                    drawMenuItem(itemCfg, Coord(colOffset, ypos), Coord(colWidth, itemCfg->getHeight()), drawEveryLine);
                 }
                 else {
-                    drawMenuItem(itemCfg, Coord(0, ypos), Coord(width, itemHeight));
+                    drawMenuItem(itemCfg, Coord(0, ypos), Coord(width, itemCfg->getHeight()), drawEveryLine);
                 }
                 if(itemCfg->getPosition().getDrawingMode() == GridPosition::DRAW_TITLE_ITEM && itemCfg->getPosition().getRow() == 0) {
                     didDrawTitle = true;
                 }
             }
             lastRow = itemCfg->getPosition().getRow();
-            addAmount = itemHeight + itemCfg->getDisplayProperties()->getSpaceAfter();
+            addAmount = itemCfg->getHeight() + itemCfg->getDisplayProperties()->getSpaceAfter();
         }
+
+    }
+
+    // and lastly, if we are drawing every line, we must clear down everything
+    totalHeight++;
+    if(drawEveryLine && totalHeight < height) {
+        fillWithBackgroundTo(totalHeight);
     }
 
     return didDrawTitle;
@@ -238,14 +247,14 @@ void BaseGraphicalRenderer::renderList() {
         GridPositionRowCacheEntry titleEntry(runList->asBackMenu(), GridPosition(GridPosition::DRAW_TITLE_ITEM,
                                                                                  titleProps->getDefaultJustification(),
                                                                                  0, titleHeight), titleProps);
-        drawMenuItem(&titleEntry, Coord(0, 0), Coord(width, titleHeight));
+        drawMenuItem(&titleEntry, Coord(0, 0), Coord(width, titleHeight), true);
     }
 
     for (int i = 0; i < maxY; i++) {
         uint8_t current = offset + i;
         RuntimeMenuItem* toDraw = runList->getChildItem(current);
         GridPositionRowCacheEntry itemEntry(toDraw, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, current + 1, rowHeight), itemProps);
-        drawMenuItem(&itemEntry, Coord(0, totalTitleHeight + (i * totalRowHeight)), Coord(width, rowHeight));
+        drawMenuItem(&itemEntry, Coord(0, totalTitleHeight + (i * totalRowHeight)), Coord(width, rowHeight), true);
         taskManager.yieldForMicros(0);
     }
 

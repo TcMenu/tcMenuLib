@@ -18,7 +18,8 @@ MenuManager menuMgr;
 
 void MenuManager::initForUpDownOk(MenuRenderer* renderer, MenuItem* root, pinid_t pinDown, pinid_t pinUp, pinid_t pinOk) {
 	this->renderer = renderer;
-	this->currentRoot = this->rootMenu = root;
+	this->currentFirstRoot = this->rootMenu = root;
+	this->currentSubMenu = nullptr;
 
 	switches.addSwitch(pinOk, nullptr);
     switches.onRelease(pinOk, [](pinid_t /*key*/, bool held) { menuMgr.onMenuSelect(held); });
@@ -28,7 +29,8 @@ void MenuManager::initForUpDownOk(MenuRenderer* renderer, MenuItem* root, pinid_
 
 void MenuManager::initForEncoder(MenuRenderer* renderer,  MenuItem* root, pinid_t encoderPinA, pinid_t encoderPinB, pinid_t encoderButton) {
 	this->renderer = renderer;
-	this->currentRoot = this->rootMenu = root;
+	this->currentFirstRoot = this->rootMenu = root;
+	this->currentSubMenu = nullptr;
 
 	switches.addSwitch(encoderButton, nullptr);
     switches.onRelease(encoderButton, [](pinid_t /*key*/, bool held) { menuMgr.onMenuSelect(held); });
@@ -77,7 +79,8 @@ void MenuManager::performDirectionMove(bool dirIsBack) {
 
 void MenuManager::initWithoutInput(MenuRenderer* renderer, MenuItem* root) {
 	this->renderer = renderer;
-	this->currentRoot = this->rootMenu = root;
+	this->currentFirstRoot = this->rootMenu = root;
+	this->currentSubMenu = nullptr;
 
 	renderer->initialise();
 }
@@ -117,7 +120,7 @@ void MenuManager::valueChanged(int value) {
             }
         }
         else {
-            currentActive = getItemAtPosition(currentRoot, value);
+            currentActive = getItemAtPosition(currentFirstRoot, value);
             currentActive->setActive(true);
             serdebugF3("Legacy set active (V, ID) ", value, currentActive->getId());
         }
@@ -132,7 +135,7 @@ void MenuManager::onMenuSelect(bool held) {
 
 	if (held) {
         if (currentEditor != nullptr && isMenuRuntimeMultiEdit(currentEditor)) {
-            setCurrentMenu(currentRoot);
+            setCurrentMenu(currentFirstRoot);
         }
         else {
             setCurrentMenu(getParentAndReset());
@@ -153,7 +156,8 @@ void MenuManager::actionOnSubMenu(MenuItem* nextSub) {
 		serdebugF2("Submenu is secured: ", nextSub->getId());
 		SecuredMenuPopup* popup = secureMenuInstance();
 		popup->start(subMenu);
-		currentRoot = popup->getRootItem();
+		currentFirstRoot = popup->getRootItem();
+		currentSubMenu = nullptr;
 		auto* baseRenderer = reinterpret_cast<BaseMenuRenderer*>(renderer);
 		baseRenderer->prepareNewSubmenu();
 	}
@@ -330,7 +334,8 @@ void MenuManager::setCurrentMenu(MenuItem * theItem) {
 	getParentAndReset();
 
 	MenuItem* root = theItem;
-	currentRoot = root;
+	currentFirstRoot = root;
+	currentSubMenu = getSubMenuFor(root);
 
     baseRenderer->prepareNewSubmenu();
 
@@ -348,7 +353,8 @@ SecuredMenuPopup* MenuManager::secureMenuInstance() {
 
 MenuManager::MenuManager() : structureNotifier() {
     this->currentEditor = nullptr;
-    this->currentRoot = nullptr;
+    this->currentFirstRoot = nullptr;
+    this->currentSubMenu = nullptr;
     this->renderer = nullptr;
     this->rootMenu = nullptr;
     this->securedMenuPopup = nullptr;

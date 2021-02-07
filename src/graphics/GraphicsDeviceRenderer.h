@@ -204,13 +204,16 @@ namespace tcgfx {
         DeviceDrawable* rootDrawable;
         DeviceDrawable* drawable;
         ConfigurableItemDisplayPropertiesFactory propertiesFactory;
+        color_t coreBackgroundColor;
         bool redrawNeeded = false;
     public:
         GraphicsDeviceRenderer(int bufferSize, const char *appTitle, DeviceDrawable *drawable);
 
         void drawWidget(Coord where, TitleWidget *widget, color_t colorFg, color_t colorBg) override;
-        void drawMenuItem(GridPositionRowCacheEntry *entry, Coord where, Coord areaSize) override;
+        void drawMenuItem(GridPositionRowCacheEntry *entry, Coord where, Coord areaSize, bool drawAll) override;
         void drawingCommand(RenderDrawingCommand command) override;
+
+        void fillWithBackgroundTo(int endPoint) override;
 
         /**
          * Get the height for the font and add the descent to the bottom padding.

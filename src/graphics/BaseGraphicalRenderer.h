@@ -50,6 +50,10 @@ namespace tcgfx {
 
         uint16_t getKey() const { return rowCol(thePosition.getRow(), thePosition.getGridPosition()); }
 
+        uint16_t getHeight() {
+            return thePosition.getGridHeight() != 0 ? thePosition.getGridHeight() : properties->getRequiredHeight();
+        }
+
         MenuItem *getMenuItem() { return menuItem; }
     };
 
@@ -145,12 +149,19 @@ namespace tcgfx {
          * @param where the position on the display to render at
          * @param areaSize the size of the area where it should be rendered
          */
-        virtual void drawMenuItem(GridPositionRowCacheEntry *entry, Coord where, Coord areaSize) = 0;
+        virtual void drawMenuItem(GridPositionRowCacheEntry *entry, Coord where, Coord areaSize, bool drawAll) = 0;
 
         /**
          * This sends general purpose commands that can be implemened by the leaf class as needed.
          */
         virtual void drawingCommand(RenderDrawingCommand command) = 0;
+
+        /**
+         * This indicates to the renderer leaf class that the background color should be filled from
+         * Y end point to the end of the screen.
+         * @param endPoint the last drawing point in the Y location
+         */
+        virtual void fillWithBackgroundTo(int endPoint) = 0;
 
         /**
          * Gets the item display factory that provides the formatting information for this renderer, it holds the font,
@@ -210,7 +221,7 @@ namespace tcgfx {
         int getHeight() const { return height; }
 
     private:
-        bool drawTheMenuItems(uint8_t locRedrawMode, int startRow);
+        bool drawTheMenuItems(int startRow, bool drawEveryLine);
 
         void renderList();
 
