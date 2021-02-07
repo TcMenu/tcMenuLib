@@ -6,19 +6,18 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
-*/
+ */
 
-#include <Arduino.h>
 #include <tcMenu.h>
 #include "esp8266WifiOled_menu.h"
 
 // Global variable declarations
 
-const PROGMEM ConnectorLocalInfo applicationInfo = { "ESP8266 Greenhouse", "01b9cb76-c108-4be3-a133-6159f8f1c9c1" };
+const PROGMEM  ConnectorLocalInfo applicationInfo = { "ESP8266 Greenhouse", "01b9cb76-c108-4be3-a133-6159f8f1c9c1" };
+
 U8G2_SH1106_128X64_NONAME_F_SW_I2C gfx(U8G2_R0, 5, 4, 16);
-U8g2GfxMenuConfig gfxConfig;
-U8g2Drawable drawable(&gfx, &Wire);
-GraphicsDeviceRenderer renderer(20, applicationInfo.name, &drawable);
+U8g2Drawable gfxDrawable(&gfx, &Wire);
+GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 WiFiServer server(3333);
 
 // Global Menu Item declarations
@@ -29,60 +28,60 @@ RENDERING_CALLBACK_NAME_INVOKE(fnPwdRtCall, textItemRenderFn, "Pwd", 23, NO_CALL
 TextMenuItem menuPwd(fnPwdRtCall, 12, 15, &menuIpAddress);
 RENDERING_CALLBACK_NAME_INVOKE(fnSSIDRtCall, textItemRenderFn, "SSID", 8, NO_CALLBACK)
 TextMenuItem menuSSID(fnSSIDRtCall, 11, 15, &menuPwd);
-const SubMenuInfo PROGMEM minfoConnectivity = { "Connectivity", 9, 0xFFFF, 0, NO_CALLBACK };
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NO_CALLBACK)
+const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 9, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuSSID);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL);
-const AnyMenuInfo PROGMEM minfoLoadFiles = { "Load Files", 15, 0xFFFF, 0, onLoadFiles };
+const PROGMEM AnyMenuInfo minfoLoadFiles = { "Load Files", 15, 0xffff, 0, onLoadFiles };
 ActionMenuItem menuLoadFiles(&minfoLoadFiles, &menuConnectivity);
 extern const char* fileChoicesArray;
 RENDERING_CALLBACK_NAME_INVOKE(fnFileRtCall, enumItemRenderFn, "File", -1, onFileChoice)
 ScrollChoiceMenuItem menuFile(14, fnFileRtCall, 0, fileChoicesArray, 10, 1, &menuLoadFiles);
-const BooleanMenuInfo PROGMEM minfoSecretEntry = { "Secret Entry", 13, 0xFFFF, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
+const PROGMEM BooleanMenuInfo minfoSecretEntry = { "Secret Entry", 13, 0xffff, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
 BooleanMenuItem menuSecretEntry(&minfoSecretEntry, false, &menuFile);
-const AnyMenuInfo PROGMEM minfoSaveAll = { "Save All", 8, 0xFFFF, 0, onSaveAll };
+const PROGMEM AnyMenuInfo minfoSaveAll = { "Save All", 8, 0xffff, 0, onSaveAll };
 ActionMenuItem menuSaveAll(&minfoSaveAll, &menuSecretEntry);
-const char enumStrWinOpening_0[] PROGMEM  = "NARROW";
-const char enumStrWinOpening_1[] PROGMEM  = "WIDE";
-const char enumStrWinOpening_2[] PROGMEM  = "CLOSED";
+const char enumStrWinOpening_0[] PROGMEM = "NARROW";
+const char enumStrWinOpening_1[] PROGMEM = "WIDE";
+const char enumStrWinOpening_2[] PROGMEM = "CLOSED";
 const char* const enumStrWinOpening[] PROGMEM  = { enumStrWinOpening_0, enumStrWinOpening_1, enumStrWinOpening_2 };
-const EnumMenuInfo PROGMEM minfoWinOpening = { "Win Opening", 7, 6, 2, onWindowOpening, enumStrWinOpening };
+const PROGMEM EnumMenuInfo minfoWinOpening = { "Win Opening", 7, 6, 2, onWindowOpening, enumStrWinOpening };
 EnumMenuItem menuWinOpening(&minfoWinOpening, 0, &menuSaveAll);
-const char enumStrHeaterPower_0[] PROGMEM  = "LOW";
-const char enumStrHeaterPower_1[] PROGMEM  = "MEDIUM";
-const char enumStrHeaterPower_2[] PROGMEM  = "HIGH";
+const char enumStrHeaterPower_0[] PROGMEM = "LOW";
+const char enumStrHeaterPower_1[] PROGMEM = "MEDIUM";
+const char enumStrHeaterPower_2[] PROGMEM = "HIGH";
 const char* const enumStrHeaterPower[] PROGMEM  = { enumStrHeaterPower_0, enumStrHeaterPower_1, enumStrHeaterPower_2 };
-const EnumMenuInfo PROGMEM minfoHeaterPower = { "Heater Power", 6, 4, 2, onHeaterPower, enumStrHeaterPower };
+const PROGMEM EnumMenuInfo minfoHeaterPower = { "Heater Power", 6, 4, 2, onHeaterPower, enumStrHeaterPower };
 EnumMenuItem menuHeaterPower(&minfoHeaterPower, 0, &menuWinOpening);
-const SubMenuInfo PROGMEM minfoSetup = { "Setup", 5, 0xFFFF, 0, NO_CALLBACK };
 RENDERING_CALLBACK_NAME_INVOKE(fnSetupRtCall, backSubItemRenderFn, "Setup", -1, NO_CALLBACK)
+const PROGMEM SubMenuInfo minfoSetup = { "Setup", 5, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackSetup(fnSetupRtCall, &menuHeaterPower);
 SubMenuItem menuSetup(&minfoSetup, &menuBackSetup, NULL);
-const BooleanMenuInfo PROGMEM minfoLockDoor = { "Lock Door", 16, 38, 1, onLockDoor, NAMING_YES_NO };
+const PROGMEM BooleanMenuInfo minfoLockDoor = { "Lock Door", 16, 38, 1, onLockDoor, NAMING_YES_NO };
 BooleanMenuItem menuLockDoor(&minfoLockDoor, false, &menuSetup);
-const BooleanMenuInfo PROGMEM minfoElectricHeater = { "Electric Heater", 4, 3, 1, onElectricHeater, NAMING_ON_OFF };
+const PROGMEM BooleanMenuInfo minfoElectricHeater = { "Electric Heater", 4, 3, 1, onElectricHeater, NAMING_ON_OFF };
 BooleanMenuItem menuElectricHeater(&minfoElectricHeater, false, &menuLockDoor);
-const AnalogMenuInfo PROGMEM minfoCucumberTemp = { "Cucumber Temp", 2, 0xFFFF, 255, NO_CALLBACK, -20, 4, "C" };
+const PROGMEM AnalogMenuInfo minfoCucumberTemp = { "Cucumber Temp", 2, 0xffff, 255, NO_CALLBACK, -20, 4, "C" };
 AnalogMenuItem menuCucumberTemp(&minfoCucumberTemp, 0, &menuElectricHeater);
-const AnalogMenuInfo PROGMEM minfoTomatoTemp = { "Tomato Temp", 1, 0xFFFF, 255, NO_CALLBACK, -20, 4, "C" };
+const PROGMEM AnalogMenuInfo minfoTomatoTemp = { "Tomato Temp", 1, 0xffff, 255, NO_CALLBACK, -20, 4, "C" };
 AnalogMenuItem menuTomatoTemp(&minfoTomatoTemp, 0, &menuCucumberTemp);
-
 
 // Set up code
 
 void setupMenu() {
-    menuTomatoTemp.setReadOnly(true);
-    menuCucumberTemp.setReadOnly(true);
-    menuSecretEntry.setVisible(false);
-    menuSSID.setLocalOnly(true);
-    menuPwd.setLocalOnly(true);
-    menuIpAddress.setReadOnly(true);
-
-    prepareBasicU8x8Config(gfxConfig);
     gfx.begin();
-    //renderer.setGraphicsConfiguration(&gfxConfig);
-    renderer.prepareDisplay(true);
+    renderer.setUpdatesPerSecond(10);
+    renderer.prepareDisplay(true, NULL, 1, &u8g2_font_timB08_tr, 1, true);
     switches.initialise(internalDigitalIo(), true);
     menuMgr.initForEncoder(&renderer, &menuTomatoTemp, 13, 12, 14);
     remoteServer.begin(&server, &applicationInfo);
+
+    // Read only and local only function calls
+    menuTomatoTemp.setReadOnly(true);
+    menuCucumberTemp.setReadOnly(true);
+    menuIpAddress.setReadOnly(true);
+    menuPwd.setLocalOnly(true);
+    menuSSID.setLocalOnly(true);
+    menuSecretEntry.setVisible(false);
 }
+

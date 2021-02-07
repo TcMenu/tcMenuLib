@@ -53,11 +53,11 @@ namespace tcgfx {
         MenuItem *getMenuItem() { return menuItem; }
     };
 
-/**
- * This is the base class for all simpler renderer classes where the height of a row is equal for all entries,
- * and there is always exactly one item on a row. This takes away much of the work to row allocation for simple
- * renderers. Examples of this are the LiquidCrystal renderer
- */
+    /**
+     * This is the base class for all simpler renderer classes where the height of a row is equal for all entries,
+     * and there is always exactly one item on a row. This takes away much of the work to row allocation for simple
+     * renderers. Examples of this are the LiquidCrystal renderer
+     */
     class BaseGraphicalRenderer : public BaseMenuRenderer {
     public:
         /**
@@ -117,6 +117,11 @@ namespace tcgfx {
 
         void render() override;
 
+        /**
+         * Usually called during the initialisation of the display internally to set the width and height.
+         * @param w display width in current rotation
+         * @param h display height in current rotation
+         */
         void setDisplayDimensions(int w, int h) {
             serdebugF3("Set dimensions: ", w, h);
             width = w;
@@ -187,10 +192,21 @@ namespace tcgfx {
          */
         MenuItem *getMenuItemAtIndex(uint16_t idx);
 
+        /**
+         * All base graphical renderers use a dialog based on menu item, this provides the greatest flexibility and
+         * also reduces the amount of dialog code. This means nearly every display we support uses menu based dialogs
+         * @return a shared menu based dialog instance
+         */
         BaseDialog *getDialog() override;
 
+        /**
+         * @return width of the display in current rotation
+         */
         int getWidth() const { return width; }
 
+        /**
+         * @return height of the display in current rotation
+         */
         int getHeight() const { return height; }
 
     private:
@@ -211,25 +227,32 @@ namespace tcgfx {
         ItemDisplayProperties::ComponentType toComponentType(GridPosition::GridDrawingMode mode, MenuItem *pMenuItem);
     };
 
+    /**
+     * This is a helper function for analog items that converts the range of an analog item over the width available
+     * in a menu item. It's mainly used by scrolling components.
+     * @param item the item to determine the current and max value from
+     * @param screenWidth the width available for the full range
+     * @return the point on the screen which represents current value
+     */
     inline int analogRangeToScreen(AnalogMenuItem *item, int screenWidth) {
         float ratio = (float) screenWidth / (float) item->getMaximumValue();
         return int((float) item->getCurrentValue() * ratio);
     }
 
-/**
- * Invokes the callback provided when the title menu item is pressed.
- * @param cb the callback to fire when the title is selected
- */
+    /**
+     * Invokes the callback provided when the title menu item is pressed.
+     * @param cb the callback to fire when the title is selected
+     */
     void setTitlePressedCallback(MenuCallbackFn cb);
 
-/**
- * This method takes an existing graphics configuration and converts it into the new display properties format, its
- * designer as a bridge between the old config object method and the new more supportable properties definitions.
- * @param factory the properties factory that we wish to populate
- * @param gfxConfig the graphics configuration to convert
- * @param titleHeight the height of the title
- * @param itemHeight the height of a standard item
- */
+    /**
+     * This method takes an existing graphics configuration and converts it into the new display properties format, its
+     * designer as a bridge between the old config object method and the new more supportable properties definitions.
+     * @param factory the properties factory that we wish to populate
+     * @param gfxConfig the graphics configuration to convert
+     * @param titleHeight the height of the title
+     * @param itemHeight the height of a standard item
+     */
     void preparePropertiesFromConfig(ConfigurableItemDisplayPropertiesFactory &factory,
                                      const ColorGfxMenuConfig<const void *> *gfxConfig, int titleHeight,
                                      int itemHeight);

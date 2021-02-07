@@ -38,7 +38,7 @@ using namespace tcgfx;
 /**
  * A standard menu render configuration that describes how to renderer each item and the title.
  * Specialised for u8g2 fonts.
- */ 
+ */
 typedef struct ColorGfxMenuConfig<const uint8_t*> U8g2GfxMenuConfig;
 
 // some colour displays don't create this value
@@ -63,7 +63,7 @@ uint8_t u8g2_byte_with_yield(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *a
  * it to this renderer. The usual procedure is to create a display variable globally in your
  * sketch and then provide that as the parameter to setGraphicsDevice. If you are using the
  * designer you provide the display variable name in the code generation parameters.
- * 
+ *
  * You can also override many elements of the display using AdaColorGfxMenuConfig, to use the defaults
  * just call prepareAdaColorDefaultGfxConfig(..) passing it a pointer to your config object. Again the
  * designer UI takes care of this.
@@ -76,25 +76,21 @@ private:
     friend uint8_t u8g2_byte_with_yield(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr);
 #endif // WANT_TASK_MANAGER_FRIENDLY_YIELD
 public:
-    U8g2Drawable(U8G2* u8g2, TwoWire* wire = nullptr);
+    explicit U8g2Drawable(U8G2* u8g2, TwoWire* wire = nullptr);
     ~U8g2Drawable() override = default;
 
-    Coord getDisplayDimensions() override {  return Coord(u8g2->getWidth(), u8g2->getHeight()); }
-    DeviceDrawable *getSubDeviceFor(int width, int height, int bitsPerPx, color_t *palette) override { return nullptr; }
+    DeviceDrawable* getSubDeviceFor(const Coord &where, const Coord &size, const color_t *palette, int paletteSize) override {return nullptr; }
 
-    void drawText(const Coord &where, const void *font, int mag, color_t textColor, const char *text) override;
-    void drawBitmap(const Coord &where, const DrawableIcon *icon, color_t defColor, bool selected) override;
-    void drawXBitmap(const Coord &where, const Coord &size, const uint8_t *data, color_t fgColor, color_t bgColor) override;
-    void drawBox(const Coord &where, const Coord &size, color_t color, bool filled) override;
+    void drawText(const Coord &where, const void *font, int mag, const char *text) override;
+    void drawBitmap(const Coord &where, const DrawableIcon *icon, bool selected) override;
+    void drawXBitmap(const Coord &where, const Coord &size, const uint8_t *data) override;
+    void drawBox(const Coord &where, const Coord &size, bool filled) override;
+    void drawCircle(const Coord &where, int radius, bool filled) override;
+    void drawPolygon(const Coord *points, int numPoints, bool filled) override;
+
+    Coord getDisplayDimensions() override {  return Coord(u8g2->getWidth(), u8g2->getHeight()); }
     void transaction(bool isStarting, bool redrawNeeded) override;
     Coord textExtents(const void *font, int mag, const char *text, int *baseline) override;
 };
-
-
-/**
- * Provides a basic graphics configuration suitable for low / medium resolution displays
- * @param config usually a global variable holding the graphics configuration.
- */
-void prepareBasicU8x8Config(U8g2GfxMenuConfig& config);
 
 #endif // _TCMENU_U8G2_H_

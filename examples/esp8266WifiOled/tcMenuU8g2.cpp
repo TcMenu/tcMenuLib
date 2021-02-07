@@ -64,17 +64,19 @@ U8g2Drawable::U8g2Drawable(U8G2 *u8g2, TwoWire* wireImpl) : u8g2(u8g2) {
 #endif
 }
 
-void U8g2Drawable::drawText(const Coord &where, const void *font, int mag, color_t textColor, const char *text) {
+void U8g2Drawable::drawText(const Coord &where, const void *font, int mag, const char *text) {
     u8g2->setFont(safeGetFont(font));
-    u8g2->setFontMode(textColor == 2);
+    u8g2->setFontMode(drawColor == 2);
     auto extraHeight = u8g2->getMaxCharHeight();
-    u8g2->setDrawColor(textColor);
+    u8g2->setDrawColor(drawColor);
     u8g2->setCursor(where.x, where.y + extraHeight);
     u8g2->print(text);
 }
 
-void U8g2Drawable::drawBitmap(const Coord &where, const DrawableIcon *icon, color_t defColor, bool selected) {
-    u8g2->setDrawColor(defColor);
+void U8g2Drawable::drawBitmap(const Coord &where, const DrawableIcon *icon, bool selected) {
+    u8g2->setDrawColor(backgroundColor);
+    u8g2->drawBox(where.x, where.y, icon->getDimensions().x, icon->getDimensions().y);
+    u8g2->setDrawColor(drawColor);
     if(icon->getIconType() == DrawableIcon::ICON_XBITMAP) {
 #if defined(__AVR__) || defined(ESP8266)
         u8g2->drawXBMP(where.x, where.y, icon->getDimensions().x, icon->getDimensions().y, icon->getIcon(selected));
@@ -84,10 +86,10 @@ void U8g2Drawable::drawBitmap(const Coord &where, const DrawableIcon *icon, colo
     }
 }
 
-void U8g2Drawable::drawXBitmap(const Coord &where, const Coord &size, const uint8_t *data, color_t fgColor, color_t bgColor) {
-    u8g2->setDrawColor(bgColor);
+void U8g2Drawable::drawXBitmap(const Coord &where, const Coord &size, const uint8_t *data) {
+    u8g2->setDrawColor(backgroundColor);
     u8g2->drawBox(where.x, where.y, size.x, size.y);
-    u8g2->setDrawColor(fgColor);
+    u8g2->setDrawColor(drawColor);
 #if defined(__AVR__) || defined(ESP8266)
     u8g2->drawXBMP(where.x, where.y, size.x, size.y, data);
 #else
@@ -95,8 +97,8 @@ void U8g2Drawable::drawXBitmap(const Coord &where, const Coord &size, const uint
 #endif
 }
 
-void U8g2Drawable::drawBox(const Coord &where, const Coord &size, color_t color, bool filled) {
-    u8g2->setDrawColor(color);
+void U8g2Drawable::drawBox(const Coord &where, const Coord &size, bool filled) {
+    u8g2->setDrawColor(drawColor);
     if(filled) {
         u8g2->drawBox(where.x, where.y, size.x, size.y);
     }
@@ -104,6 +106,21 @@ void U8g2Drawable::drawBox(const Coord &where, const Coord &size, color_t color,
         u8g2->drawFrame(where.x, where.y, size.x, size.y);
     }
 }
+
+void U8g2Drawable::drawCircle(const Coord &where, int radius, bool filled) {
+    u8g2->setDrawColor(drawColor);
+    u8g2->drawCircle(where.x, where.y, radius);
+}
+
+void U8g2Drawable::drawPolygon(const Coord *points, int numPoints, bool filled) {
+    if(numPoints == 2) {
+        u8g2->drawLine(points[0].x, points[0].y, points[1].x, points[1].y);
+    }
+    else if(numPoints == 3) {
+        u8g2->drawTriangle(points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y);
+    }
+}
+
 
 void U8g2Drawable::transaction(bool isStarting, bool redrawNeeded) {
     if(isStarting) {
@@ -119,40 +136,4 @@ Coord U8g2Drawable::textExtents(const void *font, int mag, const char *text, int
     u8g2->setFont(safeGetFont(font));
     if(baseline) *baseline = (int)u8g2->getFontDescent();
     return Coord(u8g2->getStrWidth(text), u8g2->getMaxCharHeight());
-}
-
-//
-// Default graphics configuration
-//
-
-/**
- * Provides a basic graphics configuration suitable for low / medium resolution displays. Do not use in new code, this
- * will be removed in a future release.
- *
- * @param config usually a global variable holding the graphics configuration.
- * @deprecated use display factory based configuration instead, see documentation
- */
-void prepareBasicU8x8Config(U8g2GfxMenuConfig& config) {
-	makePadding(config.titlePadding, 1, 1, 1, 1);
-	makePadding(config.itemPadding, 1, 1, 1, 1);
-	makePadding(config.widgetPadding, 2, 2, 0, 2);
-
-	config.bgTitleColor = WHITE;
-	config.fgTitleColor = BLACK;
-	config.titleFont = u8g2_font_6x12_tf;
-	config.titleBottomMargin = 1;
-	config.widgetColor = BLACK;
-	config.titleFontMagnification = 1;
-
-	config.bgItemColor = BLACK;
-	config.fgItemColor = WHITE;
-	config.bgSelectColor = BLACK;
-	config.fgSelectColor = WHITE;
-	config.itemFont = u8g2_font_6x10_tf;
-	config.itemFontMagnification = 1;
-
-    config.editIcon = loResEditingIcon;
-    config.activeIcon = loResActiveIcon;
-    config.editIconHeight = 6;
-    config.editIconWidth = 8;
 }

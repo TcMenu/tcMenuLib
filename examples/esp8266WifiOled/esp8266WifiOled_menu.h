@@ -6,55 +6,77 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
-*/
+ */
 
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
 
 #include <Arduino.h>
 #include <tcMenu.h>
-#include <RuntimeMenuItem.h>
+
 #include "tcMenuU8g2.h"
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
+#include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 
-void setupMenu();  // forward reference of the menu setup function.
-extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app info to the linker.
+// all define statements needed
+#define DISPLAY_VARIABLE gfx
+#define DISPLAY_TYPE U8G2_SH1106_128X64_NONAME_F_SW_I2C
+#define DISPLAY_ROTATION U8G2_R0
+#define YIELDING_WIRE_CB true
+#define DISPLAY_CLOCK_PIN 5
+#define DISPLAY_DATA_PIN 4
+#define DISPLAY_RESET_PIN 16
+#define DISPLAY_CS_PIN U8X8_PIN_NONE
+#define DISPLAY_RS_PIN U8X8_PIN_NONE
+#define DISPLAY_TITLE_FONT u8g2_font_timB08_tr
+#define DISPLAY_ITEM_FONT NULL
+#define UPDATES_PER_SEC 10
+#define PULLUP_LOGIC true
+#define INTERRUPT_SWITCHES false
+#define SWITCH_IODEVICE 
+#define ENCODER_PIN_A 13
+#define ENCODER_PIN_B 12
+#define ENCODER_PIN_OK 14
+#define LISTEN_PORT 3333
 
-// Global variables that need exporting
-
+// all variables that need exporting
 extern U8G2_SH1106_128X64_NONAME_F_SW_I2C gfx;
-extern U8g2GfxMenuConfig gfxConfig;
 extern GraphicsDeviceRenderer renderer;
 extern WiFiServer server;
+
+// all menu item forward references.
+extern IpAddressMenuItem menuIpAddress;
+extern TextMenuItem menuPwd;
+extern TextMenuItem menuSSID;
+extern BackMenuItem menuBackConnectivity;
+extern SubMenuItem menuConnectivity;
+extern ActionMenuItem menuLoadFiles;
+extern ScrollChoiceMenuItem menuFile;
+extern BooleanMenuItem menuSecretEntry;
+extern ActionMenuItem menuSaveAll;
+extern EnumMenuItem menuWinOpening;
+extern EnumMenuItem menuHeaterPower;
+extern BackMenuItem menuBackSetup;
+extern SubMenuItem menuSetup;
+extern BooleanMenuItem menuLockDoor;
+extern BooleanMenuItem menuElectricHeater;
+extern AnalogMenuItem menuCucumberTemp;
+extern AnalogMenuItem menuTomatoTemp;
+extern const ConnectorLocalInfo applicationInfo;
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
-// Global Menu Item exports
-
-extern IpAddressMenuItem menuIpAddress;
-extern TextMenuItem menuPwd;
-extern TextMenuItem menuSSID;
-extern SubMenuItem menuConnectivity;
-void CALLBACK_FUNCTION onLoadFiles(int id);
-extern ActionMenuItem menuLoadFiles;
-void CALLBACK_FUNCTION onFileChoice(int id);
-extern ScrollChoiceMenuItem menuFile;
-extern BooleanMenuItem menuSecretEntry;
-void CALLBACK_FUNCTION onSaveAll(int id);
-extern ActionMenuItem menuSaveAll;
-void CALLBACK_FUNCTION onWindowOpening(int id);
-extern EnumMenuItem menuWinOpening;
-void CALLBACK_FUNCTION onHeaterPower(int id);
-extern EnumMenuItem menuHeaterPower;
-extern SubMenuItem menuSetup;
-void CALLBACK_FUNCTION onLockDoor(int id);
-extern BooleanMenuItem menuLockDoor;
 void CALLBACK_FUNCTION onElectricHeater(int id);
-extern BooleanMenuItem menuElectricHeater;
-extern AnalogMenuItem menuCucumberTemp;
-extern AnalogMenuItem menuTomatoTemp;
+void CALLBACK_FUNCTION onFileChoice(int id);
+void CALLBACK_FUNCTION onHeaterPower(int id);
+void CALLBACK_FUNCTION onLoadFiles(int id);
+void CALLBACK_FUNCTION onLockDoor(int id);
+void CALLBACK_FUNCTION onSaveAll(int id);
+void CALLBACK_FUNCTION onWindowOpening(int id);
+
+void setupMenu();
 
 #endif // MENU_GENERATED_CODE_H

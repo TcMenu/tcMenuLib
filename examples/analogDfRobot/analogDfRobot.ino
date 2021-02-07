@@ -8,6 +8,8 @@
 
 ArduinoAnalogDevice analog;
 
+using namespace tcgfx;
+
 void setup() {
     auto& factory = static_cast<NullItemDisplayPropertiesFactory&>(renderer.getDisplayPropertiesFactory());
     // we now create a grid for the two led controls in the submenu, this shows how to override the default grid for a few items.
