@@ -12,33 +12,65 @@ void printMenuItem(MenuItem* menuItem);
 RENDERING_CALLBACK_NAME_INVOKE(timeMenuItemTestCb, timeItemRenderFn, "Time", 103, NULL)
 RENDERING_CALLBACK_NAME_INVOKE(dateFormattedTestCb, dateItemRenderFn, "Date", 999, NULL)
 
-test(testTimeMenuItem12Hr) {
-    TimeFormattedMenuItem timeItem24(timeMenuItemTestCb, 111, EDITMODE_TIME_12H);
-
+bool setTimeAndCompareResult(TimeFormattedMenuItem& item, int hr, int min, int sec, int hundreds, const char *expected) {
     char sz[20];
-    timeItem24.setTime(TimeStorage(12, 20, 30));
-    timeItem24.copyValue(sz, sizeof(sz));
-    assertStringCaseEqual("12:20:30PM", sz);
+    item.setTime(TimeStorage(hr, min, sec, hundreds));
+    item.copyValue(sz, sizeof sz);
+    bool success = strncmp(expected, sz, sizeof sz) == 0;
+    if(!success) {
+        Serial.print("Failed exp="); Serial.print(expected);
+        Serial.print(", act="); Serial.println(sz);
+    }
+    return success;
+}
 
-    timeItem24.setTime(TimeStorage(0, 10, 30));
-    timeItem24.copyValue(sz, sizeof(sz));
-    assertStringCaseEqual("12:10:30AM", sz);
+test(testTimeMenuItem12Hr) {
+    TimeFormattedMenuItem timeItem12(timeMenuItemTestCb, 111, EDITMODE_TIME_12H);
+    assertTrue(setTimeAndCompareResult(timeItem12, 12, 20, 30, 0, "12:20:30PM"));
+    assertTrue(setTimeAndCompareResult(timeItem12, 12, 20, 30, 0, "12:20:30PM"));
+    assertTrue(setTimeAndCompareResult(timeItem12, 0, 10, 30, 0, "12:10:30AM"));
+    assertTrue(setTimeAndCompareResult(timeItem12, 11, 59, 30, 0, "11:59:30AM"));
+    assertTrue(setTimeAndCompareResult(timeItem12, 23, 59, 30, 0, "11:59:30PM"));
 
-    timeItem24.setTime(TimeStorage(11, 59, 30));
-    timeItem24.copyValue(sz, sizeof(sz));
-    assertStringCaseEqual("11:59:30AM", sz);
-
-    timeItem24.setTime(TimeStorage(23, 59, 30));
-    timeItem24.copyValue(sz, sizeof(sz));
-    assertStringCaseEqual("11:59:30PM", sz);
+    TimeFormattedMenuItem timeItem12HHMM(timeMenuItemTestCb, 111, EDITMODE_TIME_12H_HHMM);
+    assertTrue(setTimeAndCompareResult(timeItem12HHMM, 12, 20, 30, 0, "12:20PM"));
+    assertTrue(setTimeAndCompareResult(timeItem12HHMM, 12, 20, 30, 0, "12:20PM"));
+    assertTrue(setTimeAndCompareResult(timeItem12HHMM, 23, 59, 30, 0, "11:59PM"));
 }
 
 test(testTimeMenuItem24Hr) {
+    TimeFormattedMenuItem timeItem12(timeMenuItemTestCb, 111, EDITMODE_TIME_24H);
+    assertTrue(setTimeAndCompareResult(timeItem12, 12, 20, 30, 0, "12:20:30"));
+    assertTrue(setTimeAndCompareResult(timeItem12, 0, 10, 59, 0, "00:10:59"));
+    assertTrue(setTimeAndCompareResult(timeItem12, 17, 59, 30, 0, "17:59:30"));
+    assertTrue(setTimeAndCompareResult(timeItem12, 23, 59, 30, 0, "23:59:30"));
+
+    TimeFormattedMenuItem timeItem12HHMM(timeMenuItemTestCb, 111, EDITMODE_TIME_24H_HHMM);
+    assertTrue(setTimeAndCompareResult(timeItem12HHMM, 0, 20, 30, 0, "00:20"));
+    assertTrue(setTimeAndCompareResult(timeItem12HHMM, 12, 20, 30, 0, "12:20"));
+    assertTrue(setTimeAndCompareResult(timeItem12HHMM, 23, 59, 30, 0, "23:59"));
+}
+
+test(testTimeMenuItemDuration) {
+    TimeFormattedMenuItem timeItemDurationSec(timeMenuItemTestCb, 111, EDITMODE_TIME_DURATION_SECONDS);
+    assertTrue(setTimeAndCompareResult(timeItemDurationSec, 0, 20, 30, 0, "20:30"));
+    assertTrue(setTimeAndCompareResult(timeItemDurationSec, 0, 0, 59, 11, "00:59"));
+    assertTrue(setTimeAndCompareResult(timeItemDurationSec, 1, 59, 30, 0, "01:59:30"));
+
+    TimeFormattedMenuItem timeItemDurationHundreds(timeMenuItemTestCb, 111, EDITMODE_TIME_DURATION_HUNDREDS);
+    assertTrue(setTimeAndCompareResult(timeItemDurationHundreds, 0, 20, 30, 9, "20:30.09"));
+    assertTrue(setTimeAndCompareResult(timeItemDurationHundreds, 0, 0, 59, 99, "00:59.99"));
+    assertTrue(setTimeAndCompareResult(timeItemDurationHundreds, 1, 59, 30, 1, "01:59:30.01"));
+}
+
+test(testTimeMenuItem24HrEditing) {
     TimeFormattedMenuItem timeItem24(timeMenuItemTestCb, 111, EDITMODE_TIME_HUNDREDS_24H);
 
     char sz[20];
-    timeItem24.setTime(TimeStorage(20, 39, 30, 93));
     timeItem24.copyNameToBuffer(sz, sizeof(sz));
+    assertStringCaseEqual("Time", sz);
+
+    timeItem24.setTime(TimeStorage(20, 39, 30, 93));
     assertStringCaseEqual("Time", sz);
     timeItem24.copyValue(sz, sizeof(sz));
     assertStringCaseEqual("20:39:30.93", sz);

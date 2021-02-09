@@ -110,7 +110,7 @@ int twelveHourTime(int hr) {
 
 int timeItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
 	if (item->getMenuType() != MENUTYPE_TIME) return 0;
-    TimeFormattedMenuItem* timeItem = reinterpret_cast<TimeFormattedMenuItem*>(item);
+    auto* timeItem = reinterpret_cast<TimeFormattedMenuItem*>(item);
     int idx = row - 1;
     TimeStorage data = timeItem->getTime();
 
@@ -120,15 +120,22 @@ int timeItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char
 		return true;
 	}
     case RENDERFN_VALUE: {
-        bool twelveHr = timeItem->getFormat() == EDITMODE_TIME_12H;
+        bool twelveHr = timeItem->getFormat() == EDITMODE_TIME_12H || timeItem->getFormat() == EDITMODE_TIME_12H_HHMM;
+        bool includeSeconds = timeItem->getFormat() != EDITMODE_TIME_24H_HHMM && timeItem->getFormat() != EDITMODE_TIME_12H_HHMM;
+        bool includeHundreds = timeItem->getFormat() == EDITMODE_TIME_HUNDREDS_24H || timeItem->getFormat() == EDITMODE_TIME_DURATION_HUNDREDS;
+        bool optionalHours = timeItem->getFormat() == EDITMODE_TIME_DURATION_HUNDREDS || timeItem->getFormat() == EDITMODE_TIME_DURATION_SECONDS;
 		buffer[0] = 0;
-        int hr = twelveHr ? twelveHourTime(data.hours) : data.hours;
-		wrapForEdit(hr, 0, row, buffer, bufferSize, true);
-		appendChar(buffer, ':', bufferSize);
+		if(!optionalHours || data.hours != 0) {
+            int hr = twelveHr ? twelveHourTime(data.hours) : data.hours;
+            wrapForEdit(hr, 0, row, buffer, bufferSize, true);
+            appendChar(buffer, ':', bufferSize);
+        }
 		wrapForEdit(data.minutes, 1, row, buffer, bufferSize, true);
-		appendChar(buffer, ':', bufferSize);
-		wrapForEdit(data.seconds, 2, row, buffer, bufferSize, true);
-        if(timeItem->getFormat() == EDITMODE_TIME_HUNDREDS_24H) {
+		if(includeSeconds) {
+            appendChar(buffer, ':', bufferSize);
+            wrapForEdit(data.seconds, 2, row, buffer, bufferSize, true);
+        }
+        if(includeHundreds) {
             appendChar(buffer, '.', bufferSize);
             wrapForEdit(data.hundreds, 3, row, buffer, bufferSize, true);
         }

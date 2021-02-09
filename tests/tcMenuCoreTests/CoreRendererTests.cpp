@@ -138,16 +138,20 @@ test(testIconStorageAndRetrival) {
     auto* icon = factory.iconForMenuItem(menuVolume.getId());
     assertTrue(icon != nullptr);
     assertEqual(icon->getIconType(), DrawableIcon::ICON_XBITMAP);
-    assertEqual(1, (int)icon->getDimensions().x);
-    assertEqual(3, (int)icon->getDimensions().y);
+    int iconX = (int)(icon->getDimensions().x);
+    int iconY = (int)(icon->getDimensions().y);
+    assertEqual(1, iconX);
+    assertEqual(3, iconY);
     assertEqual(pointer1, icon->getIcon(false));
     assertEqual(pointer2, icon->getIcon(true));
 
     icon = factory.iconForMenuItem(menuSub.getId());
     assertTrue(icon != nullptr);
     assertEqual(icon->getIconType(), DrawableIcon::ICON_NATIVE);
-    assertEqual(2, (int)icon->getDimensions().x);
-    assertEqual(1, (int)icon->getDimensions().y);
+    iconX = (int)(icon->getDimensions().x);
+    iconY = (int)(icon->getDimensions().y);
+    assertEqual(2, iconX);
+    assertEqual(1, iconY);
     assertEqual(pointer3, icon->getIcon(false));
     assertEqual(pointer3, icon->getIcon(true));
 }
@@ -244,7 +248,7 @@ public:
         else widgetRecordings.add(WidgetDrawingRecord(widget, where, colorBg, colorFg));
     }
 
-    void drawMenuItem(GridPositionRowCacheEntry *entry, Coord where, Coord areaSize) override {
+    void drawMenuItem(GridPositionRowCacheEntry *entry, Coord where, Coord areaSize, bool /*drawAll*/) override {
         uint8_t row = entry->getPosition().getRow() + ((entry->getPosition().getGridPosition() - 1) * 100);
         auto* itemRec = menuItemRecordings.getByKey(row);
         if(itemRec) {
@@ -279,6 +283,8 @@ public:
     ItemDisplayPropertiesFactory &getDisplayPropertiesFactory() override {
         return propertiesFactory;
     }
+
+    void fillWithBackgroundTo(int startY) override { }
 };
 
 const uint8_t* const icons1[] PROGMEM {pointer1, pointer2};

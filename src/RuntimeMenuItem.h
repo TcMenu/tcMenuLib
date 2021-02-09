@@ -42,12 +42,26 @@ int findPositionInEditorSet(char ch);
  * Defines the filter that should be applied to values of multi edit menu items on the UI
  */
 enum MultiEditWireType : uint8_t {
-	EDITMODE_PLAIN_TEXT = 0, 
+    /** plain text - zero terminated text data */
+	EDITMODE_PLAIN_TEXT = 0,
+	/** an ipV4 address */
 	EDITMODE_IP_ADDRESS = 1,
+	/** a time in the 24 hour clock HH:MM:SS */
 	EDITMODE_TIME_24H = 2,
+	/** a time in the 12 hour clock HH:MM:SS[AM/PM] */
 	EDITMODE_TIME_12H = 3,
+	/** a time in the 24 hour clock with hundreds HH:MM:SS.ss */
 	EDITMODE_TIME_HUNDREDS_24H = 4,
-    EDITMODE_GREGORIAN_DATE = 5
+    /** a date in gregorian format, see DateFormattedMenuItem for global locale formatting */
+    EDITMODE_GREGORIAN_DATE = 5,
+    /** a duration that optionally shows hours when needed, to the second */
+	EDITMODE_TIME_DURATION_SECONDS = 6,
+    /** a duration that optionally shows hours when needed, to the hundredth of second */
+	EDITMODE_TIME_DURATION_HUNDREDS = 7,
+    /** a time in the 24 hour clock HH:MM */
+    EDITMODE_TIME_24H_HHMM = 8,
+    /** a time in the 12 hour clock HH:MM[AM/PM] */
+	EDITMODE_TIME_12H_HHMM = 9,
 };
 
 /**
