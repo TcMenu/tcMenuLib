@@ -18,6 +18,7 @@ const PROGMEM  ConnectorLocalInfo applicationInfo = { "SimHub Link", "4db9fbfe-9
 Adafruit_ILI9341 gfx(22, 17, 16);
 AdafruitDrawable gfxDrawable(&gfx);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
+ESP32TouchKeysAbstraction esp32Touch(800, TOUCH_HVOLT_2V7, TOUCH_LVOLT_0V5, TOUCH_HVOLT_ATTEN_1V);
 SimhubConnector connector;
 
 // Global Menu Item declarations
@@ -56,13 +57,14 @@ void setupMenu() {
     gfx.setRotation(1);
     renderer.setUpdatesPerSecond(5);
     renderer.prepareDisplay(false, &FreeSans9pt7b, 1, &FreeSans18pt7b, 1, true);
-    switches.initialise(internalDigitalIo(), true);
-    menuMgr.initForEncoder(&renderer, &menuSpeed, 36, 37, 21);
+    switches.initialiseInterrupt(&esp32Touch, false);
+    menuMgr.initForUpDownOk(&renderer, &menuSpeed, 7, 5, 6);
+    esp32Touch.ensureInterruptRegistered();
     connector.begin(&Serial, 3);
 
     // Read only and local only function calls
-    menuRPM.setReadOnly(true);
-    menuSpeed.setReadOnly(true);
     menuTyreTemp.setReadOnly(true);
+    menuSpeed.setReadOnly(true);
+    menuRPM.setReadOnly(true);
 }
 

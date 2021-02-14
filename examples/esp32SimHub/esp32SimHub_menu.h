@@ -17,13 +17,13 @@
 #include "tcMenuAdaFruitGfx.h"
 #include <Fonts/FreeSans18pt7b.h>
 #include <Fonts/FreeSans9pt7b.h>
+#include "ESP32TouchKeysAbstraction.h"
 #include "SimhubConnector.h"
 #include <RuntimeMenuItem.h>
 
 // all define statements needed
 #define DISPLAY_VARIABLE gfx
 #define DISPLAY_TYPE Adafruit_ILI9341
-#define DISPLAY_CONFIG 
 #define DISPLAY_WIDTH 320
 #define DISPLAY_HEIGHT 240
 #define DISPLAY_RESET_PIN 16
@@ -35,12 +35,14 @@
 #define DISPLAY_TITLE_FONT FreeSans18pt7b
 #define DISPLAY_ITEM_FONT FreeSans9pt7b
 #define UPDATES_PER_SEC 5
-#define PULLUP_LOGIC true
-#define INTERRUPT_SWITCHES false
-#define SWITCH_IODEVICE 
-#define ENCODER_PIN_A 36
-#define ENCODER_PIN_B 37
-#define ENCODER_PIN_OK 21
+#define SWITCH_THRESHOLD 800
+#define INTERRUPT_SWITCHES true
+#define TP_HIGH_VOLTAGE TOUCH_HVOLT_2V7
+#define TP_LOW_VOLTAGE TOUCH_LVOLT_0V5
+#define TP_ATTENUATION TOUCH_HVOLT_ATTEN_1V
+#define UP_SENSOR 5
+#define DOWN_SENSOR 7
+#define SELECT_SENSOR 6
 #define SERIAL_PORT Serial
 #define STATUS_MENUITEM 3
 
@@ -48,6 +50,7 @@
 extern Adafruit_ILI9341 gfx;
 extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
+extern ESP32TouchKeysAbstraction esp32Touch;
 
 // all menu item forward references.
 extern ActionMenuItem menuShowDashboard;
@@ -61,6 +64,7 @@ extern AnalogMenuItem menuTyreTemp;
 extern TextMenuItem menuGear;
 extern AnalogMenuItem menuRPM;
 extern AnalogMenuItem menuSpeed;
+extern const ConnectorLocalInfo applicationInfo;
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION

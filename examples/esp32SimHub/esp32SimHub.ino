@@ -22,6 +22,10 @@
  *
  * See the Simhub guide for full instructions:
  * https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-plugins/simhub-connector/
+ *
+ * Connections by default:
+ * Encoder A=36, B=37, Sel=21
+ * Touch Up=5, Down=7, Sel=6
  */
 
 #include "esp32SimHub_menu.h"
@@ -202,8 +206,3 @@ void CALLBACK_FUNCTION onDashChanged(int id) {
 void CALLBACK_FUNCTION onShowDash(int id) {
     renderer.takeOverDisplay();
 }
-
-
-
-
-
