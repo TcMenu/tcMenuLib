@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1607154119,
+    "seconds": 1613810001,
     "nanos": 0
   },
   "codeOptions": {
@@ -97,6 +97,21 @@
       {
         "name": "DISPLAY_ROTATION",
         "latestValue": "0",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_TITLE_FONT",
+        "latestValue": "FreeSans9pt7b",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_ITEM_FONT",
+        "latestValue": "NULL",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "UPDATES_PER_SEC",
+        "latestValue": "5",
         "subsystem": "DISPLAY"
       },
       {

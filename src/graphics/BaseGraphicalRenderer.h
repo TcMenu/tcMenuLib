@@ -41,6 +41,7 @@ namespace tcgfx {
         GridPositionRowCacheEntry() : menuItem(nullptr), thePosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 0), properties(nullptr) {}
 
         GridPositionRowCacheEntry(const GridPositionRowCacheEntry &other) = default;
+        GridPositionRowCacheEntry& operator=(const GridPositionRowCacheEntry &other) = default;
 
         GridPositionRowCacheEntry(MenuItem *item, const GridPosition &pos, ItemDisplayProperties *props) : menuItem(item), thePosition(pos), properties(props) {}
 

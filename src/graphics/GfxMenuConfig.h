@@ -59,7 +59,7 @@ namespace tcgfx {
         /**
          * Represents how the item in this position should be drawn.
          */
-        enum GridDrawingMode : byte {
+        enum GridDrawingMode : uint8_t {
             /** Drawn as text in the form of Item on the left, value on the right */
             DRAW_TEXTUAL_ITEM,
             /** Drawn two buttons with the value in the middle, to move through a range of values */
@@ -74,7 +74,7 @@ namespace tcgfx {
             DRAW_TITLE_ITEM
         };
 
-        enum GridJustification : byte {
+        enum GridJustification : uint8_t {
             JUSTIFY_TITLE_LEFT_VALUE_RIGHT,
             JUSTIFY_TITLE_LEFT_WITH_VALUE,
             JUSTIFY_CENTER_WITH_VALUE,
@@ -103,6 +103,7 @@ namespace tcgfx {
                          justification(JUSTIFY_TITLE_LEFT_VALUE_RIGHT) {}
 
         GridPosition(const GridPosition &other) = default;
+        GridPosition& operator=(const GridPosition &other) = default;
 
         /**
          * Create a simple grid position that represents a row with a single column with optional override of the row height
@@ -157,6 +158,7 @@ namespace tcgfx {
                                                            GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 0) {}
 
         GridPositionWithId(const GridPositionWithId &other) = default;
+        GridPositionWithId& operator=(const GridPositionWithId &other) = default;
 
         GridPositionWithId(uint16_t itemId, const GridPosition &pos) : menuId(itemId), thePosition(pos) {}
 
@@ -211,10 +213,22 @@ namespace tcgfx {
                                 spaceAfter(spacing), requiredHeight(height) {
             memcpy(colors, palette, sizeof colors);
         }
-        ItemDisplayProperties(const ItemDisplayProperties& other) : padding{other.padding}, fontData(other.fontData),
+        ItemDisplayProperties(const ItemDisplayProperties& other) : propsKey(other.propsKey), padding{other.padding}, fontData(other.fontData),
                                 fontMagnification(other.fontMagnification), defaultJustification(other.defaultJustification),
                                 spaceAfter(other.spaceAfter), requiredHeight(other.requiredHeight) {
             memcpy(colors, other.colors, sizeof colors);
+        }
+        ItemDisplayProperties& operator=(const ItemDisplayProperties& other) {
+            if(&other == this) return *this;
+            propsKey = other.propsKey;
+            padding = other.padding;
+            fontData = other.fontData;
+            fontMagnification = other.fontMagnification;
+            defaultJustification = other.defaultJustification;
+            spaceAfter = other.spaceAfter;
+            requiredHeight = other.requiredHeight;
+            memcpy(colors, other.colors, sizeof colors);
+            return *this;
         }
 
         uint32_t getKey() const { return propsKey; }

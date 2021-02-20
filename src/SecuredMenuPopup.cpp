@@ -63,6 +63,7 @@ int secPopupActionRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode
 		else {
 			menuMgr.setCurrentMenu(menuMgr.getRoot());
 		}
+		return true;
 	default:
 		return false;
 	}

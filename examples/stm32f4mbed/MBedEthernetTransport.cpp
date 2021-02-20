@@ -13,7 +13,6 @@
 #include "MBedEthernetTransport.h"
 
 MBedEthernetTransport::~MBedEthernetTransport() {
-    serdebugF("destroy socket");
     if(socket) {
         socket->close();
     }
@@ -65,7 +64,6 @@ bool MBedEthernetTransport::readAvailable() {
     if(socket == nullptr) return false;
 
     if(readPos >= lastReadAmt) {
-
         int amt = socket->recv(readBuf, sizeof(readBuf));
         if(amt == NSAPI_ERROR_WOULD_BLOCK) return false;
         if(amt > 0) {
@@ -134,7 +132,7 @@ void EthernetTagValServer::exec() {
             return;
         }
 
-        serdebugF("Connected to network ");
+        serdebugF("Connected to network");
         if(server.open(defNetwork) != 0) {
             serdebugF("Could not open socket");
             taskManager.scheduleOnce(1,this, TIME_SECONDS);

@@ -8,6 +8,8 @@
 #ifndef TCMENU_DRAWING_PRIMITIVES_H
 #define TCMENU_DRAWING_PRIMITIVES_H
 
+#include <PlatformDetermination.h>
+
 namespace tcgfx {
 
 /**
@@ -125,7 +127,7 @@ namespace tcgfx {
      */
     class DrawableIcon {
     public:
-        enum IconType : byte {
+        enum IconType : uint8_t {
             /** the image is in the well know XBM format */
             ICON_XBITMAP,
             /** the image is a regular monochrome bitmap in native format */
@@ -135,7 +137,7 @@ namespace tcgfx {
             /** the image is in native format, that can be pushed directly to the underlying display */
             ICON_NATIVE
         };
-        enum MemoryLocation : byte {
+        enum MemoryLocation : uint8_t {
             /** Indication that this image is in progmem, this is the default */
             STORED_IN_ROM,
             /** This image is in RAM, if it can be supported by the display. EG board with progmem, driver support */
@@ -166,6 +168,16 @@ namespace tcgfx {
                                                   location(other.location), normalIcon(other.normalIcon),
                                                   selectedIcon(other.selectedIcon) {}
 
+        DrawableIcon& operator=(const DrawableIcon& other) {
+            if(&other == this) return *this;
+            menuId = other.menuId;
+            dimensions = other.dimensions;
+            iconType = other.iconType;
+            location = other.location;
+            normalIcon = other.normalIcon;
+            selectedIcon = other.selectedIcon;
+            return *this;
+        }
         /**
          * Create a drawable icon providing the size, icon type, and image data
          * @param id the menu id that this icon belongs to

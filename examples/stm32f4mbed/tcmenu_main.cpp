@@ -9,7 +9,6 @@
 #include <mbed.h>
 #include "stm32f4mbed_menu.h"
 #include "NTPTimeEvent.h"
-#include "Fonts/FreeSans9pt7b.h"
 #include "ScreenSaverCustomDrawing.h"
 #include <stockIcons/wifiAndConnectionIcons16x12.h>
 
@@ -66,11 +65,6 @@ void setup() {
 
     // this was added by designer, it sets up the input, display and remote.
     setupMenu();
-
-    // after we've setup the menu, lets make a few adjustments to the graphics config
-    // always do this after setup
-    gfxConfig.titleFont = &FreeSans9pt7b;
-    makePadding(gfxConfig.titlePadding, 0, 4, 2, 3);
 
     // and now lets try and acquire time using our quick ntp time class
     prepareRealtimeClock();

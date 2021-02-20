@@ -19,6 +19,7 @@ const char buttonClose[] PROGMEM = "close";
 const char buttonAccept[] PROGMEM = "accept";
 
 BaseDialog::BaseDialog() : header{0} {
+    flags = 0;
     bitWrite(flags, DLG_FLAG_INUSE, false);
     button1 = button2 = BTNTYPE_NONE;
     buttonHandler = nullptr;
@@ -182,6 +183,7 @@ int dialogBackRenderFn(RuntimeMenuItem* item, uint8_t /*row*/, RenderFnMode mode
     switch (mode) {
         case RENDERFN_INVOKE:
             dlg->remoteAction(BTNTYPE_CANCEL);
+            return true;
         case RENDERFN_NAME:
             dlg->copyHeader(buffer, bufferSize);
             return true;

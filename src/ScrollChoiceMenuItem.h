@@ -155,6 +155,14 @@ public:
         alpha = other.alpha;
     }
 
+    RgbColor32& operator = (const RgbColor32& other) {
+        red = other.red;
+        green = other.green;
+        blue = other.blue;
+        alpha = other.alpha;
+        return *this;
+    }
+
     explicit RgbColor32(const char* htmlColor);
 
     void asHtmlString(char *buffer, size_t bufferSize, bool withAlpha) const;

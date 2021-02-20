@@ -158,7 +158,7 @@ int GraphicsDeviceRenderer::drawCoreLineItem(GridPositionRowCacheEntry* entry, D
     }
 
     int imgMiddleY = where.y + ((size.y - icon->getDimensions().y) / 2);
-    if(entry->getMenuItem()->isEditing() || entry->getMenuItem()->isActive()) {
+    if((entry->getMenuItem()->isEditing() || entry->getMenuItem()->isActive()) && icon) {
         drawable->setDrawColor(bgColor);
         drawable->drawBox(where, size, true);
         drawable->setColors(textColor, bgColor);

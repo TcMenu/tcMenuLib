@@ -28,8 +28,9 @@ extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app inf
 
 extern SPI spi;
 extern Adafruit_SSD1306_Spi gfx;
-extern AdaColorGfxMenuConfig gfxConfig;
-extern AdaFruitGfxMenuRenderer renderer;
+extern AdafruitDrawable gfxDrawable;
+extern GraphicsDeviceRenderer renderer;
+extern const GFXfont FreeSans9pt7b;
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION

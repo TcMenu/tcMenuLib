@@ -184,6 +184,7 @@ struct WidgetDrawingRecord {
     WidgetDrawingRecord() : index(nullptr), where(0,0), bg(0), fg(0), updated(0) {}
     WidgetDrawingRecord(TitleWidget* w, Coord wh, color_t b, color_t f) : index(w), where(wh), bg(b), fg(f), updated(0) {}
     WidgetDrawingRecord(const WidgetDrawingRecord& other) = default;
+    WidgetDrawingRecord& operator=(const WidgetDrawingRecord& other) = default;
     TitleWidget* index;
     Coord where;
     color_t bg, fg;
@@ -196,6 +197,7 @@ struct MenuDrawingRecord {
     MenuDrawingRecord(uint8_t row, Coord wh, Coord sz, ItemDisplayProperties* prop, MenuItem* item, GridPosition pos)
             : rowIndex(row), where(wh), size(sz), properties(prop), theItem(item), position(pos), updated(0) {}
     MenuDrawingRecord(const MenuDrawingRecord& other) = default;
+    MenuDrawingRecord& operator=(const MenuDrawingRecord& other) = default;
     uint8_t rowIndex;
     Coord where;
     Coord size;

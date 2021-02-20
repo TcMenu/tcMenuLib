@@ -11,19 +11,20 @@
 #include <mbed.h>
 #include <tcMenu.h>
 #include "stm32f4mbed_menu.h"
+#include <Fonts/FreeSans9pt7b.h>
 
 // Global variable declarations
 
 const PROGMEM ConnectorLocalInfo applicationInfo = { "Demo mbed", "f5325e26-a7f6-40ff-876e-47afa06df532" };
 Adafruit_SSD1306_Spi gfx(spi, PD_15, PF_12, PF_13, 64, 128, SSD_1306);
-AdaColorGfxMenuConfig gfxConfig;
-AdaFruitGfxMenuRenderer renderer;
+AdafruitDrawable gfxDrawable(&gfx);
+GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 
 // Global Menu Item declarations
 
 RENDERING_CALLBACK_NAME_INVOKE(fnEditRtCall, textItemRenderFn, "Edit", -1, NO_CALLBACK)
 TextMenuItem menuEdit(fnEditRtCall, 16, 16, NULL);
-const AnalogMenuInfo minfoCommits = { "Commits", 15, 0xFFFF, 32767, NO_CALLBACK, 0, 0, "" };
+const AnalogMenuInfo minfoCommits = { "Commits", 15, 0xFFFF, 32767, NO_CALLBACK, 0, 1, "" };
 AnalogMenuItem menuCommits(&minfoCommits, 0, &menuEdit);
 RENDERING_CALLBACK_NAME_INVOKE(fnIPRtCall, ipAddressRenderFn, "IP", -1, NO_CALLBACK)
 IpAddressMenuItem menuIP(fnIPRtCall, 14, NULL);
@@ -74,10 +75,11 @@ void setupMenu() {
     menuEdit.setReadOnly(true);
     menuIP.setReadOnly(true);
 
-    prepareAdaMonoGfxConfigOled(&gfxConfig);
     gfx.setRotation(0);
     gfx.begin();
-    renderer.setGraphicsDevice(&gfx, &gfxConfig);
+    renderer.setUpdatesPerSecond(5);
+    renderer.prepareDisplay(true, NULL, 1, &FreeSans9pt7b, 1, true);
+    renderer.setUseSliderForAnalog(false);
     switches.initialise(internalDigitalIo(), true);
     menuMgr.initForEncoder(&renderer, &menuRTCDate, PE_2, PE_5, PE_4);
     remoteServer.begin(3333, &applicationInfo);
