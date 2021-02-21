@@ -72,7 +72,9 @@ namespace tcgfx {
             /** never draw the title */
             NO_TITLE,
             /** the title will only appear when row 0 is selected */
-            TITLE_FIRST_ROW
+            TITLE_FIRST_ROW,
+            /** the title will always be shown regardless of index position */
+            TITLE_ALWAYS
         };
         /**
          * Represents the possible drawing commands that the base renderer sends to the leaf class
@@ -181,8 +183,9 @@ namespace tcgfx {
 
         /**
          * Find the most appropriate item to activate and set it active, used during the display of new menus
+         * @return the item that was activated as an index.
          */
-        void activateFirstAppropriateItem();
+        int activateFirstAppropriateItem();
 
         /**
          * @return the total number of items in the current menu
@@ -222,7 +225,7 @@ namespace tcgfx {
         int getHeight() const { return height; }
 
     private:
-        bool drawTheMenuItems(int startRow, bool drawEveryLine);
+        bool drawTheMenuItems(int startRow, int startY, bool drawEveryLine);
 
         void renderList();
 

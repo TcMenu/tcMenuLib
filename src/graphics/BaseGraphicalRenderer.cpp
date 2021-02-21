@@ -104,10 +104,20 @@ void BaseGraphicalRenderer::render() {
         int activeIndex = findActiveItem();
         uint16_t totalHeight = calculateHeightTo(activeIndex, rootItem);
         int startRow = 0;
-        uint16_t adjust = lastRowExactFit ? 0 : 1;
+        uint16_t adjustedHeight = height + (lastRowExactFit ? 0 : 1);
         bool drawCompleteScreen = locRedrawMode != MENUDRAW_NO_CHANGE;
+        uint16_t startY = 0;
 
-        while (totalHeight > (height + adjust)) {
+        if(titleMode == TITLE_ALWAYS && itemOrderByRow.count() > 0) {
+            startRow++;
+            startY = heightOfRow(0, 1);
+            adjustedHeight -= startY;
+            totalHeight -= startY;
+            auto* pEntry = itemOrderByRow.itemAtIndex(0);
+            drawMenuItem(pEntry, Coord(0,0), Coord(width, startY), drawCompleteScreen);
+        }
+
+        while (totalHeight > adjustedHeight) {
             totalHeight -= heightOfRow(startRow, 1);
             startRow++;
         }
@@ -121,8 +131,8 @@ void BaseGraphicalRenderer::render() {
         lastOffset = startRow;
 
         // and then we start drawing items until we run out of screen or items
-        forceDrawWidgets = drawTheMenuItems(startRow, drawCompleteScreen);
-        titleOnDisplay = (titleMode != NO_TITLE) && startRow == 0;
+        forceDrawWidgets = drawTheMenuItems(startRow, startY, drawCompleteScreen);
+        titleOnDisplay = (titleMode == TITLE_FIRST_ROW && startRow == 0) || titleMode == TITLE_ALWAYS;
     }
 
     redrawAllWidgets(locRedrawMode != MENUDRAW_NO_CHANGE || forceDrawWidgets);
@@ -177,8 +187,8 @@ GridPositionRowCacheEntry* BaseGraphicalRenderer::findMenuEntryAndDimensions(con
     return nullptr;
 }
 
-bool BaseGraphicalRenderer::drawTheMenuItems(int startRow, bool drawEveryLine) {
-    uint16_t ypos = 0;
+bool BaseGraphicalRenderer::drawTheMenuItems(int startRow, int startY, bool drawEveryLine) {
+    uint16_t ypos = startY;
     int lastRow = 0;
     int addAmount = 0;
     bool didDrawTitle = false;
@@ -323,11 +333,13 @@ void BaseGraphicalRenderer::recalculateDisplayOrder(MenuItem *root, bool safeMod
         recalculateDisplayOrder(root, true);
     }
 
-    activateFirstAppropriateItem();
+    int activeIndex = activateFirstAppropriateItem();
+    menuMgr.setItemsInCurrentMenu(itemOrderByRow.count() - 1, activeIndex);
 }
 
-void BaseGraphicalRenderer::activateFirstAppropriateItem() {
-    if(itemOrderByRow.count() == 0) return;
+int BaseGraphicalRenderer::activateFirstAppropriateItem() {
+    if(itemOrderByRow.count() == 0) return 0;
+    int index = 0;
     bool selectedYet = false;
     for(bsize_t i=0; i<itemOrderByRow.count(); i++) {
         auto* entry = itemOrderByRow.itemAtIndex(i);
@@ -335,9 +347,12 @@ void BaseGraphicalRenderer::activateFirstAppropriateItem() {
         if(!skip && !selectedYet) {
             entry->getMenuItem()->setActive(true);
             selectedYet = true;
+            index = i;
         }
         else entry->getMenuItem()->setActive(false);
     }
+
+    return index;
 }
 
 bool BaseGraphicalRenderer::areRowsOutOfOrder() {

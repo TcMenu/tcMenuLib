@@ -66,6 +66,9 @@ void setup() {
     // this was added by designer, it sets up the input, display and remote.
     setupMenu();
 
+    // we tell the menu to always display title, regardless of current index
+    renderer.setTitleMode(BaseGraphicalRenderer::TITLE_ALWAYS);
+
     // and now lets try and acquire time using our quick ntp time class
     prepareRealtimeClock();
 
@@ -75,6 +78,15 @@ void setup() {
     // lastly we add another switch on the user button that just clears the screen saver.
     switches.addSwitch(USER_BUTTON, [](pinid_t /*pin*/, bool /*held*/) {
         screenSaver.removeScreenSaver();
+    });
+
+    setTitlePressedCallback([](int id) {
+        auto* dlg = renderer.getDialog();
+        if(dlg && !dlg->isInUse()) {
+            dlg->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
+            dlg->show("Mbed demo", false);
+            dlg->copyIntoBuffer("//TheCodersCorner");
+        }
     });
 }
 

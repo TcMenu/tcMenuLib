@@ -337,13 +337,9 @@ void MenuManager::setCurrentMenu(MenuItem * theItem) {
 	currentFirstRoot = root;
 	currentSubMenu = getSubMenuFor(root);
 
-    baseRenderer->prepareNewSubmenu();
+    root->setActive(true);
 
-	if(renderer->getRendererType() == RENDER_TYPE_CONFIGURABLE) {
-	    reinterpret_cast<BaseGraphicalRenderer*>(renderer)->activateFirstAppropriateItem();
-	} else {
-        root->setActive(true);
-	}
+    baseRenderer->prepareNewSubmenu();
 }
 
 SecuredMenuPopup* MenuManager::secureMenuInstance() {
