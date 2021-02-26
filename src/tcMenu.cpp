@@ -53,7 +53,7 @@ void MenuManager::setNextButton(pinid_t nextButtonPin) {
 
 void MenuManager::performDirectionMove(bool dirIsBack) {
     if(currentEditor != nullptr && isMenuRuntimeMultiEdit(currentEditor)) {
-        auto editableItem = reinterpret_cast<EditableMultiPartMenuItem<void*>*>(currentEditor);
+        auto editableItem = reinterpret_cast<EditableMultiPartMenuItem*>(currentEditor);
 		
         int editorRange = dirIsBack ? editableItem->previousPart() : editableItem->nextPart();
 		if (editorRange != 0) {
@@ -101,7 +101,7 @@ void MenuManager::valueChanged(int value) {
 		((ValueMenuItem*)currentEditor)->setCurrentValue(value);
 	}
 	else if (currentEditor && isMenuRuntimeMultiEdit(currentEditor)) {
-		reinterpret_cast<EditableMultiPartMenuItem<void*>*>(currentEditor)->valueChanged(value);
+		reinterpret_cast<EditableMultiPartMenuItem*>(currentEditor)->valueChanged(value);
 	}
 	else if(currentEditor && currentEditor->getMenuType() == MENUTYPE_SCROLLER_VALUE) {
 	    reinterpret_cast<ScrollChoiceMenuItem*>(currentEditor)->setCurrentValue(value);
@@ -205,7 +205,7 @@ void MenuManager::actionOnCurrentItem(MenuItem* toEdit) {
 void MenuManager::stopEditingCurrentItem(bool doMultiPartNext) {
 
 	if (doMultiPartNext && isMenuRuntimeMultiEdit(menuMgr.getCurrentEditor())) {
-		auto* editableItem = reinterpret_cast<EditableMultiPartMenuItem<void*>*>(menuMgr.getCurrentEditor());
+		auto* editableItem = reinterpret_cast<EditableMultiPartMenuItem*>(menuMgr.getCurrentEditor());
 
 		// unless we've run out of parts to edit, stay in edit mode, moving to next part.
 		int editorRange = editableItem->nextPart();
@@ -308,7 +308,7 @@ void MenuManager::setupForEditing(MenuItem* item) {
         if(!notifyEditStarting(item)) return;
         switches.getEncoder()->setUserIntention(CHANGE_VALUE);
         currentEditor = item;
-        auto* editableItem = reinterpret_cast<EditableMultiPartMenuItem<void*>*>(item);
+        auto* editableItem = reinterpret_cast<EditableMultiPartMenuItem*>(item);
 		editableItem->beginMultiEdit();
 		int range = editableItem->nextPart();
 		switches.changeEncoderPrecision(range, editableItem->getPartValueAsInt());

@@ -44,7 +44,7 @@ void MenuEditingKeyListener::keyPressed(char key, bool held) {
             processLargeNumberPress(reinterpret_cast<EditableLargeNumberMenuItem *>(editor), key);
 
         } else if (isMenuRuntimeMultiEdit(editor)) {
-            processIntegerMultiEdit(reinterpret_cast<EditableMultiPartMenuItem<uint8_t[4]> *>(editor), key);
+            processIntegerMultiEdit(reinterpret_cast<EditableMultiPartMenuItem*>(editor), key);
         }
     } else if (isdigit(key)) {
         clearState();
@@ -96,19 +96,19 @@ void MenuEditingKeyListener::keyReleased(char key) {
 void MenuEditingKeyListener::processScrollValueKeyPress(ScrollChoiceMenuItem *item, char key) {
     if (isdigit(key)) {
         int val = key - '0';
-        if (val > item->getMaximumValue()) val = item->getMaximumValue();
+        if (uint16_t(val) > item->getMaximumValue()) val = item->getMaximumValue();
         item->setCurrentValue(val);
     } else if (key == 'A') {
         int value = item->getCurrentValue();
         value--;
-        if (value <= item->getMaximumValue()) {
+        if (uint16_t(value) <= item->getMaximumValue()) {
             item->setCurrentValue(value);
         }
         return;
     } else if (key == 'B') {
         int value = item->getCurrentValue();
         value++;
-        if (value <= item->getMaximumValue()) {
+        if (uint16_t(value) <= item->getMaximumValue()) {
             item->setCurrentValue(value);
         }
         return;
@@ -139,7 +139,7 @@ void MenuEditingKeyListener::processSimpleValueKeyPress(ValueMenuItem *item, cha
     clearState();
 }
 
-void MenuEditingKeyListener::processIntegerMultiEdit(EditableMultiPartMenuItem<uint8_t[4]> *item, char key) {
+void MenuEditingKeyListener::processIntegerMultiEdit(EditableMultiPartMenuItem *item, char key) {
     if (mode == KEYEDIT_NONE || item != currentEditor) {
         mode = KEYEDIT_MULTIEDIT_INT_START;
         currentEditor = item;

@@ -29,7 +29,7 @@ void LiquidCrystalRenderer::initialise() {
     // we iterate over each widget then over each each icon.
     TitleWidget* wid = firstWidget;
     int charNo = 0;
-    while(wid != NULL) {
+    while(wid != nullptr) {
         serdebugF2("Title widget present max=", wid->getMaxValue());
         for(int i = 0; i < wid->getMaxValue(); i++) {
             serdebugF2("Creating char ", charNo);
@@ -84,7 +84,7 @@ void copyIntoBuffer(char* buffer, const char* source, int offset, int bufferLen)
     }
 }
 
-void LiquidCrystalRenderer::drawMenuItem(GridPositionRowCacheEntry* entry, Coord where, Coord areaSize) {
+void LiquidCrystalRenderer::drawMenuItem(GridPositionRowCacheEntry* entry, Coord where, Coord areaSize, bool /*ignored*/) {
     auto* theItem = entry->getMenuItem();
     theItem->setChanged(false);
 
@@ -127,17 +127,16 @@ void LiquidCrystalRenderer::drawingCommand(RenderDrawingCommand command) {
 }
 
 void LiquidCrystalRenderer::fillWithBackgroundTo(int endPoint) {
-    char sz[25];
-    memset(sz, ' ', sizeof sz);
-    sz[20]=0;
-    for(int i=endPoint;i<height;i++) {
-        lcd->setCursor(0, i);
-        lcd->print(sz);
+    for(uint16_t y=endPoint;y<height;++y) {
+        lcd->setCursor(0, y);
+        for(uint16_t x=0;x<width;x++) {
+            lcd->print(' ');
+        }
     }
 }
 
 BaseDialog* LiquidCrystalRenderer::getDialog() {
-    if(dialog == NULL) {
+    if(dialog == nullptr) {
         dialog = new MenuBasedDialog();
     }
     return dialog;

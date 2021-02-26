@@ -163,8 +163,9 @@ int largeNumItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, 
  * on LargeFixedNumber, see that for more details on the capabilities
  * @see LargeFixedNumber
  */
-class EditableLargeNumberMenuItem : public EditableMultiPartMenuItem<LargeFixedNumber> {
+class EditableLargeNumberMenuItem : public EditableMultiPartMenuItem {
 private:
+    LargeFixedNumber data;
     bool negativeAllowed;
 public:
     EditableLargeNumberMenuItem(RuntimeRenderingFn renderFn, uint16_t id, int maxDigits, int dps, bool allowNeg, MenuItem* next = nullptr)

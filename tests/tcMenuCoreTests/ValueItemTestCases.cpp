@@ -64,7 +64,7 @@ test(testCoreAndBooleanMenuItem) {
     assertStringCaseEqual("Bool1:  TRUE", buffer);
 }
 
-bool checkWholeFraction(AnalogMenuItem* item, int16_t whole, int16_t fract, bool neg = false) {
+bool checkWholeFraction(AnalogMenuItem* item, uint16_t whole, int16_t fract, bool neg = false) {
     WholeAndFraction wf = item->getWholeAndFraction();
     if (wf.fraction != fract || wf.whole != whole || wf.negative != neg) {
         printMenuItem(item);
@@ -187,4 +187,81 @@ test(testAnalogValuesWithFractions) {
     assertTrue(checkWholeFraction(&menuHalvesOffs, 0, 5, true));
     menuHalvesOffs.copyValue(sz, sizeof sz);
     assertStringCaseEqual("-0.5dB", sz);
+}
+
+int calleeCount123 = 0;
+int calleeCount321 = 0;
+void onTest123(int id) {
+    if(id == 123) calleeCount123++;
+    if(id == 321) calleeCount321++;
+}
+
+test(testAnalogValueItemInMemory) {
+    AnalogMenuInfo analogInfo = { "Test 123", 123, 0xffff, 234, onTest123, -180, 10, "dB" };
+    AnalogMenuItem analogItem(&analogInfo, 0, nullptr, INFO_LOCATION_RAM);
+
+    char sz[20];
+    analogItem.copyNameToBuffer(sz, sizeof sz);
+    assertStringCaseEqual("Test 123", sz);
+
+    analogItem.copyUnitToBuffer(sz, sizeof sz);
+    assertStringCaseEqual("dB", sz);
+
+    assertEqual((uint16_t)10, analogItem.getDivisor());
+    assertEqual((uint8_t)1, analogItem.getDecimalPlacesForDivisor());
+    assertEqual((uint16_t)10, analogItem.getActualDecimalDivisor());
+    assertEqual((uint16_t)234, analogItem.getMaximumValue());
+    assertEqual(-180, analogItem.getOffset());
+    assertEqual((uint16_t)123, analogItem.getId());
+    assertEqual((uint16_t)0xffff, analogItem.getEepromPosition());
+    assertEqual(MENUTYPE_INT_VALUE, analogItem.getMenuType());
+
+    analogItem.setCurrentValue(190);
+    assertEqual(1, calleeCount123);
+    assertTrue(analogItem.isChanged());
+    assertTrue(analogItem.isSendRemoteNeeded(0));
+
+    copyMenuItemNameAndValue(&analogItem, sz, sizeof sz);
+    assertStringCaseEqual("Test 123: 1.0dB", sz);
+}
+
+test(testBooleanItemInMemory) {
+    BooleanMenuInfo boolInfo = { "Boolio", 321, 22, 1, onTest123, NAMING_ON_OFF};
+    BooleanMenuItem boolItem(&boolInfo, false, nullptr, INFO_LOCATION_RAM);
+
+    char sz[20];
+    boolItem.copyNameToBuffer(sz, sizeof sz);
+    assertStringCaseEqual("Boolio", sz);
+
+    assertEqual((uint16_t)1, boolItem.getMaximumValue());
+    assertEqual((uint16_t)321, boolItem.getId());
+    assertEqual(NAMING_ON_OFF, boolItem.getBooleanNaming());
+    assertEqual((uint16_t)22, boolItem.getEepromPosition());
+    assertEqual(MENUTYPE_BOOLEAN_VALUE, boolItem.getMenuType());
+
+    boolItem.setBoolean(true);
+    assertEqual(1, calleeCount321);
+    assertTrue(boolItem.isChanged());
+    assertTrue(boolItem.isSendRemoteNeeded(0));
+
+    copyMenuItemNameAndValue(&boolItem, sz, sizeof sz);
+    assertStringCaseEqual("Boolio: ON", sz);
+}
+
+test(testFloatItemInMemory) {
+    FloatMenuInfo fltInfo = { "Floater", 122, 0xffff, 3, nullptr};
+    FloatMenuItem fltItem(&fltInfo, nullptr, INFO_LOCATION_RAM);
+
+    char sz[20];
+    assertEqual(3, fltItem.getDecimalPlaces());
+    assertEqual((uint16_t)122, fltItem.getId());
+    assertEqual((uint16_t)0xffff, fltItem.getEepromPosition());
+    assertEqual(MENUTYPE_FLOAT_VALUE, fltItem.getMenuType());
+
+    fltItem.setFloatValue(223.2341);
+    assertTrue(fltItem.isChanged());
+    assertTrue(fltItem.isSendRemoteNeeded(0));
+
+    copyMenuItemNameAndValue(&fltItem, sz, sizeof sz);
+    assertStringCaseEqual("Floater: 223.234", sz);
 }

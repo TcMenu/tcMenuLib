@@ -474,7 +474,7 @@ void TagValueRemoteConnector::encodeMultiEditMenu(int parentId, RuntimeMenuItem*
         transport->writeFieldInt(FIELD_EDIT_MODE, EDITMODE_GREGORIAN_DATE);
     }
 
-    EditableMultiPartMenuItem<uint8_t[4]>* multipart = reinterpret_cast<EditableMultiPartMenuItem<uint8_t[4]>*>(item);
+    EditableMultiPartMenuItem* multipart = reinterpret_cast<EditableMultiPartMenuItem*>(item);
     char sz[20];
     multipart->copyValue(sz, sizeof(sz));
     transport->writeField(FIELD_CURRENT_VAL, sz);

@@ -46,7 +46,6 @@ int EthernetTagValTransport::writeChar(char data) {
 int EthernetTagValTransport::writeStr(const char* data) {
     // only uncomment below for worst case debugging..
 //	serdebug2("writing ", data);
-    int i  = 0;
     int len = strlen(data);
 	for(int i = 0; i < len; ++i) {
         if(writeChar(data[i]) == 0) {

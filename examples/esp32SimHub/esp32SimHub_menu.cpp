@@ -10,6 +10,8 @@
 
 #include <tcMenu.h>
 #include "esp32SimHub_menu.h"
+#include <Fonts/FreeSans18pt7b.h>
+#include <Fonts/FreeSans9pt7b.h>
 
 // Global variable declarations
 

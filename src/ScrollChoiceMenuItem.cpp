@@ -121,6 +121,12 @@ int enumItemRenderFn(RuntimeMenuItem *item, uint8_t row, RenderFnMode mode, char
     }
 }
 
+Rgb32MenuItem::Rgb32MenuItem(uint16_t id, RuntimeRenderingFn renderFn, bool includeAlpha, MenuItem *next)
+        : EditableMultiPartMenuItem(MENUTYPE_COLOR_VALUE, id, includeAlpha ? 4 : 3, renderFn, next) {
+    alphaChannel = includeAlpha;
+    if (!alphaChannel) data.alpha = 255;
+}
+
 uint8_t hexValueOf(char val) {
     if(val >= '0' && val <= '9') return val - '0';
     val = (char)toupper(val);

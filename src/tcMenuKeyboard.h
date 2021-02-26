@@ -53,7 +53,7 @@ private:
     void processScrollValueKeyPress(ScrollChoiceMenuItem* item, char key);
     void processAnalogKeyPress(AnalogMenuItem* item, char key);
 	void processMultiEditKeyPress(TextMenuItem* item, char key);
-	void processIntegerMultiEdit(EditableMultiPartMenuItem<uint8_t[4]>* item, char key);
+	void processIntegerMultiEdit(EditableMultiPartMenuItem* item, char key);
     void processLargeNumberPress(EditableLargeNumberMenuItem*, char key);
 	void clearState();
 };

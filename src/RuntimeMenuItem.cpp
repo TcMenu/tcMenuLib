@@ -11,12 +11,12 @@ static uint16_t nextAvailableRandomId = RANDOM_ID_START;
 
 const char ALLOWABLE_EDIT_CHARACTERS[] PROGMEM = " .,0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!\"$%^&*()_-+=@';:#{/?\\|<>#{}~";
 
-int nextRandomId() {
+uint16_t nextRandomId() {
 	return nextAvailableRandomId++;
 }
 
 RuntimeMenuItem::RuntimeMenuItem(MenuType menuType, uint16_t id, RuntimeRenderingFn renderFn,
-	uint8_t itemPosition, uint8_t numberOfRows, MenuItem* next)	: MenuItem(menuType, NULL, next) {
+	uint8_t itemPosition, uint8_t numberOfRows, MenuItem* next)	: MenuItem(menuType, NULL, next, false) {
 	this->id = id;
 	this->noOfParts = numberOfRows;
 	this->renderFn = renderFn;
@@ -26,6 +26,26 @@ RuntimeMenuItem::RuntimeMenuItem(MenuType menuType, uint16_t id, RuntimeRenderin
 ListRuntimeMenuItem::ListRuntimeMenuItem(uint16_t id, int numberOfRows, RuntimeRenderingFn renderFn, MenuItem* next)
 	: RuntimeMenuItem(MENUTYPE_RUNTIME_LIST, id, renderFn, 0xff, numberOfRows, next) {
 	activeItem = 0;
+}
+
+RuntimeMenuItem *ListRuntimeMenuItem::getChildItem(int pos) {
+    menuType = MENUTYPE_RUNTIME_LIST;
+    itemPosition = pos;
+    setActive((activeItem - 1) == pos);
+    return this;
+}
+
+RuntimeMenuItem *ListRuntimeMenuItem::asParent() {
+    menuType = MENUTYPE_RUNTIME_LIST;
+    itemPosition = LIST_PARENT_ITEM_POS;
+    return this;
+}
+
+RuntimeMenuItem *ListRuntimeMenuItem::asBackMenu() {
+    setActive(activeItem == 0);
+    menuType = MENUTYPE_BACK_VALUE;
+    itemPosition = LIST_PARENT_ITEM_POS;
+    return this;
 }
 
 void TextMenuItem::setTextValue(const char* text, bool silent) {
@@ -334,6 +354,14 @@ int textItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char
 	}
 }
 
+TextMenuItem::TextMenuItem(RuntimeRenderingFn customRenderFn, uint16_t id, int size, MenuItem *next)
+    : EditableMultiPartMenuItem(MENUTYPE_TEXT_VALUE, id, size, customRenderFn, next) {
+        data = new char[size];
+        memset(data, 0, size);
+        passwordField = false;
+
+}
+
 void IpAddressMenuItem::setIpAddress(const char * ipData) {
 	memset(data, 0, sizeof(data));
 	char part[4];
@@ -360,6 +388,12 @@ void IpAddressMenuItem::setIpAddress(uint8_t p1, uint8_t p2, uint8_t p3, uint8_t
 	setSendRemoteNeededAll();
 }
 
+void IpAddressMenuItem::setIpPart(uint8_t part, uint8_t newVal) {
+    if (part > 3) return;
+    data[part] = newVal;
+    changeOccurred(false);
+}
+
 long parseIntUntilSeparator(const char* ptr, int& offset) {
     char sz[10];
     unsigned int pos = 0;
@@ -383,9 +417,63 @@ void TimeFormattedMenuItem::setTimeFromString(const char* ptr) {
     data.hundreds = parseIntUntilSeparator(ptr, offset);
 }
 
+TimeFormattedMenuItem::TimeFormattedMenuItem(RuntimeRenderingFn renderFn, uint16_t id, MultiEditWireType format, MenuItem *next)
+        : EditableMultiPartMenuItem(MENUTYPE_TIME, id, format == EDITMODE_TIME_HUNDREDS_24H ? 4 : 3, renderFn, next) {
+    setTime(TimeStorage(12, 0));
+    this->format = format;
+}
+
 void DateFormattedMenuItem::setDateFromString(const char *dateText) {
     int offset = 0;
     data.year = parseIntUntilSeparator(dateText, offset);
     data.month = parseIntUntilSeparator(dateText, offset);
     data.day = parseIntUntilSeparator(dateText, offset);
+}
+
+uint8_t EditableMultiPartMenuItem::beginMultiEdit() {
+    setEditing(true);
+    itemPosition = 0;
+    return noOfParts;
+}
+
+int EditableMultiPartMenuItem::changeEditBy(int amt) {
+    itemPosition += amt;
+    setChanged(true);
+    setSendRemoteNeededAll();
+    return renderFn(this, itemPosition, RENDERFN_GETRANGE, NULL, 0);
+}
+
+int EditableMultiPartMenuItem::previousPart() {
+    if (itemPosition <= 1) {
+        stopMultiEdit();
+        return 0;
+    }
+    return changeEditBy(-1);
+}
+
+int EditableMultiPartMenuItem::nextPart() {
+    if (itemPosition >= noOfParts) {
+        stopMultiEdit();
+        return 0;
+    }
+
+    return changeEditBy(1);
+}
+
+void EditableMultiPartMenuItem::stopMultiEdit() {
+    itemPosition = 0xff;
+    setEditing(false);
+    setChanged(true);
+    setSendRemoteNeededAll();
+    runCallback();
+}
+
+bool EditableMultiPartMenuItem::valueChanged(int newVal) {
+    uint8_t sz[2];
+    sz[0] = lowByte(newVal);
+    sz[1] = highByte(newVal);
+    bool valueUpdated = renderFn(this, itemPosition, RENDERFN_SET_VALUE, reinterpret_cast<char*>(sz), sizeof(sz));
+
+    changeOccurred(valueUpdated);
+    return valueUpdated;
 }

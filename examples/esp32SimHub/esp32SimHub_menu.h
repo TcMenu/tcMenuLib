@@ -15,8 +15,6 @@
 #include <tcMenu.h>
 
 #include "tcMenuAdaFruitGfx.h"
-#include <Fonts/FreeSans18pt7b.h>
-#include <Fonts/FreeSans9pt7b.h>
 #include "ESP32TouchKeysAbstraction.h"
 #include "SimhubConnector.h"
 #include <RuntimeMenuItem.h>
@@ -50,6 +48,8 @@
 extern Adafruit_ILI9341 gfx;
 extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
+extern const GFXfont FreeSans18pt7b;
+extern const GFXfont FreeSans9pt7b;
 extern ESP32TouchKeysAbstraction esp32Touch;
 
 // all menu item forward references.

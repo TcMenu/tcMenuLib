@@ -7,16 +7,17 @@
 #include "MenuItems.h"
 #include "RuntimeMenuItem.h"
 
-MenuItem::MenuItem(MenuType menuType, const AnyMenuInfo* menuInfo, MenuItem* next) {
+MenuItem::MenuItem(MenuType menuType, const AnyMenuInfo* menuInfo, MenuItem* next, bool infoProgmem) {
 	this->flags = 0;
 	this->menuType = menuType;
-	if(menuInfo != NULL) this->info = menuInfo;
+	bitWrite(flags, MENUITEM_INFO_STRUCT_PGM, infoProgmem);
+	if(menuInfo != nullptr) this->info = menuInfo;
 	this->next = next;
     this->setChanged(true); // items always start out needing redrawing.
     this->setVisible(true); // always start out visible.
 }
 
-bool MenuItem::isSendRemoteNeeded(uint8_t remoteNo) {
+bool MenuItem::isSendRemoteNeeded(uint8_t remoteNo) const {
     return bitRead(flags, (remoteNo + (int)MENUITEM_REMOTE_SEND0));
 }
 
@@ -26,9 +27,10 @@ void MenuItem::setSendRemoteNeeded(uint8_t remoteNo, bool needed) {
 
 void MenuItem::setEditing(bool active) {
 	bool isEditOnEntry = isEditing();
-	bitWrite(flags, MENUITEM_EDITING, active); setChanged(true);
+	bitWrite(flags, MENUITEM_EDITING, active);
+	setChanged(true);
 	if (isMenuRuntimeMultiEdit(this) && !active && isEditOnEntry) {
-		EditableMultiPartMenuItem<void*>* item = reinterpret_cast<EditableMultiPartMenuItem<void*>*>(this);
+		auto* item = reinterpret_cast<EditableMultiPartMenuItem*>(this);
 		item->stopMultiEdit();
 	}
 }
@@ -44,50 +46,60 @@ void MenuItem::clearSendRemoteNeededAll() {
 	flags = flags & (~MENUITEM_ALL_REMOTES);
 }
 
-void MenuItem::triggerCallback() {
+void MenuItem::triggerCallback() const {
 	if (isMenuRuntime(this)) {
 		return asRuntimeItem(this)->runCallback();
 	}
-	else {
-		MenuCallbackFn fn = get_info_callback(&info->callback);
-		if (fn != NULL) fn(getId());
-	}
+
+	auto* cb = (isInfoProgMem()) ? get_info_callback(&info->callback) : info->callback;
+	if(cb) cb(getId());
 }
 
-uint8_t MenuItem::copyNameToBuffer(char* buf, int offset, int size) {
+uint8_t MenuItem::copyNameToBuffer(char* buf, int offset, int size) const {
 	if (isMenuRuntime(this)) {
 		asRuntimeItem(this)->copyRuntimeName(buf + offset, size - offset);
 		return strlen(buf + offset) + offset;
 	}
-	else {
+	else if(isInfoProgMem()) {
 		const char* name = info->name;
 		uint8_t ret = safeProgCpy(buf + offset, name, size - offset);
 		return ret + offset;
 	}
+	else {
+	    strncpy(buf + offset, info->name, size - offset);
+	    return strlen(buf + offset) + offset;
+	}
 }
 
-uint16_t MenuItem::getId()
+uint16_t MenuItem::getId() const
 {
 	if (isMenuRuntime(this)) {
 		return asRuntimeItem(this)->getRuntimeId();
 	}
-	
-	return get_info_uint(&info->id);
+
+	return (isInfoProgMem()) ? get_info_uint(&info->id) : info->id;
 }
 
-uint16_t MenuItem::getMaximumValue()
+uint16_t MenuItem::getMaximumValue() const
 {
 	if (isMenuRuntime(this)) {
 		return asRuntimeItem(this)->getNumberOfParts();
 	}
-	else return get_info_uint(&info->maxValue);
+
+	return (isInfoProgMem()) ? get_info_uint(&info->maxValue) : info->maxValue;
 }
 
-uint16_t MenuItem::getEepromPosition()
+void MenuItem::changeOccurred(bool silent) {
+    setChanged(true);
+    setSendRemoteNeededAll();
+    if(!silent) triggerCallback();
+}
+
+uint16_t MenuItem::getEepromPosition() const
 {
 	if (isMenuRuntime(this)) return asRuntimeItem(this)->getRuntimeEeprom();
 	
-	return get_info_uint(&info->eepromAddr);
+	return  isInfoProgMem() ? get_info_uint(&info->eepromAddr) : info->eepromAddr;
 }
 
 // on avr boards we store all info structures in progmem, so we need this code to
@@ -95,14 +107,23 @@ uint16_t MenuItem::getEepromPosition()
 
 #ifdef __AVR__
 
-void EnumMenuItem::copyEnumStrToBuffer(char* buffer, int size, int idx) {
+void EnumMenuItem::copyEnumStrToBuffer(char* buffer, int size, int idx) const {
+    if(!isInfoProgMem()) {
+        auto* enumInfo = reinterpret_cast<const EnumMenuInfo*>(info);
+        strncpy(buffer, enumInfo->menuItems[idx], size);
+    }
+
     char** itemPtr = ((char**)pgm_read_ptr_near(&((EnumMenuInfo*)info)->menuItems) + idx);
     char* itemLoc = (char *)pgm_read_ptr_near(itemPtr);
     strncpy_P(buffer, itemLoc, size);
 	buffer[size - 1] = 0;
 }
 
-int EnumMenuItem::getLengthOfEnumStr(int idx) {
+int EnumMenuItem::getLengthOfEnumStr(int idx) const {
+    if(!isInfoProgMem()) {
+        auto* enumInfo = reinterpret_cast<const EnumMenuInfo*>(info);
+        return strlen(enumInfo->menuItems[idx]);
+    }
     char** itemPtr = ((char**)pgm_read_ptr_near(&((EnumMenuInfo*)info)->menuItems) + idx);
     char* itemLoc = (char *)pgm_read_ptr_near(itemPtr);
     return strlen_P(itemLoc);
@@ -110,7 +131,7 @@ int EnumMenuItem::getLengthOfEnumStr(int idx) {
 
 #else 
 
-void EnumMenuItem::copyEnumStrToBuffer(char* buffer, int size, int idx) {
+void EnumMenuItem::copyEnumStrToBuffer(char* buffer, int size, int idx) const {
     EnumMenuInfo* enumInfo = (EnumMenuInfo*)info;
     const char * const* choices = enumInfo->menuItems;
     const char * choice = choices[idx];
@@ -118,7 +139,7 @@ void EnumMenuItem::copyEnumStrToBuffer(char* buffer, int size, int idx) {
 	buffer[size - 1] = 0;
 }
 
-int EnumMenuItem::getLengthOfEnumStr(int idx) {
+int EnumMenuItem::getLengthOfEnumStr(int idx) const {
     EnumMenuInfo* enumInfo = (EnumMenuInfo*)info;
     const char * const* choices = enumInfo->menuItems;
     const char * choice = choices[idx];
@@ -132,7 +153,7 @@ bool isSame(float d1, float d2) {
 	return result < 0.0000001;
 }
 
-void AnalogMenuItem::copyValue(char * buffer, uint8_t bufferSize) {
+void AnalogMenuItem::copyValue(char * buffer, uint8_t bufferSize) const {
 	uint8_t dpNeeded = getDecimalPlacesForDivisor();
 	WholeAndFraction wf = getWholeAndFraction();
 
@@ -148,7 +169,7 @@ void AnalogMenuItem::copyValue(char * buffer, uint8_t bufferSize) {
 	if(numLen < bufferSize) copyUnitToBuffer(buffer + numLen, bufferSize - numLen);
 }
 
-float AnalogMenuItem::getAsFloatingPointValue() {
+float AnalogMenuItem::getAsFloatingPointValue() const {
 	WholeAndFraction wf = getWholeAndFraction();
 	serdebugF4("getasF ", wf.whole, wf.fraction, wf.negative);
 	float fract = (float(wf.fraction) / float(getActualDecimalDivisor()));
@@ -158,13 +179,13 @@ float AnalogMenuItem::getAsFloatingPointValue() {
 
 }
 
-uint16_t AnalogMenuItem::getActualDecimalDivisor() {
+uint16_t AnalogMenuItem::getActualDecimalDivisor() const {
 	uint16_t divisor = getDivisor();
 	if (divisor < 2) return 1;
 	return (divisor > 1000) ? 10000 : (divisor > 100) ? 1000 : (divisor > 10) ? 100 : 10;
 }
 
-WholeAndFraction AnalogMenuItem::getWholeAndFraction() {
+WholeAndFraction AnalogMenuItem::getWholeAndFraction() const {
 	WholeAndFraction wf;
 	int calcVal = int16_t(getCurrentValue()) + getOffset();
 	int divisor = getDivisor();
@@ -207,36 +228,67 @@ void AnalogMenuItem::setFromFloatingPointValue(float value) {
 	    value = abs(value);
 	}
 	wf.whole = value;
-	wf.fraction = (value - float(wf.whole)) * getActualDecimalDivisor();
+	wf.fraction = (value - float(wf.whole)) * float(getActualDecimalDivisor());
 
 	setFromWholeAndFraction(wf);
 }
 
-uint8_t AnalogMenuItem::getDecimalPlacesForDivisor() {
+uint8_t AnalogMenuItem::getDecimalPlacesForDivisor() const {
 	uint16_t divisor = getDivisor();
 	if (divisor < 2) return 0;
 
 	return (divisor > 1000) ? 4 : (divisor > 100) ? 3 : (divisor > 10) ? 2 : 1;
 }
 
+int AnalogMenuItem::getOffset() const {
+    auto* anInfo = reinterpret_cast<const AnalogMenuInfo*>(info);
+    return isInfoProgMem() ? get_info_int(&(anInfo->offset)) : anInfo->offset;
+}
+
+uint16_t AnalogMenuItem::getDivisor() const {
+    auto* anInfo = reinterpret_cast<const AnalogMenuInfo*>(info);
+    return isInfoProgMem() ? get_info_uint(&(anInfo->divisor)) : anInfo->divisor;
+}
+
+int AnalogMenuItem::unitNameLength() const {
+    auto* anInfo = reinterpret_cast<const AnalogMenuInfo*>(info);
+    return isInfoProgMem() ? ((int) strlen_P(anInfo->unitName)) : strlen(anInfo->unitName);
+}
+
+void AnalogMenuItem::copyUnitToBuffer(char *unitBuff, uint8_t size) const {
+    auto* anInfo = reinterpret_cast<const AnalogMenuInfo*>(info);
+    if(isInfoProgMem()) {
+        safeProgCpy(unitBuff, anInfo->unitName, size);
+    }
+    else {
+        strncpy(unitBuff, anInfo->unitName, size);
+        unitBuff[size - 1] = 0;
+    }
+}
+
+BooleanNaming BooleanMenuItem::getBooleanNaming() const {
+    auto* enumInfo = reinterpret_cast<const BooleanMenuInfo*>(info);
+    return isInfoProgMem() ? static_cast<BooleanNaming>(get_info_char(&(enumInfo->naming))) : enumInfo->naming;
+}
+
 void FloatMenuItem::setFloatValue(float newVal, bool silent) {
 	if(isSame(newVal, currValue)) return;
 	
 	this->currValue = newVal;
-	setSendRemoteNeededAll();
-	setChanged(true);
-	if(!silent) triggerCallback();
+	changeOccurred(silent);
+}
+
+int FloatMenuItem::getDecimalPlaces() const {
+    auto *fltInfo = reinterpret_cast<const FloatMenuInfo*>(info);
+    return isInfoProgMem() ? get_info_int(&fltInfo->numDecimalPlaces) : fltInfo->numDecimalPlaces;
 }
 
 void ValueMenuItem::setCurrentValue(uint16_t val, bool silent) {
 	if (val == currentValue || val > getMaximumValue()) {
 		return;
 	}
-	
-	setChanged(true);
-	setSendRemoteNeededAll();
 	currentValue = val;
-    if(!silent)	triggerCallback();
+	changeOccurred(silent);
 }
 
 const char ON_STR[] PGM_TCM   = "ON";
@@ -246,7 +298,7 @@ const char NO_STR[] PGM_TCM   = " NO";
 const char TRUE_STR[] PGM_TCM = " TRUE";
 const char FALSE_STR[] PGM_TCM= "FALSE";
 
-void copyMenuItemNameAndValue(MenuItem* item, char* buffer, size_t bufferSize, char additionalSep) {
+void copyMenuItemNameAndValue(const MenuItem* item, char* buffer, size_t bufferSize, char additionalSep) {
     item->copyNameToBuffer(buffer, bufferSize);
     if(additionalSep != 0) appendChar(buffer, additionalSep, bufferSize);
     appendChar(buffer, ' ', bufferSize);
@@ -255,14 +307,14 @@ void copyMenuItemNameAndValue(MenuItem* item, char* buffer, size_t bufferSize, c
     copyMenuItemValue(item, buffer + pos, bufferSize - pos);
 }
 
-void copyMenuItemValue(MenuItem* item, char* buffer, size_t bufferSize) {
+void copyMenuItemValue(const MenuItem* item, char* buffer, size_t bufferSize) {
     buffer[0] = 0;
     if(item->getMenuType() == MENUTYPE_ENUM_VALUE) {
-        auto* enItem = reinterpret_cast<EnumMenuItem*>(item);
+        auto* enItem = reinterpret_cast<const EnumMenuItem*>(item);
         enItem->copyEnumStrToBuffer(buffer, bufferSize, enItem->getCurrentValue());
     }
     else if(item->getMenuType() == MENUTYPE_BOOLEAN_VALUE) {
-        auto* boolItem = reinterpret_cast<BooleanMenuItem*>(item);
+        auto* boolItem = reinterpret_cast<const BooleanMenuItem*>(item);
         BooleanNaming naming = boolItem->getBooleanNaming();
         const char* val;
         switch(naming) {
@@ -279,11 +331,11 @@ void copyMenuItemValue(MenuItem* item, char* buffer, size_t bufferSize) {
         safeProgCpy(buffer, val, bufferSize);
     }
     else if(item->getMenuType() == MENUTYPE_FLOAT_VALUE) {
-        auto* flItem = reinterpret_cast<FloatMenuItem*>(item);
+        auto* flItem = reinterpret_cast<const FloatMenuItem*>(item);
         fastftoa(buffer, flItem->getFloatValue(), flItem->getDecimalPlaces(), bufferSize);
     }
     else if(item->getMenuType() == MENUTYPE_INT_VALUE) {
-        auto* anItem = reinterpret_cast<AnalogMenuItem*>(item);
+        auto* anItem = reinterpret_cast<const AnalogMenuItem*>(item);
         anItem->copyValue(buffer, bufferSize);
     }
     else if(item->getMenuType() == MENUTYPE_ACTION_VALUE || item->getMenuType() == MENUTYPE_SUB_VALUE) {
@@ -300,7 +352,7 @@ void copyMenuItemValue(MenuItem* item, char* buffer, size_t bufferSize) {
         buffer[0] = 0;
     }
     else if(isMenuRuntime(item)) {
-        auto* rtItem = reinterpret_cast<RuntimeMenuItem*>(item);
+        auto* rtItem = reinterpret_cast<const RuntimeMenuItem*>(item);
         rtItem->copyValue(buffer, bufferSize);
     }
 }

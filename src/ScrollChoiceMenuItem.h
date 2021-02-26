@@ -155,13 +155,7 @@ public:
         alpha = other.alpha;
     }
 
-    RgbColor32& operator = (const RgbColor32& other) {
-        red = other.red;
-        green = other.green;
-        blue = other.blue;
-        alpha = other.alpha;
-        return *this;
-    }
+    RgbColor32& operator = (const RgbColor32& other) = default;
 
     explicit RgbColor32(const char* htmlColor);
 
@@ -175,8 +169,9 @@ int rgbAlphaItemRenderFn(RuntimeMenuItem *item, uint8_t row, RenderFnMode mode, 
  * A Menu item that can display and edit RGB values that are 32 bits wide, that is 8 bit per element and
  * an optional alpha channel. This is based on editable runtime menu item.
  */
-class Rgb32MenuItem : public EditableMultiPartMenuItem<RgbColor32> {
+class Rgb32MenuItem : public EditableMultiPartMenuItem {
 private:
+    RgbColor32 data;
     bool alphaChannel;
 public:
 
@@ -187,11 +182,7 @@ public:
      * @param includeAlpha true to include alpha channel, otherwise false.
      * @param next optional pointer to the next menu item
      */
-    Rgb32MenuItem(uint16_t id, RuntimeRenderingFn renderFn, bool includeAlpha, MenuItem* next = nullptr)
-    : EditableMultiPartMenuItem<RgbColor32>(MENUTYPE_COLOR_VALUE, id, includeAlpha ? 4 : 3, renderFn, next) {
-        alphaChannel = includeAlpha;
-        if(!alphaChannel) data.alpha = 255;
-    }
+    Rgb32MenuItem(uint16_t id, RuntimeRenderingFn renderFn, bool includeAlpha, MenuItem* next = nullptr);
 
     /**
      * @return the underlying color data that can be directly modified.
@@ -208,8 +199,7 @@ public:
      */
     void setColorData(const RgbColor32& other) {
         data = other;
-        setSendRemoteNeededAll();
-        setChanged(true);
+        changeOccurred(false);
     }
 
     /**

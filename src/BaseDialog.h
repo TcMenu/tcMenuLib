@@ -3,8 +3,8 @@
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
-#ifndef _BASE_DIALOG_H_
-#define _BASE_DIALOG_H_
+#ifndef TCMENU_BASE_DIALOG_H_
+#define TCMENU_BASE_DIALOG_H_
 
 /**
  * @file BaseDialog.h
@@ -18,9 +18,12 @@
 /**
  * The types of button that can be passed to setButton for button 1 and button 2
  */
-enum ButtonType: uint8_t { BTNTYPE_NONE = 0, BTNTYPE_OK, BTNTYPE_ACCEPT, BTNTYPE_CANCEL, BTNTYPE_CLOSE };
+enum ButtonType: uint8_t {
+    BTNTYPE_NONE = 0, BTNTYPE_OK, BTNTYPE_ACCEPT, BTNTYPE_CANCEL, BTNTYPE_CLOSE,
+    BTNTYPE_CUSTOM0 = 15, BTNTYPE_CUSTOM1, BTNTYPE_CUSTOM2, BTNTYPE_CUSTOM3,
+    BTNTYPE_CUSTOM4, BTNTYPE_CUSTOM5, BTNTYPE_CUSTOM6, BTNTYPE_CUSTOM7 };
 
-#define CUSTOM_DIALOG_BUTTON_START 10
+#define CUSTOM_DIALOG_BUTTON_START BTNTYPE_CUSTOM0
 
 class BaseDialog;
 /**
@@ -29,13 +32,13 @@ class BaseDialog;
  * `void completedCallback(ButtonType buttonPressed);`
  */
 typedef void (*CompletedHandlerFn)(ButtonType buttonPressed, void* yourData);
-typedef void (*DialogButtonHandler)(uint8_t buttonNum, void* yourData);
 
 #define DLG_FLAG_SMALLDISPLAY 0
 #define DLG_FLAG_INUSE 1
 #define DLG_FLAG_CAN_SEND_REMOTE 2 
 #define DLG_FLAG_MENUITEM_BASED 3
 #define DLG_FLAG_NEEDS_RENDERING 4
+#define DLG_FLAG_USING_OO_CONTROLLER 5
 #define DLG_FLAG_REMOTE_0 8
 #define DLG_FLAG_REMOTE_1 9
 #define DLG_FLAG_REMOTE_2 10
@@ -50,6 +53,13 @@ typedef void (*DialogButtonHandler)(uint8_t buttonNum, void* yourData);
 
 class TagValueRemoteConnector; // forward reference
 
+class BaseDialogController {
+public:
+    virtual void dialogDismissed(ButtonType buttonType)=0;
+    virtual bool dialogButtonPressed(int buttonNum)=0;
+    virtual void copyCustomButtonText(int buttonNumber, char* buffer, size_t bufferSize)=0;
+};
+
 /**
  * A dialog is able to take over the display completely in order to present the user with information
  * or a question. Similar to a message box on desktop platforms. These allow for the simplest of user
@@ -60,15 +70,17 @@ class TagValueRemoteConnector; // forward reference
 class BaseDialog {
 protected:
     char header[20];
-    CompletedHandlerFn completedHandler;
+    const char* headerPgm; // for backwards compatibility with 1.7, not used in 2.0
+    union {
+        BaseDialogController* controller;
+        CompletedHandlerFn completedHandler;
+    };
     void* userData;
     ButtonType button1;
     ButtonType button2;
     uint8_t lastBtnVal;
     uint16_t flags;
     MenuRedrawState needsDrawing;
-    DialogButtonHandler buttonHandler;
-
 public:
     /**
      * Create the base dialog and clear down all the fields
@@ -86,13 +98,6 @@ public:
     void setButtons(ButtonType btn1, ButtonType btn2, int defVal = 0);
 
     /**
-     * Register a dialog button handler that will be notified when buttons are pressed. Only custom
-     * added buttons are sent to this callback.
-     * @param handler the custom button callback
-     */
-    void registerButtonPressHandler(DialogButtonHandler handler) { buttonHandler = handler; }
-
-    /**
      * Create a dialog that takes over the display and presents the header and
      * buffer, the header text is in program memory, with the buttons set up as per `setButtons`
      */
@@ -103,6 +108,18 @@ public:
      * buffer, the header text is in RAM, with the buttons set up as per `setButtons`
      */
     void showRam(const char* headerRam, bool allowRemote, CompletedHandlerFn completedHandler = NULL);
+
+    /**
+     * Create a dialog that takes over the display and presents the header and
+     * buffer, the header text is in program memory, with the buttons set up as per `setButtons`
+     */
+    void show(const char* headerPgm, bool allowRemote, BaseDialogController* completedHandler);
+
+    /**
+     * Create a dialog that takes over the display and presents the header and
+     * buffer, the header text is in RAM, with the buttons set up as per `setButtons`
+     */
+    void showRam(const char* headerRam, bool allowRemote, BaseDialogController* completedHandler);
 
     /**
      * You can set an item of data that will be passed to the callback when executed.
@@ -123,6 +140,9 @@ public:
      * Close the current dialog by taking off the display and clearing the inuse flag.
      */
     void hide();
+
+    /** Indicates that the registered completion / callback is a controller */
+    bool isUsingOOController() { return bitRead(flags, DLG_FLAG_USING_OO_CONTROLLER); }
 
     /** Indicates that this dialog is presently in use */
     bool isInUse() {return bitRead(flags, DLG_FLAG_INUSE);}
@@ -198,12 +218,12 @@ protected:
      */
     ButtonType findActiveBtn(unsigned int currentValue);
 
-    void internalShow(bool allowRemote, CompletedHandlerFn completedHandler);
+    void internalShow(bool allowRemote);
 };
 
 /**
  * This menu type is reserved only for use within dialogs, never use this button outside of that purpose. Button numbers
- * 0..7 are reserved and should never be used by application code. Use 7..255 in application code.
+ * 0..15 are reserved and should never be used by application code. Use 15..255 in application code.
  */
 class LocalDialogButtonMenuItem : public RuntimeMenuItem {
 private:
@@ -245,4 +265,4 @@ protected:
     void internalRender(int currentValue) override {}
 };
 
-#endif //_BASE_DIALOG_H_
+#endif //TCMENU_BASE_DIALOG_H_

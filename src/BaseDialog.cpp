@@ -18,30 +18,52 @@ const char buttonCancel[] PROGMEM = "cancel";
 const char buttonClose[] PROGMEM = "close";
 const char buttonAccept[] PROGMEM = "accept";
 
-BaseDialog::BaseDialog() : header{0} {
+BaseDialog::BaseDialog() : header{0}, headerPgm(nullptr) {
     flags = 0;
     bitWrite(flags, DLG_FLAG_INUSE, false);
     button1 = button2 = BTNTYPE_NONE;
-    buttonHandler = nullptr;
+
 }
 
-void BaseDialog::show(const char* headerPgm, bool allowRemote, CompletedHandlerFn completedHandler) {
+void BaseDialog::show(const char* headerPgm, bool allowRemote, CompletedHandlerFn completionCallback) {
+    this->headerPgm = headerPgm;
+    bitClear(flags, DLG_FLAG_USING_OO_CONTROLLER);
+    this->completedHandler = completionCallback;
     safeProgCpy(this->header, headerPgm, sizeof(this->header));
-    internalShow(allowRemote, completedHandler);
+    internalShow(allowRemote);
 }
 
-void BaseDialog::showRam(const char* headerRam, bool allowRemote, CompletedHandlerFn completedHandler) {
+void BaseDialog::showRam(const char* headerRam, bool allowRemote, CompletedHandlerFn completionCallback) {
+    this->headerPgm = nullptr;
+    bitClear(flags, DLG_FLAG_USING_OO_CONTROLLER);
+    this->completedHandler = completionCallback;
     strncpy(this->header, headerRam, sizeof(this->header));
     this->header[sizeof(this->header) - 1] = 0;
-    internalShow(allowRemote, completedHandler);
+    internalShow(allowRemote);
 }
 
-void BaseDialog::internalShow(bool allowRemote, CompletedHandlerFn completedHandler) {
+void BaseDialog::show(const char* headerPgm, bool allowRemote, BaseDialogController* dialogController) {
+    this->headerPgm = headerPgm;
+    bitSet(flags, DLG_FLAG_USING_OO_CONTROLLER);
+    this->controller = dialogController;
+    safeProgCpy(this->header, headerPgm, sizeof(this->header));
+    internalShow(allowRemote);
+}
+
+void BaseDialog::showRam(const char* headerRam, bool allowRemote, BaseDialogController* dialogController) {
+    this->headerPgm = nullptr;
+    bitSet(flags, DLG_FLAG_USING_OO_CONTROLLER);
+    this->controller = dialogController;
+    strncpy(this->header, headerRam, sizeof(this->header));
+    this->header[sizeof(this->header) - 1] = 0;
+    internalShow(allowRemote);
+}
+
+void BaseDialog::internalShow(bool allowRemote) {
     serdebugF("showing new dialog");
     setInUse(true);
     setRemoteAllowed(allowRemote);
     setRemoteUpdateNeededAll();
-    BaseDialog::completedHandler = completedHandler;
     internalSetVisible(true);
     needsDrawing = MENUDRAW_COMPLETE_REDRAW;
 }
@@ -77,14 +99,16 @@ ButtonType BaseDialog::findActiveBtn(unsigned int currentValue) {
 }
 
 void BaseDialog::actionPerformed(int btnNum) {
-    if(btnNum < CUSTOM_DIALOG_BUTTON_START) {
+    bool canDismiss = true;
+    if(controller && isUsingOOController()) canDismiss = controller->dialogButtonPressed(btnNum);
+
+    if(btnNum < CUSTOM_DIALOG_BUTTON_START && canDismiss) {
         // must be done before hide, which resets the encoder
         ButtonType btn = findActiveBtn(btnNum);
         serdebugF2("User clicked button: ", btn);
         hide();
         if (completedHandler) completedHandler(btn, userData);
     }
-    else if(buttonHandler) buttonHandler(btnNum, userData);
 }
 
 void BaseDialog::dialogRendering(unsigned int currentValue, bool userClicked) {
@@ -106,24 +130,31 @@ void BaseDialog::dialogRendering(unsigned int currentValue, bool userClicked) {
 }
 
 bool BaseDialog::copyButtonText(char* data, int buttonNum, int currentValue, bool sel) {
-    const char* tx;
-    int bt = (buttonNum == 0) ? button1 : button2;
-    switch(bt) {
-    case BTNTYPE_ACCEPT:
-        tx = buttonAccept;
-        break;
-    case BTNTYPE_CANCEL:
-        tx = buttonCancel;
-        break;
-    case BTNTYPE_CLOSE:
-        tx = buttonClose;
-        break;
-    default:
-        tx = buttonOK;
-        break;
+    if(buttonNum > 1) {
+        data[0]=0;
+        if(controller) controller->copyCustomButtonText(buttonNum, data, 14);
+    }
+    else {
+        const char *tx;
+        uint8_t bt = (buttonNum == 0) ? button1 : button2;
+        switch (bt) {
+            case BTNTYPE_ACCEPT:
+                tx = buttonAccept;
+                break;
+            case BTNTYPE_CANCEL:
+                tx = buttonCancel;
+                break;
+            case BTNTYPE_CLOSE:
+                tx = buttonClose;
+                break;
+            case BTNTYPE_OK:
+            default:
+                tx = buttonOK;
+                break;
+        }
+        strcpy_P(data, tx);
     }
 
-    strcpy_P(data, tx);
     if((button1 == BTNTYPE_NONE || button2 == BTNTYPE_NONE) || sel) {
         while(*data) {
             *data = toupper(*data);
@@ -204,7 +235,7 @@ int dialogButtonRenderFn(RuntimeMenuItem* item, uint8_t /*row*/, RenderFnMode mo
             dlg->actionPerformed(btnItem->getButtonNumber());
             return true;
         case RENDERFN_NAME:
-            dlg->copyButtonText(buffer, btnItem->getButtonNumber(), bufferSize, btnItem->isActive());
+            dlg->copyButtonText(buffer, btnItem->getButtonNumber(), btnItem->isActive());
             return true;
         case RENDERFN_EEPROM_POS:
             return -1;
@@ -215,7 +246,7 @@ int dialogButtonRenderFn(RuntimeMenuItem* item, uint8_t /*row*/, RenderFnMode mo
     }
 }
 
-RENDERING_CALLBACK_NAME_INVOKE(dialogTextRenderFn, textItemRenderFn, "Msg: ", -1, NO_CALLBACK)
+RENDERING_CALLBACK_NAME_INVOKE(dialogTextRenderFn, textItemRenderFn, "Msg", -1, NO_CALLBACK)
 
 MenuBasedDialog::MenuBasedDialog() :
         backItem(dialogBackRenderFn, nullptr),

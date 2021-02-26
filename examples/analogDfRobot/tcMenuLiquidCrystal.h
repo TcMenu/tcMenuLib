@@ -18,41 +18,58 @@
 #define _TCMENU_LIQUID_CRYSTAL_H
 
 #include "tcMenu.h"
+#include "BaseRenderers.h"
 #include <LiquidCrystalIO.h>
 #include <BaseDialog.h>
-#include <graphics/BaseGraphicalRenderer.h>
-
-using namespace tcgfx;
 
 /**
  * A renderer that can renderer onto a LiquidCrystal display and supports the concept of single level
  * sub menus, active items and editing.
  */
-class LiquidCrystalRenderer : public BaseGraphicalRenderer {
+class LiquidCrystalRenderer : public BaseMenuRenderer {
 private:
     LiquidCrystal* lcd;
-    NullItemDisplayPropertiesFactory propertiesFactory;
-    char backChar;
-    char forwardChar;
-    char editChar;
+    uint8_t dimY;
+    uint8_t backChar;
+    uint8_t forwardChar;
+    uint8_t editChar;
+    bool drewTitleThisTime;
+    bool titleRequired;
 public:
-    LiquidCrystalRenderer(LiquidCrystal& lcd, int dimX, int dimY);
-    ~LiquidCrystalRenderer() override;
+
+    LiquidCrystalRenderer(LiquidCrystal& lcd, uint8_t dimX, uint8_t dimY);
+    virtual ~LiquidCrystalRenderer();
+    void render() override;
     void initialise() override;
-    void setTitleRequired(bool titleRequired) { titleMode = (titleRequired) ? TITLE_FIRST_ROW : NO_TITLE; }
+    void setTitleRequired(bool titleRequired) { this->titleRequired = titleRequired; }
+
     void setEditorChars(char back, char forward, char edit);
 
-    uint8_t getRows() {return height;}
+    uint8_t getRows() {return dimY;}
     LiquidCrystal* getLCD() {return lcd;}
     BaseDialog* getDialog() override;
-
-    void drawingCommand(RenderDrawingCommand command) override;
-    void drawWidget(Coord where, TitleWidget* widget, color_t colorFg, color_t colorBg) override;
-    void drawMenuItem(GridPositionRowCacheEntry* entry, Coord where, Coord areaSize) override;
-    void fillWithBackgroundTo(int endPoint) override;
-
-    ItemDisplayPropertiesFactory &getDisplayPropertiesFactory() override { return propertiesFactory; }
-    NullItemDisplayPropertiesFactory &getLcdDisplayPropertiesFactory() { return propertiesFactory; }
+private:
+    void renderTitle(bool forceDraw);
+    void renderMenuItem(uint8_t row, MenuItem* item);
+    void renderActionItem(uint8_t row, MenuItem* item);
+    void renderBackItem(uint8_t row, MenuItem* item);
+    void renderList();
 };
+
+class LiquidCrystalDialog : public BaseDialog {
+public:
+    LiquidCrystalDialog(LiquidCrystalRenderer* renderer) {
+        bitWrite(flags, DLG_FLAG_SMALLDISPLAY, (renderer->getRows() <= 2));
+    }
+protected:
+    void internalRender(int currentValue) override;
+};
+
+/**
+ * This method constructs an instance of a liquid crystal renderer.
+ */
+inline MenuRenderer* liquidCrystalRenderer(LiquidCrystal& lcd, uint8_t dimX, uint8_t dimY) {
+    return new LiquidCrystalRenderer(lcd, dimX, dimY);
+}
 
 #endif // _TCMENU_LIQUID_CRYSTAL_H

@@ -19,6 +19,9 @@
 
 #include "tcUtil.h"
 
+#define INFO_LOCATION_PGM true
+#define INFO_LOCATION_RAM false
+
 /** The maxmimum ID that is allowed manually, only automated ID's for back items and similar will exceed this */
 #define MAXIMUM_ID_ALLOWED 32000
 
@@ -206,6 +209,8 @@ enum Flags : uint8_t {
     MENUITEM_PIN_SECURED = 5,
     /** the menu item is visible on the display and remote */
     MENUITEM_PIN_VISIBLE = 6,
+    /** the info structure is in PROGMEM */
+    MENUITEM_INFO_STRUCT_PGM = 7,
     /** indicates that remote 0 needs to resend this item */
 	MENUITEM_REMOTE_SEND0 = 10,
     /** indicates that remote 1 needs to resend this item */
@@ -330,7 +335,7 @@ public:
      * @param sz the buffer space
      * @param size the size of sz, generally obtained using sizeof
      */
-	uint8_t copyNameToBuffer(char* sz, int size) { return copyNameToBuffer(sz, 0, size);}
+	uint8_t copyNameToBuffer(char* sz, int size) const { return copyNameToBuffer(sz, 0, size);}
 
 	/** 
      * Copies the name info the provided buffer starting at the specified 
@@ -339,24 +344,26 @@ public:
      * @param offset the offset to start at relative to the buffer
      * @param size the size of sz, generally obtained using sizeof
      * */
-	uint8_t copyNameToBuffer(char* sz, int offset, int size);
+	uint8_t copyNameToBuffer(char* sz, int offset, int size) const;
 	/** Retrieves the ID from the info block */
-	uint16_t getId();
+	uint16_t getId() const;
 	/** Retrieves the maximum value for this menu type */
-	uint16_t getMaximumValue();
+	uint16_t getMaximumValue() const;
 	/** Retrieves the eeprom storage position for this menu (or 0xffff if not applicable) */
-	uint16_t getEepromPosition();
+	uint16_t getEepromPosition() const;
 	/** returns the menu type as one of the above menu type enumeration */
-	MenuType getMenuType() { return menuType; }
+	MenuType getMenuType() const { return menuType; }
 	/** triggers the event callback associated with this item */
-	void triggerCallback();
+	void triggerCallback() const;
+
+    bool isInfoProgMem() const { return bitRead(flags, MENUITEM_INFO_STRUCT_PGM); }
 
 	/** set the item to be changed, this lets the renderer know it needs painting */
 	void setChanged(bool changed) { bitWrite(flags, MENUITEM_CHANGED, changed); }
 	/** returns the changed state of the item */
-	bool isChanged() { return bitRead(flags, MENUITEM_CHANGED); }
+	bool isChanged() const { return bitRead(flags, MENUITEM_CHANGED); }
 	/** returns if the menu item needs to be sent remotely */
-	bool isSendRemoteNeeded(uint8_t remoteNo);
+	bool isSendRemoteNeeded(uint8_t remoteNo) const;
 	/** Set all the flags indicating that a remote refresh is needed for all remotes */
 	void setSendRemoteNeededAll();
     /** Clears all the flags indicating that a remote send is needed for all remotes. */
@@ -367,42 +374,48 @@ public:
 	/** sets this to be the active item, so that the renderer shows it highlighted */
 	void setActive(bool active) { bitWrite(flags, MENUITEM_ACTIVE, active); setChanged(true); }
 	/** returns the active status of the item */
-	bool isActive() { return bitRead(flags, MENUITEM_ACTIVE); }
+	bool isActive() const { return bitRead(flags, MENUITEM_ACTIVE); }
 
 	/** sets this item as the currently being edited, so that the renderer shows it as being edited */
 	void setEditing(bool active);
 	/** returns true if the status is currently being edited */
-	bool isEditing() { return bitRead(flags, MENUITEM_EDITING); }
+	bool isEditing() const { return bitRead(flags, MENUITEM_EDITING); }
 
 	/** sets this item to be read only, so that the manager will not allow it to be edited */
 	void setReadOnly(bool active) { bitWrite(flags, MENUITEM_READONLY, active); }
 	/** returns true if this item is read only */
-	bool isReadOnly() { return bitRead(flags, MENUITEM_READONLY); }
+	bool isReadOnly() const { return bitRead(flags, MENUITEM_READONLY); }
 
 	/** sets this item to be available only locally */
 	void setLocalOnly(bool localOnly) { bitWrite(flags, MENUITEM_LOCAL_ONLY, localOnly); }
 	/** returns true if this item is only available locally */
-	bool isLocalOnly() { return bitRead(flags, MENUITEM_LOCAL_ONLY); }
+	bool isLocalOnly() const { return bitRead(flags, MENUITEM_LOCAL_ONLY); }
 
 	/** sets this item to need pin security in order to display, currently only available locally */
 	void setSecured(bool secured) { bitWrite(flags, MENUITEM_PIN_SECURED, secured); }
 	/** returns true if this item requires a pin to display, , currently only available locally */
-	bool isSecured() { return bitRead(flags, MENUITEM_PIN_SECURED); }
+	bool isSecured() const { return bitRead(flags, MENUITEM_PIN_SECURED); }
 
 	/** sets this item to need pin security in order to display, currently only available locally */
 	void setVisible(bool visible) { bitWrite(flags, MENUITEM_PIN_VISIBLE, visible); }
 	/** returns true if this item requires a pin to display, , currently only available locally */
-	bool isVisible() { return bitRead(flags, MENUITEM_PIN_VISIBLE); }
+	bool isVisible() const { return bitRead(flags, MENUITEM_PIN_VISIBLE); }
 
     /** gets the next menu (sibling) at this level */
-	MenuItem* getNext() { return next; }
+	MenuItem* getNext() const { return next; }
+	/** sets or changes the menu item that comes after this one, nullptr means this is the last item */
 	void setNext(MenuItem* next) { this->next = next; }
 
+    /**
+     * Marks the menu item as having updated locally and remotely and also calls the callback if not silent
+     */
+    void changeOccurred(bool silent);
 protected:
 	/**
 	 * Do not directly create menu items, always use the leaf classes, such as AnalogMenuItem etc.
 	 */
-	MenuItem(MenuType menuType, const AnyMenuInfo* menuInfo, MenuItem* next);
+	MenuItem(MenuType menuType, const AnyMenuInfo* menuInfo, MenuItem* next, bool infoProgMem);
+
 };
 
 /** 
@@ -414,7 +427,8 @@ protected:
 	uint16_t currentValue;
 
 	/** Use the leaf types, dont construct directly. Initialise an instance of this type with the required data values */
-	ValueMenuItem(MenuType menuType, const AnyMenuInfo* info, uint16_t defaultVal, MenuItem* next = NULL) : MenuItem(menuType, info, next) {
+	ValueMenuItem(MenuType menuType, const AnyMenuInfo* info, uint16_t defaultVal, MenuItem* next, bool infoPgm)
+	        : MenuItem(menuType, info, next, infoPgm) {
 		this->currentValue = defaultVal;
 	}
 public:
@@ -422,7 +436,7 @@ public:
 	void setCurrentValue(uint16_t val, bool silent = false);
 
 	/** gets the current value */
-	uint16_t getCurrentValue() { return currentValue; }
+	uint16_t getCurrentValue() const { return currentValue; }
 };
 
 /**
@@ -469,23 +483,24 @@ public:
 	 * @param defaultVal the default starting value
 	 * @param next the next menu in the chain if there is one, or NULL.
 	 */
-	AnalogMenuItem(const AnalogMenuInfo* info, uint16_t defaultVal, MenuItem* next = NULL) : ValueMenuItem(MENUTYPE_INT_VALUE, (const AnyMenuInfo*)info, defaultVal, next) {;}
+	AnalogMenuItem(const AnalogMenuInfo* info, uint16_t defaultVal, MenuItem* next = nullptr, bool infoInPgm = INFO_LOCATION_PGM)
+	        : ValueMenuItem(MENUTYPE_INT_VALUE, (const AnyMenuInfo*)info, defaultVal, next, infoInPgm) {;}
 
 	/** Returns the offset from the MenuInfo structure */
-	int getOffset() { return get_info_int(&((AnalogMenuInfo*)info)->offset);}
+	int getOffset() const;
 	/** Returns the divisor from the menu info structure */
-	uint16_t getDivisor() { return get_info_uint(&((AnalogMenuInfo*)info)->divisor);}
+	uint16_t getDivisor() const;
 	/** Returns the length of the unit name */
-	int unitNameLength() {return (int) strlen_P(((AnalogMenuInfo*)info)->unitName);}
+	int unitNameLength() const;
 	/** copies the unit name into the provided buffer */
-	void copyUnitToBuffer(char* unitBuff, uint8_t size = 5) { safeProgCpy(unitBuff, ((AnalogMenuInfo*)info)->unitName, size);}
+	void copyUnitToBuffer(char* unitBuff, uint8_t size = 5) const;
 
 	/**
 	 * copies the whole value including unit into the buffer provided.
 	 * @param buffer the buffer to write the value into
 	 * @param bufferSize the size of the buffer
 	 */
-	void copyValue(char* buffer, uint8_t bufferSize);
+	void copyValue(char* buffer, uint8_t bufferSize) const;
 
 
 	/** 
@@ -493,7 +508,7 @@ public:
 	 * not always able to exactly represent a given value and may therefore be slightly out.
 	 * @return the nearest floating point value
 	 */
-	float getAsFloatingPointValue();
+	float getAsFloatingPointValue() const;
 
 	/**
 	 * Sets the menu item's current value to be the value provided in the float.
@@ -506,7 +521,7 @@ public:
 	 * based upon the divisor.
 	 * @return a structure containing the whole and fraction in decimal form
 	 */
-	WholeAndFraction getWholeAndFraction();
+	WholeAndFraction getWholeAndFraction() const;
 
 	/**
 	 * sets the menu based on the decimal whole and decimal fraction part. If decimal is true, the fraction
@@ -518,12 +533,12 @@ public:
 	/**
 	 * @return the number of decimal places needed for the fraction part based on the divisor
 	 */
-	uint8_t getDecimalPlacesForDivisor();
+	uint8_t getDecimalPlacesForDivisor() const;
 
 	/**
 	 * @return the nearest decimal divisor based on the divisor.
 	 */
-	uint16_t getActualDecimalDivisor();
+	uint16_t getActualDecimalDivisor() const;
 };
 
 /**
@@ -541,20 +556,21 @@ public:
 	 * @param defaultVal the default starting value
 	 * @param next the next menu in the chain if there is one, or NULL.
 	 */
-	EnumMenuItem(const EnumMenuInfo *info, uint8_t defaultVal, MenuItem* next = NULL) : ValueMenuItem(MENUTYPE_ENUM_VALUE, (const AnyMenuInfo*)info, defaultVal, next) {;}
+	EnumMenuItem(const EnumMenuInfo *info, uint8_t defaultVal, MenuItem* next = nullptr, bool infoInPgm = INFO_LOCATION_PGM)
+	        : ValueMenuItem(MENUTYPE_ENUM_VALUE, (const AnyMenuInfo*)info, defaultVal, next, infoInPgm) {;}
 
 	/**
 	 * Copies one of the enum strings into a buffer
 	 * @param buffer the buffer to copy into
 	 * @param idx the index of choice to copy
 	 */ 
-	void copyEnumStrToBuffer(char* buffer, int size, int idx);
+	void copyEnumStrToBuffer(char* buffer, int size, int idx) const;
 
 	/**
 	 * Returns the length of an enumeration string with given index
 	 * @param idx the index to get the length for
 	 */
-	int getLengthOfEnumStr(int idx);
+	int getLengthOfEnumStr(int idx) const;
 };
 
 /**
@@ -571,15 +587,16 @@ public:
 	 * @param defaultVal the default starting value
 	 * @param next the next menu in the chain if there is one, or NULL.
 	 */
-	BooleanMenuItem(const BooleanMenuInfo* info, bool defaultVal, MenuItem* next = NULL) : ValueMenuItem(MENUTYPE_BOOLEAN_VALUE, (const AnyMenuInfo*)info, defaultVal, next) {;}
+	BooleanMenuItem(const BooleanMenuInfo* info, bool defaultVal, MenuItem* next = nullptr, bool infoInPgm = INFO_LOCATION_PGM)
+	        : ValueMenuItem(MENUTYPE_BOOLEAN_VALUE, (const AnyMenuInfo*)info, defaultVal, next, infoInPgm) {;}
 
 	/**
 	 * returns the boolean naming for this item, EG: how the value should be rendered 
 	 */
-	BooleanNaming getBooleanNaming() { return (BooleanNaming)get_info_char(&((BooleanMenuInfo*)info)->naming); }
+	BooleanNaming getBooleanNaming() const;
 
 	/** return the boolean value currently stored */
-	bool getBoolean() {return currentValue != 0;}
+	bool getBoolean() const {return currentValue != 0;}
 	/** set the boolean value currently stored */
 	void setBoolean(bool b, bool silent = false) {setCurrentValue(b, silent);}
 };
@@ -599,12 +616,13 @@ public:
 	 * @param info a FloatMenuInfo structure
 	 * @param next the next menu in the chain if there is one, or NULL.
 	 */
-	FloatMenuItem(const FloatMenuInfo* info, MenuItem* next) : MenuItem(MENUTYPE_FLOAT_VALUE, (const AnyMenuInfo*)info, next) { currValue = 0; }
+	FloatMenuItem(const FloatMenuInfo* info, MenuItem* next, bool infoInPgm = INFO_LOCATION_PGM)
+	        : MenuItem(MENUTYPE_FLOAT_VALUE, (const AnyMenuInfo*)info, next, infoInPgm) { currValue = 0; }
 
 	/**
 	 * return the number of decimal places to display for this value
 	 */
-	int getDecimalPlaces() { return get_info_int(&((FloatMenuInfo*)info)->numDecimalPlaces);}
+	int getDecimalPlaces() const;
 
 	/**
 	 * Set the floating point value and mark as changed
@@ -614,7 +632,7 @@ public:
 	/**
 	 * Get the current floating point value
 	 */
-	float getFloatValue() { return currValue; }
+	float getFloatValue() const { return currValue; }
 };
 
 
@@ -631,7 +649,8 @@ public:
 	 * @param info a AnyMenuInfo structure
 	 * @param next the next menu in the chain if there is one, or NULL.
 	 */
-	ActionMenuItem(const AnyMenuInfo* info, MenuItem* next) : MenuItem(MENUTYPE_ACTION_VALUE, info, next) {;}
+	ActionMenuItem(const AnyMenuInfo* info, MenuItem* next, bool infoInProgmem = INFO_LOCATION_PGM)
+	        : MenuItem(MENUTYPE_ACTION_VALUE, info, next, infoInProgmem) {;}
 };
 
 // forward reference
@@ -643,7 +662,7 @@ class RuntimeMenuItem;
  * @param buffer the buffer for the copy
  * @param bufferSize size of the buffer
  */
-void copyMenuItemValue(MenuItem* item, char* buffer, size_t bufferSize);
+void copyMenuItemValue(const MenuItem* item, char* buffer, size_t bufferSize);
 
 /**
  * Copies both the name and textual value representation suitable for display on a device into the buffer safely.
@@ -652,12 +671,12 @@ void copyMenuItemValue(MenuItem* item, char* buffer, size_t bufferSize);
  * @param bufferSize the size of the buffer
  * @param additionalSep optional provide the separator character (use '\0' for no additional separator)
  */
-void copyMenuItemNameAndValue(MenuItem* item, char* buffer, size_t bufferSize, char additionalSep = ':');
+void copyMenuItemNameAndValue(const MenuItem* item, char* buffer, size_t bufferSize, char additionalSep = ':');
 
 /**
  * Any MenuType with an ID less than 100 is editable as an integer
  */
-inline bool isMenuBasedOnValueItem(MenuItem* item) {
+inline bool isMenuBasedOnValueItem(const MenuItem* item) {
 	auto ty =  uint8_t(item->getMenuType());
 	return ty == MENUTYPE_INT_VALUE || ty == MENUTYPE_ENUM_VALUE || ty == MENUTYPE_BOOLEAN_VALUE;
 }
@@ -665,14 +684,14 @@ inline bool isMenuBasedOnValueItem(MenuItem* item) {
 /**
  * returns true if the menu item is an editable runtime item
  */
-inline bool isMenuRuntime(MenuItem* t) {
+inline bool isMenuRuntime(const MenuItem* t) {
 	return (uint8_t(t->getMenuType()) >= uint8_t(MENUTYPE_RUNTIME_VALUE));
 }
 
 /**
  * Returns true if the menu item is a runtime item type. Otherwise returns false.
  */
-inline bool isMenuRuntimeMultiEdit(MenuItem* t) {
+inline bool isMenuRuntimeMultiEdit(const MenuItem* t) {
 	return (uint8_t(t->getMenuType()) >= uint8_t(MENUTYPE_TEXT_VALUE));
 }
 
@@ -681,8 +700,8 @@ inline bool isMenuRuntimeMultiEdit(MenuItem* t) {
  * the above isMenuRuntime() method.
  * @see isMenuRuntime
  */
-inline RuntimeMenuItem* asRuntimeItem(MenuItem* i) {
-	return reinterpret_cast<RuntimeMenuItem*>(i);
+inline const RuntimeMenuItem* asRuntimeItem(const MenuItem* i) {
+	return reinterpret_cast<const RuntimeMenuItem*>(i);
 }
 
 #endif

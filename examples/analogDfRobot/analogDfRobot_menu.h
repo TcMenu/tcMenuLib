@@ -6,43 +6,48 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
-*/
+ */
 
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
 
 #include <Arduino.h>
 #include <tcMenu.h>
-#include <RuntimeMenuItem.h>
+
 #include <LiquidCrystalIO.h>
 #include "tcMenuLiquidCrystal.h"
 #include <DfRobotInputAbstraction.h>
 #include <ScrollChoiceMenuItem.h>
+#include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
 
-void setupMenu();  // forward reference of the menu setup function.
-extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app info to the linker.
+// all define statements needed
+#define UNO_OR_FULL unoLcd
+#define UPDATES_PER_SEC 2
 
-// Global variables that need exporting
-
+// all variables that need exporting
 extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
+
+// all menu item forward references.
+extern AnalogMenuItem menuCommits;
+extern ScrollChoiceMenuItem menuChooseItem;
+extern TextMenuItem menuText;
+extern EditableLargeNumberMenuItem menuLgeNum;
+extern BooleanMenuItem menuL2;
+extern BooleanMenuItem menuL1;
+extern BackMenuItem menuBackLEDStates;
+extern SubMenuItem menuLEDStates;
+extern AnalogMenuItem menuValueA0;
+extern const ConnectorLocalInfo applicationInfo;
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
-// Global Menu Item exports
-
-extern AnalogMenuItem menuCommits;
-int fnChooseItemRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize);
-extern ScrollChoiceMenuItem menuChooseItem;
-extern TextMenuItem menuText;
-extern EditableLargeNumberMenuItem menuLgeNum;
-void CALLBACK_FUNCTION onLed2(int id);
-extern BooleanMenuItem menuL2;
+int fnChooseItemRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
 void CALLBACK_FUNCTION onLed1(int id);
-extern BooleanMenuItem menuL1;
-extern SubMenuItem menuLEDStates;
-extern AnalogMenuItem menuValueA0;
+void CALLBACK_FUNCTION onLed2(int id);
+
+void setupMenu();
 
 #endif // MENU_GENERATED_CODE_H

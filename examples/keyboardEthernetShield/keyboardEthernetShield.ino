@@ -80,7 +80,9 @@ void setup() {
 	//
 	Serial.begin(115200);
 	Wire.begin();
-	menuMgr.setEepromRef(&eeprom);
+    Wire.setClock(400000);
+    lcd.setDelayTime(20);
+    menuMgr.setEepromRef(&eeprom);
 
 	// now we enable authentication using EEPROM authentication. Where the EEPROM is
 	// queried for authentication requests, and any additional pairs are stored there too.

@@ -18,7 +18,7 @@
 #define RANDOM_ID_START 50000
 
 /** For items that dont need to have the same id each time (such as back menu items), we just randomly give them an ID */
-int nextRandomId();
+uint16_t nextRandomId();
 
 /** This is the standard renderering function used for editable text items, for use with TextMenuItem */
 int textItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
@@ -77,22 +77,22 @@ protected:
 	uint8_t noOfParts;
 public:
 	RuntimeMenuItem(MenuType menuType, uint16_t id, RuntimeRenderingFn renderFn, 
-				    uint8_t itemPosition, uint8_t numberOfRows, MenuItem* next = NULL);
+				    uint8_t itemPosition, uint8_t numberOfRows, MenuItem* next = nullptr);
 	
-	void copyValue(char* buffer, int bufferSize) {
-		renderFn(this, itemPosition, RENDERFN_VALUE, buffer, bufferSize);
+	void copyValue(char* buffer, int bufferSize) const {
+		renderFn((RuntimeMenuItem*)this, itemPosition, RENDERFN_VALUE, buffer, bufferSize);
 	}
 
-	void runCallback() { renderFn(this, itemPosition, RENDERFN_INVOKE, NULL, 0); }
-	int getRuntimeId() { return id; }
-	int getRuntimeEeprom() { return renderFn(this, itemPosition, RENDERFN_EEPROM_POS, NULL, 0); }
-	uint8_t getNumberOfParts() { return noOfParts; }
-	void copyRuntimeName(char* buffer, int bufferSize) { renderFn(this, itemPosition, RENDERFN_NAME, buffer, bufferSize); }
+	void runCallback() const { renderFn((RuntimeMenuItem*)this, itemPosition, RENDERFN_INVOKE, nullptr, 0); }
+	int getRuntimeId() const { return id; }
+	int getRuntimeEeprom() const { return renderFn((RuntimeMenuItem*)this, itemPosition, RENDERFN_EEPROM_POS, nullptr, 0); }
+	uint8_t getNumberOfParts() const { return noOfParts; }
+	void copyRuntimeName(char* buffer, int bufferSize) const { renderFn((RuntimeMenuItem*)this, itemPosition, RENDERFN_NAME, buffer, bufferSize); }
 
-    uint8_t getNumberOfRows() { return noOfParts; }
+    uint8_t getNumberOfRows() const { return noOfParts; }
 
     void setNumberOfRows(uint8_t rows) {
-		noOfParts = rows; 
+		noOfParts = rows;
 		setChanged(true); 
 		setSendRemoteNeededAll(); 
 	}
@@ -108,8 +108,6 @@ public:
  * 		SubMenu.getChild() -> Back Menu Item -> Sub Menu Item 1 ...
  */
 class BackMenuItem : public RuntimeMenuItem {
-private:
-	MenuItem* child;
 public:
 	/**
 	 * Create an instance of the class
@@ -161,10 +159,10 @@ public:
     /**
      * return the first child item
      */
-    MenuItem* getChild() { return child; }
+    MenuItem* getChild() const { return child; }
     void setChild(MenuItem* firstChildItem) { this->child = firstChildItem; }
 
-    const char* getNamePGMUnsafe() { return pgmNamePtr; }
+    const char* getNamePGMUnsafe() const { return pgmNamePtr; }
 };
 
 #define LIST_PARENT_ITEM_POS 0xff
@@ -182,111 +180,49 @@ class ListRuntimeMenuItem : public RuntimeMenuItem {
 private:
 	uint8_t activeItem;
 public:
-	ListRuntimeMenuItem(uint16_t id, int numberOfRows, RuntimeRenderingFn renderFn, MenuItem* next = NULL);
+	ListRuntimeMenuItem(uint16_t id, int numberOfRows, RuntimeRenderingFn renderFn, MenuItem* next = nullptr);
 
-	RuntimeMenuItem* getChildItem(int pos) {
-		menuType = MENUTYPE_RUNTIME_LIST;
-		itemPosition = pos;
-		setActive((activeItem - 1) == pos);
-		return this;
-	}
+	RuntimeMenuItem* getChildItem(int pos);
+	RuntimeMenuItem* asParent();
+	RuntimeMenuItem* asBackMenu();
 
-	uint8_t getActiveIndex() { return activeItem; }
-
-	void setActiveIndex(uint8_t idx) { 
-		activeItem = idx; 
-		setChanged(true);
-	}
-
-	RuntimeMenuItem* asParent() { 
-		menuType = MENUTYPE_RUNTIME_LIST;
-		itemPosition = LIST_PARENT_ITEM_POS;
-		return this;
-	}
-
-	RuntimeMenuItem* asBackMenu() {
-		setActive(activeItem == 0);
-		menuType = MENUTYPE_BACK_VALUE;
-		itemPosition = LIST_PARENT_ITEM_POS;
-		return this;
-	}
-
-	bool isActingAsParent() {
-		return itemPosition == LIST_PARENT_ITEM_POS;
-	}
+	bool isActingAsParent() const { return itemPosition == LIST_PARENT_ITEM_POS; }
+    uint8_t getActiveIndex() const { return activeItem; }
+    void setActiveIndex(uint8_t idx) {
+        activeItem = idx;
+        changeOccurred(false);
+    }
 };
 
 /**
  * This menu item allows local editing of anything that can be described as a range of values to be edited with the 
  * spinwheel or emulator. It extends from runtime menu item so has a small footprint in RAM.
  */
-template<class V> class EditableMultiPartMenuItem : public RuntimeMenuItem {
-protected:
-	V data;
+class EditableMultiPartMenuItem : public RuntimeMenuItem {
 public:
-	EditableMultiPartMenuItem(MenuType type, uint16_t id, int numberOfParts, RuntimeRenderingFn renderFn, MenuItem* next = NULL) 
+	EditableMultiPartMenuItem(MenuType type, uint16_t id, int numberOfParts, RuntimeRenderingFn renderFn, MenuItem* next = nullptr)
 			: RuntimeMenuItem(type, id, renderFn, 0, numberOfParts, next) {
 	}
 
-	uint8_t beginMultiEdit() {
-		setEditing(true);
-		itemPosition = 0;
-		return noOfParts;
-	}
+	uint8_t beginMultiEdit();
 
-	int changeEditBy(int amt) {
-		itemPosition += amt;
-		setChanged(true);
-		setSendRemoteNeededAll();
-		return renderFn(this, itemPosition, RENDERFN_GETRANGE, NULL, 0);
-	}
+	int changeEditBy(int amt);
 
-	int previousPart() {
-		if (itemPosition <= 1) {
-			stopMultiEdit();
-			return 0;
-		}
-		return changeEditBy(-1);
-	}
+	int previousPart();
 
-	int nextPart() {
-		if (itemPosition >= noOfParts) {
-			stopMultiEdit();
-			return 0;
-		}
+	int nextPart();
 
-		return changeEditBy(1);
-	}
-
-	int getCurrentRange() {
-		return renderFn(this, itemPosition, RENDERFN_GETRANGE, NULL, 0);
+	int getCurrentRange() const {
+		return renderFn((RuntimeMenuItem*)this, itemPosition, RENDERFN_GETRANGE, NULL, 0);
 	}
 	
-	void stopMultiEdit() {
-		itemPosition = 0xff;
-		setEditing(false);
-		setChanged(true);
-		setSendRemoteNeededAll();
-		runCallback();
+	void stopMultiEdit();
+
+	int getPartValueAsInt() const {
+		return renderFn((RuntimeMenuItem*)this, itemPosition, RENDERFN_GETPART, NULL, 0);
 	}
 
-	int getPartValueAsInt() {
-		return renderFn(this, itemPosition, RENDERFN_GETPART, NULL, 0);
-	}
-
-	bool valueChanged(int newVal) {
-		setChanged(true);
-		setSendRemoteNeededAll();
-
-		uint8_t sz[2];
-		sz[0] = lowByte(newVal);
-		sz[1] = highByte(newVal);
-		bool valueUpdated = renderFn(this, itemPosition, RENDERFN_SET_VALUE, reinterpret_cast<char*>(sz), sizeof(sz));
-		if(valueUpdated) {
-            runCallback();
-        }
-		return valueUpdated;
-	}
+	bool valueChanged(int newVal);
 };
 
 // number of characters in the edit set.
@@ -296,16 +232,12 @@ public:
  * An item that can represent a text value that is held in RAM, and therefore change at runtime. We now manually
  * configure the settings for this menu item in the constructor. This variant gets the name from program memory
  */
-class TextMenuItem : public EditableMultiPartMenuItem<char*> {
+class TextMenuItem : public EditableMultiPartMenuItem {
 private:
+    char* data;
     bool passwordField;
 public:
-    TextMenuItem(RuntimeRenderingFn customRenderFn, uint16_t id, int size, MenuItem* next = NULL)
-		: EditableMultiPartMenuItem(MENUTYPE_TEXT_VALUE, id, size, customRenderFn, next) {
-		data = new char[size];
-		memset(data, 0, size);
-        passwordField = false;
-	}
+    TextMenuItem(RuntimeRenderingFn customRenderFn, uint16_t id, int size, MenuItem* next = nullptr);
 
     void setPasswordField(bool pwd) {
         this->passwordField = pwd;
@@ -318,7 +250,7 @@ public:
 	~TextMenuItem() { delete data; }
 
 	/** get the max length of the text storage */
-	uint8_t textLength() { return noOfParts; }
+	uint8_t textLength() const { return noOfParts; }
 
 	/**
 	 * Copies the text into the internal buffer.
@@ -327,7 +259,7 @@ public:
 	void setTextValue(const char* text, bool silent = false);
 
 	/** returns the text value in the internal buffer */
-	const char* getTextValue() { return data; }
+	const char* getTextValue() const { return data; }
 
 	/**
 	 * Called after the array has been changed to ensure that it is in a good
@@ -350,9 +282,11 @@ int findPositionInEditorSet(char ch);
  * This menu item represents an IP address that can be configured / or just displayed on the device,
  * if it is editable it is edited 
  */
-class IpAddressMenuItem : public EditableMultiPartMenuItem<uint8_t[4]> {
+class IpAddressMenuItem : public EditableMultiPartMenuItem {
+private:
+    uint8_t data[4];
 public:
-    IpAddressMenuItem(RuntimeRenderingFn renderFn, uint16_t id, MenuItem* next = NULL)
+    IpAddressMenuItem(RuntimeRenderingFn renderFn, uint16_t id, MenuItem* next = nullptr)
 		: EditableMultiPartMenuItem(MENUTYPE_IPADDRESS, id, 4, renderFn, next) {
 		setIpAddress(127, 0, 0, 1);
 	}
@@ -363,15 +297,10 @@ public:
 	void setIpAddress(uint8_t p1, uint8_t p2, uint8_t p3, uint8_t p4);
 
 	/** gets the IP address as four separate bytes */
-	uint8_t* getIpAddress() { return data; }
+	uint8_t* getIpAddress() const { return (uint8_t*)data; }
 	
 	/** sets a single part in the address */
-	void setIpPart(uint8_t part, uint8_t newVal) {
-		if (part > 3) return;
-		data[part] = newVal;
-		setChanged(true);
-		setSendRemoteNeededAll();
-	}
+	void setIpPart(uint8_t part, uint8_t newVal);
 };
 
 /**
@@ -421,18 +350,16 @@ struct DateStorage {
  * times in parts, hours, then minutes and so on.  Instances of this class should use the `dateItemRenderFn` for the
  * base rendering.
  */
-class TimeFormattedMenuItem : public EditableMultiPartMenuItem<TimeStorage> {
+class TimeFormattedMenuItem : public EditableMultiPartMenuItem {
 private:
     MultiEditWireType format;
+    TimeStorage data;
 public:
-    TimeFormattedMenuItem(RuntimeRenderingFn renderFn, uint16_t id, MultiEditWireType format, MenuItem* next = NULL)
-		: EditableMultiPartMenuItem(MENUTYPE_TIME, id, format == EDITMODE_TIME_HUNDREDS_24H ? 4 : 3, renderFn, next) {
-		setTime(TimeStorage(12, 0));
-        this->format = format;
-	}
+    TimeFormattedMenuItem(RuntimeRenderingFn renderFn, uint16_t id, MultiEditWireType format, MenuItem* next = nullptr);
+
 
 	/** gets the IP address as four separate bytes */
-	TimeStorage getTime() { return data; }
+	TimeStorage getTime() const { return data; }
     
     /** sets the time */
 	void setTime(TimeStorage newTime) { data = newTime; }
@@ -441,7 +368,7 @@ public:
     void setTimeFromString(const char* time);
 
     /** gets the formatting currently being used. */
-    MultiEditWireType  getFormat() { return format; }	
+    MultiEditWireType  getFormat() const { return format; }
 
     TimeStorage* getUnderlyingData() {return &data;}
 };
@@ -451,10 +378,11 @@ public:
  * class that supports editing dates in parts, days, month and finally years. It has some very basic support for leap
  * years. Instances of this class should use the `dateItemRenderFn` for the base rendering.
  */
-class DateFormattedMenuItem : public EditableMultiPartMenuItem<DateStorage>{
+class DateFormattedMenuItem : public EditableMultiPartMenuItem {
 public:
     enum DateFormatOption { DD_MM_YYYY, MM_DD_YYYY, YYYY_MM_DD };
 private:
+    DateStorage data;
     static char separator;
     static DateFormatOption dateFormatMode;
 public:
@@ -493,7 +421,7 @@ public:
         return dateFormatMode;
     }
 
-    DateStorage getDate() { return data; }
+    DateStorage getDate() const { return data; }
 
     void setDate(DateStorage newDate) { data = newDate; }
 

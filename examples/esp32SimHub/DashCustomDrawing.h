@@ -207,6 +207,8 @@ public:
         titleText[0] = 0;
     }
 
+    DashMenuItem& operator= (const DashMenuItem& other) = default;
+
     DashMenuItem(MenuItem *theItem, Coord topLeft, DashDrawParameters* params, int numCharsInValue, const char* titleOverride)
             : screenLoc(topLeft), titleExtents(0, 0) {
         item = theItem;
@@ -223,7 +225,7 @@ public:
         titleText[sizeof(titleText)-1] = 0; // make sure it's null terminated.
     }
 
-    uint16_t getKey() {
+    uint16_t getKey() const {
         return item != nullptr ? item->getId() : 0;
     }
 
