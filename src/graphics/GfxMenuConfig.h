@@ -6,6 +6,11 @@
 #include "MenuItems.h"
 #include "DrawingPrimitives.h"
 
+/**
+ * @deprecated do not use in new designs use drawing properties instead, may be removed in a future release
+ * @param config the config to be filled in.
+ */
+void prepareDefaultGfxConfig(ColorGfxMenuConfig<void*>* config);
 
 /**
  * @file GfxMenuConfig.h
