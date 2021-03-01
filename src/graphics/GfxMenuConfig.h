@@ -431,22 +431,22 @@ namespace tcgfx {
     /**
      * The default editing icon for approx 100-150 dpi resolution displays
      */
-    extern const unsigned char PROGMEM loResEditingIcon[];
+    extern const uint8_t PROGMEM loResEditingIcon[];
 
     /**
      * The default active icon for approx 100-150 dpi resolution displays
      */
-    extern const unsigned char PROGMEM loResActiveIcon[];
+    extern const uint8_t PROGMEM loResActiveIcon[];
 
     /**
      * The low resolution icon for indicating active status
      */
-    extern const unsigned char PROGMEM defActiveIcon[];
+    extern const uint8_t PROGMEM defActiveIcon[];
 
     /**
      * The low resolution icon for editing status
      */
-    extern const unsigned char PROGMEM defEditingIcon[];
+    extern const uint8_t PROGMEM defEditingIcon[];
 
 } // namespace tcgfx
 
