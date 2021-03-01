@@ -25,6 +25,10 @@ const uint8_t defActiveIcon[] PROGMEM = {
  */
 const uint8_t loResEditingIcon[] PROGMEM = { 0x7c, 0x06, 0x18, 0x18, 0x06, 0x7c };
 
+/**
+ * The low resolution icon for indicating active status
+ */
+const uint8_t loResActiveIcon[] PROGMEM = { 0x20, 0x60, 0xfe, 0xfe, 0x60, 0x20 };
 
 namespace tcgfx {
 
@@ -53,11 +57,6 @@ void prepareDefaultGfxConfig(ColorGfxMenuConfig<void*>* config) {
     config->titleFontMagnification = 4;
     config->itemFontMagnification = 2;
 }
-
-/**
- * The low resolution icon for indicating active status
- */
-const uint8_t loResActiveIcon[] PROGMEM = { 0x20, 0x60, 0xfe, 0xfe, 0x60, 0x20 };
 
 ItemDisplayProperties *ConfigurableItemDisplayPropertiesFactory::configFor(MenuItem *pItem, ItemDisplayProperties::ComponentType compType) {
     // make sure that we never return null, in the worst case, provide a default row for this.
