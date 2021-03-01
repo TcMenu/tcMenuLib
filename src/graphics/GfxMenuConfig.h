@@ -16,12 +16,6 @@
 
 namespace tcgfx {
 
-/**
- * @deprecated do not use in new designs use drawing properties instead, may be removed in a future release
- * @param config the config to be filled in.
- */
-void prepareDefaultGfxConfig(ColorGfxMenuConfig<void*>* config);
-
 #define SPECIAL_ID_EDIT_ICON 0xfffe
 #define SPECIAL_ID_ACTIVE_ICON 0xfffd
 
@@ -54,6 +48,13 @@ void prepareDefaultGfxConfig(ColorGfxMenuConfig<void*>* config);
         uint8_t titleFontMagnification;
         uint8_t itemFontMagnification;
     };
+
+    /**
+     * @deprecated do not use in new designs use drawing properties instead, may be removed in a future release
+     * @param config the config to be filled in.
+     */
+    void prepareDefaultGfxConfig(ColorGfxMenuConfig<void*>* config);
+
 
     /**
     * Provides a platform independent means of identifying where on the screen a particular menu item resides using a
