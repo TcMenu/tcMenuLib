@@ -434,26 +434,26 @@ namespace tcgfx {
         }
     };
 
-    /**
-     * The default editing icon for approx 100-150 dpi resolution displays
-     */
-    extern const uint8_t PROGMEM loResEditingIcon[];
-
-    /**
-     * The default active icon for approx 100-150 dpi resolution displays
-     */
-    extern const uint8_t PROGMEM loResActiveIcon[];
-
-    /**
-     * The low resolution icon for indicating active status
-     */
-    extern const uint8_t PROGMEM defActiveIcon[];
-
-    /**
-     * The low resolution icon for editing status
-     */
-    extern const uint8_t PROGMEM defEditingIcon[];
-
 } // namespace tcgfx
+
+/**
+ * The default editing icon for approx 100-150 dpi resolution displays
+ */
+extern const uint8_t PROGMEM loResEditingIcon[];
+
+/**
+ * The default active icon for approx 100-150 dpi resolution displays
+ */
+extern const uint8_t PROGMEM loResActiveIcon[];
+
+/**
+ * The low resolution icon for indicating active status
+ */
+extern const uint8_t PROGMEM defActiveIcon[];
+
+/**
+ * The low resolution icon for editing status
+ */
+extern const uint8_t PROGMEM defEditingIcon[];
 
 #endif // _GFX_MENU_CONFIG_H_
