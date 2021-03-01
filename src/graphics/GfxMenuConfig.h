@@ -7,12 +7,6 @@
 #include "DrawingPrimitives.h"
 
 /**
- * @deprecated do not use in new designs use drawing properties instead, may be removed in a future release
- * @param config the config to be filled in.
- */
-void prepareDefaultGfxConfig(ColorGfxMenuConfig<void*>* config);
-
-/**
  * @file GfxMenuConfig.h
  * 
  * This file contains the base drawing configuration structures and helper methods for
@@ -21,6 +15,12 @@ void prepareDefaultGfxConfig(ColorGfxMenuConfig<void*>* config);
  */
 
 namespace tcgfx {
+
+/**
+ * @deprecated do not use in new designs use drawing properties instead, may be removed in a future release
+ * @param config the config to be filled in.
+ */
+void prepareDefaultGfxConfig(ColorGfxMenuConfig<void*>* config);
 
 #define SPECIAL_ID_EDIT_ICON 0xfffe
 #define SPECIAL_ID_ACTIVE_ICON 0xfffd
