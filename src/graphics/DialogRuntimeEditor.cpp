@@ -2,24 +2,37 @@
 #include <BaseRenderers.h>
 #include "DialogRuntimeEditor.h"
 
-void onScrollingChanged(int id) {
+DialogMultiPartEditor* DialogMultiPartEditor::theInstance;
 
+void onScrollingChanged(int id) {
+    DialogMultiPartEditor::theInstance->scrollChanged();
 }
 
-void DialogMultiPartEditor::presentAsDialog(BaseDialog *dialog, EditableMultiPartMenuItem* item) {
-    dialog->setButtons(BTNTYPE_OK, BTNTYPE_NONE);
-    char sz[25];
-    strcpy(sz, "Edit ");
-    item->copyNameToBuffer(sz, 5, sizeof sz);
-    dialog->showRam(sz, false, this);
+void DialogMultiPartEditor::startEditing(MenuBasedDialog* dlg, EditableMultiPartMenuItem *item) {
+    dialog = reinterpret_cast<MenuBasedDialog*>(dlg);
+    menuItemBeingEdited = item;
+    dlg->setButtons(BTNTYPE_OK, BTNTYPE_CUSTOM0);
+    dlg->showController(false, this);
+    menuItemBeingEdited->beginMultiEdit();
+    dialogButtonPressed(SECOND_DEFAULT_BUTTON);
+    scrollChanged();
 }
 
 void DialogMultiPartEditor::dialogDismissed(ButtonType buttonType) {
-
+    menuItemBeingEdited = nullptr;
+    dialog = nullptr;
 }
 
 bool DialogMultiPartEditor::dialogButtonPressed(int buttonNum) {
-    return false;
+    if(buttonNum == SECOND_DEFAULT_BUTTON) {
+        auto range = menuItemBeingEdited->nextPart();
+        if(range != 0) {
+            scrollingInfo.maxValue = range;
+            scrollingEditor.setCurrentValue(menuItemBeingEdited->getPartValueAsInt());
+            return false;
+        }
+    }
+    return true;
 }
 
 void DialogMultiPartEditor::copyCustomButtonText(int buttonNumber, char *buffer, size_t bufferSize) {
@@ -28,3 +41,15 @@ void DialogMultiPartEditor::copyCustomButtonText(int buttonNumber, char *buffer,
     }
 }
 
+void DialogMultiPartEditor::initialiseAndGetHeader(BaseDialog* dlg, char *buffer, size_t bufferSize) {
+    dialog->insertMenuItem(&scrollingEditor);
+    strcpy(buffer, "Edit ");
+    menuItemBeingEdited->copyNameToBuffer(buffer, strlen(buffer), bufferSize);
+}
+
+void DialogMultiPartEditor::scrollChanged() {
+    menuItemBeingEdited->valueChanged(scrollingEditor.getCurrentValue());
+    char sz[32];
+    copyMenuItemValue(menuItemBeingEdited, sz, sizeof sz);
+    dialog->copyIntoBuffer(sz);
+}

@@ -5,9 +5,13 @@
 
 #include "MenuTouchScreenEncoder.h"
 #include "ScrollChoiceMenuItem.h"
+#include "../BaseDialog.h"
+#include "DialogRuntimeEditor.h"
 
 using namespace iotouch;
 namespace tcgfx {
+
+DialogMultiPartEditor dialogMultiPartEditor;
 
 MenuResistiveTouchScreen::MenuResistiveTouchScreen(pinid_t xpPin, pinid_t xnPin, pinid_t ypPin, pinid_t ynPin,
                                                    BaseGraphicalRenderer* renderer, BaseResistiveTouchScreen::TouchRotation rotation)
@@ -67,6 +71,14 @@ void MenuTouchScreenEncoder::touched(const TouchNotification &evt) {
             auto held = evt.getTouchState() == HELD;
             if(isTouchActionable(evt.getEntry()->getMenuItem()) && !held) {
                 menuMgr.onMenuSelect(false);
+            }
+            else if(isMenuRuntimeMultiEdit(evt.getEntry()->getMenuItem())) {
+                auto* dlg = renderer->getDialog();
+                if(dlg && !dlg->isInUse()) {
+                    auto* menuDlg = reinterpret_cast<MenuBasedDialog*>(dlg);
+                    auto* multiItem = reinterpret_cast<EditableMultiPartMenuItem*>(evt.getEntry()->getMenuItem());
+                    dialogMultiPartEditor.startEditing(menuDlg, multiItem);
+                }
             }
             else {
                 GridPosition::GridDrawingMode drawingMode = evt.getEntry()->getPosition().getDrawingMode();

@@ -15,15 +15,18 @@
  * Dialogs are a core function of tcMenu, and must be supported on all available platforms.
  */
 
+#define FIRST_DEFAULT_BUTTON 0
+#define SECOND_DEFAULT_BUTTON 1
+#define CUSTOM_DIALOG_BUTTON_START 2
+
 /**
  * The types of button that can be passed to setButton for button 1 and button 2
  */
 enum ButtonType: uint8_t {
-    BTNTYPE_NONE = 0, BTNTYPE_OK, BTNTYPE_ACCEPT, BTNTYPE_CANCEL, BTNTYPE_CLOSE,
+    BTNTYPE_OK, BTNTYPE_ACCEPT, BTNTYPE_CANCEL, BTNTYPE_CLOSE, BTNTYPE_NONE,
     BTNTYPE_CUSTOM0 = 15, BTNTYPE_CUSTOM1, BTNTYPE_CUSTOM2, BTNTYPE_CUSTOM3,
     BTNTYPE_CUSTOM4, BTNTYPE_CUSTOM5, BTNTYPE_CUSTOM6, BTNTYPE_CUSTOM7 };
 
-#define CUSTOM_DIALOG_BUTTON_START BTNTYPE_CUSTOM0
 
 class BaseDialog;
 /**
@@ -53,10 +56,42 @@ typedef void (*CompletedHandlerFn)(ButtonType buttonPressed, void* yourData);
 
 class TagValueRemoteConnector; // forward reference
 
+/**
+ * This class provides a means of controlling a dialog, in terms of what happens when a dialog is presented, when
+ * buttons are pressed, the text that should appear on custom buttons, and also when a dialog is dismissed. You can
+ * add extra menu items to the dialog during initialiseAndGetHeader(), the button grid positioning will make space
+ * for every additional element that you add.
+ */
 class BaseDialogController {
 public:
+    /**
+     * Initialise the dialog and get the text for the header. It is called once during the dialog being shown. If you
+     * need to add extra menu items or buttons, this is the place to add them.
+     * @param dialog the dialog object
+     * @param buffer the buffer to copy the title to
+     * @param bufferSize the size of the buffer
+     */
+
+    virtual void initialiseAndGetHeader(BaseDialog* dialog, char* buffer, size_t bufferSize)=0;
+    /**
+     * Called when the dialog is dismissed, along with with the button type that was pressed
+     * @param buttonType the button type that was pressed
+     */
     virtual void dialogDismissed(ButtonType buttonType)=0;
+
+    /**
+     * Called when a dialog button is pressed, the button number from 0..N not the button type.
+     * @param buttonNum the button number
+     * @return true if the action results in the dialog being dismissed
+     */
     virtual bool dialogButtonPressed(int buttonNum)=0;
+
+    /**
+     * Copy the button text for any custom buttons by their button number
+     * @param buttonNumber the button number
+     * @param buffer the buffer to copy text into
+     * @param bufferSize the size of the buffer
+     */
     virtual void copyCustomButtonText(int buttonNumber, char* buffer, size_t bufferSize)=0;
 };
 
@@ -112,14 +147,10 @@ public:
     /**
      * Create a dialog that takes over the display and presents the header and
      * buffer, the header text is in program memory, with the buttons set up as per `setButtons`
+     *
+     * A valid controller object pointer is mandatory.
      */
-    void show(const char* headerPgm, bool allowRemote, BaseDialogController* completedHandler);
-
-    /**
-     * Create a dialog that takes over the display and presents the header and
-     * buffer, the header text is in RAM, with the buttons set up as per `setButtons`
-     */
-    void showRam(const char* headerRam, bool allowRemote, BaseDialogController* completedHandler);
+    void showController(bool allowRemote, BaseDialogController* controller);
 
     /**
      * You can set an item of data that will be passed to the callback when executed.
@@ -237,6 +268,8 @@ public:
     int getButtonNumber() { return  buttonNumber; }
 };
 
+#define FIRST_USER_BUTTON_NUM 2
+
 /**
  * This is an extended dialog based on MenuItem's that are presented to the user, you can add additional menu items that
  * go after the message text and before the first dialog button. there will always be either one or two buttons below
@@ -249,6 +282,7 @@ private:
     TextMenuItem bufferItem;
     LocalDialogButtonMenuItem btn1Item;
     LocalDialogButtonMenuItem btn2Item;
+    int addedMenuItems;
 public:
     MenuBasedDialog();
     ~MenuBasedDialog() override = default;
@@ -263,6 +297,8 @@ public:
 protected:
     /** not used in this implementation */
     void internalRender(int currentValue) override {}
+
+    void resetDialogFields();
 };
 
 #endif //TCMENU_BASE_DIALOG_H_

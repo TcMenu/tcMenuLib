@@ -33,8 +33,10 @@ const SubMenuInfo PROGMEM minfoConnectivity = { "Connectivity", 12, 0xFFFF, 0, N
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NO_CALLBACK)
 BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuConnectivityIPAddress);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL);
+const AnyMenuInfo PROGMEM minfoStatusShowDialogs = { "Show Dialogs", 20, 0xFFFF, 0, onShowDialogs };
+ActionMenuItem menuStatusShowDialogs(&minfoStatusShowDialogs, NULL);
 const AnalogMenuInfo PROGMEM minfoStatusRightVU = { "Right VU", 16, 0xFFFF, 30000, NO_CALLBACK, -20000, 1000, "dB" };
-AnalogMenuItem menuStatusRightVU(&minfoStatusRightVU, 0, NULL);
+AnalogMenuItem menuStatusRightVU(&minfoStatusRightVU, 0, &menuStatusShowDialogs);
 const AnalogMenuInfo PROGMEM minfoStatusLeftVU = { "Left VU", 15, 0xFFFF, 30000, NO_CALLBACK, -20000, 1000, "dB" };
 AnalogMenuItem menuStatusLeftVU(&minfoStatusLeftVU, 0, &menuStatusRightVU);
 const char enumStrStatusAmpStatus_0[] PROGMEM  = "Warm up";

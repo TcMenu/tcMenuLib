@@ -474,6 +474,7 @@ bool EditableMultiPartMenuItem::valueChanged(int newVal) {
     sz[1] = highByte(newVal);
     bool valueUpdated = renderFn(this, itemPosition, RENDERFN_SET_VALUE, reinterpret_cast<char*>(sz), sizeof(sz));
 
-    changeOccurred(valueUpdated);
+    // we only redraw if either the value has changed, or we are in edit mode, when we always need to draw it on change.
+    if(valueUpdated) changeOccurred(false);
     return valueUpdated;
 }

@@ -6,45 +6,23 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
- */
+*/
 
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
 
 #include <Arduino.h>
 #include <tcMenu.h>
-
+#include <RuntimeMenuItem.h>
 #include "tcMenuAdaFruitGfx.h"
 #include "ESP32TouchKeysAbstraction.h"
 #include "SimhubConnector.h"
-#include <RuntimeMenuItem.h>
 
-// all define statements needed
-#define DISPLAY_VARIABLE gfx
-#define DISPLAY_TYPE Adafruit_ILI9341
-#define DISPLAY_WIDTH 320
-#define DISPLAY_HEIGHT 240
-#define DISPLAY_RESET_PIN 16
-#define DISPLAY_CS_PIN 22
-#define DISPLAY_RS_PIN 17
-#define DISPLAY_DATA_PIN -1
-#define DISPLAY_CLOCK_PIN -1
-#define DISPLAY_ROTATION 1
-#define DISPLAY_TITLE_FONT FreeSans18pt7b
-#define DISPLAY_ITEM_FONT FreeSans9pt7b
-#define UPDATES_PER_SEC 5
-#define SWITCH_THRESHOLD 800
-#define INTERRUPT_SWITCHES true
-#define TP_HIGH_VOLTAGE TOUCH_HVOLT_2V7
-#define TP_LOW_VOLTAGE TOUCH_LVOLT_0V5
-#define TP_ATTENUATION TOUCH_HVOLT_ATTEN_1V
-#define UP_SENSOR 5
-#define DOWN_SENSOR 7
-#define SELECT_SENSOR 6
-#define SERIAL_PORT Serial
-#define STATUS_MENUITEM 3
+void setupMenu();  // forward reference of the menu setup function.
+extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app info to the linker.
 
-// all variables that need exporting
+// Global variables that need exporting
+
 extern Adafruit_ILI9341 gfx;
 extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
@@ -52,27 +30,25 @@ extern const GFXfont FreeSans18pt7b;
 extern const GFXfont FreeSans9pt7b;
 extern ESP32TouchKeysAbstraction esp32Touch;
 
-// all menu item forward references.
+// Callback functions must always include CALLBACK_FUNCTION after the return type
+#define CALLBACK_FUNCTION
+
+// Global Menu Item exports
+
+void CALLBACK_FUNCTION onShowDash(int id);
 extern ActionMenuItem menuShowDashboard;
 extern AnalogMenuItem menuLap;
+void CALLBACK_FUNCTION onDashChanged(int id);
 extern EnumMenuItem menuDashboard;
+void CALLBACK_FUNCTION onShowDialogs(int id);
+extern ActionMenuItem menuSettingsShowDialogs;
 extern AnalogMenuItem menuSettingsTestItem1;
-extern BackMenuItem menuBackSettings;
 extern SubMenuItem menuSettings;
+void CALLBACK_FUNCTION onConnectionChange(int id);
 extern BooleanMenuItem menuSimHubLink;
 extern AnalogMenuItem menuTyreTemp;
 extern TextMenuItem menuGear;
 extern AnalogMenuItem menuRPM;
 extern AnalogMenuItem menuSpeed;
-extern const ConnectorLocalInfo applicationInfo;
-
-// Callback functions must always include CALLBACK_FUNCTION after the return type
-#define CALLBACK_FUNCTION
-
-void CALLBACK_FUNCTION onConnectionChange(int id);
-void CALLBACK_FUNCTION onDashChanged(int id);
-void CALLBACK_FUNCTION onShowDash(int id);
-
-void setupMenu();
 
 #endif // MENU_GENERATED_CODE_H

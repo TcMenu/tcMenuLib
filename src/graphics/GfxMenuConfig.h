@@ -81,13 +81,23 @@ namespace tcgfx {
         };
 
         enum GridJustification : uint8_t {
-            JUSTIFY_TITLE_LEFT_VALUE_RIGHT,
-            JUSTIFY_TITLE_LEFT_WITH_VALUE,
-            JUSTIFY_CENTER_WITH_VALUE,
-            JUSTIFY_RIGHT_WITH_VALUE,
-            JUSTIFY_LEFT_NO_VALUE,
-            JUSTIFY_CENTER_NO_VALUE,
-            JUSTIFY_RIGHT_NO_VALUE
+            CORE_JUSTIFY_LEFT = 1,
+            CORE_JUSTIFY_RIGHT = 2,
+            CORE_JUSTIFY_CENTER = 3,
+
+            CORE_JUSTIFY_VALUE_REQUIRED = 0b1000,
+            CORE_JUSTIFY_NAME_REQUIRED  = 0b0100,
+
+            JUSTIFY_TITLE_LEFT_VALUE_RIGHT = 0,
+            JUSTIFY_TITLE_LEFT_WITH_VALUE = CORE_JUSTIFY_LEFT + CORE_JUSTIFY_NAME_REQUIRED + CORE_JUSTIFY_VALUE_REQUIRED,
+            JUSTIFY_CENTER_WITH_VALUE = CORE_JUSTIFY_CENTER + CORE_JUSTIFY_NAME_REQUIRED + CORE_JUSTIFY_VALUE_REQUIRED,
+            JUSTIFY_RIGHT_WITH_VALUE = CORE_JUSTIFY_RIGHT + CORE_JUSTIFY_NAME_REQUIRED + CORE_JUSTIFY_VALUE_REQUIRED,
+            JUSTIFY_LEFT_NO_VALUE = CORE_JUSTIFY_LEFT + CORE_JUSTIFY_NAME_REQUIRED,
+            JUSTIFY_CENTER_NO_VALUE = CORE_JUSTIFY_CENTER + CORE_JUSTIFY_NAME_REQUIRED,
+            JUSTIFY_RIGHT_NO_VALUE = CORE_JUSTIFY_RIGHT + CORE_JUSTIFY_NAME_REQUIRED,
+            JUSTIFY_LEFT_VALUE_ONLY= CORE_JUSTIFY_LEFT + CORE_JUSTIFY_VALUE_REQUIRED,
+            JUSTIFY_CENTER_VALUE_ONLY = CORE_JUSTIFY_CENTER + CORE_JUSTIFY_VALUE_REQUIRED,
+            JUSTIFY_RIGHT_VALUE_ONLY = CORE_JUSTIFY_RIGHT + CORE_JUSTIFY_VALUE_REQUIRED
         };
     private:
         /** the number of columns in the grid */
@@ -95,7 +105,7 @@ namespace tcgfx {
         /** the position in the columns */
         uint32_t gridPosition: 3;
         /** not yet implemented in any renderers, the number of rows this item takes up. */
-        uint32_t gridRowSpan: 3;
+        uint32_t gridRowSpan: 2;
         /** the height or 0 if not overridden. Between 0..255*/
         uint32_t gridHeight: 9;
         /** the row ordering for the item */
@@ -103,7 +113,7 @@ namespace tcgfx {
         /** the drawing mode that should be used */
         uint32_t drawingMode: 4;
         /** the text justification that should be used */
-        uint32_t justification: 3;
+        uint32_t justification: 4;
     public:
         GridPosition() : gridSize(0), gridPosition(0), gridHeight(0), rowPosition(0), drawingMode(0),
                          justification(JUSTIFY_TITLE_LEFT_VALUE_RIGHT) {}
@@ -144,9 +154,15 @@ namespace tcgfx {
     };
 
     inline bool itemNeedsValue(GridPosition::GridJustification justification) {
-        return (justification == GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE ||
-                justification == GridPosition::JUSTIFY_CENTER_WITH_VALUE ||
-                justification == GridPosition::JUSTIFY_RIGHT_WITH_VALUE);
+        return (justification & GridPosition::CORE_JUSTIFY_VALUE_REQUIRED) != 0;
+    }
+
+    inline bool itemNeedsName(GridPosition::GridJustification justification) {
+        return (justification & GridPosition::CORE_JUSTIFY_NAME_REQUIRED) != 0;
+    }
+
+    inline GridPosition::GridJustification coreJustification(GridPosition::GridJustification j) {
+        return static_cast<GridPosition::GridJustification>(j & 0b11);
     }
 
     /**

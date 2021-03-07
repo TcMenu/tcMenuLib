@@ -102,10 +102,13 @@ void LiquidCrystalRenderer::drawMenuItem(GridPositionRowCacheEntry* entry, Coord
         char sz[20];
         for(uint8_t i = 1; i < (uint8_t)areaSize.x; ++i)  buffer[i] = 32;
         buffer[areaSize.x] = 0;
-        if(itemNeedsValue(entry->getPosition().getJustification())) {
+        bool valueNeeded = itemNeedsValue(entry->getPosition().getJustification());
+        bool nameNeeded = itemNeedsName(entry->getPosition().getJustification());
+        if(nameNeeded && valueNeeded) {
             copyMenuItemNameAndValue(theItem, sz, sizeof sz, 0);
-        }
-        else {
+        } else if(valueNeeded) {
+            copyMenuItemValue(theItem, sz, sizeof sz);
+        } else {
             theItem->copyNameToBuffer(sz, sizeof sz);
         }
         int position = calculateOffset(entry->getPosition().getJustification(), areaSize.x, sz);

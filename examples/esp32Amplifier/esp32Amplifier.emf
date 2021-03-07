@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1612710341,
+    "seconds": 1614930934,
     "nanos": 0
   },
   "codeOptions": {
@@ -327,6 +327,20 @@
         "offset": -20000,
         "divisor": 1000,
         "unitName": "dB"
+      }
+    },
+    {
+      "parentId": 6,
+      "type": "actionMenu",
+      "item": {
+        "name": "Show Dialogs",
+        "eepromAddress": -1,
+        "id": 20,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "onShowDialogs",
+        "variableName": ""
       }
     },
     {

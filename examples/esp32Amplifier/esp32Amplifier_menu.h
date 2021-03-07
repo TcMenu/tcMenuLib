@@ -40,6 +40,8 @@ extern TextMenuItem menuConnectivityPasscode;
 extern TextMenuItem menuConnectivitySSID;
 extern IpAddressMenuItem menuConnectivityIPAddress;
 extern SubMenuItem menuConnectivity;
+void CALLBACK_FUNCTION onShowDialogs(int id);
+extern ActionMenuItem menuStatusShowDialogs;
 extern AnalogMenuItem menuStatusRightVU;
 extern AnalogMenuItem menuStatusLeftVU;
 extern EnumMenuItem menuStatusAmpStatus;

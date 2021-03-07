@@ -123,16 +123,21 @@ void GraphicsDeviceRenderer::internalDrawText(GridPositionRowCacheEntry* pEntry,
     }
     else {
         char sz[32];
-        if(itemNeedsValue(just))
+        bool nameNeeded = itemNeedsName(just);
+        bool valueNeeded = itemNeedsValue(just);
+        if(valueNeeded && nameNeeded) {
             copyMenuItemNameAndValue(pEntry->getMenuItem(), sz, sizeof sz, 0);
-        else
+        } else if(valueNeeded) {
+            copyMenuItemValue(pEntry->getMenuItem(), sz, sizeof sz);
+        } else {
             pEntry->getMenuItem()->copyNameToBuffer(sz, sizeof sz);
+        }
 
         int startPosition = padding.left;
-        if(just == GridPosition::JUSTIFY_RIGHT_WITH_VALUE || just == GridPosition::JUSTIFY_RIGHT_NO_VALUE) {
+        if(coreJustification(just) == GridPosition::CORE_JUSTIFY_RIGHT) {
             startPosition = size.x - (drawable->textExtents(props->getFont(), props->getFontMagnification(), sz).x + padding.right);
         }
-        else if(just == GridPosition::JUSTIFY_CENTER_WITH_VALUE || just == GridPosition::JUSTIFY_CENTER_NO_VALUE) {
+        else if(coreJustification(just) == GridPosition::CORE_JUSTIFY_CENTER) {
             startPosition = ((size.x - drawable->textExtents(props->getFont(), props->getFontMagnification(), sz).x) / 2) + padding.right;
         }
         drawable->setDrawColor(fg);
@@ -162,7 +167,7 @@ int GraphicsDeviceRenderer::drawCoreLineItem(GridPositionRowCacheEntry* entry, D
         drawable->setDrawColor(bgColor);
         drawable->drawBox(where, size, true);
         drawable->setColors(textColor, bgColor);
-        drawable->drawXBitmap(Coord(pad.left, imgMiddleY), icon->getDimensions(),  icon->getIcon(false));
+        drawable->drawXBitmap(Coord(where.x + pad.left, imgMiddleY), icon->getDimensions(),  icon->getIcon(false));
     }
     else {
         drawable->setDrawColor(bgColor);

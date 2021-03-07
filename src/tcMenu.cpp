@@ -190,6 +190,7 @@ void MenuManager::actionOnCurrentItem(MenuItem* toEdit) {
 		else menuMgr.setCurrentMenu(toEdit);
 	}
 	else if (toEdit->getMenuType() == MENUTYPE_BACK_VALUE) {
+	    toEdit->triggerCallback();
 		toEdit->setActive(false);
 		menuMgr.setCurrentMenu(menuMgr.getParentAndReset());
 	}
@@ -326,18 +327,19 @@ void MenuManager::setCurrentEditor(MenuItem * editor) {
 void MenuManager::setCurrentMenu(MenuItem * theItem) {
 	serdebugF2("setCurrentMenu: ", theItem->getId());
 
-	if (renderer->getRendererType() == RENDER_TYPE_NOLOCAL) return;
+    currentFirstRoot = theItem;
+    currentSubMenu = getSubMenuFor(theItem);
+
+    if (renderer->getRendererType() == RENDER_TYPE_NOLOCAL) {
+	    return;
+	}
+
 	auto* baseRenderer = reinterpret_cast<BaseMenuRenderer*>(renderer);
 
 	menuMgr.setCurrentEditor(nullptr);
 
 	getParentAndReset();
-
-	MenuItem* root = theItem;
-	currentFirstRoot = root;
-	currentSubMenu = getSubMenuFor(root);
-
-    root->setActive(true);
+    theItem->setActive(true);
 
     baseRenderer->prepareNewSubmenu();
 }

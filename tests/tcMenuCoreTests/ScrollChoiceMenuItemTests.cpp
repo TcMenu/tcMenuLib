@@ -151,19 +151,19 @@ test(testColorMenuItemNoAlpha) {
     colorItemNoAlpha.copyValue(sz, sizeof sz);
     assertEqual("R[100] G50 B200", sz);
     colorItemNoAlpha.valueChanged(145);
-    assertEqual(originalChangeCount + 1, colorCbCount);
+    assertEqual(originalChangeCount + 2, colorCbCount);
 
     assertEqual(255, colorItemNoAlpha.nextPart());
     colorItemNoAlpha.copyValue(sz, sizeof sz);
     assertEqual("R145 G[50] B200", sz);
     colorItemNoAlpha.valueChanged(222);
-    assertEqual(originalChangeCount + 2, colorCbCount);
+    assertEqual(originalChangeCount + 3, colorCbCount);
 
     assertEqual(255, colorItemNoAlpha.nextPart());
     colorItemNoAlpha.copyValue(sz, sizeof sz);
     assertEqual("R145 G222 B[200]", sz);
     colorItemNoAlpha.valueChanged(1);
-    assertEqual(originalChangeCount + 3, colorCbCount);
+    assertEqual(originalChangeCount + 4, colorCbCount);
 
     assertEqual(0, colorItemNoAlpha.nextPart());
     colorItemNoAlpha.copyValue(sz, sizeof sz);
@@ -194,7 +194,7 @@ test(testColorMenuItemWithAlphaAndFn) {
     colorItemWithAlpha.copyValue(sz, sizeof sz);
     assertEqual("R100 G50 B200 A[150]", sz);
     colorItemWithAlpha.valueChanged(225);
-    assertEqual(originalChangeCount + 1, colorCbCount);
+    assertEqual(originalChangeCount + 2, colorCbCount);
 
     assertEqual(0, colorItemWithAlpha.nextPart());
     colorItemWithAlpha.copyValue(sz, sizeof sz);

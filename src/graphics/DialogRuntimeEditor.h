@@ -20,22 +20,31 @@ void onScrollingChanged(int id);
 
 class DialogMultiPartEditor : BaseDialogController {
 private:
+    MenuBasedDialog *dialog;
+    EditableMultiPartMenuItem* menuItemBeingEdited;
     AnalogMenuInfo scrollingInfo = {"Item Value", nextRandomId(), 0xffff, 1, onScrollingChanged, 0, 1, "" };
     AnalogMenuItem scrollingEditor = AnalogMenuItem(&scrollingInfo, 0, nullptr, INFO_LOCATION_RAM);
 
 public:
-    DialogMultiPartEditor() = default;
+    static DialogMultiPartEditor* theInstance;
 
-private:
+    DialogMultiPartEditor() {
+        theInstance = this;
+        menuItemBeingEdited = nullptr;
+        dialog = nullptr;
+    };
+
+    void startEditing(MenuBasedDialog* dlg, EditableMultiPartMenuItem* item);
+
+    void scrollChanged();
+
     void dialogDismissed(ButtonType buttonType) override;
 
     bool dialogButtonPressed(int buttonNum) override;
 
     void copyCustomButtonText(int buttonNumber, char *buffer, size_t bufferSize) override;
 
-public:
-
-    void presentAsDialog(BaseDialog* dialog, EditableMultiPartMenuItem* item);
+    void initialiseAndGetHeader(BaseDialog* dialog, char* buffer, size_t bufferSize) override;
 };
 
 #endif //TCMENU_DIALOGRUNTIMEEDITOR_H

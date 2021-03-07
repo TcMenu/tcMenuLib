@@ -117,6 +117,8 @@ test(testSubAndItemSelectionPropertiesFactory) {
     ConfigurableItemDisplayPropertiesFactory factory;
     populatePropsWithDefaults(factory);
 
+    menuMgr.setCurrentMenu(menuSub.getChild());
+
     // using the submenu level settings because it is in menuSub, with no item level override.
     auto* config = factory.configFor(&menuIpAddr, ItemDisplayProperties::COMPTYPE_ITEM);
     assertTrue(checkPropertiesBasics(config, "override sub", pointer1, 3, palette3[1], palette3[0], 10, 60, GridPosition::JUSTIFY_CENTER_NO_VALUE));
@@ -472,7 +474,7 @@ test(testScrollingWithMoreThanOneItemOnRow) {
     renderer.resetCommandStates();
     renderer.getMenuItemRecordings().clear();
     renderer.exec();
-    assertTrue(renderer.checkCommands(true, true, true));
+    assertTrue(renderer.checkCommands(false, true, true));
     assertEqual((bsize_t)0, renderer.getWidgetRecordings().count());
     assertEqual((bsize_t)5, renderer.getMenuItemRecordings().count());
 

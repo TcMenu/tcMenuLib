@@ -17,6 +17,7 @@ const char buttonOK[] PROGMEM = "ok";
 const char buttonCancel[] PROGMEM = "cancel";
 const char buttonClose[] PROGMEM = "close";
 const char buttonAccept[] PROGMEM = "accept";
+const char* standardDialogButton[] = { buttonOK, buttonAccept, buttonCancel, buttonClose };
 
 BaseDialog::BaseDialog() : header{0}, headerPgm(nullptr) {
     flags = 0;
@@ -42,20 +43,16 @@ void BaseDialog::showRam(const char* headerRam, bool allowRemote, CompletedHandl
     internalShow(allowRemote);
 }
 
-void BaseDialog::show(const char* headerPgm, bool allowRemote, BaseDialogController* dialogController) {
-    this->headerPgm = headerPgm;
-    bitSet(flags, DLG_FLAG_USING_OO_CONTROLLER);
-    this->controller = dialogController;
-    safeProgCpy(this->header, headerPgm, sizeof(this->header));
-    internalShow(allowRemote);
-}
-
-void BaseDialog::showRam(const char* headerRam, bool allowRemote, BaseDialogController* dialogController) {
+void BaseDialog::showController(bool allowRemote, BaseDialogController* dialogController) {
+    if(dialogController == nullptr) {
+        serdebugF("Dialog controller was null, not showing");
+        return;
+    }
     this->headerPgm = nullptr;
     bitSet(flags, DLG_FLAG_USING_OO_CONTROLLER);
     this->controller = dialogController;
-    strncpy(this->header, headerRam, sizeof(this->header));
-    this->header[sizeof(this->header) - 1] = 0;
+    controller->initialiseAndGetHeader(this, header, sizeof(header));
+    this->header[sizeof(header) - 1] = 0;
     internalShow(allowRemote);
 }
 
@@ -102,12 +99,18 @@ void BaseDialog::actionPerformed(int btnNum) {
     bool canDismiss = true;
     if(controller && isUsingOOController()) canDismiss = controller->dialogButtonPressed(btnNum);
 
-    if(btnNum < CUSTOM_DIALOG_BUTTON_START && canDismiss) {
+    if(canDismiss) {
         // must be done before hide, which resets the encoder
         ButtonType btn = findActiveBtn(btnNum);
         serdebugF2("User clicked button: ", btn);
         hide();
-        if (completedHandler) completedHandler(btn, userData);
+        if (completedHandler) {
+            if(isUsingOOController()) {
+                controller->dialogDismissed(btn);
+            } else {
+                completedHandler(btn, userData);
+            }
+        }
     }
 }
 
@@ -130,32 +133,24 @@ void BaseDialog::dialogRendering(unsigned int currentValue, bool userClicked) {
 }
 
 bool BaseDialog::copyButtonText(char* data, int buttonNum, int currentValue, bool sel) {
-    if(buttonNum > 1) {
-        data[0]=0;
-        if(controller) controller->copyCustomButtonText(buttonNum, data, 14);
+    data[0]=0;
+    if(controller && buttonNum > 1) {
+        controller->copyCustomButtonText(buttonNum, data, 14);
+    }
+    else if(controller && ((buttonNum == 0 && button1 >= BTNTYPE_CUSTOM0) || (buttonNum == 1 && button2 >= BTNTYPE_CUSTOM0))) {
+        controller->copyCustomButtonText(buttonNum, data, 14);
     }
     else {
-        const char *tx;
         uint8_t bt = (buttonNum == 0) ? button1 : button2;
-        switch (bt) {
-            case BTNTYPE_ACCEPT:
-                tx = buttonAccept;
-                break;
-            case BTNTYPE_CANCEL:
-                tx = buttonCancel;
-                break;
-            case BTNTYPE_CLOSE:
-                tx = buttonClose;
-                break;
-            case BTNTYPE_OK:
-            default:
-                tx = buttonOK;
-                break;
+        if(bt < BTNTYPE_NONE) {
+            strcpy_P(data, standardDialogButton[bt]);
         }
-        strcpy_P(data, tx);
     }
 
-    if((button1 == BTNTYPE_NONE || button2 == BTNTYPE_NONE) || sel) {
+    if(currentValue == -1) {
+        if(data[0]) data[0] = toUpperCase(data[0]);
+    }
+    else if((button1 == BTNTYPE_NONE || button2 == BTNTYPE_NONE) || sel) {
         while(*data) {
             *data = toupper(*data);
             ++data;
@@ -201,7 +196,12 @@ void BaseDialog::encodeMessage(TagValueRemoteConnector* remote) {
 void BaseDialog::remoteAction(ButtonType btn) {
     serdebugF2("Remote clicked button: ", btn);
     hide();
-    if(completedHandler) completedHandler(btn, userData);
+    if(completedHandler) {
+        if(isUsingOOController())
+            controller->dialogDismissed(btn);
+        else
+            completedHandler(btn, userData);
+    }
 }
 
 //
@@ -235,7 +235,7 @@ int dialogButtonRenderFn(RuntimeMenuItem* item, uint8_t /*row*/, RenderFnMode mo
             dlg->actionPerformed(btnItem->getButtonNumber());
             return true;
         case RENDERFN_NAME:
-            dlg->copyButtonText(buffer, btnItem->getButtonNumber(), btnItem->isActive());
+            dlg->copyButtonText(buffer, btnItem->getButtonNumber(), -1);
             return true;
         case RENDERFN_EEPROM_POS:
             return -1;
@@ -254,9 +254,10 @@ MenuBasedDialog::MenuBasedDialog() :
         btn1Item(dialogButtonRenderFn, nextRandomId(), 0, nullptr),
         btn2Item(dialogButtonRenderFn, nextRandomId(), 1, nullptr) {
     flags = 0;
+    addedMenuItems = 0;
     bitWrite(flags, DLG_FLAG_SMALLDISPLAY, false);
     bitWrite(flags, DLG_FLAG_MENUITEM_BASED, true);
-    bufferItem.setReadOnly(true);
+    resetDialogFields();
 }
 
 void MenuBasedDialog::copyIntoBuffer(const char *sz) {
@@ -264,20 +265,20 @@ void MenuBasedDialog::copyIntoBuffer(const char *sz) {
 }
 
 void MenuBasedDialog::internalSetVisible(bool visible) {
+    BaseDialog::internalSetVisible(visible);
+
     bitWrite(flags, DLG_FLAG_NEEDS_RENDERING, false);
     if(visible) {
         auto* renderer =  reinterpret_cast<BaseGraphicalRenderer*>(MenuRenderer::getInstance());
         auto& factory = static_cast<ConfigurableItemDisplayPropertiesFactory&>(renderer->getDisplayPropertiesFactory());
 
-        backItem.setNext(&bufferItem);
-        bufferItem.setNext(&btn1Item);
-        btn1Item.setNext(&btn2Item);
-
         btn1Item.setVisible(button1 != BTNTYPE_NONE);
         btn2Item.setVisible(button2 != BTNTYPE_NONE);
 
-        factory.addGridPosition(&btn1Item, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_CENTER_NO_VALUE, 2, 1, 2, 0));
-        factory.addGridPosition(&btn1Item, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_CENTER_NO_VALUE, 2, 2, 2, 0));
+        auto row = 2 + addedMenuItems;
+        factory.addGridPosition(&btn1Item, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_LEFT_NO_VALUE, 2, 1, row, 0));
+        factory.addGridPosition(&btn2Item, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_RIGHT_NO_VALUE, 2, 2, row, 0));
+        factory.addGridPosition(&bufferItem, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_LEFT_VALUE_ONLY, 1, 0));
 
         MenuItem* pItem = &backItem;
         while(pItem) {
@@ -289,17 +290,29 @@ void MenuBasedDialog::internalSetVisible(bool visible) {
 
         menuMgr.setCurrentMenu(&backItem);
     }
-    else menuMgr.setCurrentMenu(menuMgr.getRoot());
+    else {
+        resetDialogFields();
+        menuMgr.setCurrentMenu(menuMgr.getRoot());
+    }
 }
 
 void MenuBasedDialog::insertMenuItem(MenuItem* item) {
     if(!item) return;
 
     item->setNext(bufferItem.getNext());
+    addedMenuItems++;
     bufferItem.setNext(item);
 }
 
 void MenuBasedDialog::copyHeader(char *buffer, int bufferSize) {
     strncpy(buffer, header, bufferSize);
     buffer[bufferSize - 1] = 0;
+}
+
+void MenuBasedDialog::resetDialogFields() {
+    backItem.setNext(&bufferItem);
+    bufferItem.setNext(&btn1Item);
+    bufferItem.setReadOnly(true);
+    btn1Item.setNext(&btn2Item);
+    addedMenuItems = 0;
 }

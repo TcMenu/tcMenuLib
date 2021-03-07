@@ -17,7 +17,6 @@ void ESP32TouchKeysAbstraction::attachInterrupt(pinid_t pin, RawIntHandler inter
 }
 
 uint8_t ESP32TouchKeysAbstraction::readValue(pinid_t pin) {
-    serdebugF2("Attempt read", pin);
     if(!allOk) return 0;
 
     ensureInterruptRegistered();

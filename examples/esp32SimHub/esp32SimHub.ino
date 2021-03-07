@@ -207,5 +207,61 @@ void CALLBACK_FUNCTION onShowDash(int id) {
     renderer.takeOverDisplay();
 }
 
+const char dlgHeaderPgm[] PROGMEM = "Dialog Header Pgm";
 
+class MyDialogController : public BaseDialogController, public Executable {
+private:
+    MenuBasedDialog* dialog;
+    taskid_t repeatingTaskId;
+public:
+    void starting(MenuBasedDialog* dlg) {
+        dialog = dlg;
+        repeatingTaskId = taskManager.scheduleFixedRate(200, this);
+    }
 
+    void exec() override {
+        char sz[20];
+        strcpy(sz,"rand=");
+        fastltoa(sz, rand() % 1000, 3, '0', sizeof sz);
+        dialog->copyIntoBuffer(sz);
+    }
+
+    void initialiseAndGetHeader(BaseDialog* dlg, char* buffer, size_t bufferSize) override {
+        strcpy(buffer, "OO header");
+    }
+
+    void dialogDismissed(ButtonType buttonType) override {
+        taskManager.cancelTask(repeatingTaskId);
+        if(buttonType == BTNTYPE_OK) {
+            dialog->setButtons(BTNTYPE_NONE, BTNTYPE_CANCEL);
+            dialog->show(dlgHeaderPgm, false, nullptr);
+            dialog->copyIntoBuffer("hello world");
+        }
+    }
+
+    bool dialogButtonPressed(int buttonNum) override {
+        serdebugF2("dialog button press ", buttonNum);
+        return true;
+    }
+
+    void copyCustomButtonText(int buttonNumber, char *buffer, size_t bufferSize) override {
+        switch (buttonNumber) {
+            case SECOND_DEFAULT_BUTTON:
+                strncpy(buffer, "Next", bufferSize);
+                break;
+            default:
+                buffer[0]=0;
+                break;
+        }
+    }
+} dialogController;
+
+void CALLBACK_FUNCTION onShowDialogs(int id) {
+    auto* dlg = renderer.getDialog();
+    if(dlg && !dlg->isInUse()) {
+        dlg->setButtons(BTNTYPE_OK, BTNTYPE_CUSTOM0);
+        dialogController.starting((MenuBasedDialog*)dlg);
+        dlg->showController(false, &dialogController);
+        dlg->copyIntoBuffer("text 1");
+    }
+}

@@ -155,6 +155,11 @@ void CALLBACK_FUNCTION onMuteSound(int id) {
     controller.onMute(menuMute.getBoolean());
 }
 
-
-
-
+void CALLBACK_FUNCTION onShowDialogs(int id) {
+    auto* dlg = renderer.getDialog();
+    if(dlg && !dlg->isInUse()) {
+        dlg->setButtons(BTNTYPE_OK, BTNTYPE_CANCEL);
+        dlg->showRam("Hello RAM dialog", false);
+        dlg->copyIntoBuffer("some more text");
+    }
+}
