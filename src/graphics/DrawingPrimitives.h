@@ -13,23 +13,28 @@
 namespace tcgfx {
 
 /**
- * this macro creates an RGB color based on R, G, B values between 0 and 255
- * regardless of actual color space available.
- */
-#define RGB(r, g, b) (uint16_t)( (((r)>>3)<<11) | (((g)>>2)<<5) | ((b)>>3) )
-
-/**
  * Represents no mask
  */
 #define DRAW_NO_MASK 0xffff
 
 
+#ifdef NEED_32BIT_COLOR_T_ALPHA
+    /**
+     * Defines a basic color type that can be used with RGB() macro
+     * regardless of the color depth.
+     */
+    typedef uint32_t color_t;
+/** this macro creates an RGB color based on R, G, B values between 0 and 255 */
+#define RGB(r, g, b) (uint32_t)( 0xff000000UL | ((r)<<16UL) | ((g)<<8UL) | (b) )
+#else
     /**
      * Defines a basic color type that can be used with RGB() macro
      * regardless of the color depth.
      */
     typedef uint16_t color_t;
-
+/** this macro creates an RGB color based on R, G, B values between 0 and 255 */
+#define RGB(r, g, b) (uint16_t)( (((r)>>3)<<11) | (((g)>>2)<<5) | ((b)>>3) )
+#endif
     /**
      * Defines padding for menu rendering when using the standard AdaGfx renderer. Each
      * position can hold the value 0..15

@@ -148,7 +148,7 @@ bool BaseDialog::copyButtonText(char* data, int buttonNum, int currentValue, boo
     }
 
     if(currentValue == -1) {
-        if(data[0]) data[0] = toUpperCase(data[0]);
+        if(data[0]) data[0] = toupper(data[0]);
     }
     else if((button1 == BTNTYPE_NONE || button2 == BTNTYPE_NONE) || sel) {
         while(*data) {

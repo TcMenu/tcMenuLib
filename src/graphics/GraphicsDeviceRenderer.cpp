@@ -211,7 +211,6 @@ void GraphicsDeviceRenderer::drawTextualItem(GridPositionRowCacheEntry* pEntry, 
     auto* icon = propertiesFactory.iconForMenuItem(pEntry->getMenuItem()->isEditing() ? SPECIAL_ID_EDIT_ICON :SPECIAL_ID_ACTIVE_ICON);
     int iconOffset = (icon) ? icon->getDimensions().x + padding.left : 0;
     drawCoreLineItem(pEntry, icon, where, size);
-
     internalDrawText(pEntry, Coord(where.x + iconOffset, where.y), Coord(size.x - iconOffset, size.y));
 }
 
