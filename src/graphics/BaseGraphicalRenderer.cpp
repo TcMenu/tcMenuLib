@@ -67,18 +67,11 @@ void setTitlePressedCallback(MenuCallbackFn cb) {
 }
 
 void BaseGraphicalRenderer::render() {
+    checkIfRootHasChanged();
+    if(itemOrderByRow.count() == 0) return; // can't draw in this case.
+
     uint8_t locRedrawMode = redrawMode;
     redrawMode = MENUDRAW_NO_CHANGE;
-
-    // if the root menu rootItem has changed then it's a complete re-draw and we need to calculate the orders again.
-    MenuItem* rootItem = menuMgr.getCurrentMenu();
-    if(currentRootMenu != rootItem)
-    {
-        serdebugF("root has changed");
-        currentRootMenu = rootItem;
-        locRedrawMode = MENUDRAW_COMPLETE_REDRAW;
-        recalculateDisplayOrder(rootItem, false);
-    }
 
     drawingCommand(DRAW_COMMAND_START);
 
@@ -92,6 +85,8 @@ void BaseGraphicalRenderer::render() {
 
     bool forceDrawWidgets = false;
 
+    // if the root menu rootItem has changed then it's a complete re-draw and we need to calculate the orders again.
+    MenuItem* rootItem = menuMgr.getCurrentMenu();
     if (menuMgr.getCurrentMenu()->getMenuType() == MENUTYPE_RUNTIME_LIST ) {
         if (rootItem->isChanged() || locRedrawMode != MENUDRAW_NO_CHANGE) {
             renderList();
@@ -108,13 +103,14 @@ void BaseGraphicalRenderer::render() {
         bool drawCompleteScreen = locRedrawMode != MENUDRAW_NO_CHANGE;
         uint16_t startY = 0;
 
-        if(titleMode == TITLE_ALWAYS && itemOrderByRow.count() > 0) {
+        if(titleMode == TITLE_ALWAYS && (drawCompleteScreen  || itemOrderByRow.itemAtIndex(0)->getMenuItem()->isChanged())) {
             startRow++;
             startY = heightOfRow(0, 1);
             adjustedHeight -= startY;
             totalHeight -= startY;
             auto* pEntry = itemOrderByRow.itemAtIndex(0);
             drawMenuItem(pEntry, Coord(0,0), Coord(width, startY), drawCompleteScreen);
+            forceDrawWidgets = true;
         }
 
         while (totalHeight > adjustedHeight) {
@@ -131,7 +127,7 @@ void BaseGraphicalRenderer::render() {
         lastOffset = startRow;
 
         // and then we start drawing items until we run out of screen or items
-        forceDrawWidgets = drawTheMenuItems(startRow, startY, drawCompleteScreen);
+        if(drawTheMenuItems(startRow, startY, drawCompleteScreen)) forceDrawWidgets = true;
         titleOnDisplay = (titleMode == TITLE_FIRST_ROW && startRow == 0) || titleMode == TITLE_ALWAYS;
     }
 
@@ -286,6 +282,17 @@ GridPosition::GridDrawingMode modeFromItem(MenuItem* item, bool useSlider) {
     }
 }
 
+void BaseGraphicalRenderer::checkIfRootHasChanged() {
+    auto* rootItem = menuMgr.getCurrentMenu();
+    if(currentRootMenu != rootItem)
+    {
+        serdebugF("root has changed");
+        currentRootMenu = rootItem;
+        redrawMode = MENUDRAW_COMPLETE_REDRAW;
+        recalculateDisplayOrder(rootItem, false);
+    }
+}
+
 void BaseGraphicalRenderer::recalculateDisplayOrder(MenuItem *root, bool safeMode) {
     serdebugF2("Recalculate display order, safe=", safeMode);
 
@@ -332,28 +339,8 @@ void BaseGraphicalRenderer::recalculateDisplayOrder(MenuItem *root, bool safeMod
     if(areRowsOutOfOrder() && !safeMode) {
         recalculateDisplayOrder(root, true);
     }
-
-    int activeIndex = activateFirstAppropriateItem();
-    menuMgr.setItemsInCurrentMenu(itemOrderByRow.count() - 1, activeIndex);
 }
 
-int BaseGraphicalRenderer::activateFirstAppropriateItem() {
-    if(itemOrderByRow.count() == 0) return 0;
-    int index = 0;
-    bool selectedYet = false;
-    for(bsize_t i=0; i<itemOrderByRow.count(); i++) {
-        auto* entry = itemOrderByRow.itemAtIndex(i);
-        bool skip = i < 3 && (entry->getMenuItem()->isReadOnly() || entry->getPosition().getDrawingMode() == GridPosition::DRAW_TITLE_ITEM);
-        if(!skip && !selectedYet) {
-            entry->getMenuItem()->setActive(true);
-            selectedYet = true;
-            index = i;
-        }
-        else entry->getMenuItem()->setActive(false);
-    }
-
-    return index;
-}
 
 bool BaseGraphicalRenderer::areRowsOutOfOrder() {
     int lastSequence = 0;
@@ -373,17 +360,17 @@ void BaseGraphicalRenderer::redrawAllWidgets(bool forceRedraw) {
     if(!titleOnDisplay || itemOrderByRow.count() == 0) return;
     if(itemOrderByRow.itemAtIndex(0)->getPosition().getDrawingMode() != GridPosition::DRAW_TITLE_ITEM) return;
 
-    auto widFg = itemOrderByRow.itemAtIndex(0)->getDisplayProperties()->getColor(ItemDisplayProperties::HIGHLIGHT1);
-    auto widBg = itemOrderByRow.itemAtIndex(0)->getDisplayProperties()->getColor(ItemDisplayProperties::BACKGROUND);
+    auto* displayProps = itemOrderByRow.itemAtIndex(0)->getDisplayProperties();
+    auto widFg = displayProps->getColor(ItemDisplayProperties::HIGHLIGHT1);
+    auto widBg = displayProps->getColor(ItemDisplayProperties::BACKGROUND);
 
     auto* widget = this->firstWidget;
     int widgetRight = width;
     while(widget) {
-        auto* myProps = getDisplayPropertiesFactory().configFor(nullptr, ItemDisplayProperties::COMPTYPE_TITLE);
-        widgetRight = widgetRight - (myProps->getPadding().right + widget->getWidth());
+        widgetRight = widgetRight - (displayProps->getPadding().right + widget->getWidth());
         if(widget->isChanged() || forceRedraw) {
             widget->setChanged(false);
-            drawWidget(Coord(widgetRight, myProps->getPadding().top), widget, widFg, widBg);
+            drawWidget(Coord(widgetRight, displayProps->getPadding().top), widget, widFg, widBg);
         }
         widget = widget->getNext();
     }
@@ -409,7 +396,13 @@ int BaseGraphicalRenderer::calculateHeightTo(int index, MenuItem *pItem) {
     return totalY;
 }
 
+int BaseGraphicalRenderer::getTotalItemsInMenu() {
+    checkIfRootHasChanged();
+    return itemOrderByRow.count();
+}
+
 int BaseGraphicalRenderer::findActiveItem() {
+    checkIfRootHasChanged();
     for(bsize_t i=0;i<itemOrderByRow.count();i++) {
         auto* possibleActive = itemOrderByRow.itemAtIndex(i);
         if(possibleActive->getMenuItem()->isActive()) return possibleActive->getPosition().getRow();
@@ -418,6 +411,7 @@ int BaseGraphicalRenderer::findActiveItem() {
 }
 
 MenuItem *BaseGraphicalRenderer::getMenuItemAtIndex(uint16_t idx) {
+    checkIfRootHasChanged();
     if(idx >= itemOrderByRow.count()) return menuMgr.getRoot();
     return itemOrderByRow.itemAtIndex(idx)->getMenuItem();
 }

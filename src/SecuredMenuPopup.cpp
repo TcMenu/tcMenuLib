@@ -48,7 +48,7 @@ int secPopupActionRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode
 	case RENDERFN_INVOKE:
 		if(act->getSecuredItem() != NULL) {
 			if (menuMgr.secureMenuInstance()->doesPinMatch()) {
-				menuMgr.setCurrentMenu(act->getSecuredItem()->getChild());
+				menuMgr.navigateToMenu(act->getSecuredItem()->getChild());
 			}
 			else {
 				BaseDialog* dlg = menuMgr.getRenderer()->getDialog();
@@ -57,11 +57,11 @@ int secPopupActionRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode
 				act->getSecuredItem()->copyNameToBuffer(sz, sizeof(sz));
 				dlg->show(pgmHeaderNotAuth, false);
 				dlg->copyIntoBuffer(sz);
-				menuMgr.setCurrentMenu(menuMgr.getRoot());
+				menuMgr.resetMenu(false);
 			}
 		}
 		else {
-			menuMgr.setCurrentMenu(menuMgr.getRoot());
+			menuMgr.resetMenu(false);
 		}
 		return true;
 	default:

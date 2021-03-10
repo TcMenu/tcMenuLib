@@ -486,9 +486,6 @@ void TagValueRemoteConnector::encodeMultiEditMenu(int parentId, RuntimeMenuItem*
 void writeFloatValueToTransport(TagValueTransport* transport, FloatMenuItem* item) {
 	char sz[20];
 	sz[0]=0;
-	ltoaClrBuff(sz, (long)item->getFloatValue(), 10, NOT_PADDED, sizeof sz);
-	appendChar(sz, '.', sizeof sz);
-	
 	fastftoa(sz, item->getFloatValue(), item->getDecimalPlaces(), sizeof sz);
 	transport->writeField(FIELD_CURRENT_VAL, sz);
 }

@@ -51,7 +51,7 @@ void BaseMenuRenderer::initialise() {
 	renderCallback = NULL;
 	redrawMode = MENUDRAW_COMPLETE_REDRAW;
 
-    menuMgr.setCurrentMenu(menuMgr.getRoot());
+    menuMgr.changeMenu();
 
     if(updatesPerSecond == 0) updatesPerSecond = TC_DISPLAY_UPDATES_PER_SECOND;
     int refreshInterval = 1000 / updatesPerSecond;
@@ -96,7 +96,7 @@ void BaseMenuRenderer::exec() {
 
 void BaseMenuRenderer::resetToDefault() {
     serdebugF2("Display reset - timeout ticks: ", resetValInTicks);
-	menuMgr.setCurrentMenu(menuMgr.getRoot());
+	menuMgr.resetMenu(true);
 	ticksToReset = MAX_TICKS;
 
     // once the menu has been reset, if the reset callback is present
@@ -151,25 +151,8 @@ void BaseMenuRenderer::giveBackDisplay() {
 	renderFnPressType = RPRESS_NONE;
 	renderCallback = nullptr;
 	displayTakenMode = NOT_TAKEN_OVER;
-	menuMgr.setCurrentMenu(menuMgr.getRoot());
+	menuMgr.changeMenu();
 	menuAltered();
-}
-
-void BaseMenuRenderer::prepareNewSubmenu() {
-	menuMgr.getParentAndReset();
-
-	if (menuMgr.getCurrentMenu()->getMenuType() == MENUTYPE_RUNTIME_LIST) {
-		ListRuntimeMenuItem* listMenu = reinterpret_cast<ListRuntimeMenuItem*>(menuMgr.getCurrentMenu());
-		listMenu->setActiveIndex(0);
-		menuMgr.setItemsInCurrentMenu(listMenu->getNumberOfParts());
-	}
-	else {
-		int items = itemCount(menuMgr.getCurrentMenu()) - 1;
-        if(rendererType == RENDER_TYPE_CONFIGURABLE && menuMgr.getCurrentMenu() == menuMgr.getRoot()) items++;
-		serdebugF3("Prepare sub ", menuMgr.getCurrentMenu()->getId(), items);
-		menuMgr.setItemsInCurrentMenu(items);
-	}
-	redrawRequirement(MENUDRAW_COMPLETE_REDRAW);
 }
 
 void BaseMenuRenderer::setFirstWidget(TitleWidget* widget) {

@@ -63,7 +63,7 @@ namespace tcgfx {
     private:
         BaseGraphicalRenderer *renderer;
     public:
-        MenuTouchScreenEncoder(BaseGraphicalRenderer* rend) {
+        explicit MenuTouchScreenEncoder(BaseGraphicalRenderer* rend) {
             renderer = rend;
         }
 
@@ -76,7 +76,7 @@ namespace tcgfx {
      * a menu item and prepares the touch events. Normally this class is instantiated in your project by tcMenu Designer
      * if you choose a touch interface.
      */
-    class MenuResistiveTouchScreen : public iotouch::BaseResistiveTouchScreen {
+    class MenuTouchScreenManager : public iotouch::TouchScreenManager {
     private:
         GridPositionRowCacheEntry* currentlySelected;
         Coord localStart;
@@ -99,8 +99,8 @@ namespace tcgfx {
          * @param renderer the graphics renderer that is in use
          * @param rotation the rotation of the touch interface
          */
-        MenuResistiveTouchScreen(pinid_t xpPin, pinid_t xnPin, pinid_t ypPin, pinid_t ynPin, BaseGraphicalRenderer* renderer,
-                                 TouchRotation rotation);
+        MenuTouchScreenManager(iotouch::TouchInterrogator* interrogator, BaseGraphicalRenderer* renderer,
+                               iotouch::TouchInterrogator::TouchRotation rotation);
 
         void sendEvent(float locationX, float locationY, float touchPressure, iotouch::TouchState touched) override;
 

@@ -13,15 +13,14 @@ namespace tcgfx {
 
 DialogMultiPartEditor dialogMultiPartEditor;
 
-MenuResistiveTouchScreen::MenuResistiveTouchScreen(pinid_t xpPin, pinid_t xnPin, pinid_t ypPin, pinid_t ynPin,
-                                                   BaseGraphicalRenderer* renderer, BaseResistiveTouchScreen::TouchRotation rotation)
-        : BaseResistiveTouchScreen(xpPin, xnPin, ypPin, ynPin, rotation),
+MenuTouchScreenManager::MenuTouchScreenManager(TouchInterrogator* interrogator, BaseGraphicalRenderer* renderer, iotouch::TouchInterrogator::TouchRotation rotation)
+        : TouchScreenManager(interrogator, rotation),
           currentlySelected(nullptr), localStart(0,0), localSize(0,0), encoder(renderer), renderer(renderer),
           observer(&encoder), lastX(0.0F), lastY(0.0F), currentState(NOT_TOUCHED) {
     renderer->setHasTouchInterface(true);
 }
 
-void MenuResistiveTouchScreen::sendEvent(float locationX, float locationY, float touchPressure, TouchState touched) {
+void MenuTouchScreenManager::sendEvent(float locationX, float locationY, float touchPressure, TouchState touched) {
     // record the settings for non event users.
     lastX = locationX;
     lastY = locationY;

@@ -182,15 +182,9 @@ namespace tcgfx {
         int findActiveItem();
 
         /**
-         * Find the most appropriate item to activate and set it active, used during the display of new menus
-         * @return the item that was activated as an index.
-         */
-        int activateFirstAppropriateItem();
-
-        /**
          * @return the total number of items in the current menu
          */
-        int getTotalItemsInMenu() { return itemOrderByRow.count(); }
+        int getTotalItemsInMenu();
 
         /**
          * Provides the menu item grid position and dimensions of it, given a screen position. Usually used by touch screen
@@ -224,7 +218,14 @@ namespace tcgfx {
          */
         int getHeight() const { return height; }
 
+        /**
+         * Force the renderer to completely recalculate the display parameters next time it's drawn.
+         */
+        void displayPropertiesHaveChanged() { currentRootMenu = nullptr; }
+
     private:
+        void checkIfRootHasChanged();
+
         bool drawTheMenuItems(int startRow, int startY, bool drawEveryLine);
 
         void renderList();

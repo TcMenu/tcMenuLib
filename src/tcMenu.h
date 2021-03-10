@@ -9,6 +9,7 @@
 #include <IoAbstraction.h>
 #include "tcUtil.h"
 #include "MenuItems.h"
+#include "MenuHistoryNavigator.h"
 #include "RuntimeMenuItem.h"
 #include "BaseRenderers.h"
 #include "RemoteAuthentication.h"
@@ -83,11 +84,9 @@ public:
  */
 class MenuManager {
 private:
-	MenuItem* rootMenu;
-	MenuRenderer* renderer;
-	MenuItem* currentFirstRoot;
-	MenuItem* currentSubMenu;
+    tcnav::MenuNavigationStore navigator{};
 	MenuItem* currentEditor;
+	MenuRenderer* renderer;
 	SecuredMenuPopup* securedMenuPopup;
 	AuthenticationManager *authenticationManager;
     EepromAbstraction* eepromRef;
@@ -146,7 +145,7 @@ public:
      * you can call this function early on to set up the root menu item.
      */
     void setRootMenu(MenuItem* menuItem) {
-        rootMenu = menuItem;
+        navigator.setRootItem(menuItem);
     }
 
 	/** 
@@ -249,7 +248,7 @@ public:
 	/**
 	 * Get the root of all menus, the first menu item basically
 	 */
-	MenuItem* getRoot() { return rootMenu; }
+	MenuItem* getRoot() { return navigator.getRoot(); }
 
     /**
      * Get the renderer that this menu is using
@@ -271,14 +270,21 @@ public:
 	 * Set the root item of either the first menu or any sub menu
 	 * @param theItem the item to become the current root of the menu.
 	 */
-	void setCurrentMenu(MenuItem* theItem);
+	void changeMenu(MenuItem* possibleActive=nullptr);
+
+	void navigateToMenu(MenuItem* theNewItem);
+
+	/**
+	 * Force a complete reset of the menu
+	 */
+	void resetMenu(bool completeReset);
 
 	/**
 	 * Get the first menu item in the linked list that is being rendered
 	 */
-	MenuItem* getCurrentMenu() { return currentFirstRoot; }
+	MenuItem* getCurrentMenu() { return navigator.getCurrentRoot(); }
 
-	MenuItem* getCurrentSubMenu() { return currentSubMenu; }
+	MenuItem* getCurrentSubMenu() { return navigator.getCurrentSubMenu(); }
 
 	/**
 	 * Get the parent of the current menu clearing all active flags too

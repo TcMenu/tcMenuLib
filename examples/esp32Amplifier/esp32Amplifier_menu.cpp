@@ -18,7 +18,8 @@ const PROGMEM ConnectorLocalInfo applicationInfo = { "ESP Amplifier", "4656c798-
 TFT_eSPI tft;
 TfteSpiDrawable tftDrawable(&tft, 45);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &tftDrawable);
-MenuResistiveTouchScreen touchScreen(2, 33, 32, 0, &renderer, MenuResistiveTouchScreen::LANDSCAPE);
+iotouch::ResistiveTouchInterrogator touchInterrogator(2, 33, 32, 0);
+MenuTouchScreenManager touchScreen(&touchInterrogator, &renderer, iotouch::TouchInterrogator::LANDSCAPE);
 WiFiServer server(3333);
 
 // Global Menu Item declarations

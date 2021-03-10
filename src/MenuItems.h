@@ -372,7 +372,7 @@ public:
 	void setSendRemoteNeeded(uint8_t remoteNo, bool needed);
 
 	/** sets this to be the active item, so that the renderer shows it highlighted */
-	void setActive(bool active) { bitWrite(flags, MENUITEM_ACTIVE, active); setChanged(true); }
+	void setActive(bool active);
 	/** returns the active status of the item */
 	bool isActive() const { return bitRead(flags, MENUITEM_ACTIVE); }
 

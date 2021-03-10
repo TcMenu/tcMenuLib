@@ -316,6 +316,8 @@ void GraphicsDeviceRenderer::prepareDisplay(bool mono, const void* itemFont, int
     factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_TITLE, titlePalette, titlePadding, titleFont, titleMag, medResOrBetter ? 3 : 1, titleHeight, GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE );
     factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, itemPalette, itemPadding, itemFont, itemMag, 1, itemHeight, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT );
     factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ACTION, itemPalette, itemPadding, itemFont, itemMag, 1, itemHeight, GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE );
+
+    reinterpret_cast<BaseGraphicalRenderer*>(MenuRenderer::getInstance())->displayPropertiesHaveChanged();
 }
 
 void GraphicsDeviceRenderer::fillWithBackgroundTo(int endPoint) {

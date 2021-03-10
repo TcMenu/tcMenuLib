@@ -19,13 +19,13 @@ using namespace tcgfx;
 class TouchScreenCalibrator : public CustomDrawing {
 private:
     DeviceDrawable* drawable;
-    MenuResistiveTouchScreen* touchScreen;
+    MenuTouchScreenManager* touchScreen;
     int oldX= 0, oldY=0;
     unsigned int takeOverCount=0;
-    MenuResistiveTouchScreen::TouchRotation oldRotation = iotouch::BaseResistiveTouchScreen::PORTRAIT;
+    iotouch::TouchInterrogator::TouchRotation oldRotation = iotouch::TouchInterrogator::PORTRAIT;
     uint8_t oldTftRotation = 0;
 public:
-    explicit TouchScreenCalibrator(MenuResistiveTouchScreen *touchScreen)
+    explicit TouchScreenCalibrator(MenuTouchScreenManager *touchScreen)
             : drawable(nullptr), touchScreen(touchScreen) {}
 
     void reset() override {
@@ -37,7 +37,7 @@ public:
             renderer.giveBackDisplay(); // we cannot work with non configurable rendering
         }
         oldTftRotation = tft.getRotation();
-        oldRotation = touchScreen->changeRotation(MenuResistiveTouchScreen::RAW, false);
+        oldRotation = touchScreen->changeRotation(iotouch::TouchInterrogator::RAW);
         tft.setRotation(0);
         drawable = reinterpret_cast<GraphicsDeviceRenderer*>(currentRenderer)->getDeviceDrawable();
         drawable->startDraw();
@@ -74,7 +74,7 @@ public:
 
         if(oldX < 40 && oldY < 40 && touchScreen->getLastTouchState() == iotouch::HELD) {
             tft.setRotation(oldTftRotation);
-            touchScreen->changeRotation(oldRotation, true);
+            touchScreen->changeRotation(oldRotation);
             renderer.giveBackDisplay();
         }
     }

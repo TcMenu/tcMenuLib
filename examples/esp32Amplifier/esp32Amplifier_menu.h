@@ -28,7 +28,7 @@ extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app inf
 extern TFT_eSPI tft;
 extern TfteSpiDrawable tftDrawable;
 extern GraphicsDeviceRenderer renderer;
-extern MenuResistiveTouchScreen touchScreen;
+extern MenuTouchScreenManager touchScreen;
 extern WiFiServer server;
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type

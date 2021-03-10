@@ -288,11 +288,11 @@ void MenuBasedDialog::internalSetVisible(bool visible) {
         }
         btn1Item.setActive(true);
 
-        menuMgr.setCurrentMenu(&backItem);
+        menuMgr.navigateToMenu(&backItem);
     }
     else {
         resetDialogFields();
-        menuMgr.setCurrentMenu(menuMgr.getRoot());
+        menuMgr.resetMenu(false);
     }
 }
 

@@ -7,6 +7,8 @@
 #include "MenuItems.h"
 #include "tcMenu.h"
 #include "MenuIterator.h"
+#include "BaseRenderers.h"
+#include "graphics/BaseGraphicalRenderer.h"
 
 MenuItem* recursiveFindParentRootVisit(MenuItem* currentMenu, MenuItem* toFind, MenuItem* parentRoot, MenuVisitorFn fn) {
     MenuItem* parent = nullptr;
@@ -149,46 +151,58 @@ bool MenuItemTypePredicate::matches(MenuItem* item) {
 }
 
 MenuItem* getItemAtPosition(MenuItem* root, uint8_t pos) {
-	uint8_t i = 0;
-	MenuItem* itm = root;
+    if(MenuRenderer::getInstance() && MenuRenderer::getInstance()->getRendererType() == RENDER_TYPE_CONFIGURABLE) {
+        auto *confRenderer = reinterpret_cast<tcgfx::BaseGraphicalRenderer *>(MenuRenderer::getInstance());
+        return confRenderer->getMenuItemAtIndex(pos);
+    } else {
+        uint8_t i = 0;
+        MenuItem *itm = root;
 
-	while (itm != nullptr) {
-        if(itm->isVisible())
-        {
-            if (i == pos) {
-                return itm;
+        while (itm != nullptr) {
+            if (itm->isVisible()) {
+                if (i == pos) {
+                    return itm;
+                }
+                i++;
             }
-            i++;
+            itm = itm->getNext();
         }
-		itm = itm->getNext();
-	}
-
+    }
 	return root;
 }
 
 int offsetOfCurrentActive(MenuItem* root) {
-	uint8_t i = 0;
-	MenuItem* itm = root;
-	while (itm != nullptr) {
-        if(itm->isVisible()) {
-            if (itm->isActive() || itm->isEditing()) {
-                return i;
+    if(MenuRenderer::getInstance() && MenuRenderer::getInstance()->getRendererType() == RENDER_TYPE_CONFIGURABLE) {
+        auto *confRenderer = reinterpret_cast<tcgfx::BaseGraphicalRenderer *>(MenuRenderer::getInstance());
+        return confRenderer->findActiveItem();
+    } else {
+        uint8_t i = 0;
+        MenuItem *itm = root;
+        while (itm != nullptr) {
+            if (itm->isVisible()) {
+                if (itm->isActive() || itm->isEditing()) {
+                    return i;
+                }
+                i++;
             }
-            i++;
+            itm = itm->getNext();
         }
-		itm = itm->getNext();
-	}
-
+    }
 	return 0;
 }
 
 uint8_t itemCount(MenuItem* item, bool includeNonVisible) {
 	uint8_t count = 0;
-	while (item) {
-        if(includeNonVisible || item->isVisible()) ++count;
-		item = item->getNext();
-	}
-	return count;
+	if(MenuRenderer::getInstance() && MenuRenderer::getInstance()->getRendererType() == RENDER_TYPE_CONFIGURABLE) {
+	    auto* confRenderer = reinterpret_cast<tcgfx::BaseGraphicalRenderer*>(MenuRenderer::getInstance());
+	    return confRenderer->getTotalItemsInMenu();
+	} else {
+        while (item) {
+            if (includeNonVisible || item->isVisible()) ++count;
+            item = item->getNext();
+        }
+        return count;
+    }
 }
 
 MenuItem* getSubRecurse(MenuItem* toSearch, MenuItem* subMenu, MenuItem* current) {

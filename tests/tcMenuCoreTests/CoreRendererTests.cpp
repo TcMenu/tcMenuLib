@@ -117,7 +117,7 @@ test(testSubAndItemSelectionPropertiesFactory) {
     ConfigurableItemDisplayPropertiesFactory factory;
     populatePropsWithDefaults(factory);
 
-    menuMgr.setCurrentMenu(menuSub.getChild());
+    menuMgr.navigateToMenu(menuSub.getChild());
 
     // using the submenu level settings because it is in menuSub, with no item level override.
     auto* config = factory.configFor(&menuIpAddr, ItemDisplayProperties::COMPTYPE_ITEM);
@@ -375,14 +375,15 @@ bool checkItem(MenuDrawingRecord* record, Coord where, Coord size, const void* f
 test(testBaseRendererWithDefaults) {
 
     TestCapturingRenderer renderer(320, 120, false, pgmName);
-    menuMgr.initWithoutInput(&renderer, &textMenuItem1);
-    taskManager.reset();
 
     renderer.setFirstWidget(&widget1);
     auto& factory = reinterpret_cast<ConfigurableItemDisplayPropertiesFactory &>(renderer.getDisplayPropertiesFactory());
     factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_TITLE, palette1, MenuPadding(4), pointer2, 1, 10, 30, GridPosition::JUSTIFY_CENTER_NO_VALUE);
     factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ACTION, palette1, MenuPadding(4), pointer1, 1, 5, 25, GridPosition::JUSTIFY_LEFT_NO_VALUE);
     factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, palette1, MenuPadding(4), pointer1, 1, 5, 20, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT);
+
+    menuMgr.initWithoutInput(&renderer, &textMenuItem1);
+    taskManager.reset();
 
     widget1.setCurrentState(0);
     menuEnum1.setCurrentValue(0);
@@ -443,8 +444,6 @@ void selectItem(MenuItem* root, MenuItem* toSelect) {
 test(testScrollingWithMoreThanOneItemOnRow) {
     TestCapturingRenderer renderer(320, 100, false, pgmName);
     renderer.setTitleMode(BaseGraphicalRenderer::NO_TITLE);
-    menuMgr.initWithoutInput(&renderer, &textMenuItem1);
-    taskManager.reset(); // this must be done to clear out the task created by calling initialise above.
 
     // first get hold of the factory and add the drawing defaults
     auto& factory = reinterpret_cast<ConfigurableItemDisplayPropertiesFactory &>(renderer.getDisplayPropertiesFactory());
@@ -453,6 +452,9 @@ test(testScrollingWithMoreThanOneItemOnRow) {
     // now make a row 1 have 2 columns with boolItem1 in position 1 and menuSub in position 2.
     factory.addGridPosition(&boolItem1, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_WITH_VALUE, 2, 1, 1, 35));
     factory.addGridPosition(&menuSub, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 2, 2, 1, 35));
+
+    menuMgr.initWithoutInput(&renderer, &textMenuItem1);
+    taskManager.reset(); // this must be done to clear out the task created by calling initialise above.
 
     // run the first iteration and check the drawing positions
     renderer.resetCommandStates();

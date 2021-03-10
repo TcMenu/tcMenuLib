@@ -392,12 +392,6 @@ public:
 	void resetToDefault();
 
 	/**
-	 * Used to set up a new submenu for display on the renderer
-	 * @param newItems the new submenu
-	 */
-	void prepareNewSubmenu();
-
-	/**
 	 * Sets the type of redraw that is needed
 	 * @param state the required redraw
 	 */

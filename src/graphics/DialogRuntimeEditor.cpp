@@ -15,7 +15,6 @@ void DialogMultiPartEditor::startEditing(MenuBasedDialog* dlg, EditableMultiPart
     dlg->showController(false, this);
     menuItemBeingEdited->beginMultiEdit();
     dialogButtonPressed(SECOND_DEFAULT_BUTTON);
-    scrollChanged();
 }
 
 void DialogMultiPartEditor::dialogDismissed(ButtonType buttonType) {
@@ -29,6 +28,7 @@ bool DialogMultiPartEditor::dialogButtonPressed(int buttonNum) {
         if(range != 0) {
             scrollingInfo.maxValue = range;
             scrollingEditor.setCurrentValue(menuItemBeingEdited->getPartValueAsInt());
+            scrollChanged();
             return false;
         }
     }

@@ -18,8 +18,7 @@ MenuManager menuMgr;
 
 void MenuManager::initForUpDownOk(MenuRenderer* renderer, MenuItem* root, pinid_t pinDown, pinid_t pinUp, pinid_t pinOk) {
 	this->renderer = renderer;
-	this->currentFirstRoot = this->rootMenu = root;
-	this->currentSubMenu = nullptr;
+	navigator.setRootItem(root);
 
 	switches.addSwitch(pinOk, nullptr);
     switches.onRelease(pinOk, [](pinid_t /*key*/, bool held) { menuMgr.onMenuSelect(held); });
@@ -29,8 +28,7 @@ void MenuManager::initForUpDownOk(MenuRenderer* renderer, MenuItem* root, pinid_
 
 void MenuManager::initForEncoder(MenuRenderer* renderer,  MenuItem* root, pinid_t encoderPinA, pinid_t encoderPinB, pinid_t encoderButton) {
 	this->renderer = renderer;
-	this->currentFirstRoot = this->rootMenu = root;
-	this->currentSubMenu = nullptr;
+    navigator.setRootItem(root);
 
 	switches.addSwitch(encoderButton, nullptr);
     switches.onRelease(encoderButton, [](pinid_t /*key*/, bool held) { menuMgr.onMenuSelect(held); });
@@ -67,10 +65,11 @@ void MenuManager::performDirectionMove(bool dirIsBack) {
         stopEditingCurrentItem(false);
     }
     else if(currentEditor == nullptr && dirIsBack) {
-        setCurrentMenu(getParentAndReset());
+        getParentAndReset();
+        resetMenu(false);
     }
     else if(currentEditor == nullptr && !dirIsBack) {
-        MenuItem* currentActive = menuMgr.findCurrentActive();
+        MenuItem* currentActive = findCurrentActive();
         if(currentActive != nullptr && currentActive->getMenuType() == MENUTYPE_SUB_VALUE) {
             actionOnSubMenu(currentActive);
         }
@@ -79,14 +78,8 @@ void MenuManager::performDirectionMove(bool dirIsBack) {
 
 void MenuManager::initWithoutInput(MenuRenderer* renderer, MenuItem* root) {
 	this->renderer = renderer;
-	this->currentFirstRoot = this->rootMenu = root;
-	this->currentSubMenu = nullptr;
-
+    navigator.setRootItem(root);
 	renderer->initialise();
-}
-
-bool isMenuBoolean(MenuType ty) {
-	return ty == MENUTYPE_BOOLEAN_VALUE;
 }
 
 /**
@@ -120,7 +113,7 @@ void MenuManager::valueChanged(int value) {
             }
         }
         else {
-            currentActive = getItemAtPosition(currentFirstRoot, value);
+            currentActive = getItemAtPosition(navigator.getCurrentRoot(), value);
             currentActive->setActive(true);
             serdebugF3("Legacy set active (V, ID) ", value, currentActive->getId());
         }
@@ -135,10 +128,10 @@ void MenuManager::onMenuSelect(bool held) {
 
 	if (held) {
         if (currentEditor != nullptr && isMenuRuntimeMultiEdit(currentEditor)) {
-            setCurrentMenu(currentFirstRoot);
+            changeMenu();
         }
         else {
-            setCurrentMenu(getParentAndReset());
+            resetMenu(true);
         }
     }
 	else if (getCurrentEditor() != nullptr) {
@@ -156,13 +149,10 @@ void MenuManager::actionOnSubMenu(MenuItem* nextSub) {
 		serdebugF2("Submenu is secured: ", nextSub->getId());
 		SecuredMenuPopup* popup = secureMenuInstance();
 		popup->start(subMenu);
-		currentFirstRoot = popup->getRootItem();
-		currentSubMenu = nullptr;
-		auto* baseRenderer = reinterpret_cast<BaseMenuRenderer*>(renderer);
-		baseRenderer->prepareNewSubmenu();
+		navigateToMenu(popup->getRootItem());
 	}
 	else {
-		menuMgr.setCurrentMenu(subMenu->getChild());
+		navigateToMenu(subMenu->getChild());
 	}
 }
 
@@ -179,7 +169,7 @@ void MenuManager::actionOnCurrentItem(MenuItem* toEdit) {
 			auto* listItem = reinterpret_cast<ListRuntimeMenuItem*>(toEdit);
 			serdebugF2("List select: ", listItem->getActiveIndex());
 			if (listItem->getActiveIndex() == 0) {
-				menuMgr.setCurrentMenu(menuMgr.getParentAndReset());
+				resetMenu(false);
 			}
 			else {
 				listItem->getChildItem(listItem->getActiveIndex() - 1)->triggerCallback();
@@ -187,12 +177,12 @@ void MenuManager::actionOnCurrentItem(MenuItem* toEdit) {
 				listItem->asParent();
 			}
 		}
-		else menuMgr.setCurrentMenu(toEdit);
+		else navigateToMenu(toEdit);
 	}
 	else if (toEdit->getMenuType() == MENUTYPE_BACK_VALUE) {
 	    toEdit->triggerCallback();
 		toEdit->setActive(false);
-		menuMgr.setCurrentMenu(menuMgr.getParentAndReset());
+		resetMenu(false);
 	}
 	else if (isItemActionable(toEdit)) {
 		toEdit->triggerCallback();
@@ -222,7 +212,6 @@ void MenuManager::stopEditingCurrentItem(bool doMultiPartNext) {
 	
     currentEditor = nullptr;
 	setItemsInCurrentMenu(itemCount(menuMgr.getCurrentMenu()) - 1, offsetOfCurrentActive(menuMgr.getCurrentMenu()));
-
 
 	if (renderer->getRendererType() != RENDER_TYPE_NOLOCAL) {
 		auto* baseRenderer = reinterpret_cast<BaseMenuRenderer*>(renderer);
@@ -262,7 +251,7 @@ bool MenuManager::activateMenuItem(MenuItem *item) {
  * Finds teh currently active menu item with the selected SubMenuItem
  */
 MenuItem* MenuManager::findCurrentActive() {
-	MenuItem* itm = getCurrentMenu();
+	MenuItem* itm = navigator.getCurrentRoot();
 	while (itm != nullptr) {
 		if (itm->isActive()) {
 			return itm;
@@ -324,24 +313,28 @@ void MenuManager::setCurrentEditor(MenuItem * editor) {
 	currentEditor = editor;
 }
 
-void MenuManager::setCurrentMenu(MenuItem * theItem) {
-	serdebugF2("setCurrentMenu: ", theItem->getId());
+void MenuManager::changeMenu(MenuItem* possibleActive) {
+    if (renderer->getRendererType() == RENDER_TYPE_NOLOCAL) return;
 
-    currentFirstRoot = theItem;
-    currentSubMenu = getSubMenuFor(theItem);
+    serdebugF2("changeMenu: ", navigator.getCurrentRoot()->getId());
 
-    if (renderer->getRendererType() == RENDER_TYPE_NOLOCAL) {
-	    return;
-	}
-
-	auto* baseRenderer = reinterpret_cast<BaseMenuRenderer*>(renderer);
-
+    // clear the current editor and ensure all active / editing flags removed.
 	menuMgr.setCurrentEditor(nullptr);
 
-	getParentAndReset();
-    theItem->setActive(true);
+	// now we set up the encoder to represent the right value and mark an item as active.
+    if (menuMgr.getCurrentMenu()->getMenuType() == MENUTYPE_RUNTIME_LIST) {
+        getParentAndReset();
+        auto* listMenu = reinterpret_cast<ListRuntimeMenuItem*>(menuMgr.getCurrentMenu());
+        listMenu->setActiveIndex(0);
+        menuMgr.setItemsInCurrentMenu(listMenu->getNumberOfParts());
+    } else {
+        auto* toActivate = (possibleActive) ? possibleActive : navigator.getCurrentRoot();
+        toActivate->setActive(true);
+        setItemsInCurrentMenu(itemCount(navigator.getCurrentRoot(), false) - 1, offsetOfCurrentActive(navigator.getCurrentRoot()));
+    }
 
-    baseRenderer->prepareNewSubmenu();
+    // lastly force a redraw.
+    reinterpret_cast<BaseMenuRenderer*>(renderer)->redrawRequirement(MENUDRAW_COMPLETE_REDRAW);
 }
 
 SecuredMenuPopup* MenuManager::secureMenuInstance() {
@@ -349,12 +342,9 @@ SecuredMenuPopup* MenuManager::secureMenuInstance() {
 	return securedMenuPopup;
 }
 
-MenuManager::MenuManager() : structureNotifier() {
+MenuManager::MenuManager() : navigator(), structureNotifier() {
     this->currentEditor = nullptr;
-    this->currentFirstRoot = nullptr;
-    this->currentSubMenu = nullptr;
     this->renderer = nullptr;
-    this->rootMenu = nullptr;
     this->securedMenuPopup = nullptr;
     this->authenticationManager = nullptr;
     this->eepromRef = nullptr;
@@ -419,4 +409,20 @@ void MenuManager::setItemsInCurrentMenu(int size, int offs) {
     if(!enc) return;
     enc->changePrecision(size, offs);
     enc->setUserIntention(SCROLL_THROUGH_ITEMS);
+}
+
+void MenuManager::resetMenu(bool completeReset) {
+    MenuItem* currentActive;
+    if(completeReset) {
+        navigator.setRootItem(navigator.getRoot());
+        currentActive = nullptr;
+    } else {
+        currentActive = navigator.popNavigationGetActive();
+    }
+    changeMenu(currentActive);
+}
+
+void MenuManager::navigateToMenu(MenuItem* theNewItem) {
+    navigator.navigateTo(findCurrentActive(), theNewItem);
+    changeMenu();
 }

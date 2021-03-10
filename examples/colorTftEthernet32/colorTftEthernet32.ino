@@ -75,7 +75,6 @@ void onCommsChange(CommunicationInfo info) {
 void setup() {
     // we used an i2c device (io8574) so must initialise wire too
     Wire.begin();
-
     // We should set the eeprom that menu manager will use as early as possible
     menuMgr.setEepromRef(&eeprom);
 
@@ -108,6 +107,9 @@ void setup() {
 
     // set up the menu
     setupMenu();
+
+    // increase SPI speed
+    gfx.setSPISpeed(10000000UL);
 
     // and then load back the previous state
     menuMgr.load();

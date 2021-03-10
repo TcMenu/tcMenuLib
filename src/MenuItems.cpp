@@ -102,6 +102,11 @@ uint16_t MenuItem::getEepromPosition() const
 	return  isInfoProgMem() ? get_info_uint(&info->eepromAddr) : info->eepromAddr;
 }
 
+void MenuItem::setActive(bool active)  {
+    bitWrite(flags, MENUITEM_ACTIVE, active);
+    setChanged(true);
+}
+
 // on avr boards we store all info structures in progmem, so we need this code to
 // pull the enum structures out of progmem. Otherwise we just read it out normally
 
