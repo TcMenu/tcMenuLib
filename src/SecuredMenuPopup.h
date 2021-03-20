@@ -37,6 +37,8 @@ private:
 public:
 	SecuredMenuPopup(AuthenticationManager *authentication);
 
+	MenuItem* getItemToActivate() { return &pinEntryItem; }
+
 	MenuItem* start(SubMenuItem* securedMenu);
 
 	MenuItem* getRootItem() {

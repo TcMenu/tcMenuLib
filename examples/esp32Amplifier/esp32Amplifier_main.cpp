@@ -57,7 +57,6 @@ void setup() {
     touchScreen.calibrateMinMaxValues(0.240F, 0.895F, 0.09F, 0.88F);
 
     renderer.setCustomDrawingHandler(new TouchScreenCalibrator(&touchScreen));
-    renderer.prepareDisplay(false, nullptr, 4, nullptr, 4, true);
 
     // first we get the graphics factory
     auto & factory = renderer.getGraphicsPropertiesFactory();
@@ -70,17 +69,18 @@ void setup() {
 
     // and now we define that row 3 of the main menu will have three columns, drawn as icons
     factory.addGridPosition(&menuSettings, GridPosition(GridPosition::DRAW_AS_ICON_ONLY,
-                                                        GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 1, 4, 45));
+                                                        GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 1, 4, 49));
     factory.addGridPosition(&menuStatus, GridPosition(GridPosition::DRAW_AS_ICON_ONLY,
-                                                      GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 2, 4, 45));
+                                                      GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 2, 4, 49));
     factory.addGridPosition(&menuMute, GridPosition(GridPosition::DRAW_AS_ICON_ONLY,
-                                                    GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 3, 4, 45));
+                                                    GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 3, 4, 49));
 
     // here is how we completely redefine the drawing of a specific item, you can also define for submenu or default
     color_t specialPalette[] { ILI9341_WHITE, ILI9341_RED, ILI9341_BLACK, ILI9341_BLUE};
-    factory.setDrawingPropertiesForItem(ItemDisplayProperties::COMPTYPE_TITLE, menuStatus.getId(), specialPalette,
-                                        MenuPadding(4), nullptr, 4, 10, 30,
-                                        GridPosition::JUSTIFY_CENTER_WITH_VALUE );
+    factory.setDrawingPropertiesAllInSub(ItemDisplayProperties::COMPTYPE_TITLE, menuStatus.getId(), specialPalette,
+                                        MenuPadding(4), nullptr, 4, 10, 36,
+                                        GridPosition::JUSTIFY_CENTER_WITH_VALUE , MenuBorder(2));
+    tcgfx::ConfigurableItemDisplayPropertiesFactory::refreshCache();
 
     setTitlePressedCallback([](int) {
         BaseDialog* dlg = MenuRenderer::getInstance()->getDialog();
@@ -155,11 +155,60 @@ void CALLBACK_FUNCTION onMuteSound(int id) {
     controller.onMute(menuMute.getBoolean());
 }
 
+class TestingDialogController : public BaseDialogController {
+private:
+    MenuBasedDialog* theDialog;
+public:
+    void initialiseAndGetHeader(BaseDialog *dialog, char *buffer, size_t bufferSize) override {
+        theDialog = reinterpret_cast<MenuBasedDialog *>(dialog);
+        strcpy(buffer, "Test Dialog");
+    }
+
+    void dialogDismissed(ButtonType buttonType) override {
+        if(buttonType == BTNTYPE_OK) {
+            theDialog->setButtons(BTNTYPE_NONE, BTNTYPE_CLOSE);
+            theDialog->showRam("Extra dlg", true);
+            theDialog->copyIntoBuffer("more text");
+        }
+    }
+
+    bool dialogButtonPressed(int buttonNum) override {
+        return true;
+    }
+
+    void copyCustomButtonText(int buttonNumber, char *buffer, size_t bufferSize) override {
+        buffer[0] = 0;
+    }
+} testingDialogController;
+
 void CALLBACK_FUNCTION onShowDialogs(int id) {
     auto* dlg = renderer.getDialog();
     if(dlg && !dlg->isInUse()) {
         dlg->setButtons(BTNTYPE_OK, BTNTYPE_CANCEL);
-        dlg->showRam("Hello RAM dialog", false);
+        dlg->showController(true, &testingDialogController);
         dlg->copyIntoBuffer("some more text");
+    }
+}
+
+int CALLBACK_FUNCTION fnStatusDataListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
+   switch(mode) {
+    case RENDERFN_INVOKE:
+        if(renderer.getDialog() && renderer.getDialog()->isInUse()) {
+            renderer.getDialog()->setButtons(BTNTYPE_NONE, BTNTYPE_CLOSE);
+            renderer.getDialog()->showRam("List select", false);
+            char sz[10];
+            ltoaClrBuff(sz, row, 3, NOT_PADDED, sizeof sz);
+            renderer.getDialog()->copyIntoBuffer(sz);
+        }
+        return true;
+    case RENDERFN_NAME:
+        ltoaClrBuff(buffer, row, 3, NOT_PADDED, bufferSize);
+        return true;
+    case RENDERFN_VALUE:
+        buffer[0] = 'V'; buffer[1]=0;
+        fastltoa(buffer, row, 3, NOT_PADDED, bufferSize);
+        return true;
+    case RENDERFN_EEPROM_POS: return 0xffff; // lists are generally not saved to EEPROM
+    default: return false;
     }
 }

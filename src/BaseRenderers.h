@@ -114,7 +114,7 @@ public:
 	/** Construct a widget with its icons and size */
 	TitleWidget(const uint8_t* const* icons, uint8_t maxStateIcons, uint8_t width, uint8_t height, TitleWidget* next = NULL);
 	/** Get the current state that the widget represents */
-	uint8_t getCurrentState() {return currentState;}
+	uint8_t getCurrentState() const {return currentState;}
 	/** gets the current icon data */
 #ifdef __AVR__
 	const uint8_t* getCurrentIcon() {
@@ -262,6 +262,7 @@ class RemoteMenuItem; // forward reference.
 class BaseMenuRenderer : public MenuRenderer, Executable {
 public:
     enum DisplayTakeoverMode { NOT_TAKEN_OVER, TAKEN_OVER_FN, START_CUSTOM_DRAW, RUNNING_CUSTOM_DRAW };
+
 protected:
 	uint8_t lastOffset;
 	uint8_t updatesPerSecond;
@@ -359,6 +360,29 @@ public:
 	bool tryTakeSelectIfNeeded(int currentReading, RenderPressMode pressMode) override;
 
 	/**
+	 * Gets the menu item at a specific position
+	 * @param root the root item
+	 * @param idx the index to find
+	 * @return the item at the index or root.
+	 */
+    virtual MenuItem *getMenuItemAtIndex(MenuItem *pItem, uint8_t idx);
+
+    /**
+     * Find the active item offset in the list
+     * @param root the root item
+     * @return the position 0 based.
+     */
+    virtual int findActiveItem(MenuItem* root);
+
+    /**
+     * Get the count of items in the current root
+     * @param item the root item
+     * @param includeNonVisible if non visible should be included
+     * @return the count
+     */
+    virtual uint8_t itemCount(MenuItem* item, bool includeNonVisible);
+
+    /**
 	 * For menu systems that support title widgets, this will allow the first widget.
 	 * @param the first widget in a chain of widgets linked by next pointer.
 	 */

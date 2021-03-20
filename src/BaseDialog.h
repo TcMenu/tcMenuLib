@@ -260,8 +260,16 @@ class LocalDialogButtonMenuItem : public RuntimeMenuItem {
 private:
     uint8_t buttonNumber;
 public:
+    /**
+     * Create a extra local dialog button, never create on with a button number lower than 2 because 0 and 1 are
+     * reserved. Ideally the button numbers should follow in sequence from 2 onwards.
+     * @param renderFn nearly always set this to dialogButtonRenderFn
+     * @param id the ID, if you don't care about this, set it to nextRandomId()
+     * @param btnNum the button number
+     * @param next the next menu item in the list
+     */
     LocalDialogButtonMenuItem(RuntimeRenderingFn renderFn, int id, int btnNum, MenuItem* next)
-            : RuntimeMenuItem(MENUTYPE_RUNTIME_VALUE, id, renderFn, 0, 1, next) {
+            : RuntimeMenuItem(MENUTYPE_DIALOG_BUTTON, id, renderFn, 0, 1, next) {
         setLocalOnly(true);
         buttonNumber = btnNum;
     }

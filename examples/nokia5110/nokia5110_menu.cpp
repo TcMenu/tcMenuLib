@@ -68,7 +68,6 @@ void setupMenu() {
     gfx.begin();
     gfx.setRotation(0);
     renderer.setUpdatesPerSecond(4);
-    renderer.prepareDisplay(true, NULL, 1, NULL, 1, true);
     renderer.setUseSliderForAnalog(false);
     switches.initialise(internalDigitalIo(), true);
     menuMgr.initForEncoder(&renderer, &menuHall, 2, 6, A3);

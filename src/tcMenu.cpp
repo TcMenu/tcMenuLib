@@ -9,10 +9,7 @@
 #include "ScrollChoiceMenuItem.h"
 #include "MenuIterator.h"
 #include "SecuredMenuPopup.h"
-#include "graphics/BaseGraphicalRenderer.h"
 #include <IoAbstraction.h>
-
-using namespace tcgfx;
 
 MenuManager menuMgr;
 
@@ -105,17 +102,13 @@ void MenuManager::valueChanged(int value) {
 	else {
         MenuItem* currentActive = menuMgr.findCurrentActive();
         currentActive->setActive(false);
-        if(renderer->getRendererType() == RENDER_TYPE_CONFIGURABLE) {
-            currentActive = reinterpret_cast<BaseGraphicalRenderer*>(renderer)->getMenuItemAtIndex(value);
+        if(renderer->getRendererType() != RENDER_TYPE_NOLOCAL) {
+            serdebugF2("activate item ", value);
+            currentActive = reinterpret_cast<BaseMenuRenderer*>(renderer)->getMenuItemAtIndex(getCurrentMenu(), value);
             if(currentActive) {
                 currentActive->setActive(true);
                 serdebugF3("Change active (V, ID) ", value, currentActive->getId());
             }
-        }
-        else {
-            currentActive = getItemAtPosition(navigator.getCurrentRoot(), value);
-            currentActive->setActive(true);
-            serdebugF3("Legacy set active (V, ID) ", value, currentActive->getId());
         }
 	}
 }
@@ -149,7 +142,7 @@ void MenuManager::actionOnSubMenu(MenuItem* nextSub) {
 		serdebugF2("Submenu is secured: ", nextSub->getId());
 		SecuredMenuPopup* popup = secureMenuInstance();
 		popup->start(subMenu);
-		navigateToMenu(popup->getRootItem());
+		navigateToMenu(popup->getRootItem(), popup->getItemToActivate(), true);
 	}
 	else {
 		navigateToMenu(subMenu->getChild());
@@ -225,23 +218,29 @@ MenuItem* MenuManager::getParentAndReset() {
         if(sub) return reinterpret_cast<SubMenuItem*>(sub)->getChild();
     }
 
+    if(menuMgr.getRenderer()->getRendererType() == RENDER_TYPE_CONFIGURABLE && navigator.isShowingRoot()) {
+        auto* titleItem = reinterpret_cast<BaseMenuRenderer*>(menuMgr.getRenderer())->getMenuItemAtIndex(getCurrentMenu(), 0);
+        if(titleItem) titleItem->setActive(false);
+    }
+
 	auto* pItem = getParentRootAndVisit(menuMgr.getCurrentMenu(), [](MenuItem* curr) {
 		curr->setActive(false);
 		curr->setEditing(false);
 	});
+
 	if(pItem == nullptr) pItem = menuMgr.getRoot();
 	return pItem;
 }
 
 bool MenuManager::activateMenuItem(MenuItem *item) {
-    if(renderer->getRendererType() == RENDER_TYPE_CONFIGURABLE) {
-        auto* r = reinterpret_cast<BaseGraphicalRenderer*>(renderer);
-        for(int i=0; i<r->getTotalItemsInMenu(); i++) {
-            auto* pItem = r->getMenuItemAtIndex(i);
-            if(pItem != nullptr && pItem->getId() == item->getId()) {
-                valueChanged(i);
-                return true;
-            }
+    if(renderer->getRendererType() == RENDER_TYPE_NOLOCAL) return false;
+    auto* r = reinterpret_cast<BaseMenuRenderer*>(renderer);
+    uint8_t count = r->itemCount(getCurrentMenu(), false);
+    for(int i=0; i < count; i++) {
+        auto* pItem = r->getMenuItemAtIndex(getCurrentMenu(), i);
+        if(pItem != nullptr && pItem->getId() == item->getId()) {
+            valueChanged(i);
+            return true;
         }
     }
     return false;
@@ -261,7 +260,7 @@ MenuItem* MenuManager::findCurrentActive() {
 
 	// there's a special case for the title menu on the main page that needs to be checked against.
 	if(renderer->getRendererType() == RENDER_TYPE_CONFIGURABLE) {
-	    auto* pItem = reinterpret_cast<BaseGraphicalRenderer*>(renderer)->getMenuItemAtIndex(0);
+	    auto* pItem = reinterpret_cast<BaseMenuRenderer*>(renderer)->getMenuItemAtIndex(getCurrentMenu(), 0);
 	    if(pItem && pItem->isActive()) return pItem;
 	}
 
@@ -320,13 +319,13 @@ void MenuManager::changeMenu(MenuItem* possibleActive) {
 
     // clear the current editor and ensure all active / editing flags removed.
 	menuMgr.setCurrentEditor(nullptr);
+    getParentAndReset();
 
 	// now we set up the encoder to represent the right value and mark an item as active.
     if (menuMgr.getCurrentMenu()->getMenuType() == MENUTYPE_RUNTIME_LIST) {
-        getParentAndReset();
         auto* listMenu = reinterpret_cast<ListRuntimeMenuItem*>(menuMgr.getCurrentMenu());
         listMenu->setActiveIndex(0);
-        menuMgr.setItemsInCurrentMenu(listMenu->getNumberOfParts());
+        menuMgr.setItemsInCurrentMenu(listMenu->getNumberOfRows());
     } else {
         auto* toActivate = (possibleActive) ? possibleActive : navigator.getCurrentRoot();
         toActivate->setActive(true);
@@ -407,6 +406,7 @@ void MenuManager::notifyStructureChanged() {
 void MenuManager::setItemsInCurrentMenu(int size, int offs) {
     auto enc = switches.getEncoder();
     if(!enc) return;
+    serdebugF3("Set items in menu (size, offs) ", size, offs);
     enc->changePrecision(size, offs);
     enc->setUserIntention(SCROLL_THROUGH_ITEMS);
 }
@@ -422,7 +422,7 @@ void MenuManager::resetMenu(bool completeReset) {
     changeMenu(currentActive);
 }
 
-void MenuManager::navigateToMenu(MenuItem* theNewItem) {
-    navigator.navigateTo(findCurrentActive(), theNewItem);
-    changeMenu();
+void MenuManager::navigateToMenu(MenuItem* theNewItem, MenuItem* possibleActive, bool customMenu) {
+    navigator.navigateTo(findCurrentActive(), theNewItem, customMenu);
+    changeMenu(possibleActive);
 }

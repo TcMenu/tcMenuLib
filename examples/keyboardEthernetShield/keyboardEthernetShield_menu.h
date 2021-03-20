@@ -34,6 +34,7 @@
 #define LCD_BACKLIGHT -1
 #define LCD_PWM_PIN -1
 #define LCD_IO_DEVICE io23017
+#define UNO_OR_FULL fullLcd
 #define UPDATES_PER_SEC 4
 #define PULLUP_LOGIC true
 #define INTERRUPT_SWITCHES false
@@ -41,6 +42,8 @@
 #define ENCODER_PIN_A 6
 #define ENCODER_PIN_B 7
 #define ENCODER_PIN_OK 5
+#define ENCODER_BACK_PIN -1
+#define ENCODER_NEXT_PIN -1
 #define LIBRARY_TYPE ETHERNET_2
 #define LISTEN_PORT 3333
 

@@ -64,9 +64,10 @@ void LiquidCrystalRenderer::drawWidget(Coord where, TitleWidget *widget, color_t
 
 int calculateOffset(GridPosition::GridJustification just, int totalLen, const char* sz) {
     int len = strlen(sz);
-    if(len > totalLen || just == GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE || just == GridPosition::JUSTIFY_LEFT_NO_VALUE) return 0;
+    auto actualJust = coreJustification(just);
+    if(len > totalLen || actualJust == GridPosition::CORE_JUSTIFY_LEFT) return 0;
 
-    if(just == GridPosition::JUSTIFY_RIGHT_WITH_VALUE || just == GridPosition::JUSTIFY_RIGHT_NO_VALUE) {
+    if(actualJust == tcgfx::GridPosition::CORE_JUSTIFY_RIGHT) {
         return (totalLen - len) - 1;
     }
     else {
@@ -102,14 +103,16 @@ void LiquidCrystalRenderer::drawMenuItem(GridPositionRowCacheEntry* entry, Coord
         char sz[20];
         for(uint8_t i = 1; i < (uint8_t)areaSize.x; ++i)  buffer[i] = 32;
         buffer[areaSize.x] = 0;
-        bool valueNeeded = itemNeedsValue(entry->getPosition().getJustification());
-        bool nameNeeded = itemNeedsName(entry->getPosition().getJustification());
-        if(nameNeeded && valueNeeded) {
-            copyMenuItemNameAndValue(theItem, sz, sizeof sz, 0);
-        } else if(valueNeeded) {
-            copyMenuItemValue(theItem, sz, sizeof sz);
-        } else {
+        uint8_t valueStart = 1;
+        if(itemNeedsName(entry->getPosition().getJustification())) {
             theItem->copyNameToBuffer(sz, sizeof sz);
+            valueStart += strlen(sz);
+            valueStart += 1;
+        }
+        if(itemNeedsValue(entry->getPosition().getJustification())) {
+            copyMenuItemValue(entry->getMenuItem(), sz, sizeof sz);
+            copyIntoBuffer(buffer, sz, valueStart, bufferSize);
+
         }
         int position = calculateOffset(entry->getPosition().getJustification(), areaSize.x, sz);
         copyIntoBuffer(&buffer[1], sz, position, bufferSize - 1);

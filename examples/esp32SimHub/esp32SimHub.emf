@@ -1,69 +1,202 @@
 {
+  "version": "1.00",
+  "projectName": "/Users/dave/Documents/Arduino/tcLibraryDev/lib/tcMenu/examples/esp32SimHub/esp32SimHub.emf",
+  "author": "dave",
   "lastEdited": {
-    "seconds": 1614797366,
-    "nanos": 0
+    "seconds": 1616260100,
+    "nanos": 660482000
   },
+  "namingRecursive": false,
+  "items": [
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "maxValue": 1000,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "",
+        "name": "Speed",
+        "variableName": "",
+        "id": 1,
+        "eepromAddress": -1,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "maxValue": 32000,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "",
+        "name": "RPM",
+        "variableName": "",
+        "id": 2,
+        "eepromAddress": -1,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "textItem",
+      "item": {
+        "textLength": 2,
+        "itemType": "PLAIN_TEXT",
+        "name": "Gear",
+        "variableName": "",
+        "id": 6,
+        "eepromAddress": -1,
+        "functionName": "",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "maxValue": 255,
+        "offset": 0,
+        "divisor": 0,
+        "unitName": "C",
+        "name": "Tyre Temp",
+        "variableName": "",
+        "id": 7,
+        "eepromAddress": -1,
+        "functionName": "",
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "boolItem",
+      "item": {
+        "naming": "ON_OFF",
+        "name": "SimHub Link",
+        "variableName": "",
+        "id": 3,
+        "eepromAddress": -1,
+        "functionName": "onConnectionChange",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "Settings",
+        "variableName": "",
+        "id": 4,
+        "eepromAddress": -1,
+        "functionName": "",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "analogItem",
+      "item": {
+        "maxValue": 100,
+        "offset": 0,
+        "divisor": 2,
+        "unitName": "",
+        "name": "Test Item 1",
+        "variableName": "",
+        "id": 5,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "actionMenu",
+      "item": {
+        "name": "Show Dialogs",
+        "variableName": "",
+        "id": 11,
+        "eepromAddress": -1,
+        "functionName": "onShowDialogs",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "enumItem",
+      "item": {
+        "enumEntries": [
+          "F1 Wheel",
+          "GT3 Wheel",
+          "Custom"
+        ],
+        "name": "Dashboard",
+        "variableName": "",
+        "id": 8,
+        "eepromAddress": -1,
+        "functionName": "onDashChanged",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "maxValue": 999,
+        "offset": 0,
+        "divisor": 0,
+        "unitName": "",
+        "name": "Lap",
+        "variableName": "",
+        "id": 10,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "actionMenu",
+      "item": {
+        "name": "Show dashboard",
+        "variableName": "",
+        "id": 9,
+        "eepromAddress": -1,
+        "functionName": "onShowDash",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    }
+  ],
   "codeOptions": {
+    "embeddedPlatform": "ARDUINO_ESP32",
+    "lastDisplayUuid": "4dcb12ec-13d8-4466-b8b6-bd575eae4612",
+    "lastInputUuid": "cc0f9246-03be-4adf-b1f5-dd501085122a",
+    "lastRemoteUuid": "4123dfc3-5271-4727-81f0-1a21d06b666b",
+    "lastThemeUuid": "03c6b25f-db63-402a-8447-a5ce1484c14d",
     "applicationUUID": "4db9fbfe-9fab-4759-b8ff-3e0c6700f475",
     "applicationName": "SimHub Link",
-    "lastInputUuid": "cc0f9246-03be-4adf-b1f5-dd501085122a",
-    "lastDisplayUuid": "4dcb12ec-13d8-4466-b8b6-bd575eae4612",
-    "lastRemoteUuid": "4123dfc3-5271-4727-81f0-1a21d06b666b",
-    "embeddedPlatform": "ARDUINO_ESP32",
-    "namingRecursive": true,
-    "saveToSrc": false,
-    "useCppMain": false,
     "lastProperties": [
-      {
-        "name": "SWITCH_THRESHOLD",
-        "latestValue": "800",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "INTERRUPT_SWITCHES",
-        "latestValue": "true",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "TP_HIGH_VOLTAGE",
-        "latestValue": "TOUCH_HVOLT_2V7",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "TP_LOW_VOLTAGE",
-        "latestValue": "TOUCH_LVOLT_0V5",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "TP_ATTENUATION",
-        "latestValue": "TOUCH_HVOLT_ATTEN_1V",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "UP_SENSOR",
-        "latestValue": "5",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "DOWN_SENSOR",
-        "latestValue": "7",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "BACK_SENSOR",
-        "latestValue": "-1",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "NEXT_SENSOR",
-        "latestValue": "-1",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "SELECT_SENSOR",
-        "latestValue": "6",
-        "subsystem": "INPUT"
-      },
       {
         "name": "DISPLAY_VARIABLE",
         "latestValue": "gfx",
@@ -115,19 +248,59 @@
         "subsystem": "DISPLAY"
       },
       {
-        "name": "DISPLAY_TITLE_FONT",
-        "latestValue": "FreeSans18pt7b",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "DISPLAY_ITEM_FONT",
-        "latestValue": "FreeSans9pt7b",
-        "subsystem": "DISPLAY"
-      },
-      {
         "name": "UPDATES_PER_SEC",
         "latestValue": "5",
         "subsystem": "DISPLAY"
+      },
+      {
+        "name": "SWITCH_THRESHOLD",
+        "latestValue": "800",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "INTERRUPT_SWITCHES",
+        "latestValue": "true",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "TP_HIGH_VOLTAGE",
+        "latestValue": "TOUCH_HVOLT_2V7",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "TP_LOW_VOLTAGE",
+        "latestValue": "TOUCH_LVOLT_0V5",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "TP_ATTENUATION",
+        "latestValue": "TOUCH_HVOLT_ATTEN_1V",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "UP_SENSOR",
+        "latestValue": "5",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "DOWN_SENSOR",
+        "latestValue": "7",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "BACK_SENSOR",
+        "latestValue": "-1",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "NEXT_SENSOR",
+        "latestValue": "-1",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SELECT_SENSOR",
+        "latestValue": "6",
+        "subsystem": "INPUT"
       },
       {
         "name": "SERIAL_PORT",
@@ -138,191 +311,45 @@
         "name": "STATUS_MENUITEM",
         "latestValue": "3",
         "subsystem": "REMOTE"
+      },
+      {
+        "name": "ITEM_FONT",
+        "latestValue": "ada:FreeSans9pt7b,1",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_FONT",
+        "latestValue": "ada:FreeSans12pt7b,1",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "FONT_INCLUDE_FOLDER",
+        "latestValue": "Fonts",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "BORDER_FOR_ACTIONS",
+        "latestValue": "0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_SHOW_MODE",
+        "latestValue": "TITLE_FIRST_ROW",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "USE_SLIDER_ANALOG",
+        "latestValue": "true",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "NEED_EDITING_ICONS",
+        "latestValue": "true",
+        "subsystem": "THEME"
       }
-    ]
-  },
-  "projectName": "/Users/dave/Documents/Arduino/tcLibraryDev/lib/tcMenu/examples/esp32SimHub/esp32SimHub.emf",
-  "namingRecursive": true,
-  "version": "1.00",
-  "items": [
-    {
-      "parentId": 0,
-      "type": "analogItem",
-      "item": {
-        "name": "Speed",
-        "eepromAddress": -1,
-        "id": 1,
-        "readOnly": true,
-        "localOnly": false,
-        "visible": true,
-        "variableName": "",
-        "maxValue": 1000,
-        "offset": 0,
-        "divisor": 1,
-        "unitName": ""
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "analogItem",
-      "item": {
-        "name": "RPM",
-        "eepromAddress": -1,
-        "id": 2,
-        "readOnly": true,
-        "localOnly": false,
-        "visible": true,
-        "variableName": "",
-        "maxValue": 32000,
-        "offset": 0,
-        "divisor": 1,
-        "unitName": ""
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "textItem",
-      "item": {
-        "name": "Gear",
-        "eepromAddress": -1,
-        "id": 6,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "functionName": "",
-        "variableName": "",
-        "itemType": "PLAIN_TEXT",
-        "textLength": 2
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "analogItem",
-      "item": {
-        "name": "Tyre Temp",
-        "eepromAddress": -1,
-        "id": 7,
-        "readOnly": true,
-        "localOnly": false,
-        "visible": true,
-        "functionName": "",
-        "variableName": "",
-        "maxValue": 255,
-        "offset": 0,
-        "divisor": 0,
-        "unitName": "C"
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "boolItem",
-      "item": {
-        "name": "SimHub Link",
-        "eepromAddress": -1,
-        "id": 3,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "functionName": "onConnectionChange",
-        "variableName": "",
-        "naming": "ON_OFF"
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "subMenu",
-      "item": {
-        "name": "Settings",
-        "eepromAddress": -1,
-        "id": 4,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "functionName": "",
-        "variableName": "",
-        "secured": false
-      }
-    },
-    {
-      "parentId": 4,
-      "type": "analogItem",
-      "item": {
-        "name": "Test Item 1",
-        "eepromAddress": -1,
-        "id": 5,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "variableName": "",
-        "maxValue": 100,
-        "offset": 0,
-        "divisor": 2,
-        "unitName": ""
-      }
-    },
-    {
-      "parentId": 4,
-      "type": "actionMenu",
-      "item": {
-        "name": "Show Dialogs",
-        "eepromAddress": -1,
-        "id": 11,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "functionName": "onShowDialogs",
-        "variableName": ""
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "enumItem",
-      "item": {
-        "name": "Dashboard",
-        "eepromAddress": -1,
-        "id": 8,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "functionName": "onDashChanged",
-        "variableName": "",
-        "enumEntries": [
-          "F1 Wheel",
-          "GT3 Wheel",
-          "Custom"
-        ]
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "analogItem",
-      "item": {
-        "name": "Lap",
-        "eepromAddress": -1,
-        "id": 10,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "variableName": "",
-        "maxValue": 999,
-        "offset": 0,
-        "divisor": 0,
-        "unitName": ""
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "actionMenu",
-      "item": {
-        "name": "Show dashboard",
-        "eepromAddress": -1,
-        "id": 9,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "functionName": "onShowDash",
-        "variableName": ""
-      }
-    }
-  ]
+    ],
+    "namingRecursive": true,
+    "saveToSrc": false,
+    "useCppMain": false
+  }
 }

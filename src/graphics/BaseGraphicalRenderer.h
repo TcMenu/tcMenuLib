@@ -12,7 +12,8 @@
 #define TCMENU_BASEGRAPHICALRENDERER_H
 
 #include <BaseRenderers.h>
-#include <graphics/GfxMenuConfig.h>
+#include "GfxMenuConfig.h"
+#include "RuntimeTitleMenuItem.h"
 
 namespace tcgfx {
 
@@ -113,7 +114,7 @@ namespace tcgfx {
 
         void setTitleMode(TitleMode mode) {
             titleMode = mode;
-            redrawMode = MENUDRAW_COMPLETE_REDRAW;
+            displayPropertiesHaveChanged();
         }
 
         void setUseSliderForAnalog(bool useSlider) {
@@ -179,12 +180,12 @@ namespace tcgfx {
          * Find the active item in the current list that is being presented, defaults to item 0.
          * @return the active item
          */
-        int findActiveItem();
+        int findActiveItem(MenuItem* root) override;
 
         /**
          * @return the total number of items in the current menu
          */
-        int getTotalItemsInMenu();
+        uint8_t itemCount(MenuItem* root, bool) override;
 
         /**
          * Provides the menu item grid position and dimensions of it, given a screen position. Usually used by touch screen
@@ -199,7 +200,7 @@ namespace tcgfx {
         /**
          * Gets the menu item at a given index, which may be different to the order in the tree.
          */
-        MenuItem *getMenuItemAtIndex(uint16_t idx);
+        MenuItem *getMenuItemAtIndex(MenuItem* currentRoot, uint8_t idx) override;
 
         /**
          * All base graphical renderers use a dialog based on menu item, this provides the greatest flexibility and
@@ -234,7 +235,7 @@ namespace tcgfx {
 
         void redrawAllWidgets(bool forceRedraw);
 
-        int heightOfRow(int row, int col);
+        int heightOfRow(int row);
 
         bool areRowsOutOfOrder();
 
@@ -254,12 +255,6 @@ namespace tcgfx {
         float ratio = (float) screenWidth / (float) item->getMaximumValue();
         return int((float) item->getCurrentValue() * ratio);
     }
-
-    /**
-     * Invokes the callback provided when the title menu item is pressed.
-     * @param cb the callback to fire when the title is selected
-     */
-    void setTitlePressedCallback(MenuCallbackFn cb);
 
     /**
      * This method takes an existing graphics configuration and converts it into the new display properties format, its

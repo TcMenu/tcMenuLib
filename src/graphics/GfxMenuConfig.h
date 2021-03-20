@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2018 https://www.thecoderscorner.com (Nutricherry LTD).
+ * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
+ */
+
 #ifndef _GFX_MENU_CONFIG_H_
 #define _GFX_MENU_CONFIG_H_
 
@@ -223,20 +228,21 @@ namespace tcgfx {
         color_t colors[SIZEOF_COLOR_ARRAY];
         MenuPadding padding;
         const void* fontData;
+        MenuBorder borderWidths;
         uint8_t fontMagnification: 4;
         uint8_t defaultJustification: 4;
         uint8_t spaceAfter;
         uint8_t requiredHeight;
     public:
-        ItemDisplayProperties() : propsKey(0), colors{}, padding(), fontData(nullptr), fontMagnification(1), defaultJustification(0), spaceAfter(0), requiredHeight(0) {}
-        ItemDisplayProperties(uint32_t key, color_t* palette, const MenuPadding& pad, const void* font, uint8_t mag, uint8_t spacing,
-                              uint8_t height, GridPosition::GridJustification defaultJustification)
-                              : propsKey(key), padding{pad}, fontData(font), fontMagnification(mag), defaultJustification(defaultJustification),
+        ItemDisplayProperties() : propsKey(0), colors{}, padding(), fontData(nullptr), borderWidths(), fontMagnification(1), defaultJustification(0), spaceAfter(0), requiredHeight(0) {}
+        ItemDisplayProperties(uint32_t key, const color_t* palette, const MenuPadding& pad, const void* font, uint8_t mag, uint8_t spacing,
+                              uint8_t height, GridPosition::GridJustification defaultJustification, MenuBorder borderWidths)
+                              : propsKey(key), padding{pad}, fontData(font), borderWidths(borderWidths), fontMagnification(mag), defaultJustification(defaultJustification),
                                 spaceAfter(spacing), requiredHeight(height) {
             memcpy(colors, palette, sizeof colors);
         }
         ItemDisplayProperties(const ItemDisplayProperties& other) : propsKey(other.propsKey), padding{other.padding}, fontData(other.fontData),
-                                fontMagnification(other.fontMagnification), defaultJustification(other.defaultJustification),
+                                borderWidths(other.borderWidths), fontMagnification(other.fontMagnification), defaultJustification(other.defaultJustification),
                                 spaceAfter(other.spaceAfter), requiredHeight(other.requiredHeight) {
             memcpy(colors, other.colors, sizeof colors);
         }
@@ -245,6 +251,7 @@ namespace tcgfx {
             propsKey = other.propsKey;
             padding = other.padding;
             fontData = other.fontData;
+            borderWidths = other.borderWidths;
             fontMagnification = other.fontMagnification;
             defaultJustification = other.defaultJustification;
             spaceAfter = other.spaceAfter;
@@ -255,7 +262,7 @@ namespace tcgfx {
 
         uint32_t getKey() const { return propsKey; }
 
-        GridPosition::GridJustification getDefaultJustification() { return (GridPosition::GridJustification)defaultJustification; }
+        GridPosition::GridJustification getDefaultJustification() const { return (GridPosition::GridJustification)defaultJustification; }
 
         void setDefaultJustification(GridPosition::GridJustification justification) { defaultJustification = justification; }
 
@@ -276,7 +283,7 @@ namespace tcgfx {
             colors[color] = value;
         }
 
-        void setColors(color_t* palette) {
+        void setColors(const color_t* palette) {
             memcpy(colors, palette, sizeof colors);
         }
 
@@ -286,6 +293,14 @@ namespace tcgfx {
 
         void setPadding(const MenuPadding& pad) {
             padding = pad;
+        }
+
+        MenuBorder getBorder() const {
+            return borderWidths;
+        }
+
+        void setBorder(MenuBorder border) {
+            borderWidths = border;
         }
 
         uint8_t getFontMagnification() const {
@@ -320,6 +335,7 @@ namespace tcgfx {
         virtual DrawableIcon* iconForMenuItem(uint16_t id) = 0;
         virtual GridPositionWithId* gridPositionForItem(MenuItem* pItem) = 0;
         virtual color_t getSelectedColor(ItemDisplayProperties::ColorType colorType)  = 0;
+        virtual void addGridPosition(MenuItem* item, const GridPosition& position)  = 0;
     };
 
     /**
@@ -331,7 +347,7 @@ namespace tcgfx {
      */
     class NullItemDisplayPropertiesFactory : public ItemDisplayPropertiesFactory {
     private:
-        ItemDisplayProperties props = ItemDisplayProperties(0, {}, MenuPadding(0), nullptr, 1, 0, 1, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT);
+        ItemDisplayProperties props = ItemDisplayProperties(0, {}, MenuPadding(0), nullptr, 1, 0, 1, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, MenuBorder());
         BtreeList<uint16_t, GridPositionWithId> gridByItem;
     public:
         NullItemDisplayPropertiesFactory() : gridByItem(4) {}
@@ -353,13 +369,14 @@ namespace tcgfx {
             return gridByItem.getByKey(pItem->getId());
         }
 
-        void addGridPosition(MenuItem* pItem, const GridPosition& position) {
+        void addGridPosition(MenuItem* pItem, const GridPosition& position) override {
             if(!pItem) return;
             auto* grid = gridByItem.getByKey(pItem->getId());
             if(grid) {
                 grid->setNewPosition(position);
             }
             else {
+                serdebugF2("Adding grid ", pItem->getId());
                 gridByItem.add(GridPositionWithId(pItem->getId(), position));
             }
         }
@@ -405,7 +422,7 @@ namespace tcgfx {
             return colorType == ItemDisplayProperties::BACKGROUND ? selectedBackgroundColor : selectedTextColor;
         }
 
-        void addGridPosition(MenuItem* pItem, const GridPosition& position) {
+        void addGridPosition(MenuItem* pItem, const GridPosition& position) override {
             if(!pItem) return;
             auto* grid = gridByItem.getByKey(pItem->getId());
             if(grid) {
@@ -426,28 +443,30 @@ namespace tcgfx {
             }
         }
 
-        void setDrawingPropertiesDefault(ItemDisplayProperties::ComponentType drawing, color_t* palette, MenuPadding pad, const void *font,
-                                         uint8_t mag,uint8_t spacing, uint8_t requiredHeight, GridPosition::GridJustification defaultJustification) {
-            setDrawingProperties(MakePropsKey(MENUID_NOTSET, false, drawing), palette, pad, font, mag, spacing, requiredHeight, defaultJustification);
+        void setDrawingPropertiesDefault(ItemDisplayProperties::ComponentType drawing, const color_t* palette, MenuPadding pad, const void *font, uint8_t mag,
+                                         uint8_t spacing, uint8_t requiredHeight, GridPosition::GridJustification defaultJustification, MenuBorder border) {
+            setDrawingProperties(MakePropsKey(MENUID_NOTSET, false, drawing), palette, pad, font, mag, spacing, requiredHeight, defaultJustification, border);
         }
 
-        void setDrawingPropertiesForItem(ItemDisplayProperties::ComponentType drawing, uint16_t id, color_t* palette, MenuPadding pad, const void *font,
-                                         uint8_t mag,uint8_t spacing, uint8_t requiredHeight, GridPosition::GridJustification defaultJustification) {
-            setDrawingProperties(MakePropsKey(id, false, drawing), palette, pad, font, mag, spacing, requiredHeight, defaultJustification);
+        void setDrawingPropertiesForItem(ItemDisplayProperties::ComponentType drawing, uint16_t id, const color_t* palette, MenuPadding pad, const void *font, uint8_t mag,
+                                         uint8_t spacing, uint8_t requiredHeight, GridPosition::GridJustification defaultJustification, MenuBorder border) {
+            setDrawingProperties(MakePropsKey(id, false, drawing), palette, pad, font, mag, spacing, requiredHeight, defaultJustification, border);
         }
 
-        void setDrawingPropertiesAllInSub(ItemDisplayProperties::ComponentType drawing, uint16_t id, color_t* palette, MenuPadding pad, const void *font,
-                                          uint8_t mag, uint8_t spacing, uint8_t requiredHeight, GridPosition::GridJustification defaultJustification) {
-            setDrawingProperties(MakePropsKey(id, true, drawing), palette, pad, font, mag, spacing, requiredHeight, defaultJustification);
+        void setDrawingPropertiesAllInSub(ItemDisplayProperties::ComponentType drawing, uint16_t id, const color_t* palette, MenuPadding pad, const void *font, uint8_t mag,
+                                          uint8_t spacing, uint8_t requiredHeight, GridPosition::GridJustification defaultJustification, MenuBorder border) {
+            setDrawingProperties(MakePropsKey(id, true, drawing), palette, pad, font, mag, spacing, requiredHeight, defaultJustification, border);
         }
 
-        void setDrawingProperties(uint32_t key, color_t* palette, MenuPadding pad, const void* font, uint8_t mag, uint8_t spacing,
-                                  uint8_t requiredHeight, GridPosition::GridJustification defaultJustification);
+        void setDrawingProperties(uint32_t key, const color_t* palette, MenuPadding pad, const void* font, uint8_t mag, uint8_t spacing,
+                                  uint8_t requiredHeight, GridPosition::GridJustification defaultJustification, MenuBorder border);
 
         void setSelectedColors(color_t background, color_t text) {
             selectedBackgroundColor = background;
             selectedTextColor = text;
         }
+
+        static void refreshCache();
     };
 
 } // namespace tcgfx

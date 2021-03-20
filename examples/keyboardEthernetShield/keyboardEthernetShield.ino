@@ -81,7 +81,7 @@ void setup() {
 	Serial.begin(115200);
 	Wire.begin();
     Wire.setClock(400000);
-    lcd.setDelayTime(20);
+    lcd.setDelayTime(0, 20);
     menuMgr.setEepromRef(&eeprom);
 
 	// now we enable authentication using EEPROM authentication. Where the EEPROM is
@@ -252,6 +252,7 @@ int CALLBACK_FUNCTION fnAdditionalCountListRtCall(RuntimeMenuItem * item, uint8_
         default: return false;
     }
 }
+
 
 
 

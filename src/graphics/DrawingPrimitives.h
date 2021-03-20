@@ -35,8 +35,19 @@ namespace tcgfx {
 /** this macro creates an RGB color based on R, G, B values between 0 and 255 */
 #define RGB(r, g, b) (uint16_t)( (((r)>>3)<<11) | (((g)>>2)<<5) | ((b)>>3) )
 #endif
+
     /**
-     * Defines padding for menu rendering when using the standard AdaGfx renderer. Each
+     * A font definition that holds both a possible font pointer and also the magnification
+     */
+     struct MenuFontDef {
+         const void* fontData;
+         const uint8_t fontMag;
+
+         MenuFontDef(const void* data, uint8_t mag) : fontData(data), fontMag(mag) { }
+     };
+
+    /**
+     * Defines padding for menu rendering when using graphical renderers. Each
      * position can hold the value 0..15
      */
     struct MenuPadding {
@@ -72,8 +83,45 @@ namespace tcgfx {
         padding.left = left;
     }
 
+    /**
+     * Used to represent a border in terms of top, right, bottom and left widths.
+     */
+    struct MenuBorder {
+        uint8_t top:2;
+        uint8_t left:2;
+        uint8_t bottom:2;
+        uint8_t right:2;
+
+        MenuBorder() = default;
+
+        explicit MenuBorder(uint8_t equalSides) {
+            top = left = bottom = right = equalSides;
+        }
+
+        MenuBorder(uint8_t top_, uint8_t right_, uint8_t bottom_, uint8_t left_) {
+            top = top_;
+            right = right_;
+            left = left_;
+            bottom = bottom_;
+        }
+
+        bool areAllBordersEqual() const {
+            return (top == left) && (left == right) && (right == bottom);
+        }
+
+        bool isBorderOff() const {
+            return areAllBordersEqual() && top == 0;
+        }
+    };
+
+
     /** A structure that holds both X and Y direction in a single 32 bit integer. Both x and y are public */
     struct Coord {
+        /** default construction sets values to 0 */
+        Coord() {
+            x = y = 0;
+        }
+
         /**
          * Create a coord based on an X and Y location
          * @param x the x location

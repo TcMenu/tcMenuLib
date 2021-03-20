@@ -204,7 +204,6 @@ namespace tcgfx {
         DeviceDrawable* rootDrawable;
         DeviceDrawable* drawable;
         ConfigurableItemDisplayPropertiesFactory propertiesFactory;
-        color_t coreBackgroundColor;
         bool redrawNeeded = false;
     public:
         GraphicsDeviceRenderer(int bufferSize, const char *appTitle, DeviceDrawable *drawable);
@@ -263,11 +262,12 @@ namespace tcgfx {
         DeviceDrawable* getDeviceDrawable() { return rootDrawable; }
     private:
         void internalDrawText(GridPositionRowCacheEntry* pEntry, const Coord& where, const Coord& size);
-        int drawCoreLineItem(GridPositionRowCacheEntry* entry, DrawableIcon* icon, const Coord &where, const Coord &size);
-        void drawTextualItem(GridPositionRowCacheEntry* entry, const Coord& where, const Coord& size);
-        void drawSlider(GridPositionRowCacheEntry* entry, AnalogMenuItem* pItem, const Coord& where, const Coord& size);
-        void drawUpDownItem(GridPositionRowCacheEntry* entry, const Coord& where, const Coord& size);
-        void drawIconItem(GridPositionRowCacheEntry *pEntry, const Coord& where, const Coord& size);
+        void drawCoreLineItem(GridPositionRowCacheEntry* entry, DrawableIcon* icon, Coord &where, Coord &size, bool drawBg);
+        void drawTextualItem(GridPositionRowCacheEntry* entry, Coord& where, Coord& size);
+        void drawSlider(GridPositionRowCacheEntry* entry, AnalogMenuItem* pItem, Coord& where, Coord& size);
+        void drawUpDownItem(GridPositionRowCacheEntry* entry, Coord& where, Coord& size);
+        void drawIconItem(GridPositionRowCacheEntry *pEntry, Coord& where, Coord& size);
+        void drawBorderAndAdjustSize(Coord &where, Coord &size, MenuBorder &border);
     };
 
 } // namespace tcgfx

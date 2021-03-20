@@ -265,3 +265,4 @@ void CALLBACK_FUNCTION onShowDialogs(int id) {
         dlg->copyIntoBuffer("text 1");
     }
 }
+

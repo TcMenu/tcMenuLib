@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2018 https://www.thecoderscorner.com (Nutricherry LTD).
+ * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
+ */
 
 #include <IoLogging.h>
 #include "MenuHistoryNavigator.h"
@@ -9,26 +13,16 @@ void tcnav::MenuNavigationStore::setRootItem(MenuItem *item) {
     currentRoot = root;
     currentSub = nullptr;
     navIdx = 0;
+    currentIsCustom = false;
 }
 
-bool tcnav::MenuNavigationStore::isItemWithinRoot(MenuItem *toCheck, MenuItem *item) {
-    if(item == nullptr) return true;
-    while(toCheck) {
-        if(item == toCheck) return true;
-        if(toCheck->getMenuType() == MENUTYPE_SUB_VALUE) {
-            if(isItemWithinRoot(reinterpret_cast<SubMenuItem*>(toCheck)->getChild(), item)) return true;
-        }
-        toCheck = toCheck->getNext();
-    }
-    return false;
-}
-
-void tcnav::MenuNavigationStore::navigateTo(MenuItem *activeItem, MenuItem *newRoot) {
+void tcnav::MenuNavigationStore::navigateTo(MenuItem *activeItem, MenuItem *newRoot, bool custom) {
     // we only stack when
-    if(navIdx < NAV_ITEM_ARRAY_SIZE && isItemWithinRoot(root, currentSub)) {
+    if(navIdx < NAV_ITEM_ARRAY_SIZE && !currentIsCustom) {
         navItems[navIdx] = currentRoot;
         activeItems[navIdx] = activeItem ? activeItem : currentRoot;
         serdebugF4("NavigateTo pushed ", navIdx, currentRoot->getId(), activeItems[navIdx]->getId());
+        currentIsCustom = custom;
         navIdx++;
     }
     else {
@@ -39,6 +33,7 @@ void tcnav::MenuNavigationStore::navigateTo(MenuItem *activeItem, MenuItem *newR
 }
 
 MenuItem *tcnav::MenuNavigationStore::popNavigationGetActive() {
+    currentIsCustom = false;
     if(navIdx == 0) {
         serdebugF("Nav pop root");
         currentSub = nullptr;
@@ -51,4 +46,8 @@ MenuItem *tcnav::MenuNavigationStore::popNavigationGetActive() {
         serdebugF3("Nav pop ", navIdx, currentRoot->getId());
         return activeItems[navIdx];
     }
+}
+
+bool tcnav::MenuNavigationStore::isShowingRoot() {
+    return currentRoot == root;
 }

@@ -1,8 +1,13 @@
+/*
+ * Copyright (c) 2018 https://www.thecoderscorner.com (Nutricherry LTD).
+ * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
+ */
 
 #include <PlatformDetermination.h>
 #include "GfxMenuConfig.h"
-#include <MenuIterator.h>
-#include <tcMenu.h>
+#include "BaseGraphicalRenderer.h"
+#include "MenuIterator.h"
+#include "tcMenu.h"
 
 /**
  * The default editing icon for approx 100-150 dpi resolution displays
@@ -63,7 +68,7 @@ ItemDisplayProperties *ConfigurableItemDisplayPropertiesFactory::configFor(MenuI
     if(displayProperties.count()==0) {
         color_t defaultColors[] = { RGB(255,255,255), RGB(0,0,0), RGB(255, 255, 255), RGB(255, 255, 255)};
         setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, defaultColors, MenuPadding(0), nullptr,
-                                    1, 2, 10, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT);
+                                    1, 2, 10, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, MenuBorder());
     }
 
     ItemDisplayProperties *pConf = nullptr;
@@ -81,9 +86,10 @@ ItemDisplayProperties *ConfigurableItemDisplayPropertiesFactory::configFor(MenuI
 
 }
 
-void ConfigurableItemDisplayPropertiesFactory::setDrawingProperties(uint32_t key, color_t *palette, MenuPadding pad,
+void ConfigurableItemDisplayPropertiesFactory::setDrawingProperties(uint32_t key, const color_t *palette, MenuPadding pad,
                                                                     const void *font, uint8_t mag, uint8_t spacing,
-                                                                    uint8_t requiredHeight, GridPosition::GridJustification just) {
+                                                                    uint8_t requiredHeight, GridPosition::GridJustification just,
+                                                                    MenuBorder border) {
     auto* pDisplayProperties = displayProperties.getByKey(key);
     if(pDisplayProperties) {
         pDisplayProperties->setColors(palette);
@@ -92,10 +98,17 @@ void ConfigurableItemDisplayPropertiesFactory::setDrawingProperties(uint32_t key
         pDisplayProperties->setRequiredHeight(requiredHeight);
         pDisplayProperties->setSpaceAfter(spacing);
         pDisplayProperties->setDefaultJustification(just);
+        pDisplayProperties->setBorder(border);
     }
     else {
-        displayProperties.add(ItemDisplayProperties(key, palette, pad, font, mag, spacing, requiredHeight, just));
+        displayProperties.add(ItemDisplayProperties(key, palette, pad, font, mag, spacing, requiredHeight, just, border));
     }
 }
+
+    void ConfigurableItemDisplayPropertiesFactory::refreshCache() {
+        if(BaseMenuRenderer::getInstance()->getRendererType() == RENDER_TYPE_CONFIGURABLE) {
+            reinterpret_cast<BaseGraphicalRenderer *>(MenuRenderer::getInstance())->displayPropertiesHaveChanged();
+        }
+    }
 
 } // namespace

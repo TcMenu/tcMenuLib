@@ -270,7 +270,7 @@ void MenuBasedDialog::internalSetVisible(bool visible) {
     bitWrite(flags, DLG_FLAG_NEEDS_RENDERING, false);
     if(visible) {
         auto* renderer =  reinterpret_cast<BaseGraphicalRenderer*>(MenuRenderer::getInstance());
-        auto& factory = static_cast<ConfigurableItemDisplayPropertiesFactory&>(renderer->getDisplayPropertiesFactory());
+        auto& factory = static_cast<ItemDisplayPropertiesFactory&>(renderer->getDisplayPropertiesFactory());
 
         btn1Item.setVisible(button1 != BTNTYPE_NONE);
         btn2Item.setVisible(button2 != BTNTYPE_NONE);
@@ -280,15 +280,7 @@ void MenuBasedDialog::internalSetVisible(bool visible) {
         factory.addGridPosition(&btn2Item, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_RIGHT_NO_VALUE, 2, 2, row, 0));
         factory.addGridPosition(&bufferItem, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_LEFT_VALUE_ONLY, 1, 0));
 
-        MenuItem* pItem = &backItem;
-        while(pItem) {
-            pItem->setActive(false);
-            pItem->setEditing(false);
-            pItem = pItem->getNext();
-        }
-        btn1Item.setActive(true);
-
-        menuMgr.navigateToMenu(&backItem);
+        menuMgr.navigateToMenu(&backItem, &btn1Item, true);
     }
     else {
         resetDialogFields();
@@ -315,4 +307,9 @@ void MenuBasedDialog::resetDialogFields() {
     bufferItem.setReadOnly(true);
     btn1Item.setNext(&btn2Item);
     addedMenuItems = 0;
+
+    backItem.setActive(false);
+    bufferItem.setActive(false);
+    btn1Item.setActive(false);
+    btn2Item.setActive(false);
 }

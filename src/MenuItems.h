@@ -259,6 +259,9 @@ enum MenuType : uint8_t {
     MENUTYPE_SUB_VALUE = 155,
     /** represents the title item, never sent remotely, only for display */
     MENUTYPE_TITLE_ITEM = 156,
+    /** A button that can only be part of a dialog */
+    MENUTYPE_DIALOG_BUTTON = 157,
+
     /** item is of type TextMenuItem */
 	MENUTYPE_TEXT_VALUE = 200,
 	/** item is an IP address and is editable per segment */
@@ -677,6 +680,7 @@ void copyMenuItemNameAndValue(const MenuItem* item, char* buffer, size_t bufferS
  * Any MenuType with an ID less than 100 is editable as an integer
  */
 inline bool isMenuBasedOnValueItem(const MenuItem* item) {
+    if(item == nullptr) return false;
 	auto ty =  uint8_t(item->getMenuType());
 	return ty == MENUTYPE_INT_VALUE || ty == MENUTYPE_ENUM_VALUE || ty == MENUTYPE_BOOLEAN_VALUE;
 }
@@ -685,14 +689,14 @@ inline bool isMenuBasedOnValueItem(const MenuItem* item) {
  * returns true if the menu item is an editable runtime item
  */
 inline bool isMenuRuntime(const MenuItem* t) {
-	return (uint8_t(t->getMenuType()) >= uint8_t(MENUTYPE_RUNTIME_VALUE));
+	return t && (uint8_t(t->getMenuType()) >= uint8_t(MENUTYPE_RUNTIME_VALUE));
 }
 
 /**
  * Returns true if the menu item is a runtime item type. Otherwise returns false.
  */
 inline bool isMenuRuntimeMultiEdit(const MenuItem* t) {
-	return (uint8_t(t->getMenuType()) >= uint8_t(MENUTYPE_TEXT_VALUE));
+	return t && (uint8_t(t->getMenuType()) >= uint8_t(MENUTYPE_TEXT_VALUE));
 }
 
 /**

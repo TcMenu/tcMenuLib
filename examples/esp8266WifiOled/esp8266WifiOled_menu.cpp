@@ -10,6 +10,7 @@
 
 #include <tcMenu.h>
 #include "esp8266WifiOled_menu.h"
+#include "ThemeMonoInverse.h"
 
 // Global variable declarations
 
@@ -69,19 +70,21 @@ AnalogMenuItem menuTomatoTemp(&minfoTomatoTemp, 0, &menuCucumberTemp);
 // Set up code
 
 void setupMenu() {
-    gfx.begin();
-    renderer.setUpdatesPerSecond(10);
-    renderer.prepareDisplay(true, NULL, 1, &u8g2_font_timB08_tr, 1, true);
-    switches.initialise(internalDigitalIo(), true);
-    menuMgr.initForEncoder(&renderer, &menuTomatoTemp, 13, 12, 14);
-    remoteServer.begin(&server, &applicationInfo);
-
     // Read only and local only function calls
+    menuIpAddress.setReadOnly(true);
     menuTomatoTemp.setReadOnly(true);
     menuCucumberTemp.setReadOnly(true);
-    menuIpAddress.setReadOnly(true);
     menuPwd.setLocalOnly(true);
     menuSSID.setLocalOnly(true);
     menuSecretEntry.setVisible(false);
+
+    gfx.begin();
+    renderer.setUpdatesPerSecond(10);
+    switches.initialise(internalDigitalIo(), true);
+    menuMgr.initForEncoder(&renderer, &menuTomatoTemp, 13, 12, 14);
+    remoteServer.begin(&server, &applicationInfo);
+    renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
+    renderer.setUseSliderForAnalog(false);
+    installMonoInverseTitleTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(u8g2_font_sirclivethebold_tr, 1), true);
 }
 

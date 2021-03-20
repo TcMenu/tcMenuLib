@@ -30,8 +30,6 @@
 #define DISPLAY_RESET_PIN 16
 #define DISPLAY_CS_PIN U8X8_PIN_NONE
 #define DISPLAY_RS_PIN U8X8_PIN_NONE
-#define DISPLAY_TITLE_FONT u8g2_font_timB08_tr
-#define DISPLAY_ITEM_FONT NULL
 #define UPDATES_PER_SEC 10
 #define PULLUP_LOGIC true
 #define INTERRUPT_SWITCHES false
@@ -39,7 +37,15 @@
 #define ENCODER_PIN_A 13
 #define ENCODER_PIN_B 12
 #define ENCODER_PIN_OK 14
+#define ENCODER_BACK_PIN -1
+#define ENCODER_NEXT_PIN -1
 #define LISTEN_PORT 3333
+#define ITEM_FONT def:,1
+#define TITLE_FONT avl:u8g2_font_sirclivethebold_tr,1
+#define FONT_INCLUDE_FOLDER 
+#define TITLE_HEADER_PADDING 2
+#define TITLE_TO_ITEM_SPACING 2
+#define TITLE_SHOW_MODE TITLE_FIRST_ROW
 
 // all variables that need exporting
 extern U8G2_SH1106_128X64_NONAME_F_SW_I2C gfx;

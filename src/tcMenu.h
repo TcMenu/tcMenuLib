@@ -272,7 +272,14 @@ public:
 	 */
 	void changeMenu(MenuItem* possibleActive=nullptr);
 
-	void navigateToMenu(MenuItem* theNewItem);
+	/**
+	 * Navigate to the menu and ensure it is display, further, you can optionally provide an item in the menu to
+	 * activate, not doing so selects the first possible item.
+	 * @param theNewItem the root menu item to display
+	 * @param possibleActive the item to activate or null for default
+	 * @param customMenu set to true if this menu is custom and should not be stored in the history
+	 */
+	void navigateToMenu(MenuItem* theNewItem, MenuItem* possibleActive = nullptr, bool customMenu = false);
 
 	/**
 	 * Force a complete reset of the menu

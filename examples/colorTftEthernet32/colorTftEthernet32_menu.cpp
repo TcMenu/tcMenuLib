@@ -85,7 +85,6 @@ void setupMenu() {
     gfx.initR(INITR_BLACKTAB);
     gfx.setRotation(1);
     renderer.setUpdatesPerSecond(5);
-    renderer.prepareDisplay(false, NULL, 1, &FreeSans9pt7b, 1, true);
     switches.initialiseInterrupt(io8574, true);
     menuMgr.initForEncoder(&renderer, &menuVoltage, 7, 6, 5);
     remoteServer.begin(&server, &applicationInfo);

@@ -322,3 +322,10 @@ void CALLBACK_FUNCTION onLoadFiles(int id) {
 void CALLBACK_FUNCTION onLockDoor(int id) {
     // Here we'd actually handle the door lock
 }
+
+
+
+
+
+
+

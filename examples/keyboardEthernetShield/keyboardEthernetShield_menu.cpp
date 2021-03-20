@@ -80,16 +80,16 @@ TimeFormattedMenuItem menuTime(fnTimeRtCall, 1, (MultiEditWireType)3, &menuAnalo
 // Set up code
 
 void setupMenu() {
+    // Read only and local only function calls
+    menuConnectivity.setLocalOnly(true);
+    menuConnectivity.setSecured(true);
+    menuHiddenItem.setVisible(false);
+
     lcd.setIoAbstraction(io23017);
     lcd.begin(20, 4);
     renderer.setUpdatesPerSecond(4);
     switches.initialise(io23017, true);
     menuMgr.initForEncoder(&renderer, &menuTime, 6, 7, 5);
     remoteServer.begin(&server, &applicationInfo);
-
-    // Read only and local only function calls
-    menuConnectivity.setLocalOnly(true);
-    menuConnectivity.setSecured(true);
-    menuHiddenItem.setVisible(false);
 }
 

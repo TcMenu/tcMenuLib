@@ -160,6 +160,46 @@ void BaseMenuRenderer::setFirstWidget(TitleWidget* widget) {
 	this->redrawMode = MENUDRAW_COMPLETE_REDRAW;
 }
 
+int BaseMenuRenderer::findActiveItem(MenuItem *root) {
+    uint8_t i = 0;
+    MenuItem *itm = root;
+    while (itm != nullptr) {
+        if (itm->isVisible()) {
+            if (itm->isActive() || itm->isEditing()) {
+                return i;
+            }
+            i++;
+        }
+        itm = itm->getNext();
+    }
+    return 0;
+}
+
+uint8_t BaseMenuRenderer::itemCount(MenuItem* item, bool includeNonVisible) {
+    uint8_t count = 0;
+    while (item) {
+        if (includeNonVisible || item->isVisible()) ++count;
+        item = item->getNext();
+    }
+    return count;
+}
+
+MenuItem *BaseMenuRenderer::getMenuItemAtIndex(MenuItem *root, uint8_t pos) {
+    uint8_t i = 0;
+    MenuItem *itm = root;
+
+    while (itm != nullptr) {
+        if (itm->isVisible()) {
+            if (i == pos) {
+                return itm;
+            }
+            i++;
+        }
+        itm = itm->getNext();
+    }
+    return root;
+}
+
 TitleWidget::TitleWidget(const uint8_t * const* icons, uint8_t maxStateIcons, uint8_t width, uint8_t height, TitleWidget* next) {
 	this->iconData = icons;
 	this->maxStateIcons = maxStateIcons;
@@ -189,7 +229,7 @@ BaseDialog* NoRenderer::getDialog() {
 bool isItemActionable(MenuItem* item) {
 	if (item->getMenuType() == MENUTYPE_SUB_VALUE || item->getMenuType() == MENUTYPE_ACTION_VALUE 
 		|| item->getMenuType() == MENUTYPE_ACTIVATE_SUBMENU || item->getMenuType() == MENUTYPE_RUNTIME_VALUE
-        || item->getMenuType() == MENUTYPE_TITLE_ITEM) return true;
+        || item->getMenuType() == MENUTYPE_TITLE_ITEM || item->getMenuType() == MENUTYPE_DIALOG_BUTTON) return true;
 
 	if (item->getMenuType() == MENUTYPE_RUNTIME_LIST) {
 		return reinterpret_cast<ListRuntimeMenuItem*>(item)->isActingAsParent();

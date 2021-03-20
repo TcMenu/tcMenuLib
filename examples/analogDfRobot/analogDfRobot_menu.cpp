@@ -6,44 +6,41 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
-*/
+ */
 
-#include <Arduino.h>
 #include <tcMenu.h>
 #include "analogDfRobot_menu.h"
 
 // Global variable declarations
 
-const PROGMEM ConnectorLocalInfo applicationInfo = { "DfRobot", "2ba37227-a412-40b7-94e7-42caf9bb0ff4" };
+const PROGMEM  ConnectorLocalInfo applicationInfo = { "DfRobot", "2ba37227-a412-40b7-94e7-42caf9bb0ff4" };
+
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 LiquidCrystalRenderer renderer(lcd, 16, 2);
 
 // Global Menu Item declarations
 
-const AnalogMenuInfo PROGMEM minfoCommits = { "Commits", 7, 0xFFFF, 65000, NO_CALLBACK, 0, 1, "" };
+const PROGMEM AnalogMenuInfo minfoCommits = { "Commits", 7, 0xffff, 65000, NO_CALLBACK, 0, 1, "" };
 AnalogMenuItem menuCommits(&minfoCommits, 0, NULL);
 ScrollChoiceMenuItem menuChooseItem(8, fnChooseItemRtCall, 0, 20, &menuCommits);
 RENDERING_CALLBACK_NAME_INVOKE(fnTextRtCall, textItemRenderFn, "Text", 4, NO_CALLBACK)
 TextMenuItem menuText(fnTextRtCall, 6, 6, &menuChooseItem);
 RENDERING_CALLBACK_NAME_INVOKE(fnLgeNumRtCall, largeNumItemRenderFn, "LgeNum", 10, NO_CALLBACK)
 EditableLargeNumberMenuItem menuLgeNum(fnLgeNumRtCall, 5, 8, 4, &menuText);
-const BooleanMenuInfo PROGMEM minfoL2 = { "L2", 4, 3, 1, onLed2, NAMING_ON_OFF };
+const PROGMEM BooleanMenuInfo minfoL2 = { "L2", 4, 3, 1, onLed2, NAMING_ON_OFF };
 BooleanMenuItem menuL2(&minfoL2, false, NULL);
-const BooleanMenuInfo PROGMEM minfoL1 = { "L1", 3, 2, 1, onLed1, NAMING_ON_OFF };
+const PROGMEM BooleanMenuInfo minfoL1 = { "L1", 3, 2, 1, onLed1, NAMING_ON_OFF };
 BooleanMenuItem menuL1(&minfoL1, false, &menuL2);
-const SubMenuInfo PROGMEM minfoLEDStates = { "LED States", 2, 0xFFFF, 0, NO_CALLBACK };
 RENDERING_CALLBACK_NAME_INVOKE(fnLEDStatesRtCall, backSubItemRenderFn, "LED States", -1, NO_CALLBACK)
+const PROGMEM SubMenuInfo minfoLEDStates = { "LED States", 2, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackLEDStates(fnLEDStatesRtCall, &menuL1);
 SubMenuItem menuLEDStates(&minfoLEDStates, &menuBackLEDStates, &menuLgeNum);
-const AnalogMenuInfo PROGMEM minfoValueA0 = { "Value A0", 1, 0xFFFF, 1024, NO_CALLBACK, 0, 1, "" };
+const PROGMEM AnalogMenuInfo minfoValueA0 = { "Value A0", 1, 0xffff, 1024, NO_CALLBACK, 0, 1, "" };
 AnalogMenuItem menuValueA0(&minfoValueA0, 0, &menuLEDStates);
-
 
 // Set up code
 
 void setupMenu() {
-    menuCommits.setReadOnly(true);
-
     lcd.begin(16, 2);
     renderer.setUpdatesPerSecond(2);
     lcd.configureBacklightPin(10);
@@ -53,4 +50,8 @@ void setupMenu() {
     menuMgr.initForUpDownOk(&renderer, &menuValueA0, DF_KEY_DOWN, DF_KEY_UP, DF_KEY_SELECT);
     menuMgr.setBackButton(DF_KEY_LEFT);
     menuMgr.setNextButton(DF_KEY_RIGHT);
+
+    // Read only and local only function calls
+    menuCommits.setReadOnly(true);
 }
+

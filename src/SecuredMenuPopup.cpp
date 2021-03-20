@@ -24,10 +24,11 @@ MenuItem* SecuredMenuPopup::start(SubMenuItem* securedMenu) {
 	actionProceedItem.setActive(false);
 	actionCancelItem.setSecuredItem(NULL);
 	actionCancelItem.setActive(false);
+	backMenuItem.setActive(false);
 
 	pinEntryItem.setTextValue("", true);
 	pinEntryItem.setPasswordField(true);
-	pinEntryItem.setActive(true);
+	pinEntryItem.setActive(false);
 	pinEntryItem.setEditing(false);
 	return &backMenuItem;
 }
@@ -51,13 +52,13 @@ int secPopupActionRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode
 				menuMgr.navigateToMenu(act->getSecuredItem()->getChild());
 			}
 			else {
-				BaseDialog* dlg = menuMgr.getRenderer()->getDialog();
+                menuMgr.resetMenu(false);
+                BaseDialog* dlg = menuMgr.getRenderer()->getDialog();
 				dlg->setButtons(BTNTYPE_NONE, BTNTYPE_CLOSE);
 				char sz[15];
 				act->getSecuredItem()->copyNameToBuffer(sz, sizeof(sz));
 				dlg->show(pgmHeaderNotAuth, false);
 				dlg->copyIntoBuffer(sz);
-				menuMgr.resetMenu(false);
 			}
 		}
 		else {

@@ -1,6 +1,7 @@
-//
-// Created by David Cherry on 09/03/2021.
-//
+/*
+ * Copyright (c) 2018 https://www.thecoderscorner.com (Nutricherry LTD).
+ * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
+ */
 
 #ifndef TCMENU_MENUHISTORYNAVIGATOR_H
 #define TCMENU_MENUHISTORYNAVIGATOR_H
@@ -21,6 +22,7 @@ namespace tcnav {
         MenuItem* navItems[NAV_ITEM_ARRAY_SIZE];
         MenuItem* activeItems[NAV_ITEM_ARRAY_SIZE];
         uint8_t navIdx;
+        bool currentIsCustom;
     public:
         MenuNavigationStore() = default;
 
@@ -45,20 +47,12 @@ namespace tcnav {
         void setRootItem(MenuItem* item);
 
         /**
-         * checks if the item is within the root menu, traversing any sub menus.
-         * @param root the root to start from
-         * @param item the item to find
-         * @return true if found, otherwise false
-         */
-        bool isItemWithinRoot(MenuItem* toCheck, MenuItem* item);
-
-        /**
          * Navigates to a new menu, remembering the history of all items that are
          * contained within the current root.
          * @param activeItem the item that was selected
          * @param newRoot the new root that will be displayed
          */
-        void navigateTo(MenuItem* activeItem, MenuItem* newRoot);
+        void navigateTo(MenuItem* activeItem, MenuItem* newRoot, bool custom);
 
         /**
          * Pops the last navigation item, or in the worst case goes back to root.
@@ -66,6 +60,7 @@ namespace tcnav {
          */
         MenuItem* popNavigationGetActive();
 
+        bool isShowingRoot();
     };
 }
 

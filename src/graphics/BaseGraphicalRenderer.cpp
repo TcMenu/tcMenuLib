@@ -5,66 +5,10 @@
 
 #include "BaseGraphicalRenderer.h"
 #include "BaseDialog.h"
+#include "RuntimeTitleMenuItem.h"
 
 namespace tcgfx {
 
-int appTitleRenderingFn(RuntimeMenuItem *item, uint8_t, RenderFnMode mode, char *buffer, int bufferSize);
-
-class RuntimeTitleMenuItem : public RuntimeMenuItem {
-private:
-    const char* titleHeaderPgm;
-    MenuCallbackFn callback;
-public:
-    RuntimeTitleMenuItem(uint16_t id, MenuItem *next) : RuntimeMenuItem(MENUTYPE_TITLE_ITEM, id, appTitleRenderingFn, 0, 1, next) {
-        titleHeaderPgm = nullptr;
-        callback = nullptr;
-    }
-
-    void setTitleHeaderPgm(const char* header) {
-        titleHeaderPgm = header;
-    }
-
-    const char* getTitleHeaderPgm() {
-        return titleHeaderPgm;
-    }
-
-    void setCallback(MenuCallbackFn titleCb) {
-        callback = titleCb;
-    }
-
-    MenuCallbackFn getCallback() {
-        return callback;
-    }
-};
-
-int appTitleRenderingFn(RuntimeMenuItem *item, uint8_t, RenderFnMode mode, char *buffer, int bufferSize) {
-    if (item->getMenuType() != MENUTYPE_TITLE_ITEM) return 0;
-    auto* pTitleItem = reinterpret_cast<RuntimeTitleMenuItem*>(item);
-
-    switch (mode) {
-        case RENDERFN_INVOKE:
-            if(pTitleItem->getCallback()) {
-                auto cb = pTitleItem->getCallback();
-                cb(item->getId());
-            }
-            return true;
-        case RENDERFN_VALUE: {
-            buffer[0] = '^'; buffer[1] = 0;
-            return true;
-        }
-        case RENDERFN_NAME: {
-            safeProgCpy(buffer, pTitleItem->getTitleHeaderPgm(), bufferSize);
-            return true;
-        }
-        default: return false;
-    }
-}
-
-RuntimeTitleMenuItem appTitleMenuItem(0, nullptr);
-
-void setTitlePressedCallback(MenuCallbackFn cb) {
-    appTitleMenuItem.setCallback(cb);
-}
 
 void BaseGraphicalRenderer::render() {
     checkIfRootHasChanged();
@@ -96,7 +40,7 @@ void BaseGraphicalRenderer::render() {
     }
     else {
         // first we find the first currently active rootItem in our single linked list
-        int activeIndex = findActiveItem();
+        int activeIndex = findActiveItem(rootItem);
         uint16_t totalHeight = calculateHeightTo(activeIndex, rootItem);
         int startRow = 0;
         uint16_t adjustedHeight = height + (lastRowExactFit ? 0 : 1);
@@ -105,7 +49,7 @@ void BaseGraphicalRenderer::render() {
 
         if(titleMode == TITLE_ALWAYS && (drawCompleteScreen  || itemOrderByRow.itemAtIndex(0)->getMenuItem()->isChanged())) {
             startRow++;
-            startY = heightOfRow(0, 1);
+            startY = heightOfRow(0);
             adjustedHeight -= startY;
             totalHeight -= startY;
             auto* pEntry = itemOrderByRow.itemAtIndex(0);
@@ -114,7 +58,7 @@ void BaseGraphicalRenderer::render() {
         }
 
         while (totalHeight > adjustedHeight) {
-            totalHeight -= heightOfRow(startRow, 1);
+            totalHeight -= heightOfRow(startRow);
             startRow++;
         }
 
@@ -143,18 +87,18 @@ GridPositionRowCacheEntry* BaseGraphicalRenderer::findMenuEntryAndDimensions(con
     int rowStartY = 0;
     auto* icon = getDisplayPropertiesFactory().iconForMenuItem(SPECIAL_ID_ACTIVE_ICON);
     int iconWidth = icon ? icon->getDimensions().x : 0;
+    uint8_t currentRow = -1;
 
     for(bsize_t i=lastOffset; i<itemOrderByRow.count(); i++) {
         auto* pEntry = itemOrderByRow.itemAtIndex(i);
-        int rowHeight = heightOfRow(pEntry->getPosition().getRow(), 1);
+        int rowHeight = heightOfRow(pEntry->getPosition().getRow());
         int rowEndY = rowStartY + rowHeight;
 
         // this seems odd but we are only doing this loop to find the heights, so we
         // only check all the first entries in the row. There is code further down to
         // deal with columns.
-        if(pEntry->getPosition().getGridPosition() != 1) {
-            continue;
-        }
+        if(pEntry->getPosition().getRow() == currentRow) continue;
+        currentRow = i;
 
         // if we are within the y bounds of of item
         if(screenPos.y > rowStartY && screenPos.y < rowEndY) {
@@ -207,7 +151,7 @@ bool BaseGraphicalRenderer::drawTheMenuItems(int startRow, int startY, bool draw
                 if(itemCfg->getPosition().getGridSize() > 1) {
                     int colWidth = width / itemCfg->getPosition().getGridSize();
                     int colOffset = colWidth * (itemCfg->getPosition().getGridPosition() - 1);
-                    drawMenuItem(itemCfg, Coord(colOffset, ypos), Coord(colWidth, itemCfg->getHeight()), drawEveryLine);
+                    drawMenuItem(itemCfg, Coord(colOffset + 1, ypos), Coord(colWidth - 1, itemCfg->getHeight()), drawEveryLine);
                 }
                 else {
                     drawMenuItem(itemCfg, Coord(0, ypos), Coord(width, itemCfg->getHeight()), drawEveryLine);
@@ -303,8 +247,7 @@ void BaseGraphicalRenderer::recalculateDisplayOrder(MenuItem *root, bool safeMod
         serdebugF("Add title");
         auto* myProps = getDisplayPropertiesFactory().configFor(nullptr, ItemDisplayProperties::COMPTYPE_TITLE);
         appTitleMenuItem.setTitleHeaderPgm(pgmTitle);
-        itemOrderByRow.add(GridPositionRowCacheEntry(&appTitleMenuItem,
-                                                     GridPosition(GridPosition::DRAW_TITLE_ITEM, myProps->getDefaultJustification(), 0), myProps));
+        itemOrderByRow.add(GridPositionRowCacheEntry(&appTitleMenuItem, GridPosition(GridPosition::DRAW_TITLE_ITEM, myProps->getDefaultJustification(), 0), myProps));
     }
 
     auto* item = root;
@@ -376,8 +319,13 @@ void BaseGraphicalRenderer::redrawAllWidgets(bool forceRedraw) {
     }
 }
 
-int BaseGraphicalRenderer::heightOfRow(int row, int col) {
-    auto* rowData = itemOrderByRow.getByKey(rowCol(row, col));
+int BaseGraphicalRenderer::heightOfRow(int row) {
+    uint8_t i = 1;
+    GridPositionRowCacheEntry *rowData = nullptr;
+    while(rowData == nullptr && i < 5) {
+        rowData = itemOrderByRow.getByKey(rowCol(row, i));
+        i++;
+    }
 
     // if there's no configuration at this position, crazy situation, return 1..
     if(rowData == nullptr) return 1;
@@ -391,18 +339,29 @@ int BaseGraphicalRenderer::calculateHeightTo(int index, MenuItem *pItem) {
     int totalY = 0;
     index += 1;
     for(int i=0; i<index; i++) {
-        totalY += heightOfRow(i, 1);
+        totalY += heightOfRow(i);
     }
     return totalY;
 }
 
-int BaseGraphicalRenderer::getTotalItemsInMenu() {
+uint8_t BaseGraphicalRenderer::itemCount(MenuItem*, bool ) {
     checkIfRootHasChanged();
-    return itemOrderByRow.count();
+    if(currentRootMenu && currentRootMenu->getMenuType() == MENUTYPE_RUNTIME_LIST) {
+        auto* listItem = reinterpret_cast<ListRuntimeMenuItem*>(currentRootMenu);
+        return listItem->getNumberOfRows() + 1; // accounts for title.
+    }
+    else {
+        return itemOrderByRow.count();
+
+    }
 }
 
-int BaseGraphicalRenderer::findActiveItem() {
+int BaseGraphicalRenderer::findActiveItem(MenuItem* root) {
     checkIfRootHasChanged();
+    if(currentRootMenu && currentRootMenu->getMenuType() == MENUTYPE_RUNTIME_LIST) {
+        auto* listItem = reinterpret_cast<ListRuntimeMenuItem*>(currentRootMenu);
+        return listItem->getActiveIndex(); // accounts for title.
+    }
     for(bsize_t i=0;i<itemOrderByRow.count();i++) {
         auto* possibleActive = itemOrderByRow.itemAtIndex(i);
         if(possibleActive->getMenuItem()->isActive()) return possibleActive->getPosition().getRow();
@@ -410,8 +369,11 @@ int BaseGraphicalRenderer::findActiveItem() {
     return 0; // default to the title (back menu item)
 }
 
-MenuItem *BaseGraphicalRenderer::getMenuItemAtIndex(uint16_t idx) {
+MenuItem *BaseGraphicalRenderer::getMenuItemAtIndex(MenuItem* item, uint8_t idx) {
     checkIfRootHasChanged();
+    if(currentRootMenu && currentRootMenu->getMenuType() == MENUTYPE_RUNTIME_LIST) {
+        return currentRootMenu;
+    }
     if(idx >= itemOrderByRow.count()) return menuMgr.getRoot();
     return itemOrderByRow.itemAtIndex(idx)->getMenuItem();
 }
@@ -427,7 +389,8 @@ ItemDisplayProperties::ComponentType BaseGraphicalRenderer::toComponentType(Grid
         case GridPosition::DRAW_AS_ICON_ONLY:
         case GridPosition::DRAW_AS_ICON_TEXT:
         default:
-            return isItemActionable(pMenuItem) ? ItemDisplayProperties::COMPTYPE_ACTION : ItemDisplayProperties::COMPTYPE_ITEM;
+            return isItemActionable(pMenuItem) || pMenuItem->getMenuType() == MENUTYPE_BOOLEAN_VALUE
+                   ? ItemDisplayProperties::COMPTYPE_ACTION : ItemDisplayProperties::COMPTYPE_ITEM;
     }
 }
 
@@ -443,14 +406,15 @@ void preparePropertiesFromConfig(ConfigurableItemDisplayPropertiesFactory& facto
     color_t paletteItems[] { gfxConfig->fgItemColor, gfxConfig->bgItemColor, gfxConfig->bgSelectColor, gfxConfig->fgSelectColor};
     color_t titleItems[] { gfxConfig->fgTitleColor, gfxConfig->bgTitleColor, gfxConfig->fgTitleColor, gfxConfig->fgSelectColor};
 
-    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ACTION, paletteItems, gfxConfig->itemPadding, gfxConfig->itemFont, gfxConfig->itemFontMagnification, 0, itemHeight, GridPosition::JUSTIFY_LEFT_NO_VALUE);
-    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, paletteItems, gfxConfig->itemPadding, gfxConfig->itemFont, gfxConfig->itemFontMagnification, 0, itemHeight, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT);
-    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_TITLE, titleItems, gfxConfig->titlePadding, gfxConfig->titleFont, gfxConfig->titleFontMagnification, gfxConfig->titleBottomMargin, titleHeight, GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE);
+    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ACTION, paletteItems, gfxConfig->itemPadding, gfxConfig->itemFont, gfxConfig->itemFontMagnification, 0, itemHeight, GridPosition::JUSTIFY_LEFT_NO_VALUE, MenuBorder());
+    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, paletteItems, gfxConfig->itemPadding, gfxConfig->itemFont, gfxConfig->itemFontMagnification, 0, itemHeight, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, MenuBorder());
+    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_TITLE, titleItems, gfxConfig->titlePadding, gfxConfig->titleFont, gfxConfig->titleFontMagnification, gfxConfig->titleBottomMargin, titleHeight, GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE, MenuBorder());
     factory.setSelectedColors(gfxConfig->bgSelectColor, gfxConfig->fgSelectColor);
 
     factory.addImageToCache(DrawableIcon(SPECIAL_ID_EDIT_ICON, Coord(gfxConfig->editIconWidth, gfxConfig->editIconHeight), DrawableIcon::ICON_XBITMAP, gfxConfig->editIcon));
     factory.addImageToCache(DrawableIcon(SPECIAL_ID_ACTIVE_ICON, Coord(gfxConfig->editIconWidth, gfxConfig->editIconHeight), DrawableIcon::ICON_XBITMAP, gfxConfig->activeIcon));
 
+    ConfigurableItemDisplayPropertiesFactory::refreshCache();
 }
 
 } // namespace tcgfx

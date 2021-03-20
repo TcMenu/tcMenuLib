@@ -68,6 +68,7 @@ test(testEmptyItemPropertiesFactory) {
     assertEqual(4, (int)sizeof(GridPosition));
     assertEqual(4, (int)sizeof(Coord));
     assertEqual(2, (int)sizeof(MenuPadding));
+    assertEqual(1, (int)sizeof(MenuBorder));
 
     ConfigurableItemDisplayPropertiesFactory factory;
     auto *config = factory.configFor(nullptr, ItemDisplayProperties::COMPTYPE_TITLE);
