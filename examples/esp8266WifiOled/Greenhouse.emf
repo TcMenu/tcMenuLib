@@ -3,8 +3,8 @@
   "projectName": "/Users/dave/Documents/Arduino/tcLibraryDev/lib/tcMenu/examples/esp8266WifiOled/Greenhouse.emf",
   "author": "dave",
   "lastEdited": {
-    "seconds": 1616263272,
-    "nanos": 841746000
+    "seconds": 1616594396,
+    "nanos": 866114000
   },
   "namingRecursive": false,
   "items": [
@@ -342,11 +342,6 @@
       {
         "name": "TITLE_FONT",
         "latestValue": "avl:u8g2_font_sirclivethebold_tr,1",
-        "subsystem": "THEME"
-      },
-      {
-        "name": "FONT_INCLUDE_FOLDER",
-        "latestValue": "",
         "subsystem": "THEME"
       },
       {

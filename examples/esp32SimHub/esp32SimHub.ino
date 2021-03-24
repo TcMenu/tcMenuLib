@@ -34,6 +34,7 @@
 #include <AnalogDeviceAbstraction.h>
 #include "DashCustomDrawing.h"
 #include "RobotoMonoBold60pt.h"
+#include <Fonts/FreeSans18pt7b.h>
 
 // here we pulsate an LED using the ESP32's DAC
 const int dacPin = 32;
@@ -265,4 +266,5 @@ void CALLBACK_FUNCTION onShowDialogs(int id) {
         dlg->copyIntoBuffer("text 1");
     }
 }
+
 

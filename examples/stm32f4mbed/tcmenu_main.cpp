@@ -66,20 +66,19 @@ void setup() {
     // this was added by designer, it sets up the input, display and remote.
     setupMenu();
 
-    // we tell the menu to always display title, regardless of current index
-    renderer.setTitleMode(BaseGraphicalRenderer::TITLE_ALWAYS);
-
     // and now lets try and acquire time using our quick ntp time class
     prepareRealtimeClock();
 
     // here we register our screen saver class with the renderer, see ScreenSaverCustomDrawing.h
     renderer.setCustomDrawingHandler(&screenSaver);
 
-    // lastly we add another switch on the user button that just clears the screen saver.
+    // we add another switch on the user button that just clears the screen saver.
     switches.addSwitch(USER_BUTTON, [](pinid_t /*pin*/, bool /*held*/) {
         screenSaver.removeScreenSaver();
     });
 
+    // When the main title is pressed or touched, we can register a callback to be executed.
+    // Here we just present a simple dialog.
     setTitlePressedCallback([](int id) {
         auto* dlg = renderer.getDialog();
         if(dlg && !dlg->isInUse()) {
@@ -88,6 +87,9 @@ void setup() {
             dlg->copyIntoBuffer("//TheCodersCorner");
         }
     });
+
+    // We set the number of items in our runtime list
+    menuCountingList.setNumberOfRows(10);
 }
 
 int main() {
@@ -128,7 +130,7 @@ int CALLBACK_FUNCTION fnCountingListRtCall(RuntimeMenuItem * item, uint8_t row, 
         return true;
     case RENDERFN_NAME:
         strcpy(buffer, "Name");
-        fastltoa(buffer, row, 2, '0', bufferSize);
+        fastltoa(buffer, row, 3, '0', bufferSize);
         return true;
     case RENDERFN_VALUE:
         // TODO - return a value for the row (for list items row==LIST_PARENT_ITEMPOS is back)

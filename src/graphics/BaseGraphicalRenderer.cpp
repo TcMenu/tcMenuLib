@@ -12,7 +12,6 @@ namespace tcgfx {
 
 void BaseGraphicalRenderer::render() {
     checkIfRootHasChanged();
-    if(itemOrderByRow.count() == 0) return; // can't draw in this case.
 
     uint8_t locRedrawMode = redrawMode;
     redrawMode = MENUDRAW_NO_CHANGE;
@@ -38,7 +37,7 @@ void BaseGraphicalRenderer::render() {
         }
         titleOnDisplay = (titleMode != NO_TITLE);
     }
-    else {
+    else if(itemOrderByRow.count()) {
         // first we find the first currently active rootItem in our single linked list
         int activeIndex = findActiveItem(rootItem);
         uint16_t totalHeight = calculateHeightTo(activeIndex, rootItem);
@@ -47,18 +46,15 @@ void BaseGraphicalRenderer::render() {
         bool drawCompleteScreen = locRedrawMode != MENUDRAW_NO_CHANGE;
         uint16_t startY = 0;
 
-        if(titleMode == TITLE_ALWAYS && (drawCompleteScreen  || itemOrderByRow.itemAtIndex(0)->getMenuItem()->isChanged())) {
+        if(titleMode == TITLE_ALWAYS) {
             startRow++;
-            startY = heightOfRow(0);
+            startY = heightOfRow(0, true);
             adjustedHeight -= startY;
             totalHeight -= startY;
-            auto* pEntry = itemOrderByRow.itemAtIndex(0);
-            drawMenuItem(pEntry, Coord(0,0), Coord(width, startY), drawCompleteScreen);
-            forceDrawWidgets = true;
         }
 
         while (totalHeight > adjustedHeight) {
-            totalHeight -= heightOfRow(startRow);
+            totalHeight -= heightOfRow(startRow, true);
             startRow++;
         }
 
@@ -69,6 +65,12 @@ void BaseGraphicalRenderer::render() {
             drawCompleteScreen = true;
         }
         lastOffset = startRow;
+
+        if(titleMode == TITLE_ALWAYS && (drawCompleteScreen  || itemOrderByRow.itemAtIndex(0)->getMenuItem()->isChanged())) {
+            auto* pEntry = itemOrderByRow.itemAtIndex(0);
+            drawMenuItem(pEntry, Coord(0,0), Coord(width, startY), drawCompleteScreen);
+            forceDrawWidgets = true;
+        }
 
         // and then we start drawing items until we run out of screen or items
         if(drawTheMenuItems(startRow, startY, drawCompleteScreen)) forceDrawWidgets = true;
@@ -202,11 +204,15 @@ void BaseGraphicalRenderer::renderList() {
 
     for (int i = 0; i < maxY; i++) {
         uint8_t current = offset + i;
+        if(current >= runList->getNumberOfRows()) break;
         RuntimeMenuItem* toDraw = runList->getChildItem(current);
         GridPositionRowCacheEntry itemEntry(toDraw, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, current + 1, rowHeight), itemProps);
-        drawMenuItem(&itemEntry, Coord(0, totalTitleHeight + (i * totalRowHeight)), Coord(width, rowHeight), true);
+        drawMenuItem(&itemEntry, Coord(0, totalTitleHeight), Coord(width, rowHeight), true);
         taskManager.yieldForMicros(0);
+        totalTitleHeight += totalRowHeight;
     }
+
+    fillWithBackgroundTo(totalTitleHeight);
 
     // reset the list item to a normal list again.
     runList->asParent();
@@ -319,7 +325,7 @@ void BaseGraphicalRenderer::redrawAllWidgets(bool forceRedraw) {
     }
 }
 
-int BaseGraphicalRenderer::heightOfRow(int row) {
+int BaseGraphicalRenderer::heightOfRow(int row, bool includeSpace) {
     uint8_t i = 1;
     GridPositionRowCacheEntry *rowData = nullptr;
     while(rowData == nullptr && i < 5) {
@@ -332,14 +338,16 @@ int BaseGraphicalRenderer::heightOfRow(int row) {
 
     // if there's a configuration, then return it, unless it's 0 then use the default
     auto itemHeight = rowData->getPosition().getGridHeight();
-    return itemHeight != 0 ? itemHeight : rowData->getDisplayProperties()->getRequiredHeight();
+    auto actualHeight = itemHeight != 0 ? itemHeight : rowData->getDisplayProperties()->getRequiredHeight();
+    if(includeSpace) actualHeight += rowData->getDisplayProperties()->getSpaceAfter();
+    return actualHeight;
 }
 
 int BaseGraphicalRenderer::calculateHeightTo(int index, MenuItem *pItem) {
     int totalY = 0;
     index += 1;
     for(int i=0; i<index; i++) {
-        totalY += heightOfRow(i);
+        totalY += heightOfRow(i, true);
     }
     return totalY;
 }

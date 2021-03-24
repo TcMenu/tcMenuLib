@@ -3,7 +3,7 @@
 #define TCMENUEXAMPLE_SCREENSAVERCUSTOMDRAWING_H
 
 #include "stm32f4mbed_menu.h"
-
+#include <Fonts/FreeSans9pt7b.h>
 /**
  * Here we implement the custom drawing class so that we can register for drawing and reset events with it.
  * When the display times out the reset method is called, where in this case we take over the display. Then

@@ -10,6 +10,7 @@
 
 #include <tcMenu.h>
 #include "simpleU8g2_menu.h"
+#include "ThemeMonoBordered.h"
 
 // Global variable declarations
 
@@ -51,8 +52,10 @@ AnalogMenuItem menuToasterPower(&minfoToasterPower, 0, &menuType);
 void setupMenu() {
     gfx.begin();
     renderer.setUpdatesPerSecond(10);
-    renderer.prepareDisplay(true, NULL, 1, NULL, 1, true);
     switches.initialise(internalDigitalIo(), true);
     menuMgr.initForEncoder(&renderer, &menuToasterPower, 13, 12, 14);
+    renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
+    renderer.setUseSliderForAnalog(false);
+    installMonoBorderedTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(u8g2_font_finderskeepers_tf, 1), true);
 }
 

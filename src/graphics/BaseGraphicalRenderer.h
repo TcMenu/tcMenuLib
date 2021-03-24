@@ -235,7 +235,7 @@ namespace tcgfx {
 
         void redrawAllWidgets(bool forceRedraw);
 
-        int heightOfRow(int row);
+        int heightOfRow(int row, bool includeSpace=false);
 
         bool areRowsOutOfOrder();
 

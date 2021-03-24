@@ -72,6 +72,6 @@ void setupMenu() {
     connector.begin(&Serial, 3);
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
     renderer.setUseSliderForAnalog(true);
-    installCoolBlueTraditionalTheme(renderer, MenuFontDef(FreeSans9pt7b, 1), MenuFontDef(FreeSans12pt7b, 1), true);
+    installCoolBlueTraditionalTheme(renderer, MenuFontDef(&FreeSans9pt7b, 1), MenuFontDef(&FreeSans12pt7b, 1), true);
 }
 

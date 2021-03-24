@@ -11,44 +11,41 @@
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
 
-#include <Arduino.h>
+#include <mbed.h>
 #include <tcMenu.h>
 
-#include "tcMenuAdaFruitGfx.h"
-#include "ESP32TouchKeysAbstraction.h"
-#include "SimhubConnector.h"
+#include "BspUserSettings.h"
+#include "tcMenuStChromaArt.h"
+#include <graphics/MenuTouchScreenEncoder.h>
 #include <RuntimeMenuItem.h>
 
 // all variables that need exporting
-extern Adafruit_ILI9341 gfx;
-extern AdafruitDrawable gfxDrawable;
+extern StChromaArtDrawable Drawable;
 extern GraphicsDeviceRenderer renderer;
-extern ESP32TouchKeysAbstraction esp32Touch;
-extern const GFXfont FreeSans9pt7b;
+extern StBspTouchInterrogator touchInterrogator;
+extern MenuTouchScreenManager touchScreen;
+extern const GFXfont FreeSans12pt7b;
 extern const GFXfont FreeSans12pt7b;
 
 // all menu item forward references.
-extern ActionMenuItem menuShowDashboard;
-extern AnalogMenuItem menuLap;
-extern EnumMenuItem menuDashboard;
-extern ActionMenuItem menuSettingsShowDialogs;
-extern AnalogMenuItem menuSettingsTestItem1;
+extern BooleanMenuItem menuConnectivityEnableUSB;
+extern BackMenuItem menuBackConnectivity;
+extern SubMenuItem menuConnectivity;
+extern TimeFormattedMenuItem menuSettingsRunDuration;
+extern AnalogMenuItem menuSettingsTargetSpeed;
 extern BackMenuItem menuBackSettings;
 extern SubMenuItem menuSettings;
-extern BooleanMenuItem menuSimHubLink;
-extern AnalogMenuItem menuTyreTemp;
-extern TextMenuItem menuGear;
-extern AnalogMenuItem menuRPM;
-extern AnalogMenuItem menuSpeed;
+extern AnalogMenuItem menuConsumption;
+extern AnalogMenuItem menuACLine;
+extern AnalogMenuItem menuBeltSpeed;
+extern EnumMenuItem menuBeltStatus;
+extern BooleanMenuItem menuPower;
 extern const ConnectorLocalInfo applicationInfo;
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
-void CALLBACK_FUNCTION onConnectionChange(int id);
-void CALLBACK_FUNCTION onDashChanged(int id);
-void CALLBACK_FUNCTION onShowDash(int id);
-void CALLBACK_FUNCTION onShowDialogs(int id);
+void CALLBACK_FUNCTION onTargetChanged(int id);
 
 void setupMenu();
 

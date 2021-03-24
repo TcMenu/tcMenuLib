@@ -6,56 +6,58 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
-*/
+ */
 
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
 
 #include <mbed.h>
 #include <tcMenu.h>
-#include <RuntimeMenuItem.h>
+
 #include "Adafruit_SSD1306.h"
 #include "tcMenuAdaFruitGfx.h"
 #include "MBedEthernetTransport.h"
 #include <RemoteConnector.h>
+#include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
 
-void setupMenu();  // forward reference of the menu setup function.
-extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app info to the linker.
-
-// Global variables that need exporting
-
+// all variables that need exporting
 extern SPI spi;
 extern Adafruit_SSD1306_Spi gfx;
 extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
-extern const GFXfont FreeSans9pt7b;
+
+// all menu item forward references.
+extern TextMenuItem menuEdit;
+extern AnalogMenuItem menuCommits;
+extern IpAddressMenuItem menuIP;
+extern BackMenuItem menuBackConnectivity;
+extern SubMenuItem menuConnectivity;
+extern FloatMenuItem menuAvgTemp;
+extern ListRuntimeMenuItem menuCountingList;
+extern ScrollChoiceMenuItem menuChoices;
+extern BackMenuItem menuBackOther;
+extern SubMenuItem menuOther;
+extern Rgb32MenuItem menuRGB;
+extern EditableLargeNumberMenuItem menuFrequency;
+extern BooleanMenuItem menuPower;
+extern EnumMenuItem menuFoods;
+extern AnalogMenuItem menuTenths;
+extern BackMenuItem menuBackEditing;
+extern SubMenuItem menuEditing;
+extern TimeFormattedMenuItem menuRTCTime;
+extern DateFormattedMenuItem menuRTCDate;
+extern const ConnectorLocalInfo applicationInfo;
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
-// Global Menu Item exports
-
-extern TextMenuItem menuEdit;
-extern AnalogMenuItem menuCommits;
-extern IpAddressMenuItem menuIP;
-extern SubMenuItem menuConnectivity;
-extern FloatMenuItem menuAvgTemp;
-int fnCountingListRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize);
-extern ListRuntimeMenuItem menuCountingList;
-extern ScrollChoiceMenuItem menuChoices;
-extern SubMenuItem menuOther;
-extern Rgb32MenuItem menuRGB;
-void CALLBACK_FUNCTION onFrequencyChanged(int id);
-extern EditableLargeNumberMenuItem menuFrequency;
-extern BooleanMenuItem menuPower;
+int fnCountingListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
 void CALLBACK_FUNCTION onFoodChange(int id);
-extern EnumMenuItem menuFoods;
+void CALLBACK_FUNCTION onFrequencyChanged(int id);
 void CALLBACK_FUNCTION onTenthsChaned(int id);
-extern AnalogMenuItem menuTenths;
-extern SubMenuItem menuEditing;
-extern TimeFormattedMenuItem menuRTCTime;
-extern DateFormattedMenuItem menuRTCDate;
+
+void setupMenu();
 
 #endif // MENU_GENERATED_CODE_H

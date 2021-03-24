@@ -18,26 +18,6 @@
 #include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
 
-// all define statements needed
-#define DISPLAY_VARIABLE gfx
-#define DISPLAY_TYPE U8G2_SH1106_128X64_NONAME_F_SW_I2C
-#define DISPLAY_ROTATION U8G2_R0
-#define YIELDING_WIRE_CB true
-#define DISPLAY_CLOCK_PIN 5
-#define DISPLAY_DATA_PIN 4
-#define DISPLAY_RESET_PIN U8X8_PIN_NONE
-#define DISPLAY_CS_PIN U8X8_PIN_NONE
-#define DISPLAY_RS_PIN U8X8_PIN_NONE
-#define DISPLAY_TITLE_FONT NULL
-#define DISPLAY_ITEM_FONT NULL
-#define UPDATES_PER_SEC 10
-#define PULLUP_LOGIC true
-#define INTERRUPT_SWITCHES false
-#define SWITCH_IODEVICE 
-#define ENCODER_PIN_A 13
-#define ENCODER_PIN_B 12
-#define ENCODER_PIN_OK 14
-
 // all variables that need exporting
 extern U8G2_SH1106_128X64_NONAME_F_SW_I2C gfx;
 extern GraphicsDeviceRenderer renderer;

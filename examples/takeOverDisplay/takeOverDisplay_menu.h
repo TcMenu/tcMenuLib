@@ -6,58 +6,60 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
-*/
+ */
 
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
 
 #include <Arduino.h>
 #include <tcMenu.h>
-#include <RuntimeMenuItem.h>
+
 #include <LiquidCrystalIO.h>
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
+#include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
 #include "tcMenuLiquidCrystal.h"
 
-void setupMenu();  // forward reference of the menu setup function.
-extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app info to the linker.
-
-// Global variables that need exporting
-
+// all variables that need exporting
 extern IoAbstractionRef io23017;
 extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
 extern IoAbstractionRef io23017;
 extern EthernetServer server;
 
-// Callback functions must always include CALLBACK_FUNCTION after the return type
-#define CALLBACK_FUNCTION
-
-// Global Menu Item exports
-
+// all menu item forward references.
 extern IpAddressMenuItem menuConnectivityIPAddress;
-void CALLBACK_FUNCTION onChangePin(int id);
 extern TextMenuItem menuConnectivityChangePin;
+extern BackMenuItem menuBackConnectivity;
 extern SubMenuItem menuConnectivity;
 extern DateFormattedMenuItem menuSettingsDate;
 extern TimeFormattedMenuItem menuSettingsTime;
 extern EditableLargeNumberMenuItem menuSettingsNum6x4;
 extern EditableLargeNumberMenuItem menuSettingsPositiveInts;
-void CALLBACK_FUNCTION onSaveSettings(int id);
 extern ActionMenuItem menuSettingsSaveSettings;
 extern AnalogMenuItem menuSettingsPower;
 extern BooleanMenuItem menuSettingsEnabled;
+extern BackMenuItem menuBackSettings;
 extern SubMenuItem menuSettings;
-void CALLBACK_FUNCTION onQuestionDlg(int id);
 extern ActionMenuItem menuQuestionDialog;
-void CALLBACK_FUNCTION onInfoDlg(int id);
 extern ActionMenuItem menuInfoDialog;
 extern TextMenuItem menuText;
-void CALLBACK_FUNCTION onFoodChoice(int id);
 extern EnumMenuItem menuFood;
-void CALLBACK_FUNCTION onTakeOverDisplay(int id);
 extern ActionMenuItem menuTakeDisplay;
 extern TimeFormattedMenuItem menuTime;
+extern const ConnectorLocalInfo applicationInfo;
+
+// Callback functions must always include CALLBACK_FUNCTION after the return type
+#define CALLBACK_FUNCTION
+
+void CALLBACK_FUNCTION onChangePin(int id);
+void CALLBACK_FUNCTION onFoodChoice(int id);
+void CALLBACK_FUNCTION onInfoDlg(int id);
+void CALLBACK_FUNCTION onQuestionDlg(int id);
+void CALLBACK_FUNCTION onSaveSettings(int id);
+void CALLBACK_FUNCTION onTakeOverDisplay(int id);
+
+void setupMenu();
 
 #endif // MENU_GENERATED_CODE_H
