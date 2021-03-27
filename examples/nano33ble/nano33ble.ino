@@ -27,6 +27,10 @@ SensorManager sensorManager;
 MotionDetection motionDetection;
 
 void setup() {
+    Serial.begin(115200);
+    Wire.begin();
+    Wire.setClock(400000);
+
     // First we set up the analog pins
     analogDevice.initPin(pwmOutputPin, DIR_OUT);
     analogDevice.initPin(analogInputPin, DIR_IN);
@@ -56,3 +60,5 @@ void CALLBACK_FUNCTION onPWMChanged(int id) {
     auto newPwm = menuAnalogReadingsOutputPWM.getCurrentValue() / 100.0F;
     analogDevice.setCurrentFloat(pwmOutputPin, newPwm);
 }
+
+

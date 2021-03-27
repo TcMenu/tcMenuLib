@@ -6,64 +6,67 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
-*/
+ */
 
-#include <Arduino.h>
 #include <tcMenu.h>
 #include "nano33ble_menu.h"
+#include "ThemeMonoInverse.h"
 
 // Global variable declarations
 
-const PROGMEM ConnectorLocalInfo applicationInfo = { "Nano 33 BLE Sense", "e95fcf8a-8a03-4043-9313-01fd8b8e8707" };
-LiquidCrystal lcd(0, 1, 2, 4, 5, 6, 7);
-LiquidCrystalRenderer renderer(lcd, 20, 4);
+const  ConnectorLocalInfo applicationInfo = { "Nano 33 BLE Sense", "e95fcf8a-8a03-4043-9313-01fd8b8e8707" };
+
+U8G2_SSD1306_128X64_NONAME_F_SW_I2C gfx(U8G2_R0, U8X8_PIN_NONE, U8X8_PIN_NONE, U8X8_PIN_NONE);
+U8g2Drawable gfxDrawable(&gfx, &Wire);
+GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 
 // Global Menu Item declarations
 
-const AnalogMenuInfo minfoAnalogReadingsOutputPWM = { "Output PWM", 13, 0xFFFF, 100, onPWMChanged, 0, 0, "%" };
+const AnalogMenuInfo minfoAnalogReadingsOutputPWM = { "Output PWM", 13, 0xffff, 100, onPWMChanged, 0, 1, "%" };
 AnalogMenuItem menuAnalogReadingsOutputPWM(&minfoAnalogReadingsOutputPWM, 0, NULL);
-const FloatMenuInfo minfoAnalogReadingsInA0 = { "In A0", 12, 0xFFFF, 2, NO_CALLBACK };
+const FloatMenuInfo minfoAnalogReadingsInA0 = { "In A0", 12, 0xffff, 2, NO_CALLBACK };
 FloatMenuItem menuAnalogReadingsInA0(&minfoAnalogReadingsInA0, &menuAnalogReadingsOutputPWM);
-const SubMenuInfo minfoAnalogReadings = { "Analog Readings", 11, 0xFFFF, 0, NO_CALLBACK };
 RENDERING_CALLBACK_NAME_INVOKE(fnAnalogReadingsRtCall, backSubItemRenderFn, "Analog Readings", -1, NO_CALLBACK)
+const SubMenuInfo minfoAnalogReadings = { "Analog Readings", 11, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackAnalogReadings(fnAnalogReadingsRtCall, &menuAnalogReadingsInA0);
 SubMenuItem menuAnalogReadings(&minfoAnalogReadings, &menuBackAnalogReadings, NULL);
-const FloatMenuInfo minfoAccelerometerAccelZ = { "AccelZ", 10, 0xFFFF, 2, NO_CALLBACK };
+const FloatMenuInfo minfoAccelerometerAccelZ = { "AccelZ", 10, 0xffff, 2, NO_CALLBACK };
 FloatMenuItem menuAccelerometerAccelZ(&minfoAccelerometerAccelZ, NULL);
-const FloatMenuInfo minfoAccelerometerAccelY = { "AccelY", 9, 0xFFFF, 2, NO_CALLBACK };
+const FloatMenuInfo minfoAccelerometerAccelY = { "AccelY", 9, 0xffff, 2, NO_CALLBACK };
 FloatMenuItem menuAccelerometerAccelY(&minfoAccelerometerAccelY, &menuAccelerometerAccelZ);
-const FloatMenuInfo minfoAccelerometerAccelX = { "AccelX", 8, 0xFFFF, 2, NO_CALLBACK };
+const FloatMenuInfo minfoAccelerometerAccelX = { "AccelX", 8, 0xffff, 2, NO_CALLBACK };
 FloatMenuItem menuAccelerometerAccelX(&minfoAccelerometerAccelX, &menuAccelerometerAccelY);
-const FloatMenuInfo minfoAccelerometerMagZ = { "MagZ", 7, 0xFFFF, 2, NO_CALLBACK };
+const FloatMenuInfo minfoAccelerometerMagZ = { "MagZ", 7, 0xffff, 2, NO_CALLBACK };
 FloatMenuItem menuAccelerometerMagZ(&minfoAccelerometerMagZ, &menuAccelerometerAccelX);
-const FloatMenuInfo minfoAccelerometerMagY = { "MagY", 6, 0xFFFF, 2, NO_CALLBACK };
+const FloatMenuInfo minfoAccelerometerMagY = { "MagY", 6, 0xffff, 2, NO_CALLBACK };
 FloatMenuItem menuAccelerometerMagY(&minfoAccelerometerMagY, &menuAccelerometerMagZ);
-const FloatMenuInfo minfoAccelerometerMagX = { "MagX", 5, 0xFFFF, 2, NO_CALLBACK };
+const FloatMenuInfo minfoAccelerometerMagX = { "MagX", 5, 0xffff, 2, NO_CALLBACK };
 FloatMenuItem menuAccelerometerMagX(&minfoAccelerometerMagX, &menuAccelerometerMagY);
-const SubMenuInfo minfoAccelerometer = { "Accelerometer", 4, 0xFFFF, 0, NO_CALLBACK };
 RENDERING_CALLBACK_NAME_INVOKE(fnAccelerometerRtCall, backSubItemRenderFn, "Accelerometer", -1, NO_CALLBACK)
+const SubMenuInfo minfoAccelerometer = { "Accelerometer", 4, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackAccelerometer(fnAccelerometerRtCall, &menuAccelerometerMagX);
 SubMenuItem menuAccelerometer(&minfoAccelerometer, &menuBackAccelerometer, &menuAnalogReadings);
-const AnalogMenuInfo minfoBPressure = { "B. Pressure", 2, 0xFFFF, 32000, NO_CALLBACK, 0, 10, "KPa" };
+const AnalogMenuInfo minfoBPressure = { "B. Pressure", 2, 0xffff, 32000, NO_CALLBACK, 0, 10, "KPa" };
 AnalogMenuItem menuBPressure(&minfoBPressure, 0, &menuAccelerometer);
-const AnalogMenuInfo minfoHumidity = { "Humidity", 3, 0xFFFF, 1000, NO_CALLBACK, 0, 10, "%" };
+const AnalogMenuInfo minfoHumidity = { "Humidity", 3, 0xffff, 1000, NO_CALLBACK, 0, 10, "%" };
 AnalogMenuItem menuHumidity(&minfoHumidity, 0, &menuBPressure);
-const AnalogMenuInfo minfoTemp = { "Temp", 1, 0xFFFF, 2000, NO_CALLBACK, 0, 10, "C" };
+const AnalogMenuInfo minfoTemp = { "Temp", 1, 0xffff, 2000, NO_CALLBACK, 0, 10, "C" };
 AnalogMenuItem menuTemp(&minfoTemp, 0, &menuHumidity);
-
 
 // Set up code
 
 void setupMenu() {
+    // Read only and local only function calls
     menuTemp.setReadOnly(true);
     menuHumidity.setReadOnly(true);
     menuBPressure.setReadOnly(true);
 
-    Wire.begin();
-    lcd.setIoAbstraction(ioFrom8574(0x20, 0xff, &Wire));
-    lcd.begin(20, 4);
-    lcd.configureBacklightPin(3);
-    lcd.backlight();
+    gfx.begin();
+    renderer.setUpdatesPerSecond(10);
     switches.initialise(internalDigitalIo(), true);
     menuMgr.initForEncoder(&renderer, &menuTemp, 5, 6, 4);
+    renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
+    renderer.setUseSliderForAnalog(false);
+    installMonoInverseTitleTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(nullptr, 1), true);
 }
+

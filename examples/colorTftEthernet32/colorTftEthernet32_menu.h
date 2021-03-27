@@ -15,35 +15,10 @@
 #include <tcMenu.h>
 
 #include "tcMenuAdaFruitGfx.h"
-#include <Fonts/FreeSans9pt7b.h>
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
-
-// all define statements needed
-#define DISPLAY_VARIABLE gfx
-#define DISPLAY_TYPE Adafruit_ST7735
-#define DISPLAY_CONFIG 
-#define DISPLAY_WIDTH 160
-#define DISPLAY_HEIGHT 128
-#define DISPLAY_RESET_PIN 3
-#define DISPLAY_CS_PIN 6
-#define DISPLAY_RS_PIN 7
-#define DISPLAY_DATA_PIN -1
-#define DISPLAY_CLOCK_PIN -1
-#define DISPLAY_ROTATION 1
-#define DISPLAY_TITLE_FONT FreeSans9pt7b
-#define DISPLAY_ITEM_FONT NULL
-#define UPDATES_PER_SEC 5
-#define PULLUP_LOGIC true
-#define INTERRUPT_SWITCHES true
-#define SWITCH_IODEVICE io8574
-#define ENCODER_PIN_A 7
-#define ENCODER_PIN_B 6
-#define ENCODER_PIN_OK 5
-#define LIBRARY_TYPE ETHERNET_2
-#define LISTEN_PORT 3333
 
 // all variables that need exporting
 extern Adafruit_ST7735 gfx;
@@ -80,6 +55,7 @@ extern SubMenuItem menuSettings;
 extern EnumMenuItem menuLimit;
 extern AnalogMenuItem menuCurrent;
 extern AnalogMenuItem menuVoltage;
+extern const ConnectorLocalInfo applicationInfo;
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION

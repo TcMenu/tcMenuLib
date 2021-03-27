@@ -10,6 +10,7 @@
 
 #include <tcMenu.h>
 #include "colorTftEthernet32_menu.h"
+#include "ThemeCoolBlueTraditional.h"
 
 // Global variable declarations
 
@@ -88,4 +89,8 @@ void setupMenu() {
     switches.initialiseInterrupt(io8574, true);
     menuMgr.initForEncoder(&renderer, &menuVoltage, 7, 6, 5);
     remoteServer.begin(&server, &applicationInfo);
+    renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
+    renderer.setUseSliderForAnalog(true);
+    installCoolBlueTraditionalTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(nullptr, 1), true);
 }
+
