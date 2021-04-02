@@ -28,6 +28,10 @@ EepromAuthenticatorManager authManager;
 TitleWidget wifiWidget(iconsWifi, 5, 16, 12, nullptr);
 AmplifierController controller;
 
+const char* simFilesForList[] = { "SuperFile1.txt",  "CustomFile.cpp", "SuperDuper.h", "File303.cpp", "File123443.h" };
+#define SIM_FILES_ARRAY_SIZE 5
+
+
 void prepareWifiForUse();
 
 void setup() {
@@ -94,7 +98,7 @@ void setup() {
         dlg->show(pgmVersionHeader, false);
     });
 
-    menuStatusDataList.setNumberOfRows(5);
+    menuStatusDataList.setNumberOfRows(SIM_FILES_ARRAY_SIZE);
 
     // If your app relies on getting the callbacks after a menuMgr.load(..) has finished then this does the callbacks
     triggerAllChangedCallbacks();
@@ -164,6 +168,11 @@ void CALLBACK_FUNCTION onShowDialogs(int id) {
 }
 
 int CALLBACK_FUNCTION fnStatusDataListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
+    if(row > SIM_FILES_ARRAY_SIZE && row != LIST_PARENT_ITEM_POS) {
+        // you wouldn't need this in a production build, it is for our debugging to do bounds checking.
+        serdebugF2("picked row > max!! ", row);
+        return false;
+    }
    switch(mode) {
     case RENDERFN_INVOKE:
         if(row != LIST_PARENT_ITEM_POS && renderer.getDialog() && !renderer.getDialog()->isInUse()) {
@@ -175,11 +184,21 @@ int CALLBACK_FUNCTION fnStatusDataListRtCall(RuntimeMenuItem* item, uint8_t row,
         }
         return true;
     case RENDERFN_NAME:
-        ltoaClrBuff(buffer, row, 3, NOT_PADDED, bufferSize);
+        if(row == LIST_PARENT_ITEM_POS) {
+            strcpy(buffer, "Sim Files");
+        }
+        else{
+            ltoaClrBuff(buffer, row, 3, NOT_PADDED, bufferSize);
+        }
         return true;
     case RENDERFN_VALUE:
-        buffer[0] = 'V'; buffer[1]=0;
-        fastltoa(buffer, row, 3, NOT_PADDED, bufferSize);
+        if(row == LIST_PARENT_ITEM_POS) {
+            strcpy(buffer, ">>");
+        }
+        else {
+            strncpy(buffer, simFilesForList[row], bufferSize);
+            buffer[bufferSize - 1] = 0;
+        }
         return true;
     case RENDERFN_EEPROM_POS: return 0xffff; // lists are generally not saved to EEPROM
     default: return false;
