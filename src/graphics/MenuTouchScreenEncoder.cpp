@@ -69,7 +69,23 @@ void MenuTouchScreenEncoder::touched(const TouchNotification &evt) {
 
             auto menuType = theItem->getMenuType();
             auto held = evt.getTouchState() == HELD;
-            if(isTouchActionable(theItem) && !held) {
+            bool showingTheList = menuMgr.getCurrentMenu() == theItem;
+            if(theItem->getMenuType() == MENUTYPE_RUNTIME_LIST && showingTheList) {
+                auto* listItem = reinterpret_cast<ListRuntimeMenuItem*>(theItem);
+                int row = evt.getEntry()->getPosition().getRow();
+                if(row == 0) {
+                    listItem->asBackMenu();
+                    menuMgr.onMenuSelect(false);
+                    listItem->asParent();
+                }
+                else {
+                    listItem->setActiveIndex(row - 1);
+                    listItem->getChildItem(row - 1);
+                    listItem->triggerCallback();
+                    listItem->asParent();
+                }
+            }
+            else if(isTouchActionable(theItem) && !held) {
                 menuMgr.onMenuSelect(false);
             }
             else if(isMenuRuntimeMultiEdit(theItem) && !theItem->isReadOnly()) {

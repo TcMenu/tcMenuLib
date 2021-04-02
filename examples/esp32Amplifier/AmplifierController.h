@@ -14,6 +14,8 @@
 #define NUM_CHANNELS 4
 #endif // NUM_CHANNELS
 
+#define EEPROM_TRIM_POS 140
+
 //                                             1234567890123456 1234567890123456 1234567890123456 1234567890123456
 const char pgmDefaultChannelNames[] PROGMEM = "Turntable\0      Auxiliary\0      USB Audio\0      Storage\0";
 
@@ -29,16 +31,19 @@ public:
         OVERHEATED
     };
 private:
-    AnalogMenuItem* levelTrims[NUM_CHANNELS]{};
     bool audioDirect;
     bool muted = true;
+    int levelTrims[NUM_CHANNELS];
 public:
-    explicit AmplifierController(AnalogMenuItem* trims[NUM_CHANNELS]) {
-        for(int i=0; i<NUM_CHANNELS; i++) {
-            levelTrims[i] = trims[i];
-        }
+    explicit AmplifierController() : levelTrims{} {
         menuMute.setBoolean(true);
         setAmpStatus(WARMING_UP);
+    }
+
+    void initialise() {
+        for(int i=0; i<NUM_CHANNELS; i++) {
+            levelTrims[i] = menuMgr.getEepromAbstraction()->read8(EEPROM_TRIM_POS + i);
+        }
     }
 
     uint8_t getChannelInt() {
@@ -56,7 +61,7 @@ public:
     }
 
     void onVolumeChanged() {
-        auto trim = levelTrims[getChannelInt()]->getCurrentValue();
+        auto trim = levelTrims[getChannelInt()];
         auto vol = menuVolume.getCurrentValue() + trim;
         auto volToWrite = menuMute.getBoolean() ? 0 : vol;
         serdebugF2("write volume to bus", volToWrite);
@@ -75,6 +80,18 @@ public:
     void onMute(bool mute) {
         muted = mute;
     }
+
+    int getTrim(uint8_t channel) {
+        if(channel >= NUM_CHANNELS) return 0;
+        return levelTrims[channel];
+    }
+
+    void setTrim(uint8_t channel, int newTrim) {
+        if(channel >= NUM_CHANNELS) return;
+        levelTrims[channel] = newTrim;
+        menuMgr.getEepromAbstraction()->write8(EEPROM_TRIM_POS + channel, newTrim);
+    }
+
 };
 
 #endif //TCMENU_ESPAMPLIFIER_AMPLIFIERCONTROLLER_H

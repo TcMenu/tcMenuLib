@@ -393,7 +393,8 @@ namespace tcgfx {
      * icons and drawing color / font / padding overrides. Each time the renderer sets up a new menu, it calls into here
      * for each item to find out what settings to use for drawing. It is therefore possible to adjust settings either globally,
      * by sub menu, or for a given menu item. This class also stores icon definitions by menu item, so any items that are
-     * set to draw as icons will look in that cache.
+     * set to draw as icons will look in that cache. After updating any drawing values, you should call refreshCache() to
+     * ensure it is picked up.
      */
     class ConfigurableItemDisplayPropertiesFactory : public ItemDisplayPropertiesFactory {
     private:
@@ -405,23 +406,52 @@ namespace tcgfx {
     public:
         ConfigurableItemDisplayPropertiesFactory()
                 : displayProperties(5, GROW_BY_5),
-                  iconsByItem(6, GROW_BY_5)
-                  { }
+                  iconsByItem(6, GROW_BY_5) { }
+
+        /**
+         * Get the icon associated with a menu ID or nullptr if not available.
+         * @param id the menu id
+         * @return an icon or nullptr
+         */
         DrawableIcon* iconForMenuItem(uint16_t id) override {
             return iconsByItem.getByKey(id);
         }
 
+        /**
+         * Gets the grid position override for a given menu item if one is available, or nullptr if not.
+         * @param pItem the menu item to get the override for
+         * @return the override position or nullptr
+         */
         GridPositionWithId* gridPositionForItem(MenuItem* pItem) override {
             if(!pItem) return nullptr;
             return gridByItem.getByKey(pItem->getId());
         }
 
+        /**
+         * Get the display configuration for a given item given a component type. This will search for an item at
+         * the menu item level first, then at the sub menu item level, and finally it will use the default. It is
+         * always safe to call this function, it never returns nullptr.
+         * @param pItem the item for which we want properties
+         * @param compType the component type we are drawing
+         * @return a display properties instance.
+         */
         ItemDisplayProperties* configFor(MenuItem* pItem, ItemDisplayProperties::ComponentType compType)  override;
 
+        /**
+         * Gets the selected color for a particular color type (such as background, text etc)
+         * @param colorType the color type we need
+         * @return the actual color
+         */
         color_t getSelectedColor(ItemDisplayProperties::ColorType colorType) override {
             return colorType == ItemDisplayProperties::BACKGROUND ? selectedBackgroundColor : selectedTextColor;
         }
 
+        /**
+         * Adds a new grid position for a particular menu item to the cache of grid positions. Grid positions are
+         * stored by menu item and override how and where an item is drawn in the grid.
+         * @param pItem the item who's position is being overridden
+         * @param position the position override
+         */
         void addGridPosition(MenuItem* pItem, const GridPosition& position) override {
             if(!pItem) return;
             auto* grid = gridByItem.getByKey(pItem->getId());
@@ -433,6 +463,11 @@ namespace tcgfx {
             }
         }
 
+        /**
+         * Adds an icon image to the cache by menu ID. When there is a grid position override that has icon drawing as
+         * its rendering type, then the image will be looked up using this cache.
+         * @param toAdd the icon image to add.
+         */
         void addImageToCache(const DrawableIcon& toAdd) {
             auto* current = iconsByItem.getByKey(toAdd.getKey());
             if(current) {
@@ -443,30 +478,78 @@ namespace tcgfx {
             }
         }
 
+        /**
+         * Sets the drawing properties that should be used when no overrides exist at any other level. these are basically the defaults for the component type
+         * @param drawing the component type for which these are the defaults
+         * @param palette the palette that should be used
+         * @param pad the padding that should be used
+         * @param font the font that will be used for text rendering
+         * @param mag the font number or magnification depending on the drawable used
+         * @param spacing the spacing between items
+         * @param requiredHeight the required default height for items (can be overridden in position)
+         * @param defaultJustification the default justification (can be overridden in position)
+         * @param border the border to draw around the edges of the item
+         */
         void setDrawingPropertiesDefault(ItemDisplayProperties::ComponentType drawing, const color_t* palette, MenuPadding pad, const void *font, uint8_t mag,
                                          uint8_t spacing, uint8_t requiredHeight, GridPosition::GridJustification defaultJustification, MenuBorder border) {
             setDrawingProperties(MakePropsKey(MENUID_NOTSET, false, drawing), palette, pad, font, mag, spacing, requiredHeight, defaultJustification, border);
         }
 
+        /**
+         * Sets the drawing properties that should be used for a specific item, it must have the right component type.
+         * @param drawing the component type for which these are the defaults
+         * @param id the menu id for which this override is valid
+         * @param palette the palette that should be used
+         * @param pad the padding that should be used
+         * @param font the font that will be used for text rendering
+         * @param mag the font number or magnification depending on the drawable used
+         * @param spacing the spacing between items
+         * @param requiredHeight the required default height for items (can be overridden in position)
+         * @param defaultJustification the default justification (can be overridden in position)
+         * @param border the border to draw around the edges of the item
+         */
         void setDrawingPropertiesForItem(ItemDisplayProperties::ComponentType drawing, uint16_t id, const color_t* palette, MenuPadding pad, const void *font, uint8_t mag,
                                          uint8_t spacing, uint8_t requiredHeight, GridPosition::GridJustification defaultJustification, MenuBorder border) {
             setDrawingProperties(MakePropsKey(id, false, drawing), palette, pad, font, mag, spacing, requiredHeight, defaultJustification, border);
         }
 
+        /**
+         * Sets the drawing properties that should be used for a specific item, it must have the right component type.
+         * @param drawing the component type for which these are the defaults
+         * @param id the submenu id for which this override will apply to all children
+         * @param palette the palette that should be used
+         * @param pad the padding that should be used
+         * @param font the font that will be used for text rendering
+         * @param mag the font number or magnification depending on the drawable used
+         * @param spacing the spacing between items
+         * @param requiredHeight the required default height for items (can be overridden in position)
+         * @param defaultJustification the default justification (can be overridden in position)
+         * @param border the border to draw around the edges of the item
+         */
         void setDrawingPropertiesAllInSub(ItemDisplayProperties::ComponentType drawing, uint16_t id, const color_t* palette, MenuPadding pad, const void *font, uint8_t mag,
                                           uint8_t spacing, uint8_t requiredHeight, GridPosition::GridJustification defaultJustification, MenuBorder border) {
             setDrawingProperties(MakePropsKey(id, true, drawing), palette, pad, font, mag, spacing, requiredHeight, defaultJustification, border);
         }
 
-        void setDrawingProperties(uint32_t key, const color_t* palette, MenuPadding pad, const void* font, uint8_t mag, uint8_t spacing,
-                                  uint8_t requiredHeight, GridPosition::GridJustification defaultJustification, MenuBorder border);
-
+        /**
+         * Set the backround and text color for selected items
+         * @param background the color of the background
+         * @param text the color of the text
+         */
         void setSelectedColors(color_t background, color_t text) {
             selectedBackgroundColor = background;
             selectedTextColor = text;
         }
 
+        /**
+         * Whenever you've called any method that adjusts the cache by adding new drawing options, you must then call refreshCache to
+         * ensure the drawing functions are aware of the change
+         */
         static void refreshCache();
+    private:
+        void setDrawingProperties(uint32_t key, const color_t* palette, MenuPadding pad, const void* font, uint8_t mag, uint8_t spacing,
+                                  uint8_t requiredHeight, GridPosition::GridJustification defaultJustification, MenuBorder border);
+
     };
 
 } // namespace tcgfx

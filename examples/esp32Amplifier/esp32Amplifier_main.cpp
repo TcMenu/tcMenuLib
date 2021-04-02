@@ -19,14 +19,14 @@
 #include "AmplifierController.h"
 #include "app_icondata.h"
 #include "TouchCalibrator.h"
+#include "TestingDialogController.h"
 
 const char pgmVersionHeader[] PROGMEM = "tcMenu Version";
 
 bool connectedToWifi = false;
 EepromAuthenticatorManager authManager;
 TitleWidget wifiWidget(iconsWifi, 5, 16, 12, nullptr);
-AnalogMenuItem* adjustMenuItems[] = {&menuSettingsLine1Adj, &menuSettingsLine2Adj, &menuSettingsLine3Adj};
-AmplifierController controller(adjustMenuItems);
+AmplifierController controller;
 
 void prepareWifiForUse();
 
@@ -53,6 +53,8 @@ void setup() {
         menuVolume.setCurrentValue(20, true);
         menuDirect.setBoolean(true, true);
     });
+
+    controller.initialise();
 
     touchScreen.calibrateMinMaxValues(0.240F, 0.895F, 0.09F, 0.88F);
 
@@ -91,6 +93,8 @@ void setup() {
         dlg->copyIntoBuffer(sz);
         dlg->show(pgmVersionHeader, false);
     });
+
+    menuStatusDataList.setNumberOfRows(5);
 
     // If your app relies on getting the callbacks after a menuMgr.load(..) has finished then this does the callbacks
     triggerAllChangedCallbacks();
@@ -155,45 +159,14 @@ void CALLBACK_FUNCTION onMuteSound(int id) {
     controller.onMute(menuMute.getBoolean());
 }
 
-class TestingDialogController : public BaseDialogController {
-private:
-    MenuBasedDialog* theDialog;
-public:
-    void initialiseAndGetHeader(BaseDialog *dialog, char *buffer, size_t bufferSize) override {
-        theDialog = reinterpret_cast<MenuBasedDialog *>(dialog);
-        strcpy(buffer, "Test Dialog");
-    }
-
-    void dialogDismissed(ButtonType buttonType) override {
-        if(buttonType == BTNTYPE_OK) {
-            theDialog->setButtons(BTNTYPE_NONE, BTNTYPE_CLOSE);
-            theDialog->showRam("Extra dlg", true);
-            theDialog->copyIntoBuffer("more text");
-        }
-    }
-
-    bool dialogButtonPressed(int buttonNum) override {
-        return true;
-    }
-
-    void copyCustomButtonText(int buttonNumber, char *buffer, size_t bufferSize) override {
-        buffer[0] = 0;
-    }
-} testingDialogController;
-
 void CALLBACK_FUNCTION onShowDialogs(int id) {
-    auto* dlg = renderer.getDialog();
-    if(dlg && !dlg->isInUse()) {
-        dlg->setButtons(BTNTYPE_OK, BTNTYPE_CANCEL);
-        dlg->showController(true, &testingDialogController);
-        dlg->copyIntoBuffer("some more text");
-    }
+    showDialogs();
 }
 
 int CALLBACK_FUNCTION fnStatusDataListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
    switch(mode) {
     case RENDERFN_INVOKE:
-        if(renderer.getDialog() && renderer.getDialog()->isInUse()) {
+        if(row != LIST_PARENT_ITEM_POS && renderer.getDialog() && !renderer.getDialog()->isInUse()) {
             renderer.getDialog()->setButtons(BTNTYPE_NONE, BTNTYPE_CLOSE);
             renderer.getDialog()->showRam("List select", false);
             char sz[10];
@@ -210,5 +183,50 @@ int CALLBACK_FUNCTION fnStatusDataListRtCall(RuntimeMenuItem* item, uint8_t row,
         return true;
     case RENDERFN_EEPROM_POS: return 0xffff; // lists are generally not saved to EEPROM
     default: return false;
+    }
+}
+
+int CALLBACK_FUNCTION fnChannelSettingsChannelRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize) {
+   switch(mode) {
+    case RENDERFN_INVOKE: {
+        auto *eeprom = menuMgr.getEepromAbstraction();
+        auto romPos = menuChannels.getEepromStart() + (row * menuChannels.getItemWidth());
+        eeprom->readIntoMemArray((uint8_t *) menuChannelSettingsName.getTextValue(), romPos, menuChannels.getItemWidth());
+        menuChannelSettingsLevelTrim.setCurrentValue(controller.getTrim(row));
+        return true;
+    }
+    case RENDERFN_NAME:
+        strcpy(buffer, "Channel");
+        return true;
+    case RENDERFN_VALUE:
+        strcpy(buffer, "Line");
+        fastltoa(buffer, row + 1, 2, NOT_PADDED, bufferSize);
+        return true;
+    case RENDERFN_EEPROM_POS: return 0xFFFF; // lists are generally not saved to EEPROM
+    default: return false;
+    }
+}
+
+void CALLBACK_FUNCTION onChannelSetttingsUpdate(int id) {
+    auto *eeprom = menuMgr.getEepromAbstraction();
+    auto romPos = menuChannels.getEepromStart() + (menuChannelSettingsChannel.getCurrentValue() * menuChannels.getItemWidth());
+    eeprom->writeArrayToRom(romPos, (uint8_t *) menuChannelSettingsName.getTextValue(), menuChannels.getItemWidth());
+    controller.setTrim(menuChannelSettingsChannel.getCurrentValue(), menuChannelSettingsLevelTrim.getCurrentValue());
+    if(renderer.getDialog() && !renderer.getDialog()->isInUse()) {
+        renderer.getDialog()->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
+        renderer.getDialog()->showRam("Channel setting saved", true);
+        char sz[5];
+        ltoaClrBuff(sz, menuChannelSettingsChannel.getCurrentValue(), 2, NOT_PADDED, sizeof sz);
+        renderer.getDialog()->copyIntoBuffer(sz);
+    }
+}
+
+void CALLBACK_FUNCTION onSaveSettings(int id) {
+    menuMgr.save();
+    EEPROM.commit();
+
+    if(renderer.getDialog() && !renderer.getDialog()->isInUse()) {
+        renderer.getDialog()->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
+        renderer.getDialog()->showRam("Committed all items", true);
     }
 }

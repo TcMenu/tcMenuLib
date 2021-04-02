@@ -94,6 +94,7 @@ namespace tcgfx {
         const char *pgmTitle;
         bool lastRowExactFit;
         bool useSliderForAnalog;
+        GridPositionRowCacheEntry cachedEntryItem;
     protected:
         TitleMode titleMode = TITLE_FIRST_ROW;
         bool titleOnDisplay = false;

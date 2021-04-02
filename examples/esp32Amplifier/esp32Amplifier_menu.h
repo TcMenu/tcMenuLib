@@ -45,12 +45,15 @@ extern AnalogMenuItem menuStatusRightVU;
 extern AnalogMenuItem menuStatusLeftVU;
 extern EnumMenuItem menuStatusAmpStatus;
 extern SubMenuItem menuStatus;
+extern ActionMenuItem menuSettingsSaveSettings;
 extern AnalogMenuItem menuSettingsValveHeating;
 extern AnalogMenuItem menuSettingsWarmUpTime;
-extern AnalogMenuItem menuSettingsLine3Adj;
-extern AnalogMenuItem menuSettingsLine2Adj;
-extern AnalogMenuItem menuSettingsLine1Adj;
-extern SubMenuItem menuSettingsChannelNames;
+extern ActionMenuItem menuChannelSettingsUpdateSettings;
+extern TextMenuItem menuChannelSettingsName;
+extern AnalogMenuItem menuChannelSettingsLevelTrim;
+int fnChannelSettingsChannelRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize);
+extern ScrollChoiceMenuItem menuChannelSettingsChannel;
+extern SubMenuItem menuSettingsChannelSettings;
 extern SubMenuItem menuSettings;
 extern BooleanMenuItem menuMute;
 extern BooleanMenuItem menuDirect;
@@ -61,6 +64,8 @@ extern AnalogMenuItem menuVolume;
 #define CALLBACK_FUNCTION
 
 void CALLBACK_FUNCTION onShowDialogs(int id);
+void CALLBACK_FUNCTION onSaveSettings(int id);
+void CALLBACK_FUNCTION onChannelSetttingsUpdate(int id);
 void CALLBACK_FUNCTION onMuteSound(int id);
 void CALLBACK_FUNCTION onAudioDirect(int id);
 void CALLBACK_FUNCTION onChannelChanged(int id);

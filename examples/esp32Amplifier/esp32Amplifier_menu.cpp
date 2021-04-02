@@ -55,29 +55,32 @@ RENDERING_CALLBACK_NAME_INVOKE(fnStatusRtCall, backSubItemRenderFn, "Status", -1
 const PROGMEM SubMenuInfo minfoStatus = { "Status", 6, 0xFFFF, 0, NO_CALLBACK };
 BackMenuItem menuBackStatus(fnStatusRtCall, &menuStatusAmpStatus);
 SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuConnectivity);
+const PROGMEM AnyMenuInfo minfoSettingsSaveSettings = { "Save settings", 25, 0xFFFF, 0, onSaveSettings };
+ActionMenuItem menuSettingsSaveSettings(&minfoSettingsSaveSettings, NULL);
 const PROGMEM AnalogMenuInfo minfoSettingsValveHeating = { "Valve Heating", 17, 15, 600, NO_CALLBACK, 0, 10, "s" };
-AnalogMenuItem menuSettingsValveHeating(&minfoSettingsValveHeating, 0, NULL);
+AnalogMenuItem menuSettingsValveHeating(&minfoSettingsValveHeating, 0, &menuSettingsSaveSettings);
 const PROGMEM AnalogMenuInfo minfoSettingsWarmUpTime = { "Warm up time", 11, 7, 300, NO_CALLBACK, 0, 10, "s" };
 AnalogMenuItem menuSettingsWarmUpTime(&minfoSettingsWarmUpTime, 0, &menuSettingsValveHeating);
-const PROGMEM AnalogMenuInfo minfoSettingsLine3Adj = { "Line 3 adj", 10, 13, 20, NO_CALLBACK, -10, 2, "dB" };
-AnalogMenuItem menuSettingsLine3Adj(&minfoSettingsLine3Adj, 0, &menuSettingsWarmUpTime);
-const PROGMEM AnalogMenuInfo minfoSettingsLine2Adj = { "Line 2 adj", 9, 11, 20, NO_CALLBACK, -10, 2, "dB" };
-AnalogMenuItem menuSettingsLine2Adj(&minfoSettingsLine2Adj, 0, &menuSettingsLine3Adj);
-const PROGMEM AnalogMenuInfo minfoSettingsLine1Adj = { "Line 1 adj", 8, 9, 20, NO_CALLBACK, -10, 2, "dB" };
-AnalogMenuItem menuSettingsLine1Adj(&minfoSettingsLine1Adj, 0, &menuSettingsLine2Adj);
-RENDERING_CALLBACK_NAME_INVOKE(fnSettingsChannelNamesRtCall, backSubItemRenderFn, "Channel Names", -1, NO_CALLBACK)
-const PROGMEM SubMenuInfo minfoSettingsChannelNames = { "Channel Names", 7, 0xFFFF, 0, NO_CALLBACK };
-BackMenuItem menuBackSettingsChannelNames(fnSettingsChannelNamesRtCall, NULL);
-SubMenuItem menuSettingsChannelNames(&minfoSettingsChannelNames, &menuBackSettingsChannelNames, &menuSettingsLine1Adj);
+const PROGMEM AnyMenuInfo minfoChannelSettingsUpdateSettings = { "Update Settings", 24, 0xFFFF, 0, onChannelSetttingsUpdate };
+ActionMenuItem menuChannelSettingsUpdateSettings(&minfoChannelSettingsUpdateSettings, NULL);
+RENDERING_CALLBACK_NAME_INVOKE(fnChannelSettingsNameRtCall, textItemRenderFn, "Name", -1, NO_CALLBACK)
+TextMenuItem menuChannelSettingsName(fnChannelSettingsNameRtCall, 22, 15, &menuChannelSettingsUpdateSettings);
+const PROGMEM AnalogMenuInfo minfoChannelSettingsLevelTrim = { "Level Trim", 8, 9, 20, NO_CALLBACK, -10, 2, "dB" };
+AnalogMenuItem menuChannelSettingsLevelTrim(&minfoChannelSettingsLevelTrim, 0, &menuChannelSettingsName);
+ScrollChoiceMenuItem menuChannelSettingsChannel(23, fnChannelSettingsChannelRtCall, 0, 3, &menuChannelSettingsLevelTrim);
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsChannelSettingsRtCall, backSubItemRenderFn, "Channel Settings", -1, NO_CALLBACK)
+const PROGMEM SubMenuInfo minfoSettingsChannelSettings = { "Channel Settings", 7, 0xFFFF, 0, NO_CALLBACK };
+BackMenuItem menuBackSettingsChannelSettings(fnSettingsChannelSettingsRtCall, &menuChannelSettingsChannel);
+SubMenuItem menuSettingsChannelSettings(&minfoSettingsChannelSettings, &menuBackSettingsChannelSettings, &menuSettingsWarmUpTime);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings", -1, NO_CALLBACK)
 const PROGMEM SubMenuInfo minfoSettings = { "Settings", 5, 0xFFFF, 0, NO_CALLBACK };
-BackMenuItem menuBackSettings(fnSettingsRtCall, &menuSettingsChannelNames);
+BackMenuItem menuBackSettings(fnSettingsRtCall, &menuSettingsChannelSettings);
 SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, &menuStatus);
 const PROGMEM BooleanMenuInfo minfoMute = { "Mute", 4, 0xFFFF, 1, onMuteSound, NAMING_TRUE_FALSE };
 BooleanMenuItem menuMute(&minfoMute, false, &menuSettings);
 const PROGMEM BooleanMenuInfo minfoDirect = { "Direct", 3, 6, 1, onAudioDirect, NAMING_TRUE_FALSE };
 BooleanMenuItem menuDirect(&minfoDirect, false, &menuMute);
-RENDERING_CALLBACK_NAME_INVOKE(fnChannelsRtCall, enumItemRenderFn, "Channels", 4, onChannelChanged)
+RENDERING_CALLBACK_NAME_INVOKE(fnChannelsRtCall, enumItemRenderFn, "Channel", 4, onChannelChanged)
 ScrollChoiceMenuItem menuChannels(2, fnChannelsRtCall, 0, 150, 16, 3, &menuDirect);
 const PROGMEM AnalogMenuInfo minfoVolume = { "Volume", 1, 2, 255, onVolumeChanged, -180, 2, "dB" };
 AnalogMenuItem menuVolume(&minfoVolume, 0, &menuChannels);
@@ -87,9 +90,6 @@ AnalogMenuItem menuVolume(&minfoVolume, 0, &menuChannels);
 
 void setupMenu() {
     menuConnectivityIPAddress.setReadOnly(true);
-    menuVolume.setReadOnly(true);
-    menuChannels.setReadOnly(true);
-    menuMute.setReadOnly(true);
 
     tft.begin();
     tft.setRotation(1);

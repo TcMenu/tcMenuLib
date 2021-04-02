@@ -1,6 +1,6 @@
 {
   "lastEdited": {
-    "seconds": 1617265602,
+    "seconds": 1617370133,
     "nanos": 0
   },
   "codeOptions": {
@@ -123,14 +123,14 @@
       "parentId": 0,
       "type": "scrollItem",
       "item": {
-        "name": "Channels",
+        "name": "Channel",
         "eepromAddress": 4,
         "id": 2,
         "readOnly": false,
         "localOnly": false,
         "visible": true,
         "functionName": "onChannelChanged",
-        "variableName": "",
+        "variableName": "Channels",
         "itemWidth": 16,
         "numEntries": 3,
         "variable": null,
@@ -186,7 +186,7 @@
       "parentId": 5,
       "type": "subMenu",
       "item": {
-        "name": "Channel Names",
+        "name": "Channel Settings",
         "eepromAddress": -1,
         "id": 7,
         "readOnly": false,
@@ -197,16 +197,35 @@
       }
     },
     {
-      "parentId": 5,
+      "parentId": 7,
+      "type": "scrollItem",
+      "item": {
+        "name": "Channel Num",
+        "eepromAddress": -1,
+        "id": 23,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "",
+        "variableName": "ChannelSettingsChannel",
+        "itemWidth": 10,
+        "numEntries": 3,
+        "variable": null,
+        "eepromOffset": 0,
+        "choiceMode": "CUSTOM_RENDERFN"
+      }
+    },
+    {
+      "parentId": 7,
       "type": "analogItem",
       "item": {
-        "name": "Line 1 adj",
+        "name": "Level Trim",
         "eepromAddress": 9,
         "id": 8,
         "readOnly": false,
         "localOnly": false,
         "visible": true,
-        "variableName": "",
+        "variableName": "ChannelSettingsLevelTrim",
         "maxValue": 20,
         "offset": -10,
         "divisor": 2,
@@ -214,37 +233,33 @@
       }
     },
     {
-      "parentId": 5,
-      "type": "analogItem",
+      "parentId": 7,
+      "type": "textItem",
       "item": {
-        "name": "Line 2 adj",
-        "eepromAddress": 11,
-        "id": 9,
+        "name": "Name",
+        "eepromAddress": -1,
+        "id": 22,
         "readOnly": false,
         "localOnly": false,
         "visible": true,
-        "variableName": "",
-        "maxValue": 20,
-        "offset": -10,
-        "divisor": 2,
-        "unitName": "dB"
+        "functionName": "",
+        "variableName": "ChannelSettingsName",
+        "itemType": "PLAIN_TEXT",
+        "textLength": 15
       }
     },
     {
-      "parentId": 5,
-      "type": "analogItem",
+      "parentId": 7,
+      "type": "actionMenu",
       "item": {
-        "name": "Line 3 adj",
-        "eepromAddress": 13,
-        "id": 10,
+        "name": "Update Settings",
+        "eepromAddress": -1,
+        "id": 24,
         "readOnly": false,
         "localOnly": false,
         "visible": true,
-        "variableName": "",
-        "maxValue": 20,
-        "offset": -10,
-        "divisor": 2,
-        "unitName": "dB"
+        "functionName": "onChannelSetttingsUpdate",
+        "variableName": "ChannelSettingsUpdateSettings"
       }
     },
     {
@@ -279,6 +294,20 @@
         "offset": 0,
         "divisor": 10,
         "unitName": "s"
+      }
+    },
+    {
+      "parentId": 5,
+      "type": "actionMenu",
+      "item": {
+        "name": "Save settings",
+        "eepromAddress": -1,
+        "id": 25,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "onSaveSettings",
+        "variableName": ""
       }
     },
     {

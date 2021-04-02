@@ -86,6 +86,23 @@ GridPositionRowCacheEntry* BaseGraphicalRenderer::findMenuEntryAndDimensions(con
         return nullptr;
     }
 
+    if(currentRootMenu && currentRootMenu->getMenuType() == MENUTYPE_RUNTIME_LIST) {
+        auto* runList = reinterpret_cast<ListRuntimeMenuItem*>(currentRootMenu);
+        auto* itemProps = getDisplayPropertiesFactory().configFor(runList, ItemDisplayProperties::COMPTYPE_ITEM);
+        auto* titleProps = getDisplayPropertiesFactory().configFor(runList, ItemDisplayProperties::COMPTYPE_TITLE);
+        int titleHeight = titleProps->getRequiredHeight() + titleProps->getSpaceAfter();
+        int rowHeight = itemProps->getRequiredHeight() + + itemProps->getSpaceAfter();
+        if(screenPos.y < titleHeight) {
+            cachedEntryItem = GridPositionRowCacheEntry(runList, GridPosition(GridPosition::DRAW_TITLE_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 0, titleHeight), titleProps);
+            return &cachedEntryItem;
+        }
+        else {
+            auto rowNum = min(int((screenPos.y - titleHeight) / rowHeight), int(runList->getNumberOfRows() - 1));
+            cachedEntryItem = GridPositionRowCacheEntry(runList, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, rowNum + 1, titleHeight), titleProps);
+            return &cachedEntryItem;
+        }
+    }
+
     int rowStartY = 0;
     auto* icon = getDisplayPropertiesFactory().iconForMenuItem(SPECIAL_ID_ACTIVE_ICON);
     int iconWidth = icon ? icon->getDimensions().x : 0;
@@ -186,6 +203,8 @@ void BaseGraphicalRenderer::renderList() {
     int totalTitleHeight = titleHeight + titleProps->getSpaceAfter();
     int totalRowHeight = rowHeight + itemProps->getSpaceAfter();
 
+    runList->setActive(true);
+
     uint8_t maxY = min(uint8_t(((height + (rowHeight - 1)) - totalTitleHeight) / totalRowHeight), runList->getNumberOfParts());
     uint8_t currentActive = runList->getActiveIndex();
 
@@ -194,20 +213,17 @@ void BaseGraphicalRenderer::renderList() {
         offset = (currentActive+1) - maxY;
     }
 
-    // these braces save memory by constraining the grid position cache entry, do not remove.
-    {
-        GridPositionRowCacheEntry titleEntry(runList->asBackMenu(), GridPosition(GridPosition::DRAW_TITLE_ITEM,
-                                                                                 titleProps->getDefaultJustification(),
-                                                                                 0, titleHeight), titleProps);
-        drawMenuItem(&titleEntry, Coord(0, 0), Coord(width, titleHeight), true);
-    }
+    cachedEntryItem = GridPositionRowCacheEntry(runList->asBackMenu(), GridPosition(GridPosition::DRAW_TITLE_ITEM,
+                                                                             titleProps->getDefaultJustification(),
+                                                                             0, titleHeight), titleProps);
+    drawMenuItem(&cachedEntryItem, Coord(0, 0), Coord(width, titleHeight), true);
 
     for (int i = 0; i < maxY; i++) {
         uint8_t current = offset + i;
         if(current >= runList->getNumberOfRows()) break;
         RuntimeMenuItem* toDraw = runList->getChildItem(current);
-        GridPositionRowCacheEntry itemEntry(toDraw, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, current + 1, rowHeight), itemProps);
-        drawMenuItem(&itemEntry, Coord(0, totalTitleHeight), Coord(width, rowHeight), true);
+        cachedEntryItem = GridPositionRowCacheEntry(toDraw, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, current + 1, rowHeight), itemProps);
+        drawMenuItem(&cachedEntryItem, Coord(0, totalTitleHeight), Coord(width, rowHeight), true);
         taskManager.yieldForMicros(0);
         totalTitleHeight += totalRowHeight;
     }
@@ -360,7 +376,6 @@ uint8_t BaseGraphicalRenderer::itemCount(MenuItem*, bool ) {
     }
     else {
         return itemOrderByRow.count();
-
     }
 }
 
