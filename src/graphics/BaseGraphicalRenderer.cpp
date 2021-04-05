@@ -205,20 +205,18 @@ void BaseGraphicalRenderer::renderList() {
 
     runList->setActive(true);
 
-    uint8_t maxY = min(uint8_t(((height + (rowHeight - 1)) - totalTitleHeight) / totalRowHeight), runList->getNumberOfParts());
+    uint8_t maxOnScreen = ((height + (rowHeight - 1)) - totalTitleHeight) / totalRowHeight;
     uint8_t currentActive = runList->getActiveIndex();
 
     uint8_t offset = 0;
-    if (currentActive >= maxY) {
-        offset = (currentActive+1) - maxY;
-    }
+    while((currentActive - offset) > maxOnScreen) offset++;
 
     cachedEntryItem = GridPositionRowCacheEntry(runList->asBackMenu(), GridPosition(GridPosition::DRAW_TITLE_ITEM,
                                                                              titleProps->getDefaultJustification(),
                                                                              0, titleHeight), titleProps);
     drawMenuItem(&cachedEntryItem, Coord(0, 0), Coord(width, titleHeight), true);
 
-    for (int i = 0; i < maxY; i++) {
+    for (int i = 0; i <= maxOnScreen; i++) {
         uint8_t current = offset + i;
         if(current >= runList->getNumberOfRows()) break;
         RuntimeMenuItem* toDraw = runList->getChildItem(current);

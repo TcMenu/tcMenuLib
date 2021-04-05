@@ -63,6 +63,11 @@ void BaseDialog::internalShow(bool allowRemote) {
     setRemoteUpdateNeededAll();
     internalSetVisible(true);
     needsDrawing = MENUDRAW_COMPLETE_REDRAW;
+
+    // we must do this after control of the menu has been taken for the dialog, otherwise it may recursively get called
+    // for list and actions where there is a risk that changing the encoder will call again.
+    int noOfOptions = (button1 != BTNTYPE_NONE && button2 != BTNTYPE_NONE)  ? 1 : 0;
+    if(switches.getEncoder() && !isMenuItemBased()) switches.getEncoder()->changePrecision(noOfOptions, lastBtnVal);
 }
 
 void BaseDialog::internalSetVisible(bool visible) {
@@ -184,8 +189,7 @@ void BaseDialog::setButtons(ButtonType btn1, ButtonType btn2, int defVal) {
     serdebugF3("Set buttons on dialog", btn1, btn2);
     button1 = btn1;
     button2 = btn2;
-    int noOfOptions = (button1 != BTNTYPE_NONE && button2 != BTNTYPE_NONE)  ? 1 : 0;
-    if(switches.getEncoder()) switches.getEncoder()->changePrecision(noOfOptions, defVal);
+    lastBtnVal = defVal;
     setNeedsDrawing(true);
 }
 

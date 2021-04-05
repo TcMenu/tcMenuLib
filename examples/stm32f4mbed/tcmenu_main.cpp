@@ -10,7 +10,9 @@
 #include "stm32f4mbed_menu.h"
 #include "NTPTimeEvent.h"
 #include "ScreenSaverCustomDrawing.h"
+#include "mbed/HalStm32EepromAbstraction.h"
 #include <stockIcons/wifiAndConnectionIcons16x12.h>
+#include <RemoteMenuItem.h>
 
 #ifdef BUILD_FOR_MBED_6
 BufferedSerial serPort(USBTX, USBRX);
@@ -33,6 +35,12 @@ SPI spi(PB_5, PB_4, PB_3);
 TitleWidget deviceConnectedWidget(iconsConnection, 2, 16, 12, nullptr);
 TitleWidget ethernetConnectionWidget(iconsEthernetConnection, 2, 16, 12, &deviceConnectedWidget);
 
+HalStm32EepromAbstraction eeprom;
+EepromAuthenticatorManager eepromAuth;
+
+RemoteMenuItem menuRemoteStatusList(nextRandomId(), 2);
+EepromAuthenicationInfoMenuItem menuAuthenticatedUserList(nextRandomId(), &eepromAuth, &menuRemoteStatusList);
+
 ScreenSaverCustomDrawing screenSaver;
 
 // forward declaration
@@ -44,6 +52,22 @@ void setup() {
 #else
     serPort.baud(115200);
 #endif
+
+    // first we set up the EEPROM we declared earlier, and provide it to the menu manager as the global eeprom storage
+    eeprom.initialise(0);
+    menuMgr.setEepromRef(&eeprom);
+
+    // now we set up the authenticator we prepared earlier, it holds the paired devices that are allowed to connect and
+    // also the passcode for secured menu items.
+    eepromAuth.initialise(&eeprom, 100);
+    menuMgr.setAuthenticator(&eepromAuth);
+    remoteServer.setAuthenticator(&eepromAuth);
+
+    // initialise and add two menu items, one shows the pairing device status, the other what's currently connected
+    menuRemoteStatusList.addConnector(remoteServer.getRemoteConnector(0));
+    menuIP.setNext(&menuAuthenticatedUserList);
+    menuRemoteStatusList.setLocalOnly(true);
+    menuAuthenticatedUserList.setLocalOnly(true);
 
     // we add a simple widget that appears on the top right of the menu, do this before calling setup to ensure that
     // it draws immediately. There's three things to do here
@@ -62,6 +86,9 @@ void setup() {
     remoteServer.getRemoteConnector(0)->setCommsNotificationCallback([](CommunicationInfo info) {
         deviceConnectedWidget.setCurrentState(info.connected ? 1 : 0);
     });
+
+    menuMgr.setRootMenu(&menuRTCDate);
+    menuMgr.load();
 
     // this was added by designer, it sets up the input, display and remote.
     setupMenu();
@@ -104,26 +131,26 @@ int main() {
     }
 }
 
-void CALLBACK_FUNCTION onTenthsChaned(int id) {
+void CALLBACK_FUNCTION onTenthsChaned(int /*id*/) {
     char sz[20];
     ltoaClrBuff(sz, menuTenths.getCurrentValue(), 5, '0', sizeof sz);
     menuEdit.setTextValue(sz);
 }
 
-void CALLBACK_FUNCTION onFoodChange(int id) {
+void CALLBACK_FUNCTION onFoodChange(int /*id*/) {
     char sz[20];
     menuFoods.copyEnumStrToBuffer(sz, sizeof  sz, menuFoods.getCurrentValue());
     menuEdit.setTextValue(sz);
 }
 
-void CALLBACK_FUNCTION onFrequencyChanged(int id) {
+void CALLBACK_FUNCTION onFrequencyChanged(int /*id*/) {
     char sz[20];
     menuFrequency.copyValue(sz, sizeof sz);
     menuEdit.setTextValue(sz);
 }
 
 // see tcMenu list documentation on thecoderscorner.com
-int CALLBACK_FUNCTION fnCountingListRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize) {
+int CALLBACK_FUNCTION fnCountingListRtCall(RuntimeMenuItem * /*item*/, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize) {
    switch(mode) {
     case RENDERFN_INVOKE:
         serdebugF2("Invoked list item", row);
@@ -198,3 +225,14 @@ void prepareRealtimeClock() {
     taskManager.scheduleOnce(5, prepareRealtimeClock, TIME_SECONDS);
 }
 #endif // BUILD_FOR_MBED_5
+
+void CALLBACK_FUNCTION onSaveAll(int id) {
+    menuMgr.save();
+    eeprom.commit();
+    auto* dlg = renderer.getDialog();
+    if(dlg && !dlg->isInUse()) {
+        dlg->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
+        dlg->showRam("Saved to ROM", false);
+        dlg->copyIntoBuffer("");
+    }
+}

@@ -41,13 +41,12 @@ void setup() {
 
     EEPROM.begin(512);
     menuMgr.setEepromRef(new ArduinoEEPROMAbstraction(&EEPROM));
+    menuMgr.setRootMenu(&menuVolume);
     authManager.initialise(menuMgr.getEepromAbstraction(), 200);
-
-    prepareWifiForUse();
+    menuMgr.setAuthenticator(&authManager);
+    remoteServer.setAuthenticator(&authManager);
 
     renderer.setFirstWidget(&wifiWidget);
-
-    setupMenu();
 
     menuMgr.load(MENU_MAGIC_KEY, [] {
         // when the eeprom is not initialised, put sensible defaults in there.
@@ -58,8 +57,11 @@ void setup() {
         menuDirect.setBoolean(true, true);
     });
 
-    controller.initialise();
+    prepareWifiForUse();
 
+    setupMenu();
+
+    controller.initialise();
     touchScreen.calibrateMinMaxValues(0.240F, 0.895F, 0.09F, 0.88F);
 
     renderer.setCustomDrawingHandler(new TouchScreenCalibrator(&touchScreen));

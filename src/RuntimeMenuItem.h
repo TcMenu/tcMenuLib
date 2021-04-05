@@ -190,7 +190,7 @@ public:
     uint8_t getActiveIndex() const { return activeItem; }
     void setActiveIndex(uint8_t idx) {
         activeItem = idx;
-        changeOccurred(false);
+        setChanged(true);
     }
 };
 
