@@ -58,7 +58,7 @@ void setup() {
     menuMgr.setEepromRef(&eeprom);
 
     // now we set up the authenticator we prepared earlier, it holds the paired devices that are allowed to connect and
-    // also the passcode for secured menu items.
+    // also the passcode for secured menu items. We provide it to the remote server and also menu manager.
     eepromAuth.initialise(&eeprom, 100);
     menuMgr.setAuthenticator(&eepromAuth);
     remoteServer.setAuthenticator(&eepromAuth);
@@ -83,7 +83,7 @@ void setup() {
 
     // and register to receive updates from the connector when connectivity changes. When connected is true
     // we have a user connected to our remote endpoint.
-    remoteServer.getRemoteConnector(0)->setCommsNotificationCallback([](CommunicationInfo info) {
+    menuRemoteStatusList.registerCommsNotification([](CommunicationInfo info) {
         deviceConnectedWidget.setCurrentState(info.connected ? 1 : 0);
     });
 
