@@ -50,13 +50,6 @@ namespace tcgfx {
             where.x += space;
         }
 
-        // icons never use double buffer drawing because they may use a lot of BPP and don't change often in the main
-        auto drawingMode = entry->getPosition().getDrawingMode();
-        if(drawingMode == GridPosition::DRAW_AS_ICON_ONLY || drawingMode == GridPosition::DRAW_AS_ICON_TEXT) {
-            drawIconItem(entry, where, areaSize);
-            return;
-        }
-
         // if we are drawing everything, then we need to clear out the areas in between items.
         if(drawAll && entry->getDisplayProperties()->getSpaceAfter() > 0) {
             auto* bgConfig = propertiesFactory.configFor(menuMgr.getCurrentSubMenu(), ItemDisplayProperties::COMPTYPE_ITEM);
@@ -64,11 +57,18 @@ namespace tcgfx {
             drawable->drawBox(Coord(where.x, where.y + areaSize.y), Coord(areaSize.x, entry->getDisplayProperties()->getSpaceAfter()), true);
         }
 
+        // icons never use double buffer drawing because they may use a lot of BPP and don't change often in the main
+        auto drawingMode = entry->getPosition().getDrawingMode();
+        if(drawingMode == GridPosition::DRAW_AS_ICON_ONLY || drawingMode == GridPosition::DRAW_AS_ICON_TEXT) {
+            drawIconItem(entry, where, areaSize);
+            return;
+        }
+
+
         auto* subDevice = rootDrawable->getSubDeviceFor(where, areaSize, entry->getDisplayProperties()->getPalette(), 6);
         if(subDevice) {
             subDevice->startDraw();
         }
-
         drawable = subDevice ? subDevice : rootDrawable;
         Coord wh = subDevice ? Coord(0,0) : where;
         switch(drawingMode) {
