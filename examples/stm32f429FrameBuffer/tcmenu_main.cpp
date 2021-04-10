@@ -1,3 +1,7 @@
+/**
+ * BETA early access, the frame buffer is not yet fully working. Only for evaluation.
+ */
+
 #include <mbed.h>
 #include "stm32f429FrameBuffer_menu.h"
 
