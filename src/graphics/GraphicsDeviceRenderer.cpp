@@ -305,7 +305,7 @@ namespace tcgfx {
             auto* boolItem = reinterpret_cast<BooleanMenuItem*>(pItem);
             sel = boolItem->getBoolean();
         }
-        color_t bgColor, textColor;
+
         if(isActiveOrEditing(pEntry->getMenuItem())) {
             drawable->setColors(propertiesFactory.getSelectedColor(ItemDisplayProperties::TEXT), propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND));
         }
