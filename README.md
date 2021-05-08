@@ -29,9 +29,8 @@ Install the [tcMenu library dependency](https://platformio.org/lib/show/7316/tcM
 
 For designing menu structures we recommend using the TcMenu Designer which can design your menu in a round trip way, generate the code including the correct plugins for your hardware setup.
 
-* On Windows 10 please use the Windows Store version: https://www.microsoft.com/store/apps/9NHJNH9BCNJN
-* On MacOS, please use the Mac App Store version: https://apps.apple.com/gb/app/tcmenu-designer/id1527782002?mt=12
-* Linux, Windows 7/8: Use the original packaged application - https://github.com/davetcc/tcMenu/releases
+All releases are available from: [https://github.com/davetcc/tcMenu/releases]
+
 
 ## Tested Configurations
 
