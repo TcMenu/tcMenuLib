@@ -27,7 +27,7 @@ Install the [tcMenu library dependency](https://platformio.org/lib/show/7316/tcM
 
 ### Installing tcMenu Designer UI, recommended
 
-For designing menu structures we recommend using the TcMenu Designer which can design your menu in a round trip way, generate the code including the correct plugins for your hardware setup.
+For designing menu structures we recommend using the TcMenu Designer which can design your menu in a round trip way, generate the code including the correct plugins for your hardware setup. There is a Linux package, notarized version for macOS, and a Windows Installer with an extended validation certificate. 
 
 All releases are available from: [https://github.com/davetcc/tcMenu/releases]
 
