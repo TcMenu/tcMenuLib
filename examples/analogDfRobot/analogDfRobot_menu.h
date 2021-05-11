@@ -13,7 +13,6 @@
 
 #include <Arduino.h>
 #include <tcMenu.h>
-
 #include <LiquidCrystalIO.h>
 #include "tcMenuLiquidCrystal.h"
 #include <DfRobotInputAbstraction.h>
@@ -21,15 +20,16 @@
 #include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
 
-// all define statements needed
-#define UNO_OR_FULL unoLcd
-#define UPDATES_PER_SEC 2
+void setupMenu();  // forward reference of the menu setup function.
+extern const PROGMEM ConnectorLocalInfo applicationInfo;  // contains app name and ID
 
-// all variables that need exporting
+// Global variables that need exporting
+
 extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
 
-// all menu item forward references.
+// Global Menu Item exports
+
 extern AnalogMenuItem menuCommits;
 extern ScrollChoiceMenuItem menuChooseItem;
 extern TextMenuItem menuText;
@@ -39,7 +39,9 @@ extern BooleanMenuItem menuL1;
 extern BackMenuItem menuBackLEDStates;
 extern SubMenuItem menuLEDStates;
 extern AnalogMenuItem menuValueA0;
-extern const ConnectorLocalInfo applicationInfo;
+
+// Provide a wrapper to get hold of the root menu item
+inline MenuItem& rootMenuItem() { return menuValueA0; }
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
@@ -47,7 +49,5 @@ extern const ConnectorLocalInfo applicationInfo;
 int fnChooseItemRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
 void CALLBACK_FUNCTION onLed1(int id);
 void CALLBACK_FUNCTION onLed2(int id);
-
-void setupMenu();
 
 #endif // MENU_GENERATED_CODE_H

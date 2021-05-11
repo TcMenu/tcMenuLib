@@ -11,11 +11,6 @@ ArduinoAnalogDevice analog;
 //using namespace tcgfx;
 
 void setup() {
-/*    auto& factory = renderer.getLcdDisplayPropertiesFactory();
-    // we now create a grid for the two led controls in the submenu, this shows how to override the default grid for a few items.
-    // In most cases the automatic rendering works fine when a few items are overriden as long as the row you request hasn't yet been taken.
-    factory.addGridPosition(&menuL1, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE, 2, 1, 1, 1));
-    factory.addGridPosition(&menuL2, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_RIGHT_WITH_VALUE, 2, 2, 1, 1));*/
     // first we setup the menu
     setupMenu();
 
@@ -24,7 +19,6 @@ void setup() {
     analog.initPin(A1, DIR_IN);
 
     // now we read the value of A0 every 200millis and set it onto a menu item
-    menuValueA0.setReadOnly(true);
     taskManager.scheduleFixedRate(200, [] {
         menuValueA0.setCurrentValue(int(analog.getCurrentFloat(A1) * 100.0));
     });
@@ -72,5 +66,7 @@ int CALLBACK_FUNCTION fnChooseItemRtCall(RuntimeMenuItem * item, uint8_t row, Re
     default: return false;
     }
 }
+
+
 
 

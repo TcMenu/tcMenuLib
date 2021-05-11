@@ -14,7 +14,6 @@
 // Global variable declarations
 
 const PROGMEM  ConnectorLocalInfo applicationInfo = { "DfRobot", "2ba37227-a412-40b7-94e7-42caf9bb0ff4" };
-
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 LiquidCrystalRenderer renderer(lcd, 16, 2);
 
@@ -41,6 +40,9 @@ AnalogMenuItem menuValueA0(&minfoValueA0, 0, &menuLEDStates);
 // Set up code
 
 void setupMenu() {
+    menuValueA0.setReadOnly(true);
+    menuCommits.setReadOnly(true);
+
     lcd.begin(16, 2);
     renderer.setUpdatesPerSecond(2);
     lcd.configureBacklightPin(10);
@@ -50,8 +52,5 @@ void setupMenu() {
     menuMgr.initForUpDownOk(&renderer, &menuValueA0, DF_KEY_DOWN, DF_KEY_UP, DF_KEY_SELECT);
     menuMgr.setBackButton(DF_KEY_LEFT);
     menuMgr.setNextButton(DF_KEY_RIGHT);
-
-    // Read only and local only function calls
-    menuCommits.setReadOnly(true);
 }
 
