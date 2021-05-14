@@ -26,10 +26,3 @@ int main() {
 void CALLBACK_FUNCTION onTargetChanged(int id) {
     // TODO - your menu change code
 }
-
-
-
-
-
-
-

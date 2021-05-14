@@ -16,7 +16,6 @@
 // Global variable declarations
 
 const  ConnectorLocalInfo applicationInfo = { "Factory", "4df3d784-674a-4a3d-bcee-54a49693788e" };
-
 StChromaArtDrawable Drawable;
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &Drawable);
 StBspTouchInterrogator touchInterrogator(240, 320);
@@ -56,7 +55,6 @@ BooleanMenuItem menuPower(&minfoPower, false, &menuBeltStatus);
 // Set up code
 
 void setupMenu() {
-    // Read only and local only function calls
     menuBeltSpeed.setReadOnly(true);
     menuBeltStatus.setReadOnly(true);
 

@@ -17,7 +17,6 @@
 // Global variable declarations
 
 const PROGMEM  ConnectorLocalInfo applicationInfo = { "SimHub Link", "4db9fbfe-9fab-4759-b8ff-3e0c6700f475" };
-
 Adafruit_ILI9341 gfx(22, 17, 16);
 AdafruitDrawable gfxDrawable(&gfx);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
@@ -36,8 +35,12 @@ const char enumStrDashboard_2[] PROGMEM = "Custom";
 const char* const enumStrDashboard[] PROGMEM  = { enumStrDashboard_0, enumStrDashboard_1, enumStrDashboard_2 };
 const PROGMEM EnumMenuInfo minfoDashboard = { "Dashboard", 8, 0xffff, 2, onDashChanged, enumStrDashboard };
 EnumMenuItem menuDashboard(&minfoDashboard, 0, &menuLap);
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsLargeTestRtCall, largeNumItemRenderFn, "LargeTest", -1, NO_CALLBACK)
+EditableLargeNumberMenuItem menuSettingsLargeTest(fnSettingsLargeTestRtCall, 13, 12, 4, true, NULL);
+const PROGMEM BooleanMenuInfo minfoSettingsOverboost = { "Overboost", 12, 0xffff, 1, NO_CALLBACK, NAMING_ON_OFF };
+BooleanMenuItem menuSettingsOverboost(&minfoSettingsOverboost, false, &menuSettingsLargeTest);
 const PROGMEM AnyMenuInfo minfoSettingsShowDialogs = { "Show Dialogs", 11, 0xffff, 0, onShowDialogs };
-ActionMenuItem menuSettingsShowDialogs(&minfoSettingsShowDialogs, NULL);
+ActionMenuItem menuSettingsShowDialogs(&minfoSettingsShowDialogs, &menuSettingsOverboost);
 const PROGMEM AnalogMenuInfo minfoSettingsTestItem1 = { "Test Item 1", 5, 0xffff, 100, NO_CALLBACK, 0, 2, "" };
 AnalogMenuItem menuSettingsTestItem1(&minfoSettingsTestItem1, 0, &menuSettingsShowDialogs);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings", -1, NO_CALLBACK)
@@ -58,7 +61,6 @@ AnalogMenuItem menuSpeed(&minfoSpeed, 0, &menuRPM);
 // Set up code
 
 void setupMenu() {
-    // Read only and local only function calls
     menuTyreTemp.setReadOnly(true);
     menuSpeed.setReadOnly(true);
     menuRPM.setReadOnly(true);

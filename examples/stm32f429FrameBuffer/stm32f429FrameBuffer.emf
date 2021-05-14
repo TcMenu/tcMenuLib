@@ -2,11 +2,6 @@
   "version": "1.00",
   "projectName": "/Users/dave/Documents/Arduino/tcLibraryDev/lib/tcMenu/examples/stm32f429FrameBuffer/stm32f429FrameBuffer.emf",
   "author": "dave",
-  "lastEdited": {
-    "seconds": 1616604885,
-    "nanos": 130087000
-  },
-  "namingRecursive": false,
   "items": [
     {
       "parentId": 0,

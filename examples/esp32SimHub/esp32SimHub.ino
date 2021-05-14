@@ -49,12 +49,15 @@ DashCustomDrawing* dashCustomDrawing;
 void setupDashboard();
 bool currentLedStatus = false;
 
+HardwareRotaryEncoder* secondEncoder;
+
 void setup() {
     SPI.begin(18, 19, 23);
     SPI.setFrequency(20000000);
 
     // we start the serial bus at 115200 so it's ready for our connector to use
     Serial.begin(115200);
+
 
     // initialise the menu library, the following line was automatically added to setup by tcMenu.
     setupMenu();
@@ -89,7 +92,7 @@ void setup() {
     // if you want to test your rendering without simhub connected, uncomment the below code, it will update all the
     // values a few times a second.
     //
-/*    taskManager.scheduleFixedRate(3000, [] {
+    taskManager.scheduleFixedRate(3000, [] {
         menuTyreTemp.setCurrentValue(random(50) + 40);
         auto gear = random(10);
         if(gear == 0) menuGear.setTextValue("N");
@@ -117,7 +120,8 @@ void setup() {
         rpm = min(16000, max(1500, rpm + (rand() % 100) - 25));
         menuRPM.setCurrentValue(rpm);
         menuSpeed.setCurrentValue(speed);
-    });*/
+    });
+    // end simulation code
 
     taskManager.scheduleFixedRate(250, [] {
         int rpm = menuRPM.getCurrentValue();
@@ -266,5 +270,3 @@ void CALLBACK_FUNCTION onShowDialogs(int id) {
         dlg->copyIntoBuffer("text 1");
     }
 }
-
-

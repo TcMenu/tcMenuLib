@@ -13,7 +13,6 @@
 
 #include <Arduino.h>
 #include <tcMenu.h>
-
 #include <LiquidCrystalIO.h>
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
@@ -21,14 +20,18 @@
 #include <EditableLargeNumberMenuItem.h>
 #include "tcMenuLiquidCrystal.h"
 
-// all variables that need exporting
+void setupMenu();  // forward reference of the menu setup function.
+extern const PROGMEM ConnectorLocalInfo applicationInfo;  // contains app name and ID
+
+// Global variables that need exporting
+
 extern IoAbstractionRef io23017;
 extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
-extern IoAbstractionRef io23017;
 extern EthernetServer server;
 
-// all menu item forward references.
+// Global Menu Item exports
+
 extern IpAddressMenuItem menuConnectivityIPAddress;
 extern TextMenuItem menuConnectivityChangePin;
 extern BackMenuItem menuBackConnectivity;
@@ -48,7 +51,9 @@ extern TextMenuItem menuText;
 extern EnumMenuItem menuFood;
 extern ActionMenuItem menuTakeDisplay;
 extern TimeFormattedMenuItem menuTime;
-extern const ConnectorLocalInfo applicationInfo;
+
+// Provide a wrapper to get hold of the root menu item
+inline MenuItem& rootMenuItem() { return menuTime; }
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
@@ -59,7 +64,5 @@ void CALLBACK_FUNCTION onInfoDlg(int id);
 void CALLBACK_FUNCTION onQuestionDlg(int id);
 void CALLBACK_FUNCTION onSaveSettings(int id);
 void CALLBACK_FUNCTION onTakeOverDisplay(int id);
-
-void setupMenu();
 
 #endif // MENU_GENERATED_CODE_H

@@ -267,15 +267,3 @@ int CALLBACK_FUNCTION fnRomLocationRtCall(RuntimeMenuItem * item, uint8_t row, R
     default: return false;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-

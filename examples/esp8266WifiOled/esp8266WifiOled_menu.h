@@ -13,19 +13,23 @@
 
 #include <Arduino.h>
 #include <tcMenu.h>
-
 #include "tcMenuU8g2.h"
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 
-// all variables that need exporting
+void setupMenu();  // forward reference of the menu setup function.
+extern const PROGMEM ConnectorLocalInfo applicationInfo;  // contains app name and ID
+
+// Global variables that need exporting
+
 extern U8G2_SH1106_128X64_NONAME_F_SW_I2C gfx;
 extern GraphicsDeviceRenderer renderer;
 extern WiFiServer server;
 
-// all menu item forward references.
+// Global Menu Item exports
+
 extern IpAddressMenuItem menuIpAddress;
 extern TextMenuItem menuPwd;
 extern TextMenuItem menuSSID;
@@ -43,7 +47,9 @@ extern BooleanMenuItem menuLockDoor;
 extern BooleanMenuItem menuElectricHeater;
 extern AnalogMenuItem menuCucumberTemp;
 extern AnalogMenuItem menuTomatoTemp;
-extern const ConnectorLocalInfo applicationInfo;
+
+// Provide a wrapper to get hold of the root menu item
+inline MenuItem& rootMenuItem() { return menuTomatoTemp; }
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
@@ -55,7 +61,5 @@ void CALLBACK_FUNCTION onLoadFiles(int id);
 void CALLBACK_FUNCTION onLockDoor(int id);
 void CALLBACK_FUNCTION onSaveAll(int id);
 void CALLBACK_FUNCTION onWindowOpening(int id);
-
-void setupMenu();
 
 #endif // MENU_GENERATED_CODE_H

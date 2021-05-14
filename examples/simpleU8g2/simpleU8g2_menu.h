@@ -13,16 +13,20 @@
 
 #include <Arduino.h>
 #include <tcMenu.h>
-
 #include "tcMenuU8g2.h"
 #include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
 
-// all variables that need exporting
+void setupMenu();  // forward reference of the menu setup function.
+extern const PROGMEM ConnectorLocalInfo applicationInfo;  // contains app name and ID
+
+// Global variables that need exporting
+
 extern U8G2_SH1106_128X64_NONAME_F_SW_I2C gfx;
 extern GraphicsDeviceRenderer renderer;
 
-// all menu item forward references.
+// Global Menu Item exports
+
 extern ActionMenuItem menuSettingsSaveSettings;
 extern EditableLargeNumberMenuItem menuSettingsSerialNumber;
 extern TextMenuItem menuSettingsUserName;
@@ -33,7 +37,9 @@ extern ActionMenuItem menuStartToasting;
 extern BooleanMenuItem menuFrozen;
 extern EnumMenuItem menuType;
 extern AnalogMenuItem menuToasterPower;
-extern const ConnectorLocalInfo applicationInfo;
+
+// Provide a wrapper to get hold of the root menu item
+inline MenuItem& rootMenuItem() { return menuToasterPower; }
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
@@ -41,7 +47,5 @@ extern const ConnectorLocalInfo applicationInfo;
 void CALLBACK_FUNCTION onNameChanged(int id);
 void CALLBACK_FUNCTION onSaveSettings(int id);
 void CALLBACK_FUNCTION onStartToasting(int id);
-
-void setupMenu();
 
 #endif // MENU_GENERATED_CODE_H

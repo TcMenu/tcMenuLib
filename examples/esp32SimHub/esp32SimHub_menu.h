@@ -13,13 +13,17 @@
 
 #include <Arduino.h>
 #include <tcMenu.h>
-
 #include "tcMenuAdaFruitGfx.h"
 #include "ESP32TouchKeysAbstraction.h"
 #include "SimhubConnector.h"
 #include <RuntimeMenuItem.h>
+#include <EditableLargeNumberMenuItem.h>
 
-// all variables that need exporting
+void setupMenu();  // forward reference of the menu setup function.
+extern const PROGMEM ConnectorLocalInfo applicationInfo;  // contains app name and ID
+
+// Global variables that need exporting
+
 extern Adafruit_ILI9341 gfx;
 extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
@@ -27,10 +31,13 @@ extern ESP32TouchKeysAbstraction esp32Touch;
 extern const GFXfont FreeSans9pt7b;
 extern const GFXfont FreeSans12pt7b;
 
-// all menu item forward references.
+// Global Menu Item exports
+
 extern ActionMenuItem menuShowDashboard;
 extern AnalogMenuItem menuLap;
 extern EnumMenuItem menuDashboard;
+extern EditableLargeNumberMenuItem menuSettingsLargeTest;
+extern BooleanMenuItem menuSettingsOverboost;
 extern ActionMenuItem menuSettingsShowDialogs;
 extern AnalogMenuItem menuSettingsTestItem1;
 extern BackMenuItem menuBackSettings;
@@ -40,7 +47,9 @@ extern AnalogMenuItem menuTyreTemp;
 extern TextMenuItem menuGear;
 extern AnalogMenuItem menuRPM;
 extern AnalogMenuItem menuSpeed;
-extern const ConnectorLocalInfo applicationInfo;
+
+// Provide a wrapper to get hold of the root menu item
+inline MenuItem& rootMenuItem() { return menuSpeed; }
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
@@ -49,7 +58,5 @@ void CALLBACK_FUNCTION onConnectionChange(int id);
 void CALLBACK_FUNCTION onDashChanged(int id);
 void CALLBACK_FUNCTION onShowDash(int id);
 void CALLBACK_FUNCTION onShowDialogs(int id);
-
-void setupMenu();
 
 #endif // MENU_GENERATED_CODE_H

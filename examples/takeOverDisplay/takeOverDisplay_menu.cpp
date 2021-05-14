@@ -14,7 +14,6 @@
 // Global variable declarations
 
 const PROGMEM  ConnectorLocalInfo applicationInfo = { "Take Over Display", "40722ec4-e8bc-4889-b54e-d81b14cb429c" };
-
 LiquidCrystal lcd(8, 9, 10, 11, 12, 13);
 LiquidCrystalRenderer renderer(lcd, 20, 4);
 EthernetServer server(3333);
@@ -34,7 +33,7 @@ DateFormattedMenuItem menuSettingsDate(fnSettingsDateRtCall, 18, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsTimeRtCall, timeItemRenderFn, "Time", -1, NO_CALLBACK)
 TimeFormattedMenuItem menuSettingsTime(fnSettingsTimeRtCall, 17, (MultiEditWireType)3, &menuSettingsDate);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsNum6x4RtCall, largeNumItemRenderFn, "Num6x4", -1, NO_CALLBACK)
-EditableLargeNumberMenuItem menuSettingsNum6x4(fnSettingsNum6x4RtCall, 16, 10, 4, &menuSettingsTime);
+EditableLargeNumberMenuItem menuSettingsNum6x4(fnSettingsNum6x4RtCall, 16, 10, 4, true, &menuSettingsTime);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsPositiveIntsRtCall, largeNumItemRenderFn, "PositiveInts", -1, NO_CALLBACK)
 EditableLargeNumberMenuItem menuSettingsPositiveInts(fnSettingsPositiveIntsRtCall, 15, 9, 0, false, &menuSettingsNum6x4);
 const PROGMEM AnyMenuInfo minfoSettingsSaveSettings = { "Save Settings", 6, 0xffff, 0, onSaveSettings };
@@ -67,7 +66,6 @@ TimeFormattedMenuItem menuTime(fnTimeRtCall, 13, (MultiEditWireType)3, &menuTake
 // Set up code
 
 void setupMenu() {
-    // Read only and local only function calls
     menuText.setReadOnly(true);
     menuSettingsSaveSettings.setLocalOnly(true);
     menuConnectivity.setLocalOnly(true);
@@ -76,7 +74,7 @@ void setupMenu() {
 
     lcd.setIoAbstraction(io23017);
     lcd.begin(20, 4);
-    renderer.setUpdatesPerSecond(2);
+    renderer.setUpdatesPerSecond(5);
     switches.initialise(io23017, true);
     menuMgr.initForEncoder(&renderer, &menuTime, 6, 7, 5);
     remoteServer.begin(&server, &applicationInfo);

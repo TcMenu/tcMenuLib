@@ -2,11 +2,6 @@
   "version": "1.00",
   "projectName": "/Users/dave/Documents/Arduino/tcLibraryDev/lib/tcMenu/examples/takeOverDisplay/takeOverDisplay.emf",
   "author": "dave",
-  "lastEdited": {
-    "seconds": 1616605504,
-    "nanos": 554298000
-  },
-  "namingRecursive": false,
   "items": [
     {
       "parentId": 0,
@@ -320,7 +315,7 @@
       },
       {
         "name": "UPDATES_PER_SEC",
-        "latestValue": "2",
+        "latestValue": "5",
         "subsystem": "DISPLAY"
       },
       {

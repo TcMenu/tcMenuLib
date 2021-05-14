@@ -15,7 +15,6 @@
 // Global variable declarations
 
 const PROGMEM  ConnectorLocalInfo applicationInfo = { "ESP8266 Greenhouse", "01b9cb76-c108-4be3-a133-6159f8f1c9c1" };
-
 U8G2_SH1106_128X64_NONAME_F_SW_I2C gfx(U8G2_R0, 5, 4, 16);
 U8g2Drawable gfxDrawable(&gfx, &Wire);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
@@ -70,9 +69,8 @@ AnalogMenuItem menuTomatoTemp(&minfoTomatoTemp, 0, &menuCucumberTemp);
 // Set up code
 
 void setupMenu() {
-    // Read only and local only function calls
-    menuIpAddress.setReadOnly(true);
     menuTomatoTemp.setReadOnly(true);
+    menuIpAddress.setReadOnly(true);
     menuCucumberTemp.setReadOnly(true);
     menuPwd.setLocalOnly(true);
     menuSSID.setLocalOnly(true);

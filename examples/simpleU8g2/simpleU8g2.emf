@@ -2,11 +2,6 @@
   "version": "1.00",
   "projectName": "/Users/dave/Documents/Arduino/tcLibraryDev/lib/tcMenu/examples/simpleU8g2/simpleU8g2.emf",
   "author": "dave",
-  "lastEdited": {
-    "seconds": 1616594361,
-    "nanos": 869308000
-  },
-  "namingRecursive": false,
   "items": [
     {
       "parentId": 0,

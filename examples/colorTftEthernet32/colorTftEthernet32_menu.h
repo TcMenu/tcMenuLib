@@ -13,21 +13,25 @@
 
 #include <Arduino.h>
 #include <tcMenu.h>
-
 #include "tcMenuAdaFruitGfx.h"
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 
-// all variables that need exporting
+void setupMenu();  // forward reference of the menu setup function.
+extern const PROGMEM ConnectorLocalInfo applicationInfo;  // contains app name and ID
+
+// Global variables that need exporting
+
 extern Adafruit_ST7735 gfx;
 extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
 extern IoAbstractionRef io8574;
 extern EthernetServer server;
 
-// all menu item forward references.
+// Global Menu Item exports
+
 extern ActionMenuItem menuTakeDisplay;
 extern ActionMenuItem menuSaveItem;
 extern TextMenuItem menuRomText;
@@ -55,7 +59,9 @@ extern SubMenuItem menuSettings;
 extern EnumMenuItem menuLimit;
 extern AnalogMenuItem menuCurrent;
 extern AnalogMenuItem menuVoltage;
-extern const ConnectorLocalInfo applicationInfo;
+
+// Provide a wrapper to get hold of the root menu item
+inline MenuItem& rootMenuItem() { return menuVoltage; }
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
@@ -68,7 +74,5 @@ void CALLBACK_FUNCTION onSaveItem(int id);
 void CALLBACK_FUNCTION onSaveRom(int id);
 void CALLBACK_FUNCTION onTakeDisplay(int id);
 void CALLBACK_FUNCTION onVoltageChange(int id);
-
-void setupMenu();
 
 #endif // MENU_GENERATED_CODE_H

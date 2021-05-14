@@ -15,7 +15,6 @@
 // Global variable declarations
 
 const PROGMEM  ConnectorLocalInfo applicationInfo = { "Simple U8G2 Toaster", "fddaa423-cb5c-4024-8f67-a9742f4457f3" };
-
 U8G2_SH1106_128X64_NONAME_F_SW_I2C gfx(U8G2_R0, 5, 4, U8X8_PIN_NONE);
 U8g2Drawable gfxDrawable(&gfx, &Wire);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
@@ -25,7 +24,7 @@ GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 const PROGMEM AnyMenuInfo minfoSettingsSaveSettings = { "SaveSettings", 9, 0xffff, 0, onSaveSettings };
 ActionMenuItem menuSettingsSaveSettings(&minfoSettingsSaveSettings, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsSerialNumberRtCall, largeNumItemRenderFn, "Serial Number", 7, NO_CALLBACK)
-EditableLargeNumberMenuItem menuSettingsSerialNumber(fnSettingsSerialNumberRtCall, 8, 8, 0, &menuSettingsSaveSettings);
+EditableLargeNumberMenuItem menuSettingsSerialNumber(fnSettingsSerialNumberRtCall, 8, 8, 0, true, &menuSettingsSaveSettings);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsUserNameRtCall, textItemRenderFn, "User Name", 16, onNameChanged)
 TextMenuItem menuSettingsUserName(fnSettingsUserNameRtCall, 7, 5, &menuSettingsSerialNumber);
 const PROGMEM BooleanMenuInfo minfoSettingsSafetyLock = { "Safety lock", 6, 15, 1, NO_CALLBACK, NAMING_TRUE_FALSE };

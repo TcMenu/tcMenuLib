@@ -2,11 +2,6 @@
   "version": "1.00",
   "projectName": "/Users/dave/Documents/Arduino/tcLibraryDev/lib/tcMenu/examples/colorTftEthernet32/colorTftEthernet.emf",
   "author": "dave",
-  "lastEdited": {
-    "seconds": 1617353180,
-    "nanos": 147621000
-  },
-  "namingRecursive": false,
   "items": [
     {
       "parentId": 0,

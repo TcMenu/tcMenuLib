@@ -2,11 +2,6 @@
   "version": "1.00",
   "projectName": "/Users/dave/Documents/Arduino/tcLibraryDev/lib/tcMenu/examples/esp32SimHub/esp32SimHub.emf",
   "author": "dave",
-  "lastEdited": {
-    "seconds": 1616593214,
-    "nanos": 888722000
-  },
-  "namingRecursive": false,
   "items": [
     {
       "parentId": 0,
@@ -132,6 +127,36 @@
         "id": 11,
         "eepromAddress": -1,
         "functionName": "onShowDialogs",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "boolItem",
+      "item": {
+        "naming": "ON_OFF",
+        "name": "Overboost",
+        "variableName": "SettingsOverboost",
+        "id": 12,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "largeNumItem",
+      "item": {
+        "digitsAllowed": 12,
+        "decimalPlaces": 4,
+        "negativeAllowed": true,
+        "name": "LargeTest",
+        "variableName": "SettingsLargeTest",
+        "id": 13,
+        "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
         "visible": true

@@ -87,4 +87,3 @@ void CALLBACK_FUNCTION onSaveSettings(int id) {
     dlg->copyIntoBuffer("just so you know");
   }
 }
-

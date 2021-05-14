@@ -170,7 +170,7 @@ bool BaseGraphicalRenderer::drawTheMenuItems(int startRow, int startY, bool draw
                 if(itemCfg->getPosition().getGridSize() > 1) {
                     int colWidth = width / itemCfg->getPosition().getGridSize();
                     int colOffset = colWidth * (itemCfg->getPosition().getGridPosition() - 1);
-                    drawMenuItem(itemCfg, Coord(colOffset + 1, ypos), Coord(colWidth - 1, itemCfg->getHeight()), drawEveryLine);
+                    drawMenuItem(itemCfg, Coord(colOffset, ypos), Coord(colWidth - 1, itemCfg->getHeight()), drawEveryLine);
                 }
                 else {
                     drawMenuItem(itemCfg, Coord(0, ypos), Coord(width, itemCfg->getHeight()), drawEveryLine);

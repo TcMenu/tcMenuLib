@@ -15,7 +15,6 @@
 // Global variable declarations
 
 const  ConnectorLocalInfo applicationInfo = { "Ada32 Ethernet", "22813e5e-88b1-42d5-9601-4831b2be369b" };
-
 Adafruit_ST7735 gfx(6, 7, 3);
 AdafruitDrawable gfxDrawable(&gfx);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);

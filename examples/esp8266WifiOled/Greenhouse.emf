@@ -2,11 +2,6 @@
   "version": "1.00",
   "projectName": "/Users/dave/Documents/Arduino/tcLibraryDev/lib/tcMenu/examples/esp8266WifiOled/Greenhouse.emf",
   "author": "dave",
-  "lastEdited": {
-    "seconds": 1616594396,
-    "nanos": 866114000
-  },
-  "namingRecursive": false,
   "items": [
     {
       "parentId": 0,

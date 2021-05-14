@@ -14,7 +14,6 @@
 // Global variable declarations
 
 const PROGMEM  ConnectorLocalInfo applicationInfo = { "Keyboard Ethernet", "b6ee8e21-449c-4f8a-bab6-a89e3f2c68d9" };
-
 LiquidCrystal lcd(8, 9, 10, 11, 12, 13);
 LiquidCrystalRenderer renderer(lcd, 20, 4);
 EthernetServer server(3333);
@@ -32,7 +31,19 @@ RENDERING_CALLBACK_NAME_INVOKE(fnRomChoicesRtCall, backSubItemRenderFn, "Rom Cho
 const PROGMEM SubMenuInfo minfoRomChoices = { "Rom Choices", 20, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackRomChoices(fnRomChoicesRtCall, &menuRomChoicesItemNum);
 SubMenuItem menuRomChoices(&minfoRomChoices, &menuBackRomChoices, NULL);
-ListRuntimeMenuItem menuAdditionalCountList(18, 20, fnAdditionalCountListRtCall, NULL);
+const PROGMEM BooleanMenuInfo minfoAdditionalBoolFlagFlag4 = { "Flag4", 28, 41, 1, NO_CALLBACK, NAMING_YES_NO };
+BooleanMenuItem menuAdditionalBoolFlagFlag4(&minfoAdditionalBoolFlagFlag4, false, NULL);
+const PROGMEM BooleanMenuInfo minfoAdditionalBoolFlagFlag3 = { "Flag3", 27, 40, 1, NO_CALLBACK, NAMING_YES_NO };
+BooleanMenuItem menuAdditionalBoolFlagFlag3(&minfoAdditionalBoolFlagFlag3, false, &menuAdditionalBoolFlagFlag4);
+const PROGMEM BooleanMenuInfo minfoAdditionalBoolFlagFlag2 = { "Flag2", 26, 39, 1, NO_CALLBACK, NAMING_ON_OFF };
+BooleanMenuItem menuAdditionalBoolFlagFlag2(&minfoAdditionalBoolFlagFlag2, false, &menuAdditionalBoolFlagFlag3);
+const PROGMEM BooleanMenuInfo minfoAdditionalBoolFlagFlag1 = { "Flag1", 25, 38, 1, NO_CALLBACK, NAMING_ON_OFF };
+BooleanMenuItem menuAdditionalBoolFlagFlag1(&minfoAdditionalBoolFlagFlag1, false, &menuAdditionalBoolFlagFlag2);
+RENDERING_CALLBACK_NAME_INVOKE(fnAdditionalBoolFlagRtCall, backSubItemRenderFn, "Bool Flag", -1, NO_CALLBACK)
+const PROGMEM SubMenuInfo minfoAdditionalBoolFlag = { "Bool Flag", 24, 0xffff, 0, NO_CALLBACK };
+BackMenuItem menuBackAdditionalBoolFlag(fnAdditionalBoolFlagRtCall, &menuAdditionalBoolFlagFlag1);
+SubMenuItem menuAdditionalBoolFlag(&minfoAdditionalBoolFlag, &menuBackAdditionalBoolFlag, NULL);
+ListRuntimeMenuItem menuAdditionalCountList(18, 20, fnAdditionalCountListRtCall, &menuAdditionalBoolFlag);
 ScrollChoiceMenuItem menuAdditionalNumChoices(17, fnAdditionalNumChoicesRtCall, 0, 30, &menuAdditionalCountList);
 RENDERING_CALLBACK_NAME_INVOKE(fnAdditionalRomChoiceRtCall, enumItemRenderFn, "Rom Choice", 30, NO_CALLBACK)
 ScrollChoiceMenuItem menuAdditionalRomChoice(19, fnAdditionalRomChoiceRtCall, 0, 500, 10, 9, &menuAdditionalNumChoices);
@@ -80,7 +91,6 @@ TimeFormattedMenuItem menuTime(fnTimeRtCall, 1, (MultiEditWireType)3, &menuAnalo
 // Set up code
 
 void setupMenu() {
-    // Read only and local only function calls
     menuConnectivity.setLocalOnly(true);
     menuConnectivity.setSecured(true);
     menuHiddenItem.setVisible(false);

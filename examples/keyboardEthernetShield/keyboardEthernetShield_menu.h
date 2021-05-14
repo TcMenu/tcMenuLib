@@ -13,7 +13,6 @@
 
 #include <Arduino.h>
 #include <tcMenu.h>
-
 #include <LiquidCrystalIO.h>
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
@@ -22,44 +21,29 @@
 #include <EditableLargeNumberMenuItem.h>
 #include "tcMenuLiquidCrystal.h"
 
-// all define statements needed
-#define LCD_WIDTH 20
-#define LCD_HEIGHT 4
-#define LCD_EN 9
-#define LCD_RS 8
-#define LCD_D4 10
-#define LCD_D5 11
-#define LCD_D6 12
-#define LCD_D7 13
-#define LCD_BACKLIGHT -1
-#define LCD_PWM_PIN -1
-#define LCD_IO_DEVICE io23017
-#define UNO_OR_FULL fullLcd
-#define UPDATES_PER_SEC 4
-#define PULLUP_LOGIC true
-#define INTERRUPT_SWITCHES false
-#define SWITCH_IODEVICE io23017
-#define ENCODER_PIN_A 6
-#define ENCODER_PIN_B 7
-#define ENCODER_PIN_OK 5
-#define ENCODER_BACK_PIN -1
-#define ENCODER_NEXT_PIN -1
-#define LIBRARY_TYPE ETHERNET_2
-#define LISTEN_PORT 3333
+void setupMenu();  // forward reference of the menu setup function.
+extern const PROGMEM ConnectorLocalInfo applicationInfo;  // contains app name and ID
 
-// all variables that need exporting
+// Global variables that need exporting
+
 extern IoAbstractionRef io23017;
 extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
-extern IoAbstractionRef io23017;
 extern EthernetServer server;
 
-// all menu item forward references.
+// Global Menu Item exports
+
 extern ActionMenuItem menuRomChoicesSave;
 extern TextMenuItem menuRomChoicesValue;
 extern ScrollChoiceMenuItem menuRomChoicesItemNum;
 extern BackMenuItem menuBackRomChoices;
 extern SubMenuItem menuRomChoices;
+extern BooleanMenuItem menuAdditionalBoolFlagFlag4;
+extern BooleanMenuItem menuAdditionalBoolFlagFlag3;
+extern BooleanMenuItem menuAdditionalBoolFlagFlag2;
+extern BooleanMenuItem menuAdditionalBoolFlagFlag1;
+extern BackMenuItem menuBackAdditionalBoolFlag;
+extern SubMenuItem menuAdditionalBoolFlag;
 extern ListRuntimeMenuItem menuAdditionalCountList;
 extern ScrollChoiceMenuItem menuAdditionalNumChoices;
 extern ScrollChoiceMenuItem menuAdditionalRomChoice;
@@ -80,7 +64,9 @@ extern AnalogMenuItem menuInteger;
 extern BooleanMenuItem menuHiddenItem;
 extern AnalogMenuItem menuAnalog1;
 extern TimeFormattedMenuItem menuTime;
-extern const ConnectorLocalInfo applicationInfo;
+
+// Provide a wrapper to get hold of the root menu item
+inline MenuItem& rootMenuItem() { return menuTime; }
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
@@ -94,7 +80,5 @@ void CALLBACK_FUNCTION onInteger(int id);
 void CALLBACK_FUNCTION onItemChange(int id);
 void CALLBACK_FUNCTION onSaveToEeprom(int id);
 void CALLBACK_FUNCTION onSaveValue(int id);
-
-void setupMenu();
 
 #endif // MENU_GENERATED_CODE_H
