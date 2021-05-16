@@ -10,11 +10,11 @@
 
 #include <tcMenu.h>
 #include "nokia5110_menu.h"
+#include "ThemeMonoInverse.h"
 
 // Global variable declarations
 
 const PROGMEM  ConnectorLocalInfo applicationInfo = { "Security App", "0e68e7f6-2932-43f0-aae3-d4f885b7561d" };
-
 Adafruit_PCD8544 gfx(35, 34, 38, 37, 36);
 AdafruitDrawable gfxDrawable(&gfx);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
@@ -65,16 +65,18 @@ AnalogMenuItem menuHall(&minfoHall, 0, &menuLiving);
 // Set up code
 
 void setupMenu() {
+    menuConnectivity.setLocalOnly(true);
+    menuConnectivity.setSecured(true);
+
     gfx.begin();
     gfx.setRotation(0);
     renderer.setUpdatesPerSecond(4);
     renderer.setUseSliderForAnalog(false);
     switches.initialise(internalDigitalIo(), true);
-    menuMgr.initForEncoder(&renderer, &menuHall, 2, 6, A3);
+    menuMgr.initForEncoder(&renderer, &menuHall, 2, 3, 4);
     remoteServer.begin(&server, &applicationInfo);
-
-    // Read only and local only function calls
-    menuConnectivity.setLocalOnly(true);
-    menuConnectivity.setSecured(true);
+    renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
+    renderer.setUseSliderForAnalog(false);
+    installMonoInverseTitleTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(nullptr, 1), true);
 }
 

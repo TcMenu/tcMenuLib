@@ -22,8 +22,6 @@ private:
     MenuTouchScreenManager* touchScreen;
     int oldX= 0, oldY=0;
     unsigned int takeOverCount=0;
-    iotouch::TouchInterrogator::TouchRotation oldRotation = iotouch::TouchInterrogator::PORTRAIT;
-    uint8_t oldTftRotation = 0;
 public:
     explicit TouchScreenCalibrator(MenuTouchScreenManager *touchScreen)
             : drawable(nullptr), touchScreen(touchScreen) {}
@@ -36,9 +34,6 @@ public:
         if(renderer.getRendererType() != RENDER_TYPE_CONFIGURABLE) {
             renderer.giveBackDisplay(); // we cannot work with non configurable rendering
         }
-        oldTftRotation = tft.getRotation();
-        oldRotation = touchScreen->changeRotation(iotouch::TouchInterrogator::RAW);
-        tft.setRotation(0);
         drawable = reinterpret_cast<GraphicsDeviceRenderer*>(currentRenderer)->getDeviceDrawable();
         drawable->startDraw();
         drawable->setDrawColor(TFT_BLACK);
@@ -48,6 +43,7 @@ public:
     }
 
     void renderLoop(unsigned int currentValue, RenderPressMode userClick) override {
+
         drawable->startDraw();
         drawable->setDrawColor(TFT_BLACK);
         drawable->drawCircle(Coord(oldX, oldY), 10, true);
@@ -73,8 +69,6 @@ public:
         drawable->drawCircle(Coord(oldX, oldY), 10, true);
 
         if(oldX < 40 && oldY < 40 && touchScreen->getLastTouchState() == iotouch::HELD) {
-            tft.setRotation(oldTftRotation);
-            touchScreen->changeRotation(oldRotation);
             renderer.giveBackDisplay();
         }
     }

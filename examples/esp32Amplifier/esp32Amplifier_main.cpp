@@ -62,7 +62,7 @@ void setup() {
     setupMenu();
 
     controller.initialise();
-    touchScreen.calibrateMinMaxValues(0.240F, 0.895F, 0.09F, 0.88F);
+    touchScreen.calibrateMinMaxValues(0.250F, 0.890F, 0.09F, 0.88F);
 
     renderer.setCustomDrawingHandler(new TouchScreenCalibrator(&touchScreen));
 

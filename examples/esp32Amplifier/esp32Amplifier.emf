@@ -1,20 +1,402 @@
 {
-  "lastEdited": {
-    "seconds": 1617370133,
-    "nanos": 0
-  },
+  "version": "1.00",
+  "projectName": "/Users/dave/Documents/Arduino/tcLibraryDev/lib/tcMenu/examples/esp32Amplifier/esp32Amplifier.emf",
+  "author": "dave",
+  "items": [
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "maxValue": 255,
+        "offset": -180,
+        "divisor": 2,
+        "unitName": "dB",
+        "name": "Volume",
+        "variableName": "",
+        "id": 1,
+        "eepromAddress": 2,
+        "functionName": "onVolumeChanged",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "scrollItem",
+      "item": {
+        "itemWidth": 16,
+        "eepromOffset": 150,
+        "numEntries": 3,
+        "choiceMode": "ARRAY_IN_EEPROM",
+        "name": "Channel",
+        "variableName": "Channels",
+        "id": 2,
+        "eepromAddress": 4,
+        "functionName": "onChannelChanged",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "boolItem",
+      "item": {
+        "naming": "TRUE_FALSE",
+        "name": "Direct",
+        "variableName": "",
+        "id": 3,
+        "eepromAddress": 6,
+        "functionName": "onAudioDirect",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "boolItem",
+      "item": {
+        "naming": "TRUE_FALSE",
+        "name": "Mute",
+        "variableName": "",
+        "id": 4,
+        "eepromAddress": -1,
+        "functionName": "onMuteSound",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "Settings",
+        "variableName": "",
+        "id": 5,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 5,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "Channel Settings",
+        "variableName": "",
+        "id": 7,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 7,
+      "type": "scrollItem",
+      "item": {
+        "itemWidth": 10,
+        "eepromOffset": 0,
+        "numEntries": 3,
+        "choiceMode": "CUSTOM_RENDERFN",
+        "name": "Channel Num",
+        "variableName": "ChannelSettingsChannel",
+        "id": 23,
+        "eepromAddress": -1,
+        "functionName": "",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 7,
+      "type": "analogItem",
+      "item": {
+        "maxValue": 20,
+        "offset": -10,
+        "divisor": 2,
+        "unitName": "dB",
+        "name": "Level Trim",
+        "variableName": "ChannelSettingsLevelTrim",
+        "id": 8,
+        "eepromAddress": 9,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 7,
+      "type": "textItem",
+      "item": {
+        "textLength": 15,
+        "itemType": "PLAIN_TEXT",
+        "name": "Name",
+        "variableName": "ChannelSettingsName",
+        "id": 22,
+        "eepromAddress": -1,
+        "functionName": "",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 7,
+      "type": "actionMenu",
+      "item": {
+        "name": "Update Settings",
+        "variableName": "ChannelSettingsUpdateSettings",
+        "id": 24,
+        "eepromAddress": -1,
+        "functionName": "onChannelSetttingsUpdate",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 5,
+      "type": "analogItem",
+      "item": {
+        "maxValue": 300,
+        "offset": 0,
+        "divisor": 10,
+        "unitName": "s",
+        "name": "Warm up time",
+        "variableName": "",
+        "id": 11,
+        "eepromAddress": 7,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 5,
+      "type": "analogItem",
+      "item": {
+        "maxValue": 600,
+        "offset": 0,
+        "divisor": 10,
+        "unitName": "s",
+        "name": "Valve Heating",
+        "variableName": "",
+        "id": 17,
+        "eepromAddress": 15,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 5,
+      "type": "actionMenu",
+      "item": {
+        "name": "Save settings",
+        "variableName": "",
+        "id": 25,
+        "eepromAddress": -1,
+        "functionName": "onSaveSettings",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "Status",
+        "variableName": "",
+        "id": 6,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 6,
+      "type": "enumItem",
+      "item": {
+        "enumEntries": [
+          "Warm up",
+          "Warm Valves",
+          "Ready",
+          "DC Protection",
+          "Overloaded",
+          "Overheated"
+        ],
+        "name": "Amp Status",
+        "variableName": "",
+        "id": 14,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 6,
+      "type": "analogItem",
+      "item": {
+        "maxValue": 30000,
+        "offset": -20000,
+        "divisor": 1000,
+        "unitName": "dB",
+        "name": "Left VU",
+        "variableName": "StatusLeftVU",
+        "id": 15,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 6,
+      "type": "analogItem",
+      "item": {
+        "maxValue": 30000,
+        "offset": -20000,
+        "divisor": 1000,
+        "unitName": "dB",
+        "name": "Right VU",
+        "variableName": "",
+        "id": 16,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 6,
+      "type": "actionMenu",
+      "item": {
+        "name": "Show Dialogs",
+        "variableName": "",
+        "id": 20,
+        "eepromAddress": -1,
+        "functionName": "onShowDialogs",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 6,
+      "type": "runtimeList",
+      "item": {
+        "initialRows": 0,
+        "name": "Data List",
+        "variableName": "StatusDataList",
+        "id": 21,
+        "eepromAddress": -1,
+        "functionName": "",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "Connectivity",
+        "variableName": "",
+        "id": 12,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 12,
+      "type": "textItem",
+      "item": {
+        "textLength": 5,
+        "itemType": "IP_ADDRESS",
+        "name": "IP address",
+        "variableName": "",
+        "id": 13,
+        "eepromAddress": -1,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 12,
+      "type": "textItem",
+      "item": {
+        "textLength": 20,
+        "itemType": "PLAIN_TEXT",
+        "name": "SSID",
+        "variableName": "",
+        "id": 18,
+        "eepromAddress": 17,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 12,
+      "type": "textItem",
+      "item": {
+        "textLength": 20,
+        "itemType": "PLAIN_TEXT",
+        "name": "Passcode",
+        "variableName": "",
+        "id": 19,
+        "eepromAddress": 37,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    }
+  ],
   "codeOptions": {
+    "embeddedPlatform": "ARDUINO_ESP32",
+    "lastDisplayUuid": "e6342680-6fab-4d1b-ac08-ce8dbfc0974c",
+    "lastInputUuid": "183448ac-a717-4b2b-823d-ffc7c8140ab9",
+    "lastRemoteUuid": "46c30011-cac6-4598-a7b8-b0630d55daab",
+    "lastThemeUuid": "850dc0a3-f534-47c2-94d8-1e64ff368a54",
     "applicationUUID": "4656c798-10c6-4110-8e03-b9c51ed8fffb",
     "applicationName": "ESP Amplifier",
-    "lastInputUuid": "183448ac-a717-4b2b-823d-ffc7c8140ab9",
-    "lastDisplayUuid": "e6342680-6fab-4d1b-ac08-ce8dbfc0974c",
-    "lastThemeUuid": "850dc0a3-f534-47c2-94d8-1e64ff368a54",
-    "lastRemoteUuid": "46c30011-cac6-4598-a7b8-b0630d55daab",
-    "embeddedPlatform": "ARDUINO_ESP32",
-    "namingRecursive": true,
-    "saveToSrc": false,
-    "useCppMain": true,
     "lastProperties": [
+      {
+        "name": "DISPLAY_VARIABLE",
+        "latestValue": "tft",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_ROTATION",
+        "latestValue": "1",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DOUBLE_BUFFER_ROWS",
+        "latestValue": "45",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "UPDATES_PER_SEC",
+        "latestValue": "10",
+        "subsystem": "DISPLAY"
+      },
       {
         "name": "XPLUS_PIN",
         "latestValue": "2",
@@ -41,26 +423,6 @@
         "subsystem": "INPUT"
       },
       {
-        "name": "DISPLAY_VARIABLE",
-        "latestValue": "tft",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "DISPLAY_ROTATION",
-        "latestValue": "1",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "DOUBLE_BUFFER_ROWS",
-        "latestValue": "45",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "UPDATES_PER_SEC",
-        "latestValue": "10",
-        "subsystem": "DISPLAY"
-      },
-      {
         "name": "LISTEN_PORT",
         "latestValue": "3333",
         "subsystem": "REMOTE"
@@ -82,7 +444,7 @@
       },
       {
         "name": "TITLE_SHOW_MODE",
-        "latestValue": "TITLE_FIRST_ROW",
+        "latestValue": "TITLE_ALWAYS",
         "subsystem": "THEME"
       },
       {
@@ -95,376 +457,9 @@
         "latestValue": "false",
         "subsystem": "THEME"
       }
-    ]
-  },
-  "projectName": "/Users/dave/Documents/Arduino/tcLibraryDev/lib/tcMenu/examples/esp32Amplifier/esp32Amplifier.emf",
-  "namingRecursive": true,
-  "version": "1.00",
-  "items": [
-    {
-      "parentId": 0,
-      "type": "analogItem",
-      "item": {
-        "name": "Volume",
-        "eepromAddress": 2,
-        "id": 1,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "functionName": "onVolumeChanged",
-        "variableName": "",
-        "maxValue": 255,
-        "offset": -180,
-        "divisor": 2,
-        "unitName": "dB"
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "scrollItem",
-      "item": {
-        "name": "Channel",
-        "eepromAddress": 4,
-        "id": 2,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "functionName": "onChannelChanged",
-        "variableName": "Channels",
-        "itemWidth": 16,
-        "numEntries": 3,
-        "variable": null,
-        "eepromOffset": 150,
-        "choiceMode": "ARRAY_IN_EEPROM"
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "boolItem",
-      "item": {
-        "name": "Direct",
-        "eepromAddress": 6,
-        "id": 3,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "functionName": "onAudioDirect",
-        "variableName": "",
-        "naming": "TRUE_FALSE"
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "boolItem",
-      "item": {
-        "name": "Mute",
-        "eepromAddress": -1,
-        "id": 4,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "functionName": "onMuteSound",
-        "variableName": "",
-        "naming": "TRUE_FALSE"
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "subMenu",
-      "item": {
-        "name": "Settings",
-        "eepromAddress": -1,
-        "id": 5,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "variableName": "",
-        "secured": false
-      }
-    },
-    {
-      "parentId": 5,
-      "type": "subMenu",
-      "item": {
-        "name": "Channel Settings",
-        "eepromAddress": -1,
-        "id": 7,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "variableName": "",
-        "secured": false
-      }
-    },
-    {
-      "parentId": 7,
-      "type": "scrollItem",
-      "item": {
-        "name": "Channel Num",
-        "eepromAddress": -1,
-        "id": 23,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "functionName": "",
-        "variableName": "ChannelSettingsChannel",
-        "itemWidth": 10,
-        "numEntries": 3,
-        "variable": null,
-        "eepromOffset": 0,
-        "choiceMode": "CUSTOM_RENDERFN"
-      }
-    },
-    {
-      "parentId": 7,
-      "type": "analogItem",
-      "item": {
-        "name": "Level Trim",
-        "eepromAddress": 9,
-        "id": 8,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "variableName": "ChannelSettingsLevelTrim",
-        "maxValue": 20,
-        "offset": -10,
-        "divisor": 2,
-        "unitName": "dB"
-      }
-    },
-    {
-      "parentId": 7,
-      "type": "textItem",
-      "item": {
-        "name": "Name",
-        "eepromAddress": -1,
-        "id": 22,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "functionName": "",
-        "variableName": "ChannelSettingsName",
-        "itemType": "PLAIN_TEXT",
-        "textLength": 15
-      }
-    },
-    {
-      "parentId": 7,
-      "type": "actionMenu",
-      "item": {
-        "name": "Update Settings",
-        "eepromAddress": -1,
-        "id": 24,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "functionName": "onChannelSetttingsUpdate",
-        "variableName": "ChannelSettingsUpdateSettings"
-      }
-    },
-    {
-      "parentId": 5,
-      "type": "analogItem",
-      "item": {
-        "name": "Warm up time",
-        "eepromAddress": 7,
-        "id": 11,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "variableName": "",
-        "maxValue": 300,
-        "offset": 0,
-        "divisor": 10,
-        "unitName": "s"
-      }
-    },
-    {
-      "parentId": 5,
-      "type": "analogItem",
-      "item": {
-        "name": "Valve Heating",
-        "eepromAddress": 15,
-        "id": 17,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "variableName": "",
-        "maxValue": 600,
-        "offset": 0,
-        "divisor": 10,
-        "unitName": "s"
-      }
-    },
-    {
-      "parentId": 5,
-      "type": "actionMenu",
-      "item": {
-        "name": "Save settings",
-        "eepromAddress": -1,
-        "id": 25,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "functionName": "onSaveSettings",
-        "variableName": ""
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "subMenu",
-      "item": {
-        "name": "Status",
-        "eepromAddress": -1,
-        "id": 6,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "variableName": "",
-        "secured": false
-      }
-    },
-    {
-      "parentId": 6,
-      "type": "enumItem",
-      "item": {
-        "name": "Amp Status",
-        "eepromAddress": -1,
-        "id": 14,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "variableName": "",
-        "enumEntries": [
-          "Warm up",
-          "Warm Valves",
-          "Ready",
-          "DC Protection",
-          "Overloaded",
-          "Overheated"
-        ]
-      }
-    },
-    {
-      "parentId": 6,
-      "type": "analogItem",
-      "item": {
-        "name": "Left VU",
-        "eepromAddress": -1,
-        "id": 15,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "variableName": "StatusLeftVU",
-        "maxValue": 30000,
-        "offset": -20000,
-        "divisor": 1000,
-        "unitName": "dB"
-      }
-    },
-    {
-      "parentId": 6,
-      "type": "analogItem",
-      "item": {
-        "name": "Right VU",
-        "eepromAddress": -1,
-        "id": 16,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "variableName": "",
-        "maxValue": 30000,
-        "offset": -20000,
-        "divisor": 1000,
-        "unitName": "dB"
-      }
-    },
-    {
-      "parentId": 6,
-      "type": "actionMenu",
-      "item": {
-        "name": "Show Dialogs",
-        "eepromAddress": -1,
-        "id": 20,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "functionName": "onShowDialogs",
-        "variableName": ""
-      }
-    },
-    {
-      "parentId": 6,
-      "type": "runtimeList",
-      "item": {
-        "name": "Data List",
-        "eepromAddress": -1,
-        "id": 21,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "variableName": "StatusDataList",
-        "initialRows": 0
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "subMenu",
-      "item": {
-        "name": "Connectivity",
-        "eepromAddress": -1,
-        "id": 12,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "variableName": "",
-        "secured": false
-      }
-    },
-    {
-      "parentId": 12,
-      "type": "textItem",
-      "item": {
-        "name": "IP address",
-        "eepromAddress": -1,
-        "id": 13,
-        "readOnly": true,
-        "localOnly": false,
-        "visible": true,
-        "variableName": "",
-        "itemType": "IP_ADDRESS",
-        "textLength": 5
-      }
-    },
-    {
-      "parentId": 12,
-      "type": "textItem",
-      "item": {
-        "name": "SSID",
-        "eepromAddress": 17,
-        "id": 18,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "variableName": "",
-        "itemType": "PLAIN_TEXT",
-        "textLength": 20
-      }
-    },
-    {
-      "parentId": 12,
-      "type": "textItem",
-      "item": {
-        "name": "Passcode",
-        "eepromAddress": 37,
-        "id": 19,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "variableName": "",
-        "itemType": "PLAIN_TEXT",
-        "textLength": 20
-      }
-    }
-  ]
+    ],
+    "namingRecursive": true,
+    "saveToSrc": false,
+    "useCppMain": true
+  }
 }

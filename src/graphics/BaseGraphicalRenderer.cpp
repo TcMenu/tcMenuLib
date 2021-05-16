@@ -103,7 +103,16 @@ GridPositionRowCacheEntry* BaseGraphicalRenderer::findMenuEntryAndDimensions(con
         }
     }
 
+    // if we are in title always mode, then the title must always be calculated
     int rowStartY = 0;
+    if(titleMode == TITLE_ALWAYS) {
+        auto* titleProps = getDisplayPropertiesFactory().configFor(nullptr, ItemDisplayProperties::COMPTYPE_TITLE);
+        rowStartY = titleProps->getRequiredHeight() + titleProps->getSpaceAfter();
+        if(screenPos.y <= rowStartY) {
+            return itemOrderByRow.itemAtIndex(0);
+        }
+    }
+
     auto* icon = getDisplayPropertiesFactory().iconForMenuItem(SPECIAL_ID_ACTIVE_ICON);
     int iconWidth = icon ? icon->getDimensions().x : 0;
     uint8_t currentRow = -1;

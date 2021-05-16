@@ -6,18 +6,18 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
-*/
+ */
 
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
 
 #include <Arduino.h>
 #include <tcMenu.h>
-#include <RuntimeMenuItem.h>
 #include "tcMenuTfteSpi.h"
 #include <graphics/MenuTouchScreenEncoder.h>
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
+#include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 
 void setupMenu();  // forward reference of the menu setup function.
@@ -37,13 +37,14 @@ extern WiFiServer server;
 extern TextMenuItem menuConnectivityPasscode;
 extern TextMenuItem menuConnectivitySSID;
 extern IpAddressMenuItem menuConnectivityIPAddress;
+extern BackMenuItem menuBackConnectivity;
 extern SubMenuItem menuConnectivity;
-int fnStatusDataListRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize);
 extern ListRuntimeMenuItem menuStatusDataList;
 extern ActionMenuItem menuStatusShowDialogs;
 extern AnalogMenuItem menuStatusRightVU;
 extern AnalogMenuItem menuStatusLeftVU;
 extern EnumMenuItem menuStatusAmpStatus;
+extern BackMenuItem menuBackStatus;
 extern SubMenuItem menuStatus;
 extern ActionMenuItem menuSettingsSaveSettings;
 extern AnalogMenuItem menuSettingsValveHeating;
@@ -51,24 +52,30 @@ extern AnalogMenuItem menuSettingsWarmUpTime;
 extern ActionMenuItem menuChannelSettingsUpdateSettings;
 extern TextMenuItem menuChannelSettingsName;
 extern AnalogMenuItem menuChannelSettingsLevelTrim;
-int fnChannelSettingsChannelRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize);
 extern ScrollChoiceMenuItem menuChannelSettingsChannel;
+extern BackMenuItem menuBackSettingsChannelSettings;
 extern SubMenuItem menuSettingsChannelSettings;
+extern BackMenuItem menuBackSettings;
 extern SubMenuItem menuSettings;
 extern BooleanMenuItem menuMute;
 extern BooleanMenuItem menuDirect;
 extern ScrollChoiceMenuItem menuChannels;
 extern AnalogMenuItem menuVolume;
 
+// Provide a wrapper to get hold of the root menu item
+inline MenuItem& rootMenuItem() { return menuVolume; }
+
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
-void CALLBACK_FUNCTION onShowDialogs(int id);
-void CALLBACK_FUNCTION onSaveSettings(int id);
-void CALLBACK_FUNCTION onChannelSetttingsUpdate(int id);
-void CALLBACK_FUNCTION onMuteSound(int id);
+int fnChannelSettingsChannelRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
+int fnStatusDataListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
 void CALLBACK_FUNCTION onAudioDirect(int id);
 void CALLBACK_FUNCTION onChannelChanged(int id);
+void CALLBACK_FUNCTION onChannelSetttingsUpdate(int id);
+void CALLBACK_FUNCTION onMuteSound(int id);
+void CALLBACK_FUNCTION onSaveSettings(int id);
+void CALLBACK_FUNCTION onShowDialogs(int id);
 void CALLBACK_FUNCTION onVolumeChanged(int id);
 
 #endif // MENU_GENERATED_CODE_H

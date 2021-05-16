@@ -1,49 +1,195 @@
 {
-  "lastEdited": {
-    "seconds": 1607374956,
-    "nanos": 0
-  },
+  "version": "1.00",
+  "projectName": "/Users/dave/Documents/Arduino/tcLibraryDev/lib/tcMenu/examples/remoteControlSerial/remoteControlSerial.emf",
+  "author": "dave",
+  "items": [
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "Analog In",
+        "id": 7,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 7,
+      "type": "analogItem",
+      "item": {
+        "maxValue": 1024,
+        "offset": 0,
+        "divisor": 200,
+        "unitName": "V",
+        "name": "A0",
+        "id": 8,
+        "eepromAddress": -1,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 7,
+      "type": "analogItem",
+      "item": {
+        "maxValue": 1024,
+        "offset": 0,
+        "divisor": 200,
+        "unitName": "V",
+        "name": "A1",
+        "id": 2,
+        "eepromAddress": -1,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 7,
+      "type": "analogItem",
+      "item": {
+        "maxValue": 1024,
+        "offset": 0,
+        "divisor": 200,
+        "unitName": "V",
+        "name": "A2",
+        "id": 3,
+        "eepromAddress": -1,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "textItem",
+      "item": {
+        "textLength": 10,
+        "itemType": "PLAIN_TEXT",
+        "name": "Text",
+        "id": 4,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "enumItem",
+      "item": {
+        "enumEntries": [
+          "Pizza",
+          "Pasta",
+          "Salad"
+        ],
+        "name": "Food",
+        "id": 5,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "actionMenu",
+      "item": {
+        "name": "Push Me",
+        "id": 6,
+        "eepromAddress": -1,
+        "functionName": "onPushMe",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "scrollItem",
+      "item": {
+        "itemWidth": 5,
+        "eepromOffset": 0,
+        "numEntries": 4,
+        "choiceMode": "ARRAY_IN_RAM",
+        "variable": "choiceRamArray",
+        "name": "Choice",
+        "id": 9,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "Runtimes",
+        "id": 10,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 10,
+      "type": "runtimeList",
+      "item": {
+        "initialRows": 9,
+        "name": "RtList",
+        "id": 12,
+        "eepromAddress": -1,
+        "functionName": "",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 10,
+      "type": "largeNumItem",
+      "item": {
+        "digitsAllowed": 8,
+        "decimalPlaces": 3,
+        "negativeAllowed": true,
+        "name": "LgeNm",
+        "id": 13,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 10,
+      "type": "rgbItem",
+      "item": {
+        "includeAlphaChannel": true,
+        "name": "RGB",
+        "id": 14,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    }
+  ],
   "codeOptions": {
+    "embeddedPlatform": "ARDUINO",
+    "lastDisplayUuid": "4dcb12ec-13d8-4466-b8b6-bd575eae4612",
+    "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
+    "lastRemoteUuid": "1e38dc42-672d-4c1c-a393-2c7632bf6c5c",
+    "lastThemeUuid": "815316bb-76c9-436a-8f83-be0bced963df",
     "applicationUUID": "f018e07a-f33f-42d2-b3a0-689a1bf6849c",
     "applicationName": "Remote Ctrl",
-    "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
-    "lastDisplayUuid": "4dcb12ec-13d8-4466-b8b6-bd575eae4612",
-    "lastRemoteUuid": "1e38dc42-672d-4c1c-a393-2c7632bf6c5c",
-    "embeddedPlatform": "ARDUINO_AVR",
-    "namingRecursive": false,
-    "saveToSrc": false,
-    "useCppMain": false,
     "lastProperties": [
-      {
-        "name": "PULLUP_LOGIC",
-        "latestValue": "true",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "INTERRUPT_SWITCHES",
-        "latestValue": "false",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "SWITCH_IODEVICE",
-        "latestValue": "",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "ENCODER_PIN_A",
-        "latestValue": "2",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "ENCODER_PIN_B",
-        "latestValue": "6",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "ENCODER_PIN_OK",
-        "latestValue": "A3",
-        "subsystem": "INPUT"
-      },
       {
         "name": "DISPLAY_VARIABLE",
         "latestValue": "gfx",
@@ -52,11 +198,6 @@
       {
         "name": "DISPLAY_TYPE",
         "latestValue": "Adafruit_PCD8544",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "DISPLAY_CONFIG",
-        "latestValue": "",
         "subsystem": "DISPLAY"
       },
       {
@@ -100,191 +241,83 @@
         "subsystem": "DISPLAY"
       },
       {
+        "name": "UPDATES_PER_SEC",
+        "latestValue": "5",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "PULLUP_LOGIC",
+        "latestValue": "true",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "INTERRUPT_SWITCHES",
+        "latestValue": "false",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SWITCH_IODEVICE",
+        "latestValue": "",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_A",
+        "latestValue": "2",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_B",
+        "latestValue": "3",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_OK",
+        "latestValue": "4",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_BACK_PIN",
+        "latestValue": "-1",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_NEXT_PIN",
+        "latestValue": "-1",
+        "subsystem": "INPUT"
+      },
+      {
         "name": "SERIAL_PORT",
         "latestValue": "Serial1",
         "subsystem": "REMOTE"
+      },
+      {
+        "name": "ITEM_FONT",
+        "latestValue": "def:,1",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_FONT",
+        "latestValue": "def:,1",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_BORDER_WIDTH",
+        "latestValue": "1",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_TO_ITEM_SPACING",
+        "latestValue": "1",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_SHOW_MODE",
+        "latestValue": "TITLE_FIRST_ROW",
+        "subsystem": "THEME"
       }
-    ]
-  },
-  "projectName": "Example of using Bluetooth Serial to remote control a menu",
-  "namingRecursive": false,
-  "version": "1.00",
-  "items": [
-    {
-      "parentId": 0,
-      "type": "subMenu",
-      "item": {
-        "name": "Analog In",
-        "eepromAddress": -1,
-        "id": 7,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "secured": false
-      }
-    },
-    {
-      "parentId": 7,
-      "type": "analogItem",
-      "item": {
-        "name": "A0",
-        "eepromAddress": -1,
-        "id": 8,
-        "readOnly": true,
-        "localOnly": false,
-        "visible": true,
-        "maxValue": 1024,
-        "offset": 0,
-        "divisor": 200,
-        "unitName": "V"
-      }
-    },
-    {
-      "parentId": 7,
-      "type": "analogItem",
-      "item": {
-        "name": "A1",
-        "eepromAddress": -1,
-        "id": 2,
-        "readOnly": true,
-        "localOnly": false,
-        "visible": true,
-        "maxValue": 1024,
-        "offset": 0,
-        "divisor": 200,
-        "unitName": "V"
-      }
-    },
-    {
-      "parentId": 7,
-      "type": "analogItem",
-      "item": {
-        "name": "A2",
-        "eepromAddress": -1,
-        "id": 3,
-        "readOnly": true,
-        "localOnly": false,
-        "visible": true,
-        "maxValue": 1024,
-        "offset": 0,
-        "divisor": 200,
-        "unitName": "V"
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "textItem",
-      "item": {
-        "name": "Text",
-        "eepromAddress": -1,
-        "id": 4,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "itemType": "PLAIN_TEXT",
-        "textLength": 10
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "enumItem",
-      "item": {
-        "name": "Food",
-        "eepromAddress": -1,
-        "id": 5,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "enumEntries": [
-          "Pizza",
-          "Pasta",
-          "Salad"
-        ]
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "actionMenu",
-      "item": {
-        "name": "Push Me",
-        "eepromAddress": -1,
-        "id": 6,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "functionName": "onPushMe"
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "scrollItem",
-      "item": {
-        "name": "Choice",
-        "eepromAddress": -1,
-        "id": 9,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "itemWidth": 5,
-        "numEntries": 4,
-        "variable": "choiceRamArray",
-        "eepromOffset": 0,
-        "choiceMode": "ARRAY_IN_RAM"
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "subMenu",
-      "item": {
-        "name": "Runtimes",
-        "eepromAddress": -1,
-        "id": 10,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "secured": false
-      }
-    },
-    {
-      "parentId": 10,
-      "type": "runtimeList",
-      "item": {
-        "name": "RtList",
-        "eepromAddress": -1,
-        "id": 12,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "initialRows": 9
-      }
-    },
-    {
-      "parentId": 10,
-      "type": "largeNumItem",
-      "item": {
-        "name": "LgeNm",
-        "eepromAddress": -1,
-        "id": 13,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "decimalPlaces": 3,
-        "digitsAllowed": 8,
-        "negativeAllowed": true
-      }
-    },
-    {
-      "parentId": 10,
-      "type": "rgbItem",
-      "item": {
-        "name": "RGB",
-        "eepromAddress": -1,
-        "id": 14,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "includeAlphaChannel": true
-      }
-    }
-  ]
+    ],
+    "namingRecursive": false,
+    "saveToSrc": false,
+    "useCppMain": false
+  }
 }

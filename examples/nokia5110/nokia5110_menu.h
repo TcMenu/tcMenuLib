@@ -13,44 +13,24 @@
 
 #include <Arduino.h>
 #include <tcMenu.h>
-
 #include "tcMenuAdaFruitGfx.h"
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 
-// all define statements needed
-#define DISPLAY_VARIABLE gfx
-#define DISPLAY_TYPE Adafruit_PCD8544
-#define DISPLAY_CONFIG 
-#define DISPLAY_WIDTH 84
-#define DISPLAY_HEIGHT 48
-#define DISPLAY_RESET_PIN 36
-#define DISPLAY_CS_PIN 37
-#define DISPLAY_RS_PIN 38
-#define DISPLAY_DATA_PIN 34
-#define DISPLAY_CLOCK_PIN 35
-#define DISPLAY_ROTATION 0
-#define DISPLAY_TITLE_FONT NULL
-#define DISPLAY_ITEM_FONT NULL
-#define UPDATES_PER_SEC 4
-#define PULLUP_LOGIC true
-#define INTERRUPT_SWITCHES false
-#define SWITCH_IODEVICE 
-#define ENCODER_PIN_A 2
-#define ENCODER_PIN_B 6
-#define ENCODER_PIN_OK A3
-#define LIBRARY_TYPE UIP_ENC28J60
-#define LISTEN_PORT 3333
+void setupMenu();  // forward reference of the menu setup function.
+extern const PROGMEM ConnectorLocalInfo applicationInfo;  // contains app name and ID
 
-// all variables that need exporting
+// Global variables that need exporting
+
 extern Adafruit_PCD8544 gfx;
 extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
 extern EthernetServer server;
 
-// all menu item forward references.
+// Global Menu Item exports
+
 extern IpAddressMenuItem menuIP;
 extern BackMenuItem menuBackConnectivity;
 extern SubMenuItem menuConnectivity;
@@ -70,6 +50,9 @@ extern AnalogMenuItem menuKitchen;
 extern AnalogMenuItem menuLiving;
 extern AnalogMenuItem menuHall;
 
+// Provide a wrapper to get hold of the root menu item
+inline MenuItem& rootMenuItem() { return menuHall; }
+
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
@@ -77,7 +60,5 @@ void CALLBACK_FUNCTION onHallLight(int id);
 void CALLBACK_FUNCTION onKitchenLight(int id);
 void CALLBACK_FUNCTION onLivingRoomLight(int id);
 void CALLBACK_FUNCTION onPowerDownDetected(int id);
-
-void setupMenu();
 
 #endif // MENU_GENERATED_CODE_H

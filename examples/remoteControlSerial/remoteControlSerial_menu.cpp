@@ -6,67 +6,70 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
-*/
+ */
 
-#include <Arduino.h>
 #include <tcMenu.h>
 #include "remoteControlSerial_menu.h"
+#include "ThemeMonoBordered.h"
 
 // Global variable declarations
 
-const PROGMEM ConnectorLocalInfo applicationInfo = { "Remote Ctrl", "f018e07a-f33f-42d2-b3a0-689a1bf6849c" };
+const PROGMEM  ConnectorLocalInfo applicationInfo = { "Remote Ctrl", "f018e07a-f33f-42d2-b3a0-689a1bf6849c" };
 Adafruit_PCD8544 gfx(35, 34, 38, 37, 36);
-AdaColorGfxMenuConfig gfxConfig;
-AdaFruitGfxMenuRenderer renderer;
+AdafruitDrawable gfxDrawable(&gfx);
+GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 
 // Global Menu Item declarations
 
 RENDERING_CALLBACK_NAME_INVOKE(fnRGBRtCall, rgbAlphaItemRenderFn, "RGB", -1, NO_CALLBACK)
 Rgb32MenuItem menuRGB(14, fnRGBRtCall, true, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnLgeNmRtCall, largeNumItemRenderFn, "LgeNm", -1, NO_CALLBACK)
-EditableLargeNumberMenuItem menuLgeNm(fnLgeNmRtCall, 13, 8, 3, &menuRGB);
+EditableLargeNumberMenuItem menuLgeNm(fnLgeNmRtCall, 13, 8, 3, true, &menuRGB);
 ListRuntimeMenuItem menuRtList(12, 9, fnRtListRtCall, &menuLgeNm);
-const SubMenuInfo PROGMEM minfoRuntimes = { "Runtimes", 10, 0xFFFF, 0, NO_CALLBACK };
 RENDERING_CALLBACK_NAME_INVOKE(fnRuntimesRtCall, backSubItemRenderFn, "Runtimes", -1, NO_CALLBACK)
+const PROGMEM SubMenuInfo minfoRuntimes = { "Runtimes", 10, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackRuntimes(fnRuntimesRtCall, &menuRtList);
 SubMenuItem menuRuntimes(&minfoRuntimes, &menuBackRuntimes, NULL);
 extern const char* choiceRamArray;
 RENDERING_CALLBACK_NAME_INVOKE(fnChoiceRtCall, enumItemRenderFn, "Choice", -1, NO_CALLBACK)
 ScrollChoiceMenuItem menuChoice(9, fnChoiceRtCall, 0, choiceRamArray, 5, 4, &menuRuntimes);
-const AnyMenuInfo PROGMEM minfoPushMe = { "Push Me", 6, 0xFFFF, 0, onPushMe };
+const PROGMEM AnyMenuInfo minfoPushMe = { "Push Me", 6, 0xffff, 0, onPushMe };
 ActionMenuItem menuPushMe(&minfoPushMe, &menuChoice);
-const char enumStrFood_0[] PROGMEM  = "Pizza";
-const char enumStrFood_1[] PROGMEM  = "Pasta";
-const char enumStrFood_2[] PROGMEM  = "Salad";
+const char enumStrFood_0[] PROGMEM = "Pizza";
+const char enumStrFood_1[] PROGMEM = "Pasta";
+const char enumStrFood_2[] PROGMEM = "Salad";
 const char* const enumStrFood[] PROGMEM  = { enumStrFood_0, enumStrFood_1, enumStrFood_2 };
-const EnumMenuInfo PROGMEM minfoFood = { "Food", 5, 0xFFFF, 2, NO_CALLBACK, enumStrFood };
+const PROGMEM EnumMenuInfo minfoFood = { "Food", 5, 0xffff, 2, NO_CALLBACK, enumStrFood };
 EnumMenuItem menuFood(&minfoFood, 0, &menuPushMe);
 RENDERING_CALLBACK_NAME_INVOKE(fnTextRtCall, textItemRenderFn, "Text", -1, NO_CALLBACK)
 TextMenuItem menuText(fnTextRtCall, 4, 10, &menuFood);
-const AnalogMenuInfo PROGMEM minfoA2 = { "A2", 3, 0xFFFF, 1024, NO_CALLBACK, 0, 200, "V" };
+const PROGMEM AnalogMenuInfo minfoA2 = { "A2", 3, 0xffff, 1024, NO_CALLBACK, 0, 200, "V" };
 AnalogMenuItem menuA2(&minfoA2, 0, NULL);
-const AnalogMenuInfo PROGMEM minfoA1 = { "A1", 2, 0xFFFF, 1024, NO_CALLBACK, 0, 200, "V" };
+const PROGMEM AnalogMenuInfo minfoA1 = { "A1", 2, 0xffff, 1024, NO_CALLBACK, 0, 200, "V" };
 AnalogMenuItem menuA1(&minfoA1, 0, &menuA2);
-const AnalogMenuInfo PROGMEM minfoA0 = { "A0", 8, 0xFFFF, 1024, NO_CALLBACK, 0, 200, "V" };
+const PROGMEM AnalogMenuInfo minfoA0 = { "A0", 8, 0xffff, 1024, NO_CALLBACK, 0, 200, "V" };
 AnalogMenuItem menuA0(&minfoA0, 0, &menuA1);
-const SubMenuInfo PROGMEM minfoAnalogIn = { "Analog In", 7, 0xFFFF, 0, NO_CALLBACK };
 RENDERING_CALLBACK_NAME_INVOKE(fnAnalogInRtCall, backSubItemRenderFn, "Analog In", -1, NO_CALLBACK)
+const PROGMEM SubMenuInfo minfoAnalogIn = { "Analog In", 7, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackAnalogIn(fnAnalogInRtCall, &menuA0);
 SubMenuItem menuAnalogIn(&minfoAnalogIn, &menuBackAnalogIn, &menuText);
-
 
 // Set up code
 
 void setupMenu() {
-    menuA0.setReadOnly(true);
     menuA1.setReadOnly(true);
     menuA2.setReadOnly(true);
+    menuA0.setReadOnly(true);
 
-    prepareAdaMonoGfxConfigLoRes(&gfxConfig);
     gfx.begin();
     gfx.setRotation(0);
-    renderer.setGraphicsDevice(&gfx, &gfxConfig);
+    renderer.setUpdatesPerSecond(5);
+    renderer.setUseSliderForAnalog(false);
     switches.initialise(internalDigitalIo(), true);
-    menuMgr.initForEncoder(&renderer, &menuAnalogIn, 2, 6, A3);
+    menuMgr.initForEncoder(&renderer, &menuAnalogIn, 2, 3, 4);
     remoteServer.begin(&Serial1, &applicationInfo);
+    renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
+    renderer.setUseSliderForAnalog(false);
+    installMonoBorderedTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(nullptr, 1), true);
 }
+
