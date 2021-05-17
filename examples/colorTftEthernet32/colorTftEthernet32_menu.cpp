@@ -88,7 +88,7 @@ void setupMenu() {
     switches.initialiseInterrupt(io8574, true);
     menuMgr.initForEncoder(&renderer, &menuVoltage, 7, 6, 5);
     remoteServer.begin(&server, &applicationInfo);
-    renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
+    renderer.setTitleMode(BaseGraphicalRenderer::TITLE_ALWAYS);
     renderer.setUseSliderForAnalog(true);
     installCoolBlueTraditionalTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(nullptr, 1), true);
 }

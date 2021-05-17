@@ -6,7 +6,7 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
-*/
+ */
 
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
@@ -14,36 +14,41 @@
 #include <Arduino.h>
 #include <tcMenu.h>
 #include <SSD1306Ascii.h>
-#include <RuntimeMenuItem.h>
 #include <SSD1306AsciiAvrI2c.h>
 #include "ssd1306asciiRenderer.h"
 #include <DfRobotInputAbstraction.h>
+#include <RuntimeMenuItem.h>
 
 void setupMenu();  // forward reference of the menu setup function.
-extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app info to the linker.
+extern const PROGMEM ConnectorLocalInfo applicationInfo;  // contains app name and ID
 
 // Global variables that need exporting
 
 extern SSD1306AsciiAvrI2c gfx;
 extern SSD1306AsciiRenderer renderer;
 
-// Callback functions must always include CALLBACK_FUNCTION after the return type
-#define CALLBACK_FUNCTION
-
 // Global Menu Item exports
 
-int fnListItemRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize);
 extern ListRuntimeMenuItem menuListItem;
 extern AnalogMenuItem menuStatusTemprature;
 extern FloatMenuItem menuStatusVoltageIn;
 extern FloatMenuItem menuStatusPowerUse;
+extern BackMenuItem menuBackStatus;
 extern SubMenuItem menuStatus;
-void CALLBACK_FUNCTION onActionPressed(int id);
 extern ActionMenuItem menuPressMe;
 extern BooleanMenuItem menuStandby;
 extern AnalogMenuItem menuBlue;
 extern AnalogMenuItem menuGreen;
 extern AnalogMenuItem menuRed;
 extern AnalogMenuItem menuBrightness;
+
+// Provide a wrapper to get hold of the root menu item
+inline MenuItem& rootMenuItem() { return menuBrightness; }
+
+// Callback functions must always include CALLBACK_FUNCTION after the return type
+#define CALLBACK_FUNCTION
+
+int fnListItemRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
+void CALLBACK_FUNCTION onActionPressed(int id);
 
 #endif // MENU_GENERATED_CODE_H
