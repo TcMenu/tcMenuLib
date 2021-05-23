@@ -23,13 +23,13 @@ void MenuManager::initForUpDownOk(MenuRenderer* renderer, MenuItem* root, pinid_
 	renderer->initialise();
 }
 
-void MenuManager::initForEncoder(MenuRenderer* renderer,  MenuItem* root, pinid_t encoderPinA, pinid_t encoderPinB, pinid_t encoderButton) {
+void MenuManager::initForEncoder(MenuRenderer* renderer,  MenuItem* root, pinid_t encoderPinA, pinid_t encoderPinB, pinid_t encoderButton, EncoderType type) {
 	this->renderer = renderer;
     navigator.setRootItem(root);
 
 	switches.addSwitch(encoderButton, nullptr);
     switches.onRelease(encoderButton, [](pinid_t /*key*/, bool held) { menuMgr.onMenuSelect(held); });
-	setupRotaryEncoderWithInterrupt(encoderPinA, encoderPinB, [](int value) {menuMgr.valueChanged(value); });
+	setupRotaryEncoderWithInterrupt(encoderPinA, encoderPinB, [](int value) {menuMgr.valueChanged(value); }, HWACCEL_REGULAR, type);
 
 	renderer->initialise();
 }

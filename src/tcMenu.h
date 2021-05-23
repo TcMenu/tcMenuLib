@@ -101,8 +101,9 @@ public:
 	 * @param encoderPinA encoder A pin
 	 * @param encorerPinB encoder B pin
 	 * @param encoderButton the OK button for the menu select / edit action
+	 * @param type optionally, you can provide the encoder type, only really needed for quarter cycle encoders.
 	 */
-	void initForEncoder(MenuRenderer* renderer, MenuItem* root, pinid_t encoderPinA, pinid_t encoderPinB, pinid_t encoderButton);
+	void initForEncoder(MenuRenderer* renderer, MenuItem* root, pinid_t encoderPinA, pinid_t encoderPinB, pinid_t encoderButton, EncoderType type = FULL_CYCLE);
 	
 	/**
 	 * Initialise for up down and OK button, instead of using hardware changeEncoderPrecision

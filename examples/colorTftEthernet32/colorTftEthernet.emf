@@ -439,6 +439,11 @@
         "subsystem": "INPUT"
       },
       {
+        "name": "ENCODER_IS_QUARTER_CYCLE",
+        "latestValue": "false",
+        "subsystem": "INPUT"
+      },
+      {
         "name": "LIBRARY_TYPE",
         "latestValue": "ETHERNET_2",
         "subsystem": "REMOTE"
