@@ -4,12 +4,10 @@ void setup() {
     Serial.begin(115200);
     Wire.begin(4, 15);
     setupMenu();
-
 }
 
 void loop() {
     taskManager.runLoop();
-
 }
 
 

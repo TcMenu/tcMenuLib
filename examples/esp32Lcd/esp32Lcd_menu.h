@@ -30,6 +30,13 @@ extern LiquidCrystalRenderer renderer;
 
 // Global Menu Item exports
 
+extern ActionMenuItem menuGridDown;
+extern ActionMenuItem menuGridUp;
+extern BooleanMenuItem menuGridLED2;
+extern BooleanMenuItem menuGridLED1;
+extern FloatMenuItem menuGridFloatValue;
+extern BackMenuItem menuBackGrid;
+extern SubMenuItem menuGrid;
 extern Rgb32MenuItem menuRGB;
 extern ListRuntimeMenuItem menuMyList;
 extern BooleanMenuItem menuPeeled;

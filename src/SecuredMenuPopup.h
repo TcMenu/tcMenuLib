@@ -1,6 +1,10 @@
 #ifndef _SECURED_MENU_POPUP_H_
 #define _SECURED_MENU_POPUP_H_
 
+/**
+ * @file SecuredMenuPopup.h contains the code to show a security screen for secured menus.
+ */
+
 #include <RuntimeMenuItem.h>
 #include <RemoteAuthentication.h>
 

@@ -3,6 +3,10 @@
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
+/**
+ * @file ScrollChoiceMenuItem.h contains the menu item definition for scrolling choice types, and also for RGB items
+ */
+
 #ifndef SCROLL_CHOICE_ENUM_MENU_ITEM_H
 #define SCROLL_CHOICE_ENUM_MENU_ITEM_H
 

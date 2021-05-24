@@ -3,6 +3,14 @@
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
+/**
+ * @file GfxMenuConfig.h
+ *
+ * This file contains the base drawing configuration structures and helper methods for
+ * drawing onto graphical screens, be it mono or colour. Also there's some additional
+ * structures for describing colours, coordinates and padding.
+ */
+
 #ifndef _GFX_MENU_CONFIG_H_
 #define _GFX_MENU_CONFIG_H_
 
@@ -11,13 +19,6 @@
 #include "MenuItems.h"
 #include "DrawingPrimitives.h"
 
-/**
- * @file GfxMenuConfig.h
- * 
- * This file contains the base drawing configuration structures and helper methods for
- * drawing onto graphical screens, be it mono or colour. Also there's some additional
- * structures for describing colours, coordinates and padding.
- */
 
 namespace tcgfx {
 
@@ -158,14 +159,29 @@ namespace tcgfx {
         int getRow() const { return rowPosition; }
     };
 
+    /**
+     * A helper function that checks if a particular justification includes the value
+     * @param justification the justification to check
+     * @return true if the value is needed
+     */
     inline bool itemNeedsValue(GridPosition::GridJustification justification) {
         return (justification & GridPosition::CORE_JUSTIFY_VALUE_REQUIRED) != 0;
     }
 
+    /**
+     * A helper function that checks if a particular justification includes the name
+     * @param justification the justification to check
+     * @return true if the name is needed
+     */
     inline bool itemNeedsName(GridPosition::GridJustification justification) {
         return (justification & GridPosition::CORE_JUSTIFY_NAME_REQUIRED) != 0;
     }
 
+    /**
+     * Get the core justification part, eg left, right centre
+     * @param j the justification to check
+     * @return the core part, just left, right centre etc.
+     */
     inline GridPosition::GridJustification coreJustification(GridPosition::GridJustification j) {
         return static_cast<GridPosition::GridJustification>(j & 0b11);
     }
@@ -331,10 +347,40 @@ namespace tcgfx {
      */
     class ItemDisplayPropertiesFactory {
     public:
+        /**
+         * Returns the configuration for the parameters below, it should never return nullptr.
+         * @param pItem the item or null for default
+         * @param compType the component type to get the rendering for
+         * @return the properties for a given component.
+         */
         virtual ItemDisplayProperties* configFor(MenuItem* pItem, ItemDisplayProperties::ComponentType compType) = 0;
+
+        /**
+         * Returns the icon associated with the menu item ID, there are two special IDs for the edit and active icons
+         * @param id the menu item ID or the special ID for edit or active icon
+         * @return the icon or nullptr if not available
+         */
         virtual DrawableIcon* iconForMenuItem(uint16_t id) = 0;
+
+        /**
+         * Get the grid item for a given position if it is available
+         * @param pItem the item to get the grid position for
+         * @return the grid position if available
+         */
         virtual GridPositionWithId* gridPositionForItem(MenuItem* pItem) = 0;
+
+        /**
+         * Get the selected color for a given palette entry
+         * @param colorType
+         * @return
+         */
         virtual color_t getSelectedColor(ItemDisplayProperties::ColorType colorType)  = 0;
+
+        /**
+         * add a new grid position for a given menu item
+         * @param item the menu item the position is for
+         * @param position the position to record
+         */
         virtual void addGridPosition(MenuItem* item, const GridPosition& position)  = 0;
     };
 

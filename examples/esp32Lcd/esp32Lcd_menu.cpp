@@ -19,8 +19,22 @@ LiquidCrystalRenderer renderer(lcd, 20, 4);
 
 // Global Menu Item declarations
 
+const PROGMEM AnyMenuInfo minfoGridDown = { "Down", 11, 0xffff, 0, NO_CALLBACK };
+ActionMenuItem menuGridDown(&minfoGridDown, NULL);
+const PROGMEM AnyMenuInfo minfoGridUp = { "Up", 10, 0xffff, 0, NO_CALLBACK };
+ActionMenuItem menuGridUp(&minfoGridUp, &menuGridDown);
+const PROGMEM BooleanMenuInfo minfoGridLED2 = { "LED2", 8, 0xffff, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
+BooleanMenuItem menuGridLED2(&minfoGridLED2, false, &menuGridUp);
+const PROGMEM BooleanMenuInfo minfoGridLED1 = { "LED1", 7, 0xffff, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
+BooleanMenuItem menuGridLED1(&minfoGridLED1, false, &menuGridLED2);
+const PROGMEM FloatMenuInfo minfoGridFloatValue = { "Float value", 9, 0xffff, 3, NO_CALLBACK };
+FloatMenuItem menuGridFloatValue(&minfoGridFloatValue, &menuGridLED1);
+RENDERING_CALLBACK_NAME_INVOKE(fnGridRtCall, backSubItemRenderFn, "Grid", -1, NO_CALLBACK)
+const PROGMEM SubMenuInfo minfoGrid = { "Grid", 6, 0xffff, 0, NO_CALLBACK };
+BackMenuItem menuBackGrid(fnGridRtCall, &menuGridFloatValue);
+SubMenuItem menuGrid(&minfoGrid, &menuBackGrid, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnRGBRtCall, rgbAlphaItemRenderFn, "RGB", -1, NO_CALLBACK)
-Rgb32MenuItem menuRGB(5, fnRGBRtCall, false, NULL);
+Rgb32MenuItem menuRGB(5, fnRGBRtCall, false, &menuGrid);
 ListRuntimeMenuItem menuMyList(4, 0, fnMyListRtCall, &menuRGB);
 const PROGMEM BooleanMenuInfo minfoPeeled = { "Power", 3, 0xffff, 1, NO_CALLBACK, NAMING_ON_OFF };
 BooleanMenuItem menuPeeled(&minfoPeeled, false, &menuMyList);

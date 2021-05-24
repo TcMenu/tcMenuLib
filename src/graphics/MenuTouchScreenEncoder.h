@@ -3,6 +3,10 @@
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
+/**
+ * @file MenuTouchScreenEncoder.h contains the interface between the touch screen and tcMenu.
+ */
+
 #ifndef TCMENU_MENUTOUCHSCREENENCODER_H
 #define TCMENU_MENUTOUCHSCREENENCODER_H
 

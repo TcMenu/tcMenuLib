@@ -3,6 +3,11 @@
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
+/**
+ * @file MenuHistoryNavigator.h contains the functionality to do with menu item navigation, including a stack of
+ * previous navigations
+ */
+
 #ifndef TCMENU_MENUHISTORYNAVIGATOR_H
 #define TCMENU_MENUHISTORYNAVIGATOR_H
 
