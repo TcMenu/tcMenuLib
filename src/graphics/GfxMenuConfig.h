@@ -347,7 +347,8 @@ namespace tcgfx {
      */
     class NullItemDisplayPropertiesFactory : public ItemDisplayPropertiesFactory {
     private:
-        ItemDisplayProperties props = ItemDisplayProperties(0, {}, MenuPadding(0), nullptr, 1, 0, 1, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, MenuBorder());
+        color_t anEmptyPalette[4] = {0};
+        ItemDisplayProperties props = ItemDisplayProperties(0, anEmptyPalette, MenuPadding(0), nullptr, 1, 0, 1, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, MenuBorder());
         BtreeList<uint16_t, GridPositionWithId> gridByItem;
     public:
         NullItemDisplayPropertiesFactory() : gridByItem(4) {}

@@ -92,7 +92,7 @@ void setup() {
     // if you want to test your rendering without simhub connected, uncomment the below code, it will update all the
     // values a few times a second.
     //
-    taskManager.scheduleFixedRate(3000, [] {
+    /*taskManager.scheduleFixedRate(3000, [] {
         menuTyreTemp.setCurrentValue(random(50) + 40);
         auto gear = random(10);
         if(gear == 0) menuGear.setTextValue("N");
@@ -105,14 +105,14 @@ void setup() {
         }
     });
 
-    taskManager.scheduleFixedRate(250, [] {
+    taskManager.scheduleFixedRate(500, [] {
         for(int i=0;i<10;i++) {
             dashCustomDrawing->setLed(i, i%2==currentLedStatus);
         }
         currentLedStatus = currentLedStatus == 0 ? 1 : 0;
     });
 
-    taskManager.scheduleFixedRate(100, [] {
+    taskManager.scheduleFixedRate(250, [] {
         int rpm = menuRPM.getCurrentValue();
         int speed = menuSpeed.getCurrentValue();
 
@@ -120,10 +120,7 @@ void setup() {
         rpm = min(16000, max(1500, rpm + (rand() % 100) - 25));
         menuRPM.setCurrentValue(rpm);
         menuSpeed.setCurrentValue(speed);
-    });
-    // end simulation code
 
-    taskManager.scheduleFixedRate(250, [] {
         int rpm = menuRPM.getCurrentValue();
         uint16_t color;
         if(rpm < 6500) {
@@ -136,7 +133,8 @@ void setup() {
         for (int i = 0; i < LED_STATES; i++) {
             dashCustomDrawing->setLed(i, color);
         }
-    });
+    });*/
+    // end manually adjusting values
 }
 
 // All IoAbstraction and TcMenu sketches need the runLoop to be called very frequently, preferably in the loop
