@@ -16,6 +16,8 @@
 #include <Wire.h>
 #include <LiquidCrystalIO.h>
 #include <IoAbstractionWire.h>
+#include <RemoteConnector.h>
+#include "SerialTransport.h"
 #include <ScrollChoiceMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include "tcMenuLiquidCrystal.h"
@@ -50,5 +52,9 @@ inline MenuItem& rootMenuItem() { return menuPercentage; }
 #define CALLBACK_FUNCTION
 
 int fnMyListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
+void CALLBACK_FUNCTION onGridDown(int id);
+void CALLBACK_FUNCTION onGridLed1(int id);
+void CALLBACK_FUNCTION onGridLed2(int id);
+void CALLBACK_FUNCTION onGridUp(int id);
 
 #endif // MENU_GENERATED_CODE_H

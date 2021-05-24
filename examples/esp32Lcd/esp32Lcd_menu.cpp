@@ -19,13 +19,13 @@ LiquidCrystalRenderer renderer(lcd, 20, 4);
 
 // Global Menu Item declarations
 
-const PROGMEM AnyMenuInfo minfoGridDown = { "Down", 11, 0xffff, 0, NO_CALLBACK };
+const PROGMEM AnyMenuInfo minfoGridDown = { "Down", 11, 0xffff, 0, onGridDown };
 ActionMenuItem menuGridDown(&minfoGridDown, NULL);
-const PROGMEM AnyMenuInfo minfoGridUp = { "Up", 10, 0xffff, 0, NO_CALLBACK };
+const PROGMEM AnyMenuInfo minfoGridUp = { "Up", 10, 0xffff, 0, onGridUp };
 ActionMenuItem menuGridUp(&minfoGridUp, &menuGridDown);
-const PROGMEM BooleanMenuInfo minfoGridLED2 = { "LED2", 8, 0xffff, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
+const PROGMEM BooleanMenuInfo minfoGridLED2 = { "LED2", 8, 0xffff, 1, onGridLed2, NAMING_ON_OFF };
 BooleanMenuItem menuGridLED2(&minfoGridLED2, false, &menuGridUp);
-const PROGMEM BooleanMenuInfo minfoGridLED1 = { "LED1", 7, 0xffff, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
+const PROGMEM BooleanMenuInfo minfoGridLED1 = { "LED1", 7, 0xffff, 1, onGridLed1, NAMING_ON_OFF };
 BooleanMenuItem menuGridLED1(&minfoGridLED1, false, &menuGridLED2);
 const PROGMEM FloatMenuInfo minfoGridFloatValue = { "Float value", 9, 0xffff, 3, NO_CALLBACK };
 FloatMenuItem menuGridFloatValue(&minfoGridFloatValue, &menuGridLED1);
@@ -59,5 +59,6 @@ void setupMenu() {
     lcd.backlight();
     switches.initialiseInterrupt(internalDigitalIo(), true);
     menuMgr.initForEncoder(&renderer, &menuPercentage, 26, 36, 21);
+    remoteServer.begin(&Serial, &applicationInfo);
 }
 

@@ -114,11 +114,12 @@
       "parentId": 6,
       "type": "boolItem",
       "item": {
-        "naming": "TRUE_FALSE",
+        "naming": "ON_OFF",
         "name": "LED1",
         "variableName": "GridLED1",
         "id": 7,
         "eepromAddress": -1,
+        "functionName": "onGridLed1",
         "readOnly": false,
         "localOnly": false,
         "visible": true
@@ -128,11 +129,12 @@
       "parentId": 6,
       "type": "boolItem",
       "item": {
-        "naming": "TRUE_FALSE",
+        "naming": "ON_OFF",
         "name": "LED2",
         "variableName": "GridLED2",
         "id": 8,
         "eepromAddress": -1,
+        "functionName": "onGridLed2",
         "readOnly": false,
         "localOnly": false,
         "visible": true
@@ -146,6 +148,7 @@
         "variableName": "GridUp",
         "id": 10,
         "eepromAddress": -1,
+        "functionName": "onGridUp",
         "readOnly": false,
         "localOnly": false,
         "visible": true
@@ -159,6 +162,7 @@
         "variableName": "GridDown",
         "id": 11,
         "eepromAddress": -1,
+        "functionName": "onGridDown",
         "readOnly": false,
         "localOnly": false,
         "visible": true
@@ -169,7 +173,7 @@
     "embeddedPlatform": "ARDUINO_ESP32",
     "lastDisplayUuid": "d4c84106-fa87-4024-b91e-053e17a52b8f",
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
-    "lastRemoteUuid": "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb",
+    "lastRemoteUuid": "ba23b2a7-040e-40e2-8fae-d45c82cf450b",
     "lastThemeUuid": "850dc0a3-f534-47c2-94d8-1e64ff368a54",
     "applicationUUID": "7833942f-2ef4-486f-9713-045552b747e8",
     "applicationName": "Esp32Lcd",
@@ -253,6 +257,16 @@
         "name": "ENCODER_IS_QUARTER_CYCLE",
         "latestValue": "false",
         "subsystem": "INPUT"
+      },
+      {
+        "name": "SERIAL_PORT",
+        "latestValue": "Serial",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "HARDWARE_PORT",
+        "latestValue": "true",
+        "subsystem": "REMOTE"
       },
       {
         "name": "ITEM_FONT",
