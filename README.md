@@ -36,14 +36,16 @@ All releases are available from: [https://github.com/davetcc/tcMenu/releases]
 
 We test each release of the software on a wide range of hardware. Here's what's tested with nearly every release. Our tests include generating the menu for each of the boards, compiling, uploading and testing on device, then testing remote control against the latest embedCONTROL UI.
 
-* MKR 1300, MKR Ethernet Shield, AdaFruit_GFX ST7735 and IL, Rotary Encoder connected to PCF8574, i2c EEPROM
-* MEGA 2560, DF Robot shield for input and output. Internal EEPROM
+* MKR 1300, MKR Ethernet Shield, AdaFruit_GFX ST7735, 2xRotary Encoder connected to PCF8574, i2c EEPROM
+* Uno, DF Robot shield for input and output. Internal EEPROM
 * MEGA 2560, Nokia 5110, Rotary Encoder, UIP Ethernet, Bluetooth Serial Module. Internal EEPROM
 * MEGA 2560, Matrix keyboard, Rotary Encoder on MCP23017, display 20x4 sharing MCP23017, i2c EEPROM 
-* ESP8266, OLED SSD1106 display, rotary encoder on PCF8574, ESP WiFi remote using DHCP.
-* ESP32, OLED SSD1306 display, minimal input, ESP WiFi remote using DHCP. (Heltek WiFi Kit 32)
-* Nano 33 BLE sense board with rotary encoder and I2C LCD display
-* mbed STM32F439 based board with Ethernet and I2C LCD display
+* ESP8266, OLED SSD1106 display, rotary encoder, ESP WiFi remote using DHCP.
+* ESP32S, touch pad, WiFi, ILI9341, SimHub connector (also used for LCD test)
+* ESP32D, touch screen, 3.5" ILI9341
+* Nano 33 BLE sense board with rotary encoder and I2C OLED display
+* mbed STM32F439 based board with Ethernet and I2C OLED display
+* mbed STM32F429 based board with LTDC frame buffer and touch via BSP
 
 ### Controlling menu items remotely
 
