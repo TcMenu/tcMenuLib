@@ -75,10 +75,6 @@ enum AckResponseStatus {
 #define MSG_BOOT_RGB_COLOR msgFieldToWord('B', 'K')
 /** Message type definition for scroll bootstrap message */
 #define MSG_BOOT_SCROLL_CHOICE msgFieldToWord('B', 'Z')
-/** Message type definition for remote status bootstrap message */
-#define MSG_BOOT_REMOTE msgFieldToWord('B','R')
-/** Message type definition for ip address field bootstrap */
-#define MSG_BOOT_IPADDRESS msgFieldToWord('B','I')
 /** Message type definition for runtime list bootstrap message */
 #define MSG_BOOT_LIST msgFieldToWord('B','L')
 /** Message type definition for value change message */

@@ -17,6 +17,9 @@ const PROGMEM  ConnectorLocalInfo applicationInfo = { "Keyboard Ethernet", "b6ee
 LiquidCrystal lcd(8, 9, 10, 11, 12, 13);
 LiquidCrystalRenderer renderer(lcd, 20, 4);
 EthernetServer server(3333);
+EthernetInitialisation ethernetInitialisation(&server);
+EthernetTagValTransport ethernetTransport;
+TcMenuRemoteServer ethernetConnection(ethernetTransport, ethernetInitialisation);
 
 // Global Menu Item declarations
 
@@ -76,7 +79,7 @@ EnumMenuItem menuFruits(&minfoFruits, 0, &menuConnectivity);
 const PROGMEM AnalogMenuInfo minfoFiths = { "Fiths", 5, 6, 200, onFiths, 0, 5, "A" };
 AnalogMenuItem menuFiths(&minfoFiths, 0, &menuFruits);
 RENDERING_CALLBACK_NAME_INVOKE(fnLargeNumRtCall, largeNumItemRenderFn, "Large Num", -1, NO_CALLBACK)
-EditableLargeNumberMenuItem menuLargeNum(fnLargeNumRtCall, 12, 8, 4, &menuFiths);
+EditableLargeNumberMenuItem menuLargeNum(fnLargeNumRtCall, 12, 8, 4, true, &menuFiths);
 const PROGMEM AnalogMenuInfo minfoDecimalTens = { "DecimalTens", 4, 28, 1000, NO_CALLBACK, 0, 10, "V" };
 AnalogMenuItem menuDecimalTens(&minfoDecimalTens, 0, &menuLargeNum);
 const PROGMEM AnalogMenuInfo minfoInteger = { "Integer", 3, 4, 1000, onInteger, 100, 1, "" };
@@ -101,5 +104,6 @@ void setupMenu() {
     switches.initialise(io23017, true);
     menuMgr.initForEncoder(&renderer, &menuTime, 6, 7, 5);
     remoteServer.begin(&server, &applicationInfo);
+    remoteServer.addConnection(&ethernetConnection);
 }
 

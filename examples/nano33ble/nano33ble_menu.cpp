@@ -20,6 +20,12 @@ U8G2_SSD1306_128X64_NONAME_F_SW_I2C gfx(U8G2_R0, U8X8_PIN_NONE, U8X8_PIN_NONE, U
 U8g2Drawable gfxDrawable(&gfx, &Wire);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 
+tcremote::BLEDeviceInitialisation bleInitialisation;
+tcremote::BLETagValTransport bleTransport;
+tcremote::RemoteServerConnection bleConnection(bleTransport, bleInitialisation);
+
+tcremote::TcMenuRemoteServer remoteServer(applicationInfo);
+
 // Global Menu Item declarations
 
 const AnalogMenuInfo minfoAnalogReadingsOutputPWM = { "Output PWM", 13, 0xffff, 100, onPWMChanged, 0, 1, "%" };
@@ -46,7 +52,7 @@ RENDERING_CALLBACK_NAME_INVOKE(fnAccelerometerRtCall, backSubItemRenderFn, "Acce
 const SubMenuInfo minfoAccelerometer = { "Accelerometer", 4, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackAccelerometer(fnAccelerometerRtCall, &menuAccelerometerMagX);
 SubMenuItem menuAccelerometer(&minfoAccelerometer, &menuBackAccelerometer, &menuAnalogReadings);
-const AnalogMenuInfo minfoBPressure = { "B. Pressure", 2, 0xffff, 32000, NO_CALLBACK, 0, 10, "KPa" };
+ const AnalogMenuInfo minfoBPressure = { "B. Pressure", 2, 0xffff, 32000, NO_CALLBACK, 0, 10, "KPa" };
 AnalogMenuItem menuBPressure(&minfoBPressure, 0, &menuAccelerometer);
 const AnalogMenuInfo minfoHumidity = { "Humidity", 3, 0xffff, 1000, NO_CALLBACK, 0, 10, "%" };
 AnalogMenuItem menuHumidity(&minfoHumidity, 0, &menuBPressure);
@@ -68,5 +74,7 @@ void setupMenu() {
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
     renderer.setUseSliderForAnalog(false);
     installMonoInverseTitleTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(nullptr, 1), true);
+
+    remoteServer.addConnection(&bleConnection);
 }
 

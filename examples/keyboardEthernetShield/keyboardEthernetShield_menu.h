@@ -30,6 +30,7 @@ extern IoAbstractionRef io23017;
 extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
 extern EthernetServer server;
+extern EthernetInitialisation ethernetInitialisation;
 
 // Global Menu Item exports
 

@@ -59,10 +59,12 @@ TagValueRemoteConnector::TagValueRemoteConnector(uint8_t remoteNo) :
     this->authManager = NULL;
 }
 
-void TagValueRemoteConnector::initialise(TagValueTransport* transport, CombinedMessageProcessor* processor, const ConnectorLocalInfo* localInfoPgm) {
+void TagValueRemoteConnector::initialise(TagValueTransport* transport, CombinedMessageProcessor* processor,
+                                         const ConnectorLocalInfo* localInfoPgm, uint8_t remoteNo=0) {
     this->processor = processor;
     this->transport = transport;
     this->localInfoPgm = localInfoPgm;
+    this->remoteNo = remoteNo;
     
     // we must always have a mode of authentication, if nothing has been set then create the NoAuthentication manager.
     if(this->authManager == NULL) authManager = new NoAuthenticationManager();

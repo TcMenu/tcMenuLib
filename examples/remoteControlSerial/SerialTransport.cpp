@@ -68,7 +68,3 @@ int SerialTagValueTransport::writeStr(const char* str) {
     }
     return i;
 }
-
-void SerialTagValServer::runLoop() {
-	connector.tick();
-}

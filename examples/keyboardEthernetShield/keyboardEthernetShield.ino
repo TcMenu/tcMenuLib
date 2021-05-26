@@ -7,6 +7,8 @@
 #include <EepromAbstraction.h>
 #include <Ethernet.h>
 
+using namespace tcremote;
+
 // Set up ethernet, the usual default settings are chosen. Change to your preferred values or use DHCP.
 byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xEE
@@ -107,13 +109,12 @@ void setup() {
 	// first we initialise the authManager, then pass it to the class.
 	// Always call BEFORE setupMenu()
 	authManager.initialise(&eeprom, 100);
-	remoteServer.setAuthenticator(&authManager);
     menuMgr.setAuthenticator(&authManager);
 
 	// Here we add two additional menus for managing the connectivity and authentication keys.
 	// In the future, there will be an option to autogenerate these from the designer.
 	menuConnectivitySaveToEEPROM.setNext(&menuAuthKeyMgr);
-	menuRemoteMonitor.addConnector(remoteServer.getRemoteConnector(0));
+	menuRemoteMonitor.addRemoteServer(remoteServer);
 	menuAuthKeyMgr.setLocalOnly(true);    
 
     // now we turn off the title and change the editor characters
@@ -277,4 +278,3 @@ int CALLBACK_FUNCTION fnAdditionalCountListRtCall(RuntimeMenuItem * item, uint8_
         default: return false;
     }
 }
-

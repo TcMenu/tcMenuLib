@@ -19,7 +19,7 @@
  */
 
 class TagValueRemoteConnector; // forward reference
-class FieldAndValue; // forward reference
+struct FieldAndValue; // forward reference
 
 /**
  * Message processors need to store some state while they are working through the fields

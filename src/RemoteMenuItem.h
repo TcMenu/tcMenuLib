@@ -10,6 +10,7 @@
 #include "MenuItems.h"
 #include <RemoteConnector.h>
 #include <RemoteAuthentication.h>
+#include <remote/BaseRemoteComponents.h>
 
 /**
  * @file RemoteMenuItem.h
@@ -32,6 +33,7 @@ private:
 	CommsCallbackFn passThru;
 	TagValConnectorPtr* connectors;
 	static RemoteMenuItem* instance;
+	uint8_t maxConnectors;
 public:
 	/**
 	 * Construct a remote menu item providing the ID, maximum remotes supported and the next item
@@ -45,6 +47,11 @@ public:
 	 */
 	void addConnector(TagValueRemoteConnector* connector);
 
+	/**
+	 * Add all connections on a remote server to the list by their connector ID.
+	 * @param server
+	 */
+    void addRemoteServer(tcremote::TcMenuRemoteServer& server);
 	/**
 	 * Register a pass thru for other items that are also interested in comms updates
 	 * @param passThru the callback to be called after this item has processed it

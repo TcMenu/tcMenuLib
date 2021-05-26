@@ -157,6 +157,13 @@ public:
 	 */
 	void setAuthenticator(AuthenticationManager* manager) { authenticationManager = manager; }
 
+	/**
+	 * @return the global authentication manager that has been set for this menu application, or nullptr otherwise
+	 */
+	AuthenticationManager* getAuthenticator() {
+	    return authenticationManager;
+	}
+
     /**
      * This is a special callback, one per menu that indicates when a commit has taken place rather
      * than when there has been a change. It uses the same callback signature as the standard change

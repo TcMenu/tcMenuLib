@@ -12,6 +12,15 @@
 
 #include "MBedEthernetTransport.h"
 
+using namespace tcremote;
+
+MBedEthernetTransport::MBedEthernetTransport() : writeBuf{}, readBuf{} {
+    readPos = lastReadAmt = writePos = 0;
+    this->socket = NULL;
+    isOpen = false;
+    taskManager.scheduleFixedRate(WRITE_DELAY, this, TIME_MILLIS);
+}
+
 MBedEthernetTransport::~MBedEthernetTransport() {
     if(socket) {
         socket->close();
@@ -104,67 +113,43 @@ void MBedEthernetTransport::endMsg() {
     flush();
 }
 
-// ----------------- Ethernet Remote Server --------------
-
-EthernetTagValServer remoteServer;
-
-void EthernetTagValServer::begin(int bindingPort, const ConnectorLocalInfo* localInfo) {
-    if(defNetwork == NULL) {
-        serdebugF("No network interface found, not initialising network");
-        return;
+bool MbedEthernetInitialisation::attemptInitialisation() {
+    initialised = false;
+    switch(initState) {
+        case NOT_STARTED:
+            if(defNetwork == NULL) {
+                serdebugF("No network interface found, not initialising network");
+                initState = NW_FAILED;
+                return false;
+            }
+            defNetwork->set_blocking(false);
+            initState = (defNetwork->connect() != NSAPI_ERROR_IS_CONNECTED) ? NOT_STARTED : NW_STARTED;
+            break;
+        case NW_STARTED:
+            server.set_blocking(false);
+            initState = (server.open(defNetwork) != 0) ? NW_STARTED : SOCKET_OPEN;
+            break;
+        case SOCKET_OPEN:
+            initState = (server.bind(listenPort) != 0 || server.listen(1) != 0) ? SOCKET_OPEN : SOCKET_BOUND;
+            break;
+        case SOCKET_BOUND:
+            initialised = true;
+            break;
+        default:
+            initialised = false;
+            break;
     }
-    listenPort = bindingPort;
-
-    connector.initialise(&transport, &messageProcessor, localInfo);
-
-    defNetwork->set_blocking(false);
-    server.set_blocking(false);
-
-    // this is the message ticker
-    taskManager.scheduleOnce(TICK_INTERVAL, this, TIME_MILLIS);
-    // this does some very basic caching of messages to try and group them up on the wire
+    return initialised;
 }
 
-void EthernetTagValServer::exec() {
-    if(!boundToAddr) {
-        if(defNetwork->connect() != NSAPI_ERROR_IS_CONNECTED) {
-            taskManager.scheduleOnce(250, this);
-            return;
-        }
-
-        serdebugF("Connected to network");
-        if(server.open(defNetwork) != 0) {
-            serdebugF("Could not open socket");
-            taskManager.scheduleOnce(1,this, TIME_SECONDS);
-            return;
-        }
-        if(server.bind(listenPort) != 0 || server.listen(1) != 0) {
-            serdebugF2("Could not bind to ", listenPort);
-            taskManager.scheduleOnce(1, this, TIME_SECONDS);
-            return;
-        }
-        boundToAddr = true;
-
-        taskManager.scheduleFixedRate(TICK_INTERVAL, this, TIME_MILLIS);
-        //secondly we provide a low speed writer task that just flushes the buffer a five times a second.
-        taskManager.scheduleFixedRate(WRITE_DELAY, &transport, TIME_MILLIS);
-
-        serdebugF2("Listen fully bound to ", listenPort);
-
-        return;
+bool MbedEthernetInitialisation::attemptNewConnection(TagValueTransport *transport) {
+    nsapi_error_t acceptErr;
+    auto tcpSock = server.accept(&acceptErr);
+    if(acceptErr == NSAPI_ERROR_OK) {
+        serdebugF("Client found");
+        transport.setSocket(tcpSock);
     }
-    if(!transport.connected()) {
-        nsapi_error_t acceptErr;
-        auto tcpSock = server.accept(&acceptErr);
-        if(acceptErr == NSAPI_ERROR_OK) {
-            serdebugF("Client found");
-            transport.setSocket(tcpSock);
-        }
-        else if(acceptErr != NSAPI_ERROR_WOULD_BLOCK) {
-            serdebugF2("Error code ", acceptErr);
-        }
-    }
-    else {
-        connector.tick();
+    else if(acceptErr != NSAPI_ERROR_WOULD_BLOCK) {
+        serdebugF2("Error code ", acceptErr);
     }
 }

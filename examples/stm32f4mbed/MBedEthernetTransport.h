@@ -18,137 +18,102 @@
 
 #include <RemoteConnector.h>
 #include <TaskManager.h>
+#include <remote/BaseRemoteComponents.h>
 
 // We try and package up writes to avoid writing out single messages, there is a task
 // that runs that will flush transports at this interval, around 7 times a second.
 #define WRITE_DELAY 142
 
-/**
- * An mbed implementation of tag val transport that works over a socket connection
- */
-class MBedEthernetTransport : public TagValueTransport, public Executable {
-private:
-    char writeBuf[128];
-    char readBuf[128];
-    size_t readPos;
-    size_t lastReadAmt;
-    size_t writePos;
-    InternetSocket* socket;
-    bool isOpen;
-public:
-    MBedEthernetTransport() {
-        readPos = lastReadAmt = writePos = 0;
-        this->socket = NULL;
-        isOpen = false;
-    }
-
-    ~MBedEthernetTransport() override;
-
-    void setSocket(InternetSocket* sock) {
-        close();
-
-        socket = sock;
-        socket->set_blocking(false);
-        lastReadAmt = readPos = writePos = 0;
-        isOpen = true;
-    }
-
-    void flush() override;
-
-    int writeChar(char data) override;
-
-    int writeStr(const char *data) override;
-
-    uint8_t readByte() override;
-
-    bool readAvailable() override;
-
-    bool available() override;
-
-    bool connected() override {
-        return isOpen;
-    }
-
-    void close() override;
-
-    void endMsg() override;
-
-    void exec() override {
-        if(isOpen && writePos > 0) flush();
-    }
-};
-
-class EthernetTagValServer : public Executable {
-private:
-    TagValueRemoteConnector connector;
-    MBedEthernetTransport transport;
-    CombinedMessageProcessor messageProcessor;
-    TCPSocket server;
-    NetworkInterface* defNetwork;
-    bool boundToAddr;
-    int listenPort;
-public:
-    /**
-     * Empty constructor - see begin.
-     */
-    EthernetTagValServer() : messageProcessor(msgHandlers, MSG_HANDLERS_SIZE)  {
-        defNetwork = NetworkInterface::get_default_instance();
-        boundToAddr = false;
-    }
+namespace tcremote {
 
     /**
-     * Sets the mode of authentication used with your remote, if you don't call this the system will
-     * default to no authentication; which is probably fine for serial / bluetooth serial.
-    *
-     * This should always be called before begin(), to ensure this in your code always ensure this
-     * is called BEFORE setupMenu().
-     *
-     * @param authManager a reference to an authentication manager.
+     * An mbed implementation of tag val transport that works over a socket connection
      */
-    void setAuthenticator(AuthenticationManager* authManager) { connector.setAuthManager(authManager); }
+    class MBedEthernetTransport : public TagValueTransport, public Executable {
+    private:
+        char writeBuf[128];
+        char readBuf[128];
+        size_t readPos;
+        size_t lastReadAmt;
+        size_t writePos;
+        InternetSocket *socket{};
+        bool isOpen;
+    public:
+        MBedEthernetTransport();
 
-    /**
-     * Creates the ethernet client manager components.
-     * @param server a ready configured ethernet server instance.
-     * @param namePgm the local name in program memory on AVR
-     */
-    void begin(int listenPort, const ConnectorLocalInfo* localInfo);
+        ~MBedEthernetTransport() override;
 
-    /**
-     * @return the EthernetTagValTransport for the given connection number - zero based
-     */
-    MBedEthernetTransport* getTransport(int /*num*/) { return &transport; }
+        void setSocket(InternetSocket *sock) {
+            close();
 
-    /**
-     * @return the selected connector by remoteNo - zero based
-     */
-    TagValueRemoteConnector* getRemoteConnector(int /*num*/) { return &connector; }
+            socket = sock;
+            socket->set_blocking(false);
+            lastReadAmt = readPos = writePos = 0;
+            isOpen = true;
+        }
 
-    /**
-     * do not manually call, called by taskManager to poll the connection
-     */
-    void exec() override;
+        void flush() override;
 
-    //
-    // mbed specific items
-    //
+        int writeChar(char data) override;
 
-    /**
-     * @return true if the server has now bound to an external address, IE. the network is connected and working
-     */
-     bool isBound() { return boundToAddr; }
+        int writeStr(const char *data) override;
 
-     /**
-      * Gets the network interface that's being used by this connector, only ever use this interface if isBound
-      * returns true, because otherwise it could be null or completely undefined.
-      * @return the network interface that can be used for other network operations.
-      */
-      NetworkInterface* networkInterface() { return defNetwork; }
-};
+        uint8_t readByte() override;
 
-/**
- * This is the global instance of the remote server for ethernet.
- */
-extern EthernetTagValServer remoteServer;
+        bool readAvailable() override;
+
+        bool available() override;
+
+        bool connected() override {
+            return isOpen;
+        }
+
+        void close() override;
+
+        void endMsg() override;
+
+        void exec() override {
+            if (isOpen && writePos > 0) flush();
+        }
+    };
+
+    class MbedEthernetInitialisation : public DeviceInitialisation {
+    private:
+        TCPSocket server;
+        NetworkInterface *defNetwork;
+        const ConnectorLocalInfo &localInfo;
+        int listenPort;
+        enum InitialisationState {
+            NOT_STARTED, NW_STARTED, SOCKET_OPEN, SOCKET_BOUND, NW_FAILED
+        } initState;
+    public:
+        /**
+         * Creates the ethernet client manager components.
+         * @param server a ready configured ethernet server instance.
+         * @param namePgm the local name in program memory on AVR
+         */
+        MbedEthernetInitialisation(int listenPort, const ConnectorLocalInfo &localInfo) {
+            defNetwork = NetworkInterface::get_default_instance();
+        }
+
+        bool attemptInitialisation() override;
+
+        bool attemptNewConnection(TagValueTransport *transport) override;
+
+        /**
+         * @return true if the server has now bound to an external address, IE. the network is connected and working
+         */
+        bool isBound() { return initState == SOCKET_BOUND; }
+
+        /**
+         * Gets the network interface that's being used by this connector, only ever use this interface if isBound
+         * returns true, because otherwise it could be null or completely undefined.
+         * @return the network interface that can be used for other network operations.
+         */
+        NetworkInterface *networkInterface() { return defNetwork; }
+
+    };
+
+}
 
 #endif //TCMENU_MBEDETHERNETTRANSPORT_H

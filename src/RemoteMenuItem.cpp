@@ -4,6 +4,7 @@
  */
 
 #include <PlatformDetermination.h>
+#include <remote/BaseRemoteComponents.h>
 #include "RemoteMenuItem.h"
 #include "RemoteConnector.h"
 #include "tcUtil.h"
@@ -92,6 +93,14 @@ RemoteMenuItem::RemoteMenuItem(uint16_t id, int maxRemotes, MenuItem* next)
 	RemoteMenuItem::instance = this;
 	connectors = new TagValueRemoteConnector*[maxRemotes];
 	memset(connectors, 0, sizeof(TagValueRemoteConnector*) * maxRemotes);
+	maxConnectors = maxRemotes;
+}
+
+void RemoteMenuItem::addRemoteServer(tcremote::TcMenuRemoteServer& server) {
+    for(int i=0; i<server.remoteCount();i++) {
+        auto* conn = server.getRemoteConnector(i);
+        if(conn && i < maxConnectors) addConnector(conn);
+    }
 }
 
 void RemoteMenuItem::addConnector(TagValueRemoteConnector* connector) {

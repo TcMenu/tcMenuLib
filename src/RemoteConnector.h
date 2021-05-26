@@ -182,7 +182,7 @@ public:
 	 * @param transport the actual underlying transport
 	 * @param remoteNo the index of this connector, 0 based.
 	 */
-	TagValueRemoteConnector(uint8_t remoteNo = 0);
+	explicit TagValueRemoteConnector(uint8_t remoteNo = 0);
 
     /**
      * Initialises the connector with a specific transport that can send and recevie data, a message processor that can
@@ -190,8 +190,9 @@ public:
      * @param transport a class that implements TagValueTransport for sending and receving data.
      * @param processor a linked list of processors that can process incoming messages.
      * @param localInfoPgm the name and UUID of this local device (in program memory where available).
+     * @param remoteNo remote number, optional and defaults to 0
      */
-    void initialise(TagValueTransport* transport, CombinedMessageProcessor* processor, const ConnectorLocalInfo* localInfoPgm);
+    void initialise(TagValueTransport* transport, CombinedMessageProcessor* processor, const ConnectorLocalInfo* localInfoPgm, uint8_t remoteNo);
 
     void setAuthManager(AuthenticationManager* mgr) { authManager = mgr; }
 
@@ -367,7 +368,7 @@ public:
 	/**
 	 * Returns the remoteNo (or remote number) for this remote
 	 */
-	uint8_t getRemoteNo() {return remoteNo;}
+	uint8_t getRemoteNo() const {return remoteNo;}
 
 	/**
 	 * Returns the remote name for this connection. The name of the other side
@@ -377,12 +378,12 @@ public:
 	/**
 	 * returns the major version of the other party API
 	 */
-	uint8_t getRemoteMajorVer() {return remoteMajorVer;}
+	uint8_t getRemoteMajorVer() const {return remoteMajorVer;}
 
 	/**
 	 * Returns the minor version of the other party API
 	 */
-	uint8_t getRemoteMinorVer() {return remoteMinorVer;}
+	uint8_t getRemoteMinorVer() const {return remoteMinorVer;}
 	
 	/**
 	 * Returns the platform of the other party.
