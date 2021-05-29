@@ -1,6 +1,6 @@
 {
   "version": "1.00",
-  "projectName": "/Users/dave/Documents/Arduino/tcLibraryDev/lib/tcMenu/examples/remoteControlSerial/remoteControlSerial.emf",
+  "projectName": "C:\\Users\\dave\\Documents\\Arduino\\tcLibraryDev\\lib\\tcMenu\\examples\\remoteControlSerial\\remoteControlSerial.emf",
   "author": "dave",
   "items": [
     {
@@ -186,6 +186,11 @@
     "lastDisplayUuid": "4dcb12ec-13d8-4466-b8b6-bd575eae4612",
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
     "lastRemoteUuid": "1e38dc42-672d-4c1c-a393-2c7632bf6c5c",
+    "lastRemoteUuids": [
+      "1e38dc42-672d-4c1c-a393-2c7632bf6c5c",
+      "0877131c-e03e-426b-8eaf-228e01f5e7f1",
+      "4123dfc3-5271-4727-81f0-1a21d06b666b"
+    ],
     "lastThemeUuid": "815316bb-76c9-436a-8f83-be0bced963df",
     "applicationUUID": "f018e07a-f33f-42d2-b3a0-689a1bf6849c",
     "applicationName": "Remote Ctrl",
@@ -286,8 +291,48 @@
         "subsystem": "INPUT"
       },
       {
+        "name": "ENCODER_IS_QUARTER_CYCLE",
+        "latestValue": "false",
+        "subsystem": "INPUT"
+      },
+      {
         "name": "SERIAL_PORT",
         "latestValue": "Serial1",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "LIBRARY_TYPE",
+        "latestValue": "ETHERNET_2",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "NUM_CONCURRENT_ETH",
+        "latestValue": "1",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "LISTEN_PORT1",
+        "latestValue": "3333",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "LISTEN_PORT2",
+        "latestValue": "3334",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "LISTEN_PORT3",
+        "latestValue": "3335",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "SERIAL_PORT",
+        "latestValue": "Serial1",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "STATUS_MENUITEM",
+        "latestValue": "-1",
         "subsystem": "REMOTE"
       },
       {
@@ -313,6 +358,11 @@
       {
         "name": "TITLE_SHOW_MODE",
         "latestValue": "TITLE_FIRST_ROW",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_IS_MONO",
+        "latestValue": "true",
         "subsystem": "THEME"
       }
     ],

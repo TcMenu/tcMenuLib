@@ -16,18 +16,23 @@
 #include "tcMenuAdaFruitGfx.h"
 #include <RemoteConnector.h>
 #include "SerialTransport.h"
+#include "EthernetTransport.h"
+#include "SimhubConnector.h"
 #include <ScrollChoiceMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
 
 void setupMenu();  // forward reference of the menu setup function.
 extern const PROGMEM ConnectorLocalInfo applicationInfo;  // contains app name and ID
+extern TcMenuRemoteServer remoteServer;
 
 // Global variables that need exporting
 
 extern Adafruit_PCD8544 gfx;
 extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
+extern EthernetServer server;
+extern EthernetInitialisation ethernetInitialisation;
 
 // Global Menu Item exports
 

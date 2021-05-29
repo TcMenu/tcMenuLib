@@ -119,7 +119,6 @@ private:
 	int noOfHandlers;
 
 	MsgHandler* currHandler;
-    uint16_t currentMsgType;
 public:
 	/**
 	 * Consructor takes an array of processors and the number of processors in the array.

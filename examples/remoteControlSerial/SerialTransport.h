@@ -19,37 +19,77 @@
 #include <MessageProcessors.h>
 #include <tcUtil.h>
 #include <RemoteAuthentication.h>
-#include <remote/BaseRemoteComponents.h>
 
-namespace tcremote {
 /**
  * Serial transport is an implementation of TagValueTransport that works over a serial port
  */
-    class SerialTagValueTransport : public TagValueTransport {
-    private:
-        Stream *serialPort;
-    public:
-        SerialTagValueTransport(Stream* port);
+class SerialTagValueTransport : public TagValueTransport {
+private:
+	Stream* serialPort;
+public:
+	SerialTagValueTransport();
+	virtual ~SerialTagValueTransport() {}
+	void setStream(Stream* stream) {this->serialPort = stream; }
 
-        virtual ~SerialTagValueTransport() {}
+	void flush() override {serialPort->flush();}
+	int writeChar(char data) override;
+	int writeStr(const char* data) override;
 
-        void flush() override { serialPort->flush(); }
+	uint8_t readByte() override { return serialPort->read(); }
+	bool readAvailable() override { return serialPort->available(); }
+	bool available() override { return serialPort->availableForWrite() != 0;}
+	bool connected() override { return true;}
 
-        int writeChar(char data) override;
+	void close() override;
 
-        int writeStr(const char *data) override;
+};
 
-        uint8_t readByte() override { return serialPort->read(); }
+/**
+ * SerialTagValServer is the implementation of remote communication that provides
+ * remote menu capability for Serial streams.
+ */
+class SerialTagValServer {
+private:
+	SerialTagValueTransport serPort;
+	TagValueRemoteConnector connector;
+    CombinedMessageProcessor messageProcessor;
+public:
+	/** Empty constructor - configured in begin */
+	SerialTagValServer();
 
-        bool readAvailable() override { return serialPort->available(); }
+    /**
+     * Sets the mode of authentication used with your remote, if you don't call this the system will
+     * default to no authentication; which is probably fine for serial / bluetooth serial.
+     *
+     * This should always be called before begin(), to ensure this in your code always ensure this
+     * is called BEFORE setupMenu().
+     *
+     * @param authManager a reference to an authentication manager.
+     */
+    void setAuthenticator(AuthenticationManager* authManager) { connector.setAuthManager(authManager); }
 
-        bool available() override { return serialPort->availableForWrite() != 0; }
+	/**
+	 * Begins serial communication on the given port. You must call begin on the stream first.
+	 * @param portStream the stream upon which to communicate, it must be already opened.
+	 * @param namePgm the local name of the application (may be program memory on AVR use safeCopyStr)
+	 */ 
+	void begin(Stream* portStream, const ConnectorLocalInfo* localInfo);
 
-        bool connected() override { return true; }
+	/**
+	 * Arranged internally don't call yourself.
+	 */ 
+	void runLoop();
 
-        void close() override;
+	/** @return the remote connector associated with the connection */
+	TagValueRemoteConnector* getRemoteConnector(int /*num*/) {return &connector;}
 
-    };
-}
+    /** @return the transport that's associated with the connection */
+    SerialTagValueTransport* getTransport(int /*num*/) {return &serPort;} 
+};
+
+/**
+ * the global instance of the SerialTagValServer
+ */
+extern SerialTagValServer remoteServer;
 
 #endif /* _TCMENU_SERIALTRANSPORT_H_ */

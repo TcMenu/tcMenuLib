@@ -8,7 +8,8 @@
 using namespace tcremote;
 
 tcremote::RemoteServerConnection::RemoteServerConnection(TagValueTransport &transport, DeviceInitialisation &initialisation)
-        : remoteConnector(0), remoteTransport(transport), initialisation(initialisation) {
+        : remoteConnector(0), remoteTransport(transport), messageProcessor(msgHandlers, MSG_HANDLERS_SIZE),
+          initialisation(initialisation) {
 }
 
 void RemoteServerConnection::tick() {
@@ -26,9 +27,16 @@ void RemoteServerConnection::tick() {
 uint8_t tcremote::TcMenuRemoteServer::addConnection(tcremote::RemoteServerConnection *toAdd) {
     if(remotesAdded >= ALLOWED_CONNECTIONS) return 0xff;
 
+    if(remotesAdded == 0) {
+        serdebugF("Starting remote server tick handler");
+        taskManager.scheduleFixedRate(TICK_INTERVAL, this, TIME_MILLIS);
+    }
+
+    serdebugF2("Adding connection #", remotesAdded);
+
     // first we setup the remote number and initialise the connector
     int remoteNo = remotesAdded;
-    toAdd->connector()->initialise(toAdd->transport(), &messageProcessor, &appInfo, remoteNo);
+    toAdd->connector()->initialise(toAdd->transport(), toAdd->messageProcessors(), &appInfo, remoteNo);
 
     // if there is an authenticator present, we add it to the connection
     if (menuMgr.getAuthenticator()) {
@@ -46,8 +54,4 @@ void TcMenuRemoteServer::exec() {
         connections[i]->tick();
         taskManager.yieldForMicros(0);
     }
-}
-
-void TcMenuRemoteServer::begin() {
-    taskManager.scheduleFixedRate(TICK_INTERVAL, this, TIME_MILLIS);
 }

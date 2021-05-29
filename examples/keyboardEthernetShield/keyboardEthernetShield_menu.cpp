@@ -14,12 +14,17 @@
 // Global variable declarations
 
 const PROGMEM  ConnectorLocalInfo applicationInfo = { "Keyboard Ethernet", "b6ee8e21-449c-4f8a-bab6-a89e3f2c68d9" };
+TcMenuRemoteServer remoteServer(applicationInfo);
+
 LiquidCrystal lcd(8, 9, 10, 11, 12, 13);
 LiquidCrystalRenderer renderer(lcd, 20, 4);
-EthernetServer server(3333);
 EthernetInitialisation ethernetInitialisation(&server);
+EthernetServer server();
 EthernetTagValTransport ethernetTransport;
-TcMenuRemoteServer ethernetConnection(ethernetTransport, ethernetInitialisation);
+RemoteServerConnection ethernetConnection(ethernetTransport, ethernetInitialisation);
+EthernetServer server(3333);
+EthernetTagValTransport ethernetTransport2;
+RemoteServerConnection ethernetConnection2(ethernetTransport2, ethernetInitialisation);
 
 // Global Menu Item declarations
 
@@ -103,7 +108,7 @@ void setupMenu() {
     renderer.setUpdatesPerSecond(4);
     switches.initialise(io23017, true);
     menuMgr.initForEncoder(&renderer, &menuTime, 6, 7, 5);
-    remoteServer.begin(&server, &applicationInfo);
     remoteServer.addConnection(&ethernetConnection);
+    remoteServer.addConnection(&ethernetConnection2);
 }
 

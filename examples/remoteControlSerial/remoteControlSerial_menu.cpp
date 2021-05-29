@@ -15,9 +15,16 @@
 // Global variable declarations
 
 const PROGMEM  ConnectorLocalInfo applicationInfo = { "Remote Ctrl", "f018e07a-f33f-42d2-b3a0-689a1bf6849c" };
+TcMenuRemoteServer remoteServer(applicationInfo);
+
 Adafruit_PCD8544 gfx(35, 34, 38, 37, 36);
 AdafruitDrawable gfxDrawable(&gfx);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
+EthernetServer server();
+EthernetInitialisation ethernetInitialisation(&server);
+EthernetTagValTransport ethernetTransport;
+RemoteServerConnection ethernetConnection(ethernetTransport, ethernetInitialisation);
+SimhubConnector connector;
 
 // Global Menu Item declarations
 
@@ -68,6 +75,8 @@ void setupMenu() {
     switches.initialise(internalDigitalIo(), true);
     menuMgr.initForEncoder(&renderer, &menuAnalogIn, 2, 3, 4);
     remoteServer.begin(&Serial1, &applicationInfo);
+    remoteServer.addConnection(&ethernetConnection);
+    connector.begin(&Serial1, -1);
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
     renderer.setUseSliderForAnalog(false);
     installMonoBorderedTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(nullptr, 1), true);

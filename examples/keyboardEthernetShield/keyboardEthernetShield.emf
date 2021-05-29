@@ -407,6 +407,9 @@
     "lastDisplayUuid": "61f370f4-0294-41cf-8988-1458f242914a",
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
     "lastRemoteUuid": "0877131c-e03e-426b-8eaf-228e01f5e7f1",
+    "lastRemoteUuids": [
+      "0877131c-e03e-426b-8eaf-228e01f5e7f1"
+    ],
     "lastThemeUuid": "850dc0a3-f534-47c2-94d8-1e64ff368a54",
     "applicationUUID": "b6ee8e21-449c-4f8a-bab6-a89e3f2c68d9",
     "applicationName": "Keyboard Ethernet",
@@ -527,13 +530,23 @@
         "subsystem": "REMOTE"
       },
       {
-        "name": "LISTEN_PORT",
+        "name": "NUM_CONCURRENT_ETH",
+        "latestValue": "2",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "LISTEN_PORT1",
         "latestValue": "3333",
         "subsystem": "REMOTE"
       },
       {
-        "name": "NUM_CONCURRENT_ETH",
-        "latestValue": "1",
+        "name": "LISTEN_PORT2",
+        "latestValue": "3334",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "LISTEN_PORT3",
+        "latestValue": "3335",
         "subsystem": "REMOTE"
       },
       {

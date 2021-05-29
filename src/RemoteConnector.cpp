@@ -14,18 +14,10 @@
 
 #include <stdlib.h>
 #include "RemoteConnector.h"
-#include "RemoteAuthentication.h"
-#include "MenuItems.h"
-#include "RemoteMenuItem.h"
 #include "TaskManager.h"
-#include "tcMenu.h"
-#include "MessageProcessors.h"
-#include "tcUtil.h"
 #include <IoLogging.h>
 #include "BaseDialog.h"
-#include "BaseRenderers.h"
 #include "EditableLargeNumberMenuItem.h"
-#include "ScrollChoiceMenuItem.h"
 
 const char PGM_TCM pmemBootStartText[] = "START";
 const char PGM_TCM pmemBootEndText[] = "END";
@@ -34,8 +26,8 @@ const char PGM_TCM pmemBootEndText[] = "END";
 // utility function to write out a debug line with the message type attached.
 inline void serdebugMsgHdr(const char* tx, int remoteNo, uint16_t msgType) {
     char sz[3];
-    sz[0] = msgType>>8;
-    sz[1] = msgType & 0xff;
+    sz[0] = char(msgType>>8);
+    sz[1] = char(msgType & 0xff);
     sz[2] = 0;
     serdebug3(tx, remoteNo, sz);
 }
@@ -47,27 +39,27 @@ void stopPairing();
 
 TagValueRemoteConnector::TagValueRemoteConnector(uint8_t remoteNo) :
         bootPredicate(MENUTYPE_BACK_VALUE, TM_INVERTED_LOCAL_ONLY),
-        remotePredicate(remoteNo) {
-	this->transport = NULL;
-	this->processor = NULL;
-    this->remoteName[0] = 0;
-	this->localInfoPgm = NULL;
+        remotePredicate(remoteNo), remoteName{}, remoteMajorVer(0), remoteMinorVer(0),
+        remotePlatform(PLATFORM_ARDUINO_8BIT) {
+	this->transport = nullptr;
+	this->processor = nullptr;
+	this->localInfoPgm = nullptr;
 	this->remoteNo = remoteNo;
 	this->ticksLastRead = this->ticksLastSend = 0xffff;
 	this->flags = 0;
-    this->commsCallback = NULL;
-    this->authManager = NULL;
+    this->commsCallback = nullptr;
+    this->authManager = nullptr;
 }
 
-void TagValueRemoteConnector::initialise(TagValueTransport* transport, CombinedMessageProcessor* processor,
-                                         const ConnectorLocalInfo* localInfoPgm, uint8_t remoteNo=0) {
-    this->processor = processor;
-    this->transport = transport;
-    this->localInfoPgm = localInfoPgm;
-    this->remoteNo = remoteNo;
+void TagValueRemoteConnector::initialise(TagValueTransport* transport_, CombinedMessageProcessor* processor_,
+                                         const ConnectorLocalInfo* localInfoPgm_, uint8_t remoteNo_=0) {
+    this->processor = processor_;
+    this->transport = transport_;
+    this->localInfoPgm = localInfoPgm_;
+    this->remoteNo = remoteNo_;
     
     // we must always have a mode of authentication, if nothing has been set then create the NoAuthentication manager.
-    if(this->authManager == NULL) authManager = new NoAuthenticationManager();
+    if(this->authManager == nullptr) authManager = new NoAuthenticationManager();
 }
 
 void TagValueRemoteConnector::setRemoteName(const char* name) {
@@ -91,7 +83,7 @@ void TagValueRemoteConnector::setRemoteConnected(uint8_t major, uint8_t minor, A
 }
 
 void TagValueRemoteConnector::provideAuthentication(const char* auth) {
-    if(auth == NULL || !authManager->isAuthenticated(remoteName, auth)) {
+    if(auth == nullptr || !authManager->isAuthenticated(remoteName, auth)) {
         serdebugF2("Authentication failed for ", remoteName);
         // wait before returning the state to prevent denial of service.
         encodeAcknowledgement(0, ACK_CREDENTIALS_INVALID);
@@ -113,7 +105,7 @@ const char headerPairingDone[] PROGMEM = "Pairing complete";
 const char* lastUuid;
 
 void onPairingFinished(ButtonType ty, void* voidConnector) {
-    TagValueRemoteConnector* connector = reinterpret_cast<TagValueRemoteConnector*>(voidConnector);
+    auto* connector = reinterpret_cast<TagValueRemoteConnector*>(voidConnector);
     if(ty==BTNTYPE_ACCEPT) {
         bool added = connector->getAuthManager()->addAdditionalUUIDKey(connector->getRemoteName(), lastUuid);
         connector->encodeAcknowledgement(0, added ? ACK_SUCCESS : ACK_CREDENTIALS_INVALID);
@@ -152,7 +144,7 @@ void TagValueRemoteConnector::pairingRequest(const char* name, const char* uuid)
 }
 
 void TagValueRemoteConnector::commsNotify(uint16_t err) {
-    if(commsCallback != NULL) {
+    if(commsCallback != nullptr) {
         CommunicationInfo info;
         info.remoteNo = remoteNo;
         info.connected = isAuthenticated();
@@ -262,7 +254,7 @@ void TagValueRemoteConnector::performAnyWrites() {
         }
 
         BaseDialog* dlg = MenuRenderer::getInstance()->getDialog();
-        if(dlg!=NULL && dlg->isRemoteUpdateNeeded(remoteNo)) {
+        if(dlg!=nullptr && dlg->isRemoteUpdateNeeded(remoteNo)) {
             dlg->encodeMessage(this);
             dlg->setRemoteUpdateNeeded(remoteNo, false);
         }
@@ -283,7 +275,7 @@ void TagValueRemoteConnector::nextBootstrap() {
 
     MenuItem* bootItem = iterator.nextItem();
 	MenuItem* parent = iterator.currentParent() ;
-    int parentId = parent == NULL ? 0 : parent->getId();
+    int parentId = parent == nullptr ? 0 : parent->getId();
 	if(!bootItem) {
         serdebugF2("Finishing bootstrap mode", remoteNo);
 		setBootstrapMode(false);
@@ -343,7 +335,7 @@ void TagValueRemoteConnector::encodeDialogMsg(uint8_t mode, uint8_t btn1, uint8_
 	if(!prepareWriteMsg(MSG_DIALOG)) return;
 
 	char buffer[2];
-    buffer[0]=mode;
+    buffer[0]=(char)mode;
     buffer[1]=0;
     transport->writeField(FIELD_MODE, buffer);
 
@@ -469,14 +461,14 @@ void TagValueRemoteConnector::encodeMultiEditMenu(int parentId, RuntimeMenuItem*
 		transport->writeFieldInt(FIELD_EDIT_MODE, EDITMODE_IP_ADDRESS);
 	}
     else if(item->getMenuType() == MENUTYPE_TIME) {
-        TimeFormattedMenuItem* editable = reinterpret_cast<TimeFormattedMenuItem*>(item);
+        auto* editable = reinterpret_cast<TimeFormattedMenuItem*>(item);
         transport->writeFieldInt(FIELD_EDIT_MODE, editable->getFormat());
     }
     else if(item->getMenuType() == MENUTYPE_DATE) {
         transport->writeFieldInt(FIELD_EDIT_MODE, EDITMODE_GREGORIAN_DATE);
     }
 
-    EditableMultiPartMenuItem* multipart = reinterpret_cast<EditableMultiPartMenuItem*>(item);
+    auto* multipart = reinterpret_cast<EditableMultiPartMenuItem*>(item);
     char sz[20];
     multipart->copyValue(sz, sizeof(sz));
     transport->writeField(FIELD_CURRENT_VAL, sz);
@@ -641,14 +633,14 @@ void TagValueTransport::startMsg(uint16_t msgType) {
 	writeChar(TAG_VAL_PROTOCOL);
 
     // message type high then low
-	writeChar(msgType >> 8);
-	writeChar(msgType & 0xff);
+	writeChar(char(msgType >> 8));
+	writeChar(char(msgType & 0xff));
 }
 
 void TagValueTransport::writeField(uint16_t field, const char* value) {
 	char sz[4];
-	sz[0] = field >> 8;
-	sz[1] = field & 0xff;
+	sz[0] = char(field >> 8);
+	sz[1] = char(field & 0xff);
 	sz[2] = '=';
 	sz[3] = 0;
 	writeStr(sz);
@@ -658,8 +650,8 @@ void TagValueTransport::writeField(uint16_t field, const char* value) {
 
 void TagValueTransport::writeFieldInt(uint16_t field, int value) {
 	char sz[10];
-	sz[0] = field >> 8;
-	sz[1] = field & 0xff;
+	sz[0] = char(field >> 8);
+	sz[1] = char(field & 0xff);
 	sz[2] = '=';
 	sz[3] = 0;
 	writeStr(sz);
@@ -670,8 +662,8 @@ void TagValueTransport::writeFieldInt(uint16_t field, int value) {
 
 void TagValueTransport::writeFieldLong(uint16_t field, long value) {
 	char sz[12];
-	sz[0] = field >> 8;
-	sz[1] = field & 0xff;
+	sz[0] = char(field >> 8);
+	sz[1] = char(field & 0xff);
 	sz[2] = '=';
 	sz[3] = 0;
 	writeStr(sz);
@@ -819,27 +811,25 @@ FieldAndValue* TagValueTransport::fieldIfAvailable() {
 CombinedMessageProcessor::CombinedMessageProcessor(MsgHandler handlers[], int noOfHandlers) {
 	this->handlers = handlers;
 	this->noOfHandlers = noOfHandlers;
-	this->currHandler = NULL;
-    this->currentMsgType = 0;
+	this->currHandler = nullptr;
 }
 
 void CombinedMessageProcessor::newMsg(uint16_t msgType) {
-	currHandler = NULL;
+	currHandler = nullptr;
 	for(int i=0;i<noOfHandlers;++i) {
 		if(handlers[i].msgType == msgType) {
 			currHandler = &handlers[i];
 		}
 	}
 
-	if(currHandler != NULL) {
-        currentMsgType = msgType;
+	if(currHandler != nullptr) {
 		memset(&val, 0, sizeof val);
 	}
 }
 
 void CombinedMessageProcessor::fieldUpdate(TagValueRemoteConnector* connector, FieldAndValue* field) {
     uint16_t mt = field->msgType;
-	if(currHandler != NULL && (connector->isAuthenticated() || mt == MSG_JOIN || mt == MSG_PAIR || mt == MSG_HEARTBEAT)) {
+	if(currHandler != nullptr && (connector->isAuthenticated() || mt == MSG_JOIN || mt == MSG_PAIR || mt == MSG_HEARTBEAT)) {
 		currHandler->fieldUpdateFn(connector, field, &val);
 	}
     else if(mt != MSG_HEARTBEAT) {

@@ -26,7 +26,7 @@ namespace tcremote {
     protected:
         bool initialised = false;
     public:
-        bool isInitialised() { return initialised; }
+        bool isInitialised() const { return initialised; }
         virtual bool attemptInitialisation()=0;
         virtual bool attemptNewConnection(TagValueTransport* transport)=0;
     };
@@ -55,6 +55,7 @@ namespace tcremote {
     private:
         TagValueRemoteConnector remoteConnector;
         TagValueTransport &remoteTransport;
+        CombinedMessageProcessor messageProcessor;
         DeviceInitialisation &initialisation;
     public:
         RemoteServerConnection(TagValueTransport &transport, DeviceInitialisation& initialisation);
@@ -62,6 +63,8 @@ namespace tcremote {
         TagValueRemoteConnector *connector() { return &remoteConnector; }
 
         TagValueTransport *transport() { return &remoteTransport; }
+
+        CombinedMessageProcessor *messageProcessors() { return &messageProcessor; }
 
         void tick();
     };
@@ -75,23 +78,17 @@ namespace tcremote {
      */
     class TcMenuRemoteServer : public Executable {
         RemoteServerConnectionPtr connections[ALLOWED_CONNECTIONS];
-        CombinedMessageProcessor messageProcessor;
         const ConnectorLocalInfo& appInfo;
         uint8_t remotesAdded;
     public:
         /**
          * Creates an instance of the remote server component that has no connections but is properly configured ready
-         * for connections to be added. You must provide the application information.
+         * for connections to be added. You must provide the application information. The server is started when the
+         * first remote is added.
+         *
          * @param appInfo the application information - uuid and name basically.
          */
-        TcMenuRemoteServer(const ConnectorLocalInfo& appInfo) : connections{}, messageProcessor(msgHandlers, MSG_HANDLERS_SIZE),
-                           appInfo(appInfo), remotesAdded(0) {
-        }
-
-        /**
-         * This actually starts the connection handling, call once the connections have been added.
-         */
-        void begin();
+        explicit TcMenuRemoteServer(const ConnectorLocalInfo& appInfo) : connections{}, appInfo(appInfo), remotesAdded(0) { }
 
         void exec() override;
 

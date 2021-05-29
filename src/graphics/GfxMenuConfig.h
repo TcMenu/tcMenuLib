@@ -448,8 +448,8 @@ namespace tcgfx {
         BtreeList<uint32_t, ItemDisplayProperties> displayProperties;
         BtreeList<uint16_t, DrawableIcon> iconsByItem;
         BtreeList<uint16_t, GridPositionWithId> gridByItem;
-        color_t selectedTextColor = RGB(255,255,255);
-        color_t selectedBackgroundColor = RGB(0, 0, 255);
+        color_t selectedTextColor = RGB(0,0,0);
+        color_t selectedBackgroundColor = RGB(0, 100, 255);
     public:
         ConfigurableItemDisplayPropertiesFactory()
                 : displayProperties(5, GROW_BY_5),

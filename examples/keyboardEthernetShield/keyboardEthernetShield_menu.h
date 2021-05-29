@@ -23,14 +23,15 @@
 
 void setupMenu();  // forward reference of the menu setup function.
 extern const PROGMEM ConnectorLocalInfo applicationInfo;  // contains app name and ID
+extern TcMenuRemoteServer remoteServer;
 
 // Global variables that need exporting
 
 extern IoAbstractionRef io23017;
 extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
-extern EthernetServer server;
 extern EthernetInitialisation ethernetInitialisation;
+extern EthernetServer server;
 
 // Global Menu Item exports
 
