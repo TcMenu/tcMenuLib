@@ -24,6 +24,10 @@
 #define ETHERNET_BUFFER_SIZE 64
 #endif
 
+#if ETHERNET_BUFFER_SIZE > 0
+#include <remote/BaseBufferedRemoteTransport.h>
+#endif
+
 namespace tcremote {
 
 #if ETHERNET_BUFFER_SIZE > 0
@@ -31,35 +35,19 @@ namespace tcremote {
 /**
  * An implementation of TagValueTransport that is able to read and write via a buffer to sockets.
  */
-class EthernetTagValTransport : public TagValueTransport {
+class EthernetTagValTransport : public tcremote::BaseBufferedRemoteTransport {
 private:
 	EthernetClient client;
-    uint8_t bufferData[ETHERNET_BUFFER_SIZE];
-    unsigned int bufferPosition = 0;
 public:
-    EthernetTagValTransport() = default;
+    EthernetTagValTransport() : BaseBufferedRemoteTransport(BUFFER_MESSAGES_TILL_FULL, ETHERNET_BUFFER_SIZE, MAX_VALUE_LEN) { }
+    ~EthernetTagValTransport() override = default;
+	void setClient(EthernetClient cl) { this->client = cl; }
 
-    virtual ~EthernetTagValTransport() = default;
-
-	void setClient(EthernetClient client) { this->client = client; }
-
-    void endMsg() override {
-        TagValueTransport::endMsg();
-        flush();
-    }
-
-	int writeChar(char data) override ;
-	int writeStr(const char* data) override;
+	int fillReadBuffer(uint8_t* data, int maxSize) override;
 	void flush() override;
 	bool available() override;
 	bool connected() override;
-	uint8_t readByte() override;
-	bool readAvailable() override;
-    void close() override {
-        currentField.msgType = UNKNOWN_MSG_TYPE;
-        currentField.fieldType = FVAL_PROCESSING_AWAITINGMSG;
-        client.stop();
-    }
+    void close() override;
 };
 
 #else // ethernet buffering not needed
@@ -98,7 +86,7 @@ class EthernetInitialisation : public DeviceInitialisation {
 private:
 	EthernetServer *server;
 public:
-    EthernetInitialisation(EthernetServer* server) : server(server) {}
+    explicit EthernetInitialisation(EthernetServer* server) : server(server) {}
 
     bool attemptInitialisation() override;
 
@@ -115,7 +103,7 @@ public:
  */
 int fromWiFiRSSITo4StateIndicator(int strength);
 
-}
+}  // namespace tcremote
 
 using namespace tcremote;
 

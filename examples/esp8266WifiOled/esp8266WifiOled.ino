@@ -12,6 +12,7 @@
  * and window opener driven by it too.
  */
 
+#include <U8g2lib.h>
 #include <Wire.h>
 #include "esp8266WifiOled_menu.h"
 #include <IoAbstractionWire.h>
@@ -82,7 +83,7 @@ void onCommsChange(CommunicationInfo info) {
 //
 void setup() {
     Serial.begin(115200);
-    Serial.println("Starting NodeMCU example");
+    serdebugF("Starting NodeMCU example");
 
     Wire.begin();
     //Wire.setClock(400000);
@@ -91,24 +92,31 @@ void setup() {
     EEPROM.begin(512);
     eeprom = new ArduinoEEPROMAbstraction(&EEPROM);
 
+    serdebugF("EEPROM initialised");
+
     // now we enable authentication using EEPROM authentication. Where the EEPROM is
     // queried for authentication requests, and any additional pairs are stored there too.
     // first we initialise the authManager, then pass it to the class.
     // Always call BEFORE setupMenu()
     authManager.initialise(eeprom, 100);
-    remoteServer.setAuthenticator(&authManager);
+    menuMgr.setAuthenticator(&authManager);
 
     // Here we add two additional menus for managing the connectivity and authentication keys.
     // In the future, there will be an option to autogenerate these from the designer.
-    menuIpAddress.setNext(&menuAuthKeyMgr);
+/*    menuIpAddress.setNext(&menuAuthKeyMgr);
     menuRemoteMonitor.addConnector(remoteServer.getRemoteConnector(0));
     menuRemoteMonitor.registerCommsNotification(onCommsChange);
-    menuAuthKeyMgr.setLocalOnly(true);
+    menuAuthKeyMgr.setLocalOnly(true);*/
+
+    serdebugF("Remote setup completed");
 
     // because we are initialising wifi from the menu entries, we need to load the WiFi
     // specific eeprom values very early, so we just load the two items we need.
     loadMenuItem(eeprom, &menuSSID);
     loadMenuItem(eeprom, &menuPwd);
+
+    serdebugF3("Starting WiFi", menuSSID.getTextValue(), menuPwd.getTextValue());
+
 
     // this sketch assumes you've successfully connected to the Wifi before, does not
     // call begin.. You can initialise the wifi whichever way you wish here.

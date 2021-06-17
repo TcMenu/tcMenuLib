@@ -358,7 +358,7 @@ public:
     TimeFormattedMenuItem(RuntimeRenderingFn renderFn, uint16_t id, MultiEditWireType format, MenuItem* next = nullptr);
 
 
-	/** gets the IP address as four separate bytes */
+	/** gets the time as four separate bytes */
 	TimeStorage getTime() const { return data; }
     
     /** sets the time */

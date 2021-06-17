@@ -350,7 +350,11 @@ MenuManager::MenuManager() : navigator(), structureNotifier() {
 }
 
 void MenuManager::addMenuAfter(MenuItem *existing, MenuItem* toAdd, bool silent) {
-    toAdd->setNext(existing->getNext());
+    MenuItem* endOfAddedList = toAdd;
+    while(endOfAddedList->getNext() != nullptr) {
+        endOfAddedList = endOfAddedList->getNext();
+    }
+    endOfAddedList->setNext(existing->getNext());
     existing->setNext(toAdd);
     if(!silent) notifyStructureChanged();
 }

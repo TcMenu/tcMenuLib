@@ -24,51 +24,30 @@ bool EthernetTagValTransport::connected() {
 	return client && client.connected();
 }
 
-int EthernetTagValTransport::writeChar(char data) {
-    // only uncomment below for worst case debugging..
-//	serdebug2("writing ", data);
-    if(bufferPosition >= sizeof(bufferData)) {
-        flush();
-        // if the buffer isn't empty, something went wrong.
-        if(bufferPosition != 0) return 0;
-    }
-
-	
-    // and lastly add the byte
-    return bufferData[bufferPosition++] = data;
-}
-
-int EthernetTagValTransport::writeStr(const char* data) {
-    // only uncomment below for worst case debugging..
-//	serdebug2("writing ", data);
-    int len = strlen(data);
-	for(int i = 0; i < len; ++i) {
-        if(writeChar(data[i]) == 0) {
-            return 0;
-        }
-    }
-    return len;
-}
-
 void EthernetTagValTransport::flush() {
-	if(!client || bufferPosition == 0) return;
+	if(!client || writeBufferPos == 0) return;
 
-    if(client.write(bufferData, bufferPosition) == bufferPosition) {
-        serdebugF2("Buffer written ", bufferPosition);
-        bufferPosition = 0;
+    if((int)client.write(writeBuffer, writeBufferPos) == writeBufferPos) {
+        serdebugF2("Buffer written ", writeBufferPos);
+        writeBufferPos = 0;
+        client.flush();
     }
     else {
-        serdebugF2("Buffer write fail ", bufferPosition);
+        close();
     }
-    client.flush();
 }
 
-uint8_t EthernetTagValTransport::readByte() {
-	return client.read();
-}
-
-bool EthernetTagValTransport::readAvailable() {
-	return client && client.connected() && client.available();
+int EthernetTagValTransport::fillReadBuffer(uint8_t* dataBuffer, int maxData) {
+    if(client && client.connected() && client.available()) {
+        auto amt = client.read(dataBuffer, maxData);
+        if(amt <= 0) {
+            close();
+            return 0;
+        }
+        serdebugF2("read to buffer ", amt);
+        return amt;
+    }
+    return 0;
 }
 
 #else // unbuffed client for all fully implemented stacks
@@ -107,6 +86,14 @@ bool EthernetTagValTransport::readAvailable() {
 
 #endif
 
+void EthernetTagValTransport::close() {
+    serdebugF("socket close");
+    BaseBufferedRemoteTransport::close();
+    currentField.msgType = UNKNOWN_MSG_TYPE;
+    currentField.fieldType = FVAL_PROCESSING_AWAITINGMSG;
+    client.stop();
+}
+
 int fromWiFiRSSITo4StateIndicator(int strength) {
     int qualityIcon = 0;
     if(strength > -50) qualityIcon = 4;
@@ -116,14 +103,14 @@ int fromWiFiRSSITo4StateIndicator(int strength) {
     return qualityIcon;
 }
 
-bool tcremote::EthernetInitialisation::attemptInitialisation() {
+bool EthernetInitialisation::attemptInitialisation() {
     serdebugF("Initialising server ");
     this->server->begin();
     initialised = true;
     return initialised;
 }
 
-bool tcremote::EthernetInitialisation::attemptNewConnection(TagValueTransport *transport) {
+bool EthernetInitialisation::attemptNewConnection(TagValueTransport *transport) {
     EthernetClient client = server->available();
     if(client) {
         serdebugF("Client found");

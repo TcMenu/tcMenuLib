@@ -19,12 +19,9 @@ TcMenuRemoteServer remoteServer(applicationInfo);
 LiquidCrystal lcd(8, 9, 10, 11, 12, 13);
 LiquidCrystalRenderer renderer(lcd, 20, 4);
 EthernetInitialisation ethernetInitialisation(&server);
-EthernetServer server();
+EthernetServer server(3333);
 EthernetTagValTransport ethernetTransport;
 RemoteServerConnection ethernetConnection(ethernetTransport, ethernetInitialisation);
-EthernetServer server(3333);
-EthernetTagValTransport ethernetTransport2;
-RemoteServerConnection ethernetConnection2(ethernetTransport2, ethernetInitialisation);
 
 // Global Menu Item declarations
 
@@ -109,6 +106,5 @@ void setupMenu() {
     switches.initialise(io23017, true);
     menuMgr.initForEncoder(&renderer, &menuTime, 6, 7, 5);
     remoteServer.addConnection(&ethernetConnection);
-    remoteServer.addConnection(&ethernetConnection2);
 }
 

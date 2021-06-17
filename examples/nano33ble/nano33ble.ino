@@ -60,5 +60,3 @@ void CALLBACK_FUNCTION onPWMChanged(int id) {
     auto newPwm = menuAnalogReadingsOutputPWM.getCurrentValue() / 100.0F;
     analogDevice.setCurrentFloat(pwmOutputPin, newPwm);
 }
-
-

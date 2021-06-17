@@ -13,15 +13,14 @@
 #include "ThemeMonoInverse.h"
 
 // Global variable declarations
-
 const PROGMEM  ConnectorLocalInfo applicationInfo = { "ESP8266 Greenhouse", "01b9cb76-c108-4be3-a133-6159f8f1c9c1" };
-U8G2_SH1106_128X64_NONAME_F_SW_I2C gfx(U8G2_R0, 5, 4, 16);
+TcMenuRemoteServer remoteServer(applicationInfo);
+U8G2_SH1106_128X64_NONAME_F_HW_I2C gfx(U8G2_R0, 16, U8X8_PIN_NONE, U8X8_PIN_NONE);
 U8g2Drawable gfxDrawable(&gfx, &Wire);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 WiFiServer server(3333);
 
 // Global Menu Item declarations
-
 RENDERING_CALLBACK_NAME_INVOKE(fnIpAddressRtCall, ipAddressRenderFn, "IpAddress", -1, NO_CALLBACK)
 IpAddressMenuItem menuIpAddress(fnIpAddressRtCall, 10, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnPwdRtCall, textItemRenderFn, "Pwd", 23, NO_CALLBACK)
@@ -66,12 +65,10 @@ AnalogMenuItem menuCucumberTemp(&minfoCucumberTemp, 0, &menuElectricHeater);
 const PROGMEM AnalogMenuInfo minfoTomatoTemp = { "Tomato Temp", 1, 0xffff, 255, NO_CALLBACK, -20, 4, "C" };
 AnalogMenuItem menuTomatoTemp(&minfoTomatoTemp, 0, &menuCucumberTemp);
 
-// Set up code
-
 void setupMenu() {
     menuTomatoTemp.setReadOnly(true);
-    menuIpAddress.setReadOnly(true);
     menuCucumberTemp.setReadOnly(true);
+    menuIpAddress.setReadOnly(true);
     menuPwd.setLocalOnly(true);
     menuSSID.setLocalOnly(true);
     menuSecretEntry.setVisible(false);
@@ -80,7 +77,6 @@ void setupMenu() {
     renderer.setUpdatesPerSecond(10);
     switches.initialise(internalDigitalIo(), true);
     menuMgr.initForEncoder(&renderer, &menuTomatoTemp, 13, 12, 14);
-    remoteServer.begin(&server, &applicationInfo);
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
     renderer.setUseSliderForAnalog(false);
     installMonoInverseTitleTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(u8g2_font_sirclivethebold_tr, 1), true);
