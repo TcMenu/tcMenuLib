@@ -31,6 +31,10 @@ ActionMenuItem menuOvenPower(&minfoOvenPower, &menuOvenFull, false);
 AnalogMenuInfo minfoOvenTempInfo = { "Oven Temp", nextRandomId(), 0xffff, 255, NO_CALLBACK, 0, 1, "C" };
 AnalogMenuItem menuOvenTempItem(&minfoOvenTempInfo, 0, &menuOvenPower, false);
 
+//
+// these are used by the list rendering function further down, as the items to put into the list. The count constant is
+// also used to set up the initial list size during setup.
+//
 const char* listElements[] = {
         "Beans",
         "Tomatoes",
@@ -42,6 +46,9 @@ const char* listElements[] = {
 };
 const int numListItems = 7;
 
+//
+// Here we add some dynamic items at runtime to the oven menu.
+//
 void prepareOvenMenuAtRuntime() {
     // as we declared these two items as not in progmem (last menu item parameter is false), we can adjust these items at runtime.
     minfoOvenPower.maxValue = 300;
@@ -137,6 +144,9 @@ void CALLBACK_FUNCTION onDialogQuestion(int id) {
     });
 }
 
+//
+// Left to do..
+//
 void CALLBACK_FUNCTION onDialogController(int id) {
     withDialogIfAvailable([](MenuBasedDialog* dlg) {
 
