@@ -1,0 +1,351 @@
+{
+  "version": "1.00",
+  "projectName": "This example shows how to work with menu items in a dynamic way, eg creating content at runtime.",
+  "author": "dave",
+  "items": [
+    {
+      "parentId": 0,
+      "type": "boolItem",
+      "item": {
+        "naming": "ON_OFF",
+        "name": "Main Power",
+        "variableName": "MainPower",
+        "id": 1,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "Oven",
+        "variableName": "Oven",
+        "id": 2,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "Pizza Maker",
+        "variableName": "PizzaMaker",
+        "id": 3,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 3,
+      "type": "analogItem",
+      "item": {
+        "maxValue": 300,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "C",
+        "name": "Oven Temp",
+        "variableName": "PizzaMakerOvenTemp",
+        "id": 4,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 3,
+      "type": "scrollItem",
+      "item": {
+        "itemWidth": 10,
+        "eepromOffset": 0,
+        "numEntries": 6,
+        "choiceMode": "ARRAY_IN_RAM",
+        "variable": "pizzaToppings",
+        "name": "Topping 1",
+        "variableName": "PizzaMakerTopping1",
+        "id": 5,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 3,
+      "type": "scrollItem",
+      "item": {
+        "itemWidth": 10,
+        "eepromOffset": 0,
+        "numEntries": 6,
+        "choiceMode": "ARRAY_IN_RAM",
+        "variable": "pizzaToppings",
+        "name": "Topping 2",
+        "variableName": "PizzaMakerTopping2",
+        "id": 6,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 3,
+      "type": "scrollItem",
+      "item": {
+        "itemWidth": 10,
+        "eepromOffset": 0,
+        "numEntries": 6,
+        "choiceMode": "ARRAY_IN_RAM",
+        "variable": "pizzaToppings",
+        "name": "Topping 3",
+        "variableName": "PizzaMakerTopping3",
+        "id": 7,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 3,
+      "type": "actionMenu",
+      "item": {
+        "name": "Start Cooking",
+        "variableName": "PizzaMakerStartCooking",
+        "id": 8,
+        "eepromAddress": -1,
+        "functionName": "onStartCooking",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "Dialogs",
+        "variableName": "Dialogs",
+        "id": 9,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 9,
+      "type": "actionMenu",
+      "item": {
+        "name": "Question",
+        "variableName": "DialogsQuestion",
+        "id": 10,
+        "eepromAddress": -1,
+        "functionName": "onDialogQuestion",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 9,
+      "type": "actionMenu",
+      "item": {
+        "name": "Information",
+        "variableName": "DialogsInformation",
+        "id": 11,
+        "eepromAddress": -1,
+        "functionName": "onDialogInfo",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 9,
+      "type": "actionMenu",
+      "item": {
+        "name": "Controller",
+        "variableName": "DialogsController",
+        "id": 12,
+        "eepromAddress": -1,
+        "functionName": "onDialogController",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "runtimeList",
+      "item": {
+        "initialRows": 0,
+        "name": "List",
+        "variableName": "List",
+        "id": 13,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    }
+  ],
+  "codeOptions": {
+    "embeddedPlatform": "ARDUINO32",
+    "lastDisplayUuid": "4dcb12ec-13d8-4466-b8b6-bd575eae4612",
+    "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
+    "lastRemoteUuid": "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb",
+    "lastRemoteUuids": [
+      "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
+    ],
+    "lastThemeUuid": "03c6b25f-db63-402a-8447-a5ce1484c14d",
+    "applicationUUID": "5f22995e-8da2-49c4-9ec8-d055901003af",
+    "applicationName": "Dynamic Menus",
+    "lastProperties": [
+      {
+        "name": "DISPLAY_VARIABLE",
+        "latestValue": "gfx",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_TYPE",
+        "latestValue": "Adafruit_ST7735",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_WIDTH",
+        "latestValue": "160",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_HEIGHT",
+        "latestValue": "128",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_RESET_PIN",
+        "latestValue": "3",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CS_PIN",
+        "latestValue": "6",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_RS_PIN",
+        "latestValue": "7",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_DATA_PIN",
+        "latestValue": "-1",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CLOCK_PIN",
+        "latestValue": "-1",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_ROTATION",
+        "latestValue": "0",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "UPDATES_PER_SEC",
+        "latestValue": "5",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "PULLUP_LOGIC",
+        "latestValue": "true",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "INTERRUPT_SWITCHES",
+        "latestValue": "true",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SWITCH_IODEVICE",
+        "latestValue": "io8574",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_A",
+        "latestValue": "7",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_B",
+        "latestValue": "6",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_OK",
+        "latestValue": "5",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_BACK_PIN",
+        "latestValue": "-1",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_NEXT_PIN",
+        "latestValue": "-1",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_IS_QUARTER_CYCLE",
+        "latestValue": "false",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ITEM_FONT",
+        "latestValue": "def:,1",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_FONT",
+        "latestValue": "def:,1",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "BORDER_FOR_ACTIONS",
+        "latestValue": "0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_SHOW_MODE",
+        "latestValue": "TITLE_FIRST_ROW",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "USE_SLIDER_ANALOG",
+        "latestValue": "true",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "NEED_EDITING_ICONS",
+        "latestValue": "true",
+        "subsystem": "THEME"
+      }
+    ],
+    "namingRecursive": true,
+    "saveToSrc": false,
+    "useCppMain": false
+  }
+}
