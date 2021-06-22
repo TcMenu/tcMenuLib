@@ -90,6 +90,13 @@ namespace tcremote {
          */
         explicit TcMenuRemoteServer(const ConnectorLocalInfo& appInfo) : connections{}, appInfo(appInfo), remotesAdded(0) { }
 
+        /**
+         * Remove all current remotes
+         */
+        void clearRemotes() {
+            remotesAdded = 0;
+        }
+
         void exec() override;
 
         /**

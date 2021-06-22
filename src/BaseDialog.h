@@ -253,6 +253,16 @@ protected:
 };
 
 /**
+ * This is the render function that should be used with the LocalDialogButtonMenuItem
+ * @param item
+ * @param mode
+ * @param buffer
+ * @param bufferSize
+ * @return
+ */
+int dialogButtonRenderFn(RuntimeMenuItem* item, uint8_t /*row*/, RenderFnMode mode, char* buffer, int bufferSize);
+
+/**
  * This menu type is reserved only for use within dialogs, never use this button outside of that purpose. Button numbers
  * 0..15 are reserved and should never be used by application code. Use 15..255 in application code.
  */

@@ -145,11 +145,72 @@ void CALLBACK_FUNCTION onDialogQuestion(int id) {
 }
 
 //
-// Left to do..
+// In this case we create a controller based dialog that increments and decrements a number that is stored within
+// an Analog item. We add the analog item and also an extra button to the dialog.
 //
+
+class MyDialogController : public BaseDialogController {
+private:
+    // create an extra button (buttonNum = 2)
+    LocalDialogButtonMenuItem menuExtraButton = LocalDialogButtonMenuItem(dialogButtonRenderFn, nextRandomId(), 2, nullptr);
+
+    // create an extra analog item to add.
+    AnalogMenuInfo minfoAnalogController = { "Current", nextRandomId(), 0xffff, 100, NO_CALLBACK, 0, 1,"" };
+    AnalogMenuItem menuAnalogController = AnalogMenuItem(&minfoAnalogController, 0, nullptr, false);
+public:
+    void initialiseAndGetHeader(BaseDialog *dialog, char *buffer, size_t bufferSize) override {
+        // here we are responsible for setting the dialog title by copying the title text into the provided buffer,
+        // and we can also add any extra items that we need here too.
+        auto* menuDlg = reinterpret_cast<MenuBasedDialog*>(dialog);
+        strcpy(buffer, "My Title");
+        menuDlg->insertMenuItem(&menuAnalogController);
+        menuDlg->insertMenuItem(&menuExtraButton);
+    }
+
+    void dialogDismissed(ButtonType buttonType) override {
+        // once the dialog is dismissed this method is called when you can act on the result.
+        Serial.print("Dialog dismissed: ");
+        Serial.println(buttonType);
+    }
+
+    bool dialogButtonPressed(int buttonNum) override {
+        // when any dialog button is pressed, either of the two default ones, or any extra ones you add, then this
+        // controller is called. The default action of a dialog is to close when a button is pressed, however you
+        // can stop that here by returning false.
+
+        Serial.println("Button pressed: ");
+        Serial.println(buttonNum);
+
+        int currentVal = (int)menuAnalogController.getCurrentValue();
+        if(buttonNum == 1) currentVal++;
+        if(buttonNum == 2) currentVal--;
+        menuAnalogController.setCurrentValue(currentVal);
+
+        // we return true to allow processing (IE close dialog), false to stop the dialog closing.
+        return buttonNum == 0;
+    }
+
+    void copyCustomButtonText(int buttonNumber, char *buffer, size_t bufferSize) override {
+        // if either, the button number is not 0 or 1, or the button type is one of the custom values
+        // then this method is called to get the text.
+
+        // position 1 is going to be called up and 2 will be doown
+        if(buttonNumber == 1) {
+            strcpy(buffer, "Up");
+        }
+        else if(buttonNumber == 2) {
+            strcpy(buffer, "Down");
+        }
+    }
+};
+
+MyDialogController dialogController;
+
 void CALLBACK_FUNCTION onDialogController(int id) {
     withDialogIfAvailable([](MenuBasedDialog* dlg) {
-
+        dlg->setButtons(BTNTYPE_OK, BTNTYPE_CUSTOM0);
+        dlg->showController(true, &dialogController);
+        dlg->copyIntoBuffer("Press up/down");
     });
 }
 

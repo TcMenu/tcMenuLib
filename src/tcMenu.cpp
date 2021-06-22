@@ -10,6 +10,7 @@
 #include "MenuIterator.h"
 #include "SecuredMenuPopup.h"
 #include <IoAbstraction.h>
+#include <BaseDialog.h>
 
 MenuManager menuMgr;
 
@@ -416,6 +417,9 @@ void MenuManager::setItemsInCurrentMenu(int size, int offs) {
 }
 
 void MenuManager::resetMenu(bool completeReset) {
+    // we cannot reset the menu while a dialog is currently shown.
+    if(renderer->getDialog() && renderer->getDialog()->isInUse()) return;
+
     MenuItem* currentActive;
     if(completeReset) {
         navigator.setRootItem(navigator.getRoot());
