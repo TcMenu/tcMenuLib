@@ -19,7 +19,7 @@ void MenuManager::initForUpDownOk(MenuRenderer* renderer, MenuItem* root, pinid_
 
 	switches.addSwitch(pinOk, nullptr);
     switches.onRelease(pinOk, [](pinid_t /*key*/, bool held) { menuMgr.onMenuSelect(held); });
-	setupUpDownButtonEncoder(pinUp, pinDown, [](int value) {menuMgr.valueChanged(value); });
+	setupUpDownButtonEncoder(pinUp, pinDown, [](int value) -> bool { return menuMgr.valueChanged(value); });
 	renderer->initialise();
 }
 
@@ -29,7 +29,7 @@ void MenuManager::initForEncoder(MenuRenderer* renderer,  MenuItem* root, pinid_
 
 	switches.addSwitch(encoderButton, nullptr);
     switches.onRelease(encoderButton, [](pinid_t /*key*/, bool held) { menuMgr.onMenuSelect(held); });
-	setupRotaryEncoderWithInterrupt(encoderPinA, encoderPinB, [](int value) {menuMgr.valueChanged(value); }, HWACCEL_REGULAR, type);
+	setupRotaryEncoderWithInterrupt(encoderPinA, encoderPinB, [](int value) -> bool { return menuMgr.valueChanged(value); }, HWACCEL_REGULAR, type);
 
 	renderer->initialise();
 }
@@ -83,8 +83,8 @@ void MenuManager::initWithoutInput(MenuRenderer* renderer, MenuItem* root) {
  * Called when the rotary encoder value has changed, if we are editing this changes the value in the current editor, if we are
  * showing menu items, it changes the index of the active item (renderer will move into display if needed).
  */
-void MenuManager::valueChanged(int value) {
-	if (renderer->tryTakeSelectIfNeeded(value, RPRESS_NONE)) return;
+bool MenuManager::valueChanged(int value) {
+	if (renderer->tryTakeSelectIfNeeded(value, RPRESS_NONE)) return false;
 	MenuItem* currentEditor = getCurrentEditor();
 
 	if (currentEditor && isMenuBasedOnValueItem(currentEditor)) {
@@ -104,13 +104,20 @@ void MenuManager::valueChanged(int value) {
         currentActive->setActive(false);
         if(renderer->getRendererType() != RENDER_TYPE_NOLOCAL) {
             serdebugF2("activate item ", value);
+            MenuItem* temp = currentActive;
             currentActive = reinterpret_cast<BaseMenuRenderer*>(renderer)->getMenuItemAtIndex(getCurrentMenu(), value);
             if(currentActive) {
-                currentActive->setActive(true);
-                serdebugF3("Change active (V, ID) ", value, currentActive->getId());
+                if (currentActive->getMenuType() == MENUTYPE_TITLE_ITEM || (temp->getMenuType() == MENUTYPE_DIALOG_BUTTON && currentActive->getMenuType() != MENUTYPE_DIALOG_BUTTON)) {
+                    temp->setActive(true);
+                    return false;
+                } else {
+                    currentActive->setActive(true);
+                    serdebugF3("Change active (V, ID) ", value, currentActive->getId());
+                }
             }
         }
 	}
+    return true;
 }
 
 /**

@@ -170,8 +170,9 @@ public:
 	/** 
 	 * called when the rotary encoder has moved to a new position to update the menu
 	 * @param value the new changed value
+	 * @return true if focus to another position has been succesful
 	 */
-	void valueChanged(int value);
+	bool valueChanged(int value);
 
 	/**
 	 * Called when the OK button has been pressed
