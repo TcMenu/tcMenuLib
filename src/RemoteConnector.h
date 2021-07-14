@@ -109,15 +109,30 @@ class AuthenticationManager;
 class EditableLargeNumberMenuItem;
 
 /**
+ * The base type of transport that is in use, it can be either unbuffered, buffered, or simple encrypted. Encrypted
+ * tag val will become available during the 2.2 releases.
+ */
+enum TagValueTransportType {
+    /** an unbuffered connection that writes immediately to the transport. */
+    TVAL_UNBUFFERED,
+    /** a buffered connection that writes to a buffer, and requires a timed check for writing */
+    TVAL_BUFFERED,
+    /** a buffered and encrypted transport that requires a timed check */
+    TVAL_BUFFERED_DELEGATE_ENCRYPT
+};
+
+/**
  * The definition of a transport that can send and receive information remotely using the TagVal protocol.
  * Implementations include SerialTransport and EthernetTransport located in the remotes directory.
  */
 class TagValueTransport {
 protected:
 	FieldAndValue currentField;
+    TagValueTransportType transportType;
+    uint8_t protocolUsed;
 public:
-	TagValueTransport();
-	virtual ~TagValueTransport() {}
+	explicit TagValueTransport(TagValueTransportType type);
+	virtual ~TagValueTransport() = default;
 
 	void startMsg(uint16_t msgType);
 	void writeField(uint16_t field, const char* value);

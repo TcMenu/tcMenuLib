@@ -8,10 +8,15 @@ using namespace tcremote;
 
 class UnitTestBufferedTransport : public BaseBufferedRemoteTransport {
 private:
-    bool bufferComplete;
+    bool bufferComplete = false;
+    int sequence = 1;
 public:
     int fillReadBuffer(uint8_t *dataBuffer, int maxSize) override {
-        return 1;
+        int toFill = min(maxSize, 11);
+        for(int i=0; i<toFill; i++) {
+            dataBuffer[i] = sequence++;
+        }
+        return toFill;
     }
 
     void flush() override {

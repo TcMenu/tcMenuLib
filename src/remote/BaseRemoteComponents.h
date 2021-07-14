@@ -17,6 +17,8 @@
 
 namespace tcremote {
 
+    class BaseRemoteServerConnection;
+
     /**
      * The device initialiser is responsible for initially preparing the hardware communications device for use, and
      * then for creating new connections that can be used with a transport, you provide the transport to it, and the
@@ -28,7 +30,7 @@ namespace tcremote {
     public:
         bool isInitialised() const { return initialised; }
         virtual bool attemptInitialisation()=0;
-        virtual bool attemptNewConnection(TagValueTransport* transport)=0;
+        virtual bool attemptNewConnection(BaseRemoteServerConnection* remoteConnection)=0;
     };
 
     /**
@@ -43,7 +45,28 @@ namespace tcremote {
             return true;
         }
 
-        bool attemptNewConnection(TagValueTransport *transport) override { return true; }
+        bool attemptNewConnection(BaseRemoteServerConnection *transport) override { return true; }
+    };
+
+    enum RemoteServerType: uint8_t {
+        TAG_VAL_REMOTE_SERVER
+    };
+
+    class BaseRemoteServerConnection {
+    protected:
+        DeviceInitialisation &initialisation;
+        RemoteServerType remoteServerType;
+    public:
+        BaseRemoteServerConnection(DeviceInitialisation &initialisation, RemoteServerType remoteServerType)
+                : initialisation(initialisation), remoteServerType(remoteServerType) {}
+
+        RemoteServerType getRemoteServerType() { return remoteServerType; }
+
+        void runLoop();
+        virtual void init(int remoteNumber, const ConnectorLocalInfo& info) = 0;
+        virtual void tick() = 0;
+        virtual bool connected() = 0;
+        virtual void copyConnectionStatus(char *buffer, int bufferSize) = 0;
     };
 
     /**
@@ -51,14 +74,15 @@ namespace tcremote {
      * allows us to send and receive messages on that transport, connect to it, and determine if it is still connected.
      * It also allows us to establish new connections via the transport.
      */
-    class RemoteServerConnection {
+    class TagValueRemoteServerConnection : public BaseRemoteServerConnection {
     private:
         TagValueRemoteConnector remoteConnector;
         TagValueTransport &remoteTransport;
         CombinedMessageProcessor messageProcessor;
-        DeviceInitialisation &initialisation;
     public:
-        RemoteServerConnection(TagValueTransport &transport, DeviceInitialisation& initialisation);
+        TagValueRemoteServerConnection(TagValueTransport &transport, DeviceInitialisation& initialisation);
+
+        void init(int remoteNumber, const ConnectorLocalInfo& info) override;
 
         TagValueRemoteConnector *connector() { return &remoteConnector; }
 
@@ -66,10 +90,11 @@ namespace tcremote {
 
         CombinedMessageProcessor *messageProcessors() { return &messageProcessor; }
 
-        void tick();
-    };
+        void tick() override;
+        bool connected() override { return remoteTransport.connected(); }
 
-    typedef RemoteServerConnection* RemoteServerConnectionPtr;
+        void copyConnectionStatus(char *buffer, int bufferSize) override;
+    };
 
     /**
      * This is the component that allows us to manage as many connections as needed using a single instance, it
@@ -77,7 +102,7 @@ namespace tcremote {
      * for acquiring the transport or connector for a given item.
      */
     class TcMenuRemoteServer : public Executable {
-        RemoteServerConnectionPtr connections[ALLOWED_CONNECTIONS];
+        BaseRemoteServerConnection* connections[ALLOWED_CONNECTIONS];
         const ConnectorLocalInfo& appInfo;
         uint8_t remotesAdded;
     public:
@@ -105,7 +130,7 @@ namespace tcremote {
          * @param toAdd the connection to add
          * @return a remote number of 0xff if it fails.
          */
-        uint8_t addConnection(RemoteServerConnection *toAdd);
+        uint8_t addConnection(BaseRemoteServerConnection *toAdd);
 
         /**
          * @return the number of remote connections added.
@@ -118,8 +143,8 @@ namespace tcremote {
          * @return either a valid object or nullptr
          */
         TagValueRemoteConnector *getRemoteConnector(int num) {
-            if(num >= remotesAdded) return nullptr;
-            return connections[num]->connector();
+            if(num >= remotesAdded || connections[num]->getRemoteServerType() != TAG_VAL_REMOTE_SERVER) return nullptr;
+            return reinterpret_cast<TagValueRemoteServerConnection*>(connections[num])->connector();
         }
 
         /**
@@ -128,8 +153,19 @@ namespace tcremote {
          * @return either a valid object or nullptr
          */
         TagValueTransport *getTransport(int num) {
+            if(num >= remotesAdded || connections[num]->getRemoteServerType() != TAG_VAL_REMOTE_SERVER) return nullptr;
+            return reinterpret_cast<TagValueRemoteServerConnection*>(connections[num])->transport();
+        }
+
+        /**
+         * Gets the underlying remote connection for external processing, this will be device specific and you should
+         * check the type using `getRemoteServerType` before doing anything with the connection.
+         * @param num the remote number
+         * @return either a pointer to a remote server, or nullptr if there is no such connection.
+         */
+        BaseRemoteServerConnection* getRemoteServerConnection(int num) {
             if(num >= remotesAdded) return nullptr;
-            return connections[num]->transport();
+            return connections[num];
         }
     };
 }

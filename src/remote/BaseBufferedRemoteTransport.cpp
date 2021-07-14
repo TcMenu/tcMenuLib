@@ -8,8 +8,8 @@
 using namespace tcremote;
 
 BaseBufferedRemoteTransport::BaseBufferedRemoteTransport(BufferingMode bufferMode, int8_t readBufferSize, int writeBufferSize)
-        : writeBufferSize(writeBufferSize), writeBufferPos(0), readBufferSize(readBufferSize), readBufferPos(0),
-          readBufferAvail(0), mode(bufferMode) {
+        : TagValueTransport(TVAL_BUFFERED), writeBufferSize(writeBufferSize), writeBufferPos(0),
+          readBufferSize(readBufferSize), readBufferPos(0), readBufferAvail(0), mode(bufferMode) {
     readBuffer = new uint8_t[readBufferSize];
     writeBuffer = new uint8_t[writeBufferSize];
 }
@@ -45,8 +45,10 @@ bool BaseBufferedRemoteTransport::readAvailable() {
 
 int BaseBufferedRemoteTransport::writeChar(char data) {
     if(writeBufferPos >= writeBufferSize) {
-        flush(); // exceeded the buffer, must try to flush now.
-        if (writeBufferPos != 0) return 0;
+        // we've exceeded the buffer size so we must flush, and then ensure
+        // that flush actually did something and there is now capacity.
+        flush();
+        return  (writeBufferPos < writeBufferSize);
     }
     writeBuffer[writeBufferPos++] = data;
     return 1;
@@ -69,4 +71,6 @@ void BaseBufferedRemoteTransport::close() {
     writeBufferPos = 0;
     readBufferPos = 0;
     readBufferAvail = 0;
+    currentField.msgType = UNKNOWN_MSG_TYPE;
+    currentField.fieldType = FVAL_PROCESSING_AWAITINGMSG;
 }

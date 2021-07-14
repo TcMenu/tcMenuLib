@@ -161,6 +161,7 @@ public:
 	 * @return the global authentication manager that has been set for this menu application, or nullptr otherwise
 	 */
 	AuthenticationManager* getAuthenticator() {
+	    if(authenticationManager == nullptr) authenticationManager = new NoAuthenticationManager();
 	    return authenticationManager;
 	}
 

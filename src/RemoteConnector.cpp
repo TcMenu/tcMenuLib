@@ -57,9 +57,9 @@ void TagValueRemoteConnector::initialise(TagValueTransport* transport_, Combined
     this->transport = transport_;
     this->localInfoPgm = localInfoPgm_;
     this->remoteNo = remoteNo_;
-    
-    // we must always have a mode of authentication, if nothing has been set then create the NoAuthentication manager.
-    if(this->authManager == nullptr) authManager = new NoAuthenticationManager();
+
+    // we must always have a mode of authentication, if nothing has been set then get the one from menuMgr as a backup.
+    if(this->authManager == nullptr) authManager = menuMgr.getAuthenticator();
 }
 
 void TagValueRemoteConnector::setRemoteName(const char* name) {
@@ -618,11 +618,13 @@ void TagValueRemoteConnector::encodeChangeValue(MenuItem* theItem) {
 // Base transport capabilities
 //
 
-TagValueTransport::TagValueTransport() {
+TagValueTransport::TagValueTransport(TagValueTransportType tvType) {
 	this->currentField.field = UNKNOWN_FIELD_PART;
 	this->currentField.fieldType = FVAL_PROCESSING_AWAITINGMSG;
 	this->currentField.msgType = UNKNOWN_MSG_TYPE;
 	this->currentField.len = 0;
+	this->transportType = tvType;
+	this->protocolUsed = TAG_VAL_PROTOCOL;
 }
 
 void TagValueTransport::startMsg(uint16_t msgType) {
@@ -630,7 +632,7 @@ void TagValueTransport::startMsg(uint16_t msgType) {
 	writeChar(START_OF_MESSAGE);
 
 	// protocol byte
-	writeChar(TAG_VAL_PROTOCOL);
+	writeChar(protocolUsed);
 
     // message type high then low
 	writeChar(char(msgType >> 8));
@@ -758,7 +760,7 @@ FieldAndValue* TagValueTransport::fieldIfAvailable() {
 
 		case FVAL_PROCESSING_PROTOCOL: // we need to make sure the protocol is valid
 			if(readAvailable()) {
-                currentField.fieldType = (readByte() == TAG_VAL_PROTOCOL) ? FVAL_PROCESSING_MSGTYPE_HI : FVAL_ERROR_PROTO;
+                currentField.fieldType = (readByte() == protocolUsed) ? FVAL_PROCESSING_MSGTYPE_HI : FVAL_ERROR_PROTO;
             }
 			break;
 

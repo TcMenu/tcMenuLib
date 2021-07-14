@@ -118,7 +118,7 @@ test(testAuthMenuItem) {
 	auth.addAdditionalUUIDKey("uuid1", uuid1);
 	auth.addAdditionalUUIDKey("uuid2", uuid2);
 
-	EepromAuthenicationInfoMenuItem menuItem(2002, &auth, NULL);
+	EepromAuthenticationInfoMenuItem menuItem(2002, &auth, NULL);
 	RuntimeMenuItem *itm = menuItem.asParent();
 	char sz[20];
 	itm->copyNameToBuffer(sz, sizeof(sz));

@@ -7,24 +7,47 @@
 
 using namespace tcremote;
 
-tcremote::RemoteServerConnection::RemoteServerConnection(TagValueTransport &transport, DeviceInitialisation &initialisation)
-        : remoteConnector(0), remoteTransport(transport), messageProcessor(msgHandlers, MSG_HANDLERS_SIZE),
-          initialisation(initialisation) {
-}
-
-void RemoteServerConnection::tick() {
-    if (initialisation.isInitialised()) {
-        remoteConnector.tick();
-        if (!remoteTransport.connected()) {
-            initialisation.attemptNewConnection(transport());
-        }
+void BaseRemoteServerConnection::runLoop() {
+    if (!connected()) {
+        initialisation.attemptNewConnection(this);
     }
     else {
         initialisation.attemptInitialisation();
     }
 }
 
-uint8_t tcremote::TcMenuRemoteServer::addConnection(tcremote::RemoteServerConnection *toAdd) {
+TagValueRemoteServerConnection::TagValueRemoteServerConnection(TagValueTransport &transport, DeviceInitialisation &initialisation)
+        : BaseRemoteServerConnection(initialisation, TAG_VAL_REMOTE_SERVER), remoteConnector(0),
+          remoteTransport(transport), messageProcessor(msgHandlers, MSG_HANDLERS_SIZE) {
+}
+
+void TagValueRemoteServerConnection::tick() {
+    remoteConnector.tick();
+}
+
+void TagValueRemoteServerConnection::init(int remoteNumber, const ConnectorLocalInfo& info) {
+    // first we setup the remote number and initialise the connector
+    connector()->initialise(transport(), messageProcessors(), &info, remoteNumber);
+    connector()->setAuthManager(menuMgr.getAuthenticator());
+}
+
+void TagValueRemoteServerConnection::copyConnectionStatus(char *buffer, int bufferSize) {
+    strncpy(buffer, connector()->getRemoteName(), bufferSize);
+    buffer[bufferSize - 1] = 0; // make sure it's zero terminated
+    appendChar(buffer, ':', bufferSize);
+    char authStatus = connector()->isAuthenticated() ? 'A' : (connector()->isConnected() ? 'C' : 'D');
+    appendChar(buffer, authStatus, bufferSize);
+    appendChar(buffer, ':', bufferSize);
+    fastltoa(buffer, connector()->getRemoteMajorVer(), 2, NOT_PADDED, bufferSize);
+    appendChar(buffer, '.', bufferSize);
+    fastltoa(buffer, connector()->getRemoteMinorVer(), 2, NOT_PADDED, bufferSize);
+    if (strlen(buffer) < (unsigned int)bufferSize) {
+        appendChar(buffer, ':', bufferSize);
+        appendChar(buffer, connector()->getRemotePlatform() + '0', bufferSize);
+    }
+}
+
+uint8_t tcremote::TcMenuRemoteServer::addConnection(tcremote::BaseRemoteServerConnection *toAdd) {
     if(remotesAdded >= ALLOWED_CONNECTIONS) return 0xff;
 
     if(remotesAdded == 0) {
@@ -34,24 +57,16 @@ uint8_t tcremote::TcMenuRemoteServer::addConnection(tcremote::RemoteServerConnec
 
     serdebugF2("Adding connection #", remotesAdded);
 
-    // first we setup the remote number and initialise the connector
-    int remoteNo = remotesAdded;
-    toAdd->connector()->initialise(toAdd->transport(), toAdd->messageProcessors(), &appInfo, remoteNo);
-
-    // if there is an authenticator present, we add it to the connection
-    if (menuMgr.getAuthenticator()) {
-        toAdd->connector()->setAuthManager(menuMgr.getAuthenticator());
-    }
-
     // and then add it to our array.
-    connections[remotesAdded++] = toAdd;
+    connections[remotesAdded] = toAdd;
+    toAdd->init(remotesAdded, appInfo);
 
-    return remoteNo;
+    return remotesAdded++;
 }
 
 void TcMenuRemoteServer::exec() {
     for (int i = 0; i < remotesAdded; i++) {
-        connections[i]->tick();
+        connections[i]->runLoop();
         taskManager.yieldForMicros(0);
     }
 }
