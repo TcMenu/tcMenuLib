@@ -277,6 +277,7 @@ protected:
     bool isCustomDrawing;
 	DisplayTakeoverMode displayTakenMode;
     BaseDialog* dialog;
+    taskid_t taskId;
 
 	RenderPressMode renderFnPressType;
 	RendererCallbackFn renderCallback;
@@ -303,8 +304,17 @@ public:
 	 * @param updatesSec the number of updates.
 	 */
 	void setUpdatesPerSecond(int updatesSec) {
+        if(updatesSec == 0) updatesSec = TC_DISPLAY_UPDATES_PER_SECOND;
+
 	    updatesPerSecond = updatesSec;
         resetValInTicks = 30 * updatesSec;
+
+        // if task already created, update task schedule
+        TimerTask* task = taskManager.getTask(taskId);
+        if (task) {
+            int refreshInterval = 1000 / updatesPerSecond;
+            task->handleScheduling(refreshInterval, TIME_MILLIS, true);
+        } 
     }
 
     /** 

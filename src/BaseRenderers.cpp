@@ -56,7 +56,7 @@ void BaseMenuRenderer::initialise() {
     if(updatesPerSecond == 0) updatesPerSecond = TC_DISPLAY_UPDATES_PER_SECOND;
     int refreshInterval = 1000 / updatesPerSecond;
 
-	taskManager.scheduleFixedRate(refreshInterval, this);
+	taskId = taskManager.scheduleFixedRate(refreshInterval, this);
 	menuMgr.addChangeNotification(&menuMgrListener);
 }
 
