@@ -167,6 +167,36 @@
         "localOnly": false,
         "visible": true
       }
+    },
+    {
+      "parentId": 6,
+      "type": "scrollItem",
+      "item": {
+        "itemWidth": 11,
+        "eepromOffset": 122,
+        "numEntries": 4,
+        "choiceMode": "ARRAY_IN_EEPROM",
+        "name": "New Choice Item",
+        "variableName": "GridNewChoiceItem",
+        "id": 12,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 6,
+      "type": "customBuildItem",
+      "item": {
+        "menuType": "AUTHENTICATION",
+        "name": "Authenticator",
+        "id": 13,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
     }
   ],
   "codeOptions": {
@@ -304,6 +334,8 @@
     ],
     "namingRecursive": true,
     "saveToSrc": false,
-    "useCppMain": false
+    "useCppMain": false,
+    "eepromDefinition": "",
+    "authenticatorDefinition": ""
   }
 }

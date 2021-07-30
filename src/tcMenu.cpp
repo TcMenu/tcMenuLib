@@ -153,6 +153,8 @@ void MenuManager::actionOnSubMenu(MenuItem* nextSub) {
 void MenuManager::actionOnCurrentItem(MenuItem* toEdit) {
 	auto* baseRenderer = reinterpret_cast<BaseMenuRenderer*>(renderer);
 
+	if(!notifyEditStarting(toEdit)) return;
+
 	// if there's a new item specified in toEdit, it means we need to change
 	// the current editor (if it's possible to edit that value)
 	if (toEdit->getMenuType() == MENUTYPE_SUB_VALUE) {
@@ -275,7 +277,6 @@ void MenuManager::setupForEditing(MenuItem* item) {
 	MenuType ty = item->getMenuType();
 	if ((ty == MENUTYPE_ENUM_VALUE || ty == MENUTYPE_INT_VALUE)) {
 		// these are the only types we can edit with a rotary encoder & LCD.
-		if(!notifyEditStarting(item)) return;
 		currentEditor = item;
 		currentEditor->setEditing(true);
 		switches.changeEncoderPrecision(item->getMaximumValue(), reinterpret_cast<ValueMenuItem*>(currentEditor)->getCurrentValue());
@@ -283,19 +284,16 @@ void MenuManager::setupForEditing(MenuItem* item) {
 	}
 	else if (ty == MENUTYPE_BOOLEAN_VALUE) {
 		// we don't actually edit boolean items, just toggle them instead
-        if(!notifyEditStarting(item)) return;
         auto* boolItem = (BooleanMenuItem*)item;
 		boolItem->setBoolean(!boolItem->getBoolean());
 		notifyEditEnd(item);
 	}
 	else if (ty == MENUTYPE_SCROLLER_VALUE) {
-        if(!notifyEditStarting(item)) return;
         currentEditor = item;
         currentEditor->setEditing(true);
 	    switches.changeEncoderPrecision(item->getMaximumValue(), reinterpret_cast<ScrollChoiceMenuItem*>(item)->getCurrentValue());
 	}
 	else if (isMenuRuntimeMultiEdit(item)) {
-        if(!notifyEditStarting(item)) return;
         switches.getEncoder()->setUserIntention(CHANGE_VALUE);
         currentEditor = item;
         auto* editableItem = reinterpret_cast<EditableMultiPartMenuItem*>(item);

@@ -50,7 +50,7 @@ int remoteInfoRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, ch
 			safeProgCpy(buffer, NO_LINK_STR, bufferSize);
 		}
 		else {
-		    baseRemote->copyConnectionStatus(buffer, bufferSize)
+		    baseRemote->copyConnectionStatus(buffer, bufferSize);
 		}
 		return true;
 	}
@@ -98,7 +98,10 @@ void RemoteMenuItem::setRemoteServer(tcremote::TcMenuRemoteServer& server) {
 
 EepromAuthenticationInfoMenuItem::EepromAuthenticationInfoMenuItem(const char* pgmName, MenuCallbackFn onAuthChanged,
                                                                    uint16_t id, MenuItem * next)
-	: ListRuntimeMenuItem(id, 1, authenticationMenuItemRenderFn, next), pgmName(pgmName), onAuthChanged(onAuthChanged) {
+	: ListRuntimeMenuItem(id, 0, authenticationMenuItemRenderFn, next), pgmName(pgmName), onAuthChanged(onAuthChanged) {
+    if(menuMgr.getAuthenticator()->getAuthenticationManagerType() != AUTHENTICATION_IN_EEPROM) {
+        setNumberOfRows(reinterpret_cast<EepromAuthenticatorManager*>(menuMgr.getAuthenticator())->getNumberOfEntries());
+    }
 }
 
 EepromAuthenticatorManager *EepromAuthenticationInfoMenuItem::getAuthManager() {

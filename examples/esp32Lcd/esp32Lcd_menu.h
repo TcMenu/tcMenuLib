@@ -18,20 +18,20 @@
 #include <IoAbstractionWire.h>
 #include <RemoteConnector.h>
 #include "SerialTransport.h"
+#include <RemoteMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 #include <RuntimeMenuItem.h>
+#include <RemoteAuthentication.h>
 #include "tcMenuLiquidCrystal.h"
 
-void setupMenu();  // forward reference of the menu setup function.
-extern const PROGMEM ConnectorLocalInfo applicationInfo;  // contains app name and ID
-
-// Global variables that need exporting
-
+// variables we declare that you may need to access
+extern const PROGMEM ConnectorLocalInfo applicationInfo;
 extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
 
 // Global Menu Item exports
-
+extern EepromAuthenticationInfoMenuItem menuGridAuthenticator;
+extern ScrollChoiceMenuItem menuGridNewChoiceItem;
 extern ActionMenuItem menuGridDown;
 extern ActionMenuItem menuGridUp;
 extern BooleanMenuItem menuGridLED2;
@@ -45,8 +45,9 @@ extern BooleanMenuItem menuPeeled;
 extern EnumMenuItem menuFoods;
 extern AnalogMenuItem menuPercentage;
 
-// Provide a wrapper to get hold of the root menu item
+// Provide a wrapper to get hold of the root menu item and export setupMenu
 inline MenuItem& rootMenuItem() { return menuPercentage; }
+void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION

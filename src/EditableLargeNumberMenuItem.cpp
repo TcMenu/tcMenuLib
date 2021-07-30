@@ -74,7 +74,7 @@ float LargeFixedNumber::getAsFloat() {
 
 void LargeFixedNumber::setFromFloat(float value) {
     bool neg = value < 0.0f;
-    value = abs(value);
+    value = tcFltAbs(value);
     uint32_t val;
     uint32_t frc;
     if(fractionDp == 0) {
