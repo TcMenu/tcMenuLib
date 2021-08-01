@@ -23,24 +23,11 @@
 // a few forward references
 void addWidgetToTitleArea();
 
-// We are going to load and save using the inbuilt AVR EEPROM storage
-AvrEeprom eeprom;
-
-// we want to authenticate connections, the easiest and quickest way is to use the EEPROM
-// authenticator where pairing requests add a new item into the EEPROM. Any authentication
-// requests are then handled by looking in the EEPROM.
-EepromAuthenticatorManager authManager;
-
 // we are going to allow control of the menu over local area network
 // so therefore must configure ethernet..
 byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
 };
-
-// Here we create two additional menus, that will be added manually to handle the connectivity
-// status and authentication keys. In a future version these will be added to th desinger.
-RemoteMenuItem menuRemoteMonitor(1001, 2);
-EepromAuthenicationInfoMenuItem menuAuthKeyMgr(1002, &authManager, &menuRemoteMonitor);
 
 // used the the dialog further down, dialog headers are always from progmem / constant.
 const char warningPgm[] PROGMEM = "Warning!";
@@ -50,39 +37,20 @@ void setup() {
     while(!Serial);
     Serial.begin(115200);
 
-    // now we enable authentication using EEPROM authentication. Where the EEPROM is
-    // queried for authentication requests, and any additional pairs are stored there too.
-    // first we initialise the authManager, then pass it to the class.
-    // Always call BEFORE setupMenu()
-    authManager.initialise(&eeprom, 100);
-    remoteServer.setAuthenticator(&authManager);
-    menuMgr.setAuthenticator(&authManager);
-
     addWidgetToTitleArea();
     
-    // Here we add two additional menus for managing the connectivity and authentication keys.
-    // In the future, there will be an option to autogenerate these from the designer.
-    menuIP.setNext(&menuAuthKeyMgr);
-    menuRemoteMonitor.addConnector(remoteServer.getRemoteConnector(0));
-    menuRemoteMonitor.registerCommsNotification(onCommsChange);
-    menuAuthKeyMgr.setLocalOnly(true);
-
-    // here we load an item very early because we need to initialise it before the menu starts.
-    // be very careful not to use any menu infrastructure during the callback.
-    loadMenuItem(&eeprom, &menuIP, 0xd00d);
-
-    // spin up the Ethernet library, get the IP address from the menu
-    byte* rawIp = menuIP.getIpAddress();
-    IPAddress ip(rawIp[0], rawIp[1], rawIp[2], rawIp[3]);
-    Ethernet.begin(mac, ip);
-
     // initialise the menu
     setupMenu();
 
     // we can load the menu back from eeprom, the second parameter is an
     // optional override of the magic key. This key is saved out with the
     // menu, and the values are only loaded when the key matches.
-    menuMgr.load(eeprom, 0xd00d);
+    menuMgr.load(0xd00d);
+
+    // spin up the Ethernet library, get the IP address from the menu
+    byte* rawIp = menuIP.getIpAddress();
+    IPAddress ip(rawIp[0], rawIp[1], rawIp[2], rawIp[3]);
+    Ethernet.begin(mac, ip);
 
     // because we are using the simple adafruit configuration option, tcMenu will set up the display for us.
     // it's less configurable but supports most of the popular choices. You can tweak the settings after setupMenu().
@@ -119,7 +87,7 @@ void setup() {
 // https://www.thecoderscorner.com/electronics/microcontrollers/psu-control/detecting-power-loss-in-powersupply/ 
 //
 void CALLBACK_FUNCTION onPowerDownDetected(int) {
-    menuMgr.save(eeprom, 0xd00d);
+    menuMgr.save(0xd00d);
 }
 
 void loop() {
