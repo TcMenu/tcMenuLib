@@ -18,7 +18,7 @@ namespace tcremote {
      * to send single full messages at a time. Some other drivers can benefit from some level of buffering.
      * To avoid writing this code many times in different contexts it is available in this core package.
      */
-    class BaseBufferedRemoteTransport : public TagValueTransport {
+    class BaseBufferedRemoteTransport : public TagValueTransport, Executable {
     protected:
         const int writeBufferSize;
         uint8_t* readBuffer;
@@ -28,6 +28,7 @@ namespace tcremote {
         int8_t readBufferPos;
         int8_t readBufferAvail;
         BufferingMode mode;
+        taskid_t bufferWriteCheckTask;
     public:
         BaseBufferedRemoteTransport(BufferingMode bufferMode, int8_t readBufferSize, int writeBufferSize);
         ~BaseBufferedRemoteTransport() override;
@@ -41,6 +42,8 @@ namespace tcremote {
         void close() override;
 
         virtual int fillReadBuffer(uint8_t* dataBuffer, int maxSize)=0;
+
+        void exec() override;
     };
 
 }

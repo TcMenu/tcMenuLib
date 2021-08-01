@@ -140,6 +140,7 @@ public:
     void writeFieldLong(uint16_t field, long value);
 	FieldAndValue* fieldIfAvailable();
 	void clearFieldStatus(FieldValueType ty = FVAL_PROCESSING);
+	TagValueTransportType getTransportType() { return transportType; }
 
 	virtual void flush() = 0;
 	virtual int writeChar(char data) = 0;

@@ -22,7 +22,7 @@ AdafruitDrawable gfxDrawable(&gfx);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 EthernetServer server();
 EthernetInitialisation ethernetInitialisation(&server);
-EthernetTagValTransport ethernetTransport;
+EthernetTagValTransport ethernetTransport(TVAL_BUFFERED_DELEGATE_ENCRYPT);
 RemoteServerConnection ethernetConnection(ethernetTransport, ethernetInitialisation);
 SimhubConnector connector;
 

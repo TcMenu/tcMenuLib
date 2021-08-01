@@ -8,11 +8,13 @@
 using namespace tcremote;
 
 void BaseRemoteServerConnection::runLoop() {
-    if (!connected()) {
-        initialisation.attemptNewConnection(this);
-    }
-    else {
+    if(!initialisation.isInitialised()) {
         initialisation.attemptInitialisation();
+    }
+    else if (!connected()) {
+        initialisation.attemptNewConnection(this);
+    } else {
+        tick();
     }
 }
 
@@ -28,7 +30,6 @@ void TagValueRemoteServerConnection::tick() {
 void TagValueRemoteServerConnection::init(int remoteNumber, const ConnectorLocalInfo& info) {
     // first we setup the remote number and initialise the connector
     connector()->initialise(transport(), messageProcessors(), &info, remoteNumber);
-    connector()->setAuthManager(menuMgr.getAuthenticator());
 }
 
 void TagValueRemoteServerConnection::copyConnectionStatus(char *buffer, int bufferSize) {

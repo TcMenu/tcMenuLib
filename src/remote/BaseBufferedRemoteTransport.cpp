@@ -12,11 +12,22 @@ BaseBufferedRemoteTransport::BaseBufferedRemoteTransport(BufferingMode bufferMod
           readBufferSize(readBufferSize), readBufferPos(0), readBufferAvail(0), mode(bufferMode) {
     readBuffer = new uint8_t[readBufferSize];
     writeBuffer = new uint8_t[writeBufferSize];
+    if(bufferMode == BUFFER_MESSAGES_TILL_FULL) {
+        bufferWriteCheckTask = taskManager.scheduleFixedRate(200, this, TIME_MILLIS);
+    }
+    else {
+        bufferWriteCheckTask = TASKMGR_INVALIDID;
+    }
 }
 
 BaseBufferedRemoteTransport::~BaseBufferedRemoteTransport() {
     delete[] readBuffer;
     delete[] writeBuffer;
+    if(bufferWriteCheckTask != TASKMGR_INVALIDID) taskManager.cancelTask(bufferWriteCheckTask);
+}
+
+void BaseBufferedRemoteTransport::exec() {
+    if(writeBufferPos > 0) flush();
 }
 
 void BaseBufferedRemoteTransport::endMsg() {
@@ -29,17 +40,17 @@ uint8_t BaseBufferedRemoteTransport::readByte() {
     auto ch = readBuffer[readBufferPos];
     readBufferPos += 1;
     // only uncomment the below for debugging.
-    serdebugF2("readByte ", ch);
+    //serdebugF2("readByte ", ch);
     return ch;
 }
 
 bool BaseBufferedRemoteTransport::readAvailable() {
     if(readBufferAvail && readBufferPos < readBufferAvail) {
-        serdebugF("avl");
         return true;
     }
 
     readBufferAvail = (int8_t)fillReadBuffer(readBuffer, readBufferSize);
+    readBufferPos = 0;
     return readBufferPos < readBufferAvail;
 }
 
@@ -48,7 +59,7 @@ int BaseBufferedRemoteTransport::writeChar(char data) {
         // we've exceeded the buffer size so we must flush, and then ensure
         // that flush actually did something and there is now capacity.
         flush();
-        return  (writeBufferPos < writeBufferSize);
+        if(writeBufferPos >= writeBufferSize) return 0;// we did not write so return an error condition.
     }
     writeBuffer[writeBufferPos++] = data;
     return 1;
@@ -68,6 +79,7 @@ int BaseBufferedRemoteTransport::writeStr(const char *data) {
 }
 
 void BaseBufferedRemoteTransport::close() {
+    flush();
     writeBufferPos = 0;
     readBufferPos = 0;
     readBufferAvail = 0;

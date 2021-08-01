@@ -44,6 +44,13 @@ public:
 
     void renderLoop(unsigned int currentValue, RenderPressMode userClick) override {
 
+        // If the dialog is in use then we leave this loop immediately to give it priority.
+        // As of 2.1 onwards this behaviour is up to you, you can choose to have higher priority than dialogs.
+        if(renderer.getDialog() != nullptr && renderer.getDialog()->isInUse()) {
+            renderer.giveBackDisplay();
+            return;
+        }
+
         drawable->startDraw();
         drawable->setDrawColor(TFT_BLACK);
         drawable->drawCircle(Coord(oldX, oldY), 10, true);

@@ -241,6 +241,33 @@
       }
     },
     {
+      "parentId": 14,
+      "type": "customBuildItem",
+      "item": {
+        "name": "IoT Monitor",
+        "variableName": "IoTMonitor",
+        "id": 27,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": true,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 14,
+      "type": "customBuildItem",
+      "item": {
+        "menuType": "AUTHENTICATION",
+        "name": "Authenticator",
+        "variableName": "Authenticator",
+        "id": 28,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": true,
+        "visible": true
+      }
+    },
+    {
       "parentId": 0,
       "type": "subMenu",
       "item": {
@@ -452,8 +479,23 @@
         "subsystem": "REMOTE"
       },
       {
-        "name": "LISTEN_PORT",
+        "name": "NUM_CONCURRENT_ETH",
+        "latestValue": "1",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "LISTEN_PORT1",
         "latestValue": "3333",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "LISTEN_PORT2",
+        "latestValue": "3334",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "LISTEN_PORT3",
+        "latestValue": "3335",
         "subsystem": "REMOTE"
       },
       {
@@ -489,6 +531,8 @@
     ],
     "namingRecursive": false,
     "saveToSrc": false,
-    "useCppMain": false
+    "useCppMain": false,
+    "eepromDefinition": "at24:80:PAGESIZE_AT24C128",
+    "authenticatorDefinition": "rom:100:6"
   }
 }

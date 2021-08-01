@@ -39,7 +39,7 @@ HalStm32EepromAbstraction eeprom;
 EepromAuthenticatorManager eepromAuth;
 
 RemoteMenuItem menuRemoteStatusList(nextRandomId(), 2);
-EepromAuthenicationInfoMenuItem menuAuthenticatedUserList(nextRandomId(), &eepromAuth, &menuRemoteStatusList);
+EepromAuthenticationInfoMenuItem menuAuthenticatedUserList(nextRandomId(), &eepromAuth, &menuRemoteStatusList);
 
 ScreenSaverCustomDrawing screenSaver;
 

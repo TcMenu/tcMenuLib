@@ -373,6 +373,9 @@
     "lastDisplayUuid": "e6342680-6fab-4d1b-ac08-ce8dbfc0974c",
     "lastInputUuid": "183448ac-a717-4b2b-823d-ffc7c8140ab9",
     "lastRemoteUuid": "46c30011-cac6-4598-a7b8-b0630d55daab",
+    "lastRemoteUuids": [
+      "46c30011-cac6-4598-a7b8-b0630d55daab"
+    ],
     "lastThemeUuid": "850dc0a3-f534-47c2-94d8-1e64ff368a54",
     "applicationUUID": "4656c798-10c6-4110-8e03-b9c51ed8fffb",
     "applicationName": "ESP Amplifier",
@@ -460,6 +463,8 @@
     ],
     "namingRecursive": true,
     "saveToSrc": false,
-    "useCppMain": true
+    "useCppMain": true,
+    "eepromDefinition": "eeprom:",
+    "authenticatorDefinition": "rom:200:6"
   }
 }

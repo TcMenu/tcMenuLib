@@ -25,28 +25,11 @@ byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
 };
 
-// we want to customise the colours and menu spacing. So we create this config object too
-// which we initialise during the setup method.
-AdaColorGfxMenuConfig colorConfig;
-
-// We also store/restore state from an i2c EEPROM chip
-I2cAt24Eeprom eeprom(0x50, PAGESIZE_AT24C128);
-
-// we want to authenticate connections, the easiest and quickest way is to use the EEPROM
-// authenticator where pairing requests add a new item into the EEPROM. Any authentication
-// requests are then handled by looking in the EEPROM.
-EepromAuthenticatorManager authManager;
-
 // then we setup the IO expander that the also set up in the designer for input.
 IoAbstractionRef io8574 = ioFrom8574(0x20, 0); // on addr 0x20 and interrupt pin 0
 
 // and we create an analog device with enhanced range because we are using a 32bit board.
 ArduinoAnalogDevice analogDevice(12, 10);
-
-// Here we create two additional menus, that will be added manually to handle the connectivity
-// status and authentication keys. In a future version these will be added to th designer.
-RemoteMenuItem menuRemoteMonitor(1001, 2);
-EepromAuthenicationInfoMenuItem menuAuthKeyMgr(1002, &authManager, &menuRemoteMonitor);
 
 // We add a title widget that shows when a user is connected to the device. Connection icons
 // are in the standard icon set we included at the top.
@@ -63,7 +46,8 @@ HardwareRotaryEncoder *secondEncoder;
 const int ledPin = 1;
 // End 2nd Encoder
 
-// when there's a change in communication status (client connects for example) this gets called.
+// when there's a change in communication status (connection or disconnection for example) this gets called.
+// see further down in the code where we add this to the remote IoT monitor.
 void onCommsChange(CommunicationInfo info) {
     if(info.remoteNo == 0) {
         connectedWidget.setCurrentState(info.connected ? 1 : 0);
@@ -75,22 +59,11 @@ void onCommsChange(CommunicationInfo info) {
 void setup() {
     // we used an i2c device (io8574) so must initialise wire too
     Wire.begin();
-    // We should set the eeprom that menu manager will use as early as possible
-    menuMgr.setEepromRef(&eeprom);
+    Serial.begin(115200);
 
-    // now we enable authentication using EEPROM authentication. Where the EEPROM is
-    // queried for authentication requests, and any additional pairs are stored there too.
-    // first we initialise the authManager, then pass it to the class.
-    // Always call BEFORE setupMenu()
-    authManager.initialise(&eeprom, 100);
-    remoteServer.setAuthenticator(&authManager);
-
-    // Here we add two additional menus for managing the connectivity and authentication keys.
-    // In the future, there will be an option to autogenerate these from the designer.
-    menuIpAddress.setNext(&menuAuthKeyMgr);
-    menuRemoteMonitor.addConnector(remoteServer.getRemoteConnector(0));
-    menuRemoteMonitor.registerCommsNotification(onCommsChange);
-    menuAuthKeyMgr.setLocalOnly(true);
+    // Often the easiest way to add a comms listener, is to add it to an IoT monitor menu item as we show
+    // here, as it aggregates all the connection information together.
+    menuIoTMonitor.registerCommsNotification(onCommsChange);
 
     // and set up the dac on the 32 bit board.
     analogDevice.initPin(A0, DIR_OUT);
