@@ -30,20 +30,6 @@ IoAbstractionRef io23017 = ioFrom23017(0x20, ACTIVE_LOW_OPEN, 2);
 // a counter that we use in the display function when we take over the display.
 int counter = 0;
 
-// if you don't have an i2c rom uncomment the avr variant and remove the i2c one.
-// AvrEeprom eeprom; 
-I2cAt24Eeprom eeprom(0x50, PAGESIZE_AT24C128); // page size 64 for AT24-128 model
-
-// we want to authenticate connections, the easiest and quickest way is to use the EEPROM
-// authenticator where pairing requests add a new item into the EEPROM. Any authentication
-// requests are then handled by looking in the EEPROM.
-EepromAuthenticatorManager authManager;
-
-// Here we create two additional menus, that will be added manually to handle the connectivity
-// status and authentication keys. In a future version these will be added to th desinger.
-RemoteMenuItem menuRemoteMonitor(1001, 2);
-EepromAuthenicationInfoMenuItem menuAuthKeyMgr(1002, &authManager, &menuRemoteMonitor);
-
 // We add a title widget that shows when a user is connected to the device. Connection icons
 // are in the standard icon set we included at the top.
 // Yes even on LCD we now support title widgets, but they eat up a few of your custom chars.
@@ -80,46 +66,26 @@ void setup() {
 
     serdebug("Added the reset callback");
 
-    // now we enable authentication using EEPROM authentication. Where the EEPROM is
-    // queried for authentication requests, and any additional pairs are stored there too.
-    // first we initialise the authManager, then pass it to the class.
-    // Always call BEFORE setupMenu()
-    authManager.initialise(&eeprom, 100);
-    remoteServer.setAuthenticator(&authManager);
-	menuMgr.setAuthenticator(&authManager);
-
-    // Here we add two additional menus for managing the connectivity and authentication keys.
-    // In the future, there will be an option to autogenerate these from the designer.
-    menuConnectivityIPAddress.setNext(&menuAuthKeyMgr);
-    menuRemoteMonitor.addConnector(remoteServer.getRemoteConnector(0));
-    menuRemoteMonitor.registerCommsNotification(onCommsChange);
-    menuAuthKeyMgr.setLocalOnly(true);
-
-    // here we need to access the ip address before the menu is fully initialised, so we just load the item
-    // be careful not to use any infrastructure of the menu in its callback
-    if(!loadMenuItem(&eeprom, &menuConnectivityIPAddress)) {
-        menuConnectivityIPAddress.setIpAddress(192, 168, 0, 200);
-    }
-
-    // spin up the Ethernet library, get the IP address from the menu
-    byte* rawIp = menuConnectivityIPAddress.getIpAddress();
-    IPAddress ip(rawIp[0], rawIp[1], rawIp[2], rawIp[3]);
-    Ethernet.begin(mac, ip);
-
     // Here we add a widget to the display, it will display connected status.
     renderer.setFirstWidget(&connectedWidget);
 
     // this is put in by the menu designer and must be called (always ensure devices are setup first).
     setupMenu();
 
-    menuMgr.load(eeprom);
+    menuMgr.load();
+
+    // spin up the Ethernet library, get the IP address from the menu
+    byte* rawIp = menuConnectivityIPAddress.getIpAddress();
+    IPAddress ip(rawIp[0], rawIp[1], rawIp[2], rawIp[3]);
+    Ethernet.begin(mac, ip);
 
     // and print out the IP address
     char sz[20];
     menuConnectivityIPAddress.copyValue(sz, sizeof(sz));
     serdebugF2("Device IP is: ", sz);
 
-	authManager.copyPinToBuffer(sz, sizeof(sz));
+    auto* authMgr = reinterpret_cast<EepromAuthenticatorManager*>(menuMgr.getAuthenticator());
+    authMgr->copyPinToBuffer(sz, sizeof(sz));
 	menuConnectivityChangePin.setTextValue(sz);
 	menuConnectivityChangePin.setPasswordField(true);
 
@@ -266,7 +232,7 @@ void CALLBACK_FUNCTION onQuestionDlg(int /*id*/) {
 // https://www.thecoderscorner.com/electronics/microcontrollers/psu-control/detecting-power-loss-in-powersupply/
 //
 void CALLBACK_FUNCTION onSaveSettings(int /*id*/) {
-    menuMgr.save(eeprom);
+    menuMgr.save();
 }
 
 const char pgmPinTooShort[] PROGMEM = "Pin too short";
@@ -279,7 +245,8 @@ void CALLBACK_FUNCTION onChangePin(int id) {
 		dlg->show(pgmPinTooShort, false);
 	}
 	else {
-		authManager.changePin(sz);
+	    auto* authMgr = reinterpret_cast<EepromAuthenticatorManager*>(menuMgr.getAuthenticator());
+		authMgr->changePin(sz);
 		serdebugF2("Pin changed to ", sz);
 	}
 }

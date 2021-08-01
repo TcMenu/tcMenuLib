@@ -25,13 +25,13 @@ bool EthernetTagValTransport::connected() {
 }
 
 void EthernetTagValTransport::flush() {
-	if(!client || writeBufferPos == 0) return;
+    if(!client || writeBufferPos == 0) return;
 
     if((int)client.write(writeBuffer, writeBufferPos) == writeBufferPos) {
         serdebugF2("Buffer written ", writeBufferPos);
         writeBufferPos = 0;
-        client.flush();
-    }
+    client.flush();
+}
     else {
         close();
     }
@@ -50,7 +50,13 @@ int EthernetTagValTransport::fillReadBuffer(uint8_t* dataBuffer, int maxData) {
     return 0;
 }
 
-#else // unbuffed client for all fully implemented stacks
+void EthernetTagValTransport::close() {
+    serdebugF("socket close");
+    BaseBufferedRemoteTransport::close();
+    client.stop();
+}
+
+#else // unbuffed client - requires library to support Nagle algorythm.
 
 bool EthernetTagValTransport::available() {
 	return client && client.connected();
@@ -84,17 +90,17 @@ bool EthernetTagValTransport::readAvailable() {
 	return client && client.connected() && client.available();
 }
 
-#endif
-
 void EthernetTagValTransport::close() {
     serdebugF("socket close");
-    BaseBufferedRemoteTransport::close();
+    client.stop();
     currentField.msgType = UNKNOWN_MSG_TYPE;
     currentField.fieldType = FVAL_PROCESSING_AWAITINGMSG;
-    client.stop();
 }
 
-int fromWiFiRSSITo4StateIndicator(int strength) {
+#endif
+
+
+int tcremote::fromWiFiRSSITo4StateIndicator(int strength) {
     int qualityIcon = 0;
     if(strength > -50) qualityIcon = 4;
     else if(strength > -60) qualityIcon = 3;
@@ -110,11 +116,12 @@ bool EthernetInitialisation::attemptInitialisation() {
     return initialised;
 }
 
-bool EthernetInitialisation::attemptNewConnection(TagValueTransport *transport) {
-    EthernetClient client = server->available();
+bool EthernetInitialisation::attemptNewConnection(BaseRemoteServerConnection *remoteServerConnection) {
+    auto client = server->available();
     if(client) {
         serdebugF("Client found");
-        reinterpret_cast<EthernetTagValTransport*>(transport)->setClient(client);
+        auto* tvCon = reinterpret_cast<TagValueRemoteServerConnection*>(remoteServerConnection);
+        reinterpret_cast<EthernetTagValTransport*>(tvCon->transport())->setClient(client);
         return true;
     }
     return false;

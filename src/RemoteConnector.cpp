@@ -57,6 +57,7 @@ void TagValueRemoteConnector::initialise(TagValueTransport* transport_, Combined
     this->transport = transport_;
     this->localInfoPgm = localInfoPgm_;
     this->remoteNo = remoteNo_;
+    this->remotePredicate.setRemoteNo(remoteNo_);
 
     // we must always have a mode of authentication, if nothing has been set then get the one from menuMgr as a backup.
     if(this->authManager == nullptr) authManager = menuMgr.getAuthenticator();

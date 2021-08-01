@@ -11,8 +11,8 @@
  * make sure to rename it first.
  */
 
-#ifndef _TCMENU_ETHERNETTRANSPORT_H_
-#define _TCMENU_ETHERNETTRANSPORT_H_
+#ifndef TCMENU_ETHERNETTRANSPORT_H_
+#define TCMENU_ETHERNETTRANSPORT_H_
 
 #include <RemoteConnector.h>
 #include <TaskManager.h>
@@ -35,20 +35,20 @@ namespace tcremote {
 /**
  * An implementation of TagValueTransport that is able to read and write via a buffer to sockets.
  */
-class EthernetTagValTransport : public tcremote::BaseBufferedRemoteTransport {
-private:
-	EthernetClient client;
-public:
-    EthernetTagValTransport() : BaseBufferedRemoteTransport(BUFFER_MESSAGES_TILL_FULL, ETHERNET_BUFFER_SIZE, MAX_VALUE_LEN) { }
-    ~EthernetTagValTransport() override = default;
-	void setClient(EthernetClient cl) { this->client = cl; }
+    class EthernetTagValTransport : public tcremote::BaseBufferedRemoteTransport {
+    private:
+        EthernetClient client;
+    public:
+        EthernetTagValTransport() : BaseBufferedRemoteTransport(BUFFER_MESSAGES_TILL_FULL, ETHERNET_BUFFER_SIZE, MAX_VALUE_LEN) { }
+        ~EthernetTagValTransport() override = default;
+        void setClient(EthernetClient cl) { this->client = cl; }
 
-	int fillReadBuffer(uint8_t* data, int maxSize) override;
-	void flush() override;
-	bool available() override;
-	bool connected() override;
-    void close() override;
-};
+        int fillReadBuffer(uint8_t* data, int maxSize) override;
+        void flush() override;
+        bool available() override;
+        bool connected() override;
+        void close() override;
+    };
 
 #else // ethernet buffering not needed
 
@@ -59,22 +59,18 @@ class EthernetTagValTransport : public TagValueTransport {
 private:
 	EthernetClient client;
 public:
-	EthernetTagValTransport();
-	virtual ~EthernetTagValTransport();
+	EthernetTagValTransport() : TagValueTransport(TagValueTransportType::TVAL_UNBUFFERED) {};
+	~EthernetTagValTransport() override = default;
 	void setClient(EthernetClient client) { this->client = client; }
 
-	virtual int writeChar(char data);
-	virtual int writeStr(const char* data);
-	virtual void flush();
-	virtual bool available();
-	virtual bool connected();
-	virtual uint8_t readByte();
-	virtual bool readAvailable();
-    void close() override {
-        currentField.msgType = UNKNOWN_MSG_TYPE;
-        currentField.fieldType = FVAL_PROCESSING_AWAITINGMSG;
-        client.stop();
-    }
+	int writeChar(char data) override ;
+	int writeStr(const char* data) override;
+	void flush() override;
+	bool available() override;
+	bool connected() override;
+	uint8_t readByte() override;
+	bool readAvailable() override;
+    void close() override;
 };
 
 #endif // ethernet buffering check
@@ -90,7 +86,7 @@ public:
 
     bool attemptInitialisation() override;
 
-    bool attemptNewConnection(TagValueTransport *transport) override;
+    bool attemptNewConnection(BaseRemoteServerConnection *transport) override;
 };
 
 /**
@@ -103,8 +99,10 @@ public:
  */
 int fromWiFiRSSITo4StateIndicator(int strength);
 
-}  // namespace tcremote
+} // namespace tcremote
 
+#ifndef TC_MANUAL_NAMESPACING
 using namespace tcremote;
+#endif // TC_MANUAL_NAMESPACING
 
-#endif /* _TCMENU_ETHERNETTRANSPORT_H_ */
+#endif /* TCMENU_ETHERNETTRANSPORT_H_ */
