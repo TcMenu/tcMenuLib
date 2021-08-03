@@ -28,7 +28,8 @@ void MBedEthernetTransport::flush() {
         if(written == NSAPI_ERROR_WOULD_BLOCK) continue;
         if(written <=0) {
             serdebugF2("socket error ", written);
-            close();
+            socket->close();
+            socket = nullptr;
             return;
         }
         if(written < sizeToGo) {
