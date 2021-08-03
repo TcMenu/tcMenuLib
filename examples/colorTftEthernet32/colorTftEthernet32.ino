@@ -200,7 +200,7 @@ void CALLBACK_FUNCTION onSaveItem(int /*id*/) {
     auto itemNo = menuRomLocation.getCurrentValue();
     auto itemSize = menuRomChoice.getItemWidth();
     auto position = menuRomChoice.getEepromStart() + (itemNo * itemSize);
-    eeprom.writeArrayToRom(position, (const uint8_t*)menuRomText.getTextValue(), 10);
+    menuMgr.getEepromAbstraction()->writeArrayToRom(position, (const uint8_t*)menuRomText.getTextValue(), 10);
 
     if(renderer.getDialog()->isInUse()) return;
     renderer.getDialog()->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
@@ -212,7 +212,7 @@ void CALLBACK_FUNCTION onRomLocationChange(int /*id*/) {
     auto itemNo = menuRomLocation.getCurrentValue();
     char sz[12];
     auto itemSize = menuRomChoice.getItemWidth();
-    eeprom.readIntoMemArray((uint8_t*)sz, menuRomChoice.getEepromStart() + (itemNo * itemSize), 10);
+    menuMgr.getEepromAbstraction()->readIntoMemArray((uint8_t*)sz, menuRomChoice.getEepromStart() + (itemNo * itemSize), 10);
     menuRomText.setTextValue(sz);
     serdebugF2("Rom data was ", sz)
 }

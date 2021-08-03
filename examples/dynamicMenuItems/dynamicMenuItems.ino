@@ -32,6 +32,49 @@ AnalogMenuInfo minfoOvenTempInfo = { "Oven Temp", nextRandomId(), 0xffff, 255, N
 AnalogMenuItem menuOvenTempItem(&minfoOvenTempInfo, 0, &menuOvenPower, false);
 
 //
+// Here's a few examples of how you can capture the state of various actions taking place in the menu manager, such as
+// actionable menu items being activated, editing starting and ending on editable items, and changes in tree structure.
+// We create an instance of this class and then register it with menuMgr further down.
+//
+class MyMenuManagerObserver : public MenuManagerObserver {
+private:
+    bool allowDialogBack = false;
+public:
+    void setAllowDialogBackAction(bool allow) {
+        allowDialogBack = allow;
+    }
+
+    void structureHasChanged() override {
+        serdebugF("Structure of menu tree has changed, IE item added or removed!");
+    }
+
+    bool menuEditStarting(MenuItem *item) override {
+        serdebugF2("Item about to be actioned/editing", item->getId());
+
+        if(item->getId() == menuList.getId() && menuMgr.getCurrentMenu() == item) {
+            // If we get here, list is on display, check if the back item is presented.
+            auto* list = reinterpret_cast<ListRuntimeMenuItem*>(item);
+            serdebugF2("List item press on ", list->getActiveIndex());
+            return list->getActiveIndex() != 0;
+        }
+
+        auto backMenuId = reinterpret_cast<MenuBasedDialog*>(renderer.getDialog())->getBackMenuItemId();
+
+        if(item->getId() == backMenuId || item->getId() == menuDialogsBlockedBool.getId() ||
+                item->getId() == menuDialogsBlockedSub.getId() || item->getId() == menuDialogsBlockedAction.getId()) {
+            // Here we block certain actions for the back menu item of the dialog, or a few chosen menu items that
+            // we want to control using allowDialogBack variable.
+            return allowDialogBack;
+        }
+        return true; // otherwise, default to allowing all actions.
+    }
+
+    void menuEditEnded(MenuItem *item) override {
+        serdebugF2("Edit has completed for ID ", item->getId());
+    }
+} myMgrObserver;
+
+//
 // these are used by the list rendering function further down, as the items to put into the list. The count constant is
 // also used to set up the initial list size during setup.
 //
@@ -61,6 +104,7 @@ void setup() {
     Serial.begin(115200);
     Wire.begin();
     setupMenu();
+    menuMgr.addChangeNotification(&myMgrObserver);
     prepareOvenMenuAtRuntime();
     menuList.setNumberOfRows(numListItems);
 }
@@ -221,6 +265,8 @@ int CALLBACK_FUNCTION fnListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnM
    switch(mode) {
     case RENDERFN_INVOKE:
         Serial.print("Selected "); Serial.println(row);
+        // do something with the selected item.
+        menuMgr.resetMenu(false);
         return true;
     case RENDERFN_NAME:
         if(row > 253) {
@@ -246,4 +292,8 @@ int CALLBACK_FUNCTION fnListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnM
     case RENDERFN_EEPROM_POS: return 0xffff; // lists are generally not saved to EEPROM
     default: return false;
     }
+}
+
+void CALLBACK_FUNCTION onDialogBack(int id) {
+    myMgrObserver.setAllowDialogBackAction(menuDialogsDialogBack.getBoolean());
 }

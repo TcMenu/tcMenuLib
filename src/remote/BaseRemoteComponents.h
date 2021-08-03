@@ -62,6 +62,7 @@ namespace tcremote {
 
         RemoteServerType getRemoteServerType() { return remoteServerType; }
 
+        DeviceInitialisation& getDeviceInitialisation() const { return initialisation; }
         void runLoop();
         virtual void init(int remoteNumber, const ConnectorLocalInfo& info) = 0;
         virtual void tick() = 0;

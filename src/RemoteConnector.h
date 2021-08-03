@@ -23,9 +23,12 @@
 #define TAG_VAL_PROTOCOL 0x01
 #define START_OF_MESSAGE 0x01
 #define TICK_INTERVAL 1
-#define HEARTBEAT_INTERVAL 1500
-// when debugging you can increase the heartbeat time to reduce disconnects (below gives 90 seconds)
-//#define HEARTBEAT_INTERVAL 30000
+
+// when debugging to reduce disconnects set the following (give 1 minute timeout): -DHEARTBEAT_INTERVAL=20000
+#ifndef HEARTBEAT_INTERVAL
+# define HEARTBEAT_INTERVAL 1500
+#endif
+
 #define HEARTBEAT_INTERVAL_TICKS (HEARTBEAT_INTERVAL / TICK_INTERVAL)
 #define PAIRING_TIMEOUT_TICKS (15000 / TICK_INTERVAL)
 

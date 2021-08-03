@@ -223,6 +223,34 @@
       }
     },
     {
+      "parentId": 13,
+      "type": "customBuildItem",
+      "item": {
+        "menuType": "REMOTE_IOT_MONITOR",
+        "name": "IoT Monitor",
+        "variableName": "IoTMonitor",
+        "id": 18,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": true,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 13,
+      "type": "customBuildItem",
+      "item": {
+        "menuType": "AUTHENTICATION",
+        "name": "Authenticator",
+        "variableName": "Authenticator",
+        "id": 19,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": true,
+        "visible": true
+      }
+    },
+    {
       "parentId": 0,
       "type": "analogItem",
       "item": {
@@ -258,50 +286,13 @@
     "lastDisplayUuid": "8a15d500-410f-489d-b3dc-540b05e630ed",
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
     "lastRemoteUuid": "27e7a502-330e-4570-9f8e-bd26ac88051f",
+    "lastRemoteUuids": [
+      "27e7a502-330e-4570-9f8e-bd26ac88051f"
+    ],
     "lastThemeUuid": "0dd60ceb-7e0f-46e2-8d40-b264eb3aa7e0",
     "applicationUUID": "f5325e26-a7f6-40ff-876e-47afa06df532",
     "applicationName": "Demo mbed",
     "lastProperties": [
-      {
-        "name": "PULLUP_LOGIC",
-        "latestValue": "true",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "INTERRUPT_SWITCHES",
-        "latestValue": "false",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "SWITCH_IODEVICE",
-        "latestValue": "",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "ENCODER_PIN_A",
-        "latestValue": "PE_2",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "ENCODER_PIN_B",
-        "latestValue": "PE_5",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "ENCODER_PIN_OK",
-        "latestValue": "PE_4",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "ENCODER_BACK_PIN",
-        "latestValue": "-1",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "ENCODER_NEXT_PIN",
-        "latestValue": "-1",
-        "subsystem": "INPUT"
-      },
       {
         "name": "SERIAL_BUS",
         "latestValue": "spi",
@@ -358,8 +349,68 @@
         "subsystem": "DISPLAY"
       },
       {
-        "name": "LISTEN_PORT",
+        "name": "PULLUP_LOGIC",
+        "latestValue": "true",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "INTERRUPT_SWITCHES",
+        "latestValue": "false",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SWITCH_IODEVICE",
+        "latestValue": "",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_A",
+        "latestValue": "PE_2",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_B",
+        "latestValue": "PE_5",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_OK",
+        "latestValue": "PE_4",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_BACK_PIN",
+        "latestValue": "-1",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_NEXT_PIN",
+        "latestValue": "-1",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_IS_QUARTER_CYCLE",
+        "latestValue": "false",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "MBED_NUM_CONCURRENT_ETH",
+        "latestValue": "1",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "MBED_LISTEN_PORT1",
         "latestValue": "3333",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "MBED_LISTEN_PORT2",
+        "latestValue": "3334",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "MBED_LISTEN_PORT3",
+        "latestValue": "3335",
         "subsystem": "REMOTE"
       },
       {
@@ -390,6 +441,8 @@
     ],
     "namingRecursive": false,
     "saveToSrc": false,
-    "useCppMain": true
+    "useCppMain": true,
+    "eepromDefinition": "bsp:0",
+    "authenticatorDefinition": "rom:100:6"
   }
 }

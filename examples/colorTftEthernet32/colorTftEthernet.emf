@@ -244,9 +244,10 @@
       "parentId": 14,
       "type": "customBuildItem",
       "item": {
-        "name": "IoT Monitor",
-        "variableName": "IoTMonitor",
-        "id": 27,
+        "menuType": "AUTHENTICATION",
+        "name": "Authenticator",
+        "variableName": "Authenticator",
+        "id": 28,
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": true,
@@ -257,13 +258,12 @@
       "parentId": 14,
       "type": "customBuildItem",
       "item": {
-        "menuType": "AUTHENTICATION",
-        "name": "Authenticator",
-        "variableName": "Authenticator",
-        "id": 28,
+        "menuType": "REMOTE_IOT_MONITOR",
+        "name": "IoT Monitor",
+        "id": 29,
         "eepromAddress": -1,
         "readOnly": false,
-        "localOnly": true,
+        "localOnly": false,
         "visible": true
       }
     },
@@ -474,27 +474,27 @@
         "subsystem": "INPUT"
       },
       {
-        "name": "LIBRARY_TYPE",
-        "latestValue": "ETHERNET_2",
-        "subsystem": "REMOTE"
-      },
-      {
-        "name": "NUM_CONCURRENT_ETH",
+        "name": "ETH_CONCURRENT_CONNECTIONS",
         "latestValue": "1",
         "subsystem": "REMOTE"
       },
       {
-        "name": "LISTEN_PORT1",
+        "name": "ETH_LIBRARY_TYPE",
+        "latestValue": "ETHERNET_2",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "ETH_LISTEN_PORT1",
         "latestValue": "3333",
         "subsystem": "REMOTE"
       },
       {
-        "name": "LISTEN_PORT2",
+        "name": "ETH_LISTEN_PORT2",
         "latestValue": "3334",
         "subsystem": "REMOTE"
       },
       {
-        "name": "LISTEN_PORT3",
+        "name": "ETH_LISTEN_PORT3",
         "latestValue": "3335",
         "subsystem": "REMOTE"
       },

@@ -7,6 +7,7 @@
 #define TCMENU_BASEBUFFEREDREMOTETRANSPORT_H
 
 #include <RemoteConnector.h>
+#define TICKS_TO_FLUSH_WRITE 140
 
 namespace tcremote {
 
@@ -18,7 +19,7 @@ namespace tcremote {
      * to send single full messages at a time. Some other drivers can benefit from some level of buffering.
      * To avoid writing this code many times in different contexts it is available in this core package.
      */
-    class BaseBufferedRemoteTransport : public TagValueTransport, Executable {
+    class BaseBufferedRemoteTransport : public TagValueTransport {
     protected:
         const int writeBufferSize;
         uint8_t* readBuffer;
@@ -29,6 +30,7 @@ namespace tcremote {
         int8_t readBufferAvail;
         BufferingMode mode;
         taskid_t bufferWriteCheckTask;
+        uint8_t ticksSinceWrite;
     public:
         BaseBufferedRemoteTransport(BufferingMode bufferMode, int8_t readBufferSize, int writeBufferSize);
         ~BaseBufferedRemoteTransport() override;
@@ -40,10 +42,9 @@ namespace tcremote {
         uint8_t readByte() override;
         bool readAvailable() override;
         void close() override;
+        void flushIfRequired();
 
         virtual int fillReadBuffer(uint8_t* dataBuffer, int maxSize)=0;
-
-        void exec() override;
     };
 
 }

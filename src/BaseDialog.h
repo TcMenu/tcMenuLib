@@ -305,6 +305,8 @@ public:
     MenuBasedDialog();
     ~MenuBasedDialog() override = default;
 
+    uint16_t getBackMenuItemId() { return backItem.getId(); }
+
     void internalSetVisible(bool visible) override;
     void copyIntoBuffer(const char *sz) override;
 

@@ -187,6 +187,62 @@
       }
     },
     {
+      "parentId": 9,
+      "type": "boolItem",
+      "item": {
+        "naming": "ON_OFF",
+        "name": "Allow Observer",
+        "variableName": "DialogsDialogBack",
+        "id": 14,
+        "eepromAddress": -1,
+        "functionName": "onDialogBack",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 9,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "Blocked Sub",
+        "variableName": "DialogsBlockedSub",
+        "id": 15,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 9,
+      "type": "actionMenu",
+      "item": {
+        "name": "Blocked Action",
+        "variableName": "DialogsBlockedAction",
+        "id": 17,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 9,
+      "type": "boolItem",
+      "item": {
+        "naming": "TRUE_FALSE",
+        "name": "Blocked Bool",
+        "variableName": "DialogsBlockedBool",
+        "id": 18,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
       "parentId": 0,
       "type": "runtimeList",
       "item": {
@@ -195,6 +251,7 @@
         "variableName": "List",
         "id": 13,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true
@@ -346,6 +403,8 @@
     ],
     "namingRecursive": true,
     "saveToSrc": false,
-    "useCppMain": false
+    "useCppMain": false,
+    "eepromDefinition": "",
+    "authenticatorDefinition": ""
   }
 }

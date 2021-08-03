@@ -9,17 +9,7 @@
  * make sure to rename it first.
  */
 
-
 #include "MBedEthernetTransport.h"
-
-using namespace tcremote;
-
-MBedEthernetTransport::MBedEthernetTransport() : writeBuf{}, readBuf{} {
-    readPos = lastReadAmt = writePos = 0;
-    this->socket = NULL;
-    isOpen = false;
-    taskManager.scheduleFixedRate(WRITE_DELAY, this, TIME_MILLIS);
-}
 
 MBedEthernetTransport::~MBedEthernetTransport() {
     if(socket) {
@@ -28,79 +18,62 @@ MBedEthernetTransport::~MBedEthernetTransport() {
 }
 
 void MBedEthernetTransport::flush() {
-    if(writePos == 0 || socket == nullptr) return;
+    if(writeBufferPos == 0 || socket == nullptr) return;
 
-    int written = socket->send(writeBuf, writePos);
-    if(written == NSAPI_ERROR_WOULD_BLOCK) return;
-    if(written > 0) {
-        int left = writePos - written;
-        if(left > 0) {
-            memmove(writeBuf, &writeBuf[written], left);
-            writePos = left;
+    int attempts = 0;
+    int pos = 0;
+    int sizeToGo = writeBufferPos;
+    while(++attempts < 50) {
+        int written = socket->send(&writeBuffer[pos], sizeToGo);
+        if(written == NSAPI_ERROR_WOULD_BLOCK) continue;
+        if(written <=0) {
+            serdebugF2("socket error ", written);
+            close();
+            return;
         }
-        else writePos = 0;
-    }
-    else {
-        close();
-    }
-}
-
-int MBedEthernetTransport::writeChar(char data) {
-    if(writePos >= sizeof(writeBuf)) {
-        flush();
-    }
-    if(writePos < sizeof(writeBuf)) {
-        writeBuf[writePos] = data;
-        writePos++;
-        return 1;
-    }
-    else return 0;
-}
-
-int MBedEthernetTransport::writeStr(const char *data) {
-    int len = strlen(data);
-    for(int i=0; i<len; i++) {
-        if(writeChar(data[i]) == 0) return 0;
-    }
-    return len;
-}
-
-uint8_t MBedEthernetTransport::readByte() {
-    return (readAvailable()) ? readBuf[readPos++] : -1;
-}
-
-bool MBedEthernetTransport::readAvailable() {
-    if(socket == nullptr) return false;
-
-    if(readPos >= lastReadAmt) {
-        int amt = socket->recv(readBuf, sizeof(readBuf));
-        if(amt == NSAPI_ERROR_WOULD_BLOCK) return false;
-        if(amt > 0) {
-            readPos = 0;
-            lastReadAmt = amt;
-            return true;
+        if(written < sizeToGo) {
+            serdebugF2("Written chunk ", written);
+            pos += written;
+            sizeToGo -= written;
         }
         else {
-            close();
-            lastReadAmt =0;
-            readPos = 0;
-            return false;
+            serdebugF2("Written all ", written);
+            writeBufferPos = 0;
+            return;
         }
-    } else return true;
+        taskManager.yieldForMicros(250);
+    }
+}
+
+int MBedEthernetTransport::fillReadBuffer(uint8_t* dataBuffer, int maxData) {
+    if(!connected()) return 0;
+
+    int attempts = 0;
+    while(++attempts < 50) {
+        auto amt = socket->recv(dataBuffer, maxData);
+        if(amt == NSAPI_ERROR_WOULD_BLOCK) continue;
+        if(amt <= 0) {
+            serdebugF2("socket error ", amt);
+            close();
+            return 0;
+        }
+
+        serdebugF2("read to buffer ", amt);
+        return amt;
+    }
+    return 0;
 }
 
 bool MBedEthernetTransport::available() {
-    if(socket == nullptr) return false;
+    return (socket == nullptr && isOpen);
 
-    if(readPos >= sizeof(writeBuf)) {
-        flush();
-    }
-    return (readPos < sizeof(writeBuf));
 }
 
 void MBedEthernetTransport::close() {
     if(socket == nullptr) return;
     serdebugF("closing socket");
+
+    BaseBufferedRemoteTransport::close();
 
     isOpen = false;
     socket->close();
@@ -108,48 +81,50 @@ void MBedEthernetTransport::close() {
     socket = nullptr;
 }
 
-void MBedEthernetTransport::endMsg() {
-    TagValueTransport::endMsg();
-    flush();
+MbedEthernetInitialiser::MbedEthernetInitialiser(int port, NetworkInterface* networkInterface) : interface(networkInterface), port(port) {
+    if(interface == nullptr) interface = NetworkInterface::get_default_instance();
+    initState = TRY_CONNECT;
+    interface->set_blocking(false);
+    server.set_blocking(false);
 }
 
-bool MbedEthernetInitialisation::attemptInitialisation() {
-    initialised = false;
-    switch(initState) {
-        case NOT_STARTED:
-            if(defNetwork == NULL) {
-                serdebugF("No network interface found, not initialising network");
-                initState = NW_FAILED;
-                return false;
-            }
-            defNetwork->set_blocking(false);
-            initState = (defNetwork->connect() != NSAPI_ERROR_IS_CONNECTED) ? NOT_STARTED : NW_STARTED;
-            break;
-        case NW_STARTED:
-            server.set_blocking(false);
-            initState = (server.open(defNetwork) != 0) ? NW_STARTED : SOCKET_OPEN;
-            break;
-        case SOCKET_OPEN:
-            initState = (server.bind(listenPort) != 0 || server.listen(1) != 0) ? SOCKET_OPEN : SOCKET_BOUND;
-            break;
-        case SOCKET_BOUND:
-            initialised = true;
-            break;
-        default:
-            initialised = false;
-            break;
+bool MbedEthernetInitialiser::attemptInitialisation() {
+    if(initState == TRY_CONNECT) {
+        if(interface->connect() != NSAPI_ERROR_IS_CONNECTED) {
+            return false;
+        }
+        initState = TRY_BIND;
     }
-    return initialised;
+
+    if(initState == TRY_BIND) {
+        serdebugF("Connected to network");
+        if(server.open(interface) != 0) {
+            serdebugF("Could not open socket");
+            return false;
+        }
+        if(server.bind(port) != 0 || server.listen(1) != 0) {
+            serdebugF2("Could not bind to ", port);
+            return false;
+        }
+        initState = FULLY_CONNECTED;
+        initialised = true;
+        return true;
+    }
+    return false;
 }
 
-bool MbedEthernetInitialisation::attemptNewConnection(TagValueTransport *transport) {
+bool MbedEthernetInitialiser::attemptNewConnection(BaseRemoteServerConnection *remoteConnection) {
+    auto* tvRemote = reinterpret_cast<TagValueRemoteServerConnection*>(remoteConnection);
+    auto* mbedTransport = reinterpret_cast<MBedEthernetTransport*>(tvRemote->transport());
     nsapi_error_t acceptErr;
     auto tcpSock = server.accept(&acceptErr);
     if(acceptErr == NSAPI_ERROR_OK) {
         serdebugF("Client found");
-        transport.setSocket(tcpSock);
+        mbedTransport->setSocket(tcpSock);
+        return true;
     }
     else if(acceptErr != NSAPI_ERROR_WOULD_BLOCK) {
         serdebugF2("Error code ", acceptErr);
     }
+    return false;
 }

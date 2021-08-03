@@ -4,6 +4,7 @@
  */
 
 #include "BaseRemoteComponents.h"
+#include "BaseBufferedRemoteTransport.h"
 
 using namespace tcremote;
 
@@ -25,6 +26,11 @@ TagValueRemoteServerConnection::TagValueRemoteServerConnection(TagValueTransport
 
 void TagValueRemoteServerConnection::tick() {
     remoteConnector.tick();
+
+    // if this is a buffered transport, we must give it chance to flush the buffer from time to time.
+    if(remoteTransport.getTransportType() == TVAL_BUFFERED) {
+        reinterpret_cast<BaseBufferedRemoteTransport&>(remoteTransport).flushIfRequired();
+    }
 }
 
 void TagValueRemoteServerConnection::init(int remoteNumber, const ConnectorLocalInfo& info) {

@@ -12,22 +12,13 @@ BaseBufferedRemoteTransport::BaseBufferedRemoteTransport(BufferingMode bufferMod
           readBufferSize(readBufferSize), readBufferPos(0), readBufferAvail(0), mode(bufferMode) {
     readBuffer = new uint8_t[readBufferSize];
     writeBuffer = new uint8_t[writeBufferSize];
-    if(bufferMode == BUFFER_MESSAGES_TILL_FULL) {
-        bufferWriteCheckTask = taskManager.scheduleFixedRate(200, this, TIME_MILLIS);
-    }
-    else {
-        bufferWriteCheckTask = TASKMGR_INVALIDID;
-    }
+    ticksSinceWrite = 0;
 }
 
 BaseBufferedRemoteTransport::~BaseBufferedRemoteTransport() {
     delete[] readBuffer;
     delete[] writeBuffer;
     if(bufferWriteCheckTask != TASKMGR_INVALIDID) taskManager.cancelTask(bufferWriteCheckTask);
-}
-
-void BaseBufferedRemoteTransport::exec() {
-    if(writeBufferPos > 0) flush();
 }
 
 void BaseBufferedRemoteTransport::endMsg() {
@@ -62,6 +53,7 @@ int BaseBufferedRemoteTransport::writeChar(char data) {
         if(writeBufferPos >= writeBufferSize) return 0;// we did not write so return an error condition.
     }
     writeBuffer[writeBufferPos++] = data;
+    ticksSinceWrite = 0;
     return 1;
 }
 
@@ -76,6 +68,16 @@ int BaseBufferedRemoteTransport::writeStr(const char *data) {
         }
     }
     return (int)len;
+}
+
+void BaseBufferedRemoteTransport::flushIfRequired() {
+    if(!connected() || writeBufferPos == 0 || mode == BUFFER_ONE_MESSAGE) return;
+
+    if(ticksSinceWrite < TICKS_TO_FLUSH_WRITE) ++ticksSinceWrite;
+    if(ticksSinceWrite == TICKS_TO_FLUSH_WRITE) {
+        ticksSinceWrite = 0xff;
+        flush();
+    }
 }
 
 void BaseBufferedRemoteTransport::close() {

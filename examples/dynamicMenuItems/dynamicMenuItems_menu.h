@@ -26,6 +26,11 @@ extern IoAbstractionRef io8574;
 
 // Global Menu Item exports
 extern ListRuntimeMenuItem menuList;
+extern BooleanMenuItem menuDialogsBlockedBool;
+extern ActionMenuItem menuDialogsBlockedAction;
+extern BackMenuItem menuBackDialogsBlockedSub;
+extern SubMenuItem menuDialogsBlockedSub;
+extern BooleanMenuItem menuDialogsDialogBack;
 extern ActionMenuItem menuDialogsController;
 extern ActionMenuItem menuDialogsInformation;
 extern ActionMenuItem menuDialogsQuestion;
@@ -50,6 +55,7 @@ void setupMenu();
 #define CALLBACK_FUNCTION
 
 int fnListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
+void CALLBACK_FUNCTION onDialogBack(int id);
 void CALLBACK_FUNCTION onDialogController(int id);
 void CALLBACK_FUNCTION onDialogInfo(int id);
 void CALLBACK_FUNCTION onDialogQuestion(int id);

@@ -26,7 +26,7 @@ void addWidgetToTitleArea();
 // we are going to allow control of the menu over local area network
 // so therefore must configure ethernet..
 byte mac[] = {
-  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
+  0xDE, 0xAD, 0xBE, 0xEF, 0xF0, 0x0D
 };
 
 // used the the dialog further down, dialog headers are always from progmem / constant.
