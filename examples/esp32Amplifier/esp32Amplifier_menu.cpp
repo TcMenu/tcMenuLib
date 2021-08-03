@@ -11,7 +11,6 @@
 #include <tcMenu.h>
 #include "esp32Amplifier_menu.h"
 #include "ThemeCoolBlueModern.h"
-#include "EthernetTransport.h"
 
 // Global variable declarations
 const PROGMEM  ConnectorLocalInfo applicationInfo = { "ESP Amplifier", "4656c798-10c6-4110-8e03-b9c51ed8fffb" };
@@ -23,14 +22,22 @@ TfteSpiDrawable tftDrawable(&tft, 45);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &tftDrawable);
 iotouch::ResistiveTouchInterrogator touchInterrogator(2, 33, 32, 0);
 MenuTouchScreenManager touchScreen(&touchInterrogator, &renderer, iotouch::TouchInterrogator::LANDSCAPE);
-WiFiServer server3333(3333);
-EthernetInitialisation ethernetInitialisation3333(&server3333);
-EthernetTagValTransport ethernetTransport3333;
-TagValueRemoteServerConnection ethernetConnection3333(ethernetTransport3333, ethernetInitialisation3333);
+WiFiServer server(3333);
+EthernetInitialisation ethernetInitialisation(&server);
+EthernetTagValTransport ethernetTransport;
+TagValueRemoteServerConnection ethernetConnection(ethernetTransport, ethernetInitialisation);
+WiFiServer server2(3334);
+EthernetInitialisation ethernetInitialisation2(&server2);
+EthernetTagValTransport ethernetTransport2;
+TagValueRemoteServerConnection ethernetConnection2(ethernetTransport2, ethernetInitialisation2);
 
 // Global Menu Item declarations
+const PROGMEM char pgmStrConnectivityAuthenticatorText[] = { "Authenticator" };
+EepromAuthenticationInfoMenuItem menuConnectivityAuthenticator(pgmStrConnectivityAuthenticatorText, NO_CALLBACK, 27, NULL);
+const PROGMEM char pgmStrConnectivityIoTMonitorText[] = { "IoT Monitor" };
+RemoteMenuItem menuConnectivityIoTMonitor(pgmStrConnectivityIoTMonitorText, 26, &menuConnectivityAuthenticator);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityPasscodeRtCall, textItemRenderFn, "Passcode", 37, NO_CALLBACK)
-TextMenuItem menuConnectivityPasscode(fnConnectivityPasscodeRtCall, 19, 20, NULL);
+TextMenuItem menuConnectivityPasscode(fnConnectivityPasscodeRtCall, 19, 20, &menuConnectivityIoTMonitor);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivitySSIDRtCall, textItemRenderFn, "SSID", 17, NO_CALLBACK)
 TextMenuItem menuConnectivitySSID(fnConnectivitySSIDRtCall, 18, 20, &menuConnectivityPasscode);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityIPAddressRtCall, ipAddressRenderFn, "IP address", -1, NO_CALLBACK)
@@ -103,9 +110,13 @@ void setupMenu() {
     renderer.setUpdatesPerSecond(10);
     touchScreen.start();
     menuMgr.initWithoutInput(&renderer, &menuVolume);
-    remoteServer.addConnection(&ethernetConnection3333);
+    remoteServer.addConnection(&ethernetConnection);
+    remoteServer.addConnection(&ethernetConnection2);
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_ALWAYS);
     renderer.setUseSliderForAnalog(true);
     installCoolBlueModernTheme(renderer, MenuFontDef(nullptr, 4), MenuFontDef(nullptr, 4), false);
+
+    // We have an IoT monitor, register the server
+    menuConnectivityIoTMonitor.setRemoteServer(remoteServer);
 }
 

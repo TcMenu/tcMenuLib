@@ -16,8 +16,11 @@
 #include "tcMenuU8g2.h"
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
+#include <RemoteMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
+#include <ArduinoEEPROMAbstraction.h>
+#include <RemoteAuthentication.h>
 
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
@@ -25,8 +28,11 @@ extern TcMenuRemoteServer remoteServer;
 extern U8G2_SH1106_128X64_NONAME_F_HW_I2C gfx;
 extern GraphicsDeviceRenderer renderer;
 extern WiFiServer server;
+extern EthernetInitialisation ethernetInitialisation;
 
 // Global Menu Item exports
+extern EepromAuthenticationInfoMenuItem menuAuthenticator;
+extern RemoteMenuItem menuIoTMonitor;
 extern IpAddressMenuItem menuIpAddress;
 extern TextMenuItem menuPwd;
 extern TextMenuItem menuSSID;

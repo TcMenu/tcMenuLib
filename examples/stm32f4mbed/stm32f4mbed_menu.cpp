@@ -98,7 +98,7 @@ void setupMenu() {
     remoteServer.addConnection(&ethernetConnection);
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_ALWAYS);
     renderer.setUseSliderForAnalog(false);
-    //installMonoInverseTitleTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(nullptr, 1), true);
+    installMonoInverseTitleTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(nullptr, 1), true);
 
     // We have an IoT monitor, register the server
     menuIoTMonitor.setRemoteServer(remoteServer);

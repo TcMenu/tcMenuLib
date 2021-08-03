@@ -17,18 +17,11 @@ using namespace tcremote;
 #if ETHERNET_BUFFER_SIZE > 0 // we need buffering when dealing with Ethernet2
 
 bool EthernetTagValTransport::available() {
-    return client && client.connected();
+	return client && client.connected();
 }
 
 bool EthernetTagValTransport::connected() {
-    return client && client.connected();
-}
-
-void EthernetTagValTransport::setClient(WiFiClient cl) {
-    readBufferPos = 0;
-    writeBufferPos = 0;
-    readBufferAvail = 0;
-    this->client = cl;
+	return client && client.connected();
 }
 
 void EthernetTagValTransport::flush() {
@@ -37,8 +30,8 @@ void EthernetTagValTransport::flush() {
     if((int)client.write(writeBuffer, writeBufferPos) == writeBufferPos) {
         serdebugF2("Buffer written ", writeBufferPos);
         writeBufferPos = 0;
-        client.flush();
-    }
+    client.flush();
+}
     else {
         close();
     }

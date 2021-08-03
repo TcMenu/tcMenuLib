@@ -223,6 +223,32 @@
         "localOnly": false,
         "visible": true
       }
+    },
+    {
+      "parentId": 9,
+      "type": "customBuildItem",
+      "item": {
+        "menuType": "REMOTE_IOT_MONITOR",
+        "name": "IoT Monitor",
+        "id": 17,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 9,
+      "type": "customBuildItem",
+      "item": {
+        "menuType": "AUTHENTICATION",
+        "name": "Authenticator",
+        "id": 18,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
     }
   ],
   "codeOptions": {
@@ -333,8 +359,28 @@
         "subsystem": "INPUT"
       },
       {
-        "name": "LISTEN_PORT",
+        "name": "ESPWIFI_CONCURRENT_CONNECTIONS",
+        "latestValue": "1",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "ESPWIFI_LISTEN_PORT1",
         "latestValue": "3333",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "ESPWIFI_LISTEN_PORT2",
+        "latestValue": "3334",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "ESPWIFI_LISTEN_PORT3",
+        "latestValue": "3335",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "ESPWIFI_BUFFERED",
+        "latestValue": "true",
         "subsystem": "REMOTE"
       },
       {
@@ -365,6 +411,8 @@
     ],
     "namingRecursive": false,
     "saveToSrc": false,
-    "useCppMain": false
+    "useCppMain": false,
+    "eepromDefinition": "eeprom:",
+    "authenticatorDefinition": "rom:100:6"
   }
 }

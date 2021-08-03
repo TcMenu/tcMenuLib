@@ -17,6 +17,7 @@
 #include <graphics/MenuTouchScreenEncoder.h>
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
+#include <RemoteMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 #include <ArduinoEEPROMAbstraction.h>
@@ -30,10 +31,14 @@ extern TfteSpiDrawable tftDrawable;
 extern GraphicsDeviceRenderer renderer;
 extern iotouch::ResistiveTouchInterrogator touchInterrogator;
 extern MenuTouchScreenManager touchScreen;
-extern WiFiServer server3333;
-extern EthernetInitialisation ethernetInitialisation3333;
+extern WiFiServer server;
+extern EthernetInitialisation ethernetInitialisation;
+extern WiFiServer server2;
+extern EthernetInitialisation ethernetInitialisation2;
 
 // Global Menu Item exports
+extern EepromAuthenticationInfoMenuItem menuConnectivityAuthenticator;
+extern RemoteMenuItem menuConnectivityIoTMonitor;
 extern TextMenuItem menuConnectivityPasscode;
 extern TextMenuItem menuConnectivitySSID;
 extern IpAddressMenuItem menuConnectivityIPAddress;

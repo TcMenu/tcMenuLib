@@ -21,7 +21,7 @@
 #include <remote/BaseRemoteComponents.h>
 
 #ifndef ETHERNET_BUFFER_SIZE
-#define ETHERNET_BUFFER_SIZE 64
+#define ETHERNET_BUFFER_SIZE 96
 #endif
 
 #if ETHERNET_BUFFER_SIZE > 0
@@ -39,9 +39,9 @@ namespace tcremote {
     private:
         WiFiClient client;
     public:
-        EthernetTagValTransport() : BaseBufferedRemoteTransport(BUFFER_MESSAGES_TILL_FULL, ETHERNET_BUFFER_SIZE, ETHERNET_BUFFER_SIZE) { }
+        EthernetTagValTransport() : BaseBufferedRemoteTransport(BUFFER_MESSAGES_TILL_FULL, ETHERNET_BUFFER_SIZE, MAX_VALUE_LEN) { }
         ~EthernetTagValTransport() override = default;
-        void setClient(WiFiClient cl);
+        void setClient(WiFiClient cl) { this->client = cl; }
 
         int fillReadBuffer(uint8_t* data, int maxSize) override;
         void flush() override;
@@ -63,7 +63,7 @@ public:
 	~EthernetTagValTransport() override = default;
 	void setClient(WiFiClient client) { this->client = client; }
 
-	int writeChar(char data) override;
+	int writeChar(char data) override ;
 	int writeStr(const char* data) override;
 	void flush() override;
 	bool available() override;
@@ -78,16 +78,16 @@ public:
 /**
  * This class provides the initialisation and connection generation logic for ethernet connections.
  */
-    class EthernetInitialisation : public DeviceInitialisation {
-    private:
-        WiFiServer *server;
-    public:
-        explicit EthernetInitialisation(WiFiServer* server) : server(server) {}
+class EthernetInitialisation : public DeviceInitialisation {
+private:
+	WiFiServer *server;
+public:
+    explicit EthernetInitialisation(WiFiServer* server) : server(server) {}
 
-        bool attemptInitialisation() override;
+    bool attemptInitialisation() override;
 
-        bool attemptNewConnection(BaseRemoteServerConnection *transport) override;
-    };
+    bool attemptNewConnection(BaseRemoteServerConnection *transport) override;
+};
 
 /**
  * This function converts from a RSSI (Radio Strength indicator)
@@ -97,10 +97,12 @@ public:
  * @param strength the signal strength (usually negative) as an int
  * @return a state that can be used with the standard wifi TitleWidget
  */
-    int fromWiFiRSSITo4StateIndicator(int strength);
+int fromWiFiRSSITo4StateIndicator(int strength);
 
-}  // namespace tcremote
+} // namespace tcremote
 
+#ifndef TC_MANUAL_NAMESPACING
 using namespace tcremote;
+#endif // TC_MANUAL_NAMESPACING
 
 #endif /* TCMENU_ETHERNETTRANSPORT_H_ */
