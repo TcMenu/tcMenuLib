@@ -119,7 +119,7 @@ const char AUTH_EMPTY_KEY[] PROGMEM = "EmptyKey";
 void onAuthenticateRemoveKeysDlgComplete(ButtonType btn, void* data) {
     if (btn == BTNTYPE_OK) {
         auto* mgr = reinterpret_cast<EepromAuthenticatorManager*>(menuMgr.getAuthenticator());
-        reinterpret_cast<EepromAuthenticationInfoMenuItem*>(menuMgr.getAuthenticator())->invokePossibleListener();
+        reinterpret_cast<EepromAuthenticationInfoMenuItem*>(data)->invokePossibleListener();
         mgr->resetAllKeys();
     }
 }
