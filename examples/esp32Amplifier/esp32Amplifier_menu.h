@@ -17,23 +17,28 @@
 #include <graphics/MenuTouchScreenEncoder.h>
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
+#include <RemoteMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
+#include <ArduinoEEPROMAbstraction.h>
+#include <RemoteAuthentication.h>
 
-void setupMenu();  // forward reference of the menu setup function.
-extern const PROGMEM ConnectorLocalInfo applicationInfo;  // contains app name and ID
-
-// Global variables that need exporting
-
+// variables we declare that you may need to access
+extern const PROGMEM ConnectorLocalInfo applicationInfo;
+extern TcMenuRemoteServer remoteServer;
 extern TFT_eSPI tft;
 extern TfteSpiDrawable tftDrawable;
 extern GraphicsDeviceRenderer renderer;
 extern iotouch::ResistiveTouchInterrogator touchInterrogator;
 extern MenuTouchScreenManager touchScreen;
 extern WiFiServer server;
+extern EthernetInitialisation ethernetInitialisation;
+extern WiFiServer server2;
+extern EthernetInitialisation ethernetInitialisation2;
 
 // Global Menu Item exports
-
+extern EepromAuthenticationInfoMenuItem menuConnectivityAuthenticator;
+extern RemoteMenuItem menuConnectivityIoTMonitor;
 extern TextMenuItem menuConnectivityPasscode;
 extern TextMenuItem menuConnectivitySSID;
 extern IpAddressMenuItem menuConnectivityIPAddress;
@@ -62,8 +67,9 @@ extern BooleanMenuItem menuDirect;
 extern ScrollChoiceMenuItem menuChannels;
 extern AnalogMenuItem menuVolume;
 
-// Provide a wrapper to get hold of the root menu item
+// Provide a wrapper to get hold of the root menu item and export setupMenu
 inline MenuItem& rootMenuItem() { return menuVolume; }
+void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION

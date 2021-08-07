@@ -45,10 +45,11 @@ public:
      * @param userClick if the user has clicked on the button, one of: RPRESS_NONE, PRESS_PRESSED, RPRESS_HELD
      */
     void renderLoop(unsigned int currentValue, RenderPressMode userClick) override {
-        if(userClick != RPRESS_NONE || exitDisplayProc) {
+        if(userClick != RPRESS_NONE || exitDisplayProc || renderer.getDialog()->isInUse()) {
             renderer.giveBackDisplay();
             return;
         }
+
         if((renderTickCount % 100) == 0) {
             offsetX = rand() % 64;
             offsetY = rand() % 25;

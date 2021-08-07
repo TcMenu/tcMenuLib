@@ -7,6 +7,8 @@
 #include <EepromAbstraction.h>
 #include <Ethernet.h>
 
+using namespace tcremote;
+
 // Set up ethernet, the usual default settings are chosen. Change to your preferred values or use DHCP.
 byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xEE
@@ -24,20 +26,7 @@ const char * romSpaceNames = "item 01item 02item 03item 04item 05item 06item 07i
 // make sure you've arranged for !RESET pin to be held HIGH!!
 IoAbstractionRef io23017 = ioFrom23017(0x20, ACTIVE_LOW_OPEN, 2);
 
-// we want to authenticate connections, the easiest and quickest way is to use the EEPROM
-// authenticator where pairing requests add a new item into the EEPROM. Any authentication
-// requests are then handled by looking in the EEPROM.
-EepromAuthenticatorManager authManager;
-
-// here we initialise an AVR eeprom, there are lots of abstractions that cover most types of EEPROM
-AvrEeprom eeprom;
-
-// Here we create two additional menus, that will be added manually to handle the connectivity
-// status and authentication keys. In a future version these will be added to th desinger.
-RemoteMenuItem menuRemoteMonitor(1001, 2);
-EepromAuthenicationInfoMenuItem menuAuthKeyMgr(1002, &authManager, &menuRemoteMonitor);
-
-// 
+//
 // Here we add the keyboard components to the menu. For more general documentation of keyboards
 // https://www.thecoderscorner.com/products/arduino-libraries/io-abstraction/matrix-keyboard-keypad-manager/
 //
@@ -53,6 +42,8 @@ MatrixKeyboardManager keyboard;
 // This is the tcMenu standard keyboard listener. It allows control of the menu by keyboard
 // You could also write your own keyboard interface if this didn't work as expected for you.
 MenuEditingKeyListener menuKeyListener;
+
+// end keyboard components
 
 //
 // This function is called by setup() further down to initialise the keyboard.
@@ -100,21 +91,6 @@ void setup() {
 	Wire.begin();
     Wire.setClock(400000);
     lcd.setDelayTime(0, 20);
-    menuMgr.setEepromRef(&eeprom);
-
-	// now we enable authentication using EEPROM authentication. Where the EEPROM is
-	// queried for authentication requests, and any additional pairs are stored there too.
-	// first we initialise the authManager, then pass it to the class.
-	// Always call BEFORE setupMenu()
-	authManager.initialise(&eeprom, 100);
-	remoteServer.setAuthenticator(&authManager);
-    menuMgr.setAuthenticator(&authManager);
-
-	// Here we add two additional menus for managing the connectivity and authentication keys.
-	// In the future, there will be an option to autogenerate these from the designer.
-	menuConnectivitySaveToEEPROM.setNext(&menuAuthKeyMgr);
-	menuRemoteMonitor.addConnector(remoteServer.getRemoteConnector(0));
-	menuAuthKeyMgr.setLocalOnly(true);    
 
     // now we turn off the title and change the editor characters
     renderer.setTitleRequired(false);
@@ -124,9 +100,13 @@ void setup() {
 
 	setupMenu();
 
+	auto* authenticator = reinterpret_cast<EepromAuthenticatorManager*>(menuMgr.getAuthenticator());
+
+	// Here you could have a button internal to the device somewhere that reset the pins and remotes, in this case
+	// if the button is held at start up it trigger a key reset.
     if(ioDeviceDigitalReadS(io23017, 5) == LOW) {
         Serial.println("Resetting all keys and pin");
-        authManager.resetAllKeys();
+        authenticator->resetAllKeys();
     }
 
     setupKeyboard();
@@ -146,7 +126,7 @@ void setup() {
 
     // copy the pin from the authenticator into the change pin field.
     // and make it a password field so characters are not visible unless edited.
-    authManager.copyPinToBuffer(sz, sizeof(sz));
+    authenticator->copyPinToBuffer(sz, sizeof(sz));
     menuConnectivityChangePin.setTextValue(sz);
     menuConnectivityChangePin.setPasswordField(true);
 
@@ -178,7 +158,7 @@ void CALLBACK_FUNCTION onAnalog1(int /*id*/) {
 const char pgmSavedText[] PROGMEM = "Saved all setttings";
 
 void CALLBACK_FUNCTION onSaveToEeprom(int /*id*/) {
-	menuMgr.save(eeprom, 0xf8f3);
+	menuMgr.save(0xf8f3);
 	auto dlg = renderer.getDialog();
 	if(dlg && !dlg->isInUse()) {
 	    dlg->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
@@ -200,7 +180,8 @@ void CALLBACK_FUNCTION onChangePin(int /*id*/) {
         dlg->copyIntoBuffer(newPin);
     }
     else {
-        authManager.changePin(newPin);
+        auto* authenticator = reinterpret_cast<EepromAuthenticatorManager*>(menuMgr.getAuthenticator());
+        authenticator->changePin(newPin);
     }
 }
 
@@ -208,7 +189,7 @@ void CALLBACK_FUNCTION onItemChange(int id) {
     auto itemNo = menuRomChoicesItemNum.getCurrentValue();
     char sz[12];
     auto itemSize = menuAdditionalRomChoice.getItemWidth();
-    eeprom.readIntoMemArray((uint8_t*)sz, menuAdditionalRomChoice.getEepromStart() + (itemNo * itemSize), 10);
+    menuMgr.getEepromAbstraction()->readIntoMemArray((uint8_t*)sz, menuAdditionalRomChoice.getEepromStart() + (itemNo * itemSize), 10);
     menuRomChoicesValue.setTextValue(sz);
 }
 
@@ -217,7 +198,7 @@ void CALLBACK_FUNCTION onSaveValue(int id) {
     auto itemNo = menuRomChoicesItemNum.getCurrentValue();
     auto itemSize = menuAdditionalRomChoice.getItemWidth();
     auto position = menuAdditionalRomChoice.getEepromStart() + (itemNo * itemSize);
-    eeprom.writeArrayToRom(position, (const uint8_t*)menuRomChoicesValue.getTextValue(), itemSize);
+    menuMgr.getEepromAbstraction()->writeArrayToRom(position, (const uint8_t*)menuRomChoicesValue.getTextValue(), itemSize);
 
     if(renderer.getDialog()->isInUse()) return;
     renderer.getDialog()->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
@@ -277,4 +258,3 @@ int CALLBACK_FUNCTION fnAdditionalCountListRtCall(RuntimeMenuItem * item, uint8_
         default: return false;
     }
 }
-

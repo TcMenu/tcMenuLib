@@ -16,20 +16,23 @@
 #include "tcMenuU8g2.h"
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
+#include <RemoteMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
+#include <ArduinoEEPROMAbstraction.h>
+#include <RemoteAuthentication.h>
 
-void setupMenu();  // forward reference of the menu setup function.
-extern const PROGMEM ConnectorLocalInfo applicationInfo;  // contains app name and ID
-
-// Global variables that need exporting
-
-extern U8G2_SH1106_128X64_NONAME_F_SW_I2C gfx;
+// variables we declare that you may need to access
+extern const PROGMEM ConnectorLocalInfo applicationInfo;
+extern TcMenuRemoteServer remoteServer;
+extern U8G2_SH1106_128X64_NONAME_F_HW_I2C gfx;
 extern GraphicsDeviceRenderer renderer;
 extern WiFiServer server;
+extern EthernetInitialisation ethernetInitialisation;
 
 // Global Menu Item exports
-
+extern EepromAuthenticationInfoMenuItem menuAuthenticator;
+extern RemoteMenuItem menuIoTMonitor;
 extern IpAddressMenuItem menuIpAddress;
 extern TextMenuItem menuPwd;
 extern TextMenuItem menuSSID;
@@ -48,8 +51,9 @@ extern BooleanMenuItem menuElectricHeater;
 extern AnalogMenuItem menuCucumberTemp;
 extern AnalogMenuItem menuTomatoTemp;
 
-// Provide a wrapper to get hold of the root menu item
+// Provide a wrapper to get hold of the root menu item and export setupMenu
 inline MenuItem& rootMenuItem() { return menuTomatoTemp; }
+void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION

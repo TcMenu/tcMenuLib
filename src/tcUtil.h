@@ -118,6 +118,10 @@ void fastftoa(char* sz, float fl, int dp, int strSize);
  */
 long dpToDivisor(int dp);
 
+inline float tcFltAbs(float f1) {
+    return f1 > 0.0F ? f1 : -f1;
+}
+
 // There now follows pretty much internal code for dealing with program memory
 // never use direct program memory commands, always prefer these, it allows us
 // to compile it out much easier.

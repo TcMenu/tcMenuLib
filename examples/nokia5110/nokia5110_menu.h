@@ -16,21 +16,24 @@
 #include "tcMenuAdaFruitGfx.h"
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
+#include <RemoteMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
+#include <EepromAbstraction.h>
+#include <RemoteAuthentication.h>
 
-void setupMenu();  // forward reference of the menu setup function.
-extern const PROGMEM ConnectorLocalInfo applicationInfo;  // contains app name and ID
-
-// Global variables that need exporting
-
+// variables we declare that you may need to access
+extern const PROGMEM ConnectorLocalInfo applicationInfo;
+extern TcMenuRemoteServer remoteServer;
 extern Adafruit_PCD8544 gfx;
 extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
 extern EthernetServer server;
+extern EthernetInitialisation ethernetInitialisation;
 
 // Global Menu Item exports
-
+extern EepromAuthenticationInfoMenuItem menuAuthenticator;
+extern RemoteMenuItem menuIoTMonitor;
 extern IpAddressMenuItem menuIP;
 extern BackMenuItem menuBackConnectivity;
 extern SubMenuItem menuConnectivity;
@@ -50,8 +53,9 @@ extern AnalogMenuItem menuKitchen;
 extern AnalogMenuItem menuLiving;
 extern AnalogMenuItem menuHall;
 
-// Provide a wrapper to get hold of the root menu item
+// Provide a wrapper to get hold of the root menu item and export setupMenu
 inline MenuItem& rootMenuItem() { return menuHall; }
+void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION

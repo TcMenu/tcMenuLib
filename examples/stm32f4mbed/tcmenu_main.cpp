@@ -34,13 +34,6 @@ SPI spi(PB_5, PB_4, PB_3);
 // This is the actual title widget declaration - see setup
 TitleWidget deviceConnectedWidget(iconsConnection, 2, 16, 12, nullptr);
 TitleWidget ethernetConnectionWidget(iconsEthernetConnection, 2, 16, 12, &deviceConnectedWidget);
-
-HalStm32EepromAbstraction eeprom;
-EepromAuthenticatorManager eepromAuth;
-
-RemoteMenuItem menuRemoteStatusList(nextRandomId(), 2);
-EepromAuthenicationInfoMenuItem menuAuthenticatedUserList(nextRandomId(), &eepromAuth, &menuRemoteStatusList);
-
 ScreenSaverCustomDrawing screenSaver;
 
 // forward declaration
@@ -53,22 +46,6 @@ void setup() {
     serPort.baud(115200);
 #endif
 
-    // first we set up the EEPROM we declared earlier, and provide it to the menu manager as the global eeprom storage
-    eeprom.initialise(0);
-    menuMgr.setEepromRef(&eeprom);
-
-    // now we set up the authenticator we prepared earlier, it holds the paired devices that are allowed to connect and
-    // also the passcode for secured menu items. We provide it to the remote server and also menu manager.
-    eepromAuth.initialise(&eeprom, 100);
-    menuMgr.setAuthenticator(&eepromAuth);
-    remoteServer.setAuthenticator(&eepromAuth);
-
-    // initialise and add two menu items, one shows the pairing device status, the other what's currently connected
-    menuRemoteStatusList.addConnector(remoteServer.getRemoteConnector(0));
-    menuIP.setNext(&menuAuthenticatedUserList);
-    menuRemoteStatusList.setLocalOnly(true);
-    menuAuthenticatedUserList.setLocalOnly(true);
-
     // we add a simple widget that appears on the top right of the menu, do this before calling setup to ensure that
     // it draws immediately. There's three things to do here
     // 1. include the stock icons - see includes
@@ -78,20 +55,20 @@ void setup() {
 
     // now we have a task that every few seconds checks if we are still connected to the network
     taskManager.scheduleFixedRate(2, [] {
-        ethernetConnectionWidget.setCurrentState(remoteServer.isBound() ? 1 : 0);
+        auto pConnection = remoteServer.getRemoteServerConnection(0);
+        if(pConnection) ethernetConnectionWidget.setCurrentState(pConnection->getDeviceInitialisation().isInitialised() ? 1 : 0);
     }, TIME_SECONDS);
 
     // and register to receive updates from the connector when connectivity changes. When connected is true
     // we have a user connected to our remote endpoint.
-    menuRemoteStatusList.registerCommsNotification([](CommunicationInfo info) {
+    menuIoTMonitor.registerCommsNotification([](CommunicationInfo info) {
         deviceConnectedWidget.setCurrentState(info.connected ? 1 : 0);
     });
 
-    menuMgr.setRootMenu(&menuRTCDate);
-    menuMgr.load();
-
     // this was added by designer, it sets up the input, display and remote.
     setupMenu();
+
+    menuMgr.load();
 
     // and now lets try and acquire time using our quick ntp time class
     prepareRealtimeClock();
@@ -201,12 +178,18 @@ public:
 
 #ifdef BUILD_FOR_MBED_6
 void prepareRealtimeClock() {
-    if(remoteServer.isBound()) {
+
+    // make sure a connection was registered before trying to use it
+    BaseRemoteServerConnection *pConnection = remoteServer.getRemoteServerConnection(0);
+
+    // and then we
+    auto& devInit = reinterpret_cast<const MbedEthernetInitialiser&>(pConnection->getDeviceInitialisation());
+    if(pConnection != nullptr && devInit.isInitialised()) {
         SocketAddress addr;
-        if(remoteServer.networkInterface()->get_ip_address(&addr) == NSAPI_ERROR_OK) {
+        if(devInit.getInterface()->get_ip_address(&addr) == NSAPI_ERROR_OK) {
             menuIP.setIpAddress(addr.get_ip_address());
             taskManager.registerEvent(new NTPTimeMenuSetupEvent(
-                    remoteServer.networkInterface(),
+                    devInit.getInterface(),
                     "2.pool.ntp.org", 123),  true);
             return;
         }
@@ -228,7 +211,7 @@ void prepareRealtimeClock() {
 
 void CALLBACK_FUNCTION onSaveAll(int id) {
     menuMgr.save();
-    eeprom.commit();
+    reinterpret_cast<HalStm32EepromAbstraction*>(menuMgr.getEepromAbstraction())->commit();
     auto* dlg = renderer.getDialog();
     if(dlg && !dlg->isInUse()) {
         dlg->setButtons(BTNTYPE_NONE, BTNTYPE_OK);

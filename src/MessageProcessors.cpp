@@ -124,6 +124,17 @@ void fieldUpdateJoinMsg(TagValueRemoteConnector* connector, FieldAndValue* field
 	}
 }
 
+bool isStringTrue(const char* val) {
+
+    if(val == nullptr || val[0] == 0) return false;
+    // digit 1 or Y is true
+    if(val[0] == 'Y' || val[0] == '1') return true;
+    // first 3 letters of true in any case.
+    if(tolower(val[0]) == 't' && tolower(val[1]) == 'r' && tolower(val[2] == 'u')) return true;
+
+    return false;
+}
+
 bool processValueChangeField(FieldAndValue* field, MessageProcessorInfo* info) {
     if(info->value.item->getMenuType() == MENUTYPE_INT_VALUE || info->value.item->getMenuType() == MENUTYPE_ENUM_VALUE) {
         auto valItem = (ValueMenuItem*)info->value.item;
@@ -149,7 +160,7 @@ bool processValueChangeField(FieldAndValue* field, MessageProcessorInfo* info) {
     else if(info->value.item->getMenuType() == MENUTYPE_BOOLEAN_VALUE) {
         // booleans are always absolute
         BooleanMenuItem* boolItem = reinterpret_cast<BooleanMenuItem*>(info->value.item);
-        boolItem->setBoolean(atoi(field->value));
+        boolItem->setBoolean(isStringTrue(field->value));
         serdebugF2("Bool change: ", boolItem->getBoolean());
     }
     else if(info->value.item->getMenuType() == MENUTYPE_TEXT_VALUE) {

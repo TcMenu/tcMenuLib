@@ -154,7 +154,7 @@ int EnumMenuItem::getLengthOfEnumStr(int idx) const {
 #endif
 
 bool isSame(float d1, float d2) {
-	float result = abs(d1 - d2);
+	float result = tcFltAbs(d1 - d2);
 	return result < 0.0000001;
 }
 
@@ -230,10 +230,10 @@ void AnalogMenuItem::setFromFloatingPointValue(float value) {
 	WholeAndFraction wf;
 	if(value < 0.0F) {
 	    wf.negative = true;
-	    value = abs(value);
+	    value = tcFltAbs(value);
 	}
-	wf.whole = value;
-	wf.fraction = (value - float(wf.whole)) * float(getActualDecimalDivisor());
+	wf.whole = static_cast<uint32_t>(value);
+	wf.fraction = static_cast<uint32_t>((value - float(wf.whole)) * float(getActualDecimalDivisor()));
 
 	setFromWholeAndFraction(wf);
 }

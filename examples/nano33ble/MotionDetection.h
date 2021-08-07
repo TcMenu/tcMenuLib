@@ -1,7 +1,3 @@
-//
-// Created by David Cherry on 17/07/2020.
-//
-
 #ifndef TCLIBRARYDEV_MOTIONDETECTION_H
 #define TCLIBRARYDEV_MOTIONDETECTION_H
 

@@ -117,8 +117,9 @@ test(testAuthMenuItem) {
 	auth.initialise(&eeprom, 20);
 	auth.addAdditionalUUIDKey("uuid1", uuid1);
 	auth.addAdditionalUUIDKey("uuid2", uuid2);
+    menuMgr.setAuthenticator(&auth);
 
-	EepromAuthenicationInfoMenuItem menuItem(2002, &auth, NULL);
+	EepromAuthenticationInfoMenuItem menuItem("Authorised Keys", nullptr, 2002, nullptr);
 	RuntimeMenuItem *itm = menuItem.asParent();
 	char sz[20];
 	itm->copyNameToBuffer(sz, sizeof(sz));

@@ -118,6 +118,12 @@ public:
      * @return true if the remote has changed, false otherwise
      */
     bool matches(MenuItem* item) override;
+
+    /**
+     * Sets the remote number that we should filter on
+     * @param newRemoteNum the remote to filter on
+     */
+    void setRemoteNo(uint8_t newRemoteNum) { remoteNo = newRemoteNum; }
 };
 
 // the modes that can be passed to the type predicate

@@ -20,17 +20,14 @@
 #include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
 
-void setupMenu();  // forward reference of the menu setup function.
-extern const PROGMEM ConnectorLocalInfo applicationInfo;  // contains app name and ID
-
-// Global variables that need exporting
-
+// variables we declare that you may need to access
+extern const PROGMEM ConnectorLocalInfo applicationInfo;
+extern TcMenuRemoteServer remoteServer;
 extern Adafruit_PCD8544 gfx;
 extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
 
 // Global Menu Item exports
-
 extern Rgb32MenuItem menuRGB;
 extern EditableLargeNumberMenuItem menuLgeNm;
 extern ListRuntimeMenuItem menuRtList;
@@ -46,8 +43,9 @@ extern AnalogMenuItem menuA0;
 extern BackMenuItem menuBackAnalogIn;
 extern SubMenuItem menuAnalogIn;
 
-// Provide a wrapper to get hold of the root menu item
+// Provide a wrapper to get hold of the root menu item and export setupMenu
 inline MenuItem& rootMenuItem() { return menuAnalogIn; }
+void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION

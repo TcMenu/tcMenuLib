@@ -18,21 +18,24 @@
 #include <RemoteConnector.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
+#include <RemoteMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
+#include <EepromAbstraction.h>
+#include <RemoteAuthentication.h>
 #include "tcMenuLiquidCrystal.h"
 
-void setupMenu();  // forward reference of the menu setup function.
-extern const PROGMEM ConnectorLocalInfo applicationInfo;  // contains app name and ID
-
-// Global variables that need exporting
-
+// variables we declare that you may need to access
+extern const PROGMEM ConnectorLocalInfo applicationInfo;
+extern TcMenuRemoteServer remoteServer;
 extern IoAbstractionRef io23017;
 extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
 extern EthernetServer server;
+extern EthernetInitialisation ethernetInitialisation;
+extern EthernetServer server2;
+extern EthernetInitialisation ethernetInitialisation2;
 
 // Global Menu Item exports
-
 extern ActionMenuItem menuRomChoicesSave;
 extern TextMenuItem menuRomChoicesValue;
 extern ScrollChoiceMenuItem menuRomChoicesItemNum;
@@ -50,6 +53,8 @@ extern ScrollChoiceMenuItem menuAdditionalRomChoice;
 extern Rgb32MenuItem menuAdditionalRGB;
 extern BackMenuItem menuBackAdditional;
 extern SubMenuItem menuAdditional;
+extern EepromAuthenticationInfoMenuItem menuConnectivityAuthenticator;
+extern RemoteMenuItem menuConnectivityIoTMonitor;
 extern ActionMenuItem menuConnectivitySaveToEEPROM;
 extern TextMenuItem menuConnectivityText;
 extern IpAddressMenuItem menuConnectivityIpAddress;
@@ -65,8 +70,9 @@ extern BooleanMenuItem menuHiddenItem;
 extern AnalogMenuItem menuAnalog1;
 extern TimeFormattedMenuItem menuTime;
 
-// Provide a wrapper to get hold of the root menu item
+// Provide a wrapper to get hold of the root menu item and export setupMenu
 inline MenuItem& rootMenuItem() { return menuTime; }
+void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION

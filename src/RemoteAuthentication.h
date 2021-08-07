@@ -20,6 +20,10 @@
 #define CLIENT_DESC_SIZE 16
 #define TOTAL_KEY_SIZE (UUID_KEY_SIZE + CLIENT_DESC_SIZE)
 
+enum AuthenticationManagerType: uint8_t {
+    AUTHENTICATION_NONE, AUTHENTICATION_IN_EEPROM, AUTHENTICATION_IN_FLASH
+};
+
 /**
  * This is the external interface of authentication when using the menu library. It
  * provides the support for checking if a connection is authenticated and also for
@@ -27,7 +31,17 @@
  * so always try and use the interface rather than a given impl.
  */
 class AuthenticationManager {
-public:    
+private:
+    AuthenticationManagerType authenticationManagerType;
+public:
+    explicit AuthenticationManager(AuthenticationManagerType authType) : authenticationManagerType(authType) {}
+
+    /**
+     * Get the type of this authentication manager, such as EEPROM, FLASH, NONE.
+     * @return the type of the manager
+     */
+    AuthenticationManagerType getAuthenticationManagerType() { return authenticationManagerType; }
+
     /**
      * Adds an additional name, key mapping to the authentication manager, if there is space
      * left in internal storage. If there is not enough space, it will return false and you
@@ -68,8 +82,8 @@ private:
     uint16_t magicKey;
 	uint8_t  numberOfEntries;
 public:
-    EepromAuthenticatorManager(uint8_t numOfEntries = 6) {
-        eeprom = NULL;
+    explicit EepromAuthenticatorManager(uint8_t numOfEntries = 6) : AuthenticationManager(AUTHENTICATION_IN_EEPROM) {
+        eeprom = nullptr;
         romStart = 0;
         this->magicKey = 0;
 		this->numberOfEntries = numOfEntries;
@@ -132,7 +146,7 @@ public:
 	/**
 	 * @return the number of spaces for entries in the eeprom
 	 */
-	int getNumberOfEntries() {
+	int getNumberOfEntries() const {
 		return numberOfEntries;
 	}
 private:
@@ -140,7 +154,7 @@ private:
     int findSlotFor(const char* name);
 
     // helper to calculate the eeprom position from an index.
-    EepromPosition eepromOffset(int i) {
+    EepromPosition eepromOffset(int i) const {
         return romStart + 2 + (i * TOTAL_KEY_SIZE);
     }
 };
@@ -151,7 +165,7 @@ private:
  */
 class NoAuthenticationManager : public AuthenticationManager {
 public:
-    NoAuthenticationManager() { }
+    NoAuthenticationManager() : AuthenticationManager(AUTHENTICATION_NONE) { }
 
     /** prize every time with the No Authentication impl, everyone is always admitted. */
     bool addAdditionalUUIDKey(const char* /*connectionName*/, const char* /*uuid*/) override { return true; }
@@ -187,14 +201,15 @@ public:
      * @param authBlocksPgm the authorisation blocks in const / program memory
      * @param numberOfEntries the number of blocks in the array.
      */
-    ReadOnlyAuthenticationManager(const AuthBlock* authBlocksPgm, int numberOfEntries, const char* pgmActualPin) {
+    ReadOnlyAuthenticationManager(const AuthBlock* authBlocksPgm, int numberOfEntries, const char* pgmActualPin)
+      : AuthenticationManager(AUTHENTICATION_IN_FLASH) {
         this->authBlocksPgm = authBlocksPgm;
         this->numberOfEntries = numberOfEntries;
 		this->pgmActualPin = pgmActualPin;
     }
 
-	ReadOnlyAuthenticationManager(const char* pgmActualPin) {
-		this->authBlocksPgm = NULL;
+	explicit ReadOnlyAuthenticationManager(const char* pgmActualPin)  : AuthenticationManager(AUTHENTICATION_IN_FLASH) {
+		this->authBlocksPgm = nullptr;
 		this->numberOfEntries = 0;
 		this->pgmActualPin = pgmActualPin;
 	}

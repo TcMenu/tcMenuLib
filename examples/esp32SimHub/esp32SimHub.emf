@@ -1,6 +1,6 @@
 {
   "version": "1.00",
-  "projectName": "/Users/dave/Documents/Arduino/tcLibraryDev/lib/tcMenu/examples/esp32SimHub/esp32SimHub.emf",
+  "projectName": "C:\\Users\\dave\\Documents\\Arduino\\tcLibraryDev\\lib\\tcMenu\\examples\\esp32SimHub\\esp32SimHub.emf",
   "author": "dave",
   "items": [
     {
@@ -218,6 +218,9 @@
     "lastDisplayUuid": "4dcb12ec-13d8-4466-b8b6-bd575eae4612",
     "lastInputUuid": "cc0f9246-03be-4adf-b1f5-dd501085122a",
     "lastRemoteUuid": "4123dfc3-5271-4727-81f0-1a21d06b666b",
+    "lastRemoteUuids": [
+      "4123dfc3-5271-4727-81f0-1a21d06b666b"
+    ],
     "lastThemeUuid": "03c6b25f-db63-402a-8447-a5ce1484c14d",
     "applicationUUID": "4db9fbfe-9fab-4759-b8ff-3e0c6700f475",
     "applicationName": "SimHub Link",

@@ -78,11 +78,11 @@ test(testEmptyItemPropertiesFactory) {
 
 void populatePropsWithDefaults(ConfigurableItemDisplayPropertiesFactory& factory) {
     factory.setSelectedColors(RGB(1, 2, 3), RGB(3, 2, 1));
-    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_TITLE, palette1, MenuPadding(4, 3, 2, 1), pointer1, 4, 22, 30, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT);
-    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, palette2, MenuPadding(2), pointer2, 1, 4, 40, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT);
-    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ACTION, palette2, MenuPadding(1), pointer3, 2, 2, 50, GridPosition::JUSTIFY_LEFT_NO_VALUE);
-    factory.setDrawingPropertiesAllInSub(ItemDisplayProperties::COMPTYPE_ITEM, menuSub.getId(), palette3, MenuPadding(3), pointer1, 3, 10, 60, GridPosition::JUSTIFY_CENTER_NO_VALUE);
-    factory.setDrawingPropertiesForItem(ItemDisplayProperties::COMPTYPE_ITEM, menuSubAnalog.getId(), palette1, MenuPadding(6), pointer2, 3, 12, 80, GridPosition::JUSTIFY_CENTER_WITH_VALUE);
+    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_TITLE, palette1, MenuPadding(4, 3, 2, 1), pointer1, 4, 22, 30, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, MenuBorder(0));
+    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, palette2, MenuPadding(2), pointer2, 1, 4, 40, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, MenuBorder(0));
+    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ACTION, palette2, MenuPadding(1), pointer3, 2, 2, 50, GridPosition::JUSTIFY_LEFT_NO_VALUE, MenuBorder(0));
+    factory.setDrawingPropertiesAllInSub(ItemDisplayProperties::COMPTYPE_ITEM, menuSub.getId(), palette3, MenuPadding(3), pointer1, 3, 10, 60, GridPosition::JUSTIFY_CENTER_NO_VALUE, MenuBorder(0));
+    factory.setDrawingPropertiesForItem(ItemDisplayProperties::COMPTYPE_ITEM, menuSubAnalog.getId(), palette1, MenuPadding(6), pointer2, 3, 12, 80, GridPosition::JUSTIFY_CENTER_WITH_VALUE, MenuBorder(0));
     factory.addGridPosition(&menuVolume, GridPosition(GridPosition::DRAW_INTEGER_AS_UP_DOWN, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 2, 100));
     menuMgr.initWithoutInput(&noRenderer, &textMenuItem1);
     taskManager.reset();
@@ -108,7 +108,7 @@ test(testDefaultItemPropertiesFactory) {
     assertTrue(checkPadding(config->getPadding(), 1,1,1,1));
 
     // now change the default item and ensure that it picks up the new settings.
-    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, palette1, MenuPadding(2,3,4,5), pointer1, 2, 14, 15, GridPosition::JUSTIFY_RIGHT_NO_VALUE);
+    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, palette1, MenuPadding(2,3,4,5), pointer1, 2, 14, 15, GridPosition::JUSTIFY_RIGHT_NO_VALUE, MenuBorder(0));
     config = factory.configFor(nullptr, ItemDisplayProperties::COMPTYPE_ITEM);
     assertTrue(checkPropertiesBasics(config, "default changed item", pointer1, 2, palette1[1], palette1[0], 14, 15, GridPosition::JUSTIFY_RIGHT_NO_VALUE));
     assertTrue(checkPadding(config->getPadding(), 2,3,4,5));
@@ -379,9 +379,9 @@ test(testBaseRendererWithDefaults) {
 
     renderer.setFirstWidget(&widget1);
     auto& factory = reinterpret_cast<ConfigurableItemDisplayPropertiesFactory &>(renderer.getDisplayPropertiesFactory());
-    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_TITLE, palette1, MenuPadding(4), pointer2, 1, 10, 30, GridPosition::JUSTIFY_CENTER_NO_VALUE);
-    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ACTION, palette1, MenuPadding(4), pointer1, 1, 5, 25, GridPosition::JUSTIFY_LEFT_NO_VALUE);
-    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, palette1, MenuPadding(4), pointer1, 1, 5, 20, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT);
+    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_TITLE, palette1, MenuPadding(4), pointer2, 1, 10, 30, GridPosition::JUSTIFY_CENTER_NO_VALUE, MenuBorder(0));
+    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ACTION, palette1, MenuPadding(4), pointer1, 1, 5, 25, GridPosition::JUSTIFY_LEFT_NO_VALUE, MenuBorder(0));
+    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, palette1, MenuPadding(4), pointer1, 1, 5, 20, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, MenuBorder(0));
 
     menuMgr.initWithoutInput(&renderer, &textMenuItem1);
     taskManager.reset();
@@ -398,12 +398,11 @@ test(testBaseRendererWithDefaults) {
     assertTrue(checkWidget(2, renderer.getWidgetRecordings().getByKey((unsigned long)&widget2), Coord(320 - 16 - 8, 4), palette1, 0));
 
     assertEqual((bsize_t)2, renderer.getWidgetRecordings().count());
-    assertEqual(7, renderer.getTotalItemsInMenu());
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(0), Coord(0, 0), Coord(320, 30), pointer2, GridPosition::DRAW_TITLE_ITEM, GridPosition::JUSTIFY_CENTER_NO_VALUE, 0));
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(1), Coord(0, 40), Coord(320, 20), pointer1, GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 0, &textMenuItem1));
-    assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(2), Coord(0, 65), Coord(320, 20), pointer1, GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 0, &boolItem1));
-    assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(3), Coord(0, 90), Coord(320, 20), pointer1, GridPosition::DRAW_INTEGER_AS_UP_DOWN, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 0, &menuEnum1));
-    assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(4), Coord(0, 115), Coord(320, 20), pointer1, GridPosition::DRAW_INTEGER_AS_SCROLL, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 0, &menuAnalog2));
+    assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(2), Coord(0, 65), Coord(320, 25), pointer1, GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 0, &boolItem1));
+    assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(3), Coord(0, 95), Coord(320, 20), pointer1, GridPosition::DRAW_INTEGER_AS_UP_DOWN, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 0, &menuEnum1));
+    assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(4), Coord(0, 120), Coord(320, 20), pointer1, GridPosition::DRAW_INTEGER_AS_SCROLL, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 0, &menuAnalog2));
     assertFalse(textMenuItem1.isChanged());
     assertFalse(boolItem1.isChanged());
     assertFalse(menuEnum1.isChanged());
@@ -424,7 +423,7 @@ test(testBaseRendererWithDefaults) {
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(4), Coord(0, 115), Coord(320, 20), pointer1, GridPosition::DRAW_INTEGER_AS_SCROLL, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 0, &menuAnalog2));
     assertFalse(menuEnum1.isChanged());
 
-    renderer.getMenuItemAtIndex(0)->setChanged(true);
+    renderer.getMenuItemAtIndex(menuMgr.getCurrentMenu(), 0)->setChanged(true);
     renderer.resetCommandStates();
     renderer.exec();
 
@@ -448,8 +447,8 @@ test(testScrollingWithMoreThanOneItemOnRow) {
 
     // first get hold of the factory and add the drawing defaults
     auto& factory = reinterpret_cast<ConfigurableItemDisplayPropertiesFactory &>(renderer.getDisplayPropertiesFactory());
-    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ACTION, palette1, MenuPadding(4), pointer1, 1, 5, 25, GridPosition::JUSTIFY_LEFT_NO_VALUE);
-    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, palette1, MenuPadding(4), pointer1, 1, 5, 20, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT);
+    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ACTION, palette1, MenuPadding(4), pointer1, 1, 5, 25, GridPosition::JUSTIFY_LEFT_NO_VALUE, MenuBorder(0));
+    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, palette1, MenuPadding(4), pointer1, 1, 5, 20, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, MenuBorder(0));
     // now make a row 1 have 2 columns with boolItem1 in position 1 and menuSub in position 2.
     factory.addGridPosition(&boolItem1, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_WITH_VALUE, 2, 1, 1, 35));
     factory.addGridPosition(&menuSub, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 2, 2, 1, 35));
@@ -462,12 +461,11 @@ test(testScrollingWithMoreThanOneItemOnRow) {
     renderer.exec();
     assertTrue(renderer.checkCommands(true, true, true));
     assertEqual((bsize_t)0, renderer.getWidgetRecordings().count());
-    assertEqual(6, renderer.getTotalItemsInMenu());
     assertEqual((bsize_t)5, renderer.getMenuItemRecordings().count());
 
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(0), Coord(0, 0), Coord(320, 20), pointer1, GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 0, &textMenuItem1));
-    assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(1), Coord(0, 25), Coord(160, 35), pointer1, GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_WITH_VALUE, 0, &boolItem1));
-    assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(101), Coord(160, 25), Coord(160, 35), pointer1, GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 0, &menuSub));
+    assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(1), Coord(0, 25), Coord(159, 35), pointer1, GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_WITH_VALUE, 0, &boolItem1));
+    assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(101), Coord(160, 25), Coord(159, 35), pointer1, GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 0, &menuSub));
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(2), Coord(0, 65), Coord(320, 20), pointer1, GridPosition::DRAW_INTEGER_AS_UP_DOWN, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 0, &menuEnum1));
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(3), Coord(0, 90), Coord(320, 20), pointer1, GridPosition::DRAW_INTEGER_AS_SCROLL, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 0, &menuAnalog2));
 
@@ -550,13 +548,13 @@ test(testListRendering) {
     DisplayDrawing drawingTest;
     menuMgr.initWithoutInput(&renderer, &runtimeItem);
     auto& factory = reinterpret_cast<ConfigurableItemDisplayPropertiesFactory &>(renderer.getDisplayPropertiesFactory());
-    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_TITLE, palette1, MenuPadding(4), pointer2, 1, 10, 30, GridPosition::JUSTIFY_CENTER_NO_VALUE);
-    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, palette1, MenuPadding(4), pointer1, 1, 5, 20, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT);
+    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_TITLE, palette1, MenuPadding(4), pointer2, 1, 10, 30, GridPosition::JUSTIFY_CENTER_NO_VALUE, MenuBorder(0));
+    factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, palette1, MenuPadding(4), pointer1, 1, 5, 20, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, MenuBorder(0));
     taskManager.reset();
 
     renderer.resetCommandStates();
     renderer.exec();
-    assertEqual((bsize_t)4, renderer.getMenuItemRecordings().count());
+    assertEqual((bsize_t)5, renderer.getMenuItemRecordings().count());
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(0), Coord(0, 0), Coord(320, 30), pointer2, GridPosition::DRAW_TITLE_ITEM, GridPosition::JUSTIFY_CENTER_NO_VALUE, 0, &runtimeItem));
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(1), Coord(0, 40), Coord(320, 20), pointer1, GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 0, &runtimeItem));
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(2), Coord(0, 65), Coord(320, 20), pointer1, GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 0, &runtimeItem));

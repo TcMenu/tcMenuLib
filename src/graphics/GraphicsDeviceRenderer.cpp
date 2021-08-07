@@ -13,6 +13,9 @@ namespace tcgfx {
 
     GraphicsDeviceRenderer::GraphicsDeviceRenderer(int bufferSize, const char *appTitle, DeviceDrawable *drawable)
             : BaseGraphicalRenderer(bufferSize, 1, 1, false, appTitle), rootDrawable(drawable), drawable(drawable) {
+        const Coord &coord = rootDrawable->getDisplayDimensions();
+        width = coord.x;
+        height = coord.y;
     }
 
     void GraphicsDeviceRenderer::drawingCommand(BaseGraphicalRenderer::RenderDrawingCommand command) {

@@ -19,7 +19,7 @@
  */
 
 class TagValueRemoteConnector; // forward reference
-class FieldAndValue; // forward reference
+struct FieldAndValue; // forward reference
 
 /**
  * Message processors need to store some state while they are working through the fields
@@ -119,7 +119,6 @@ private:
 	int noOfHandlers;
 
 	MsgHandler* currHandler;
-    uint16_t currentMsgType;
 public:
 	/**
 	 * Consructor takes an array of processors and the number of processors in the array.
