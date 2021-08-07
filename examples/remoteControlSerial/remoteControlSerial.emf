@@ -295,7 +295,7 @@
       },
       {
         "name": "SERIAL_PORT",
-        "latestValue": "Serial1",
+        "latestValue": "Serial",
         "subsystem": "REMOTE"
       },
       {

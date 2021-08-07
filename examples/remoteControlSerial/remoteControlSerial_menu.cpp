@@ -19,6 +19,9 @@ TcMenuRemoteServer remoteServer(applicationInfo);
 Adafruit_PCD8544 gfx(35, 34, 38, 37, 36);
 AdafruitDrawable gfxDrawable(&gfx);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
+NoInitialisationNeeded serialInitializer;
+SerialTagValueTransport serialTransport(&Serial);
+TagValueRemoteServerConnection serialConnection(serialTransport, serialInitializer);
 
 // Global Menu Item declarations
 RENDERING_CALLBACK_NAME_INVOKE(fnRGBRtCall, rgbAlphaItemRenderFn, "RGB", -1, NO_CALLBACK)
@@ -69,7 +72,7 @@ void setupMenu() {
     renderer.setUseSliderForAnalog(false);
     switches.initialise(internalDigitalIo(), true);
     menuMgr.initForEncoder(&renderer, &menuAnalogIn, 2, 3, 4);
-    remoteServer.begin(&Serial1, &applicationInfo);
+    remoteServer.addConnection(&serialConnection);
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
     renderer.setUseSliderForAnalog(false);
     installMonoBorderedTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(nullptr, 1), true);
