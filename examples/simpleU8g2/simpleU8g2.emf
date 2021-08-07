@@ -244,6 +244,11 @@
         "subsystem": "INPUT"
       },
       {
+        "name": "ENCODER_IS_QUARTER_CYCLE",
+        "latestValue": "false",
+        "subsystem": "INPUT"
+      },
+      {
         "name": "ITEM_FONT",
         "latestValue": "def:,1",
         "subsystem": "THEME"
@@ -271,6 +276,8 @@
     ],
     "namingRecursive": true,
     "saveToSrc": false,
-    "useCppMain": false
+    "useCppMain": false,
+    "eepromDefinition": "eeprom:",
+    "authenticatorDefinition": ""
   }
 }

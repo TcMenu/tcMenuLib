@@ -11,14 +11,11 @@
 #include "simpleU8g2_menu.h"
 #include <Wire.h>
 #include <IoAbstractionWire.h>
-#include <ArduinoEEPROMAbstraction.h>
 
 // this is the interrupt pin connection from the PCF8574 back to the ESP8266 board.
 #define IO_INTERRUPT_PIN 12
 
 const char pgmCommittedToRom[] PROGMEM = "Saved to ROM";
-
-ArduinoEEPROMAbstraction arduinoEeprom(&EEPROM);
 
 void setup() {
     // If you use i2c and serial devices, be sure to start wire / serial.
@@ -28,8 +25,6 @@ void setup() {
     // here we initialise the EEPROM class to 512 bytes of storage
     // don't commit often to this, it's in FLASH
     EEPROM.begin(512);
-    // importantly, we then tell menu manager that this is the eeprom we are using
-    menuMgr.setEepromRef(&arduinoEeprom);
 
     // This is added by tcMenu Designer automatically during the first setup.
     setupMenu();
