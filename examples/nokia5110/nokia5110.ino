@@ -38,7 +38,7 @@ void setup() {
     Serial.begin(115200);
 
     addWidgetToTitleArea();
-    
+
     // initialise the menu
     setupMenu();
 
