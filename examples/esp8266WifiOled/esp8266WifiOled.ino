@@ -103,6 +103,7 @@ void setup() {
     menuMgr.load();
 
     startWiFi();
+    menuIoTMonitor.registerCommsNotification(onCommsChange);
 
     // now we add three icons into the icon cache, we should add one for each menu item that we give a grid position
     // that draws as an image.

@@ -140,8 +140,7 @@ void onCommsChange(CommunicationInfo info) {
 }
 
 void addWidgetToTitleArea() {
-    // first register for changes in connection state in the Ethernet connection.
-    remoteServer.getRemoteConnector(0)->setCommsNotificationCallback(onCommsChange);
+    menuIoTMonitor.registerCommsNotification(onCommsChange);
 
     // and give the renderer our widget.
     renderer.setFirstWidget(&connectedWidget);

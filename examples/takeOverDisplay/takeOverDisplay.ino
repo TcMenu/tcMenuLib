@@ -92,6 +92,8 @@ void setup() {
     switches.addSwitch(4, [](uint8_t, bool held) {
         serdebugF2("Extra switch ", (held ? "held" : "pressed"));
     }, 20, true);
+
+    menuConnectivityIoTMonitor.registerCommsNotification(onCommsChange);
 }
 
 //

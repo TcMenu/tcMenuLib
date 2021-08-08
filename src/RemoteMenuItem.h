@@ -38,7 +38,7 @@ public:
     /**
      * Construct a remote menu item providing the ID, maximum remotes supported and the next item
      */
-    RemoteMenuItem(const char* name, uint16_t id, MenuItem *next = nullptr);
+    RemoteMenuItem(const char* name, menuid_t id, MenuItem *next = nullptr);
 
     /**
      * Add all connections on a remote server to the list by their connector ID.
@@ -77,7 +77,7 @@ private:
     const char *pgmName;
     MenuCallbackFn onAuthChanged;
 public:
-    EepromAuthenticationInfoMenuItem(const char *name, MenuCallbackFn onAuthChanged, uint16_t id,
+    EepromAuthenticationInfoMenuItem(const char *name, MenuCallbackFn onAuthChanged, menuid_t id,
                                      MenuItem *next = nullptr);
 
     EepromAuthenticatorManager *getAuthManager();

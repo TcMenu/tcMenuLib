@@ -78,7 +78,7 @@ void onRemoteItemCommsNotify(CommunicationInfo info) {
 
 RemoteMenuItem* RemoteMenuItem::instance = nullptr;
 
-RemoteMenuItem::RemoteMenuItem(const char* pgmName, uint16_t id, MenuItem* next)
+RemoteMenuItem::RemoteMenuItem(const char* pgmName, menuid_t id, MenuItem* next)
 	: ListRuntimeMenuItem(id, 0, remoteInfoRenderFn, next), pgmName(pgmName) {
     instance = this;
 }
@@ -96,7 +96,7 @@ void RemoteMenuItem::setRemoteServer(tcremote::TcMenuRemoteServer& server) {
 // EEPROM Authentication manager start
 
 EepromAuthenticationInfoMenuItem::EepromAuthenticationInfoMenuItem(const char* pgmName, MenuCallbackFn onAuthChanged,
-                                                                   uint16_t id, MenuItem * next)
+                                                                   menuid_t id, MenuItem * next)
 	: ListRuntimeMenuItem(id, 0, authenticationMenuItemRenderFn, next), pgmName(pgmName), onAuthChanged(onAuthChanged) {
     if(menuMgr.getAuthenticator()->getAuthenticationManagerType() != AUTHENTICATION_IN_EEPROM) {
         setNumberOfRows(reinterpret_cast<EepromAuthenticatorManager*>(menuMgr.getAuthenticator())->getNumberOfEntries());

@@ -48,7 +48,7 @@ MenuItem* getParentRootAndVisit(MenuItem* current, MenuVisitorFn visitor) {
  * Find an item by it's ID by traversing through the menu structure looking
  * for the ID and short circuiting on the first match.
  */
-MenuItem* recursiveFindById(MenuItem* current, uint16_t id) {
+MenuItem* recursiveFindById(MenuItem* current, menuid_t id) {
     while(current != nullptr) {
         if(current->getId() == id) {
             return current;
@@ -66,7 +66,7 @@ MenuItem* recursiveFindById(MenuItem* current, uint16_t id) {
     return nullptr;
 }
 
-MenuItem* getMenuItemById(int id) {
+MenuItem* getMenuItemById(menuid_t id) {
     return recursiveFindById(menuMgr.getRoot(), id);
 }
 

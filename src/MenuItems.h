@@ -47,7 +47,7 @@ struct AnyMenuInfo {
 	/** the name given to this menu item */ 
 	char name[NAME_SIZE_T];
 	/** the identifier for this menu */
-	uint16_t id;
+	menuid_t id;
 	/** eeprom address for this item or -1 if not stored */
 	uint16_t eepromAddr;
 	/** maximum value that this type can store */
@@ -67,7 +67,7 @@ struct AnalogMenuInfo {
 	/** the name given to this menu item */ 
 	char name[NAME_SIZE_T];
 	/** the identifier for this menu */
-	uint16_t id;
+	menuid_t id;
 	/** eeprom address for this item or -1 if not stored */
 	uint16_t eepromAddr;
 	/** maximum value that this type can store */
@@ -104,7 +104,7 @@ struct EnumMenuInfo {
 	/** the name given to this menu item */ 
 	char name[NAME_SIZE_T];
 	/** the identifier for this menu */
-	uint16_t id;
+	menuid_t id;
 	/** eeprom address for this item or -1 if not stored */
 	uint16_t eepromAddr;
 	/** the number of items in the below array. */
@@ -145,7 +145,7 @@ struct BooleanMenuInfo {
 	/** the name given to this menu item */ 
 	char name[NAME_SIZE_T];
 	/** the identifier for this menu */
-	uint16_t id;
+	menuid_t id;
 	/** eeprom address for this item or -1 if not stored */
 	uint16_t eepromAddr;
 	/** maximum value that this type can store - always 1 */
@@ -170,7 +170,7 @@ struct SubMenuInfo {
 	/** the name given to this menu item */ 
 	char name[NAME_SIZE_T];
 	/** the identifier for this menu */
-	uint16_t id;
+	menuid_t id;
 	/** Not used for submenus. */
 	uint16_t eepromAddr;
 	/** maximum value that this type can store - always 0 */
@@ -187,7 +187,7 @@ struct FloatMenuInfo {
 	/** the name given to this menu item */ 
 	char name[NAME_SIZE_T];
 	/** the identifier for this menu */
-	uint16_t id;
+	menuid_t id;
 	/** eeprom address for this item or -1 if not stored */
 	uint16_t eepromAddr;
 	/** The number of decimal places to render to */
@@ -354,7 +354,7 @@ public:
      * */
 	uint8_t copyNameToBuffer(char* sz, int offset, int size) const;
 	/** Retrieves the ID from the info block */
-	uint16_t getId() const;
+	menuid_t getId() const;
 	/** Retrieves the maximum value for this menu type */
 	uint16_t getMaximumValue() const;
 	/** Retrieves the eeprom storage position for this menu (or 0xffff if not applicable) */

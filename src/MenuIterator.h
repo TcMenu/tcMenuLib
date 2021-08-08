@@ -59,7 +59,7 @@ MenuItem* getSubMenuFor(MenuItem* current);
  * @param the ID to locate the menu item  for
  * @return the menu item associated or NULL.
  */
-MenuItem* getMenuItemById(int id);
+MenuItem* getMenuItemById(menuid_t id);
 
 /**
  * Gets the item at the position requested within menu root.
