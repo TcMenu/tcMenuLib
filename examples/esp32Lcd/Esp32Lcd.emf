@@ -172,10 +172,11 @@
       "parentId": 6,
       "type": "scrollItem",
       "item": {
-        "itemWidth": 11,
+        "itemWidth": 10,
         "eepromOffset": 122,
         "numEntries": 4,
-        "choiceMode": "ARRAY_IN_EEPROM",
+        "choiceMode": "ARRAY_IN_RAM",
+        "variable": "ramChoices",
         "name": "New Choice Item",
         "variableName": "GridNewChoiceItem",
         "id": 12,
@@ -186,12 +187,26 @@
       }
     },
     {
-      "parentId": 6,
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "Connectivity",
+        "variableName": "Connectivity",
+        "id": 14,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 14,
       "type": "customBuildItem",
       "item": {
-        "menuType": "AUTHENTICATION",
-        "name": "Authenticator",
-        "id": 13,
+        "menuType": "REMOTE_IOT_MONITOR",
+        "name": "IoT Monitor",
+        "id": 15,
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
@@ -333,7 +348,7 @@
       }
     ],
     "namingRecursive": true,
-    "saveToSrc": true,
+    "saveToSrc": false,
     "useCppMain": false,
     "eepromDefinition": "",
     "authenticatorDefinition": ""

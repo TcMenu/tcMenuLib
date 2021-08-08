@@ -21,16 +21,18 @@
 #include <RemoteMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 #include <RuntimeMenuItem.h>
-#include <RemoteAuthentication.h>
 #include "tcMenuLiquidCrystal.h"
 
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
+extern TcMenuRemoteServer remoteServer;
 extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
 
 // Global Menu Item exports
-extern EepromAuthenticationInfoMenuItem menuGridAuthenticator;
+extern RemoteMenuItem menuConnectivityIoTMonitor;
+extern BackMenuItem menuBackConnectivity;
+extern SubMenuItem menuConnectivity;
 extern ScrollChoiceMenuItem menuGridNewChoiceItem;
 extern ActionMenuItem menuGridDown;
 extern ActionMenuItem menuGridUp;

@@ -1,5 +1,8 @@
 #include "esp32Lcd_menu.h"
 
+//                           0123456789012345678901234567890123456789
+char ramChoices[] = "Pot NoodleTakeaways FishNchipsPepperoni  ";
+
 //
 // Creating a grid layout just for a specific menu item. The flags menu under additional is laid out in a grid format,
 // where the menu items are presented two per row.
