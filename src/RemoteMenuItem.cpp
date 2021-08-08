@@ -10,7 +10,6 @@
 #include "tcUtil.h"
 #include "BaseDialog.h"
 
-const char NO_LINK_STR[] PROGMEM = "No Link";
 const char REMOVE_CONN_HDR_PGM[] PROGMEM = "Close Connection";
 
 // called when the close connection dialog completes.
@@ -46,8 +45,8 @@ int remoteInfoRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, ch
 			return true;
 		}
 		auto* baseRemote = remoteItem->pRemoteServer->getRemoteServerConnection(row);
-		if (baseRemote == nullptr || !baseRemote->connected()) {
-			safeProgCpy(buffer, NO_LINK_STR, bufferSize);
+		if (baseRemote == nullptr) {
+			buffer[0]=0;
 		}
 		else {
 		    baseRemote->copyConnectionStatus(buffer, bufferSize);

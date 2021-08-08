@@ -25,6 +25,11 @@
 /** The maxmimum ID that is allowed manually, only automated ID's for back items and similar will exceed this */
 #define MAXIMUM_ID_ALLOWED 32000
 
+typedef uint16_t menuid_t;
+
+/** Defines a menu ID that is not valid and may be used to indicate no menu item */
+#define INVALID_MENU_ID 0xffff
+
 /** the size of each name in program memory */
 #define NAME_SIZE_T 20
 

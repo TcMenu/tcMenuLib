@@ -49,7 +49,7 @@ namespace tcremote {
     };
 
     enum RemoteServerType: uint8_t {
-        TAG_VAL_REMOTE_SERVER
+        TAG_VAL_REMOTE_SERVER, SIMHUB_CONNECTOR
     };
 
     class BaseRemoteServerConnection {

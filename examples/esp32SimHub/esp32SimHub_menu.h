@@ -16,14 +16,13 @@
 #include "tcMenuAdaFruitGfx.h"
 #include "ESP32TouchKeysAbstraction.h"
 #include "SimhubConnector.h"
+#include <RemoteMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
 
-void setupMenu();  // forward reference of the menu setup function.
-extern const PROGMEM ConnectorLocalInfo applicationInfo;  // contains app name and ID
-
-// Global variables that need exporting
-
+// variables we declare that you may need to access
+extern const PROGMEM ConnectorLocalInfo applicationInfo;
+extern TcMenuRemoteServer remoteServer;
 extern Adafruit_ILI9341 gfx;
 extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
@@ -32,10 +31,10 @@ extern const GFXfont FreeSans9pt7b;
 extern const GFXfont FreeSans12pt7b;
 
 // Global Menu Item exports
-
 extern ActionMenuItem menuShowDashboard;
 extern AnalogMenuItem menuLap;
 extern EnumMenuItem menuDashboard;
+extern RemoteMenuItem menuSettingsIoTMonitor;
 extern EditableLargeNumberMenuItem menuSettingsLargeTest;
 extern BooleanMenuItem menuSettingsOverboost;
 extern ActionMenuItem menuSettingsShowDialogs;
@@ -48,8 +47,9 @@ extern TextMenuItem menuGear;
 extern AnalogMenuItem menuRPM;
 extern AnalogMenuItem menuSpeed;
 
-// Provide a wrapper to get hold of the root menu item
+// Provide a wrapper to get hold of the root menu item and export setupMenu
 inline MenuItem& rootMenuItem() { return menuSpeed; }
+void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION

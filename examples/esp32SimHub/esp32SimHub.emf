@@ -163,6 +163,19 @@
       }
     },
     {
+      "parentId": 4,
+      "type": "customBuildItem",
+      "item": {
+        "menuType": "REMOTE_IOT_MONITOR",
+        "name": "IoT Monitor",
+        "id": 14,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
       "parentId": 0,
       "type": "enumItem",
       "item": {
@@ -331,7 +344,7 @@
         "subsystem": "INPUT"
       },
       {
-        "name": "SERIAL_PORT",
+        "name": "SH_SERIAL_PORT",
         "latestValue": "Serial",
         "subsystem": "REMOTE"
       },
@@ -373,6 +386,8 @@
     ],
     "namingRecursive": true,
     "saveToSrc": false,
-    "useCppMain": false
+    "useCppMain": false,
+    "eepromDefinition": "",
+    "authenticatorDefinition": ""
   }
 }

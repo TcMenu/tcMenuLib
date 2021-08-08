@@ -43,13 +43,13 @@ ESP32TouchKeysAbstraction::ESP32TouchKeysAbstraction(int defThreshold, touch_hig
     startedUp = false;
     pinThreshold = defThreshold;
     enabledPinMask = 0;
+    taskManager.scheduleFixedRate(5, [] {serdebugF2("intCount=", intCount);}, TIME_SECONDS);
 }
 
 void ESP32TouchKeysAbstraction::ensureInterruptRegistered() {
     if(!startedUp) {
         startedUp = true;
         touch_pad_filter_start(DEFAULT_TOUCHKEY_FILTER_FREQ);
-        touch_pad_set_filter_period(10);
     }
 
     if(interruptCodeNeeded) {
