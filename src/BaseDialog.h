@@ -167,6 +167,8 @@ public:
     /** overriden in other types to handle show and hide differently */
     virtual void internalSetVisible(bool visible);
 
+    virtual char* getBufferData();
+
     /**
      * Close the current dialog by taking off the display and clearing the inuse flag.
      */
@@ -313,6 +315,8 @@ public:
     void insertMenuItem(MenuItem* item);
 
     void copyHeader(char *buffer, int bufferSize);
+
+    char* getBufferData() override { return const_cast<char *>(bufferItem.getTextValue()); }
 
 protected:
     /** not used in this implementation */

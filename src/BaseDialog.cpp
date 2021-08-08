@@ -165,9 +165,13 @@ bool BaseDialog::copyButtonText(char* data, int buttonNum, int currentValue, boo
     return false;
 }
 
+char* BaseDialog::getBufferData() {
+    return MenuRenderer::getInstance()->getBuffer();
+}
+
 void BaseDialog::copyIntoBuffer(const char* sz) {
     if(isInUse()) {
-        char* buffer = MenuRenderer::getInstance()->getBuffer();
+        char* buffer = getBufferData();
         uint8_t bufferSize = MenuRenderer::getInstance()->getBufferSize();
         strncpy(buffer, sz, bufferSize);
         int l = strlen(buffer);
@@ -194,7 +198,7 @@ void BaseDialog::setButtons(ButtonType btn1, ButtonType btn2, int defVal) {
 }
 
 void BaseDialog::encodeMessage(TagValueRemoteConnector* remote) {
-    remote->encodeDialogMsg(isInUse() ? DLG_VISIBLE : DLG_HIDDEN, button1, button2, header, MenuRenderer::getInstance()->getBuffer());
+    remote->encodeDialogMsg(isInUse() ? DLG_VISIBLE : DLG_HIDDEN, button1, button2, header, getBufferData());
 }
 
 void BaseDialog::remoteAction(ButtonType btn) {

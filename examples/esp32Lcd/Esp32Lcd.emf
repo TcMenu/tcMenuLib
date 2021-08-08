@@ -206,10 +206,11 @@
       "item": {
         "menuType": "REMOTE_IOT_MONITOR",
         "name": "IoT Monitor",
+        "variableName": "ConnectivityIoTMonitor",
         "id": 15,
         "eepromAddress": -1,
         "readOnly": false,
-        "localOnly": false,
+        "localOnly": true,
         "visible": true
       }
     }
