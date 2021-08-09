@@ -4,6 +4,7 @@
 #include <BaseRenderers.h>
 #include <MockEepromAbstraction.h>
 #include "fixtures_extern.h"
+#include "TestCapturingRenderer.h"
 
 extern MockedIoAbstraction mockIo;
 extern NoRenderer noRenderer; 
@@ -119,8 +120,9 @@ const PROGMEM AnyMenuInfo testActionInfo2 = { "ActTest", 2394, 0xffff,  0, NO_CA
 ActionMenuItem testActionItem2(&testActionInfo2, nullptr);
 
 test(addingItemsAndMenuCallbacks) {
+    TestCapturingRenderer testRenderer(320, 200, true, "hello");
     menuMgr.setRootMenu(&textMenuItem1);
-    menuMgr.initWithoutInput(&noRenderer, &textMenuItem1);
+    menuMgr.initWithoutInput(&testRenderer, &textMenuItem1);
     menuMgr.addChangeNotification(&menuMgrObserver);
     menuMgr.setItemCommittedHook(originalCommitCb);
 
@@ -141,7 +143,7 @@ test(addingItemsAndMenuCallbacks) {
     menuMgrObserver.reset();
     menuMgrObserver.setStartReturn(true);
     auto currentMenuValue = boolItem1.getBoolean();
-    menuMgr.valueChanged(1); // boolItem1
+    menuMgr.valueChanged(2); // boolItem1
     assertTrue(boolItem1.isActive());
     menuMgr.onMenuSelect(false);
 
@@ -161,7 +163,7 @@ test(addingItemsAndMenuCallbacks) {
     // now we move on to test an enum (integer) item and ensure we get the edit callbacks.
     menuMgrObserver.reset();
     menuMgrObserver.setStartReturn(true);
-    menuMgr.valueChanged(2); //  select menuEnum1
+    menuMgr.valueChanged(3); //  select menuEnum1
     menuMgr.onMenuSelect(false); // start edit
     assertTrue(menuMgrObserver.didTriggerStartEdit());
     assertTrue(menuEnum1.isEditing());
@@ -175,7 +177,7 @@ test(addingItemsAndMenuCallbacks) {
     // lastly try an enum item that does not go into editing because the callback returned false.
     menuMgrObserver.reset();
     menuMgrObserver.setStartReturn(false);
-    menuMgr.valueChanged(2); // menuEnum1
+    menuMgr.valueChanged(3); // menuEnum1
     menuMgr.onMenuSelect(false);
     assertTrue(menuMgrObserver.didTriggerStartEdit());
     assertFalse(menuEnum1.isEditing());
