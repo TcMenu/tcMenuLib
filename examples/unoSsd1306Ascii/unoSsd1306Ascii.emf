@@ -169,6 +169,9 @@
     "lastDisplayUuid": "1ec1b247-cc51-49d7-aa5c-dd0d4530751d",
     "lastInputUuid": "7daa6a81-dd09-422e-b83c-bda5045abaef",
     "lastRemoteUuid": "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb",
+    "lastRemoteUuids": [
+      "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
+    ],
     "lastThemeUuid": "850dc0a3-f534-47c2-94d8-1e64ff368a54",
     "applicationUUID": "c4858c2f-4134-4597-a7a0-b6719631a99b",
     "applicationName": "Uno1306Ascii",
@@ -231,6 +234,8 @@
     ],
     "namingRecursive": true,
     "saveToSrc": true,
-    "useCppMain": false
+    "useCppMain": false,
+    "eepromDefinition": "",
+    "authenticatorDefinition": ""
   }
 }

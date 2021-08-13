@@ -128,6 +128,9 @@
     "lastDisplayUuid": "bcd5fe34-9e9f-4fcb-9edf-f4e3caca0674",
     "lastInputUuid": "7daa6a81-dd09-422e-b83c-bda5045abaef",
     "lastRemoteUuid": "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb",
+    "lastRemoteUuids": [
+      "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
+    ],
     "lastThemeUuid": "850dc0a3-f534-47c2-94d8-1e64ff368a54",
     "applicationUUID": "2ba37227-a412-40b7-94e7-42caf9bb0ff4",
     "applicationName": "DfRobot",
@@ -175,6 +178,8 @@
     ],
     "namingRecursive": false,
     "saveToSrc": false,
-    "useCppMain": false
+    "useCppMain": false,
+    "eepromDefinition": "",
+    "authenticatorDefinition": ""
   }
 }

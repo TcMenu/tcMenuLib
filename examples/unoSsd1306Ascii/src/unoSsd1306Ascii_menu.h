@@ -19,16 +19,12 @@
 #include <DfRobotInputAbstraction.h>
 #include <RuntimeMenuItem.h>
 
-void setupMenu();  // forward reference of the menu setup function.
-extern const PROGMEM ConnectorLocalInfo applicationInfo;  // contains app name and ID
-
-// Global variables that need exporting
-
+// variables we declare that you may need to access
+extern const PROGMEM ConnectorLocalInfo applicationInfo;
 extern SSD1306AsciiAvrI2c gfx;
 extern SSD1306AsciiRenderer renderer;
 
 // Global Menu Item exports
-
 extern ListRuntimeMenuItem menuListItem;
 extern AnalogMenuItem menuStatusTemprature;
 extern FloatMenuItem menuStatusVoltageIn;
@@ -42,8 +38,9 @@ extern AnalogMenuItem menuGreen;
 extern AnalogMenuItem menuRed;
 extern AnalogMenuItem menuBrightness;
 
-// Provide a wrapper to get hold of the root menu item
+// Provide a wrapper to get hold of the root menu item and export setupMenu
 inline MenuItem& rootMenuItem() { return menuBrightness; }
+void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
