@@ -12,7 +12,8 @@
 
 using namespace tcremote;
 
-BLETagValTransport::BLETagValTransport() : fromApiCharacteristic(), readBuffer{}, readBufferPos(0), writeBuffer{}, writeBufferPos(0) {
+BLETagValTransport::BLETagValTransport() : TagValueTransport(TVAL_BUFFERED), fromApiCharacteristic(), readBuffer{},
+                                           readBufferPos(0), writeBuffer{}, writeBufferPos(0) {
 }
 
 int BLETagValTransport::writeChar(char data) {
@@ -94,7 +95,7 @@ bool BLEDeviceInitialisation::attemptInitialisation() {
     return true;
 }
 
-bool BLEDeviceInitialisation::attemptNewConnection(TagValueTransport *transport) {
+bool BLEDeviceInitialisation::attemptNewConnection(BaseRemoteServerConnection *transport) {
     BLE.poll();
     if(BLE.connected()) {
         auto central = BLE.central();

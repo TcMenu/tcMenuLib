@@ -167,6 +167,9 @@
     "lastDisplayUuid": "fc7b8f22-6553-43d6-9968-df4ee2562aaf",
     "lastInputUuid": "89cd7f70-0457-4884-97c2-0db904ccb0ba",
     "lastRemoteUuid": "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb",
+    "lastRemoteUuids": [
+      "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
+    ],
     "lastThemeUuid": "850dc0a3-f534-47c2-94d8-1e64ff368a54",
     "applicationUUID": "4df3d784-674a-4a3d-bcee-54a49693788e",
     "applicationName": "Factory",
@@ -229,6 +232,8 @@
     ],
     "namingRecursive": true,
     "saveToSrc": false,
-    "useCppMain": true
+    "useCppMain": true,
+    "eepromDefinition": "",
+    "authenticatorDefinition": ""
   }
 }

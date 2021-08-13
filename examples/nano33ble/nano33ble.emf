@@ -327,6 +327,8 @@
     ],
     "namingRecursive": true,
     "saveToSrc": false,
-    "useCppMain": false
+    "useCppMain": false,
+    "eepromDefinition": "",
+    "authenticatorDefinition": ""
   }
 }

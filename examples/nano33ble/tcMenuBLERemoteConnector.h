@@ -35,7 +35,7 @@ namespace tcremote {
 
         bool attemptInitialisation() override;
 
-        bool attemptNewConnection(TagValueTransport *transport) override;
+        bool attemptNewConnection(BaseRemoteServerConnection *connection) override;
     };
 
     class BLETagValTransport : public TagValueTransport {

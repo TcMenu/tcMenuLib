@@ -19,11 +19,8 @@
 #include <graphics/MenuTouchScreenEncoder.h>
 #include <RuntimeMenuItem.h>
 
-void setupMenu();  // forward reference of the menu setup function.
-extern const PROGMEM ConnectorLocalInfo applicationInfo;  // contains app name and ID
-
-// Global variables that need exporting
-
+// variables we declare that you may need to access
+extern const PROGMEM ConnectorLocalInfo applicationInfo;
 extern StChromaArtDrawable Drawable;
 extern GraphicsDeviceRenderer renderer;
 extern StBspTouchInterrogator touchInterrogator;
@@ -31,7 +28,6 @@ extern MenuTouchScreenManager touchScreen;
 extern const GFXfont FreeSans12pt7b;
 
 // Global Menu Item exports
-
 extern BooleanMenuItem menuConnectivityEnableUSB;
 extern BackMenuItem menuBackConnectivity;
 extern SubMenuItem menuConnectivity;
@@ -45,8 +41,9 @@ extern AnalogMenuItem menuBeltSpeed;
 extern EnumMenuItem menuBeltStatus;
 extern BooleanMenuItem menuPower;
 
-// Provide a wrapper to get hold of the root menu item
+// Provide a wrapper to get hold of the root menu item and export setupMenu
 inline MenuItem& rootMenuItem() { return menuPower; }
+void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
