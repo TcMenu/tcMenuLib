@@ -118,6 +118,9 @@ void setup() {
     props.addGridPosition(&menuLockDoor, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 3, 3, 26));
     props.addGridPosition(&menuSetup, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 1, 3, 26));
 
+    // after changing the drawing properties, always refresh the cache to ensure it draws properly.
+    tcgfx::ConfigurableItemDisplayPropertiesFactory::refreshCache();
+
     // now monitor the wifi level every second and report it in a widget.
     taskManager.scheduleFixedRate(1000, [] {
         if(WiFi.status() == WL_CONNECTED) {
