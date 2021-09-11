@@ -19,6 +19,8 @@
 #include <RemoteMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
+#include <IoAbstraction.h>
+#include <IoAbstractionWire.h>
 #include <ArduinoEEPROMAbstraction.h>
 #include <RemoteAuthentication.h>
 
@@ -29,6 +31,9 @@ extern U8G2_SH1106_128X64_NONAME_F_HW_I2C gfx;
 extern GraphicsDeviceRenderer renderer;
 extern WiFiServer server;
 extern EthernetInitialisation ethernetInitialisation;
+
+// Any externals needed by IO expanders, EEPROMs etc
+extern IoAbstractionRef ioexp_io8574;
 
 // Global Menu Item exports
 extern EepromAuthenticationInfoMenuItem menuAuthenticator;

@@ -34,20 +34,9 @@ char fileChoicesArray[255]{};
 #define WINDOW_PIN 3
 #define HEATER_PIN 4
 
-// this is the interrupt pin connection from the PCF8574 back to the ESP8266 board.
-#define IO_INTERRUPT_PIN 12
-
-
-//
-// ESP boards tend to have few pins available for general purpose use, to make things easier
-// this sketch assumes the rotary encoder and switch are attached to a PCF8574 IO Expander.
-// Change in menu designer's code generator to remove this if you prefer to use device pins.
-//
-//IoAbstractionRef io8574 = new LoggingIoAbstraction(ioFrom8574(0x20, IO_INTERRUPT_PIN), 8);
-IoAbstractionRef io8574 = ioFrom8574(0x20, IO_INTERRUPT_PIN);
-
 // we add two widgets that show both the connection status and wifi signal strength
 // these are added to the renderer and rendered upon any change.
+// https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/rendering-with-tcmenu-lcd-tft-oled/#titlewidget-for-presenting-state-in-icon-form
 TitleWidget connectedWidget(iconsConnection, 2, 16, 12);
 TitleWidget wifiWidget(iconsWifi, 5, 16, 12, &connectedWidget);
 

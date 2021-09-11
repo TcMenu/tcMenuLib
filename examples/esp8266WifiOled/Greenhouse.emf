@@ -325,7 +325,7 @@
       },
       {
         "name": "SWITCH_IODEVICE",
-        "latestValue": "",
+        "latestValue": "io8574",
         "subsystem": "INPUT"
       },
       {
@@ -413,6 +413,10 @@
     "saveToSrc": false,
     "useCppMain": false,
     "eepromDefinition": "eeprom:",
-    "authenticatorDefinition": "rom:100:6"
+    "authenticatorDefinition": "rom:100:6",
+    "projectIoExpanders": [
+      "deviceIO:",
+      "pcf8574:io8574:32:12"
+    ]
   }
 }
