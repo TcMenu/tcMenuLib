@@ -23,7 +23,6 @@ BaseDialog::BaseDialog() : header{0}, headerPgm(nullptr) {
     flags = 0;
     bitWrite(flags, DLG_FLAG_INUSE, false);
     button1 = button2 = BTNTYPE_NONE;
-
 }
 
 void BaseDialog::show(const char* headerPgm, bool allowRemote, CompletedHandlerFn completionCallback) {
@@ -320,4 +319,13 @@ void MenuBasedDialog::resetDialogFields() {
     bufferItem.setActive(false);
     btn1Item.setActive(false);
     btn2Item.setActive(false);
+}
+
+void withMenuDialogIfAvailable(DialogInitialiser dlgFn) {
+    if(MenuRenderer::getInstance() == nullptr) return;
+    BaseDialog* dlg = MenuRenderer::getInstance()->getDialog();
+
+    if(dlg && !dlg->isInUse() && dlg->isMenuItemBased()) {
+        dlgFn((MenuBasedDialog*)dlg);
+    }
 }

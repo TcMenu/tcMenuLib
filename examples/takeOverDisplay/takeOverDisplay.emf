@@ -452,6 +452,10 @@
     "saveToSrc": false,
     "useCppMain": false,
     "eepromDefinition": "at24:80:PAGESIZE_AT24C128",
-    "authenticatorDefinition": "rom:100:6"
+    "authenticatorDefinition": "rom:100:6",
+    "projectIoExpanders": [
+      "deviceIO:",
+      "customIO:io23017"
+    ]
   }
 }

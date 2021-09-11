@@ -612,6 +612,10 @@
     "saveToSrc": false,
     "useCppMain": false,
     "eepromDefinition": "avr:",
-    "authenticatorDefinition": "rom:100:6"
+    "authenticatorDefinition": "rom:100:6",
+    "projectIoExpanders": [
+      "deviceIO:",
+      "mcp23017:io23017:32:2"
+    ]
   }
 }

@@ -21,11 +21,6 @@ const char pgmListPressed[] PROGMEM = "List Item Pressed";
 const char pgmHeaderSavedItem[] PROGMEM = "Saved Item";
 const char * romSpaceNames = "item 01item 02item 03item 04item 05item 06item 07item 08item 09item 10 ";
 
-// In the designer UI we configured io23017 as an IoExpander variable for both the input and display.
-// We must now create it as an MCP23017 expander. Address is 0x20 with interrupt pin connected to pin 2.
-// make sure you've arranged for !RESET pin to be held HIGH!!
-IoAbstractionRef io23017 = ioFrom23017(0x20, ACTIVE_LOW_OPEN, 2);
-
 //
 // Here we add the keyboard components to the menu. For more general documentation of keyboards
 // https://www.thecoderscorner.com/products/arduino-libraries/io-abstraction/matrix-keyboard-keypad-manager/
@@ -104,7 +99,7 @@ void setup() {
 
 	// Here you could have a button internal to the device somewhere that reset the pins and remotes, in this case
 	// if the button is held at start up it trigger a key reset.
-    if(ioDeviceDigitalReadS(io23017, 5) == LOW) {
+    if(ioDeviceDigitalReadS(ioexp_io23017, 5) == LOW) {
         Serial.println("Resetting all keys and pin");
         authenticator->resetAllKeys();
     }

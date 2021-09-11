@@ -505,7 +505,7 @@
       },
       {
         "name": "TITLE_FONT",
-        "latestValue": "def:,1",
+        "latestValue": "ada:FreeSansBold9pt7b,1",
         "subsystem": "THEME"
       },
       {
@@ -533,6 +533,10 @@
     "saveToSrc": false,
     "useCppMain": false,
     "eepromDefinition": "at24:80:PAGESIZE_AT24C128",
-    "authenticatorDefinition": "rom:100:6"
+    "authenticatorDefinition": "rom:100:6",
+    "projectIoExpanders": [
+      "deviceIO:",
+      "pcf8574:io8574:32:0"
+    ]
   }
 }

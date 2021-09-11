@@ -19,6 +19,7 @@
 #include <RemoteMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
+#include <IoAbstraction.h>
 #include <EepromAbstractionWire.h>
 #include <RemoteAuthentication.h>
 #include "tcMenuLiquidCrystal.h"
@@ -26,11 +27,13 @@
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
 extern TcMenuRemoteServer remoteServer;
-extern IoAbstractionRef io23017;
 extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
 extern EthernetServer server;
 extern EthernetInitialisation ethernetInitialisation;
+
+// Any externals needed by IO expanders, EEPROMs etc
+extern IoAbstractionRef io23017;
 
 // Global Menu Item exports
 extern EepromAuthenticationInfoMenuItem menuConnectivityAuthenticator;

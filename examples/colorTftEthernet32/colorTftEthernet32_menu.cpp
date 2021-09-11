@@ -11,10 +11,12 @@
 #include <tcMenu.h>
 #include "colorTftEthernet32_menu.h"
 #include "ThemeCoolBlueTraditional.h"
+#include <Fonts/FreeSansBold9pt7b.h>
 
 // Global variable declarations
 const  ConnectorLocalInfo applicationInfo = { "Ada32 Ethernet", "22813e5e-88b1-42d5-9601-4831b2be369b" };
 TcMenuRemoteServer remoteServer(applicationInfo);
+IoAbstractionRef ioexp_io8574 = ioFrom8574(0x20, 0);
 I2cAt24Eeprom glI2cRom(0x50, PAGESIZE_AT24C128);
 EepromAuthenticatorManager authManager(6);
 Adafruit_ST7735 gfx(6, 7, 3);
@@ -99,12 +101,12 @@ void setupMenu() {
     gfx.initR(INITR_BLACKTAB);
     gfx.setRotation(1);
     renderer.setUpdatesPerSecond(5);
-    switches.initialiseInterrupt(io8574, true);
+    switches.initialiseInterrupt(ioexp_io8574, true);
     menuMgr.initForEncoder(&renderer, &menuVoltage, 7, 6, 5);
     remoteServer.addConnection(&ethernetConnection);
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_ALWAYS);
     renderer.setUseSliderForAnalog(true);
-    installCoolBlueTraditionalTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(nullptr, 1), true);
+    installCoolBlueTraditionalTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(&FreeSansBold9pt7b, 1), true);
 
     // We have an IoT monitor, register the server
     menuIoTMonitor.setRemoteServer(remoteServer);

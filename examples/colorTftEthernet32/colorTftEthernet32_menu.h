@@ -19,6 +19,8 @@
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 #include <RemoteMenuItem.h>
+#include <IoAbstraction.h>
+#include <IoAbstractionWire.h>
 #include <EepromAbstractionWire.h>
 #include <RemoteAuthentication.h>
 
@@ -28,9 +30,12 @@ extern TcMenuRemoteServer remoteServer;
 extern Adafruit_ST7735 gfx;
 extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
-extern IoAbstractionRef io8574;
 extern EthernetServer server;
 extern EthernetInitialisation ethernetInitialisation;
+extern const GFXfont FreeSansBold9pt7b;
+
+// Any externals needed by IO expanders, EEPROMs etc
+extern IoAbstractionRef ioexp_io8574;
 
 // Global Menu Item exports
 extern ActionMenuItem menuTakeDisplay;

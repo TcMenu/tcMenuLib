@@ -7,6 +7,7 @@
 #include <Ethernet.h>
 #include <SPI.h>
 #include <IoLogging.h>
+#include "ColorEtherenetCustomDraw.h"
 
 // contains the graphical widget title components.
 #include "stockIcons/wifiAndConnectionIcons16x12.h"
@@ -25,15 +26,20 @@ byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
 };
 
-// then we setup the IO expander that the also set up in the designer for input.
-IoAbstractionRef io8574 = ioFrom8574(0x20, 0); // on addr 0x20 and interrupt pin 0
-
 // and we create an analog device with enhanced range because we are using a 32bit board.
 ArduinoAnalogDevice analogDevice(12, 10);
 
 // We add a title widget that shows when a user is connected to the device. Connection icons
 // are in the standard icon set we included at the top.
 TitleWidget connectedWidget(iconsConnection, 2, 16, 12);
+
+// We also want to take over the display whenever the screen becomes idle, here we use the CustomDrawing
+// technique described in the documentation. See ColorEthernetCustomDraw.h
+ColorEthernetCustomDraw myCustomDraw;
+
+// Here we declare a string in const/PROGMEM for use with a dialog later. Note that this works even on ARM
+// boards that don't have separated program memory.
+const char pgmHeaderSavedItem[] PROGMEM = "Rom Item Saved";
 
 // Start 2nd Encoder
 // Here, we use a second rotary encoder to adjust one of the menu items, the button toggles a boolean item
@@ -101,6 +107,9 @@ void setup() {
         menuVoltA1.setFloatValue(a1Value * 3.3);
     });
 
+    // register the custom drawing handler
+    renderer.setCustomDrawingHandler(&myCustomDraw);
+
     // Start 2nd encoder
     Serial.println("Setting up second encoder now");
 
@@ -131,8 +140,8 @@ void writeToDac() {
     float volts = menuVoltage.getAsFloatingPointValue();
     float curr = menuCurrent.getAsFloatingPointValue();
     
-    float total = (volts / 64.0) * (curr / 2.0);
-    analogDevice.setCurrentFloat(A0, (unsigned int)total);
+    float total = (volts / 64.0F) * (curr / 2.0F);
+    analogDevice.setCurrentFloat(A0, total);
     menuVoltA0.setFloatValue(total);
 }
 
@@ -153,42 +162,8 @@ void CALLBACK_FUNCTION onSaveRom(int /*id*/) {
     menuMgr.save();
 }
 
-bool starting = true;
-
-const char pgmHeaderSavedItem[] PROGMEM = "Rom Item Saved";
-
-void myRenderCallback(unsigned int encoderVal, RenderPressMode pressType) {
-    if(pressType == RPRESS_HELD)
-    {
-        // if the encoder / select button is held, we go back to the menu.
-        renderer.giveBackDisplay();
-    }
-    else if(starting)
-    {
-        // you need to handle the clearing and preparation of the display when you're first called.
-        // the easiest way is to set a flag such as this and then prepare the display.
-        starting = false;
-        switches.getEncoder()->changePrecision(1000, 500);
-        gfx.setCursor(0, 0);
-        gfx.fillRect(0, 0, gfx.width(), gfx.height(), BLACK);
-        gfx.setFont(nullptr);
-        gfx.setTextSize(2);
-        gfx.print("Encoder ");
-    }
-    else
-    {
-        GFXcanvas1 canvas(100, 20);
-        canvas.fillScreen(BLACK);
-        canvas.setCursor(0,0);
-        canvas.print(encoderVal);
-        canvas.setTextSize(2);
-        gfx.drawBitmap(0, 35, canvas.getBuffer(), 100, 20, WHITE, BLACK);
-    }
-}
-
 void CALLBACK_FUNCTION onTakeDisplay(int /*id*/) {
-    starting = true;
-    renderer.takeOverDisplay(myRenderCallback);
+    renderer.takeOverDisplay();
 }
 
 void CALLBACK_FUNCTION onRgbChanged(int /*id*/) {
@@ -200,7 +175,7 @@ void CALLBACK_FUNCTION onSaveItem(int /*id*/) {
     auto itemNo = menuRomLocation.getCurrentValue();
     auto itemSize = menuRomChoice.getItemWidth();
     auto position = menuRomChoice.getEepromStart() + (itemNo * itemSize);
-    eeprom.writeArrayToRom(position, (const uint8_t*)menuRomText.getTextValue(), 10);
+    menuMgr.getEepromAbstraction()->writeArrayToRom(position, (const uint8_t*)menuRomText.getTextValue(), 10);
 
     if(renderer.getDialog()->isInUse()) return;
     renderer.getDialog()->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
@@ -212,7 +187,7 @@ void CALLBACK_FUNCTION onRomLocationChange(int /*id*/) {
     auto itemNo = menuRomLocation.getCurrentValue();
     char sz[12];
     auto itemSize = menuRomChoice.getItemWidth();
-    eeprom.readIntoMemArray((uint8_t*)sz, menuRomChoice.getEepromStart() + (itemNo * itemSize), 10);
+    menuMgr.getEepromAbstraction()->readIntoMemArray((uint8_t*)sz, menuRomChoice.getEepromStart() + (itemNo * itemSize), 10);
     menuRomText.setTextValue(sz);
     serdebugF2("Rom data was ", sz)
 }
@@ -225,7 +200,7 @@ void CALLBACK_FUNCTION onRomLocationChange(int /*id*/) {
 int CALLBACK_FUNCTION fnRomLocationRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize) {
    switch(mode) {
     case RENDERFN_INVOKE:
-        onRomLocationChange(item->getId());
+        onRomLocationChange(int(item->getId()));
         return true;
     case RENDERFN_NAME:
         // TODO - each row has it's own name - 0xff is the parent item

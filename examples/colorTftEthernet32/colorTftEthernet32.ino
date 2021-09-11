@@ -7,6 +7,8 @@
 #include <Ethernet.h>
 #include <SPI.h>
 #include <IoLogging.h>
+#include "ColorEtherenetCustomDraw.h"
+#include <tcMenuVersion.h>
 
 // contains the graphical widget title components.
 #include "stockIcons/wifiAndConnectionIcons16x12.h"
@@ -25,15 +27,20 @@ byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
 };
 
-// then we setup the IO expander that the also set up in the designer for input.
-IoAbstractionRef io8574 = ioFrom8574(0x20, 0); // on addr 0x20 and interrupt pin 0
-
 // and we create an analog device with enhanced range because we are using a 32bit board.
 ArduinoAnalogDevice analogDevice(12, 10);
 
 // We add a title widget that shows when a user is connected to the device. Connection icons
 // are in the standard icon set we included at the top.
 TitleWidget connectedWidget(iconsConnection, 2, 16, 12);
+
+// We also want to take over the display whenever the screen becomes idle, here we use the CustomDrawing
+// technique described in the documentation. See ColorEthernetCustomDraw.h
+ColorEthernetCustomDraw myCustomDraw;
+
+// Here we declare a string in const/PROGMEM for use with a dialog later. Note that this works even on ARM
+// boards that don't have separated program memory.
+const char pgmHeaderSavedItem[] PROGMEM = "Rom Item Saved";
 
 // Start 2nd Encoder
 // Here, we use a second rotary encoder to adjust one of the menu items, the button toggles a boolean item
@@ -49,7 +56,7 @@ const int ledPin = 1;
 // when there's a change in communication status (connection or disconnection for example) this gets called.
 // see further down in the code where we add this to the remote IoT monitor.
 void onCommsChange(CommunicationInfo info) {
-    if(info.remoteNo == 0) {
+    if(info.remoteNo == 0U) {
         connectedWidget.setCurrentState(info.connected ? 1 : 0);
     }
     // this relies on logging in IoAbstraction's ioLogging.h, to turn it on visit the file for instructions.
@@ -96,15 +103,28 @@ void setup() {
     menuIpAddress.copyValue(sz, sizeof(sz));
     Serial.print("Ethernet available on ");Serial.println(sz);
 
-    taskManager.scheduleFixedRate(2250, [] {
+    taskManager.scheduleFixedRate(250, [] {
         float a1Value = analogDevice.getCurrentFloat(A1);
-        menuVoltA1.setFloatValue(a1Value * 3.3);
+        menuVoltA1.setFloatValue(a1Value * 3.3F);
+    });
+
+    // register the custom drawing handler
+    renderer.setCustomDrawingHandler(&myCustomDraw);
+
+    ioDevicePinMode(switches.getIoAbstraction(), ledPin, OUTPUT);
+
+    setTitlePressedCallback([](int id) {
+        withMenuDialogIfAvailable([](MenuBasedDialog* dlg) {
+            dlg->setButtons(BTNTYPE_CLOSE, BTNTYPE_NONE);
+            dlg->showRam("ARM Example", false);
+            char menuVer[10];
+            tccore::copyTcMenuVersion(menuVer, sizeof menuVer);
+            dlg->copyIntoBuffer(menuVer);
+        });
     });
 
     // Start 2nd encoder
     Serial.println("Setting up second encoder now");
-
-    ioDevicePinMode(switches.getIoAbstraction(), ledPin, OUTPUT);
 
     // here we want the encoder set to the range of values that menuCurrent takes, this is just for example,
     // and you could set the range to anything that is required. We use the callback to update the menu item.
@@ -131,8 +151,8 @@ void writeToDac() {
     float volts = menuVoltage.getAsFloatingPointValue();
     float curr = menuCurrent.getAsFloatingPointValue();
     
-    float total = (volts / 64.0) * (curr / 2.0);
-    analogDevice.setCurrentFloat(A0, (unsigned int)total);
+    float total = (volts / 64.0F) * (curr / 2.0F);
+    analogDevice.setCurrentFloat(A0, total);
     menuVoltA0.setFloatValue(total);
 }
 
@@ -153,42 +173,8 @@ void CALLBACK_FUNCTION onSaveRom(int /*id*/) {
     menuMgr.save();
 }
 
-bool starting = true;
-
-const char pgmHeaderSavedItem[] PROGMEM = "Rom Item Saved";
-
-void myRenderCallback(unsigned int encoderVal, RenderPressMode pressType) {
-    if(pressType == RPRESS_HELD)
-    {
-        // if the encoder / select button is held, we go back to the menu.
-        renderer.giveBackDisplay();
-    }
-    else if(starting)
-    {
-        // you need to handle the clearing and preparation of the display when you're first called.
-        // the easiest way is to set a flag such as this and then prepare the display.
-        starting = false;
-        switches.getEncoder()->changePrecision(1000, 500);
-        gfx.setCursor(0, 0);
-        gfx.fillRect(0, 0, gfx.width(), gfx.height(), BLACK);
-        gfx.setFont(nullptr);
-        gfx.setTextSize(2);
-        gfx.print("Encoder ");
-    }
-    else
-    {
-        GFXcanvas1 canvas(100, 20);
-        canvas.fillScreen(BLACK);
-        canvas.setCursor(0,0);
-        canvas.print(encoderVal);
-        canvas.setTextSize(2);
-        gfx.drawBitmap(0, 35, canvas.getBuffer(), 100, 20, WHITE, BLACK);
-    }
-}
-
 void CALLBACK_FUNCTION onTakeDisplay(int /*id*/) {
-    starting = true;
-    renderer.takeOverDisplay(myRenderCallback);
+    renderer.takeOverDisplay();
 }
 
 void CALLBACK_FUNCTION onRgbChanged(int /*id*/) {
@@ -225,7 +211,7 @@ void CALLBACK_FUNCTION onRomLocationChange(int /*id*/) {
 int CALLBACK_FUNCTION fnRomLocationRtCall(RuntimeMenuItem * item, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize) {
    switch(mode) {
     case RENDERFN_INVOKE:
-        onRomLocationChange(item->getId());
+        onRomLocationChange(int(item->getId()));
         return true;
     case RENDERFN_NAME:
         // TODO - each row has it's own name - 0xff is the parent item

@@ -325,4 +325,15 @@ protected:
     void resetDialogFields();
 };
 
+/** a callback method that is used alongside withMenuDialogIfAvailable(..) */
+typedef void (*DialogInitialiser)(MenuBasedDialog*);
+
+/**
+ * A small helper that checks if we can use the dialog, and then calls the provided function if we can.
+ * Note: only works with MenuBasedDialog
+ *
+ * @param dlgFn the function to be called with the dialog object pointer, if getting the dialog was successful.
+ */
+void withMenuDialogIfAvailable(DialogInitialiser dlgFn);
+
 #endif //TCMENU_BASE_DIALOG_H_

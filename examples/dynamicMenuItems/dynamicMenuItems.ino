@@ -7,9 +7,6 @@
 #include "dynamicMenuItems_menu.h"
 #include <IoAbstractionWire.h>
 
-// Part of the helper method for dealing with dialogs.
-typedef void (*DialogInitialiser)(MenuBasedDialog*);
-
 // we declare a reference to an io expander as our encoder is on I2C
 IoAbstractionRef io8574 = ioFrom8574(0x20, 0); // on addr 0x20 and interrupt pin 0
 
@@ -128,16 +125,6 @@ void CALLBACK_FUNCTION onStartCooking(int id) {
 }
 
 //
-// a small helper that checks if we can use the dialog, and then calls the provided function if we can.
-//
-void withDialogIfAvailable(DialogInitialiser dlgFn) {
-    BaseDialog* dlg = renderer.getDialog();
-    if(dlg && !dlg->isInUse() && dlg->isMenuItemBased()) {
-        dlgFn((MenuBasedDialog*)dlg);
-    }
-}
-
-//
 // here we create an extra menu item that allows us to have three lines of text in the info dialog, made up of the
 // title, the buffer line, and also this line, then the buttons. It uses the showRam function which shows from
 // a non constant / PGM string
@@ -146,7 +133,7 @@ RENDERING_CALLBACK_NAME_INVOKE(fnExtraDialogLine, textItemRenderFn, "Detail: ", 
 TextMenuItem secondItem(fnExtraDialogLine, nextRandomId(), 12, nullptr);
 
 void CALLBACK_FUNCTION onDialogInfo(int id) {
-    withDialogIfAvailable([](MenuBasedDialog* dlg) {
+    withMenuDialogIfAvailable([](MenuBasedDialog* dlg) {
         // we set it to have only one button, named close.
         dlg->setButtons(BTNTYPE_NONE, BTNTYPE_CLOSE);
 
@@ -171,7 +158,7 @@ void CALLBACK_FUNCTION onDialogInfo(int id) {
 const char pgmQuestionHeader[] PROGMEM = {"Question.."};
 taskid_t questionTask = TASKMGR_INVALIDID;
 void CALLBACK_FUNCTION onDialogQuestion(int id) {
-    withDialogIfAvailable([] (MenuBasedDialog* dlg) {
+    withMenuDialogIfAvailable([] (MenuBasedDialog* dlg) {
         dlg->setButtons(BTNTYPE_ACCEPT, BTNTYPE_CANCEL);
         dlg->show(pgmQuestionHeader, true, [](ButtonType btn, void* data) {
             // this is the completion task that runs when the dialog is dismissed.
@@ -251,7 +238,7 @@ public:
 MyDialogController dialogController;
 
 void CALLBACK_FUNCTION onDialogController(int id) {
-    withDialogIfAvailable([](MenuBasedDialog* dlg) {
+    withMenuDialogIfAvailable([](MenuBasedDialog* dlg) {
         dlg->setButtons(BTNTYPE_OK, BTNTYPE_CUSTOM0);
         dlg->showController(true, &dialogController);
         dlg->copyIntoBuffer("Press up/down");
