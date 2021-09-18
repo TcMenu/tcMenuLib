@@ -13,6 +13,7 @@
 #include "mbed/HalStm32EepromAbstraction.h"
 #include <stockIcons/wifiAndConnectionIcons16x12.h>
 #include <RemoteMenuItem.h>
+#include <tcMenuVersion.h>
 
 #ifdef BUILD_FOR_MBED_6
 BufferedSerial serPort(USBTX, USBRX);
@@ -88,7 +89,9 @@ void setup() {
         if(dlg && !dlg->isInUse()) {
             dlg->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
             dlg->show("Mbed demo", false);
-            dlg->copyIntoBuffer("//TheCodersCorner");
+            char szVer[10];
+            tccore::copyTcMenuVersion(szVer, sizeof szVer);
+            dlg->copyIntoBuffer(szVer);
         }
     });
 

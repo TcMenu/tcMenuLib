@@ -22,6 +22,7 @@
 #include <RemoteMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
+#include <IoAbstraction.h>
 #include <mbed/HalStm32EepromAbstraction.h>
 #include <RemoteAuthentication.h>
 
@@ -33,6 +34,9 @@ extern Adafruit_SSD1306_Spi gfx;
 extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
 extern MbedEthernetInitialiser mbedEthInitialisation;
+
+// Any externals needed by IO expanders, EEPROMs etc
+
 
 // Global Menu Item exports
 extern TextMenuItem menuEdit;

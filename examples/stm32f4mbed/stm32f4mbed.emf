@@ -360,7 +360,7 @@
       },
       {
         "name": "SWITCH_IODEVICE",
-        "latestValue": "",
+        "latestValue": "devicePins",
         "subsystem": "INPUT"
       },
       {
@@ -443,6 +443,9 @@
     "saveToSrc": false,
     "useCppMain": true,
     "eepromDefinition": "bsp:0",
-    "authenticatorDefinition": "rom:100:6"
+    "authenticatorDefinition": "rom:100:6",
+    "projectIoExpanders": [
+      "deviceIO:"
+    ]
   }
 }
