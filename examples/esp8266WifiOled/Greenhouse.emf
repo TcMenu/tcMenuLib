@@ -325,7 +325,7 @@
       },
       {
         "name": "SWITCH_IODEVICE",
-        "latestValue": "io8574",
+        "latestValue": "devicePins",
         "subsystem": "INPUT"
       },
       {

@@ -511,6 +511,9 @@
     "saveToSrc": false,
     "useCppMain": true,
     "eepromDefinition": "eeprom:",
-    "authenticatorDefinition": "rom:200:6"
+    "authenticatorDefinition": "rom:200:6",
+    "projectIoExpanders": [
+      "deviceIO:"
+    ]
   }
 }

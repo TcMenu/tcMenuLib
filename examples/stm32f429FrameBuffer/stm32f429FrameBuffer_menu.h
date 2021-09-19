@@ -18,6 +18,7 @@
 #include "tcMenuStChromaArt.h"
 #include <graphics/MenuTouchScreenEncoder.h>
 #include <RuntimeMenuItem.h>
+#include <IoAbstraction.h>
 
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
@@ -26,6 +27,9 @@ extern GraphicsDeviceRenderer renderer;
 extern StBspTouchInterrogator touchInterrogator;
 extern MenuTouchScreenManager touchScreen;
 extern const GFXfont FreeSans12pt7b;
+
+// Any externals needed by IO expanders, EEPROMs etc
+
 
 // Global Menu Item exports
 extern BooleanMenuItem menuConnectivityEnableUSB;

@@ -388,6 +388,9 @@
     "saveToSrc": false,
     "useCppMain": false,
     "eepromDefinition": "",
-    "authenticatorDefinition": ""
+    "authenticatorDefinition": "",
+    "projectIoExpanders": [
+      "deviceIO:"
+    ]
   }
 }

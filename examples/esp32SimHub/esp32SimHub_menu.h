@@ -19,6 +19,7 @@
 #include <RemoteMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
+#include <IoAbstraction.h>
 
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
@@ -29,6 +30,9 @@ extern GraphicsDeviceRenderer renderer;
 extern ESP32TouchKeysAbstraction esp32Touch;
 extern const GFXfont FreeSans9pt7b;
 extern const GFXfont FreeSans12pt7b;
+
+// Any externals needed by IO expanders, EEPROMs etc
+
 
 // Global Menu Item exports
 extern ActionMenuItem menuShowDashboard;

@@ -35,6 +35,7 @@
 #include "DashCustomDrawing.h"
 #include "RobotoMonoBold60pt.h"
 #include <Fonts/FreeSans18pt7b.h>
+#include <tcMenuVersion.h>
 
 // here we pulsate an LED using the ESP32's DAC
 const int dacPin = 32;
@@ -80,12 +81,13 @@ void setup() {
     });
 
     setTitlePressedCallback([](int id) {
-        auto* dlg = renderer.getDialog();
-        if(dlg && !dlg->isInUse()) {
-            dlg->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
+        withMenuDialogIfAvailable([](MenuBasedDialog* dlg) {
+            dlg->setButtons(BTNTYPE_OK, BTNTYPE_NONE);
             dlg->show(applicationInfo.name, true);
-            dlg->copyIntoBuffer("by theCodersCorner");
-        }
+            char szVersion[10];
+            tccore::copyTcMenuVersion(szVersion, sizeof szVersion);
+            dlg->copyIntoBuffer(szVersion);
+        });
     });
 
     //

@@ -142,10 +142,10 @@ void setup() {
     // Now we configure our simulated heater and window.. We use inverse
     // logic on the 8574 because it's better at pulling down to GND than up.
     //
-    ioDevicePinMode(io8574, WINDOW_PIN, OUTPUT);
-    ioDevicePinMode(io8574, HEATER_PIN, OUTPUT);
-    ioDeviceDigitalWrite(io8574, WINDOW_PIN, HIGH);
-    ioDeviceDigitalWriteS(io8574, HEATER_PIN, HIGH);
+    ioDevicePinMode(ioexp_io8574, WINDOW_PIN, OUTPUT);
+    ioDevicePinMode(ioexp_io8574, HEATER_PIN, OUTPUT);
+    ioDeviceDigitalWrite(ioexp_io8574, WINDOW_PIN, HIGH);
+    ioDeviceDigitalWriteS(ioexp_io8574, HEATER_PIN, HIGH);
 }
 
 //
@@ -176,7 +176,7 @@ void windowOpenFn() {
     }
     else windowOpen = false;
 
-    ioDeviceDigitalWriteS(io8574, WINDOW_PIN, windowOpen);
+    ioDeviceDigitalWriteS(ioexp_io8574, WINDOW_PIN, windowOpen);
 }
 
 // we are using a simulated low speed PWM to control the heater
@@ -193,7 +193,7 @@ void heaterOnFn() {
     }
     else heaterOn = false;
 
-    ioDeviceDigitalWriteS(io8574, HEATER_PIN, heaterOn);
+    ioDeviceDigitalWriteS(ioexp_io8574, HEATER_PIN, heaterOn);
 }
 
 //

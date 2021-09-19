@@ -99,7 +99,7 @@ void setup() {
 
 	// Here you could have a button internal to the device somewhere that reset the pins and remotes, in this case
 	// if the button is held at start up it trigger a key reset.
-    if(ioDeviceDigitalReadS(io23017, 5) == LOW) {
+    if(ioDeviceDigitalReadS(ioexp_io23017, 5) == LOW) {
         Serial.println("Resetting all keys and pin");
         authenticator->resetAllKeys();
     }

@@ -20,6 +20,7 @@
 #include <RemoteMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
+#include <IoAbstraction.h>
 #include <ArduinoEEPROMAbstraction.h>
 #include <RemoteAuthentication.h>
 
@@ -35,6 +36,9 @@ extern WiFiServer server;
 extern EthernetInitialisation ethernetInitialisation;
 extern WiFiServer server2;
 extern EthernetInitialisation ethernetInitialisation2;
+
+// Any externals needed by IO expanders, EEPROMs etc
+
 
 // Global Menu Item exports
 extern EepromAuthenticationInfoMenuItem menuConnectivityAuthenticator;
