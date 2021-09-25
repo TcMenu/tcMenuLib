@@ -17,7 +17,7 @@ namespace tccore {
 // here we define the version as both a string and separate field
 #define TCMENU_MAJOR 2
 #define TCMENU_MINOR 2
-#define TCMENU_PATCH 3
+#define TCMENU_PATCH 4
 
 /**
  * A helper to generate the major minor version numbers used in the protocol

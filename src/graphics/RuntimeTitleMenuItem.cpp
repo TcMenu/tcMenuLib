@@ -5,6 +5,7 @@
 
 #include "PlatformDetermination.h"
 #include "RuntimeTitleMenuItem.h"
+
 namespace tcgfx {
 
     RuntimeTitleMenuItem appTitleMenuItem(0, nullptr);

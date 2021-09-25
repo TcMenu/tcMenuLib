@@ -5,10 +5,10 @@
  */
 
 #include "dynamicMenuItems_menu.h"
+#include <BaseDialog.h>
 #include <IoAbstractionWire.h>
-
-// we declare a reference to an io expander as our encoder is on I2C
-IoAbstractionRef io8574 = ioFrom8574(0x20, 0); // on addr 0x20 and interrupt pin 0
+#include <graphics/RuntimeTitleMenuItem.h>
+#include <tcMenuVersion.h>
 
 // Pizza toppings that we forward referenced in the scroll choice item, when in RAM or EEPROM then they are declared in
 // a flat array based on the item size.
@@ -97,13 +97,34 @@ void prepareOvenMenuAtRuntime() {
     menuMgr.addMenuAfter(&menuBackOven, &menuOvenTempItem);
 }
 
+//
+// We register a handler that will be called when the title menu item is selected, see setup where we set the callback
+//
+void onTitlePressed(int /*id*/) {
+    withMenuDialogIfAvailable([] (MenuBasedDialog* dlg) {
+        dlg->setButtons(BTNTYPE_CLOSE, BTNTYPE_NONE);
+        dlg->showRam("Title clicked", false);
+        char szVer[10];
+        tccore::copyTcMenuVersion(szVer, sizeof szVer);
+        dlg->copyIntoBuffer(szVer);
+    });
+}
+
 void setup() {
+    // If we use wire or serial, it's our responsibility to prepare it.
     Serial.begin(115200);
     Wire.begin();
     setupMenu();
+
+    // Here we add a menu observer that is notified as events take place on the menu.
     menuMgr.addChangeNotification(&myMgrObserver);
+
+    // Now we set up the runtime parameters of various menu items
     prepareOvenMenuAtRuntime();
     menuList.setNumberOfRows(numListItems);
+
+    // and lastly we add the title callback that is notified of the title being selected
+    appTitleMenuItem.setCallback(onTitlePressed);
 }
 
 void loop() {
@@ -152,17 +173,24 @@ void CALLBACK_FUNCTION onDialogInfo(int id) {
 }
 
 //
-// Shows a question dialog that gets the title from const/program memory. Notice that in this case we have a completion handler
-// that accepts the final value, so that we could do something with the result.
+// Shows a question dialog that gets the title from const/program memory. Notice that in this case we have a completion
+// handler that accepts the final value, so that we could do something with the result.
 //
-const char pgmQuestionHeader[] PROGMEM = {"Question.."};
+const char pgmQuestionHeader[] PROGMEM = {"Override the title?"};
+const char pgmTitleOverride[] PROGMEM = {"Title Overridden"};
 taskid_t questionTask = TASKMGR_INVALIDID;
 void CALLBACK_FUNCTION onDialogQuestion(int id) {
     withMenuDialogIfAvailable([] (MenuBasedDialog* dlg) {
-        dlg->setButtons(BTNTYPE_ACCEPT, BTNTYPE_CANCEL);
+        dlg->setButtons(BTNTYPE_OK, BTNTYPE_CANCEL);
         dlg->show(pgmQuestionHeader, true, [](ButtonType btn, void* data) {
             // this is the completion task that runs when the dialog is dismissed.
             Serial.print("Question result was "); Serial.println(btn);
+            if(btn == BTNTYPE_OK) {
+                appTitleMenuItem.setTitleOverridePgm(pgmTitleOverride);
+            }
+            else {
+                appTitleMenuItem.clearTitleOverride();
+            }
             taskManager.cancelTask(questionTask);
         });
 
@@ -179,7 +207,6 @@ void CALLBACK_FUNCTION onDialogQuestion(int id) {
 // In this case we create a controller based dialog that increments and decrements a number that is stored within
 // an Analog item. We add the analog item and also an extra button to the dialog.
 //
-
 class MyDialogController : public BaseDialogController {
 private:
     // create an extra button (buttonNum = 2)

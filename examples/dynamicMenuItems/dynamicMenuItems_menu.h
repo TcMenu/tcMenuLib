@@ -16,13 +16,17 @@
 #include "tcMenuAdaFruitGfx.h"
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
+#include <IoAbstraction.h>
+#include <IoAbstractionWire.h>
 
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
 extern Adafruit_ST7735 gfx;
 extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
-extern IoAbstractionRef io8574;
+
+// Any externals needed by IO expanders, EEPROMs etc
+extern IoAbstractionRef ioexp_io8574;
 
 // Global Menu Item exports
 extern ListRuntimeMenuItem menuList;

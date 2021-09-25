@@ -14,7 +14,7 @@
 
 // Global variable declarations
 const  ConnectorLocalInfo applicationInfo = { "Dynamic Menus", "5f22995e-8da2-49c4-9ec8-d055901003af" };
-
+IoAbstractionRef ioexp_io8574 = ioFrom8574(0x20, 0);
 Adafruit_ST7735 gfx(6, 7, 3);
 AdafruitDrawable gfxDrawable(&gfx);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
@@ -72,7 +72,7 @@ void setupMenu() {
     gfx.initR(INITR_BLACKTAB);
     gfx.setRotation(0);
     renderer.setUpdatesPerSecond(5);
-    switches.initialiseInterrupt(io8574, true);
+    switches.initialiseInterrupt(ioexp_io8574, true);
     menuMgr.initForEncoder(&renderer, &menuMainPower, 7, 6, 5);
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
     renderer.setUseSliderForAnalog(true);
