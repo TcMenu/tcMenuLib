@@ -279,11 +279,6 @@
         "subsystem": "DISPLAY"
       },
       {
-        "name": "YIELDING_WIRE_CB",
-        "latestValue": "true",
-        "subsystem": "DISPLAY"
-      },
-      {
         "name": "DISPLAY_CLOCK_PIN",
         "latestValue": "U8X8_PIN_NONE",
         "subsystem": "DISPLAY"
@@ -311,6 +306,11 @@
       {
         "name": "UPDATES_PER_SEC",
         "latestValue": "10",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "YIELDING_WIRE_CB",
+        "latestValue": "true",
         "subsystem": "DISPLAY"
       },
       {
@@ -415,8 +415,8 @@
     "eepromDefinition": "eeprom:",
     "authenticatorDefinition": "rom:100:6",
     "projectIoExpanders": [
-      "deviceIO:",
-      "pcf8574:io8574:32:12"
+      "pcf8574:io8574:32:12",
+      "deviceIO:"
     ]
   }
 }

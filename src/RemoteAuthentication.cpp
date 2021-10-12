@@ -80,7 +80,7 @@ void EepromAuthenticatorManager::copyKeyNameToBuffer(int idx, char* buffer, int 
 }
 
 void EepromAuthenticatorManager::resetAllKeys() {
-    serdebugF("Resetting auth store");
+    serdebugF2("Resetting auth store: ", numberOfEntries);
     eeprom->write16(romStart, magicKey);
     for(int i=0; i<numberOfEntries;i++) {
         // we just zero the name and UUID first character, to clear it.
@@ -88,6 +88,7 @@ void EepromAuthenticatorManager::resetAllKeys() {
         eeprom->write8(eepromOffset(i) + CLIENT_DESC_SIZE, 0);
     }
 	changePin("1234");
+    serdebugF("Finished reset of auth store. Pin is now 1234");
 }
 
 int EepromAuthenticatorManager::findSlotFor(const char* name) {
