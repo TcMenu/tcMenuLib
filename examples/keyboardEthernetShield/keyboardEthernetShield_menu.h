@@ -20,8 +20,8 @@
 #include <ScrollChoiceMenuItem.h>
 #include <RemoteMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
-#include <IoAbstractionWire.h>
 #include <IoAbstraction.h>
+#include <IoAbstractionWire.h>
 #include <EepromAbstraction.h>
 #include <RemoteAuthentication.h>
 #include "tcMenuLiquidCrystal.h"

@@ -614,8 +614,8 @@
     "eepromDefinition": "avr:",
     "authenticatorDefinition": "rom:100:6",
     "projectIoExpanders": [
-      "mcp23017:io23017:32:2",
-      "deviceIO:"
+      "deviceIO:",
+      "mcp23017:io23017:32:2"
     ]
   }
 }

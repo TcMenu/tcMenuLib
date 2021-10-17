@@ -419,6 +419,11 @@
         "subsystem": "DISPLAY"
       },
       {
+        "name": "ST7735_TAB_TYPE",
+        "latestValue": "INITR_BLACKTAB",
+        "subsystem": "DISPLAY"
+      },
+      {
         "name": "DISPLAY_ROTATION",
         "latestValue": "1",
         "subsystem": "DISPLAY"
@@ -535,8 +540,8 @@
     "eepromDefinition": "at24:80:PAGESIZE_AT24C128",
     "authenticatorDefinition": "rom:100:6",
     "projectIoExpanders": [
-      "deviceIO:",
-      "pcf8574:io8574:32:0"
+      "pcf8574:io8574:32:0",
+      "deviceIO:"
     ]
   }
 }

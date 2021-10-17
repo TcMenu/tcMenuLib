@@ -19,8 +19,8 @@
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 #include <RemoteMenuItem.h>
-#include <IoAbstraction.h>
 #include <IoAbstractionWire.h>
+#include <IoAbstraction.h>
 #include <EepromAbstractionWire.h>
 #include <RemoteAuthentication.h>
 

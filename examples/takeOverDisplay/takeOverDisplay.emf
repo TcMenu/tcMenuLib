@@ -454,8 +454,8 @@
     "eepromDefinition": "at24:80:PAGESIZE_AT24C128",
     "authenticatorDefinition": "rom:100:6",
     "projectIoExpanders": [
-      "customIO:io23017",
-      "deviceIO:"
+      "deviceIO:",
+      "customIO:io23017"
     ]
   }
 }

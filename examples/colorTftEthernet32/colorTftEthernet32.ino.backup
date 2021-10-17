@@ -8,6 +8,7 @@
 #include <SPI.h>
 #include <IoLogging.h>
 #include "ColorEtherenetCustomDraw.h"
+#include <tcMenuVersion.h>
 
 // contains the graphical widget title components.
 #include "stockIcons/wifiAndConnectionIcons16x12.h"
@@ -55,7 +56,7 @@ const int ledPin = 1;
 // when there's a change in communication status (connection or disconnection for example) this gets called.
 // see further down in the code where we add this to the remote IoT monitor.
 void onCommsChange(CommunicationInfo info) {
-    if(info.remoteNo == 0) {
+    if(info.remoteNo == 0U) {
         connectedWidget.setCurrentState(info.connected ? 1 : 0);
     }
     // this relies on logging in IoAbstraction's ioLogging.h, to turn it on visit the file for instructions.
@@ -102,18 +103,28 @@ void setup() {
     menuIpAddress.copyValue(sz, sizeof(sz));
     Serial.print("Ethernet available on ");Serial.println(sz);
 
-    taskManager.scheduleFixedRate(2250, [] {
+    taskManager.scheduleFixedRate(250, [] {
         float a1Value = analogDevice.getCurrentFloat(A1);
-        menuVoltA1.setFloatValue(a1Value * 3.3);
+        menuVoltA1.setFloatValue(a1Value * 3.3F);
     });
 
     // register the custom drawing handler
     renderer.setCustomDrawingHandler(&myCustomDraw);
 
+    ioDevicePinMode(switches.getIoAbstraction(), ledPin, OUTPUT);
+
+    setTitlePressedCallback([](int id) {
+        withMenuDialogIfAvailable([](MenuBasedDialog* dlg) {
+            dlg->setButtons(BTNTYPE_CLOSE, BTNTYPE_NONE);
+            dlg->showRam("ARM Example", false);
+            char menuVer[10];
+            tccore::copyTcMenuVersion(menuVer, sizeof menuVer);
+            dlg->copyIntoBuffer(menuVer);
+        });
+    });
+
     // Start 2nd encoder
     Serial.println("Setting up second encoder now");
-
-    ioDevicePinMode(switches.getIoAbstraction(), ledPin, OUTPUT);
 
     // here we want the encoder set to the range of values that menuCurrent takes, this is just for example,
     // and you could set the range to anything that is required. We use the callback to update the menu item.

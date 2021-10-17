@@ -169,11 +169,6 @@
         "subsystem": "DISPLAY"
       },
       {
-        "name": "YIELDING_WIRE_CB",
-        "latestValue": "true",
-        "subsystem": "DISPLAY"
-      },
-      {
         "name": "DISPLAY_CLOCK_PIN",
         "latestValue": "5",
         "subsystem": "DISPLAY"
@@ -204,6 +199,11 @@
         "subsystem": "DISPLAY"
       },
       {
+        "name": "YIELDING_WIRE_CB",
+        "latestValue": "true",
+        "subsystem": "DISPLAY"
+      },
+      {
         "name": "PULLUP_LOGIC",
         "latestValue": "true",
         "subsystem": "INPUT"
@@ -215,7 +215,7 @@
       },
       {
         "name": "SWITCH_IODEVICE",
-        "latestValue": "",
+        "latestValue": "devicePins",
         "subsystem": "INPUT"
       },
       {
@@ -278,6 +278,9 @@
     "saveToSrc": false,
     "useCppMain": false,
     "eepromDefinition": "eeprom:",
-    "authenticatorDefinition": ""
+    "authenticatorDefinition": "",
+    "projectIoExpanders": [
+      "deviceIO:"
+    ]
   }
 }
