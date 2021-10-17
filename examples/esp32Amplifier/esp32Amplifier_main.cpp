@@ -19,8 +19,8 @@
 #include <tcMenuVersion.h>
 #include "AmplifierController.h"
 #include "app_icondata.h"
-#include "TouchCalibrator.h"
 #include "TestingDialogController.h"
+#include <extras/DrawableTouchCalibrator.h>
 
 const char pgmVersionHeader[] PROGMEM = "tcMenu Version";
 
@@ -56,7 +56,7 @@ void setup() {
     controller.initialise();
     touchScreen.calibrateMinMaxValues(0.250F, 0.890F, 0.09F, 0.88F);
 
-    renderer.setCustomDrawingHandler(new TouchScreenCalibrator(&touchScreen));
+    renderer.setCustomDrawingHandler(new tcextras::TouchScreenCalibrator(&touchScreen, &renderer));
 
     // first we get the graphics factory
     auto & factory = renderer.getGraphicsPropertiesFactory();
