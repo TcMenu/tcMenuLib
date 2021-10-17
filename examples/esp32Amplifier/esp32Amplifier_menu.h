@@ -48,6 +48,7 @@ extern TextMenuItem menuConnectivitySSID;
 extern IpAddressMenuItem menuConnectivityIPAddress;
 extern BackMenuItem menuBackConnectivity;
 extern SubMenuItem menuConnectivity;
+extern AnalogMenuItem menuStatusTest;
 extern ListRuntimeMenuItem menuStatusDataList;
 extern ActionMenuItem menuStatusShowDialogs;
 extern AnalogMenuItem menuStatusRightVU;

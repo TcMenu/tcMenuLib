@@ -309,6 +309,23 @@
       }
     },
     {
+      "parentId": 6,
+      "type": "analogItem",
+      "item": {
+        "maxValue": 65535,
+        "offset": -5000,
+        "divisor": 10,
+        "unitName": "U",
+        "name": "Test",
+        "variableName": "StatusTest",
+        "id": 28,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
       "parentId": 0,
       "type": "subMenu",
       "item": {

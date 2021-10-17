@@ -192,8 +192,8 @@ uint16_t AnalogMenuItem::getActualDecimalDivisor() const {
 
 WholeAndFraction AnalogMenuItem::getWholeAndFraction() const {
 	WholeAndFraction wf;
-	int calcVal = int16_t(getCurrentValue()) + getOffset();
-	int divisor = getDivisor();
+	int32_t calcVal = int32_t(getCurrentValue()) + int32_t(getOffset());
+	int32_t divisor = getDivisor();
 
     wf.negative = (calcVal < 0);
 

@@ -46,7 +46,9 @@ RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Conne
 const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 12, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuConnectivityIPAddress);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL);
-ListRuntimeMenuItem menuStatusDataList(21, 0, fnStatusDataListRtCall, NULL);
+const PROGMEM AnalogMenuInfo minfoStatusTest = { "Test", 28, 0xffff, 65535, NO_CALLBACK, -5000, 10, "U" };
+AnalogMenuItem menuStatusTest(&minfoStatusTest, 0, NULL);
+ListRuntimeMenuItem menuStatusDataList(21, 0, fnStatusDataListRtCall, &menuStatusTest);
 const PROGMEM AnyMenuInfo minfoStatusShowDialogs = { "Show Dialogs", 20, 0xffff, 0, onShowDialogs };
 ActionMenuItem menuStatusShowDialogs(&minfoStatusShowDialogs, &menuStatusDataList);
 const PROGMEM AnalogMenuInfo minfoStatusRightVU = { "Right VU", 16, 0xffff, 30000, NO_CALLBACK, -20000, 1000, "dB" };

@@ -415,8 +415,8 @@
     "eepromDefinition": "eeprom:",
     "authenticatorDefinition": "rom:100:6",
     "projectIoExpanders": [
-      "pcf8574:io8574:32:12",
-      "deviceIO:"
+      "deviceIO:",
+      "pcf8574:io8574:32:12"
     ]
   }
 }
