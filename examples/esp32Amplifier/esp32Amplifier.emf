@@ -171,9 +171,10 @@
         "divisor": 10,
         "unitName": "s",
         "name": "Warm up time",
-        "variableName": "",
+        "variableName": "SettingsWarmUpTime",
         "id": 11,
         "eepromAddress": 7,
+        "functionName": "@warmUpChanged",
         "readOnly": false,
         "localOnly": false,
         "visible": true
@@ -188,9 +189,10 @@
         "divisor": 10,
         "unitName": "s",
         "name": "Valve Heating",
-        "variableName": "",
+        "variableName": "SettingsValveHeating",
         "id": 17,
         "eepromAddress": 15,
+        "functionName": "@valveHeatingChanged",
         "readOnly": false,
         "localOnly": false,
         "visible": true

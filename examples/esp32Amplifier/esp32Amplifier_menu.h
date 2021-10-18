@@ -88,5 +88,7 @@ void CALLBACK_FUNCTION onMuteSound(int id);
 void CALLBACK_FUNCTION onSaveSettings(int id);
 void CALLBACK_FUNCTION onShowDialogs(int id);
 void CALLBACK_FUNCTION onVolumeChanged(int id);
+void CALLBACK_FUNCTION valveHeatingChanged(int id);
+void CALLBACK_FUNCTION warmUpChanged(int id);
 
 #endif // MENU_GENERATED_CODE_H
