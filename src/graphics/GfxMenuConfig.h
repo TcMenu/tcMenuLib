@@ -149,19 +149,23 @@ namespace tcgfx {
         /**
          * Create a simple grid position that represents a row with a single column with optional override of the row height
          * @param mode the mode in which to draw the item
+         * @param justification the desired justification for this item
+         * @param row the row on which to draw the item
          * @param height the height of the item or leave blank for default
          */
         GridPosition(GridDrawingMode mode, GridJustification justification, int row, int height = 0)
                 : gridSize(1), gridPosition(1), gridHeight(height),rowPosition(row), drawingMode(mode), justification(justification) { }
 
-        /**
-         * Create a more complex multi column grid with height, this represents a single row with one or more columns,
-         * a position in the columns, and if need be, a height override.
-         * @param mode the mode in which to draw the item
-         * @param size the number of columns in the row
-         * @param pos the column position in the row
-         * @param hei the height of the row, or 0 for the default height.
-         */
+                /**
+                 * Create a more complex multi column grid with height, this represents a single row with one or more columns,
+                 * a position in the columns, and if need be, a height override.
+                 * @param mode the mode in which to draw the item
+                 * @param justification the desired justification for this item
+                 * @param size the number of columns in the row
+                 * @param pos the column position in the row
+                 * @param row the row on which to draw the item
+                 * @param hei the height of the row, or 0 for the default height.
+                 */
         GridPosition(GridDrawingMode mode, GridJustification just, int size, int pos, int row, int hei)
                 : gridSize(size), gridPosition(pos), gridHeight(hei), rowPosition(row), drawingMode(mode), justification(just) { }
 
