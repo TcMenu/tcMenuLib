@@ -318,6 +318,13 @@ public:
     }
 
     /**
+     * Completely turn off the reset interval so there will never be a reset.
+     */
+    void turnOffResetLogic() {
+        resetValInTicks = MAX_TICKS;
+    }
+
+    /**
      * Sets the callback that will receive reset events when the menu has not been edited
      * for some time. You can optionally use an instance of CustomDrawing instead of this,
      * and that will be notified of both reset events and take over display events.
