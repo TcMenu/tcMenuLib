@@ -86,23 +86,42 @@ namespace tcgfx {
             DRAW_TITLE_ITEM
         };
 
+        /**
+         * Represents the justification of both the item name and the value within the items drawing space. This controls exactly
+         * what text is presented, and the position too.
+         */
         enum GridJustification : uint8_t {
+            /** Indicates left justification - usually use of the combined types below */
             CORE_JUSTIFY_LEFT = 1,
+            /** Indicates right justification - usually use of the combined types below */
             CORE_JUSTIFY_RIGHT = 2,
+            /** Indicates centre justification - usually use of the combined types below */
             CORE_JUSTIFY_CENTER = 3,
 
+            /** usually use of the combined types below */
             CORE_JUSTIFY_VALUE_REQUIRED = 0b1000,
+            /** usually use of the combined types below */
             CORE_JUSTIFY_NAME_REQUIRED  = 0b0100,
 
+            /** Justify the item name on the left and the value on the right */
             JUSTIFY_TITLE_LEFT_VALUE_RIGHT = 0,
+            /** Justify the item name and value on the right */
             JUSTIFY_TITLE_LEFT_WITH_VALUE = CORE_JUSTIFY_LEFT + CORE_JUSTIFY_NAME_REQUIRED + CORE_JUSTIFY_VALUE_REQUIRED,
+            /** Justify the item name and value centered */
             JUSTIFY_CENTER_WITH_VALUE = CORE_JUSTIFY_CENTER + CORE_JUSTIFY_NAME_REQUIRED + CORE_JUSTIFY_VALUE_REQUIRED,
+            /** Justify the item name and value on the right */
             JUSTIFY_RIGHT_WITH_VALUE = CORE_JUSTIFY_RIGHT + CORE_JUSTIFY_NAME_REQUIRED + CORE_JUSTIFY_VALUE_REQUIRED,
+            /** Justify just the item name to the left */
             JUSTIFY_LEFT_NO_VALUE = CORE_JUSTIFY_LEFT + CORE_JUSTIFY_NAME_REQUIRED,
+            /** Justify just the item name in the center */
             JUSTIFY_CENTER_NO_VALUE = CORE_JUSTIFY_CENTER + CORE_JUSTIFY_NAME_REQUIRED,
+            /** Justify just the item name in the center */
             JUSTIFY_RIGHT_NO_VALUE = CORE_JUSTIFY_RIGHT + CORE_JUSTIFY_NAME_REQUIRED,
+            /** Justify just the items current value to the left */
             JUSTIFY_LEFT_VALUE_ONLY= CORE_JUSTIFY_LEFT + CORE_JUSTIFY_VALUE_REQUIRED,
+            /** Justify just the items current value in the center */
             JUSTIFY_CENTER_VALUE_ONLY = CORE_JUSTIFY_CENTER + CORE_JUSTIFY_VALUE_REQUIRED,
+            /** Justify just the items current value to the right */
             JUSTIFY_RIGHT_VALUE_ONLY = CORE_JUSTIFY_RIGHT + CORE_JUSTIFY_VALUE_REQUIRED
         };
     private:
