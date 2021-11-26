@@ -7,12 +7,11 @@
 
 using namespace tcremote;
 
-BaseBufferedRemoteTransport::BaseBufferedRemoteTransport(BufferingMode bufferMode, int8_t readBufferSize, int writeBufferSize)
+BaseBufferedRemoteTransport::BaseBufferedRemoteTransport(BufferingMode bufferMode, uint8_t readBufferSize, uint8_t writeBufferSize)
         : TagValueTransport(TVAL_BUFFERED), writeBufferSize(writeBufferSize), writeBufferPos(0),
-          readBufferSize(readBufferSize), readBufferPos(0), readBufferAvail(0), mode(bufferMode) {
+        readBufferSize(readBufferSize), readBufferPos(0), readBufferAvail(0), mode(bufferMode), bufferWriteCheckTask(0), ticksSinceWrite(0) {
     readBuffer = new uint8_t[readBufferSize];
     writeBuffer = new uint8_t[writeBufferSize];
-    ticksSinceWrite = 0;
 }
 
 BaseBufferedRemoteTransport::~BaseBufferedRemoteTransport() {

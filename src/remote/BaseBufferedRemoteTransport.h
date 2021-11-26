@@ -24,15 +24,15 @@ namespace tcremote {
         const int writeBufferSize;
         uint8_t* readBuffer;
         uint8_t* writeBuffer;
-        int writeBufferPos;
-        const int8_t readBufferSize;
-        int8_t readBufferPos;
-        int8_t readBufferAvail;
+        uint8_t writeBufferPos;
+        const uint8_t readBufferSize;
+        uint8_t readBufferPos;
+        uint8_t readBufferAvail;
         BufferingMode mode;
         taskid_t bufferWriteCheckTask;
         uint8_t ticksSinceWrite;
     public:
-        BaseBufferedRemoteTransport(BufferingMode bufferMode, int8_t readBufferSize, int writeBufferSize);
+        BaseBufferedRemoteTransport(BufferingMode bufferMode, uint8_t readBufferSize, uint8_t writeBufferSize);
         ~BaseBufferedRemoteTransport() override;
 
         void endMsg() override;
