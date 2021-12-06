@@ -68,7 +68,10 @@ void setup() {
     Wire.begin();
     Serial.begin(115200);
 
+    // here we make all menu items except menu voltage wrap around. Wrap means that when the value hits maximum it
+    // goes back to 0, and when it hits 0 it goes back to maximum. Default is all wrapping off.
     menuMgr.setUseWrapAroundEncoder(true);
+    menuMgr.addEncoderWrapOverride(menuVoltage, false);
 
     // Often the easiest way to add a comms listener, is to add it to an IoT monitor menu item as we show
     // here, as it aggregates all the connection information together.
@@ -230,9 +233,6 @@ int CALLBACK_FUNCTION fnRomLocationRtCall(RuntimeMenuItem * item, uint8_t row, R
     default: return false;
     }
 }
-
-
-
 
 void CALLBACK_FUNCTION onShowHidden(int id) {
     menuHiddenItem.setVisible(menuShowHidden.getBoolean());
