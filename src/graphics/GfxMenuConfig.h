@@ -18,6 +18,7 @@
 #include <SimpleCollections.h>
 #include "MenuItems.h"
 #include "DrawingPrimitives.h"
+#include <IoLogging.h>
 
 
 namespace tcgfx {

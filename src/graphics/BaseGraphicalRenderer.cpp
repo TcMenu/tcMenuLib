@@ -263,6 +263,7 @@ void BaseGraphicalRenderer::checkIfRootHasChanged() {
         currentRootMenu = rootItem;
         redrawMode = MENUDRAW_COMPLETE_REDRAW;
         recalculateDisplayOrder(rootItem, false);
+        menuMgr.majorOrderChangeApplied(itemOrderByRow.count());
     }
 }
 

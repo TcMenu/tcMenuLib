@@ -170,6 +170,21 @@
       }
     },
     {
+      "parentId": 11,
+      "type": "boolItem",
+      "item": {
+        "naming": "YES_NO",
+        "name": "Show Hidden",
+        "variableName": "ShowHidden",
+        "id": 30,
+        "eepromAddress": -1,
+        "functionName": "onShowHidden",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
       "parentId": 0,
       "type": "subMenu",
       "item": {

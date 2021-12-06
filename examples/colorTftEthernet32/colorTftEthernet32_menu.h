@@ -54,6 +54,7 @@ extern FloatMenuItem menuVoltA1;
 extern FloatMenuItem menuVoltA0;
 extern BackMenuItem menuBackStatus;
 extern SubMenuItem menuStatus;
+extern BooleanMenuItem menuShowHidden;
 extern Rgb32MenuItem menuRGB;
 extern BooleanMenuItem menuTempCheck;
 extern ActionMenuItem menuHiddenItem;
@@ -81,6 +82,7 @@ void CALLBACK_FUNCTION onLimitMode(int id);
 void CALLBACK_FUNCTION onRgbChanged(int id);
 void CALLBACK_FUNCTION onSaveItem(int id);
 void CALLBACK_FUNCTION onSaveRom(int id);
+void CALLBACK_FUNCTION onShowHidden(int id);
 void CALLBACK_FUNCTION onTakeDisplay(int id);
 void CALLBACK_FUNCTION onVoltageChange(int id);
 

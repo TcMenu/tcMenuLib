@@ -59,8 +59,10 @@ RENDERING_CALLBACK_NAME_INVOKE(fnStatusRtCall, backSubItemRenderFn, "Status", -1
 const SubMenuInfo minfoStatus = { "Status", 7, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackStatus(fnStatusRtCall, &menuVoltA0);
 SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuConnectivity);
+const BooleanMenuInfo minfoShowHidden = { "Show Hidden", 30, 0xffff, 1, onShowHidden, NAMING_YES_NO };
+BooleanMenuItem menuShowHidden(&minfoShowHidden, false, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnRGBRtCall, rgbAlphaItemRenderFn, "RGB", 16, onRgbChanged)
-Rgb32MenuItem menuRGB(26, fnRGBRtCall, false, NULL);
+Rgb32MenuItem menuRGB(26, fnRGBRtCall, false, &menuShowHidden);
 const BooleanMenuInfo minfoTempCheck = { "Temp Check", 13, 9, 1, NO_CALLBACK, NAMING_ON_OFF };
 BooleanMenuItem menuTempCheck(&minfoTempCheck, false, &menuRGB);
 const AnyMenuInfo minfoHiddenItem = { "Hidden item", 16, 0xffff, 0, NO_CALLBACK };

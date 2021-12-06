@@ -68,6 +68,8 @@ void setup() {
     Wire.begin();
     Serial.begin(115200);
 
+    menuMgr.setUseWrapAroundEncoder(true);
+
     // Often the easiest way to add a comms listener, is to add it to an IoT monitor menu item as we show
     // here, as it aggregates all the connection information together.
     menuIoTMonitor.registerCommsNotification(onCommsChange);
@@ -75,6 +77,8 @@ void setup() {
     // and set up the dac on the 32 bit board.
     analogDevice.initPin(A0, DIR_OUT);
     analogDevice.initPin(A1, DIR_IN);
+
+    menuShowHidden.setBoolean(false);
 
     // here we make the menuitem "hidden item" invisible. It will not be displayed.
     // here it is done before setupMenu is called, so there's no need to refresh the
@@ -131,7 +135,7 @@ void setup() {
     secondEncoder = new HardwareRotaryEncoder(encoder2APin, encoder2BPin, [](int encoderValue) {
         menuCurrent.setCurrentValue(encoderValue);
     });
-    secondEncoder->changePrecision(menuCurrent.getMaximumValue(), menuCurrent.getCurrentValue());
+    secondEncoder->changePrecision(menuCurrent.getMaximumValue(), menuCurrent.getCurrentValue(), true);
     switches.setEncoder(1, secondEncoder); // put it into the 2nd available encoder slot.
 
     // now, when the additional encoder button is released, we toggle the state of menuPwrDelay.
@@ -225,4 +229,12 @@ int CALLBACK_FUNCTION fnRomLocationRtCall(RuntimeMenuItem * item, uint8_t row, R
     case RENDERFN_EEPROM_POS: return 0xFFFF; // lists are generally not saved to EEPROM
     default: return false;
     }
+}
+
+
+
+
+void CALLBACK_FUNCTION onShowHidden(int id) {
+    menuHiddenItem.setVisible(menuShowHidden.getBoolean());
+    menuMgr.notifyStructureChanged();
 }
