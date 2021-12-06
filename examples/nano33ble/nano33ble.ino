@@ -36,6 +36,12 @@ void setup() {
     analogDevice.initPin(pwmOutputPin, DIR_OUT);
     analogDevice.initPin(analogInputPin, DIR_IN);
 
+    // Here we tell the encoder not to wrap (we don't technically need to do this as false is the default.
+    // Wrap means go from maxValue back to 0, or from 0 back to maxValue. On is true, Off (default) is false.
+    menuMgr.setUseWrapAroundEncoder(false);
+    // We can also define overrides for a particular menu item
+    menuMgr.addEncoderWrapOverride(menuAnalogReadingsOutputPWM, true);
+
     // and set up the menu itself, so it starts displaying and accepting input
     setupMenu();
 
