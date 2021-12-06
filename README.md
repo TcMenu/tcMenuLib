@@ -2,7 +2,7 @@
 
 ## Summary
 
-TheCodersCorner.com invest a lot of time and resources into making this open source product which is used by literally thousands of users. We don't presently sell hardware or have any other income streams from it, we ask that especially commercial users consider making a voluntary contribution to help keep us going, the sponsor button will appear on this page and the main tcMenu page soon.
+Dave Cherry / TheCodersCorner.com make this framework available for you to use. It takes me significant effort to keep all my libraries current and working on a wide range of boards. Please consider making at least a one off donation via the sponsor button if you find it useful.
 
 TcMenu is a modular, IoT ready menu library for the Arduino and mbed platform, it uses plugins to support many displays, input devices and provides remote control using a simple protocol over Ethernet and Serial.
 
@@ -60,7 +60,7 @@ If you are manually using tcMenu, without the designer, this page fully document
 
 ## Asking questions
 
-We try our best to answer all questions in our hosted forum that covers our libraries, we also provide commercial support for companies trying to use our libraries in a commercial design. Further, you can also ask questions related to Arduino in the regular Arduino forum, we try to monitor that on a best efforts basis, please include the library name in the forum topic if you use Arduino forum.
+There is a forum where questions can be asked, but the rules of engagement are: **this is my hobby, I make it available because it helps others**. Don't expect immediate answers, make sure you've recreated the problem in a simple sketch that you can send to me. Please consider making at least a one time donation using the sponsor link above before using the forum.
 
 * [TCC Community forum](https://www.thecoderscorner.com/jforum/)
 * [Commercial support](https://www.thecoderscorner.com/all-contact)
