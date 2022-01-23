@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 https://www.thecoderscorner.com (Nutricherry LTD).
+ * Copyright (c) 2018 https://www.thecoderscorner.com (Dave Cherry).
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
@@ -49,7 +49,7 @@ namespace tcremote {
     };
 
     enum RemoteServerType: uint8_t {
-        TAG_VAL_REMOTE_SERVER, SIMHUB_CONNECTOR
+        TAG_VAL_REMOTE_SERVER, SIMHUB_CONNECTOR, TAG_VAL_WEB_SOCKET
     };
 
     class BaseRemoteServerConnection {

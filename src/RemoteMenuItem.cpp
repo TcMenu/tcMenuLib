@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 https://www.thecoderscorner.com (Nutricherry LTD).
+ * Copyright (c) 2018 https://www.thecoderscorner.com (Dave Cherry).
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
@@ -97,11 +97,7 @@ void RemoteMenuItem::setRemoteServer(tcremote::TcMenuRemoteServer& server) {
 
 EepromAuthenticationInfoMenuItem::EepromAuthenticationInfoMenuItem(const char* pgmName, MenuCallbackFn onAuthChanged,
                                                                    menuid_t id, MenuItem * next)
-	: ListRuntimeMenuItem(id, 0, authenticationMenuItemRenderFn, next), pgmName(pgmName), onAuthChanged(onAuthChanged) {
-    if(menuMgr.getAuthenticator()->getAuthenticationManagerType() != AUTHENTICATION_IN_EEPROM) {
-        setNumberOfRows(reinterpret_cast<EepromAuthenticatorManager*>(menuMgr.getAuthenticator())->getNumberOfEntries());
-    }
-}
+	: ListRuntimeMenuItem(id, 0, authenticationMenuItemRenderFn, next), pgmName(pgmName), onAuthChanged(onAuthChanged) { }
 
 EepromAuthenticatorManager *EepromAuthenticationInfoMenuItem::getAuthManager() {
     auto* authMgr = menuMgr.getAuthenticator();
@@ -131,9 +127,7 @@ int authenticationMenuItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnM
 
     auto authMgr = reinterpret_cast<EepromAuthenticatorManager*>(menuMgr.getAuthenticator());
     auto* authItem = reinterpret_cast<EepromAuthenticationInfoMenuItem*>(item);
-    if(authItem->getNumberOfRows() == 0) {
-        authItem->setNumberOfRows(authMgr->getNumberOfEntries());
-    }
+    authItem->setNumberOfRows(authMgr->getNumberOfEntries());
 
     switch (mode) {
         case RENDERFN_NAME:
