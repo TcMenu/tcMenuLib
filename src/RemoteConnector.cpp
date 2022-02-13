@@ -79,7 +79,7 @@ void TagValueRemoteConnector::setRemoteConnected(uint8_t major, uint8_t minor, A
     }
     else {
         serdebugF("Not authenticated, dropping");
-        transport->close();
+        close();
     }
 }
 
@@ -90,7 +90,7 @@ void TagValueRemoteConnector::provideAuthentication(const char* auth) {
         encodeAcknowledgement(0, ACK_CREDENTIALS_INVALID);
         taskManager.yieldForMicros(15000); 
         setAuthenticated(false);
-        transport->close();
+        close();
         commsNotify(COMMSERR_DISCONNECTED);
     }
     else {
@@ -108,10 +108,12 @@ const char* lastUuid;
 void onPairingFinished(ButtonType ty, void* voidConnector) {
     auto* connector = reinterpret_cast<TagValueRemoteConnector*>(voidConnector);
     if(ty==BTNTYPE_ACCEPT) {
+        serdebugF("Adding key after user pressed accept");
         bool added = connector->getAuthManager()->addAdditionalUUIDKey(connector->getRemoteName(), lastUuid);
         connector->encodeAcknowledgement(0, added ? ACK_SUCCESS : ACK_CREDENTIALS_INVALID);
     }
     else {
+        serdebugF("Not adding key, close pressed");
         connector->encodeAcknowledgement(0, ACK_CREDENTIALS_INVALID);
     }
 } 
