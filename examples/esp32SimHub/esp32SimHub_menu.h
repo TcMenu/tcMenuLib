@@ -16,9 +16,9 @@
 #include "tcMenuAdaFruitGfx.h"
 #include "ESP32TouchKeysAbstraction.h"
 #include "SimhubConnector.h"
-#include <RemoteMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
+#include <RemoteMenuItem.h>
 #include <IoAbstraction.h>
 
 // variables we declare that you may need to access
@@ -38,6 +38,7 @@ extern const GFXfont FreeSans12pt7b;
 extern ActionMenuItem menuShowDashboard;
 extern AnalogMenuItem menuLap;
 extern EnumMenuItem menuDashboard;
+extern EditableLargeNumberMenuItem menuSettingsNewLargeNumber;
 extern RemoteMenuItem menuSettingsIoTMonitor;
 extern EditableLargeNumberMenuItem menuSettingsLargeTest;
 extern BooleanMenuItem menuSettingsOverboost;

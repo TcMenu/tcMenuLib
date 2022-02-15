@@ -105,12 +105,12 @@
       "parentId": 4,
       "type": "analogItem",
       "item": {
-        "maxValue": 100,
-        "offset": 0,
+        "maxValue": 255,
+        "offset": -180,
         "divisor": 2,
-        "unitName": "",
+        "unitName": "dB",
         "name": "Test Item 1",
-        "variableName": "",
+        "variableName": "SettingsTestItem1",
         "id": 5,
         "eepromAddress": -1,
         "readOnly": false,
@@ -169,6 +169,22 @@
         "menuType": "REMOTE_IOT_MONITOR",
         "name": "IoT Monitor",
         "id": 14,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "largeNumItem",
+      "item": {
+        "digitsAllowed": 4,
+        "decimalPlaces": 1,
+        "negativeAllowed": true,
+        "name": "New Large Number",
+        "variableName": "SettingsNewLargeNumber",
+        "id": 15,
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
@@ -281,6 +297,11 @@
       {
         "name": "DISPLAY_CLOCK_PIN",
         "latestValue": "-1",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "ST7735_TAB_TYPE",
+        "latestValue": "INITR_BLACKTAB",
         "subsystem": "DISPLAY"
       },
       {

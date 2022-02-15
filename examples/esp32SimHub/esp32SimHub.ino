@@ -28,6 +28,7 @@
  * Touch Up=5, Down=7, Sel=6
  */
 
+#include <Adafruit_ILI9341.h>
 #include "esp32SimHub_menu.h"
 #include <Wire.h>
 #include <IoLogging.h>
@@ -71,6 +72,13 @@ void setup() {
     renderer.takeOverDisplay();
 
     menuGear.setTextValue("N");
+
+    //menuSettingsNewLargeNumber.setLargeNumberFromString("12.1");
+    auto largeNum = menuSettingsNewLargeNumber.getLargeNumber();
+    //largeNum->setFromFloat(12.1f);
+    largeNum->setValue(12, 1, false);
+    //menuSettingsNewLargeNumber.setLargeNumberFromString("12.1");
+    menuSettingsTestItem1.setFromFloatingPointValue(21.5F);
 
     analogDevice.initPin(dacPin, DIR_OUT);
     taskManager.scheduleFixedRate(10, [] {

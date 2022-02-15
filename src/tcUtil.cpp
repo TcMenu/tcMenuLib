@@ -28,6 +28,7 @@ long dpToDivisor(int dp) {
         case 3: return 1000;
         case 2: return 100;
         case 1: return 10;
+        case 0: return 1;
         default:
         case 9: return 1000000000L;
     }

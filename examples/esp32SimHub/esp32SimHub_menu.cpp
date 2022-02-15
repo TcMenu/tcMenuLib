@@ -35,15 +35,17 @@ const char enumStrDashboard_2[] PROGMEM = "Custom";
 const char* const enumStrDashboard[] PROGMEM  = { enumStrDashboard_0, enumStrDashboard_1, enumStrDashboard_2 };
 const PROGMEM EnumMenuInfo minfoDashboard = { "Dashboard", 8, 0xffff, 2, onDashChanged, enumStrDashboard };
 EnumMenuItem menuDashboard(&minfoDashboard, 0, &menuLap);
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsNewLargeNumberRtCall, largeNumItemRenderFn, "New Large Number", -1, NO_CALLBACK)
+EditableLargeNumberMenuItem menuSettingsNewLargeNumber(fnSettingsNewLargeNumberRtCall, 15, 4, 1, true, NULL);
 const PROGMEM char pgmStrSettingsIoTMonitorText[] = { "IoT Monitor" };
-RemoteMenuItem menuSettingsIoTMonitor(pgmStrSettingsIoTMonitorText, 14, NULL);
+RemoteMenuItem menuSettingsIoTMonitor(pgmStrSettingsIoTMonitorText, 14, &menuSettingsNewLargeNumber);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsLargeTestRtCall, largeNumItemRenderFn, "LargeTest", -1, NO_CALLBACK)
 EditableLargeNumberMenuItem menuSettingsLargeTest(fnSettingsLargeTestRtCall, 13, 12, 4, true, &menuSettingsIoTMonitor);
 const PROGMEM BooleanMenuInfo minfoSettingsOverboost = { "Overboost", 12, 0xffff, 1, NO_CALLBACK, NAMING_ON_OFF };
 BooleanMenuItem menuSettingsOverboost(&minfoSettingsOverboost, false, &menuSettingsLargeTest);
 const PROGMEM AnyMenuInfo minfoSettingsShowDialogs = { "Show Dialogs", 11, 0xffff, 0, onShowDialogs };
 ActionMenuItem menuSettingsShowDialogs(&minfoSettingsShowDialogs, &menuSettingsOverboost);
-const PROGMEM AnalogMenuInfo minfoSettingsTestItem1 = { "Test Item 1", 5, 0xffff, 100, NO_CALLBACK, 0, 2, "" };
+const PROGMEM AnalogMenuInfo minfoSettingsTestItem1 = { "Test Item 1", 5, 0xffff, 255, NO_CALLBACK, -180, 2, "dB" };
 AnalogMenuItem menuSettingsTestItem1(&minfoSettingsTestItem1, 0, &menuSettingsShowDialogs);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings", -1, NO_CALLBACK)
 const PROGMEM SubMenuInfo minfoSettings = { "Settings", 4, 0xffff, 0, NO_CALLBACK };
