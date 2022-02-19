@@ -16,17 +16,18 @@
 #include "tcMenuU8g2.h"
 #include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
+#include <IoAbstraction.h>
+#include <ArduinoEEPROMAbstraction.h>
 
-void setupMenu();  // forward reference of the menu setup function.
-extern const PROGMEM ConnectorLocalInfo applicationInfo;  // contains app name and ID
-
-// Global variables that need exporting
-
+// variables we declare that you may need to access
+extern const PROGMEM ConnectorLocalInfo applicationInfo;
 extern U8G2_SH1106_128X64_NONAME_F_SW_I2C gfx;
 extern GraphicsDeviceRenderer renderer;
 
-// Global Menu Item exports
+// Any externals needed by IO expanders, EEPROMs etc
 
+
+// Global Menu Item exports
 extern ActionMenuItem menuSettingsSaveSettings;
 extern EditableLargeNumberMenuItem menuSettingsSerialNumber;
 extern TextMenuItem menuSettingsUserName;
@@ -38,8 +39,9 @@ extern BooleanMenuItem menuFrozen;
 extern EnumMenuItem menuType;
 extern AnalogMenuItem menuToasterPower;
 
-// Provide a wrapper to get hold of the root menu item
+// Provide a wrapper to get hold of the root menu item and export setupMenu
 inline MenuItem& rootMenuItem() { return menuToasterPower; }
+void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION

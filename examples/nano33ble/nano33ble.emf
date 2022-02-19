@@ -1,12 +1,7 @@
 {
   "version": "1.00",
-  "projectName": "/Users/dave/Documents/Arduino/tcLibraryDev/lib/tcMenu/examples/nano33ble/nano33ble.emf",
+  "projectName": "C:\\Users\\dave\\Documents\\Arduino\\tcLibraryDev\\lib\\tcMenu\\examples\\nano33ble\\nano33ble.emf",
   "author": "dave",
-  "lastEdited": {
-    "seconds": 1616688378,
-    "nanos": 607720000
-  },
-  "namingRecursive": false,
   "items": [
     {
       "parentId": 0,
@@ -202,6 +197,9 @@
     "lastDisplayUuid": "fd998437-c4b2-4386-ba88-d0ae7c20620b",
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
     "lastRemoteUuid": "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb",
+    "lastRemoteUuids": [
+      "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
+    ],
     "lastThemeUuid": "0dd60ceb-7e0f-46e2-8d40-b264eb3aa7e0",
     "applicationUUID": "e95fcf8a-8a03-4043-9313-01fd8b8e8707",
     "applicationName": "Nano 33 BLE Sense",
@@ -213,7 +211,7 @@
       },
       {
         "name": "DISPLAY_TYPE",
-        "latestValue": "U8G2_SSD1306_128X64_NONAME_F_SW_I2C",
+        "latestValue": "U8G2_SSD1306_128X64_NONAME_F_HW_I2C",
         "subsystem": "DISPLAY"
       },
       {
@@ -268,7 +266,7 @@
       },
       {
         "name": "SWITCH_IODEVICE",
-        "latestValue": "",
+        "latestValue": "devicePins",
         "subsystem": "INPUT"
       },
       {
@@ -294,6 +292,11 @@
       {
         "name": "ENCODER_NEXT_PIN",
         "latestValue": "-1",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_IS_QUARTER_CYCLE",
+        "latestValue": "false",
         "subsystem": "INPUT"
       },
       {
@@ -324,6 +327,11 @@
     ],
     "namingRecursive": true,
     "saveToSrc": false,
-    "useCppMain": false
+    "useCppMain": false,
+    "eepromDefinition": "",
+    "authenticatorDefinition": "",
+    "projectIoExpanders": [
+      "deviceIO:"
+    ]
   }
 }

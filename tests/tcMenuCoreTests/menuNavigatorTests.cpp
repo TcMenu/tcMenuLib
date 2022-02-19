@@ -14,28 +14,16 @@ test(creatingAndInitialisation) {
     assertEqual(nullptr, nav.getCurrentSubMenu());
 }
 
-test(isWithinRootIsWorkingProperly) {
-    MenuNavigationStore nav;
-    nav.setRootItem(&menuVolume);
-
-    assertTrue(nav.isItemWithinRoot(&menuVolume, &menuVolume));     // top level items
-    assertTrue(nav.isItemWithinRoot(&menuVolume, &menuSettings));
-    assertTrue(nav.isItemWithinRoot(&menuVolume, &menuSecondLevel));// two test on nested items
-    assertTrue(nav.isItemWithinRoot(&menuVolume, &menuPressMe));
-    assertTrue(nav.isItemWithinRoot(&menuVolume, nullptr));         // null returns true
-    assertFalse(nav.isItemWithinRoot(&menuVolume, &menuNumTwoDp));  // from a different tree
-}
-
 test(navigationPushAndPop) {
     MenuNavigationStore nav;
     nav.setRootItem(&menuVolume);
     menuMgr.initWithoutInput(&noRenderer, &menuVolume);
 
-    nav.navigateTo(&menuChannel, menuStatus.getChild());
-    nav.navigateTo(&menuLHSTemp, menuSecondLevel.getChild());
-    nav.navigateTo(&menu12VStandby, menuSettings.getChild());
-    nav.navigateTo(&menuRHSTemp, &menuSub); // should not be stored
-    nav.navigateTo(&menuRHSTemp, &menuSub);
+    nav.navigateTo(&menuChannel, menuStatus.getChild(), false);
+    nav.navigateTo(&menuLHSTemp, menuSecondLevel.getChild(), false);
+    nav.navigateTo(&menu12VStandby, menuSettings.getChild(), false);
+    nav.navigateTo(&menuRHSTemp, &menuSub, false); // should not be stored
+    nav.navigateTo(&menuRHSTemp, &menuSub, false);
 
     auto* act = nav.popNavigationGetActive();
     assertEqual(act, &menuRHSTemp);

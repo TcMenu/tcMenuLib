@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 https://www.thecoderscorner.com (Nutricherry LTD).
+ * Copyright (c) 2018 https://www.thecoderscorner.com (Dave Cherry).
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
@@ -25,6 +25,11 @@
 /** The maxmimum ID that is allowed manually, only automated ID's for back items and similar will exceed this */
 #define MAXIMUM_ID_ALLOWED 32000
 
+typedef uint16_t menuid_t;
+
+/** Defines a menu ID that is not valid and may be used to indicate no menu item */
+#define INVALID_MENU_ID 0xffff
+
 /** the size of each name in program memory */
 #define NAME_SIZE_T 20
 
@@ -42,7 +47,7 @@ struct AnyMenuInfo {
 	/** the name given to this menu item */ 
 	char name[NAME_SIZE_T];
 	/** the identifier for this menu */
-	uint16_t id;
+	menuid_t id;
 	/** eeprom address for this item or -1 if not stored */
 	uint16_t eepromAddr;
 	/** maximum value that this type can store */
@@ -62,7 +67,7 @@ struct AnalogMenuInfo {
 	/** the name given to this menu item */ 
 	char name[NAME_SIZE_T];
 	/** the identifier for this menu */
-	uint16_t id;
+	menuid_t id;
 	/** eeprom address for this item or -1 if not stored */
 	uint16_t eepromAddr;
 	/** maximum value that this type can store */
@@ -99,7 +104,7 @@ struct EnumMenuInfo {
 	/** the name given to this menu item */ 
 	char name[NAME_SIZE_T];
 	/** the identifier for this menu */
-	uint16_t id;
+	menuid_t id;
 	/** eeprom address for this item or -1 if not stored */
 	uint16_t eepromAddr;
 	/** the number of items in the below array. */
@@ -140,7 +145,7 @@ struct BooleanMenuInfo {
 	/** the name given to this menu item */ 
 	char name[NAME_SIZE_T];
 	/** the identifier for this menu */
-	uint16_t id;
+	menuid_t id;
 	/** eeprom address for this item or -1 if not stored */
 	uint16_t eepromAddr;
 	/** maximum value that this type can store - always 1 */
@@ -165,7 +170,7 @@ struct SubMenuInfo {
 	/** the name given to this menu item */ 
 	char name[NAME_SIZE_T];
 	/** the identifier for this menu */
-	uint16_t id;
+	menuid_t id;
 	/** Not used for submenus. */
 	uint16_t eepromAddr;
 	/** maximum value that this type can store - always 0 */
@@ -182,7 +187,7 @@ struct FloatMenuInfo {
 	/** the name given to this menu item */ 
 	char name[NAME_SIZE_T];
 	/** the identifier for this menu */
-	uint16_t id;
+	menuid_t id;
 	/** eeprom address for this item or -1 if not stored */
 	uint16_t eepromAddr;
 	/** The number of decimal places to render to */
@@ -349,7 +354,7 @@ public:
      * */
 	uint8_t copyNameToBuffer(char* sz, int offset, int size) const;
 	/** Retrieves the ID from the info block */
-	uint16_t getId() const;
+	menuid_t getId() const;
 	/** Retrieves the maximum value for this menu type */
 	uint16_t getMaximumValue() const;
 	/** Retrieves the eeprom storage position for this menu (or 0xffff if not applicable) */

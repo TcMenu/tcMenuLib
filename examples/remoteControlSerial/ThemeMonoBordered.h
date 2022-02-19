@@ -1,7 +1,11 @@
 #ifndef TCMENU_THEME_MONO_BORDER
 #define TCMENU_THEME_MONO_BORDER
 
-color_t defaultItemPaletteMono[] = {1, 0, 1, 1};
+/* for the 5110 display the colours are inverted, we must take account of that here and change the palette.
+ * You can edit themes as they are not automatically updated by designer once in place. To force designer to
+ * update a theme you need to delete the file.
+ */
+color_t defaultItemPaletteMono[] = {BLACK, WHITE, BLACK, BLACK};
 
 #define TITLE_BORDER_THICKNESS 2
 #define TITLE_SPACING 2

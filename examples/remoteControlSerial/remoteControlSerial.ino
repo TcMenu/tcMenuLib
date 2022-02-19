@@ -26,12 +26,6 @@ void setup() {
     Serial.begin(115200);
     while(!Serial);
 
-    // for serial communication, we only need to setup the speed here.
-    // in this example I am using a bluetooth module with serial1, you could switch to
-    // regular Serial by changing the below line and change the menu designer code generator
-    // too.
-    Serial1.begin(9600);
-
     // we are going to be toggling this so need to set it as output.
     pinMode(LED_BUILTIN, OUTPUT);
 

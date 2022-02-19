@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 https://www.thecoderscorner.com (Nutricherry LTD).
+ * Copyright (c) 2018 https://www.thecoderscorner.com (Dave Cherry).
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
@@ -79,6 +79,25 @@ public:
 #endif
 
 /**
+ * Defines an encoder wrapping override, mainly used internally by menu item when encoder wrapping overrides are added
+ */
+class EncoderWrapOverride {
+private:
+    menuid_t itemId;
+    bool overrideValue;
+public:
+    EncoderWrapOverride() = default;
+    EncoderWrapOverride(const EncoderWrapOverride &other) = default;
+    EncoderWrapOverride &operator=(const EncoderWrapOverride &other) = default;
+    EncoderWrapOverride(menuid_t itemId, bool overrideValue) : itemId(itemId), overrideValue(overrideValue) {}
+
+    menuid_t getKey() const { return itemId; }
+
+    menuid_t getMenuId() const { return itemId; }
+    bool getOverrideValue() const { return overrideValue; }
+};
+
+/**
  * MenuManager ties together all the parts of the menu app, it looks after the menu structure that's being presented,
  * the renderer, security, and optionally an eeprom.
  */
@@ -91,8 +110,40 @@ private:
 	AuthenticationManager *authenticationManager;
     EepromAbstraction* eepromRef;
     MenuManagerObserver* structureNotifier[MAX_MENU_NOTIFIERS];
+    bool useWrapAroundByDefault = false;
+    BtreeList<menuid_t, EncoderWrapOverride> encoderWrapOverrides;
 public:
 	MenuManager();
+
+    /**
+     * This method tells tcMenu to always attempt to use wrap around with the encoder, IE when value reaches max
+     * it goes back to min, and vica-versa. The default is NOT to wrap.
+     * @param wrapAround should values wrap
+     */
+    void setUseWrapAroundEncoder(bool wrapAround) {
+        useWrapAroundByDefault = wrapAround;
+    }
+
+    /**
+     * In many cases some items would suit wrap around encoder mode and some would not. For example nearly all enum
+     * and scroll items suit wrap around. Items that require many turns of the encoder also suit it, but volume for
+     * example really wouldn't suit it. Imagine hitting 0 volume and wrapping back to maximum in an amplifier.
+     *
+     * To set the default wrap around mode call `setUseWrapAroundEncoder` first, the default is no wrapping.
+     *
+     * @param item the item for which the override is to be applied.
+     * @param override true if wrapping is needed, otherwise false.
+     */
+    void addEncoderWrapOverride(MenuItem& item, bool override);
+
+    /**
+     * Check if the encoder should use wrapping for a given menu item or not. We use a pointer here because it can
+     * legally be nullptr too.
+     *
+     * @param menuId the menu id obtained using getId() on the menu item
+     * @return true if wrapping is to be used, otherwise false
+     */
+    bool isWrapAroundEncoder(MenuItem* item);
 
 	/**
 	 * Initialise the menu manager to use a hardware rotary encoder
@@ -156,6 +207,14 @@ public:
 	 * @param manager the authentication manager to use for the submenu pin lock.
 	 */
 	void setAuthenticator(AuthenticationManager* manager) { authenticationManager = manager; }
+
+	/**
+	 * @return the global authentication manager that has been set for this menu application, or nullptr otherwise
+	 */
+	AuthenticationManager* getAuthenticator() {
+	    if(authenticationManager == nullptr) authenticationManager = new NoAuthenticationManager();
+	    return authenticationManager;
+	}
 
     /**
      * This is a special callback, one per menu that indicates when a commit has taken place rather
@@ -337,6 +396,9 @@ public:
      * @param observer to be notified of structure changes.
      */
     void addChangeNotification(MenuManagerObserver* observer);
+
+    void majorOrderChangeApplied(int newMax);
+
 protected:
 	void setupForEditing(MenuItem* item);
 	void actionOnCurrentItem(MenuItem * toEdit);

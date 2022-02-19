@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 https://www.thecoderscorner.com (Nutricherry LTD).
+ * Copyright (c) 2018 https://www.thecoderscorner.com (Dave Cherry).
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
@@ -167,6 +167,8 @@ public:
     /** overriden in other types to handle show and hide differently */
     virtual void internalSetVisible(bool visible);
 
+    virtual char* getBufferData();
+
     /**
      * Close the current dialog by taking off the display and clearing the inuse flag.
      */
@@ -253,6 +255,16 @@ protected:
 };
 
 /**
+ * This is the render function that should be used with the LocalDialogButtonMenuItem
+ * @param item
+ * @param mode
+ * @param buffer
+ * @param bufferSize
+ * @return
+ */
+int dialogButtonRenderFn(RuntimeMenuItem* item, uint8_t /*row*/, RenderFnMode mode, char* buffer, int bufferSize);
+
+/**
  * This menu type is reserved only for use within dialogs, never use this button outside of that purpose. Button numbers
  * 0..15 are reserved and should never be used by application code. Use 15..255 in application code.
  */
@@ -295,6 +307,8 @@ public:
     MenuBasedDialog();
     ~MenuBasedDialog() override = default;
 
+    uint16_t getBackMenuItemId() { return backItem.getId(); }
+
     void internalSetVisible(bool visible) override;
     void copyIntoBuffer(const char *sz) override;
 
@@ -302,11 +316,24 @@ public:
 
     void copyHeader(char *buffer, int bufferSize);
 
+    char* getBufferData() override { return const_cast<char *>(bufferItem.getTextValue()); }
+
 protected:
     /** not used in this implementation */
     void internalRender(int currentValue) override {}
 
     void resetDialogFields();
 };
+
+/** a callback method that is used alongside withMenuDialogIfAvailable(..) */
+typedef void (*DialogInitialiser)(MenuBasedDialog*);
+
+/**
+ * A small helper that checks if we can use the dialog, and then calls the provided function if we can.
+ * Note: only works with MenuBasedDialog
+ *
+ * @param dlgFn the function to be called with the dialog object pointer, if getting the dialog was successful.
+ */
+void withMenuDialogIfAvailable(DialogInitialiser dlgFn);
 
 #endif //TCMENU_BASE_DIALOG_H_

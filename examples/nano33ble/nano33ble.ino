@@ -11,6 +11,7 @@
 #include "SensorManager.h"
 #include "MotionDetection.h"
 #include <AnalogDeviceAbstraction.h>
+#include <tcMenuVersion.h>
 
 // on the analog menu, we both have an analog input and an analog output (PWM). You can configure those pins here.
 const int analogInputPin = A0;
@@ -35,6 +36,12 @@ void setup() {
     analogDevice.initPin(pwmOutputPin, DIR_OUT);
     analogDevice.initPin(analogInputPin, DIR_IN);
 
+    // Here we tell the encoder not to wrap (we don't technically need to do this as false is the default.
+    // Wrap means go from maxValue back to 0, or from 0 back to maxValue. On is true, Off (default) is false.
+    menuMgr.setUseWrapAroundEncoder(false);
+    // We can also define overrides for a particular menu item
+    menuMgr.addEncoderWrapOverride(menuAnalogReadingsOutputPWM, true);
+
     // and set up the menu itself, so it starts displaying and accepting input
     setupMenu();
 
@@ -43,6 +50,16 @@ void setup() {
     motionDetection.initialise();
     taskManager.registerEvent(&motionDetection);
     taskManager.scheduleFixedRate(1, &sensorManager, TIME_SECONDS);
+
+    setTitlePressedCallback([](int id) {
+        withMenuDialogIfAvailable([](MenuBasedDialog* dlg) {
+            dlg->setButtons(BTNTYPE_CLOSE, BTNTYPE_NONE);
+            dlg->showRam("Nano BLE Example", false);
+            char szVer[10];
+            tccore::copyTcMenuVersion(szVer, sizeof szVer);
+            dlg->copyIntoBuffer(szVer);
+        });
+    });
 
     // lastly we set up something simple to read from analog in
     taskManager.scheduleFixedRate(100, [] {
@@ -60,5 +77,3 @@ void CALLBACK_FUNCTION onPWMChanged(int id) {
     auto newPwm = menuAnalogReadingsOutputPWM.getCurrentValue() / 100.0F;
     analogDevice.setCurrentFloat(pwmOutputPin, newPwm);
 }
-
-

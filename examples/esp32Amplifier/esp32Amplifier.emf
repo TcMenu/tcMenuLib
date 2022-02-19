@@ -171,9 +171,10 @@
         "divisor": 10,
         "unitName": "s",
         "name": "Warm up time",
-        "variableName": "",
+        "variableName": "SettingsWarmUpTime",
         "id": 11,
         "eepromAddress": 7,
+        "functionName": "@warmUpChanged",
         "readOnly": false,
         "localOnly": false,
         "visible": true
@@ -188,9 +189,10 @@
         "divisor": 10,
         "unitName": "s",
         "name": "Valve Heating",
-        "variableName": "",
+        "variableName": "SettingsValveHeating",
         "id": 17,
         "eepromAddress": 15,
+        "functionName": "@valveHeatingChanged",
         "readOnly": false,
         "localOnly": false,
         "visible": true
@@ -309,6 +311,23 @@
       }
     },
     {
+      "parentId": 6,
+      "type": "analogItem",
+      "item": {
+        "maxValue": 65535,
+        "offset": -5000,
+        "divisor": 10,
+        "unitName": "U",
+        "name": "Test",
+        "variableName": "StatusTest",
+        "id": 28,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
       "parentId": 0,
       "type": "subMenu",
       "item": {
@@ -366,6 +385,32 @@
         "localOnly": false,
         "visible": true
       }
+    },
+    {
+      "parentId": 12,
+      "type": "customBuildItem",
+      "item": {
+        "menuType": "REMOTE_IOT_MONITOR",
+        "name": "IoT Monitor",
+        "id": 26,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 12,
+      "type": "customBuildItem",
+      "item": {
+        "menuType": "AUTHENTICATION",
+        "name": "Authenticator",
+        "id": 27,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
     }
   ],
   "codeOptions": {
@@ -373,6 +418,9 @@
     "lastDisplayUuid": "e6342680-6fab-4d1b-ac08-ce8dbfc0974c",
     "lastInputUuid": "183448ac-a717-4b2b-823d-ffc7c8140ab9",
     "lastRemoteUuid": "46c30011-cac6-4598-a7b8-b0630d55daab",
+    "lastRemoteUuids": [
+      "46c30011-cac6-4598-a7b8-b0630d55daab"
+    ],
     "lastThemeUuid": "850dc0a3-f534-47c2-94d8-1e64ff368a54",
     "applicationUUID": "4656c798-10c6-4110-8e03-b9c51ed8fffb",
     "applicationName": "ESP Amplifier",
@@ -423,8 +471,28 @@
         "subsystem": "INPUT"
       },
       {
-        "name": "LISTEN_PORT",
+        "name": "ESPWIFI_CONCURRENT_CONNECTIONS",
+        "latestValue": "2",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "ESPWIFI_LISTEN_PORT1",
         "latestValue": "3333",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "ESPWIFI_LISTEN_PORT2",
+        "latestValue": "3334",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "ESPWIFI_LISTEN_PORT3",
+        "latestValue": "3335",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "ESPWIFI_BUFFERED",
+        "latestValue": "true",
         "subsystem": "REMOTE"
       },
       {
@@ -460,6 +528,11 @@
     ],
     "namingRecursive": true,
     "saveToSrc": false,
-    "useCppMain": true
+    "useCppMain": true,
+    "eepromDefinition": "eeprom:",
+    "authenticatorDefinition": "rom:200:6",
+    "projectIoExpanders": [
+      "deviceIO:"
+    ]
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 https://www.thecoderscorner.com (Nutricherry LTD).
+ * Copyright (c) 2018 https://www.thecoderscorner.com (Dave Cherry).
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
@@ -66,6 +66,7 @@ void ScrollChoiceMenuItem::valueAtPosition(char *buffer, size_t bufferSize, int 
     auto safeSize = min((size_t)itemSize, bufferSize - 1);
 
     if (rangeValues != nullptr) {
+        serdebugF4("Start Cached ", idx, (int)rangeValues, itemSize);
         strncpy(buffer, &rangeValues[itemSize * idx], safeSize);
         buffer[safeSize] = 0;
         serdebugF2("Cached ", idx);

@@ -28,6 +28,7 @@
  * Touch Up=5, Down=7, Sel=6
  */
 
+#include <Adafruit_ILI9341.h>
 #include "esp32SimHub_menu.h"
 #include <Wire.h>
 #include <IoLogging.h>
@@ -35,6 +36,7 @@
 #include "DashCustomDrawing.h"
 #include "RobotoMonoBold60pt.h"
 #include <Fonts/FreeSans18pt7b.h>
+#include <tcMenuVersion.h>
 
 // here we pulsate an LED using the ESP32's DAC
 const int dacPin = 32;
@@ -71,6 +73,13 @@ void setup() {
 
     menuGear.setTextValue("N");
 
+    //menuSettingsNewLargeNumber.setLargeNumberFromString("12.1");
+    auto largeNum = menuSettingsNewLargeNumber.getLargeNumber();
+    //largeNum->setFromFloat(12.1f);
+    largeNum->setValue(12, 1, false);
+    //menuSettingsNewLargeNumber.setLargeNumberFromString("12.1");
+    menuSettingsTestItem1.setFromFloatingPointValue(21.5F);
+
     analogDevice.initPin(dacPin, DIR_OUT);
     taskManager.scheduleFixedRate(10, [] {
         ledLevel += ledAdjustment;
@@ -80,12 +89,13 @@ void setup() {
     });
 
     setTitlePressedCallback([](int id) {
-        auto* dlg = renderer.getDialog();
-        if(dlg && !dlg->isInUse()) {
-            dlg->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
+        withMenuDialogIfAvailable([](MenuBasedDialog* dlg) {
+            dlg->setButtons(BTNTYPE_OK, BTNTYPE_NONE);
             dlg->show(applicationInfo.name, true);
-            dlg->copyIntoBuffer("by theCodersCorner");
-        }
+            char szVersion[10];
+            tccore::copyTcMenuVersion(szVersion, sizeof szVersion);
+            dlg->copyIntoBuffer(szVersion);
+        });
     });
 
     //

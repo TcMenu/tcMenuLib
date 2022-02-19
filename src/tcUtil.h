@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 https://www.thecoderscorner.com (Nutricherry LTD).
+ * Copyright (c) 2018 https://www.thecoderscorner.com (Dave Cherry).
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
@@ -117,6 +117,10 @@ void fastftoa(char* sz, float fl, int dp, int strSize);
  * converts decimal places into a suitable divisor, eg: 2 -> 100, 4 -> 10000
  */
 long dpToDivisor(int dp);
+
+inline float tcFltAbs(float f1) {
+    return f1 > 0.0F ? f1 : -f1;
+}
 
 // There now follows pretty much internal code for dealing with program memory
 // never use direct program memory commands, always prefer these, it allows us

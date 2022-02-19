@@ -1,6 +1,8 @@
 #ifndef TCMENU_ESPAMPLIFIER_TESTINGDIALOGCONTROLLER_H
 #define TCMENU_ESPAMPLIFIER_TESTINGDIALOGCONTROLLER_H
 
+#include <BaseDialog.h>
+
 class TestingDialogController : public BaseDialogController {
 private:
     MenuBasedDialog* theDialog;

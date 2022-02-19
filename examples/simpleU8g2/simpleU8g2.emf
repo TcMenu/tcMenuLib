@@ -1,6 +1,6 @@
 {
   "version": "1.00",
-  "projectName": "/Users/dave/Documents/Arduino/tcLibraryDev/lib/tcMenu/examples/simpleU8g2/simpleU8g2.emf",
+  "projectName": "C:\\Users\\dave\\Documents\\Arduino\\tcLibraryDev\\lib\\tcMenu\\examples\\simpleU8g2\\simpleU8g2.emf",
   "author": "dave",
   "items": [
     {
@@ -146,6 +146,9 @@
     "lastDisplayUuid": "fd998437-c4b2-4386-ba88-d0ae7c20620b",
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
     "lastRemoteUuid": "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb",
+    "lastRemoteUuids": [
+      "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
+    ],
     "lastThemeUuid": "815316bb-76c9-436a-8f83-be0bced963df",
     "applicationUUID": "fddaa423-cb5c-4024-8f67-a9742f4457f3",
     "applicationName": "Simple U8G2 Toaster",
@@ -163,11 +166,6 @@
       {
         "name": "DISPLAY_ROTATION",
         "latestValue": "U8G2_R0",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "YIELDING_WIRE_CB",
-        "latestValue": "true",
         "subsystem": "DISPLAY"
       },
       {
@@ -201,6 +199,11 @@
         "subsystem": "DISPLAY"
       },
       {
+        "name": "YIELDING_WIRE_CB",
+        "latestValue": "true",
+        "subsystem": "DISPLAY"
+      },
+      {
         "name": "PULLUP_LOGIC",
         "latestValue": "true",
         "subsystem": "INPUT"
@@ -212,7 +215,7 @@
       },
       {
         "name": "SWITCH_IODEVICE",
-        "latestValue": "",
+        "latestValue": "devicePins",
         "subsystem": "INPUT"
       },
       {
@@ -238,6 +241,11 @@
       {
         "name": "ENCODER_NEXT_PIN",
         "latestValue": "-1",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_IS_QUARTER_CYCLE",
+        "latestValue": "false",
         "subsystem": "INPUT"
       },
       {
@@ -268,6 +276,11 @@
     ],
     "namingRecursive": true,
     "saveToSrc": false,
-    "useCppMain": false
+    "useCppMain": false,
+    "eepromDefinition": "eeprom:",
+    "authenticatorDefinition": "",
+    "projectIoExpanders": [
+      "deviceIO:"
+    ]
   }
 }

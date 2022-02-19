@@ -13,14 +13,18 @@
 
 #include <Arduino.h>
 #include <tcMenu.h>
-
 #include "tcMenuU8g2.h"
+#include <IoAbstraction.h>
 
-// all variables that need exporting
-extern U8G2_SSD1306_128X64_NONAME_F_SW_I2C gfx;
+// variables we declare that you may need to access
+extern const PROGMEM ConnectorLocalInfo applicationInfo;
+extern U8G2_SSD1306_128X64_NONAME_F_HW_I2C gfx;
 extern GraphicsDeviceRenderer renderer;
 
-// all menu item forward references.
+// Any externals needed by IO expanders, EEPROMs etc
+
+
+// Global Menu Item exports
 extern AnalogMenuItem menuAnalogReadingsOutputPWM;
 extern FloatMenuItem menuAnalogReadingsInA0;
 extern BackMenuItem menuBackAnalogReadings;
@@ -36,13 +40,14 @@ extern SubMenuItem menuAccelerometer;
 extern AnalogMenuItem menuBPressure;
 extern AnalogMenuItem menuHumidity;
 extern AnalogMenuItem menuTemp;
-extern const ConnectorLocalInfo applicationInfo;
+
+// Provide a wrapper to get hold of the root menu item and export setupMenu
+inline MenuItem& rootMenuItem() { return menuTemp; }
+void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
 void CALLBACK_FUNCTION onPWMChanged(int id);
-
-void setupMenu();
 
 #endif // MENU_GENERATED_CODE_H

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 https://www.thecoderscorner.com (Nutricherry LTD).
+ * Copyright (c) 2018 https://www.thecoderscorner.com (Dave Cherry).
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
@@ -18,6 +18,7 @@
 #include <SimpleCollections.h>
 #include "MenuItems.h"
 #include "DrawingPrimitives.h"
+#include <IoLogging.h>
 
 
 namespace tcgfx {
@@ -86,23 +87,42 @@ namespace tcgfx {
             DRAW_TITLE_ITEM
         };
 
+        /**
+         * Represents the justification of both the item name and the value within the items drawing space. This controls exactly
+         * what text is presented, and the position too.
+         */
         enum GridJustification : uint8_t {
+            /** Indicates left justification - usually use of the combined types below */
             CORE_JUSTIFY_LEFT = 1,
+            /** Indicates right justification - usually use of the combined types below */
             CORE_JUSTIFY_RIGHT = 2,
+            /** Indicates centre justification - usually use of the combined types below */
             CORE_JUSTIFY_CENTER = 3,
 
+            /** usually use of the combined types below */
             CORE_JUSTIFY_VALUE_REQUIRED = 0b1000,
+            /** usually use of the combined types below */
             CORE_JUSTIFY_NAME_REQUIRED  = 0b0100,
 
+            /** Justify the item name on the left and the value on the right */
             JUSTIFY_TITLE_LEFT_VALUE_RIGHT = 0,
+            /** Justify the item name and value on the right */
             JUSTIFY_TITLE_LEFT_WITH_VALUE = CORE_JUSTIFY_LEFT + CORE_JUSTIFY_NAME_REQUIRED + CORE_JUSTIFY_VALUE_REQUIRED,
+            /** Justify the item name and value centered */
             JUSTIFY_CENTER_WITH_VALUE = CORE_JUSTIFY_CENTER + CORE_JUSTIFY_NAME_REQUIRED + CORE_JUSTIFY_VALUE_REQUIRED,
+            /** Justify the item name and value on the right */
             JUSTIFY_RIGHT_WITH_VALUE = CORE_JUSTIFY_RIGHT + CORE_JUSTIFY_NAME_REQUIRED + CORE_JUSTIFY_VALUE_REQUIRED,
+            /** Justify just the item name to the left */
             JUSTIFY_LEFT_NO_VALUE = CORE_JUSTIFY_LEFT + CORE_JUSTIFY_NAME_REQUIRED,
+            /** Justify just the item name in the center */
             JUSTIFY_CENTER_NO_VALUE = CORE_JUSTIFY_CENTER + CORE_JUSTIFY_NAME_REQUIRED,
+            /** Justify just the item name in the center */
             JUSTIFY_RIGHT_NO_VALUE = CORE_JUSTIFY_RIGHT + CORE_JUSTIFY_NAME_REQUIRED,
+            /** Justify just the items current value to the left */
             JUSTIFY_LEFT_VALUE_ONLY= CORE_JUSTIFY_LEFT + CORE_JUSTIFY_VALUE_REQUIRED,
+            /** Justify just the items current value in the center */
             JUSTIFY_CENTER_VALUE_ONLY = CORE_JUSTIFY_CENTER + CORE_JUSTIFY_VALUE_REQUIRED,
+            /** Justify just the items current value to the right */
             JUSTIFY_RIGHT_VALUE_ONLY = CORE_JUSTIFY_RIGHT + CORE_JUSTIFY_VALUE_REQUIRED
         };
     private:
@@ -130,19 +150,23 @@ namespace tcgfx {
         /**
          * Create a simple grid position that represents a row with a single column with optional override of the row height
          * @param mode the mode in which to draw the item
+         * @param justification the desired justification for this item
+         * @param row the row on which to draw the item
          * @param height the height of the item or leave blank for default
          */
         GridPosition(GridDrawingMode mode, GridJustification justification, int row, int height = 0)
                 : gridSize(1), gridPosition(1), gridHeight(height),rowPosition(row), drawingMode(mode), justification(justification) { }
 
-        /**
-         * Create a more complex multi column grid with height, this represents a single row with one or more columns,
-         * a position in the columns, and if need be, a height override.
-         * @param mode the mode in which to draw the item
-         * @param size the number of columns in the row
-         * @param pos the column position in the row
-         * @param hei the height of the row, or 0 for the default height.
-         */
+                /**
+                 * Create a more complex multi column grid with height, this represents a single row with one or more columns,
+                 * a position in the columns, and if need be, a height override.
+                 * @param mode the mode in which to draw the item
+                 * @param justification the desired justification for this item
+                 * @param size the number of columns in the row
+                 * @param pos the column position in the row
+                 * @param row the row on which to draw the item
+                 * @param hei the height of the row, or 0 for the default height.
+                 */
         GridPosition(GridDrawingMode mode, GridJustification just, int size, int pos, int row, int hei)
                 : gridSize(size), gridPosition(pos), gridHeight(hei), rowPosition(row), drawingMode(mode), justification(just) { }
 
@@ -448,8 +472,8 @@ namespace tcgfx {
         BtreeList<uint32_t, ItemDisplayProperties> displayProperties;
         BtreeList<uint16_t, DrawableIcon> iconsByItem;
         BtreeList<uint16_t, GridPositionWithId> gridByItem;
-        color_t selectedTextColor = RGB(255,255,255);
-        color_t selectedBackgroundColor = RGB(0, 0, 255);
+        color_t selectedTextColor = RGB(0,0,0);
+        color_t selectedBackgroundColor = RGB(0, 100, 255);
     public:
         ConfigurableItemDisplayPropertiesFactory()
                 : displayProperties(5, GROW_BY_5),

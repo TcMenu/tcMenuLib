@@ -19,17 +19,17 @@
 #include <ScrollChoiceMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
+#include <IoAbstraction.h>
 
-void setupMenu();  // forward reference of the menu setup function.
-extern const PROGMEM ConnectorLocalInfo applicationInfo;  // contains app name and ID
-
-// Global variables that need exporting
-
+// variables we declare that you may need to access
+extern const PROGMEM ConnectorLocalInfo applicationInfo;
 extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
 
-// Global Menu Item exports
+// Any externals needed by IO expanders, EEPROMs etc
 
+
+// Global Menu Item exports
 extern AnalogMenuItem menuCommits;
 extern ScrollChoiceMenuItem menuChooseItem;
 extern TextMenuItem menuText;
@@ -40,8 +40,9 @@ extern BackMenuItem menuBackLEDStates;
 extern SubMenuItem menuLEDStates;
 extern AnalogMenuItem menuValueA0;
 
-// Provide a wrapper to get hold of the root menu item
+// Provide a wrapper to get hold of the root menu item and export setupMenu
 inline MenuItem& rootMenuItem() { return menuValueA0; }
+void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION

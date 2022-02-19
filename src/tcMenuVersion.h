@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 https://www.thecoderscorner.com (Nutricherry LTD).
+ * Copyright (c) 2018 https://www.thecoderscorner.com (Dave Cherry).
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
@@ -16,8 +16,8 @@ namespace tccore {
 
 // here we define the version as both a string and separate field
 #define TCMENU_MAJOR 2
-#define TCMENU_MINOR 1
-#define TCMENU_PATCH 3
+#define TCMENU_MINOR 2
+#define TCMENU_PATCH 4
 
 /**
  * A helper to generate the major minor version numbers used in the protocol

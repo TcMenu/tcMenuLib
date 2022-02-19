@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 https://www.thecoderscorner.com (Nutricherry LTD).
+ * Copyright (c) 2018 https://www.thecoderscorner.com (Dave Cherry).
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
@@ -154,7 +154,7 @@ int EnumMenuItem::getLengthOfEnumStr(int idx) const {
 #endif
 
 bool isSame(float d1, float d2) {
-	float result = abs(d1 - d2);
+	float result = tcFltAbs(d1 - d2);
 	return result < 0.0000001;
 }
 
@@ -192,8 +192,8 @@ uint16_t AnalogMenuItem::getActualDecimalDivisor() const {
 
 WholeAndFraction AnalogMenuItem::getWholeAndFraction() const {
 	WholeAndFraction wf;
-	int calcVal = int16_t(getCurrentValue()) + getOffset();
-	int divisor = getDivisor();
+	int32_t calcVal = int32_t(getCurrentValue()) + int32_t(getOffset());
+	int32_t divisor = getDivisor();
 
     wf.negative = (calcVal < 0);
 
@@ -230,10 +230,10 @@ void AnalogMenuItem::setFromFloatingPointValue(float value) {
 	WholeAndFraction wf;
 	if(value < 0.0F) {
 	    wf.negative = true;
-	    value = abs(value);
+	    value = tcFltAbs(value);
 	}
-	wf.whole = value;
-	wf.fraction = (value - float(wf.whole)) * float(getActualDecimalDivisor());
+	wf.whole = static_cast<uint32_t>(value);
+	wf.fraction = static_cast<uint32_t>((value - float(wf.whole)) * float(getActualDecimalDivisor()));
 
 	setFromWholeAndFraction(wf);
 }

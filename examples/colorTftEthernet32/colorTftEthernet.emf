@@ -1,6 +1,6 @@
 {
   "version": "1.00",
-  "projectName": "/Users/dave/Documents/Arduino/tcLibraryDev/lib/tcMenu/examples/colorTftEthernet32/colorTftEthernet.emf",
+  "projectName": "C:\\Users\\dave\\Documents\\Arduino\\tcLibraryDev\\lib\\tcMenu\\examples\\colorTftEthernet32\\colorTftEthernet.emf",
   "author": "dave",
   "items": [
     {
@@ -170,6 +170,21 @@
       }
     },
     {
+      "parentId": 11,
+      "type": "boolItem",
+      "item": {
+        "naming": "YES_NO",
+        "name": "Show Hidden",
+        "variableName": "ShowHidden",
+        "id": 30,
+        "eepromAddress": -1,
+        "functionName": "onShowHidden",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
       "parentId": 0,
       "type": "subMenu",
       "item": {
@@ -235,6 +250,33 @@
         "variableName": "",
         "id": 15,
         "eepromAddress": 10,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 14,
+      "type": "customBuildItem",
+      "item": {
+        "menuType": "AUTHENTICATION",
+        "name": "Authenticator",
+        "variableName": "Authenticator",
+        "id": 28,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": true,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 14,
+      "type": "customBuildItem",
+      "item": {
+        "menuType": "REMOTE_IOT_MONITOR",
+        "name": "IoT Monitor",
+        "id": 29,
+        "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
         "visible": true
@@ -339,6 +381,9 @@
     "lastDisplayUuid": "4dcb12ec-13d8-4466-b8b6-bd575eae4612",
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
     "lastRemoteUuid": "0877131c-e03e-426b-8eaf-228e01f5e7f1",
+    "lastRemoteUuids": [
+      "0877131c-e03e-426b-8eaf-228e01f5e7f1"
+    ],
     "lastThemeUuid": "03c6b25f-db63-402a-8447-a5ce1484c14d",
     "applicationUUID": "22813e5e-88b1-42d5-9601-4831b2be369b",
     "applicationName": "Ada32 Ethernet",
@@ -386,6 +431,11 @@
       {
         "name": "DISPLAY_CLOCK_PIN",
         "latestValue": "-1",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "ST7735_TAB_TYPE",
+        "latestValue": "INITR_BLACKTAB",
         "subsystem": "DISPLAY"
       },
       {
@@ -444,13 +494,28 @@
         "subsystem": "INPUT"
       },
       {
-        "name": "LIBRARY_TYPE",
+        "name": "ETH_CONCURRENT_CONNECTIONS",
+        "latestValue": "1",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "ETH_LIBRARY_TYPE",
         "latestValue": "ETHERNET_2",
         "subsystem": "REMOTE"
       },
       {
-        "name": "LISTEN_PORT",
+        "name": "ETH_LISTEN_PORT1",
         "latestValue": "3333",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "ETH_LISTEN_PORT2",
+        "latestValue": "3334",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "ETH_LISTEN_PORT3",
+        "latestValue": "3335",
         "subsystem": "REMOTE"
       },
       {
@@ -460,7 +525,7 @@
       },
       {
         "name": "TITLE_FONT",
-        "latestValue": "def:,1",
+        "latestValue": "ada:FreeSansBold9pt7b,1",
         "subsystem": "THEME"
       },
       {
@@ -486,6 +551,12 @@
     ],
     "namingRecursive": false,
     "saveToSrc": false,
-    "useCppMain": false
+    "useCppMain": false,
+    "eepromDefinition": "at24:80:PAGESIZE_AT24C128",
+    "authenticatorDefinition": "rom:100:6",
+    "projectIoExpanders": [
+      "pcf8574:io8574:32:0",
+      "deviceIO:"
+    ]
   }
 }

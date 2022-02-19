@@ -1,5 +1,6 @@
 /**
- * This presents an amplifier control panel onto an ESP32.
+ * This presents an amplifier control panel onto an ESP32. The example assumes an ESP32 with an ILI9341 screen driven
+ * using TFT_eSPI, a resistive touch screen and WiFi in STA mode.
  *
  * YPOS_PIN 32
  * XNEG_PIN 33
@@ -18,19 +19,17 @@
 #include <tcMenuVersion.h>
 #include "AmplifierController.h"
 #include "app_icondata.h"
-#include "TouchCalibrator.h"
 #include "TestingDialogController.h"
+#include <extras/DrawableTouchCalibrator.h>
 
 const char pgmVersionHeader[] PROGMEM = "tcMenu Version";
 
 bool connectedToWifi = false;
-EepromAuthenticatorManager authManager;
 TitleWidget wifiWidget(iconsWifi, 5, 16, 12, nullptr);
 AmplifierController controller;
 
 const char* simFilesForList[] = { "SuperFile1.txt",  "CustomFile.cpp", "SuperDuper.h", "File303.cpp", "File123443.h" };
 #define SIM_FILES_ARRAY_SIZE 5
-
 
 void prepareWifiForUse();
 
@@ -38,15 +37,11 @@ void setup() {
     SPI.setFrequency(20000000);
     SPI.begin();
     Serial.begin(115200);
-
     EEPROM.begin(512);
-    menuMgr.setEepromRef(new ArduinoEEPROMAbstraction(&EEPROM));
-    menuMgr.setRootMenu(&menuVolume);
-    authManager.initialise(menuMgr.getEepromAbstraction(), 200);
-    menuMgr.setAuthenticator(&authManager);
-    remoteServer.setAuthenticator(&authManager);
 
     renderer.setFirstWidget(&wifiWidget);
+
+    setupMenu();
 
     menuMgr.load(MENU_MAGIC_KEY, [] {
         // when the eeprom is not initialised, put sensible defaults in there.
@@ -56,15 +51,12 @@ void setup() {
         menuVolume.setCurrentValue(20, true);
         menuDirect.setBoolean(true, true);
     });
-
     prepareWifiForUse();
-
-    setupMenu();
 
     controller.initialise();
     touchScreen.calibrateMinMaxValues(0.250F, 0.890F, 0.09F, 0.88F);
 
-    renderer.setCustomDrawingHandler(new TouchScreenCalibrator(&touchScreen));
+    renderer.setCustomDrawingHandler(new tcextras::TouchScreenCalibrator(&touchScreen, &renderer));
 
     // first we get the graphics factory
     auto & factory = renderer.getGraphicsPropertiesFactory();

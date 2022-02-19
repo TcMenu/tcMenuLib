@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 https://www.thecoderscorner.com (Nutricherry LTD).
+ * Copyright (c) 2018 https://www.thecoderscorner.com (Dave Cherry).
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
@@ -23,7 +23,6 @@ BaseDialog::BaseDialog() : header{0}, headerPgm(nullptr) {
     flags = 0;
     bitWrite(flags, DLG_FLAG_INUSE, false);
     button1 = button2 = BTNTYPE_NONE;
-
 }
 
 void BaseDialog::show(const char* headerPgm, bool allowRemote, CompletedHandlerFn completionCallback) {
@@ -165,9 +164,13 @@ bool BaseDialog::copyButtonText(char* data, int buttonNum, int currentValue, boo
     return false;
 }
 
+char* BaseDialog::getBufferData() {
+    return MenuRenderer::getInstance()->getBuffer();
+}
+
 void BaseDialog::copyIntoBuffer(const char* sz) {
     if(isInUse()) {
-        char* buffer = MenuRenderer::getInstance()->getBuffer();
+        char* buffer = getBufferData();
         uint8_t bufferSize = MenuRenderer::getInstance()->getBufferSize();
         strncpy(buffer, sz, bufferSize);
         int l = strlen(buffer);
@@ -194,7 +197,7 @@ void BaseDialog::setButtons(ButtonType btn1, ButtonType btn2, int defVal) {
 }
 
 void BaseDialog::encodeMessage(TagValueRemoteConnector* remote) {
-    remote->encodeDialogMsg(isInUse() ? DLG_VISIBLE : DLG_HIDDEN, button1, button2, header, MenuRenderer::getInstance()->getBuffer());
+    remote->encodeDialogMsg(isInUse() ? DLG_VISIBLE : DLG_HIDDEN, button1, button2, header, getBufferData());
 }
 
 void BaseDialog::remoteAction(ButtonType btn) {
@@ -316,4 +319,13 @@ void MenuBasedDialog::resetDialogFields() {
     bufferItem.setActive(false);
     btn1Item.setActive(false);
     btn2Item.setActive(false);
+}
+
+void withMenuDialogIfAvailable(DialogInitialiser dlgFn) {
+    if(MenuRenderer::getInstance() == nullptr) return;
+    BaseDialog* dlg = MenuRenderer::getInstance()->getDialog();
+
+    if(dlg && !dlg->isInUse() && dlg->isMenuItemBased()) {
+        dlgFn((MenuBasedDialog*)dlg);
+    }
 }

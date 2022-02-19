@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 https://www.thecoderscorner.com (Nutricherry LTD).
+ * Copyright (c) 2018 https://www.thecoderscorner.com (Dave Cherry).
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
@@ -11,11 +11,11 @@ static uint16_t nextAvailableRandomId = RANDOM_ID_START;
 
 const char ALLOWABLE_EDIT_CHARACTERS[] PROGMEM = " .,0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!\"$%^&*()_-+=@';:#{/?\\|<>#{}~";
 
-uint16_t nextRandomId() {
+menuid_t nextRandomId() {
 	return nextAvailableRandomId++;
 }
 
-RuntimeMenuItem::RuntimeMenuItem(MenuType menuType, uint16_t id, RuntimeRenderingFn renderFn,
+RuntimeMenuItem::RuntimeMenuItem(MenuType menuType, menuid_t id, RuntimeRenderingFn renderFn,
 	uint8_t itemPosition, uint8_t numberOfRows, MenuItem* next)	: MenuItem(menuType, NULL, next, false) {
 	this->id = id;
 	this->noOfParts = numberOfRows;
@@ -23,7 +23,7 @@ RuntimeMenuItem::RuntimeMenuItem(MenuType menuType, uint16_t id, RuntimeRenderin
 	this->itemPosition = itemPosition;
 }
 
-ListRuntimeMenuItem::ListRuntimeMenuItem(uint16_t id, int numberOfRows, RuntimeRenderingFn renderFn, MenuItem* next)
+ListRuntimeMenuItem::ListRuntimeMenuItem(menuid_t id, int numberOfRows, RuntimeRenderingFn renderFn, MenuItem* next)
 	: RuntimeMenuItem(MENUTYPE_RUNTIME_LIST, id, renderFn, 0xff, numberOfRows, next) {
 	activeItem = 0;
 }
@@ -354,7 +354,7 @@ int textItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char
 	}
 }
 
-TextMenuItem::TextMenuItem(RuntimeRenderingFn customRenderFn, uint16_t id, int size, MenuItem *next)
+TextMenuItem::TextMenuItem(RuntimeRenderingFn customRenderFn, menuid_t id, int size, MenuItem *next)
     : EditableMultiPartMenuItem(MENUTYPE_TEXT_VALUE, id, size, customRenderFn, next) {
         data = new char[size];
         memset(data, 0, size);
@@ -417,7 +417,7 @@ void TimeFormattedMenuItem::setTimeFromString(const char* ptr) {
     data.hundreds = parseIntUntilSeparator(ptr, offset);
 }
 
-TimeFormattedMenuItem::TimeFormattedMenuItem(RuntimeRenderingFn renderFn, uint16_t id, MultiEditWireType format, MenuItem *next)
+TimeFormattedMenuItem::TimeFormattedMenuItem(RuntimeRenderingFn renderFn, menuid_t id, MultiEditWireType format, MenuItem *next)
         : EditableMultiPartMenuItem(MENUTYPE_TIME, id, format == EDITMODE_TIME_HUNDREDS_24H ? 4 : 3, renderFn, next) {
     setTime(TimeStorage(12, 0));
     this->format = format;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 https://www.thecoderscorner.com (Nutricherry LTD).
+ * Copyright (c) 2018 https://www.thecoderscorner.com (Dave Cherry).
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
@@ -18,7 +18,7 @@
 #define RANDOM_ID_START 50000
 
 /** For items that dont need to have the same id each time (such as back menu items), we just randomly give them an ID */
-uint16_t nextRandomId();
+menuid_t nextRandomId();
 
 /** This is the standard renderering function used for editable text items, for use with TextMenuItem */
 int textItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
@@ -72,11 +72,11 @@ enum MultiEditWireType : uint8_t {
  */
 class RuntimeMenuItem : public MenuItem {
 protected:
-	uint16_t id;
+    menuid_t id;
 	uint8_t itemPosition;
 	uint8_t noOfParts;
 public:
-	RuntimeMenuItem(MenuType menuType, uint16_t id, RuntimeRenderingFn renderFn, 
+    RuntimeMenuItem(MenuType menuType, menuid_t id, RuntimeRenderingFn renderFn,
 				    uint8_t itemPosition, uint8_t numberOfRows, MenuItem* next = nullptr);
 	
 	void copyValue(char* buffer, int bufferSize) const {
@@ -149,7 +149,7 @@ public:
      * @param child the first child item in the sub menu
      * @param next the next menu in the chain if there i one, or NULL.
      */
-    SubMenuItem(uint16_t id, RuntimeRenderingFn renderFn, MenuItem* child, MenuItem* next = nullptr)
+    SubMenuItem(menuid_t id, RuntimeRenderingFn renderFn, MenuItem* child, MenuItem* next = nullptr)
             : RuntimeMenuItem(MENUTYPE_SUB_VALUE, id, renderFn,
                               0, 1, next) {
         this->child = child;
@@ -180,7 +180,7 @@ class ListRuntimeMenuItem : public RuntimeMenuItem {
 private:
 	uint8_t activeItem;
 public:
-	ListRuntimeMenuItem(uint16_t id, int numberOfRows, RuntimeRenderingFn renderFn, MenuItem* next = nullptr);
+    ListRuntimeMenuItem(menuid_t id, int numberOfRows, RuntimeRenderingFn renderFn, MenuItem* next = nullptr);
 
 	RuntimeMenuItem* getChildItem(int pos);
 	RuntimeMenuItem* asParent();
@@ -200,7 +200,7 @@ public:
  */
 class EditableMultiPartMenuItem : public RuntimeMenuItem {
 public:
-	EditableMultiPartMenuItem(MenuType type, uint16_t id, int numberOfParts, RuntimeRenderingFn renderFn, MenuItem* next = nullptr)
+    EditableMultiPartMenuItem(MenuType type, menuid_t id, int numberOfParts, RuntimeRenderingFn renderFn, MenuItem* next = nullptr)
 			: RuntimeMenuItem(type, id, renderFn, 0, numberOfParts, next) {
 	}
 
@@ -237,7 +237,7 @@ private:
     char* data;
     bool passwordField;
 public:
-    TextMenuItem(RuntimeRenderingFn customRenderFn, uint16_t id, int size, MenuItem* next = nullptr);
+    TextMenuItem(RuntimeRenderingFn customRenderFn, menuid_t id, int size, MenuItem* next = nullptr);
 
     void setPasswordField(bool pwd) {
         this->passwordField = pwd;
@@ -286,7 +286,7 @@ class IpAddressMenuItem : public EditableMultiPartMenuItem {
 private:
     uint8_t data[4];
 public:
-    IpAddressMenuItem(RuntimeRenderingFn renderFn, uint16_t id, MenuItem* next = nullptr)
+    IpAddressMenuItem(RuntimeRenderingFn renderFn, menuid_t id, MenuItem* next = nullptr)
 		: EditableMultiPartMenuItem(MENUTYPE_IPADDRESS, id, 4, renderFn, next) {
 		setIpAddress(127, 0, 0, 1);
 	}
@@ -355,10 +355,10 @@ private:
     MultiEditWireType format;
     TimeStorage data;
 public:
-    TimeFormattedMenuItem(RuntimeRenderingFn renderFn, uint16_t id, MultiEditWireType format, MenuItem* next = nullptr);
+    TimeFormattedMenuItem(RuntimeRenderingFn renderFn, menuid_t id, MultiEditWireType format, MenuItem* next = nullptr);
 
 
-	/** gets the IP address as four separate bytes */
+	/** gets the time as four separate bytes */
 	TimeStorage getTime() const { return data; }
     
     /** sets the time */
@@ -386,7 +386,7 @@ private:
     static char separator;
     static DateFormatOption dateFormatMode;
 public:
-    DateFormattedMenuItem(RuntimeRenderingFn renderFn, uint16_t id, MenuItem* next = nullptr)
+    DateFormattedMenuItem(RuntimeRenderingFn renderFn, menuid_t id, MenuItem* next = nullptr)
     : EditableMultiPartMenuItem(MENUTYPE_DATE, id, 3, renderFn, next) {
         setDate(DateStorage(1, 1, 2020));
     }

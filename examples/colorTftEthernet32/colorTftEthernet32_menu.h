@@ -18,20 +18,26 @@
 #include <RemoteConnector.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
+#include <RemoteMenuItem.h>
+#include <IoAbstractionWire.h>
+#include <IoAbstraction.h>
+#include <EepromAbstractionWire.h>
+#include <RemoteAuthentication.h>
 
-void setupMenu();  // forward reference of the menu setup function.
-extern const PROGMEM ConnectorLocalInfo applicationInfo;  // contains app name and ID
-
-// Global variables that need exporting
-
+// variables we declare that you may need to access
+extern const PROGMEM ConnectorLocalInfo applicationInfo;
+extern TcMenuRemoteServer remoteServer;
 extern Adafruit_ST7735 gfx;
 extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
-extern IoAbstractionRef io8574;
 extern EthernetServer server;
+extern EthernetInitialisation ethernetInitialisation;
+extern const GFXfont FreeSansBold9pt7b;
+
+// Any externals needed by IO expanders, EEPROMs etc
+extern IoAbstractionRef ioexp_io8574;
 
 // Global Menu Item exports
-
 extern ActionMenuItem menuTakeDisplay;
 extern ActionMenuItem menuSaveItem;
 extern TextMenuItem menuRomText;
@@ -39,6 +45,8 @@ extern ScrollChoiceMenuItem menuRomLocation;
 extern ScrollChoiceMenuItem menuRomChoice;
 extern BackMenuItem menuBackRomValues;
 extern SubMenuItem menuRomValues;
+extern RemoteMenuItem menuIoTMonitor;
+extern EepromAuthenticationInfoMenuItem menuAuthenticator;
 extern IpAddressMenuItem menuIpAddress;
 extern BackMenuItem menuBackConnectivity;
 extern SubMenuItem menuConnectivity;
@@ -46,6 +54,7 @@ extern FloatMenuItem menuVoltA1;
 extern FloatMenuItem menuVoltA0;
 extern BackMenuItem menuBackStatus;
 extern SubMenuItem menuStatus;
+extern BooleanMenuItem menuShowHidden;
 extern Rgb32MenuItem menuRGB;
 extern BooleanMenuItem menuTempCheck;
 extern ActionMenuItem menuHiddenItem;
@@ -60,8 +69,9 @@ extern EnumMenuItem menuLimit;
 extern AnalogMenuItem menuCurrent;
 extern AnalogMenuItem menuVoltage;
 
-// Provide a wrapper to get hold of the root menu item
+// Provide a wrapper to get hold of the root menu item and export setupMenu
 inline MenuItem& rootMenuItem() { return menuVoltage; }
+void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
@@ -72,6 +82,7 @@ void CALLBACK_FUNCTION onLimitMode(int id);
 void CALLBACK_FUNCTION onRgbChanged(int id);
 void CALLBACK_FUNCTION onSaveItem(int id);
 void CALLBACK_FUNCTION onSaveRom(int id);
+void CALLBACK_FUNCTION onShowHidden(int id);
 void CALLBACK_FUNCTION onTakeDisplay(int id);
 void CALLBACK_FUNCTION onVoltageChange(int id);
 

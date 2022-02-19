@@ -11,46 +11,44 @@
  * make sure to rename it first.
  */
 
-#ifndef _TCMENU_ETHERNETTRANSPORT_H_
-#define _TCMENU_ETHERNETTRANSPORT_H_
+#ifndef TCMENU_ETHERNETTRANSPORT_H_
+#define TCMENU_ETHERNETTRANSPORT_H_
 
 #include <RemoteConnector.h>
 #include <TaskManager.h>
 #include <WiFi.h>
 #include <tcUtil.h>
+#include <remote/BaseRemoteComponents.h>
 
 #ifndef ETHERNET_BUFFER_SIZE
-#define ETHERNET_BUFFER_SIZE 0
+#define ETHERNET_BUFFER_SIZE 96
 #endif
+
+#if ETHERNET_BUFFER_SIZE > 0
+#include <remote/BaseBufferedRemoteTransport.h>
+#endif
+
+namespace tcremote {
 
 #if ETHERNET_BUFFER_SIZE > 0
 
 /**
  * An implementation of TagValueTransport that is able to read and write via a buffer to sockets.
  */
-class EthernetTagValTransport : public TagValueTransport {
-private:
-	WiFiClient client;
-    uint8_t bufferData[ETHERNET_BUFFER_SIZE];
-    int bufferPosition;
-public:
-	EthernetTagValTransport();
-	virtual ~EthernetTagValTransport();
-	void setClient(WiFiClient client) { this->client = client; }
+    class EthernetTagValTransport : public tcremote::BaseBufferedRemoteTransport {
+    private:
+        WiFiClient client;
+    public:
+        EthernetTagValTransport() : BaseBufferedRemoteTransport(BUFFER_MESSAGES_TILL_FULL, ETHERNET_BUFFER_SIZE, MAX_VALUE_LEN) { }
+        ~EthernetTagValTransport() override = default;
+        void setClient(WiFiClient cl) { this->client = cl; }
 
-    void endMsg() override {
-        TagValueTransport::endMsg();
-        flush();
-    }
-	int writeChar(char data) override ;
-	int writeStr(const char* data) override;
-	void flush() override;
-	bool available() override;
-	bool connected() override;
-	uint8_t readByte() override;
-	bool readAvailable() override;
-	void close() override;
-};
+        int fillReadBuffer(uint8_t* data, int maxSize) override;
+        void flush() override;
+        bool available() override;
+        bool connected() override;
+        void close() override;
+    };
 
 #else // ethernet buffering not needed
 
@@ -61,79 +59,35 @@ class EthernetTagValTransport : public TagValueTransport {
 private:
 	WiFiClient client;
 public:
-	EthernetTagValTransport();
-	virtual ~EthernetTagValTransport();
+	EthernetTagValTransport() : TagValueTransport(TagValueTransportType::TVAL_UNBUFFERED) {};
+	~EthernetTagValTransport() override = default;
 	void setClient(WiFiClient client) { this->client = client; }
 
-	virtual int writeChar(char data);
-	virtual int writeStr(const char* data);
-	virtual void flush();
-	virtual bool available();
-	virtual bool connected();
-	virtual uint8_t readByte();
-	virtual bool readAvailable();
-	virtual void close();
+	int writeChar(char data) override ;
+	int writeStr(const char* data) override;
+	void flush() override;
+	bool available() override;
+	bool connected() override;
+	uint8_t readByte() override;
+	bool readAvailable() override;
+    void close() override;
 };
 
 #endif // ethernet buffering check
 
 /**
- * This is the actual server component that manages all the ethernet connections.
- * It holds the connector, transport and processors that are needed to be able
- * to service messages. To initialise it one calls begin(..) passing an ethernet
- * server to listen on and the name (which on AVR is in PROGMEM).
+ * This class provides the initialisation and connection generation logic for ethernet connections.
  */
-class EthernetTagValServer : public Executable {
+class EthernetInitialisation : public DeviceInitialisation {
 private:
-	TagValueRemoteConnector connector;
-	EthernetTagValTransport transport;
-	CombinedMessageProcessor messageProcessor;
 	WiFiServer *server;
 public:
+    explicit EthernetInitialisation(WiFiServer* server) : server(server) {}
 
-	/**
-	 * Empty constructor - see begin.
-	 */
-	EthernetTagValServer();
+    bool attemptInitialisation() override;
 
-    /**
-     * Sets the mode of authentication used with your remote, if you don't call this the system will
-     * default to no authentication; which is probably fine for serial / bluetooth serial.
-    *
-     * This should always be called before begin(), to ensure this in your code always ensure this
-     * is called BEFORE setupMenu().
-     *
-     * @param authManager a reference to an authentication manager.
-     */
-    void setAuthenticator(AuthenticationManager* authManager) { connector.setAuthManager(authManager); }
-
-	/**
-	 * Creates the ethernet client manager components.
-	 * @param server a ready configured ethernet server instance.
-	 * @param namePgm the local name in program memory on AVR
-	 */
-	void begin(WiFiServer* server, const ConnectorLocalInfo* localInfo);
-
-	/**
-	 * @return the EthernetTagValTransport for the given connection number - zero based
-	 */
-	EthernetTagValTransport* getTransport(int /*num*/) { return &transport; }
-
-	/**
-	 * @return the selected connector by remoteNo - zero based
-	 */
-	TagValueRemoteConnector* getRemoteConnector(int /*num*/) { return &connector; }
-
-	/**
-	 * do not manually call, called by taskManager to poll the connection
-	 */
-	void exec();
+    bool attemptNewConnection(BaseRemoteServerConnection *transport) override;
 };
-
-/**
- * This is the global instance of the remote server for ethernet.
- */
-extern EthernetTagValServer remoteServer;
 
 /**
  * This function converts from a RSSI (Radio Strength indicator)
@@ -145,4 +99,10 @@ extern EthernetTagValServer remoteServer;
  */
 int fromWiFiRSSITo4StateIndicator(int strength);
 
-#endif /* _TCMENU_ETHERNETTRANSPORT_H_ */
+} // namespace tcremote
+
+#ifndef TC_MANUAL_NAMESPACING
+using namespace tcremote;
+#endif // TC_MANUAL_NAMESPACING
+
+#endif /* TCMENU_ETHERNETTRANSPORT_H_ */

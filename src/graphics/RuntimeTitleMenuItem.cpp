@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 2018 https://www.thecoderscorner.com (Nutricherry LTD).
+ * Copyright (c) 2018 https://www.thecoderscorner.com (Dave Cherry).
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
 #include "PlatformDetermination.h"
 #include "RuntimeTitleMenuItem.h"
+
 namespace tcgfx {
 
     RuntimeTitleMenuItem appTitleMenuItem(0, nullptr);

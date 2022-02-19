@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 https://www.thecoderscorner.com (Nutricherry LTD).
+ * Copyright (c) 2018 https://www.thecoderscorner.com (Dave Cherry).
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
@@ -325,6 +325,13 @@ public:
      */
     void setResetIntervalTimeSeconds(uint16_t interval) { 
         resetValInTicks = interval * updatesPerSecond;
+    }
+
+    /**
+     * Completely turn off the reset interval so there will never be a reset.
+     */
+    void turnOffResetLogic() {
+        resetValInTicks = MAX_TICKS;
     }
 
     /**

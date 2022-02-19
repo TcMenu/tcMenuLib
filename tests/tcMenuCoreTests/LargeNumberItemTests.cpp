@@ -282,4 +282,25 @@ test(LargeNumWithNegativeNotAllowed) {
     assertStringCaseEqual("15265", sz);
 }
 
+test(LargeNumberWithOneDecimalPlace) {
+    EditableLargeNumberMenuItem editable(largeNumTestCb, 101, 4, 1, false);
+    editable.setLargeNumberFromString("12.1");
+    assertEqual(editable.getLargeNumber()->getWhole(), (uint32_t)12);
+    assertEqual(editable.getLargeNumber()->getFraction(), (uint32_t)1);
+    assertNear(editable.getLargeNumber()->getAsFloat(), 12.1F, 0.00001);
+    assertFalse(editable.getLargeNumber()->isNegative());
+
+    editable.getLargeNumber()->setFromFloat(14.1F);
+    assertEqual(editable.getLargeNumber()->getWhole(), (uint32_t)14);
+    assertEqual(editable.getLargeNumber()->getFraction(), (uint32_t)1);
+    assertNear(editable.getLargeNumber()->getAsFloat(), 14.1F, 0.00001);
+    assertFalse(editable.getLargeNumber()->isNegative());
+
+    editable.getLargeNumber()->setValue(13, 5, false);
+    assertEqual(editable.getLargeNumber()->getWhole(), (uint32_t)13);
+    assertEqual(editable.getLargeNumber()->getFraction(), (uint32_t)5);
+    assertNear(editable.getLargeNumber()->getAsFloat(), 13.5F, 0.00001);
+    assertFalse(editable.getLargeNumber()->isNegative());
+}
+
 #endif // LARGE_NUMBER_ITEM_TESTS_H

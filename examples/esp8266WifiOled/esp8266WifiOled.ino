@@ -12,6 +12,7 @@
  * and window opener driven by it too.
  */
 
+#include <U8g2lib.h>
 #include <Wire.h>
 #include "esp8266WifiOled_menu.h"
 #include <IoAbstractionWire.h>
@@ -33,36 +34,11 @@ char fileChoicesArray[255]{};
 #define WINDOW_PIN 3
 #define HEATER_PIN 4
 
-// this is the interrupt pin connection from the PCF8574 back to the ESP8266 board.
-#define IO_INTERRUPT_PIN 12
-
-
-//
-// ESP boards tend to have few pins available for general purpose use, to make things easier
-// this sketch assumes the rotary encoder and switch are attached to a PCF8574 IO Expander.
-// Change in menu designer's code generator to remove this if you prefer to use device pins.
-//
-//IoAbstractionRef io8574 = new LoggingIoAbstraction(ioFrom8574(0x20, IO_INTERRUPT_PIN), 8);
-IoAbstractionRef io8574 = ioFrom8574(0x20, IO_INTERRUPT_PIN);
-
-// eeprom wrapper, initialised in setup.
-ArduinoEEPROMAbstraction *eeprom = NULL;
-
-// we want to authenticate connections, the easiest and quickest way is to use the EEPROM
-// authenticator where pairing requests add a new item into the EEPROM. Any authentication
-// requests are then handled by looking in the EEPROM.
-EepromAuthenticatorManager authManager;
-
 // we add two widgets that show both the connection status and wifi signal strength
 // these are added to the renderer and rendered upon any change.
+// https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/rendering-with-tcmenu-lcd-tft-oled/#titlewidget-for-presenting-state-in-icon-form
 TitleWidget connectedWidget(iconsConnection, 2, 16, 12);
 TitleWidget wifiWidget(iconsWifi, 5, 16, 12, &connectedWidget);
-
-// Here we create two additional menus, that will be added manually to handle the connectivity
-// status and authentication keys. In a future version these will be added to th desinger.
-RemoteMenuItem menuRemoteMonitor(1001, 2);
-EepromAuthenicationInfoMenuItem menuAuthKeyMgr(1002, &authManager, &menuRemoteMonitor);
-
 
 // state used by the sketch
 
@@ -77,38 +53,8 @@ void onCommsChange(CommunicationInfo info) {
     serdebugF4("Comms notify (rNo, con, enum)", info.remoteNo, info.connected, info.errorMode);
 }
 
-//
-// here we just start serial for debugging and try to initialise the display and menu
-//
-void setup() {
-    Serial.begin(115200);
-    Serial.println("Starting NodeMCU example");
-
-    Wire.begin();
-    //Wire.setClock(400000);
-
-    // set up the inbuilt ESP rom to use for load and store.
-    EEPROM.begin(512);
-    eeprom = new ArduinoEEPROMAbstraction(&EEPROM);
-
-    // now we enable authentication using EEPROM authentication. Where the EEPROM is
-    // queried for authentication requests, and any additional pairs are stored there too.
-    // first we initialise the authManager, then pass it to the class.
-    // Always call BEFORE setupMenu()
-    authManager.initialise(eeprom, 100);
-    remoteServer.setAuthenticator(&authManager);
-
-    // Here we add two additional menus for managing the connectivity and authentication keys.
-    // In the future, there will be an option to autogenerate these from the designer.
-    menuIpAddress.setNext(&menuAuthKeyMgr);
-    menuRemoteMonitor.addConnector(remoteServer.getRemoteConnector(0));
-    menuRemoteMonitor.registerCommsNotification(onCommsChange);
-    menuAuthKeyMgr.setLocalOnly(true);
-
-    // because we are initialising wifi from the menu entries, we need to load the WiFi
-    // specific eeprom values very early, so we just load the two items we need.
-    loadMenuItem(eeprom, &menuSSID);
-    loadMenuItem(eeprom, &menuPwd);
+void startWiFi() {
+    serdebugF3("Starting WiFi", menuSSID.getTextValue(), menuPwd.getTextValue());
 
     // this sketch assumes you've successfully connected to the Wifi before, does not
     // call begin.. You can initialise the wifi whichever way you wish here.
@@ -124,11 +70,29 @@ void setup() {
         serdebugF("Connecting to Wifi using settings from connectivity menu");
     }
 
+}
+
+//
+// here we just start serial for debugging and try to initialise the display and menu
+//
+void setup() {
+    Serial.begin(115200);
+    serdebugF("Starting NodeMCU example");
+    Wire.begin();
+    //Wire.setClock(400000);
+    EEPROM.begin(512); // set up the inbuilt ESP rom to use for load and store.
+
     // here we set the first widget that will be displayed in the title area.
     renderer.setFirstWidget(&wifiWidget);
 
     // initialise the menu.
     setupMenu();
+
+    // load back the core menu items
+    menuMgr.load();
+
+    startWiFi();
+    menuIoTMonitor.registerCommsNotification(onCommsChange);
 
     // now we add three icons into the icon cache, we should add one for each menu item that we give a grid position
     // that draws as an image.
@@ -143,8 +107,8 @@ void setup() {
     props.addGridPosition(&menuLockDoor, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 3, 3, 26));
     props.addGridPosition(&menuSetup, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 1, 3, 26));
 
-    // load back the core menu items
-    menuMgr.load(*eeprom);
+    // after changing the drawing properties, always refresh the cache to ensure it draws properly.
+    tcgfx::ConfigurableItemDisplayPropertiesFactory::refreshCache();
 
     // now monitor the wifi level every second and report it in a widget.
     taskManager.scheduleFixedRate(1000, [] {
@@ -178,10 +142,10 @@ void setup() {
     // Now we configure our simulated heater and window.. We use inverse
     // logic on the 8574 because it's better at pulling down to GND than up.
     //
-    ioDevicePinMode(io8574, WINDOW_PIN, OUTPUT);
-    ioDevicePinMode(io8574, HEATER_PIN, OUTPUT);
-    ioDeviceDigitalWrite(io8574, WINDOW_PIN, HIGH);
-    ioDeviceDigitalWriteS(io8574, HEATER_PIN, HIGH);
+    ioDevicePinMode(ioexp_io8574, WINDOW_PIN, OUTPUT);
+    ioDevicePinMode(ioexp_io8574, HEATER_PIN, OUTPUT);
+    ioDeviceDigitalWrite(ioexp_io8574, WINDOW_PIN, HIGH);
+    ioDeviceDigitalWriteS(ioexp_io8574, HEATER_PIN, HIGH);
 }
 
 //
@@ -212,7 +176,7 @@ void windowOpenFn() {
     }
     else windowOpen = false;
 
-    ioDeviceDigitalWriteS(io8574, WINDOW_PIN, windowOpen);
+    ioDeviceDigitalWriteS(ioexp_io8574, WINDOW_PIN, windowOpen);
 }
 
 // we are using a simulated low speed PWM to control the heater
@@ -229,7 +193,7 @@ void heaterOnFn() {
     }
     else heaterOn = false;
 
-    ioDeviceDigitalWriteS(io8574, HEATER_PIN, heaterOn);
+    ioDeviceDigitalWriteS(ioexp_io8574, HEATER_PIN, heaterOn);
 }
 
 //
@@ -289,7 +253,7 @@ void CALLBACK_FUNCTION onElectricHeater(int /*id*/) {
 const char allSavedPgm[] PROGMEM = "All saved to EEPROM";
 void CALLBACK_FUNCTION onSaveAll(int id) {
     Serial.println("Saving values to EEPROM");
-    menuMgr.save(*eeprom);
+    menuMgr.save();
     // on esp you must commit after calling save.
     EEPROM.commit();
 

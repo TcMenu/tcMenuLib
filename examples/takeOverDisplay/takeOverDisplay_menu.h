@@ -16,22 +16,28 @@
 #include <LiquidCrystalIO.h>
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
+#include <RemoteMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
+#include <IoAbstraction.h>
+#include <EepromAbstractionWire.h>
+#include <RemoteAuthentication.h>
 #include "tcMenuLiquidCrystal.h"
 
-void setupMenu();  // forward reference of the menu setup function.
-extern const PROGMEM ConnectorLocalInfo applicationInfo;  // contains app name and ID
-
-// Global variables that need exporting
-
-extern IoAbstractionRef io23017;
+// variables we declare that you may need to access
+extern const PROGMEM ConnectorLocalInfo applicationInfo;
+extern TcMenuRemoteServer remoteServer;
 extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
 extern EthernetServer server;
+extern EthernetInitialisation ethernetInitialisation;
+
+// Any externals needed by IO expanders, EEPROMs etc
+extern IoAbstractionRef io23017;
 
 // Global Menu Item exports
-
+extern EepromAuthenticationInfoMenuItem menuConnectivityAuthenticator;
+extern RemoteMenuItem menuConnectivityIoTMonitor;
 extern IpAddressMenuItem menuConnectivityIPAddress;
 extern TextMenuItem menuConnectivityChangePin;
 extern BackMenuItem menuBackConnectivity;
@@ -52,8 +58,9 @@ extern EnumMenuItem menuFood;
 extern ActionMenuItem menuTakeDisplay;
 extern TimeFormattedMenuItem menuTime;
 
-// Provide a wrapper to get hold of the root menu item
+// Provide a wrapper to get hold of the root menu item and export setupMenu
 inline MenuItem& rootMenuItem() { return menuTime; }
+void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION

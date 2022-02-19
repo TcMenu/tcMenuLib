@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 https://www.thecoderscorner.com (Nutricherry LTD).
+ * Copyright (c) 2018 https://www.thecoderscorner.com (Dave Cherry).
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
@@ -74,7 +74,7 @@ float LargeFixedNumber::getAsFloat() {
 
 void LargeFixedNumber::setFromFloat(float value) {
     bool neg = value < 0.0f;
-    value = abs(value);
+    value = tcFltAbs(value);
     uint32_t val;
     uint32_t frc;
     if(fractionDp == 0) {

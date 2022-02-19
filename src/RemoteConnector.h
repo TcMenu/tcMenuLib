@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 https://www.thecoderscorner.com (Nutricherry LTD).
+ * Copyright (c) 2018 https://www.thecoderscorner.com (Dave Cherry).
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
@@ -23,9 +23,12 @@
 #define TAG_VAL_PROTOCOL 0x01
 #define START_OF_MESSAGE 0x01
 #define TICK_INTERVAL 1
-#define HEARTBEAT_INTERVAL 1500
-// when debugging you can increase the heartbeat time to reduce disconnects (below gives 90 seconds)
-//#define HEARTBEAT_INTERVAL 30000
+
+// when debugging to reduce disconnects set the following (give 1 minute timeout): -DHEARTBEAT_INTERVAL=20000
+#ifndef HEARTBEAT_INTERVAL
+# define HEARTBEAT_INTERVAL 1500
+#endif
+
 #define HEARTBEAT_INTERVAL_TICKS (HEARTBEAT_INTERVAL / TICK_INTERVAL)
 #define PAIRING_TIMEOUT_TICKS (15000 / TICK_INTERVAL)
 
@@ -109,15 +112,30 @@ class AuthenticationManager;
 class EditableLargeNumberMenuItem;
 
 /**
+ * The base type of transport that is in use, it can be either unbuffered, buffered, or simple encrypted. Encrypted
+ * tag val will become available during the 2.2 releases.
+ */
+enum TagValueTransportType {
+    /** an unbuffered connection that writes immediately to the transport. */
+    TVAL_UNBUFFERED,
+    /** a buffered connection that writes to a buffer, and requires a timed check for writing */
+    TVAL_BUFFERED,
+    /** a buffered and encrypted transport that requires a timed check */
+    TVAL_BUFFERED_DELEGATE_ENCRYPT
+};
+
+/**
  * The definition of a transport that can send and receive information remotely using the TagVal protocol.
  * Implementations include SerialTransport and EthernetTransport located in the remotes directory.
  */
 class TagValueTransport {
 protected:
 	FieldAndValue currentField;
+    TagValueTransportType transportType;
+    uint8_t protocolUsed;
 public:
-	TagValueTransport();
-	virtual ~TagValueTransport() {}
+	explicit TagValueTransport(TagValueTransportType type);
+	virtual ~TagValueTransport() = default;
 
 	void startMsg(uint16_t msgType);
 	void writeField(uint16_t field, const char* value);
@@ -125,6 +143,7 @@ public:
     void writeFieldLong(uint16_t field, long value);
 	FieldAndValue* fieldIfAvailable();
 	void clearFieldStatus(FieldValueType ty = FVAL_PROCESSING);
+	TagValueTransportType getTransportType() { return transportType; }
 
 	virtual void flush() = 0;
 	virtual int writeChar(char data) = 0;
@@ -182,7 +201,7 @@ public:
 	 * @param transport the actual underlying transport
 	 * @param remoteNo the index of this connector, 0 based.
 	 */
-	TagValueRemoteConnector(uint8_t remoteNo = 0);
+	explicit TagValueRemoteConnector(uint8_t remoteNo = 0);
 
     /**
      * Initialises the connector with a specific transport that can send and recevie data, a message processor that can
@@ -190,8 +209,9 @@ public:
      * @param transport a class that implements TagValueTransport for sending and receving data.
      * @param processor a linked list of processors that can process incoming messages.
      * @param localInfoPgm the name and UUID of this local device (in program memory where available).
+     * @param remoteNo remote number, optional and defaults to 0
      */
-    void initialise(TagValueTransport* transport, CombinedMessageProcessor* processor, const ConnectorLocalInfo* localInfoPgm);
+    void initialise(TagValueTransport* transport, CombinedMessageProcessor* processor, const ConnectorLocalInfo* localInfoPgm, uint8_t remoteNo);
 
     void setAuthManager(AuthenticationManager* mgr) { authManager = mgr; }
 
@@ -367,7 +387,7 @@ public:
 	/**
 	 * Returns the remoteNo (or remote number) for this remote
 	 */
-	uint8_t getRemoteNo() {return remoteNo;}
+	uint8_t getRemoteNo() const {return remoteNo;}
 
 	/**
 	 * Returns the remote name for this connection. The name of the other side
@@ -377,12 +397,12 @@ public:
 	/**
 	 * returns the major version of the other party API
 	 */
-	uint8_t getRemoteMajorVer() {return remoteMajorVer;}
+	uint8_t getRemoteMajorVer() const {return remoteMajorVer;}
 
 	/**
 	 * Returns the minor version of the other party API
 	 */
-	uint8_t getRemoteMinorVer() {return remoteMinorVer;}
+	uint8_t getRemoteMinorVer() const {return remoteMinorVer;}
 	
 	/**
 	 * Returns the platform of the other party.

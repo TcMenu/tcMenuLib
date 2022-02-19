@@ -1,6 +1,6 @@
 {
   "version": "1.00",
-  "projectName": "/Users/dave/Documents/Arduino/tcLibraryDev/lib/tcMenu/examples/esp32SimHub/esp32SimHub.emf",
+  "projectName": "C:\\Users\\dave\\Documents\\Arduino\\tcLibraryDev\\lib\\tcMenu\\examples\\esp32SimHub\\esp32SimHub.emf",
   "author": "dave",
   "items": [
     {
@@ -105,12 +105,12 @@
       "parentId": 4,
       "type": "analogItem",
       "item": {
-        "maxValue": 100,
-        "offset": 0,
+        "maxValue": 255,
+        "offset": -180,
         "divisor": 2,
-        "unitName": "",
+        "unitName": "dB",
         "name": "Test Item 1",
-        "variableName": "",
+        "variableName": "SettingsTestItem1",
         "id": 5,
         "eepromAddress": -1,
         "readOnly": false,
@@ -156,6 +156,35 @@
         "name": "LargeTest",
         "variableName": "SettingsLargeTest",
         "id": 13,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "customBuildItem",
+      "item": {
+        "menuType": "REMOTE_IOT_MONITOR",
+        "name": "IoT Monitor",
+        "id": 14,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "largeNumItem",
+      "item": {
+        "digitsAllowed": 4,
+        "decimalPlaces": 1,
+        "negativeAllowed": true,
+        "name": "New Large Number",
+        "variableName": "SettingsNewLargeNumber",
+        "id": 15,
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
@@ -218,6 +247,9 @@
     "lastDisplayUuid": "4dcb12ec-13d8-4466-b8b6-bd575eae4612",
     "lastInputUuid": "cc0f9246-03be-4adf-b1f5-dd501085122a",
     "lastRemoteUuid": "4123dfc3-5271-4727-81f0-1a21d06b666b",
+    "lastRemoteUuids": [
+      "4123dfc3-5271-4727-81f0-1a21d06b666b"
+    ],
     "lastThemeUuid": "03c6b25f-db63-402a-8447-a5ce1484c14d",
     "applicationUUID": "4db9fbfe-9fab-4759-b8ff-3e0c6700f475",
     "applicationName": "SimHub Link",
@@ -265,6 +297,11 @@
       {
         "name": "DISPLAY_CLOCK_PIN",
         "latestValue": "-1",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "ST7735_TAB_TYPE",
+        "latestValue": "INITR_BLACKTAB",
         "subsystem": "DISPLAY"
       },
       {
@@ -328,7 +365,7 @@
         "subsystem": "INPUT"
       },
       {
-        "name": "SERIAL_PORT",
+        "name": "SH_SERIAL_PORT",
         "latestValue": "Serial",
         "subsystem": "REMOTE"
       },
@@ -370,6 +407,11 @@
     ],
     "namingRecursive": true,
     "saveToSrc": false,
-    "useCppMain": false
+    "useCppMain": false,
+    "eepromDefinition": "",
+    "authenticatorDefinition": "",
+    "projectIoExpanders": [
+      "deviceIO:"
+    ]
   }
 }

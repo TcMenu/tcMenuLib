@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 https://www.thecoderscorner.com (Nutricherry LTD).
+ * Copyright (c) 2018 https://www.thecoderscorner.com (Dave Cherry).
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
@@ -48,25 +48,25 @@ MenuItem* getParentRootAndVisit(MenuItem* current, MenuVisitorFn visitor) {
  * Find an item by it's ID by traversing through the menu structure looking
  * for the ID and short circuiting on the first match.
  */
-MenuItem* recursiveFindById(MenuItem* current, uint16_t id) {
+MenuItem* recursiveFindById(MenuItem* current, menuid_t id) {
     while(current != nullptr) {
-        if(current->getMenuType() == MENUTYPE_SUB_VALUE) {
+        if(current->getId() == id) {
+            return current;
+        }
+        else if(current->getMenuType() == MENUTYPE_SUB_VALUE) {
             auto sub = reinterpret_cast<SubMenuItem*>(current);
             MenuItem* ret = recursiveFindById(sub->getChild(), id);
             if(ret != nullptr) {
                 return ret;
             }
         }
-        else if(current->getId() == id) {
-            return current;
-        } 
 
         current = current->getNext();
     }
     return nullptr;
 }
 
-MenuItem* getMenuItemById(int id) {
+MenuItem* getMenuItemById(menuid_t id) {
     return recursiveFindById(menuMgr.getRoot(), id);
 }
 

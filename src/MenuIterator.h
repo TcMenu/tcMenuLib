@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 https://www.thecoderscorner.com (Nutricherry LTD).
+ * Copyright (c) 2018 https://www.thecoderscorner.com (Dave Cherry).
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
@@ -59,7 +59,7 @@ MenuItem* getSubMenuFor(MenuItem* current);
  * @param the ID to locate the menu item  for
  * @return the menu item associated or NULL.
  */
-MenuItem* getMenuItemById(int id);
+MenuItem* getMenuItemById(menuid_t id);
 
 /**
  * Gets the item at the position requested within menu root.
@@ -118,6 +118,12 @@ public:
      * @return true if the remote has changed, false otherwise
      */
     bool matches(MenuItem* item) override;
+
+    /**
+     * Sets the remote number that we should filter on
+     * @param newRemoteNum the remote to filter on
+     */
+    void setRemoteNo(uint8_t newRemoteNum) { remoteNo = newRemoteNum; }
 };
 
 // the modes that can be passed to the type predicate

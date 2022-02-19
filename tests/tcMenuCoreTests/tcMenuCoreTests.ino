@@ -138,6 +138,7 @@ testF(MenuItemIteratorFixture, testGetItemById) {
     assertTrue(getMenuItemById(0) == NULL);
     assertTrue(checkMenuItem(getMenuItemById(1), &menuVolume));
     assertTrue(checkMenuItem(getMenuItemById(menuBackStatus.getId()), &menuBackStatus));
+    assertTrue(checkMenuItem(getMenuItemById(5), &menuStatus));
     assertTrue(checkMenuItem(getMenuItemById(101), &menuPressMe));
     assertTrue(checkMenuItem(getMenuItemById(2), &menuChannel));
     assertTrue(checkMenuItem(getMenuItemById(7), &menuLHSTemp));

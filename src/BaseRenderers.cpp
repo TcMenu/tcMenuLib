@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 https://www.thecoderscorner.com (Nutricherry LTD).
+ * Copyright (c) 2018 https://www.thecoderscorner.com (Dave Cherry).
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
@@ -9,6 +9,7 @@
 #include "RemoteMenuItem.h"
 #include "BaseRenderers.h"
 #include "BaseDialog.h"
+#include "graphics/BaseGraphicalRenderer.h"
 
 MenuRenderer* MenuRenderer::theInstance = nullptr;
 
@@ -16,7 +17,10 @@ class RenderingMenuMgrObserver : public MenuManagerObserver {
 public:
     void structureHasChanged() override {
         auto myRenderer = MenuRenderer::getInstance();
-        if(myRenderer->getRendererType() != RENDER_TYPE_NOLOCAL) {
+        if(myRenderer->getRendererType() == RENDER_TYPE_CONFIGURABLE) {
+            auto gfxRenderer = reinterpret_cast<tcgfx::BaseGraphicalRenderer*>(myRenderer);
+            gfxRenderer->displayPropertiesHaveChanged();
+        } else if(myRenderer->getRendererType() != RENDER_TYPE_NOLOCAL) {
             serdebugF("Completely invalidate the display");
             reinterpret_cast<BaseMenuRenderer*>(myRenderer)->invalidateAll();
         }

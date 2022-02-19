@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2018 https://www.thecoderscorner.com (Dave Cherry).
+ * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
+ */
+
 #ifndef _SECURED_MENU_POPUP_H_
 #define _SECURED_MENU_POPUP_H_
 
