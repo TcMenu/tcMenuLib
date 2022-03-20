@@ -125,7 +125,7 @@ enum AckResponseStatus {
  * delta or incremental (for example menuVolume + 3) or absolulte (channel is now 2)
  */
 enum ChangeType: uint8_t {
-	CHANGE_DELTA = 0, CHANGE_ABSOLUTE = 1, CHANGE_LIST = 2
+	CHANGE_DELTA = 0, CHANGE_ABSOLUTE = 1, CHANGE_LIST = 2, CHANGE_LIST_RESPONSE = 3
 };
 
 /**

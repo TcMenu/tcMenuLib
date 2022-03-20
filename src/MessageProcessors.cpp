@@ -35,9 +35,7 @@ void fieldUpdateHeartbeatMsg(TagValueRemoteConnector* connector, FieldAndValue* 
 			serdebugF("HB start msg");
 			connector->encodeJoin();
 		}
-    }
-
-    else {
+    } else {
         if(field->field == FIELD_HB_MODE) {
             info->hb.hbMode = (HeartbeatMode)(atoi(field->value));
         }
@@ -65,7 +63,7 @@ void fieldUpdateDialogMsg(TagValueRemoteConnector* connector, FieldAndValue* fie
         info->dialog.mode = field->value[0];
         break;
     case FIELD_CORRELATION:
-        info->dialog.correlation = strtoul(field->value, NULL, 16);
+        info->dialog.correlation = strtoul(field->value, nullptr, 16);
         break;
     }
 
@@ -93,7 +91,7 @@ void fieldUpdateJoinMsg(TagValueRemoteConnector* connector, FieldAndValue* field
         // ensure that authentication has been done, if not basically fail the connection.
         if(!info->join.authProvided) {
             serdebugF("Connection without authentication - stopping");
-            connector->provideAuthentication(NULL);
+            connector->provideAuthentication(nullptr);
         }
         else {
             connector->setRemoteConnected(info->join.major, info->join.minor, info->join.platform);
@@ -159,33 +157,33 @@ bool processValueChangeField(FieldAndValue* field, MessageProcessorInfo* info) {
     }
     else if(info->value.item->getMenuType() == MENUTYPE_BOOLEAN_VALUE) {
         // booleans are always absolute
-        BooleanMenuItem* boolItem = reinterpret_cast<BooleanMenuItem*>(info->value.item);
+        auto* boolItem = reinterpret_cast<BooleanMenuItem*>(info->value.item);
         boolItem->setBoolean(isStringTrue(field->value));
         serdebugF2("Bool change: ", boolItem->getBoolean());
     }
     else if(info->value.item->getMenuType() == MENUTYPE_TEXT_VALUE) {
         // text is always absolute
-        TextMenuItem* textItem = reinterpret_cast<TextMenuItem*>(info->value.item);
+        auto* textItem = reinterpret_cast<TextMenuItem*>(info->value.item);
         textItem->setTextValue(field->value);
         serdebugF2("Text change: ", textItem->getTextValue());
     }
     else if (info->value.item->getMenuType() == MENUTYPE_IPADDRESS) {
-		IpAddressMenuItem* ipItem = reinterpret_cast<IpAddressMenuItem*>(info->value.item);
+		auto* ipItem = reinterpret_cast<IpAddressMenuItem*>(info->value.item);
 		ipItem->setIpAddress(field->value);
 		serdebugF2("Ip Addr change: ", field->value);
 	}
     else if(info->value.item->getMenuType() == MENUTYPE_TIME) {
-        TimeFormattedMenuItem* timeItem = reinterpret_cast<TimeFormattedMenuItem*>(info->value.item);
+        auto* timeItem = reinterpret_cast<TimeFormattedMenuItem*>(info->value.item);
         timeItem->setTimeFromString(field->value);
         serdebugF2("Time item change: ", field->value);
     }
     else if(info->value.item->getMenuType() == MENUTYPE_DATE) {
-        DateFormattedMenuItem* dateItem = reinterpret_cast<DateFormattedMenuItem*>(info->value.item);
+        auto* dateItem = reinterpret_cast<DateFormattedMenuItem*>(info->value.item);
         dateItem->setDateFromString(field->value);
         serdebugF2("Date change: ", field->value);
     }
     else if (info->value.item->getMenuType() == MENUTYPE_LARGENUM_VALUE) {
-		EditableLargeNumberMenuItem* numItem = reinterpret_cast<EditableLargeNumberMenuItem*>(info->value.item);
+		auto* numItem = reinterpret_cast<EditableLargeNumberMenuItem*>(info->value.item);
 		numItem->setLargeNumberFromString(field->value);
 		serdebugF2("Large num change: ", field->value);
 	}
@@ -199,6 +197,17 @@ bool processValueChangeField(FieldAndValue* field, MessageProcessorInfo* info) {
         sc->setFromRemote(field->value);
         serdebugF2("Scroller change ", sc->getCurrentValue());
     }
+    else if(info->value.item->getMenuType() == MENUTYPE_RUNTIME_LIST && info->value.changeType == CHANGE_LIST_RESPONSE) {
+        auto listItem = reinterpret_cast<ListRuntimeMenuItem*>(info->value.item);
+        int offs = 0;
+        long idx = parseIntUntilSeparator(field->value, offs);
+        bool invoke = parseIntUntilSeparator(field->value, offs) == 1L;
+        if(invoke) {
+            listItem->getChildItem((int)idx)->triggerCallback();
+            // reset to parent after doing the callback
+            listItem->asParent();
+        }
+    }
     return true;
 }
 
@@ -206,14 +215,14 @@ bool processIdChangeField(FieldAndValue* field, MessageProcessorInfo* info) {
     int id = atoi(field->value);
 
     MenuItem* foundItem = getMenuItemById(id);
-    if(foundItem != NULL && !foundItem->isReadOnly()) {
+    if(foundItem != nullptr && !foundItem->isReadOnly()) {
         info->value.item = foundItem;
         serdebugF2("ValChange for ID ", foundItem->getId());
         return true;
     }
     else {
         serdebugF("Bad ID on valchange msg");
-        info->value.item = NULL;
+        info->value.item = nullptr;
         return false;
     }
 }
@@ -221,24 +230,24 @@ bool processIdChangeField(FieldAndValue* field, MessageProcessorInfo* info) {
 void fieldUpdateValueMsg(TagValueRemoteConnector* connector, FieldAndValue* field, MessageProcessorInfo* info) {
 	if(field->fieldType == FVAL_END_MSG) {
 		// if this is an action item, we trigger the callback to occur just before ending.
-		if(info->value.item != NULL && info->value.item->getMenuType() == MENUTYPE_ACTION_VALUE) {
+		if(info->value.item != nullptr && info->value.item->getMenuType() == MENUTYPE_ACTION_VALUE) {
 			info->value.item->triggerCallback();
 		}
 		return;
 	}
 	
-    bool ret = false;
+    bool ret;
 
 	switch(field->field) {
     case FIELD_CORRELATION:
-        info->value.correlation = strtoul(field->value, NULL, 16);
+        info->value.correlation = strtoul(field->value, nullptr, 16);
         break;
 	case FIELD_ID:
         ret = processIdChangeField(field, info);
         if(!ret) connector->encodeAcknowledgement(info->value.correlation, ACK_ID_NOT_FOUND);
 		break;
 	case FIELD_CURRENT_VAL:
-        if(info->value.item != NULL) {
+        if(info->value.item != nullptr) {
             ret = processValueChangeField(field, info);
             connector->encodeAcknowledgement(info->value.correlation, ret ? ACK_SUCCESS : ACK_VALUE_RANGE);
         }
