@@ -83,7 +83,7 @@ void LargeFixedNumber::setFromFloat(float value) {
     }
     else {
         val = (uint32_t)value;
-        frc = (value - (float) val) * float(dpToDivisor(fractionDp));
+        frc = (uint32_t)((value - (float) val) * ((float)dpToDivisor(fractionDp) + 0.5F));
     }
     setValue(val, frc, neg);
 }
@@ -96,7 +96,7 @@ void EditableLargeNumberMenuItem::setLargeNumberFromString(const char* val) {
 		negative = true;
 	}
 	int32_t whole = parseIntUntilSeparator(val, offset);
-	int32_t fract = parseIntUntilSeparator(val, offset);
+	int32_t fract = parseIntUntilSeparator(val, offset, getLargeNumber()->decimalPointIndex());
 	data.setValue(whole, fract, negative);
 	setSendRemoteNeededAll();
 	setChanged(true);

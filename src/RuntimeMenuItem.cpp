@@ -394,7 +394,7 @@ void IpAddressMenuItem::setIpPart(uint8_t part, uint8_t newVal) {
     changeOccurred(false);
 }
 
-long parseIntUntilSeparator(const char* ptr, int& offset) {
+long parseIntUntilSeparator(const char* ptr, int& offset, size_t maximumDigits) {
     char sz[10];
     unsigned int pos = 0;
     // skip any non numerics
@@ -402,7 +402,8 @@ long parseIntUntilSeparator(const char* ptr, int& offset) {
         offset++;
     }
     // collect the numerics
-    while(pos < (sizeof(sz)-1) && ptr[offset] && ptr[offset] >= '0' && ptr[offset] <= '9') {
+    auto maxPos = min(maximumDigits, sizeof(sz) -1);
+    while(pos < maxPos && ptr[offset] && ptr[offset] >= '0' && ptr[offset] <= '9') {
         sz[pos++] = ptr[offset++];
     }
     sz[pos] = 0;

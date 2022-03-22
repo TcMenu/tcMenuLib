@@ -97,8 +97,6 @@ void ScrollChoiceMenuItem::copyTransportText(char *buffer, size_t bufferSize) {
     buffer[bufferSize - 1] = 0;
 }
 
-long parseIntUntilSeparator(const char* ptr, int& offset);
-
 void ScrollChoiceMenuItem::setFromRemote(const char *buffer) {
     int pos = 0;
     setCurrentValue((int)parseIntUntilSeparator(buffer, pos));

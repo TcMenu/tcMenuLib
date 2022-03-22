@@ -282,25 +282,45 @@ test(LargeNumWithNegativeNotAllowed) {
     assertStringCaseEqual("15265", sz);
 }
 
+bool checkMatches(LargeFixedNumber* num, uint32_t whole, uint32_t fract, float nearValue, bool isNeg) {
+    if(num->getWhole() != whole || num->getFraction() != fract || num->isNegative() != isNeg) {
+        serdebugF4("Mismatched number - expected ", whole, fract, isNeg);
+        serdebugF4("Mismatched number - actual ", num->getWhole(), num->getFraction(), num->isNegative());
+        return false;
+    }
+    auto diff = num->getAsFloat() - nearValue;
+    return (diff > -0.00001 && diff < 0.00001);
+}
+
 test(LargeNumberWithOneDecimalPlace) {
     EditableLargeNumberMenuItem editable(largeNumTestCb, 101, 4, 1, false);
+
+    // conversion from String to float
     editable.setLargeNumberFromString("12.1");
-    assertEqual(editable.getLargeNumber()->getWhole(), (uint32_t)12);
-    assertEqual(editable.getLargeNumber()->getFraction(), (uint32_t)1);
-    assertNear(editable.getLargeNumber()->getAsFloat(), 12.1F, 0.00001);
-    assertFalse(editable.getLargeNumber()->isNegative());
+    assertTrue(checkMatches(editable.getLargeNumber(), 12, 1, 12.1F, false));
 
+    // conversion using setFromFloat
     editable.getLargeNumber()->setFromFloat(14.1F);
-    assertEqual(editable.getLargeNumber()->getWhole(), (uint32_t)14);
-    assertEqual(editable.getLargeNumber()->getFraction(), (uint32_t)1);
-    assertNear(editable.getLargeNumber()->getAsFloat(), 14.1F, 0.00001);
-    assertFalse(editable.getLargeNumber()->isNegative());
+    assertTrue(checkMatches(editable.getLargeNumber(), 14, 1, 14.1F, false));
+    editable.getLargeNumber()->setFromFloat(3.1F);
+    assertTrue(checkMatches(editable.getLargeNumber(), 3, 1, 3.1F, false));
 
+    // conversion directly to fields
     editable.getLargeNumber()->setValue(13, 5, false);
-    assertEqual(editable.getLargeNumber()->getWhole(), (uint32_t)13);
-    assertEqual(editable.getLargeNumber()->getFraction(), (uint32_t)5);
-    assertNear(editable.getLargeNumber()->getAsFloat(), 13.5F, 0.00001);
-    assertFalse(editable.getLargeNumber()->isNegative());
+    assertTrue(checkMatches(editable.getLargeNumber(), 13, 5, 13.5F, false));
+
+    // conversion from a string object with too many decimal places -eg 3.100
+    auto str = String(3.1F, 3);
+    editable.setLargeNumberFromString(str.c_str());
+    assertTrue(checkMatches(editable.getLargeNumber(), 3, 1, 3.1F, false));
+
+    // conversion right on the edge of the next value
+    str = String(3.999F, 3);
+    editable.setLargeNumberFromString(str.c_str());
+    assertTrue(checkMatches(editable.getLargeNumber(), 3, 9, 3.9F, false));
+
+    editable.getLargeNumber()->setFromFloat(14.9999F);
+    assertTrue(checkMatches(editable.getLargeNumber(), 14, 9, 14.9F, false));
 }
 
 #endif // LARGE_NUMBER_ITEM_TESTS_H

@@ -436,7 +436,7 @@ public:
  * @param offset a ref to an integer that starts as the offset and is updated
  * @return the integer that was obtain before a non digit was found
  */
-long parseIntUntilSeparator(const char* ptr, int& offset);
+long parseIntUntilSeparator(const char* ptr, int& offset, size_t maxDigits=10);
 
 /**
  * Invokes a menu callback if it is safe to do so
