@@ -230,10 +230,11 @@
       "item": {
         "menuType": "REMOTE_IOT_MONITOR",
         "name": "IoT Monitor",
+        "variableName": "IoTMonitor",
         "id": 17,
         "eepromAddress": -1,
         "readOnly": false,
-        "localOnly": false,
+        "localOnly": true,
         "visible": true
       }
     },
@@ -243,10 +244,11 @@
       "item": {
         "menuType": "AUTHENTICATION",
         "name": "Authenticator",
+        "variableName": "Authenticator",
         "id": 18,
         "eepromAddress": -1,
         "readOnly": false,
-        "localOnly": false,
+        "localOnly": true,
         "visible": true
       }
     }
@@ -415,8 +417,8 @@
     "eepromDefinition": "eeprom:",
     "authenticatorDefinition": "rom:100:6",
     "projectIoExpanders": [
-      "deviceIO:",
-      "pcf8574:io8574:32:12"
+      "pcf8574:io8574:32:12",
+      "deviceIO:"
     ]
   }
 }

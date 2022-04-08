@@ -1,25 +1,8 @@
 {
   "version": "1.00",
-  "projectName": "C:\\Users\\dave\\Documents\\Arduino\\tcLibraryDev\\lib\\tcMenu\\examples\\nano33ble\\nano33ble.emf",
+  "projectName": "Project description",
   "author": "dave",
   "items": [
-    {
-      "parentId": 0,
-      "type": "analogItem",
-      "item": {
-        "maxValue": 2000,
-        "offset": 0,
-        "divisor": 10,
-        "unitName": "C",
-        "name": "Temp",
-        "id": 1,
-        "eepromAddress": -1,
-        "functionName": "",
-        "readOnly": true,
-        "localOnly": false,
-        "visible": true
-      }
-    },
     {
       "parentId": 0,
       "type": "analogItem",
@@ -27,12 +10,13 @@
         "maxValue": 1000,
         "offset": 0,
         "divisor": 10,
-        "unitName": "%",
-        "name": "Humidity",
-        "id": 3,
-        "eepromAddress": -1,
-        "functionName": "",
-        "readOnly": true,
+        "unitName": "d",
+        "name": "Decimal",
+        "variableName": "Decimal",
+        "id": 1,
+        "eepromAddress": 2,
+        "functionName": "decimalDidChange",
+        "readOnly": false,
         "localOnly": false,
         "visible": true
       }
@@ -41,15 +25,32 @@
       "parentId": 0,
       "type": "analogItem",
       "item": {
-        "maxValue": 32000,
+        "maxValue": 255,
         "offset": 0,
-        "divisor": 10,
-        "unitName": "KPa",
-        "name": "B. Pressure",
+        "divisor": 2,
+        "unitName": "dB",
+        "name": "Halves",
+        "variableName": "Halves",
         "id": 2,
-        "eepromAddress": -1,
-        "functionName": "",
-        "readOnly": true,
+        "eepromAddress": 4,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "largeNumItem",
+      "item": {
+        "digitsAllowed": 9,
+        "decimalPlaces": 3,
+        "negativeAllowed": true,
+        "name": "Lge Num",
+        "variableName": "LgeNum",
+        "id": 3,
+        "eepromAddress": 6,
+        "functionName": "largeNumDidChange",
+        "readOnly": false,
         "localOnly": false,
         "visible": true
       }
@@ -59,10 +60,10 @@
       "type": "subMenu",
       "item": {
         "secured": false,
-        "name": "Accelerometer",
+        "name": "More Items",
+        "variableName": "MoreItems",
         "id": 4,
         "eepromAddress": -1,
-        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true
@@ -70,12 +71,17 @@
     },
     {
       "parentId": 4,
-      "type": "floatItem",
+      "type": "enumItem",
       "item": {
-        "numDecimalPlaces": 2,
-        "name": "MagX",
+        "enumEntries": [
+          "Pizza",
+          "Pasta",
+          "Salad"
+        ],
+        "name": "Options",
+        "variableName": "MoreItemsOptions",
         "id": 5,
-        "eepromAddress": -1,
+        "eepromAddress": 14,
         "readOnly": false,
         "localOnly": false,
         "visible": true
@@ -83,12 +89,13 @@
     },
     {
       "parentId": 4,
-      "type": "floatItem",
+      "type": "boolItem",
       "item": {
-        "numDecimalPlaces": 2,
-        "name": "MagY",
+        "naming": "YES_NO",
+        "name": "Toppings",
+        "variableName": "MoreItemsToppings",
         "id": 6,
-        "eepromAddress": -1,
+        "eepromAddress": 16,
         "readOnly": false,
         "localOnly": false,
         "visible": true
@@ -96,12 +103,13 @@
     },
     {
       "parentId": 4,
-      "type": "floatItem",
+      "type": "boolItem",
       "item": {
-        "numDecimalPlaces": 2,
-        "name": "MagZ",
+        "naming": "ON_OFF",
+        "name": "Power",
+        "variableName": "MoreItemsPower",
         "id": 7,
-        "eepromAddress": -1,
+        "eepromAddress": 17,
         "readOnly": false,
         "localOnly": false,
         "visible": true
@@ -109,12 +117,13 @@
     },
     {
       "parentId": 4,
-      "type": "floatItem",
+      "type": "actionMenu",
       "item": {
-        "numDecimalPlaces": 2,
-        "name": "AccelX",
+        "name": "Save",
+        "variableName": "MoreItemsPressMe",
         "id": 8,
         "eepromAddress": -1,
+        "functionName": "saveWasPressed",
         "readOnly": false,
         "localOnly": false,
         "visible": true
@@ -125,7 +134,8 @@
       "type": "floatItem",
       "item": {
         "numDecimalPlaces": 2,
-        "name": "AccelY",
+        "name": "Number",
+        "variableName": "MoreItemsNumber",
         "id": 9,
         "eepromAddress": -1,
         "readOnly": false,
@@ -135,13 +145,17 @@
     },
     {
       "parentId": 4,
-      "type": "floatItem",
+      "type": "scrollItem",
       "item": {
-        "numDecimalPlaces": 2,
-        "name": "AccelZ",
+        "itemWidth": 10,
+        "eepromOffset": 0,
+        "numEntries": 5,
+        "choiceMode": "ARRAY_IN_RAM",
+        "variable": "ramDataSet",
+        "name": "Scroll",
+        "variableName": "MoreItemsScroll",
         "id": 10,
         "eepromAddress": -1,
-        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true
@@ -152,7 +166,8 @@
       "type": "subMenu",
       "item": {
         "secured": false,
-        "name": "Analog Readings",
+        "name": "Runtimes",
+        "variableName": "Runtimes",
         "id": 11,
         "eepromAddress": -1,
         "readOnly": false,
@@ -162,11 +177,27 @@
     },
     {
       "parentId": 11,
-      "type": "floatItem",
+      "type": "textItem",
       "item": {
-        "numDecimalPlaces": 2,
-        "name": "In A0",
+        "textLength": 5,
+        "itemType": "PLAIN_TEXT",
+        "name": "Text",
+        "variableName": "RuntimesText",
         "id": 12,
+        "eepromAddress": 18,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 11,
+      "type": "runtimeList",
+      "item": {
+        "initialRows": 0,
+        "name": "Custom List",
+        "variableName": "RuntimesCustomList",
+        "id": 13,
         "eepromAddress": -1,
         "functionName": "",
         "readOnly": false,
@@ -176,16 +207,25 @@
     },
     {
       "parentId": 11,
-      "type": "analogItem",
+      "type": "customBuildItem",
       "item": {
-        "maxValue": 100,
-        "offset": 0,
-        "divisor": 0,
-        "unitName": "%",
-        "name": "Output PWM",
-        "id": 13,
+        "menuType": "REMOTE_IOT_MONITOR",
+        "name": "IoT Monitor",
+        "id": 14,
         "eepromAddress": -1,
-        "functionName": "onPWMChanged",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 11,
+      "type": "customBuildItem",
+      "item": {
+        "menuType": "AUTHENTICATION",
+        "name": "Authenticator",
+        "id": 15,
+        "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
         "visible": true
@@ -193,16 +233,16 @@
     }
   ],
   "codeOptions": {
-    "embeddedPlatform": "ARDUINO32",
+    "embeddedPlatform": "STM32DUINO",
     "lastDisplayUuid": "fd998437-c4b2-4386-ba88-d0ae7c20620b",
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
-    "lastRemoteUuid": "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb",
+    "lastRemoteUuid": "0877131c-e03e-426b-8eaf-228e01f5e7f1",
     "lastRemoteUuids": [
-      "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
+      "0877131c-e03e-426b-8eaf-228e01f5e7f1"
     ],
     "lastThemeUuid": "0dd60ceb-7e0f-46e2-8d40-b264eb3aa7e0",
-    "applicationUUID": "e95fcf8a-8a03-4043-9313-01fd8b8e8707",
-    "applicationName": "Nano 33 BLE Sense",
+    "applicationUUID": "ecd5607f-55eb-4252-a512-aab769452dd3",
+    "applicationName": "stm32DuinoDemo",
     "lastProperties": [
       {
         "name": "DISPLAY_VARIABLE",
@@ -211,7 +251,7 @@
       },
       {
         "name": "DISPLAY_TYPE",
-        "latestValue": "U8G2_SSD1306_128X64_NONAME_F_HW_I2C",
+        "latestValue": "U8G2_SSD1306_128X64_NONAME_F_4W_HW_SPI",
         "subsystem": "DISPLAY"
       },
       {
@@ -231,27 +271,27 @@
       },
       {
         "name": "DISPLAY_RESET_PIN",
-        "latestValue": "U8X8_PIN_NONE",
+        "latestValue": "PF12",
         "subsystem": "DISPLAY"
       },
       {
         "name": "DISPLAY_CS_PIN",
-        "latestValue": "U8X8_PIN_NONE",
+        "latestValue": "PF13",
         "subsystem": "DISPLAY"
       },
       {
         "name": "DISPLAY_RS_PIN",
-        "latestValue": "U8X8_PIN_NONE",
+        "latestValue": "PD15",
         "subsystem": "DISPLAY"
       },
       {
         "name": "UPDATES_PER_SEC",
-        "latestValue": "10",
+        "latestValue": "5",
         "subsystem": "DISPLAY"
       },
       {
         "name": "YIELDING_WIRE_CB",
-        "latestValue": "true",
+        "latestValue": "false",
         "subsystem": "DISPLAY"
       },
       {
@@ -271,17 +311,17 @@
       },
       {
         "name": "ENCODER_PIN_A",
-        "latestValue": "5",
+        "latestValue": "PC8",
         "subsystem": "INPUT"
       },
       {
         "name": "ENCODER_PIN_B",
-        "latestValue": "6",
+        "latestValue": "PC10",
         "subsystem": "INPUT"
       },
       {
         "name": "ENCODER_PIN_OK",
-        "latestValue": "4",
+        "latestValue": "PC9",
         "subsystem": "INPUT"
       },
       {
@@ -300,39 +340,64 @@
         "subsystem": "INPUT"
       },
       {
+        "name": "ETH_CONCURRENT_CONNECTIONS",
+        "latestValue": "1",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "ETH_LIBRARY_TYPE",
+        "latestValue": "STM32ETHERNET",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "ETH_LISTEN_PORT1",
+        "latestValue": "3333",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "ETH_LISTEN_PORT2",
+        "latestValue": "3334",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "ETH_LISTEN_PORT3",
+        "latestValue": "3335",
+        "subsystem": "REMOTE"
+      },
+      {
         "name": "ITEM_FONT",
         "latestValue": "def:,1",
         "subsystem": "THEME"
       },
       {
         "name": "TITLE_FONT",
-        "latestValue": "def:,1",
+        "latestValue": "avl:u8g2_font_prospero_bold_nbp_tr,1",
         "subsystem": "THEME"
       },
       {
         "name": "TITLE_HEADER_PADDING",
-        "latestValue": "2",
+        "latestValue": "1",
         "subsystem": "THEME"
       },
       {
         "name": "TITLE_TO_ITEM_SPACING",
-        "latestValue": "2",
+        "latestValue": "0",
         "subsystem": "THEME"
       },
       {
         "name": "TITLE_SHOW_MODE",
-        "latestValue": "TITLE_FIRST_ROW",
+        "latestValue": "TITLE_ALWAYS",
         "subsystem": "THEME"
       }
     ],
     "namingRecursive": true,
     "saveToSrc": false,
     "useCppMain": false,
-    "eepromDefinition": "",
-    "authenticatorDefinition": "",
+    "eepromDefinition": "bsp:0",
+    "authenticatorDefinition": "rom:150:4",
     "projectIoExpanders": [
-      "deviceIO:",
-      "customIO:io23017"
-    ]
+      "deviceIO:"
+    ],
+    "packageNamespace": ""
   }
 }

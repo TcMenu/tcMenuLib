@@ -30,9 +30,10 @@ void EthernetTagValTransport::flush() {
     if((int)client.write(writeBuffer, writeBufferPos) == writeBufferPos) {
         serdebugF2("Buffer written ", writeBufferPos);
         writeBufferPos = 0;
-    client.flush();
-}
+        client.flush();
+    }
     else {
+        writeBufferPos = 0;
         close();
     }
 }
@@ -110,6 +111,10 @@ int tcremote::fromWiFiRSSITo4StateIndicator(int strength) {
 }
 
 bool EthernetInitialisation::attemptInitialisation() {
+#ifdef ARDUINO_ARCH_STM32
+    // we'll keep checking if the link is up before trying to initialise further
+    if(Ethernet.linkStatus() == LinkOFF) return false;
+#endif
     serdebugF("Initialising server ");
     this->server->begin();
     initialised = true;

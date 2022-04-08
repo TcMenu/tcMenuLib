@@ -19,6 +19,7 @@
 #include <ScrollChoiceMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
+#include <IoAbstraction.h>
 
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
@@ -26,6 +27,9 @@ extern TcMenuRemoteServer remoteServer;
 extern Adafruit_PCD8544 gfx;
 extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
+
+// Any externals needed by IO expanders, EEPROMs etc
+
 
 // Global Menu Item exports
 extern Rgb32MenuItem menuRGB;

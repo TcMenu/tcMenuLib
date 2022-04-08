@@ -315,6 +315,8 @@ void MenuManager::setCurrentEditor(MenuItem * editor) {
 	currentEditor = editor;
 }
 
+const char pszEmptyList[] = "No Items";
+
 void MenuManager::changeMenu(MenuItem* possibleActive) {
     if (renderer->getRendererType() == RENDER_TYPE_NOLOCAL) return;
 
@@ -327,8 +329,17 @@ void MenuManager::changeMenu(MenuItem* possibleActive) {
 	// now we set up the encoder to represent the right value and mark an item as active.
     if (menuMgr.getCurrentMenu()->getMenuType() == MENUTYPE_RUNTIME_LIST) {
         auto* listMenu = reinterpret_cast<ListRuntimeMenuItem*>(menuMgr.getCurrentMenu());
-        listMenu->setActiveIndex(0);
-        menuMgr.setItemsInCurrentMenu(listMenu->getNumberOfRows());
+        if(listMenu->getNumberOfRows() > 0) {
+            listMenu->setActiveIndex(0);
+            menuMgr.setItemsInCurrentMenu(listMenu->getNumberOfRows());
+        } else {
+            renderer->getDialog()->setButtons(BTNTYPE_NONE, BTNTYPE_CLOSE);
+            renderer->getDialog()->show(pszEmptyList, false);
+            char sz[20];
+            listMenu->copyNameToBuffer(sz, sizeof(sz));
+            renderer->getDialog()->copyIntoBuffer(sz);
+            resetMenu(false);
+        }
     } else {
         auto* toActivate = (possibleActive) ? possibleActive : navigator.getCurrentRoot();
         toActivate->setActive(true);
@@ -449,7 +460,7 @@ bool MenuManager::isWrapAroundEncoder(MenuItem* menuItem) {
 }
 
 void MenuManager::majorOrderChangeApplied(int newMax) {
-    if(renderer->getRendererType() == RENDER_TYPE_CONFIGURABLE) {
+    if(renderer->getRendererType() == RENDER_TYPE_CONFIGURABLE && getCurrentMenu()->getMenuType() != MENUTYPE_RUNTIME_LIST) {
         setItemsInCurrentMenu(newMax);
     }
 }

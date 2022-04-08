@@ -120,5 +120,8 @@ void setupMenu() {
 
     // We have an IoT monitor, register the server
     menuConnectivityIoTMonitor.setRemoteServer(remoteServer);
+
+    // We have an EEPROM authenticator, it needs initialising
+    menuConnectivityAuthenticator.init();
 }
 

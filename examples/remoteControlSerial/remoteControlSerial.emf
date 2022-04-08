@@ -239,6 +239,11 @@
         "subsystem": "DISPLAY"
       },
       {
+        "name": "ST7735_TAB_TYPE",
+        "latestValue": "INITR_BLACKTAB",
+        "subsystem": "DISPLAY"
+      },
+      {
         "name": "DISPLAY_ROTATION",
         "latestValue": "0",
         "subsystem": "DISPLAY"
@@ -260,7 +265,7 @@
       },
       {
         "name": "SWITCH_IODEVICE",
-        "latestValue": "",
+        "latestValue": "devicePins",
         "subsystem": "INPUT"
       },
       {
@@ -328,6 +333,10 @@
     "saveToSrc": false,
     "useCppMain": false,
     "eepromDefinition": "",
-    "authenticatorDefinition": ""
+    "authenticatorDefinition": "",
+    "projectIoExpanders": [
+      "deviceIO:",
+      "customIO:io23017"
+    ]
   }
 }

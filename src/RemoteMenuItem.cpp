@@ -97,7 +97,12 @@ void RemoteMenuItem::setRemoteServer(tcremote::TcMenuRemoteServer& server) {
 
 EepromAuthenticationInfoMenuItem::EepromAuthenticationInfoMenuItem(const char* pgmName, MenuCallbackFn onAuthChanged,
                                                                    menuid_t id, MenuItem * next)
-	: ListRuntimeMenuItem(id, 0, authenticationMenuItemRenderFn, next), pgmName(pgmName), onAuthChanged(onAuthChanged) { }
+	: ListRuntimeMenuItem(id, 0, authenticationMenuItemRenderFn, next), pgmName(pgmName), onAuthChanged(onAuthChanged) {
+}
+
+void EepromAuthenticationInfoMenuItem::init() {
+    setNumberOfRows(getAuthManager()->getNumberOfEntries());
+}
 
 EepromAuthenticatorManager *EepromAuthenticationInfoMenuItem::getAuthManager() {
     auto* authMgr = menuMgr.getAuthenticator();
@@ -125,9 +130,7 @@ int authenticationMenuItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnM
         return false;
     }
 
-    auto authMgr = reinterpret_cast<EepromAuthenticatorManager*>(menuMgr.getAuthenticator());
     auto* authItem = reinterpret_cast<EepromAuthenticationInfoMenuItem*>(item);
-    authItem->setNumberOfRows(authMgr->getNumberOfEntries());
 
     switch (mode) {
         case RENDERFN_NAME:
@@ -136,7 +139,7 @@ int authenticationMenuItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnM
             }
             else if(row < authItem->getAuthManager()->getNumberOfEntries()) {
                 authItem->getAuthManager()->copyKeyNameToBuffer(row, buffer, bufferSize);
-                serdebugF4("Aname: ", row, buffer, bufferSize);
+                serdebugHexDump("Aname: ", buffer, bufferSize);
                 if (buffer[0] == 0) safeProgCpy(buffer, AUTH_EMPTY_KEY, bufferSize);
             }
             else {

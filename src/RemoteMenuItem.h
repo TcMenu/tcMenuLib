@@ -79,6 +79,7 @@ private:
 public:
     EepromAuthenticationInfoMenuItem(const char *name, MenuCallbackFn onAuthChanged, menuid_t id,
                                      MenuItem *next = nullptr);
+    void init();
 
     EepromAuthenticatorManager *getAuthManager();
 

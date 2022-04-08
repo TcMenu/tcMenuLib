@@ -16,12 +16,12 @@
 
 #include <RemoteConnector.h>
 #include <TaskManager.h>
-#include <WiFi.h>
+#include <STM32Ethernet.h>
 #include <tcUtil.h>
 #include <remote/BaseRemoteComponents.h>
 
 #ifndef ETHERNET_BUFFER_SIZE
-#define ETHERNET_BUFFER_SIZE 96
+#define ETHERNET_BUFFER_SIZE 0
 #endif
 
 #if ETHERNET_BUFFER_SIZE > 0
@@ -37,11 +37,11 @@ namespace tcremote {
  */
     class EthernetTagValTransport : public tcremote::BaseBufferedRemoteTransport {
     private:
-        WiFiClient client;
+        EthernetClient client;
     public:
         EthernetTagValTransport() : BaseBufferedRemoteTransport(BUFFER_MESSAGES_TILL_FULL, ETHERNET_BUFFER_SIZE, MAX_VALUE_LEN) { }
         ~EthernetTagValTransport() override = default;
-        void setClient(WiFiClient cl) { this->client = cl; }
+        void setClient(EthernetClient cl) { this->client = cl; }
 
         int fillReadBuffer(uint8_t* data, int maxSize) override;
         void flush() override;
@@ -57,11 +57,11 @@ namespace tcremote {
  */
 class EthernetTagValTransport : public TagValueTransport {
 private:
-	WiFiClient client;
+	EthernetClient client;
 public:
 	EthernetTagValTransport() : TagValueTransport(TagValueTransportType::TVAL_UNBUFFERED) {};
 	~EthernetTagValTransport() override = default;
-	void setClient(WiFiClient client) { this->client = client; }
+	void setClient(EthernetClient client) { this->client = client; }
 
 	int writeChar(char data) override ;
 	int writeStr(const char* data) override;
@@ -80,9 +80,9 @@ public:
  */
 class EthernetInitialisation : public DeviceInitialisation {
 private:
-	WiFiServer *server;
+	EthernetServer *server;
 public:
-    explicit EthernetInitialisation(WiFiServer* server) : server(server) {}
+    explicit EthernetInitialisation(EthernetServer* server) : server(server) {}
 
     bool attemptInitialisation() override;
 

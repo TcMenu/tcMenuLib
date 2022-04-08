@@ -28,8 +28,9 @@ bool connectedToWifi = false;
 TitleWidget wifiWidget(iconsWifi, 5, 16, 12, nullptr);
 AmplifierController controller;
 
-const char* simFilesForList[] = { "SuperFile1.txt",  "CustomFile.cpp", "SuperDuper.h", "File303.cpp", "File123443.h" };
-#define SIM_FILES_ARRAY_SIZE 5
+const char* simFilesForList[] = { "SuperFile1.txt",  "CustomFile.cpp", "SuperDuper.h", "File303.cpp", "File123443.h",
+                                  "Another.file", "TestMe.txt", "Program.txt" };
+#define SIM_FILES_ARRAY_SIZE 8
 
 void prepareWifiForUse();
 

@@ -13,21 +13,21 @@
 
 #include <Arduino.h>
 #include <tcMenu.h>
-#include "tcMenuAdaFruitGfx.h"
+#include "tcMenuU8g2.h"
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
 #include <RemoteMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
+#include <EditableLargeNumberMenuItem.h>
 #include <IoAbstraction.h>
-#include <EepromAbstraction.h>
+#include <mbed/HalStm32EepromAbstraction.h>
 #include <RemoteAuthentication.h>
 
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
 extern TcMenuRemoteServer remoteServer;
-extern Adafruit_PCD8544 gfx;
-extern AdafruitDrawable gfxDrawable;
+extern U8G2_SSD1306_128X64_NONAME_F_4W_HW_SPI gfx;
 extern GraphicsDeviceRenderer renderer;
 extern EthernetServer server;
 extern EthernetInitialisation ethernetInitialisation;
@@ -36,37 +36,34 @@ extern EthernetInitialisation ethernetInitialisation;
 
 
 // Global Menu Item exports
-extern EepromAuthenticationInfoMenuItem menuAuthenticator;
-extern RemoteMenuItem menuIoTMonitor;
-extern IpAddressMenuItem menuIP;
-extern BackMenuItem menuBackConnectivity;
-extern SubMenuItem menuConnectivity;
-extern TextMenuItem menuTxt;
-extern FloatMenuItem menuCurrent;
-extern FloatMenuItem menuVoltsIn;
-extern BackMenuItem menuBackStatus;
-extern SubMenuItem menuStatus;
-extern Rgb32MenuItem menuRGB;
-extern ActionMenuItem menuShutdownNow;
-extern AnalogMenuItem menuDelay;
-extern BooleanMenuItem menuPwrDelay;
-extern BackMenuItem menuBackSettings;
-extern SubMenuItem menuSettings;
-extern EnumMenuItem menuOnAlm;
-extern AnalogMenuItem menuKitchen;
-extern AnalogMenuItem menuLiving;
-extern AnalogMenuItem menuHall;
+extern EepromAuthenticationInfoMenuItem menuRuntimesAuthenticator;
+extern RemoteMenuItem menuRuntimesIoTMonitor;
+extern ListRuntimeMenuItem menuRuntimesCustomList;
+extern TextMenuItem menuRuntimesText;
+extern BackMenuItem menuBackRuntimes;
+extern SubMenuItem menuRuntimes;
+extern ScrollChoiceMenuItem menuMoreItemsScroll;
+extern FloatMenuItem menuMoreItemsNumber;
+extern ActionMenuItem menuMoreItemsPressMe;
+extern BooleanMenuItem menuMoreItemsPower;
+extern BooleanMenuItem menuMoreItemsToppings;
+extern EnumMenuItem menuMoreItemsOptions;
+extern BackMenuItem menuBackMoreItems;
+extern SubMenuItem menuMoreItems;
+extern EditableLargeNumberMenuItem menuLgeNum;
+extern AnalogMenuItem menuHalves;
+extern AnalogMenuItem menuDecimal;
 
 // Provide a wrapper to get hold of the root menu item and export setupMenu
-inline MenuItem& rootMenuItem() { return menuHall; }
+inline MenuItem& rootMenuItem() { return menuDecimal; }
 void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
-void CALLBACK_FUNCTION onHallLight(int id);
-void CALLBACK_FUNCTION onKitchenLight(int id);
-void CALLBACK_FUNCTION onLivingRoomLight(int id);
-void CALLBACK_FUNCTION onPowerDownDetected(int id);
+void CALLBACK_FUNCTION decimalDidChange(int id);
+int fnRuntimesCustomListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
+void CALLBACK_FUNCTION largeNumDidChange(int id);
+void CALLBACK_FUNCTION saveWasPressed(int id);
 
 #endif // MENU_GENERATED_CODE_H
