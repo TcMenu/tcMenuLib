@@ -154,14 +154,17 @@ void MenuManager::actionOnSubMenu(MenuItem* nextSub) {
 void MenuManager::actionOnCurrentItem(MenuItem* toEdit) {
 	auto* baseRenderer = reinterpret_cast<BaseMenuRenderer*>(renderer);
 
-	if(!notifyEditStarting(toEdit)) return;
+    if(!notifyEditStarting(toEdit)) return;
 
 	// if there's a new item specified in toEdit, it means we need to change
 	// the current editor (if it's possible to edit that value)
 	if (toEdit->getMenuType() == MENUTYPE_SUB_VALUE) {
+        if(toEdit != getCurrentMenu()) notifyEditEnd(getCurrentMenu());
 		actionOnSubMenu(toEdit);
+        return;
 	}
-	else if (toEdit->getMenuType() == MENUTYPE_RUNTIME_LIST) {
+
+	if (toEdit->getMenuType() == MENUTYPE_RUNTIME_LIST) {
 		if (menuMgr.getCurrentMenu() == toEdit) {
 			auto* listItem = reinterpret_cast<ListRuntimeMenuItem*>(toEdit);
 			serdebugF2("List select: ", listItem->getActiveIndex());
