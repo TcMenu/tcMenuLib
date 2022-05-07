@@ -524,6 +524,8 @@ public:
 	 */
 	void setFromFloatingPointValue(float value);
 
+    int getIntValueIncludingOffset() { return (int)currentValue + (int)getOffset(); }
+
 	/**
 	 * gets the whole and fraction part with the fractional part converted to decimal for ease of use. It
 	 * based upon the divisor.

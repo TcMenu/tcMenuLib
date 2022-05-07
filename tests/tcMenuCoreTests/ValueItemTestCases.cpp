@@ -119,6 +119,7 @@ test(testAnalogMenuItem) {
     assertEqual(uint8_t(0), menuAnalog.getDecimalPlacesForDivisor());
 
     menuAnalog.setCurrentValue(192);
+    assertEqual(192, menuAnalog.getIntValueIncludingOffset());
     assertEqual((uint16_t)192U, menuAnalog.getCurrentValue());
     assertTrue(checkWholeFraction(&menuAnalog, 192, 0));
     assertEqual((uint16_t)192U, menuAnalog.getCurrentValue());
@@ -137,6 +138,18 @@ test(testAnalogMenuItem) {
 
     menuAnalog2.setFromFloatingPointValue(-0.2);
     assertNear(-0.2F, menuAnalog2.getAsFloatingPointValue(), 0.0001F);
+}
+
+test(testGetIntValueIncudingOffset) {
+    AnalogMenuInfo myInfo = { "Analog12", 102, 0xffff, 200, nullptr, 100, 1, "xyz" };
+    AnalogMenuItem localAnalog(&myInfo, 0, nullptr, INFO_LOCATION_RAM);
+    assertEqual(100, localAnalog.getIntValueIncludingOffset());
+    localAnalog.setCurrentValue(123);
+    assertEqual(223, localAnalog.getIntValueIncludingOffset());
+    localAnalog.setCurrentValue(123);
+    assertEqual(223, localAnalog.getIntValueIncludingOffset());
+    localAnalog.setCurrentValue(50);
+    assertEqual(150, localAnalog.getIntValueIncludingOffset());
 }
 
 test(testAnalogValuesWithFractions) {
