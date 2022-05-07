@@ -120,6 +120,7 @@ test(testAuthMenuItem) {
     menuMgr.setAuthenticator(&auth);
 
 	EepromAuthenticationInfoMenuItem menuItem("Authorised Keys", nullptr, 2002, nullptr);
+    menuItem.init();
 	RuntimeMenuItem *itm = menuItem.asParent();
 	char sz[20];
 	itm->copyNameToBuffer(sz, sizeof(sz));
