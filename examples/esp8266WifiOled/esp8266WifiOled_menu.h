@@ -19,8 +19,8 @@
 #include <RemoteMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
-#include <IoAbstractionWire.h>
 #include <IoAbstraction.h>
+#include <IoAbstractionWire.h>
 #include <ArduinoEEPROMAbstraction.h>
 #include <RemoteAuthentication.h>
 
@@ -36,6 +36,7 @@ extern EthernetInitialisation ethernetInitialisation;
 extern IoAbstractionRef ioexp_io8574;
 
 // Global Menu Item exports
+extern EnumMenuItem menuWiFiMode;
 extern EepromAuthenticationInfoMenuItem menuAuthenticator;
 extern RemoteMenuItem menuIoTMonitor;
 extern IpAddressMenuItem menuIpAddress;

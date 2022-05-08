@@ -251,6 +251,23 @@
         "localOnly": true,
         "visible": true
       }
+    },
+    {
+      "parentId": 9,
+      "type": "enumItem",
+      "item": {
+        "enumEntries": [
+          "Station",
+          "Access Point"
+        ],
+        "name": "WiFi Mode",
+        "variableName": "WiFiMode",
+        "id": 19,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
     }
   ],
   "codeOptions": {
@@ -316,13 +333,8 @@
         "subsystem": "DISPLAY"
       },
       {
-        "name": "PULLUP_LOGIC",
-        "latestValue": "true",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "INTERRUPT_SWITCHES",
-        "latestValue": "false",
+        "name": "SW_POLLING_MODE",
+        "latestValue": "SWITCHES_POLL_KEYS_ONLY",
         "subsystem": "INPUT"
       },
       {
@@ -353,6 +365,11 @@
       {
         "name": "ENCODER_NEXT_PIN",
         "latestValue": "-1",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "PULLUP_LOGIC",
+        "latestValue": "true",
         "subsystem": "INPUT"
       },
       {
@@ -417,8 +434,12 @@
     "eepromDefinition": "eeprom:",
     "authenticatorDefinition": "rom:100:6",
     "projectIoExpanders": [
-      "pcf8574:io8574:32:12",
-      "deviceIO:"
-    ]
+      "deviceIO:",
+      "pcf8574:io8574:32:12"
+    ],
+    "menuInMenuCollection": {
+      "menuDefinitions": []
+    },
+    "packageNamespace": ""
   }
 }

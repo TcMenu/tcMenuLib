@@ -54,11 +54,9 @@ void onCommsChange(CommunicationInfo info) {
 }
 
 void startWiFi() {
-    serdebugF3("Starting WiFi", menuSSID.getTextValue(), menuPwd.getTextValue());
-
-    // this sketch assumes you've successfully connected to the Wifi before, does not
-    // call begin.. You can initialise the wifi whichever way you wish here.
-    if(strlen(menuSSID.getTextValue())==0) {
+    // You can choose between station and access point mode by setting the connectivity/Wifi Mode option to your
+    // own choice
+    if(menuWiFiMode.getCurrentValue() == 0) {
         // no SSID come up as an access point
         WiFi.mode(WIFI_AP);
         WiFi.softAP("tcmenu", "secret");

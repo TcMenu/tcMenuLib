@@ -117,12 +117,15 @@ void setupMenu() {
     lcd.setIoAbstraction(ioexp_io23017);
     lcd.begin(20, 4);
     renderer.setUpdatesPerSecond(4);
-    switches.initialise(ioexp_io23017, true);
+    switches.init(ioexp_io23017, SWITCHES_POLL_EVERYTHING, true);
     menuMgr.initForEncoder(&renderer, &menuTime, 6, 7, 5);
     remoteServer.addConnection(&ethernetConnection);
     remoteServer.addConnection(&ethernetConnection2);
 
     // We have an IoT monitor, register the server
     menuConnectivityIoTMonitor.setRemoteServer(remoteServer);
+
+    // We have an EEPROM authenticator, it needs initialising
+    menuConnectivityAuthenticator.init();
 }
 
