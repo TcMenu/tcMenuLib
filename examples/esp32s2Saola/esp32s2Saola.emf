@@ -1,20 +1,21 @@
 {
   "version": "1.00",
-  "projectName": "C:\\Users\\dave\\Documents\\Arduino\\tcLibraryDev\\lib\\tcMenu\\examples\\esp8266WifiOled\\Greenhouse.emf",
+  "projectName": "I2C OLED wired on regular pins (10 \u0026 11), rotary encoder on 7,8 with select on 9",
   "author": "dave",
   "items": [
     {
       "parentId": 0,
       "type": "analogItem",
       "item": {
-        "maxValue": 255,
-        "offset": -20,
-        "divisor": 4,
-        "unitName": "C",
-        "name": "Tomato Temp",
+        "maxValue": 100,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "%",
+        "name": "Int Edit",
+        "variableName": "IntEdit",
         "id": 1,
-        "eepromAddress": -1,
-        "readOnly": true,
+        "eepromAddress": 2,
+        "readOnly": false,
         "localOnly": false,
         "visible": true
       }
@@ -23,27 +24,50 @@
       "parentId": 0,
       "type": "analogItem",
       "item": {
-        "maxValue": 255,
-        "offset": -20,
-        "divisor": 4,
-        "unitName": "C",
-        "name": "Cucumber Temp",
+        "maxValue": 1000,
+        "offset": 0,
+        "divisor": 10,
+        "unitName": "oC",
+        "name": "Dec Edit",
+        "variableName": "DecEdit",
         "id": 2,
-        "eepromAddress": -1,
-        "readOnly": true,
+        "eepromAddress": 4,
+        "readOnly": false,
         "localOnly": false,
         "visible": true
       }
     },
     {
       "parentId": 0,
-      "type": "boolItem",
+      "type": "analogItem",
       "item": {
-        "naming": "ON_OFF",
-        "name": "Electric Heater",
+        "maxValue": 200,
+        "offset": 0,
+        "divisor": 2,
+        "unitName": "",
+        "name": "Halves",
+        "variableName": "Halves",
+        "id": 3,
+        "eepromAddress": 6,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "enumItem",
+      "item": {
+        "enumEntries": [
+          "Pizza",
+          "Pasta",
+          "Salad",
+          "Pie"
+        ],
+        "name": "Foods",
+        "variableName": "Foods",
         "id": 4,
-        "eepromAddress": 3,
-        "functionName": "onElectricHeater",
+        "eepromAddress": 8,
         "readOnly": false,
         "localOnly": false,
         "visible": true
@@ -54,10 +78,10 @@
       "type": "boolItem",
       "item": {
         "naming": "YES_NO",
-        "name": "Lock Door",
-        "id": 16,
-        "eepromAddress": 38,
-        "functionName": "onLockDoor",
+        "name": "Door Open",
+        "variableName": "DoorOpen",
+        "id": 5,
+        "eepromAddress": 10,
         "readOnly": false,
         "localOnly": false,
         "visible": true
@@ -68,8 +92,9 @@
       "type": "subMenu",
       "item": {
         "secured": false,
-        "name": "Setup",
-        "id": 5,
+        "name": "Select Me",
+        "variableName": "SelectMe",
+        "id": 6,
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
@@ -77,105 +102,113 @@
       }
     },
     {
-      "parentId": 5,
-      "type": "enumItem",
+      "parentId": 6,
+      "type": "floatItem",
       "item": {
-        "enumEntries": [
-          "LOW",
-          "MEDIUM",
-          "HIGH"
-        ],
-        "name": "Heater Power",
-        "id": 6,
-        "eepromAddress": 4,
-        "functionName": "onHeaterPower",
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true
-      }
-    },
-    {
-      "parentId": 5,
-      "type": "enumItem",
-      "item": {
-        "enumEntries": [
-          "NARROW",
-          "WIDE",
-          "CLOSED"
-        ],
-        "name": "Win Opening",
+        "numDecimalPlaces": 3,
+        "name": "Float 1",
+        "variableName": "SelectMeFloat1",
         "id": 7,
-        "eepromAddress": 6,
-        "functionName": "onWindowOpening",
+        "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
         "visible": true
       }
     },
     {
-      "parentId": 5,
-      "type": "actionMenu",
+      "parentId": 6,
+      "type": "floatItem",
       "item": {
-        "name": "Save All",
+        "numDecimalPlaces": 3,
+        "name": "Float 2",
+        "variableName": "SelectMeFloat2",
         "id": 8,
         "eepromAddress": -1,
-        "functionName": "onSaveAll",
         "readOnly": false,
         "localOnly": false,
         "visible": true
       }
     },
     {
-      "parentId": 5,
-      "type": "boolItem",
-      "item": {
-        "naming": "TRUE_FALSE",
-        "name": "Secret Entry",
-        "id": 13,
-        "eepromAddress": -1,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": false
-      }
-    },
-    {
-      "parentId": 5,
-      "type": "scrollItem",
-      "item": {
-        "itemWidth": 10,
-        "eepromOffset": 200,
-        "numEntries": 1,
-        "choiceMode": "ARRAY_IN_RAM",
-        "variable": "fileChoicesArray",
-        "name": "File",
-        "id": 14,
-        "eepromAddress": -1,
-        "functionName": "onFileChoice",
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true
-      }
-    },
-    {
-      "parentId": 5,
+      "parentId": 6,
       "type": "actionMenu",
       "item": {
-        "name": "Load Files",
-        "id": 15,
+        "name": "Press Me",
+        "variableName": "SelectMePressMe",
+        "id": 9,
         "eepromAddress": -1,
-        "functionName": "onLoadFiles",
+        "functionName": "pressMeActionRun",
         "readOnly": false,
         "localOnly": false,
         "visible": true
       }
     },
     {
-      "parentId": 5,
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "Extras",
+        "variableName": "Extras",
+        "id": 10,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 10,
+      "type": "textItem",
+      "item": {
+        "textLength": 5,
+        "itemType": "PLAIN_TEXT",
+        "name": "Text",
+        "variableName": "ExtrasText",
+        "id": 11,
+        "eepromAddress": 11,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 10,
+      "type": "rgbItem",
+      "item": {
+        "includeAlphaChannel": false,
+        "name": "Color",
+        "variableName": "ExtrasColor",
+        "id": 12,
+        "eepromAddress": 16,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 10,
+      "type": "runtimeList",
+      "item": {
+        "initialRows": 0,
+        "name": "My List",
+        "variableName": "ExtrasMyList",
+        "id": 13,
+        "eepromAddress": -1,
+        "functionName": "",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
       "type": "subMenu",
       "item": {
         "secured": false,
         "name": "Connectivity",
-        "id": 9,
+        "variableName": "Connectivity",
+        "id": 14,
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
@@ -183,95 +216,98 @@
       }
     },
     {
-      "parentId": 9,
+      "parentId": 14,
       "type": "textItem",
       "item": {
-        "textLength": 15,
+        "textLength": 22,
         "itemType": "PLAIN_TEXT",
         "name": "SSID",
-        "id": 11,
-        "eepromAddress": 8,
+        "variableName": "ConnectivitySSID",
+        "id": 16,
+        "eepromAddress": 20,
         "readOnly": false,
-        "localOnly": true,
-        "visible": true
-      }
-    },
-    {
-      "parentId": 9,
-      "type": "textItem",
-      "item": {
-        "textLength": 15,
-        "itemType": "PLAIN_TEXT",
-        "name": "Pwd",
-        "id": 12,
-        "eepromAddress": 23,
-        "readOnly": false,
-        "localOnly": true,
-        "visible": true
-      }
-    },
-    {
-      "parentId": 9,
-      "type": "textItem",
-      "item": {
-        "textLength": 20,
-        "itemType": "IP_ADDRESS",
-        "name": "IpAddress",
-        "id": 10,
-        "eepromAddress": -1,
-        "readOnly": true,
         "localOnly": false,
         "visible": true
       }
     },
     {
-      "parentId": 9,
-      "type": "customBuildItem",
+      "parentId": 14,
+      "type": "textItem",
       "item": {
-        "menuType": "REMOTE_IOT_MONITOR",
-        "name": "IoT Monitor",
-        "variableName": "IoTMonitor",
+        "textLength": 22,
+        "itemType": "PLAIN_TEXT",
+        "name": "Passcode",
+        "variableName": "ConnectivityPasscode",
         "id": 17,
-        "eepromAddress": -1,
+        "eepromAddress": 42,
         "readOnly": false,
-        "localOnly": true,
+        "localOnly": false,
         "visible": true
       }
     },
     {
-      "parentId": 9,
-      "type": "customBuildItem",
-      "item": {
-        "menuType": "AUTHENTICATION",
-        "name": "Authenticator",
-        "variableName": "Authenticator",
-        "id": 18,
-        "eepromAddress": -1,
-        "readOnly": false,
-        "localOnly": true,
-        "visible": true
-      }
-    },
-    {
-      "parentId": 9,
+      "parentId": 14,
       "type": "enumItem",
       "item": {
         "enumEntries": [
           "Station",
-          "Access Point"
+          "Soft AP"
         ],
         "name": "WiFi Mode",
-        "variableName": "WiFiMode",
-        "id": 19,
+        "variableName": "ConnectivityWiFiMode",
+        "id": 18,
+        "eepromAddress": 64,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 14,
+      "type": "textItem",
+      "item": {
+        "textLength": 5,
+        "itemType": "IP_ADDRESS",
+        "name": "IP Address",
+        "variableName": "ConnectivityIPAddress",
+        "id": 15,
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 14,
+      "type": "customBuildItem",
+      "item": {
+        "menuType": "REMOTE_IOT_MONITOR",
+        "name": "IoT Monitor",
+        "variableName": "ConnectivityIoTMonitor",
+        "id": 19,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": true,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 14,
+      "type": "customBuildItem",
+      "item": {
+        "menuType": "AUTHENTICATION",
+        "name": "Authenticator",
+        "variableName": "ConnectivityAuthenticator",
+        "id": 20,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": true,
         "visible": true
       }
     }
   ],
   "codeOptions": {
-    "embeddedPlatform": "ARDUINO_ESP8266",
+    "embeddedPlatform": "ARDUINO_ESP32",
     "lastDisplayUuid": "fd998437-c4b2-4386-ba88-d0ae7c20620b",
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
     "lastRemoteUuid": "46c30011-cac6-4598-a7b8-b0630d55daab",
@@ -279,8 +315,8 @@
       "46c30011-cac6-4598-a7b8-b0630d55daab"
     ],
     "lastThemeUuid": "0dd60ceb-7e0f-46e2-8d40-b264eb3aa7e0",
-    "applicationUUID": "01b9cb76-c108-4be3-a133-6159f8f1c9c1",
-    "applicationName": "ESP8266 Greenhouse",
+    "applicationUUID": "b447b433-fe4f-4ce7-8746-d94bfeefc707",
+    "applicationName": "ESP32-S2 Saola board",
     "lastProperties": [
       {
         "name": "DISPLAY_VARIABLE",
@@ -309,7 +345,7 @@
       },
       {
         "name": "DISPLAY_RESET_PIN",
-        "latestValue": "16",
+        "latestValue": "U8X8_PIN_NONE",
         "subsystem": "DISPLAY"
       },
       {
@@ -334,7 +370,7 @@
       },
       {
         "name": "SW_POLLING_MODE",
-        "latestValue": "SWITCHES_POLL_KEYS_ONLY",
+        "latestValue": "SWITCHES_POLL_EVERYTHING",
         "subsystem": "INPUT"
       },
       {
@@ -344,17 +380,17 @@
       },
       {
         "name": "ENCODER_PIN_A",
-        "latestValue": "12",
+        "latestValue": "5",
         "subsystem": "INPUT"
       },
       {
         "name": "ENCODER_PIN_B",
-        "latestValue": "13",
+        "latestValue": "6",
         "subsystem": "INPUT"
       },
       {
         "name": "ENCODER_PIN_OK",
-        "latestValue": "14",
+        "latestValue": "7",
         "subsystem": "INPUT"
       },
       {
@@ -409,7 +445,7 @@
       },
       {
         "name": "TITLE_FONT",
-        "latestValue": "avl:u8g2_font_sirclivethebold_tr,1",
+        "latestValue": "def:,1",
         "subsystem": "THEME"
       },
       {
@@ -424,17 +460,16 @@
       },
       {
         "name": "TITLE_SHOW_MODE",
-        "latestValue": "TITLE_FIRST_ROW",
+        "latestValue": "TITLE_ALWAYS",
         "subsystem": "THEME"
       }
     ],
-    "namingRecursive": false,
+    "namingRecursive": true,
     "saveToSrc": false,
     "useCppMain": false,
     "eepromDefinition": "eeprom:",
-    "authenticatorDefinition": "rom:100:6",
+    "authenticatorDefinition": "rom:200:4",
     "projectIoExpanders": [
-      "pcf8574:io8574:32:12",
       "deviceIO:"
     ],
     "menuInMenuCollection": {

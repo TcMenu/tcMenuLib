@@ -86,8 +86,8 @@ void setupMenu() {
     authManager.initialise(menuMgr.getEepromAbstraction(), 100);
     menuMgr.setAuthenticator(&authManager);
     // Now add any readonly, non-remote and visible flags.
-    menuIpAddress.setReadOnly(true);
     menuTomatoTemp.setReadOnly(true);
+    menuIpAddress.setReadOnly(true);
     menuCucumberTemp.setReadOnly(true);
     menuSSID.setLocalOnly(true);
     menuPwd.setLocalOnly(true);
@@ -99,7 +99,7 @@ void setupMenu() {
     gfx.begin();
     renderer.setUpdatesPerSecond(10);
     switches.init(internalDigitalIo(), SWITCHES_POLL_KEYS_ONLY, true);
-    menuMgr.initForEncoder(&renderer, &menuTomatoTemp, 13, 12, 14);
+    menuMgr.initForEncoder(&renderer, &menuTomatoTemp, 12, 13, 14);
     remoteServer.addConnection(&ethernetConnection);
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
     renderer.setUseSliderForAnalog(false);

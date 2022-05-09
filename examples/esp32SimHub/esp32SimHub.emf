@@ -320,8 +320,8 @@
         "subsystem": "INPUT"
       },
       {
-        "name": "INTERRUPT_SWITCHES",
-        "latestValue": "true",
+        "name": "SW_POLLING_MODE",
+        "latestValue": "SWITCHES_POLL_EVERYTHING",
         "subsystem": "INPUT"
       },
       {
@@ -412,6 +412,10 @@
     "authenticatorDefinition": "",
     "projectIoExpanders": [
       "deviceIO:"
-    ]
+    ],
+    "menuInMenuCollection": {
+      "menuDefinitions": []
+    },
+    "packageNamespace": ""
   }
 }

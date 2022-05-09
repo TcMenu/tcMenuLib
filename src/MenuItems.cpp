@@ -361,3 +361,12 @@ void copyMenuItemValue(const MenuItem* item, char* buffer, size_t bufferSize) {
         rtItem->copyValue(buffer, bufferSize);
     }
 }
+
+void copyMenuItemValueDefault(const MenuItem* item, char* buffer, size_t bufferSize, const char* defValue) {
+    buffer[0]=0;
+    copyMenuItemValue(item, buffer, bufferSize);
+    if(strlen(buffer)==0) {
+        strncpy(buffer, defValue, bufferSize);
+        buffer[bufferSize - 1] = 0;
+    }
+}

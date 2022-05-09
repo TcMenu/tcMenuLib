@@ -43,7 +43,7 @@ class MenuItem;
  * It contains the name that this device should be identified by and it's UUID.
  */
 struct ConnectorLocalInfo {
-    char name[20];
+    char name[30];
     char uuid[38];
 };
 

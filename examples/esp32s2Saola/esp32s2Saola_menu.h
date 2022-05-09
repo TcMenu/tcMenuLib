@@ -19,7 +19,6 @@
 #include <RemoteMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
-#include <IoAbstractionWire.h>
 #include <IoAbstraction.h>
 #include <ArduinoEEPROMAbstraction.h>
 #include <RemoteAuthentication.h>
@@ -33,43 +32,41 @@ extern WiFiServer server;
 extern EthernetInitialisation ethernetInitialisation;
 
 // Any externals needed by IO expanders, EEPROMs etc
-extern IoAbstractionRef ioexp_io8574;
+
 
 // Global Menu Item exports
-extern EnumMenuItem menuWiFiMode;
-extern EepromAuthenticationInfoMenuItem menuAuthenticator;
-extern RemoteMenuItem menuIoTMonitor;
-extern IpAddressMenuItem menuIpAddress;
-extern TextMenuItem menuPwd;
-extern TextMenuItem menuSSID;
+extern EepromAuthenticationInfoMenuItem menuConnectivityAuthenticator;
+extern RemoteMenuItem menuConnectivityIoTMonitor;
+extern IpAddressMenuItem menuConnectivityIPAddress;
+extern EnumMenuItem menuConnectivityWiFiMode;
+extern TextMenuItem menuConnectivityPasscode;
+extern TextMenuItem menuConnectivitySSID;
 extern BackMenuItem menuBackConnectivity;
 extern SubMenuItem menuConnectivity;
-extern ActionMenuItem menuLoadFiles;
-extern ScrollChoiceMenuItem menuFile;
-extern BooleanMenuItem menuSecretEntry;
-extern ActionMenuItem menuSaveAll;
-extern EnumMenuItem menuWinOpening;
-extern EnumMenuItem menuHeaterPower;
-extern BackMenuItem menuBackSetup;
-extern SubMenuItem menuSetup;
-extern BooleanMenuItem menuLockDoor;
-extern BooleanMenuItem menuElectricHeater;
-extern AnalogMenuItem menuCucumberTemp;
-extern AnalogMenuItem menuTomatoTemp;
+extern ListRuntimeMenuItem menuExtrasMyList;
+extern Rgb32MenuItem menuExtrasColor;
+extern TextMenuItem menuExtrasText;
+extern BackMenuItem menuBackExtras;
+extern SubMenuItem menuExtras;
+extern ActionMenuItem menuSelectMePressMe;
+extern FloatMenuItem menuSelectMeFloat2;
+extern FloatMenuItem menuSelectMeFloat1;
+extern BackMenuItem menuBackSelectMe;
+extern SubMenuItem menuSelectMe;
+extern BooleanMenuItem menuDoorOpen;
+extern EnumMenuItem menuFoods;
+extern AnalogMenuItem menuHalves;
+extern AnalogMenuItem menuDecEdit;
+extern AnalogMenuItem menuIntEdit;
 
 // Provide a wrapper to get hold of the root menu item and export setupMenu
-inline MenuItem& rootMenuItem() { return menuTomatoTemp; }
+inline MenuItem& rootMenuItem() { return menuIntEdit; }
 void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
-void CALLBACK_FUNCTION onElectricHeater(int id);
-void CALLBACK_FUNCTION onFileChoice(int id);
-void CALLBACK_FUNCTION onHeaterPower(int id);
-void CALLBACK_FUNCTION onLoadFiles(int id);
-void CALLBACK_FUNCTION onLockDoor(int id);
-void CALLBACK_FUNCTION onSaveAll(int id);
-void CALLBACK_FUNCTION onWindowOpening(int id);
+int fnExtrasMyListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
+void CALLBACK_FUNCTION pressMeActionRun(int id);
 
 #endif // MENU_GENERATED_CODE_H

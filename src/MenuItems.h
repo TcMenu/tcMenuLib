@@ -684,6 +684,12 @@ void copyMenuItemValue(const MenuItem* item, char* buffer, size_t bufferSize);
 void copyMenuItemNameAndValue(const MenuItem* item, char* buffer, size_t bufferSize, char additionalSep = ':');
 
 /**
+ * Copies the item value into the buffer provided using the above `copyMenuItemValue` method, if the resulting string
+ * is empty, then the default is provided instead.
+ */
+void copyMenuItemValueDefault(const MenuItem* item, char* buffer, size_t bufferSize, const char* defValue);
+
+/**
  * Any MenuType with an ID less than 100 is editable as an integer
  */
 inline bool isMenuBasedOnValueItem(const MenuItem* item) {

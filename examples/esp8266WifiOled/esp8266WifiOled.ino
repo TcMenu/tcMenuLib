@@ -33,6 +33,7 @@ char fileChoicesArray[255]{};
 // 0, 1 are A and B from encoder, 2 is OK button.
 #define WINDOW_PIN 3
 #define HEATER_PIN 4
+#define MENU_WIFIMODE_STATION 0
 
 // we add two widgets that show both the connection status and wifi signal strength
 // these are added to the renderer and rendered upon any change.
@@ -56,16 +57,21 @@ void onCommsChange(CommunicationInfo info) {
 void startWiFi() {
     // You can choose between station and access point mode by setting the connectivity/Wifi Mode option to your
     // own choice
-    if(menuWiFiMode.getCurrentValue() == 0) {
-        // no SSID come up as an access point
-        WiFi.mode(WIFI_AP);
-        WiFi.softAP("tcmenu", "secret");
-        serdebugF("Started up in AP mode, connect with 'tcmenu' and 'secret'");
-    }
-    else {
+    if(menuWiFiMode.getCurrentValue() == MENU_WIFIMODE_STATION) {
+        // we are in station mode
         WiFi.begin(menuSSID.getTextValue(), menuPwd.getTextValue());
         WiFi.mode(WIFI_STA);
         serdebugF("Connecting to Wifi using settings from connectivity menu");
+    }
+    else {
+        // we are in access point mode
+        WiFi.mode(WIFI_AP);
+        char ssid[25];
+        char pwd[25];
+        copyMenuItemValueDefault(&menuSSID, ssid, sizeof ssid, "tcmenu");
+        copyMenuItemValueDefault(&menuPwd, pwd, sizeof pwd, "secret");
+        WiFi.softAP(ssid, pwd);
+        serdebugF3("Started up in AP mode, connect with ", ssid, pwd);
     }
 
 }
