@@ -449,13 +449,8 @@
         "subsystem": "DISPLAY"
       },
       {
-        "name": "PULLUP_LOGIC",
-        "latestValue": "true",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "INTERRUPT_SWITCHES",
-        "latestValue": "true",
+        "name": "SW_POLLING_MODE",
+        "latestValue": "SWITCHES_POLL_KEYS_ONLY",
         "subsystem": "INPUT"
       },
       {
@@ -486,6 +481,11 @@
       {
         "name": "ENCODER_NEXT_PIN",
         "latestValue": "-1",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "PULLUP_LOGIC",
+        "latestValue": "true",
         "subsystem": "INPUT"
       },
       {
@@ -557,6 +557,10 @@
     "projectIoExpanders": [
       "pcf8574:io8574:32:0",
       "deviceIO:"
-    ]
+    ],
+    "menuInMenuCollection": {
+      "menuDefinitions": []
+    },
+    "packageNamespace": ""
   }
 }

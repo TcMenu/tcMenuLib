@@ -103,7 +103,7 @@ void setupMenu() {
     gfx.initR(INITR_BLACKTAB);
     gfx.setRotation(1);
     renderer.setUpdatesPerSecond(5);
-    switches.initialiseInterrupt(ioexp_io8574, true);
+    switches.init(ioexp_io8574, SWITCHES_POLL_KEYS_ONLY, true);
     menuMgr.initForEncoder(&renderer, &menuVoltage, 7, 6, 5);
     remoteServer.addConnection(&ethernetConnection);
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_ALWAYS);
@@ -112,5 +112,8 @@ void setupMenu() {
 
     // We have an IoT monitor, register the server
     menuIoTMonitor.setRemoteServer(remoteServer);
+
+    // We have an EEPROM authenticator, it needs initialising
+    menuAuthenticator.init();
 }
 
