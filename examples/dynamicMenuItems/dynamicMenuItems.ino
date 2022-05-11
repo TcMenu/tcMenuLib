@@ -1,6 +1,10 @@
 /**
  * This example shows how to create scroll choices, lists, and dynamically add items to both dialogs and existing menus
- * at runtime. Although it's set up to run on SAMD/MKR there is no reason it could not be easily reconfigured for any
+ * at runtime.
+ *
+ * Test environment: Seeed MG126 - Adafruit 128x128 display, encoder on device pins.
+ *
+ * Although it's set up to run on SAMD/MKR there is no reason it could not be easily reconfigured for any
  * other board.
  */
 

@@ -282,7 +282,7 @@
       },
       {
         "name": "DISPLAY_WIDTH",
-        "latestValue": "160",
+        "latestValue": "128",
         "subsystem": "DISPLAY"
       },
       {
@@ -292,17 +292,17 @@
       },
       {
         "name": "DISPLAY_RESET_PIN",
-        "latestValue": "3",
+        "latestValue": "-1",
         "subsystem": "DISPLAY"
       },
       {
         "name": "DISPLAY_CS_PIN",
-        "latestValue": "6",
+        "latestValue": "1",
         "subsystem": "DISPLAY"
       },
       {
         "name": "DISPLAY_RS_PIN",
-        "latestValue": "7",
+        "latestValue": "0",
         "subsystem": "DISPLAY"
       },
       {
@@ -316,6 +316,11 @@
         "subsystem": "DISPLAY"
       },
       {
+        "name": "ST7735_TAB_TYPE",
+        "latestValue": "INITR_REDTAB",
+        "subsystem": "DISPLAY"
+      },
+      {
         "name": "DISPLAY_ROTATION",
         "latestValue": "0",
         "subsystem": "DISPLAY"
@@ -326,33 +331,28 @@
         "subsystem": "DISPLAY"
       },
       {
-        "name": "PULLUP_LOGIC",
-        "latestValue": "true",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "INTERRUPT_SWITCHES",
-        "latestValue": "true",
+        "name": "SW_POLLING_MODE",
+        "latestValue": "SWITCHES_POLL_EVERYTHING",
         "subsystem": "INPUT"
       },
       {
         "name": "SWITCH_IODEVICE",
-        "latestValue": "io8574",
+        "latestValue": "devicePins",
         "subsystem": "INPUT"
       },
       {
         "name": "ENCODER_PIN_A",
-        "latestValue": "7",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "ENCODER_PIN_B",
         "latestValue": "6",
         "subsystem": "INPUT"
       },
       {
-        "name": "ENCODER_PIN_OK",
+        "name": "ENCODER_PIN_B",
         "latestValue": "5",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_OK",
+        "latestValue": "9",
         "subsystem": "INPUT"
       },
       {
@@ -363,6 +363,11 @@
       {
         "name": "ENCODER_NEXT_PIN",
         "latestValue": "-1",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "PULLUP_LOGIC",
+        "latestValue": "true",
         "subsystem": "INPUT"
       },
       {
@@ -409,6 +414,10 @@
     "projectIoExpanders": [
       "deviceIO:",
       "pcf8574:io8574:32:0"
-    ]
+    ],
+    "menuInMenuCollection": {
+      "menuDefinitions": []
+    },
+    "packageNamespace": ""
   }
 }
