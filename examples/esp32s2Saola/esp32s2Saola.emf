@@ -475,6 +475,7 @@
     "menuInMenuCollection": {
       "menuDefinitions": []
     },
-    "packageNamespace": ""
+    "packageNamespace": "",
+    "appIsModular": false
   }
 }

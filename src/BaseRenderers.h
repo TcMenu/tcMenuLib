@@ -299,7 +299,8 @@ public:
 	void initialise() override;
 
 	/**
-	 * Set the number of updates per second for the display, use caution not to set too high, never set to 0.
+	 * Set the number of updates per second for the display, use caution not to set too high, never set to 0. This
+	 * re-initialises the reset interval to 30 seconds
 	 * @param updatesSec the number of updates.
 	 */
 	void setUpdatesPerSecond(int updatesSec) {

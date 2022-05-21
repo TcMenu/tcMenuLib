@@ -352,6 +352,13 @@ void TagValueRemoteConnector::encodeDialogMsg(uint8_t mode, uint8_t btn1, uint8_
     transport->endMsg();
 }
 
+void TagValueRemoteConnector::encodeCustomTagValMessage(uint16_t msgType, void (*msgWriter)(TagValueTransport*)) {
+    if(!prepareWriteMsg(msgType)) return;
+    msgWriter(transport);
+    transport->endMsg();
+    serdebugF2("Custom message write complete", msgType);
+}
+
 void TagValueRemoteConnector::encodeJoin() {
 	if(!prepareWriteMsg(MSG_JOIN)) return;
     char szName[40];
@@ -811,33 +818,4 @@ FieldAndValue* TagValueTransport::fieldIfAvailable() {
 		contProcessing = contProcessing && readAvailable();
 	}
 	return &currentField;
-}
-
-CombinedMessageProcessor::CombinedMessageProcessor(MsgHandler handlers[], int noOfHandlers) {
-	this->handlers = handlers;
-	this->noOfHandlers = noOfHandlers;
-	this->currHandler = nullptr;
-}
-
-void CombinedMessageProcessor::newMsg(uint16_t msgType) {
-	currHandler = nullptr;
-	for(int i=0;i<noOfHandlers;++i) {
-		if(handlers[i].msgType == msgType) {
-			currHandler = &handlers[i];
-		}
-	}
-
-	if(currHandler != nullptr) {
-		memset(&val, 0, sizeof val);
-	}
-}
-
-void CombinedMessageProcessor::fieldUpdate(TagValueRemoteConnector* connector, FieldAndValue* field) {
-    uint16_t mt = field->msgType;
-	if(currHandler != nullptr && (connector->isAuthenticated() || mt == MSG_JOIN || mt == MSG_PAIR || mt == MSG_HEARTBEAT)) {
-		currHandler->fieldUpdateFn(connector, field, &val);
-	}
-    else if(mt != MSG_HEARTBEAT) {
-        serdebugF3("Did not proccess(mt,auth)", field->msgType, connector->isAuthenticated());
-    }
 }

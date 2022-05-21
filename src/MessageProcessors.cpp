@@ -10,20 +10,38 @@
 #include "BaseDialog.h"
 #include "EditableLargeNumberMenuItem.h"
 
-/**
- * An array of message handlers, where each one is a function that can process that type of message and a message type.
- * Messages are received a field at a time, so each time the function is called a new field will be available, when the
- * last field is processed the end indicator will be set.
- * @See TagValueRemoteConnector
- */
+CombinedMessageProcessor::CombinedMessageProcessor() {
+    messageHandlers.add(MsgHandler(MSG_CHANGE_INT, fieldUpdateValueMsg));
+    messageHandlers.add(MsgHandler(MSG_JOIN, fieldUpdateJoinMsg));
+    messageHandlers.add(MsgHandler(MSG_PAIR, fieldUpdatePairingMsg));
+    messageHandlers.add(MsgHandler(MSG_DIALOG, fieldUpdateDialogMsg));
+    messageHandlers.add(MsgHandler(MSG_HEARTBEAT, fieldUpdateHeartbeatMsg));
+    this->currHandler = nullptr;
+}
 
-MsgHandler msgHandlers[] = {
-	{ fieldUpdateValueMsg, MSG_CHANGE_INT }, 
-	{ fieldUpdateJoinMsg, MSG_JOIN },
-	{ fieldUpdatePairingMsg, MSG_PAIR },
-	{ fieldUpdateDialogMsg, MSG_DIALOG },
-    { fieldUpdateHeartbeatMsg, MSG_HEARTBEAT }
-};
+void CombinedMessageProcessor::newMsg(uint16_t msgType) {
+    currHandler = messageHandlers.getByKey(msgType);
+
+    if(currHandler != nullptr) {
+        memset(&val, 0, sizeof val);
+    } else {
+        char sz[2];
+        sz[0] = char(msgType>>8);
+        sz[1] = char(msgType & 0xff);
+        serdebugF2("No handler - ", sz);
+    }
+}
+
+void CombinedMessageProcessor::fieldUpdate(TagValueRemoteConnector* connector, FieldAndValue* field) {
+    uint16_t mt = field->msgType;
+    if(currHandler != nullptr && (connector->isAuthenticated() || mt == MSG_JOIN || mt == MSG_PAIR || mt == MSG_HEARTBEAT)) {
+        currHandler->invoke(connector, field, &val);
+    }
+    else if(mt != MSG_HEARTBEAT) {
+        serdebugF3("Did not proccess(mt,auth)", field->msgType, connector->isAuthenticated());
+    }
+}
+
 
 void fieldUpdateHeartbeatMsg(TagValueRemoteConnector* connector, FieldAndValue* field, MessageProcessorInfo* info) {
 	if(field->fieldType == FVAL_END_MSG) {

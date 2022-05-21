@@ -58,9 +58,8 @@ void BaseMenuRenderer::initialise() {
     menuMgr.changeMenu();
 
     if(updatesPerSecond == 0) updatesPerSecond = TC_DISPLAY_UPDATES_PER_SECOND;
-    int refreshInterval = 1000 / updatesPerSecond;
 
-	taskManager.scheduleFixedRate(refreshInterval, this);
+    taskManager.scheduleOnce(250, this);
 	menuMgr.addChangeNotification(&menuMgrListener);
 }
 
@@ -82,20 +81,19 @@ void BaseMenuRenderer::exec() {
 
 	if(dialog!=nullptr && dialog->isRenderNeeded()) {
 		dialog->dialogRendering(menuMgr.getCurrentRangeValue(), renderFnPressType);
-    }
-	else if(displayTakenMode == NOT_TAKEN_OVER) {
+    } else if(displayTakenMode == NOT_TAKEN_OVER) {
         render();
-    }
-    else if(displayTakenMode == START_CUSTOM_DRAW) {
+    } else if(displayTakenMode == START_CUSTOM_DRAW) {
         customDrawing->started(this);
         displayTakenMode = RUNNING_CUSTOM_DRAW;
-    }
-    else if(displayTakenMode == RUNNING_CUSTOM_DRAW) {
+    } else if(displayTakenMode == RUNNING_CUSTOM_DRAW) {
         customDrawing->renderLoop(menuMgr.getCurrentRangeValue(), renderFnPressType);
-    }
-	else if(displayTakenMode == TAKEN_OVER_FN) {
+    } else if(displayTakenMode == TAKEN_OVER_FN) {
 	    renderCallback(menuMgr.getCurrentRangeValue(), renderFnPressType);
 	}
+
+    int refreshInterval = 1000 / updatesPerSecond;
+    taskManager.scheduleOnce(refreshInterval, this);
 }
 
 void BaseMenuRenderer::resetToDefault() {

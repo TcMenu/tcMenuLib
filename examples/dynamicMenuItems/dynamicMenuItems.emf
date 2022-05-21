@@ -409,6 +409,7 @@
     "projectIoExpanders": [
       "deviceIO:",
       "pcf8574:io8574:32:0"
-    ]
+    ],
+    "appIsModular": false
   }
 }

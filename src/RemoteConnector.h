@@ -41,7 +41,9 @@
 /**
  * This enum describes the various states that a field and value object can be in. Field and value is
  * basically a simple state machine that remembers where the incoming communication was up to last time
- * around, so it can be processed asynchronously.
+ * around, so it can be processed asynchronously. Anything containing PROCESSING is an internal state that
+ * is not ready for external processing, and generally would not be passed to a message callback.
+ *
  * @see FieldAndValue
  */
 enum FieldValueType : uint8_t {
@@ -76,6 +78,9 @@ enum FieldValueType : uint8_t {
  * a byte at a time and slowly updating it's state. It has many states, but more generally the states
  * containing the word PROCESSING mean that there is nothing yet ready for use, these will never be
  * passed externally to a message processor.
+ *
+ * A remote connection will typically use a field and value to store the state on incoming message processing, it
+ * will generally pass anything that is not in a PROCESSING* state to a message callback for further processing.
  */
 struct FieldAndValue {
 	FieldValueType fieldType;
@@ -238,6 +243,26 @@ public:
 	 * @param localName the name to send in the join message
 	 */
 	void encodeJoin();
+
+    /**
+     * Encode a custom message onto the wire in the TagVal protocol, provide the message type and a function that sets
+     * the fields you wish to send. This works by you providing the type of message and a function that will set all the
+     * fields by calling transport's add field methods. Once that method returns the message will be completed and
+     * sent on the wire.
+     *
+     * ```
+     * // first we define out custom message, we'd define any custom fields the same way.
+     * #define MSG_CUSTOM msgFieldToWord('Z','Z')
+     *
+     * // then we call the function to send the message, it wraps up the message for us.
+     * myConnector.encodeCustomTagValMessage(MSG_CUSTOM, [](TagValueTransport* transport) {
+     *     transport.writeField(FIELD_BUFFER, "12345");
+     *     transport.writeFieldInt(FIELD_VERSION, 123);
+     *     transport.writeFieldLong(FIELD_HB_MILLISEC, 2039349L);
+     * });
+     * ```
+     */
+    void encodeCustomTagValMessage(uint16_t msgType, void (*msgWriter)(TagValueTransport*));
 
     /**
      * Encodes a dialog message that the UI can use to render / remove a dialog from the display.

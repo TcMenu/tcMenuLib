@@ -21,7 +21,7 @@ void BaseRemoteServerConnection::runLoop() {
 
 TagValueRemoteServerConnection::TagValueRemoteServerConnection(TagValueTransport &transport, DeviceInitialisation &initialisation)
         : BaseRemoteServerConnection(initialisation, TAG_VAL_REMOTE_SERVER), remoteConnector(0),
-          remoteTransport(transport), messageProcessor(msgHandlers, MSG_HANDLERS_SIZE) {
+          remoteTransport(transport), messageProcessor() {
 }
 
 void TagValueRemoteServerConnection::tick() {
