@@ -9,6 +9,12 @@
 #include "MenuIterator.h"
 #include "BaseRenderers.h"
 
+// if you have a particularly large menu and you don't want to cache menu items when they are looked up by, as this has
+// a memory footprint associated with it, then set this value to 0, it will disable the cache.
+#ifndef TCMENU_ITEM_CACHE_SIZE
+#define TCMENU_ITEM_CACHE_SIZE 16
+#endif
+
 MenuItem* recursiveFindParentRootVisit(MenuItem* currentMenu, MenuItem* toFind, MenuItem* parentRoot, MenuVisitorFn fn) {
     MenuItem* parent = nullptr;
 	MenuItem* currentRoot = currentMenu;
@@ -66,9 +72,40 @@ MenuItem* recursiveFindById(MenuItem* current, menuid_t id) {
     return nullptr;
 }
 
+#if(TCMENU_ITEM_CACHE_SIZE > 0)
+class MenuItemHolder {
+private:
+    menuid_t itemId;
+    MenuItem* item;
+public:
+    MenuItemHolder() : itemId(0xffff), item(nullptr) {}
+    explicit MenuItemHolder(MenuItem* item) : itemId(item->getId()), item(item) {}
+    MenuItemHolder(const MenuItemHolder& item) =default;
+    MenuItemHolder& operator=(const MenuItemHolder& item) =default;
+
+    menuid_t getKey() const { return itemId; }
+    MenuItem* getItem() {
+        return item;
+    }
+};
+
+BtreeList<menuid_t, MenuItemHolder> tcMenuIdCache(TCMENU_ITEM_CACHE_SIZE, tccollection::GROW_BY_DOUBLE);
+MenuItem* getMenuItemById(menuid_t id) {
+    auto item = tcMenuIdCache.getByKey(id);
+    if(item) {
+        return item->getItem();
+    } else {
+        auto foundItem = recursiveFindById(menuMgr.getRoot(), id);
+        if(foundItem == nullptr) return nullptr;
+        tcMenuIdCache.add(MenuItemHolder(foundItem));
+        return foundItem;
+    }
+}
+#else
 MenuItem* getMenuItemById(menuid_t id) {
     return recursiveFindById(menuMgr.getRoot(), id);
 }
+#endif
 
 void MenuItemIterator::reset() {
     currentItem = menuMgr.getRoot();
