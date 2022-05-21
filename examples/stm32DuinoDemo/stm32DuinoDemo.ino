@@ -13,6 +13,52 @@
 //                        0123456789 0123456789 0123456789 0123456789 0123456789
 const char* ramDataSet = "Item 1\0   Item 2\0   Item 3\0   Item 4\0   Item 5\0   ";
 
+class MyCustomDrawing : public CustomDrawing {
+private:
+    GraphicsDeviceRenderer& dev;
+    int ticks;
+public:
+    MyCustomDrawing(GraphicsDeviceRenderer& r) : dev(r), ticks(0) {}
+
+    void registerWithRenderer() {
+        dev.setCustomDrawingHandler(this);
+    }
+
+    void started(BaseMenuRenderer *currentRenderer) override {
+        // called once when the take-over display  is started before calling renderLoop so you can set things up.
+        switches.getEncoder()->changePrecision(100, 50);
+    }
+
+    void reset() override {
+        // called whenever the display is reset, IE times out on editing etc.
+    }
+
+    void renderLoop(unsigned int currentValue, RenderPressMode userClick) override {
+        // called in a game loop between takeOverDisplay and giveBackDisplay, at this point you renderer the display.
+        if(userClick == RPRESS_PRESSED) {
+            dev.giveBackDisplay();
+        }
+        else if(++ticks % 10 == 1) {
+            // Why write your own code using device drawable? The main reason is, that it works exactly the same over
+            // adafruit, u8g2 and TFTeSPI with a moderately complete API.
+            DeviceDrawable *dd = dev.getDeviceDrawable();
+            dd->startDraw();
+            const Coord &dims = dd->getDisplayDimensions();
+            dd->setDrawColor(BLACK);
+            dd->drawBox(Coord(0, 0), dims, true);
+            dd->setColors(WHITE, BLACK);
+            auto height = int(dims.y) - 16;
+            int width = int(dims.x) - 20;
+            dd->drawText(Coord(rand() % width, (rand() % height) + 10), nullptr, 1, "hello");
+            dd->drawText(Coord(rand() % width, (rand() % height) + 10), nullptr, 1, "world");
+            char sz[10];
+            ltoaClrBuff(sz, currentValue, 4, NOT_PADDED, sizeof sz);
+            dd->drawText(Coord(0, 0), nullptr, 1, sz);
+            dd->endDraw();
+        }
+    }
+} myCustomDrawing(renderer);
+
 void setup() {
     // Start up serial and prepare the correct SPI
     Serial.begin(115200);
@@ -28,6 +74,13 @@ void setup() {
 
     // and then run the menu setup
     setupMenu();
+
+    menuMgr.load();
+
+    myCustomDrawing.registerWithRenderer();
+    setTitlePressedCallback([](int) {
+        renderer.takeOverDisplay();
+    });
 }
 
 void loop() {
@@ -62,7 +115,9 @@ void CALLBACK_FUNCTION decimalDidChange(int id) {
 
 
 void CALLBACK_FUNCTION saveWasPressed(int id) {
-    // TODO - your menu change code
+     auto bspBackupRam = reinterpret_cast<HalStm32EepromAbstraction*>(menuMgr.getEepromAbstraction());
+     menuMgr.save();
+     bspBackupRam->commit();
 }
 
 
