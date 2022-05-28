@@ -19,6 +19,10 @@ AvrEeprom glAvrRom;
 EepromAuthenticatorManager authManager(6);
 LiquidCrystal lcd(8, 9, 10, 11, 12, 13);
 LiquidCrystalRenderer renderer(lcd, 20, 4);
+MatrixKeyboardManager keyboard;
+const char keyboardKeys[] PROGMEM  = "123456789*0#";
+KeyboardLayout keyboardLayout(4, 3, keyboardKeys);
+MenuEditingKeyListener tcMenuKeyListener('*', '#', 'A', 'B');
 EthernetServer server(3333);
 EthernetInitialisation ethernetInitialisation(&server);
 EthernetTagValTransport ethernetTransport;
@@ -107,8 +111,8 @@ void setupMenu() {
     authManager.initialise(menuMgr.getEepromAbstraction(), 100);
     menuMgr.setAuthenticator(&authManager);
     // Now add any readonly, non-remote and visible flags.
-    menuConnectivityIoTMonitor.setLocalOnly(true);
     menuConnectivityAuthenticator.setLocalOnly(true);
+    menuConnectivityIoTMonitor.setLocalOnly(true);
     menuConnectivity.setLocalOnly(true);
     menuConnectivity.setSecured(true);
     menuHiddenItem.setVisible(false);
@@ -117,8 +121,17 @@ void setupMenu() {
     lcd.setIoAbstraction(ioexp_io23017);
     lcd.begin(20, 4);
     renderer.setUpdatesPerSecond(4);
-    switches.init(ioexp_io23017, SWITCHES_POLL_EVERYTHING, true);
-    menuMgr.initForEncoder(&renderer, &menuTime, 6, 7, 5);
+    switches.init(ioexp_io23017, SWITCHES_NO_POLLING, true);
+    menuMgr.initForEncoder(&renderer, &menuTime, 6, 7, 5, FULL_CYCLE);
+    keyboardLayout.setRowPin(0, 22);
+    keyboardLayout.setRowPin(1, 23);
+    keyboardLayout.setRowPin(2, 24);
+    keyboardLayout.setRowPin(3, 25);
+    keyboardLayout.setColPin(0, 26);
+    keyboardLayout.setColPin(1, 27);
+    keyboardLayout.setColPin(2, 28);
+    keyboard.initialise(internalDigitalIo(), &keyboardLayout, &tcMenuKeyListener, false);
+    keyboard.setRepeatKeyMillis(850, 350);
     remoteServer.addConnection(&ethernetConnection);
     remoteServer.addConnection(&ethernetConnection2);
 

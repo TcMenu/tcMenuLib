@@ -143,6 +143,11 @@ testF(MenuItemIteratorFixture, testGetItemById) {
     assertTrue(checkMenuItem(getMenuItemById(2), &menuChannel));
     assertTrue(checkMenuItem(getMenuItemById(7), &menuLHSTemp));
     assertTrue(checkMenuItem(getMenuItemById(103), &menuCaseTemp));
+
+    // now test a few again for the 2nd time to ensure caching works as expected
+    assertTrue(checkMenuItem(getMenuItemById(5), &menuStatus));
+    assertTrue(checkMenuItem(getMenuItemById(101), &menuPressMe));
+    assertTrue(checkMenuItem(getMenuItemById(7), &menuLHSTemp));
 }
 
 void clearAllChangeStatus() {

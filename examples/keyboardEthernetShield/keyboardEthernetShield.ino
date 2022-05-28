@@ -1,3 +1,13 @@
+/**
+ * This script demonstrates the use of a matrix keyboard with a rotary encoder also attached, this allows for the
+ * best of both worlds where the encoder is used for rotational type editing, and the keyboard where it is appropriate.
+ * This sketch is setup for MEGA2560 AVR with a 20x4 LCD on I2C and also an encoder on I2C. It also assumes an I2C ROM.
+ * However, you can take the ideas from this sketch and apply them in your own designs.
+ *
+ * More information about matrix keyboard support:
+ * https://www.thecoderscorner.com/products/arduino-libraries/io-abstraction/matrix-keyboard-keypad-manager/
+
+ */
 #include "keyboardEthernetShield_menu.h"
 #include <IoAbstractionWire.h>
 #include <RemoteAuthentication.h>
@@ -20,44 +30,6 @@ byte mac[] = {
 const char pgmListPressed[] PROGMEM = "List Item Pressed";
 const char pgmHeaderSavedItem[] PROGMEM = "Saved Item";
 const char * romSpaceNames = "item 01item 02item 03item 04item 05item 06item 07item 08item 09item 10 ";
-
-//
-// Here we add the keyboard components to the menu. For more general documentation of keyboards
-// https://www.thecoderscorner.com/products/arduino-libraries/io-abstraction/matrix-keyboard-keypad-manager/
-//
-
-// First we create a standard layout, in this case the 3x4 layout but there's also a 4x4 one
-// You can also generate your own layouts for this. The class is KeyboardLayout.
-MAKE_KEYBOARD_LAYOUT_3X4(keyboardLayout)
-//MAKE_KEYBOARD_LAYOUT_4X4(keyboardLayout)
-
-// The matrix keyboard manager itself, looks after the keyboard, notifies of changes etc.
-MatrixKeyboardManager keyboard;
-
-// This is the tcMenu standard keyboard listener. It allows control of the menu by keyboard
-// You could also write your own keyboard interface if this didn't work as expected for you.
-MenuEditingKeyListener menuKeyListener;
-
-// end keyboard components
-
-//
-// This function is called by setup() further down to initialise the keyboard.
-//
-void setupKeyboard() {
-	// set up the pin mappings.
-	keyboardLayout.setRowPin(0, 22);
-	keyboardLayout.setRowPin(1, 23);
-	keyboardLayout.setRowPin(2, 24);
-	keyboardLayout.setRowPin(3, 25);
-	keyboardLayout.setColPin(0, 26);
-	keyboardLayout.setColPin(1, 27);
-	keyboardLayout.setColPin(2, 28);
-
-	// initialise and set the repeat key intervals.
-	keyboard.initialise(ioUsingArduino(), &keyboardLayout, &menuKeyListener);
-	keyboard.setRepeatKeyMillis(850, 350);
-
-}
 
 //
 // Creating a grid layout just for a specific menu item. The flags menu under additional is laid out in a grid format,
@@ -103,8 +75,6 @@ void setup() {
         Serial.println("Resetting all keys and pin");
         authenticator->resetAllKeys();
     }
-
-    setupKeyboard();
 
 	// here we use the EEPROM to load back the last set of values.
 	menuMgr.load(0xf8f3);

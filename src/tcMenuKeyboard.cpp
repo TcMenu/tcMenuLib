@@ -18,16 +18,6 @@ int fromKeyToIndex(char ch) {
 }
 
 void MenuEditingKeyListener::keyPressed(char key, bool held) {
-    // we must have a locally available base renderer.
-    if (menuMgr.getRenderer()->getRendererType() == RENDER_TYPE_NOLOCAL) return;
-    auto *renderer = reinterpret_cast<BaseMenuRenderer *>(menuMgr.getRenderer());
-
-    // no matter what this always resets the state.
-    if (key == '#' && held) {
-        clearState();
-        renderer->resetToDefault();
-    }
-
     MenuItem *editor = menuMgr.getCurrentEditor();
     if (editor != nullptr) {
         // we are editing, attempt to manipulate the item using the keypress
@@ -50,7 +40,7 @@ void MenuEditingKeyListener::keyPressed(char key, bool held) {
         clearState();
         // we are not editing, attempt to select an item using 0-9
         menuMgr.valueChanged(fromKeyToIndex(key));
-    } else if (key == 'A') {
+    } else if (key == backKey) {
         MenuItem *itm = menuMgr.getCurrentMenu();
         bool haveSelected = false;
         while (itm != nullptr) {
@@ -67,7 +57,7 @@ void MenuEditingKeyListener::keyPressed(char key, bool held) {
             menuMgr.valueChanged(0);
         }
 
-    } else if (key == 'B') {
+    } else if (key == nextKey) {
         MenuItem *itm = menuMgr.getCurrentMenu();
         bool haveSelected = false;
         while (itm != nullptr) {
@@ -83,10 +73,14 @@ void MenuEditingKeyListener::keyPressed(char key, bool held) {
         if (!haveSelected) {
             menuMgr.valueChanged(1);
         }
-    } else if (key == '*') {
+    } else if (key == deleteKey) {
+        clearState();
+        menuMgr.resetMenu(held);
+    } else if (key == enterKey) {
         clearState();
         menuMgr.onMenuSelect(held);
     }
+
 }
 
 void MenuEditingKeyListener::keyReleased(char key) {
@@ -96,24 +90,24 @@ void MenuEditingKeyListener::keyReleased(char key) {
 void MenuEditingKeyListener::processScrollValueKeyPress(ScrollChoiceMenuItem *item, char key) {
     if (isdigit(key)) {
         int val = key - '0';
-        if (uint16_t(val) > item->getMaximumValue()) val = item->getMaximumValue();
+        if (uint16_t(val) > item->getMaximumValue()) val = int(item->getMaximumValue());
         item->setCurrentValue(val);
-    } else if (key == 'A') {
+        clearState();
+    } else if (key == backKey) {
         int value = item->getCurrentValue();
         value--;
         if (uint16_t(value) <= item->getMaximumValue()) {
             item->setCurrentValue(value);
         }
-        return;
-    } else if (key == 'B') {
+    } else if (key == nextKey) {
         int value = item->getCurrentValue();
         value++;
         if (uint16_t(value) <= item->getMaximumValue()) {
             item->setCurrentValue(value);
         }
-        return;
+    } else if (key == enterKey || key == backKey) {
+        clearState();
     }
-    clearState();
 }
 
 void MenuEditingKeyListener::processSimpleValueKeyPress(ValueMenuItem *item, char key) {
@@ -121,22 +115,22 @@ void MenuEditingKeyListener::processSimpleValueKeyPress(ValueMenuItem *item, cha
         unsigned int val = key - '0';
         if (val > item->getMaximumValue()) val = item->getMaximumValue();
         item->setCurrentValue(val);
-    } else if (key == 'A') {
+        clearState();
+    } else if (key == backKey) {
         unsigned int value = item->getCurrentValue();
         value--;
         if (value <= item->getMaximumValue()) {
             item->setCurrentValue(value);
         }
-        return;
-    } else if (key == 'B') {
+    } else if (key == nextKey) {
         unsigned int value = item->getCurrentValue();
         value++;
         if (value <= item->getMaximumValue()) {
             item->setCurrentValue(value);
         }
-        return;
+    } else if(key == enterKey || key == backKey) {
+        clearState();
     }
-    clearState();
 }
 
 void MenuEditingKeyListener::processIntegerMultiEdit(EditableMultiPartMenuItem *item, char key) {
@@ -146,10 +140,10 @@ void MenuEditingKeyListener::processIntegerMultiEdit(EditableMultiPartMenuItem *
         item->valueChanged(0);
     }
 
-    if (key == '*') {
+    if (key == enterKey) {
         int range = item->nextPart();
         if (range == 0) {
-            serdebugF("Finished with multiedit");
+            serdebugF("Finished with multi-edit");
             clearState();
             return;
         }
@@ -181,43 +175,40 @@ void MenuEditingKeyListener::processAnalogKeyPress(AnalogMenuItem *item, char ke
         serdebugF("Starting analog edit");
     }
 
-    // special handling.
-    if (key < '0' || key > '9') {
-        if (mode == KEYEDIT_ANALOG_EDIT_WHOLE && (key == '#' || key == '-')) {
+    if (mode == KEYEDIT_ANALOG_EDIT_WHOLE && (key == deleteKey || key == '-')) {
             currentValue.negative = !currentValue.negative;
             serdebugF2("Negate to ", currentValue.whole);
             item->setFromWholeAndFraction(currentValue);
-        } else if (mode == KEYEDIT_ANALOG_EDIT_WHOLE && item->getDivisor() > 1) {
+    } else if (key == enterKey) {
+        if(mode == KEYEDIT_ANALOG_EDIT_WHOLE && item->getDivisor() > 1) {
             mode = KEYEDIT_ANALOG_EDIT_FRACT;
             serdebugF("Start fraction edit");
-        } else {
-            item->setEditing(false);
-            clearState();
         }
-
-        // we must not enter the next block, as it's not a digit
-        return;
-    }
-
-    // numeric handling
-    int num = (key - '0');
-    if (mode == KEYEDIT_ANALOG_EDIT_WHOLE) {
-        currentValue.whole = (currentValue.whole * 10) + num;
-        serdebugF2("New digit ", currentValue.whole);
-    } else if (mode == KEYEDIT_ANALOG_EDIT_FRACT) {
-        if (item->getDivisor() <= 10) {
-            currentValue.fraction = num;
-            serdebugF2("New fraction digit ", currentValue.fraction);
-        } else {
-            unsigned int frac = (currentValue.fraction * 10) + num;
-            if (frac > item->getDivisor()) {
-                // the number entered is too big, exit.
-                serdebugF2("Number too large ", frac);
-                item->setEditing(false);
-                clearState();
-                return;
+        else {
+            clearState();
+            return;
+        }
+    } else if((key >= '0' && key <= '9')) {
+        int num = (key - '0');
+        // numeric handling
+        if (mode == KEYEDIT_ANALOG_EDIT_WHOLE) {
+            currentValue.whole = (currentValue.whole * 10) + num;
+            serdebugF2("New digit ", currentValue.whole);
+        } else if (mode == KEYEDIT_ANALOG_EDIT_FRACT) {
+            if (item->getDivisor() <= 10) {
+                currentValue.fraction = num;
+                serdebugF2("New fraction digit ", currentValue.fraction);
+            } else {
+                unsigned int frac = (currentValue.fraction * 10) + num;
+                if (frac > item->getDivisor()) {
+                    // the number entered is too big, exit.
+                    serdebugF2("Number too large ", frac);
+                    item->setEditing(false);
+                    clearState();
+                    return;
+                }
+                currentValue.fraction = frac;
             }
-            currentValue.fraction = frac;
         }
     }
     serdebugF3("Setting to ", currentValue.whole, currentValue.fraction);
@@ -232,19 +223,27 @@ void MenuEditingKeyListener::processLargeNumberPress(EditableLargeNumberMenuItem
             item->setEditing(false);
         }
     }
+    else if(key == enterKey) {
+        clearState();
+    }
 
 }
 
 void MenuEditingKeyListener::processMultiEditKeyPress(TextMenuItem *item, char key) {
-    item->valueChanged(findPositionInEditorSet(key));
-    if (!item->nextPart()) {
+    if(key == enterKey) {
         clearState();
-        item->setEditing(false);
+    }
+    else {
+        item->valueChanged(findPositionInEditorSet(key));
+        if (!item->nextPart()) {
+            clearState();
+            item->setEditing(false);
+        }
     }
 }
 
 void MenuEditingKeyListener::clearState() {
     menuMgr.stopEditingCurrentItem(true);
-    currentEditor = NULL;
+    currentEditor = nullptr;
     mode = KEYEDIT_NONE;
 }

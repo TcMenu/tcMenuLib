@@ -24,29 +24,50 @@ enum MenuEditingKeyMode: uint8_t {
 class EditableLargeNumberMenuItem;
 class ScrollChoiceMenuItem;
 
+#define KEY_NOT_CONFIGURED 0xff
+
 /**
- * An implementation of the key listener that can be used with TcMenu to edit menu items and control
- * the menu. When not in edit mode, the keyboard 0-9 keys can be used to select menu items. Pressing
- * '#' will reset the menu and pressing '*' will do the equivalent of select.
+ * An implementation of the key listener that can be used with TcMenu to edit menu items and control the menu where
+ * nearly all types of menu item and navigation are supported. For some cases it may be beneficial to have a rotary
+ * encoder with center button, but it is not needed as every menu operation can be performed via the keyboard.
  *
- * When editing:
- * * boolean - pressing 0 = false, pressing any other digit = true
- * * analog - pressing # resets the value, pressing * is a decimal point, 0-9 increase reduce the number
- * * enum - values 0-9 represent the values in the enum
- * * text - the value of the key is added to the string
- * * ip/date - the integer values are editing one as if using the encoder.
+ * If you have enough keys you can set two keys to be next and back, where they will allow the next menu item to become
+ * When not in edit mode, the keyboard 0-9 keys can be used to select items where 1 is the first item to select. For
+ * any keys you do not wish to map, set them to `KEY_NOT_CONFIGURED` or `-1`.
+ *
  */
 class MenuEditingKeyListener : public KeyboardListener {
 private:
 	WholeAndFraction currentValue;
 	MenuItem* currentEditor;
 	MenuEditingKeyMode mode;
+    uint8_t deleteKey;
+    uint8_t enterKey;
+    uint8_t backKey;
+    uint8_t nextKey;
 public:
-	MenuEditingKeyListener() {
-		currentEditor = nullptr;
-		mode = KEYEDIT_NONE;
-	}
+    /**
+     * Construct the key listener that will control TcMenu based on key presses. It is passed as the listener to an instance
+     * of IoAbstraction's `KeyboardManager`. You can set which keys act in certain roles such as enter and delete.
+     * @param enterKey the key code for enter - defaulted to '#'
+     * @param deleteKey the key code for del/exit, defaulted to '*'
+     * @param backKey the key code for back, defaulted to 'A'
+     * @param nextKey the key code for next, defaulted to 'B'
+     */
+	MenuEditingKeyListener(uint8_t enterKey = '*', uint8_t deleteKey = '#', uint8_t backKey = 'A', uint8_t nextKey = 'B') :
+            currentEditor(nullptr), mode(KEYEDIT_NONE), deleteKey(deleteKey), enterKey(enterKey), backKey(backKey), nextKey(nextKey) {}
+
+    /**
+     * Implements the key pressed interface method from KeyboardListener, this should not be called by user code
+     * @param key the keycode
+     * @param held if it is held down.
+     */
     void keyPressed(char key, bool held) override;
+
+    /**
+     * Implements the key released interface method from KeyboardListener, this should not be called by user code
+     * @param key the keycode
+     */
     void keyReleased(char key) override;
 private:
 	void processSimpleValueKeyPress(ValueMenuItem* item, char key);

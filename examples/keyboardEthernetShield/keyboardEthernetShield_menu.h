@@ -14,14 +14,15 @@
 #include <Arduino.h>
 #include <tcMenu.h>
 #include <LiquidCrystalIO.h>
+#include <tcMenuKeyboard.h>
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 #include <RemoteMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
-#include <IoAbstractionWire.h>
 #include <IoAbstraction.h>
+#include <IoAbstractionWire.h>
 #include <EepromAbstraction.h>
 #include <RemoteAuthentication.h>
 #include "tcMenuLiquidCrystal.h"
@@ -31,6 +32,8 @@ extern const PROGMEM ConnectorLocalInfo applicationInfo;
 extern TcMenuRemoteServer remoteServer;
 extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
+extern MatrixKeyboardManager keyboard;
+extern MenuEditingKeyListener tcMenuKeyListener;
 extern EthernetServer server;
 extern EthernetInitialisation ethernetInitialisation;
 extern EthernetServer server2;

@@ -433,7 +433,7 @@
   "codeOptions": {
     "embeddedPlatform": "ARDUINO",
     "lastDisplayUuid": "61f370f4-0294-41cf-8988-1458f242914a",
-    "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
+    "lastInputUuid": "71DAF854-DF8D-4F0B-9039-23C5583C85B1",
     "lastRemoteUuid": "0877131c-e03e-426b-8eaf-228e01f5e7f1",
     "lastRemoteUuids": [
       "0877131c-e03e-426b-8eaf-228e01f5e7f1"
@@ -508,48 +508,133 @@
         "subsystem": "DISPLAY"
       },
       {
-        "name": "SW_POLLING_MODE",
-        "latestValue": "SWITCHES_POLL_EVERYTHING",
+        "name": "MK_KEYBOARD_NEXT",
+        "latestValue": "B",
         "subsystem": "INPUT"
       },
       {
-        "name": "SWITCH_IODEVICE",
-        "latestValue": "io23017",
+        "name": "MK_KEYBOARD_BACK",
+        "latestValue": "A",
         "subsystem": "INPUT"
       },
       {
-        "name": "ENCODER_PIN_A",
-        "latestValue": "6",
+        "name": "MK_KEYBOARD_ENTER",
+        "latestValue": "*",
         "subsystem": "INPUT"
       },
       {
-        "name": "ENCODER_PIN_B",
-        "latestValue": "7",
+        "name": "MK_KEYBOARD_DEL",
+        "latestValue": "#",
         "subsystem": "INPUT"
       },
       {
-        "name": "ENCODER_PIN_OK",
-        "latestValue": "5",
+        "name": "MK_KEYBOARD_LAYOUT",
+        "latestValue": "LAYOUT_3X4",
         "subsystem": "INPUT"
       },
       {
-        "name": "ENCODER_BACK_PIN",
+        "name": "MK_ROW_PIN_0",
+        "latestValue": "22",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "MK_ROW_PIN_1",
+        "latestValue": "23",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "MK_ROW_PIN_2",
+        "latestValue": "24",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "MK_ROW_PIN_3",
+        "latestValue": "25",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "MK_COL_PIN_0",
+        "latestValue": "26",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "MK_COL_PIN_1",
+        "latestValue": "27",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "MK_COL_PIN_2",
+        "latestValue": "28",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "MK_COL_PIN_3",
         "latestValue": "-1",
         "subsystem": "INPUT"
       },
       {
-        "name": "ENCODER_NEXT_PIN",
-        "latestValue": "-1",
+        "name": "MK_REPEAT_START",
+        "latestValue": "850",
         "subsystem": "INPUT"
       },
       {
-        "name": "PULLUP_LOGIC",
+        "name": "MK_REPEAT_INTERVAL",
+        "latestValue": "350",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "MK_KEYBOARD_DEVICE",
+        "latestValue": "devicePins",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "MK_KEYBOARD_INTERRUPTS",
+        "latestValue": "false",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SEPARATOR",
+        "latestValue": "",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "MK_NEED_ENCODER",
         "latestValue": "true",
         "subsystem": "INPUT"
       },
       {
-        "name": "ENCODER_IS_QUARTER_CYCLE",
-        "latestValue": "false",
+        "name": "MK_USE_PULL_UP",
+        "latestValue": "true",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "MK_ENCODER_A",
+        "latestValue": "6",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "MK_ENCODER_B",
+        "latestValue": "7",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "MK_ENCODER_SEL",
+        "latestValue": "5",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "MK_ENCODER_DEVICE",
+        "latestValue": "io23017",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "MK_POLLING_MODE",
+        "latestValue": "SWITCHES_NO_POLLING",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "MK_ENCODER_TYPE",
+        "latestValue": "FULL_CYCLE",
         "subsystem": "INPUT"
       },
       {
@@ -620,6 +705,7 @@
     "menuInMenuCollection": {
       "menuDefinitions": []
     },
-    "packageNamespace": ""
+    "packageNamespace": "",
+    "appIsModular": false
   }
 }

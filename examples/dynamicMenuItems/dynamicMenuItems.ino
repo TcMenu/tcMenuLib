@@ -4,7 +4,7 @@
  *
  * Test environment: Seeed MG126 - Adafruit 128x128 display, encoder on device pins.
  *
- * Although it's set up to run on SAMD/MKR there is no reason it could not be easily reconfigured for any
+ * Although it's set up to run on SAMD there is no reason it could not be easily reconfigured for any
  * other board.
  */
 
