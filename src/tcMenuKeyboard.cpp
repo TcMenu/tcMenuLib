@@ -19,6 +19,13 @@ int fromKeyToIndex(char ch) {
 
 void MenuEditingKeyListener::keyPressed(char key, bool held) {
     MenuItem *editor = menuMgr.getCurrentEditor();
+
+    // holding delete always resets the menu.
+    if (key == deleteKey && held) {
+        clearState();
+        menuMgr.resetMenu(true);
+    }
+
     if (editor != nullptr) {
         // we are editing, attempt to manipulate the item using the keypress
         MenuType type = editor->getMenuType();
@@ -26,6 +33,8 @@ void MenuEditingKeyListener::keyPressed(char key, bool held) {
             processSimpleValueKeyPress(reinterpret_cast<ValueMenuItem *>(editor), key);
         } else if(type == MENUTYPE_SCROLLER_VALUE) {
             processScrollValueKeyPress(reinterpret_cast<ScrollChoiceMenuItem*>(editor), key);
+        } else if(type == MENUTYPE_RUNTIME_LIST) {
+            processListMenuSelection(reinterpret_cast<ListRuntimeMenuItem*>(editor), key);
         } else if (type == MENUTYPE_INT_VALUE) {
             processAnalogKeyPress(reinterpret_cast<AnalogMenuItem *>(editor), key);
         } else if (type == MENUTYPE_TEXT_VALUE) {
@@ -40,38 +49,19 @@ void MenuEditingKeyListener::keyPressed(char key, bool held) {
         clearState();
         // we are not editing, attempt to select an item using 0-9
         menuMgr.valueChanged(fromKeyToIndex(key));
-    } else if (key == backKey) {
-        MenuItem *itm = menuMgr.getCurrentMenu();
-        bool haveSelected = false;
-        while (itm != nullptr) {
-            if (itm->getNext() != nullptr && itm->getNext()->isActive()) {
-                itm->getNext()->setActive(false);
-                itm->setActive(true);
-                haveSelected = true;
-                break;
-            } else {
-                itm = itm->getNext();
-            }
-        }
-        if (!haveSelected) {
-            menuMgr.valueChanged(0);
-        }
+    } else if (key == backKey || key == nextKey) {
+        int dir = (key == backKey)  ? -1 : 1;
 
-    } else if (key == nextKey) {
-        MenuItem *itm = menuMgr.getCurrentMenu();
-        bool haveSelected = false;
-        while (itm != nullptr) {
-            if (itm->getNext() != nullptr && itm->isActive()) {
-                itm->setActive(false);
-                itm->getNext()->setActive(true);
-                haveSelected = true;
-                break;
-            } else {
-                itm = itm->getNext();
-            }
-        }
-        if (!haveSelected) {
-            menuMgr.valueChanged(1);
+        MenuItem* currentActive = menuMgr.findCurrentActive();
+        uint16_t indexOfActive = offsetOfCurrentActive(currentActive) + dir;
+        uint8_t numItems = itemCount(menuMgr.getCurrentMenu(), false);
+        serdebugF4("act, items", indexOfActive, numItems, dir);
+        if(indexOfActive > numItems) return;
+        MenuItem* newActive = getItemAtPosition(menuMgr.getCurrentMenu(), indexOfActive);
+        if(currentActive && newActive) {
+            currentActive->setActive(false);
+            newActive->setActive(true);
+            serdebugF2("activate item ", newActive->getId());
         }
     } else if (key == deleteKey) {
         clearState();
@@ -87,50 +77,46 @@ void MenuEditingKeyListener::keyReleased(char key) {
     // presently ignored.
 }
 
-void MenuEditingKeyListener::processScrollValueKeyPress(ScrollChoiceMenuItem *item, char key) {
+void MenuEditingKeyListener::processDirectionalIndexItem(MenuItem *item, uint16_t currVal, char key, DirectionalItemCallback callback) {
     if (isdigit(key)) {
         int val = key - '0';
         if (uint16_t(val) > item->getMaximumValue()) val = int(item->getMaximumValue());
-        item->setCurrentValue(val);
+        callback(item, val);
         clearState();
     } else if (key == backKey) {
-        int value = item->getCurrentValue();
+        uint16_t value = currVal;
         value--;
-        if (uint16_t(value) <= item->getMaximumValue()) {
-            item->setCurrentValue(value);
+        if (value <= item->getMaximumValue()) {
+            callback(item, value);
         }
     } else if (key == nextKey) {
-        int value = item->getCurrentValue();
+        uint16_t value = currVal;
         value++;
-        if (uint16_t(value) <= item->getMaximumValue()) {
-            item->setCurrentValue(value);
+        if (value <= item->getMaximumValue()) {
+            callback(item, value);
         }
     } else if (key == enterKey || key == backKey) {
         clearState();
     }
 }
 
+void MenuEditingKeyListener::processScrollValueKeyPress(ScrollChoiceMenuItem *item, char key) {
+    processDirectionalIndexItem(item, item->getCurrentValue(), key, [](MenuItem* itm, uint16_t newVal) {
+        reinterpret_cast<ScrollChoiceMenuItem*>(itm)->setCurrentValue(int(newVal));
+    });
+}
+
+
+void MenuEditingKeyListener::processListMenuSelection(ListRuntimeMenuItem *item, char key) {
+    processDirectionalIndexItem(item, item->getActiveIndex(), key, [](MenuItem* itm, uint16_t newVal) {
+        reinterpret_cast<ListRuntimeMenuItem*>(itm)->setActiveIndex(newVal);
+    });
+}
+
 void MenuEditingKeyListener::processSimpleValueKeyPress(ValueMenuItem *item, char key) {
-    if (isdigit(key)) {
-        unsigned int val = key - '0';
-        if (val > item->getMaximumValue()) val = item->getMaximumValue();
-        item->setCurrentValue(val);
-        clearState();
-    } else if (key == backKey) {
-        unsigned int value = item->getCurrentValue();
-        value--;
-        if (value <= item->getMaximumValue()) {
-            item->setCurrentValue(value);
-        }
-    } else if (key == nextKey) {
-        unsigned int value = item->getCurrentValue();
-        value++;
-        if (value <= item->getMaximumValue()) {
-            item->setCurrentValue(value);
-        }
-    } else if(key == enterKey || key == backKey) {
-        clearState();
-    }
+    processDirectionalIndexItem(item, item->getCurrentValue(), key, [](MenuItem* itm, uint16_t newVal) {
+        reinterpret_cast<ValueMenuItem*>(itm)->setCurrentValue(newVal);
+    });
 }
 
 void MenuEditingKeyListener::processIntegerMultiEdit(EditableMultiPartMenuItem *item, char key) {
@@ -232,8 +218,7 @@ void MenuEditingKeyListener::processLargeNumberPress(EditableLargeNumberMenuItem
 void MenuEditingKeyListener::processMultiEditKeyPress(TextMenuItem *item, char key) {
     if(key == enterKey) {
         clearState();
-    }
-    else {
+    } else {
         item->valueChanged(findPositionInEditorSet(key));
         if (!item->nextPart()) {
             clearState();

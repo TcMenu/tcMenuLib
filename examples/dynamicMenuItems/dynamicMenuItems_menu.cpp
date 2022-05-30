@@ -14,10 +14,14 @@
 
 // Global variable declarations
 const  ConnectorLocalInfo applicationInfo = { "Dynamic Menus", "5f22995e-8da2-49c4-9ec8-d055901003af" };
-IoAbstractionRef ioexp_io8574 = ioFrom8574(0x20, 0);
+IoAbstractionRef ioexp_io23017 = ioFrom23017(0x20, ACTIVE_LOW_OPEN, 10);
 Adafruit_ST7735 gfx(1, 0, -1);
 AdafruitDrawable gfxDrawable(&gfx);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
+MatrixKeyboardManager keyboard;
+const char keyboardKeys[]  = "123A456B789C*0#D";
+KeyboardLayout keyboardLayout(4, 4, keyboardKeys);
+MenuEditingKeyListener tcMenuKeyListener('*', '#', 'A', 'B');
 
 // Global Menu Item declarations
 ListRuntimeMenuItem menuList(13, 0, fnListRtCall, NULL);
@@ -72,8 +76,18 @@ void setupMenu() {
     gfx.initR(INITR_REDTAB);
     gfx.setRotation(0);
     renderer.setUpdatesPerSecond(5);
-    switches.init(internalDigitalIo(), SWITCHES_POLL_EVERYTHING, true);
-    menuMgr.initForEncoder(&renderer, &menuMainPower, 6, 5, 9);
+    switches.init(internalDigitalIo(), SWITCHES_POLL_KEYS_ONLY, true);
+    menuMgr.initForEncoder(&renderer, &menuMainPower, 6, 5, 9, FULL_CYCLE);
+    keyboardLayout.setRowPin(0, 11);
+    keyboardLayout.setRowPin(1, 10);
+    keyboardLayout.setRowPin(2, 9);
+    keyboardLayout.setRowPin(3, 8);
+    keyboardLayout.setColPin(0, 15);
+    keyboardLayout.setColPin(1, 14);
+    keyboardLayout.setColPin(2, 13);
+    keyboardLayout.setColPin(3, 12);
+    keyboard.initialise(ioexp_io23017, &keyboardLayout, &tcMenuKeyListener, true);
+    keyboard.setRepeatKeyMillis(850, 350);
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
     renderer.setUseSliderForAnalog(true);
     installCoolBlueTraditionalTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(nullptr, 1), true);

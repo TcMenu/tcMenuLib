@@ -21,6 +21,8 @@ enum MenuEditingKeyMode: uint8_t {
 	KEYEDIT_MULTIEDIT_INT_START = 100,
 };
 
+typedef void (*DirectionalItemCallback)(MenuItem* item, uint16_t currentValue);
+
 class EditableLargeNumberMenuItem;
 class ScrollChoiceMenuItem;
 
@@ -38,6 +40,7 @@ class ScrollChoiceMenuItem;
  */
 class MenuEditingKeyListener : public KeyboardListener {
 private:
+    BaseMenuRenderer* baseRenderer;
 	WholeAndFraction currentValue;
 	MenuItem* currentEditor;
 	MenuEditingKeyMode mode;
@@ -70,12 +73,14 @@ public:
      */
     void keyReleased(char key) override;
 private:
-	void processSimpleValueKeyPress(ValueMenuItem* item, char key);
+    void processDirectionalIndexItem(MenuItem *item, uint16_t currVal, char key, DirectionalItemCallback callback);
+    void processSimpleValueKeyPress(ValueMenuItem* item, char key);
     void processScrollValueKeyPress(ScrollChoiceMenuItem* item, char key);
     void processAnalogKeyPress(AnalogMenuItem* item, char key);
 	void processMultiEditKeyPress(TextMenuItem* item, char key);
 	void processIntegerMultiEdit(EditableMultiPartMenuItem* item, char key);
     void processLargeNumberPress(EditableLargeNumberMenuItem*, char key);
+    void processListMenuSelection(ListRuntimeMenuItem *item, char key);
 	void clearState();
 };
 

@@ -14,6 +14,7 @@
 #include <Arduino.h>
 #include <tcMenu.h>
 #include "tcMenuAdaFruitGfx.h"
+#include <tcMenuKeyboard.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 #include <IoAbstraction.h>
@@ -24,9 +25,11 @@ extern const PROGMEM ConnectorLocalInfo applicationInfo;
 extern Adafruit_ST7735 gfx;
 extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
+extern MatrixKeyboardManager keyboard;
+extern MenuEditingKeyListener tcMenuKeyListener;
 
 // Any externals needed by IO expanders, EEPROMs etc
-extern IoAbstractionRef ioexp_io8574;
+extern IoAbstractionRef ioexp_io23017;
 
 // Global Menu Item exports
 extern ListRuntimeMenuItem menuList;

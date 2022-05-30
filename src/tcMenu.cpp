@@ -399,6 +399,7 @@ void MenuManager::load(EepromAbstraction &eeprom, uint16_t magicKey, TimerFn onE
 }
 
 void MenuManager::notifyEditEnd(MenuItem *item) {
+    if(item == nullptr) return; // don't notify a null pointer
     for(auto & obs : structureNotifier) {
         if(obs != nullptr) {
             obs->menuEditEnded(item);
@@ -407,6 +408,8 @@ void MenuManager::notifyEditEnd(MenuItem *item) {
 }
 
 bool MenuManager::notifyEditStarting(MenuItem *item) {
+    if(item == nullptr) return true; // don't notify a null pointer and allow menu to proceed.
+
     bool goAhead = true;
     for(auto & obs : structureNotifier) {
         if(obs != nullptr) {
