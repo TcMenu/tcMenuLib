@@ -1,3 +1,27 @@
+/**
+ * ## TcMenu Example: Take over the display
+ * This example shows the use of a MCP23017 IO expander that has a HD44780 LCD 20x4 display connected on port B and the
+ * rotary encoder on port A, although could easily be changed to other kinds of IO expanders by redefining the two
+ * IoExpander variables in the code generator properties. I've assumed this will be built on either a MEGA board, but
+ * should work equally well on any other Arduino board with only minor changes.
+ *
+ * When the application starts up, it immediately takes over the display, and takes over the display every time the menu
+ * detects that it is idle. This is done by setting up a reset handler with the renderer class. You can also manually
+ * take over the display by pressing on the take display menu option.
+ *
+ * There are also two dialogs, dialogs are small display independent rendering utilities, that allow to inform the user
+ * of a condition, or ask a question locally on the device. For example they are used heavily in the remote authentication.
+ * See the two action menu items that bring up an informational text and also a question. Open the serial port at 115200
+ * and you'll see the button you pressed there for the question one.
+ *
+ * There are two remote capabilities started by this application, the first is on Serial, to use this ensure that
+ * IoLogging is not logging to the serial port, it also starts the Ethernet library too.
+ *
+ * This example also shows how to use an i2c AT24 EEPROM instead of the AVR one, comment in/out the one you want in the
+ * sketch.
+ *
+ */
+
 #include "takeOverDisplay_menu.h"
 #include <EepromAbstractionWire.h>
 #include <IoAbstractionWire.h>
@@ -8,14 +32,6 @@
 
 // contains the graphical widget title components.
 #include "stockIcons/wifiAndConnectionIconsLCD.h"
-
-/**
- * This TcMenu example shows how to take over the display for your own purposes from a menu item.
- * It also shows how to use the dialog facilities to locally show an information dialog and also a
- * question dialog.
- * 
- * For more detail see the README.md file
- */
 
 // Set up ethernet, the usual default settings are chosen. Change to your preferred values or use DHCP.
 byte mac[] = {

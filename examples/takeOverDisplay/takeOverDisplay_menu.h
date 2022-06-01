@@ -16,6 +16,7 @@
 #include <LiquidCrystalIO.h>
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
+#include "SerialTransport.h"
 #include <RemoteMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>

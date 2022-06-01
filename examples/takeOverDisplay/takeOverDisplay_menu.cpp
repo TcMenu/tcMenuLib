@@ -22,6 +22,9 @@ EthernetServer server(3333);
 EthernetInitialisation ethernetInitialisation(&server);
 EthernetTagValTransport ethernetTransport;
 TagValueRemoteServerConnection ethernetConnection(ethernetTransport, ethernetInitialisation);
+NoInitialisationNeeded serialInitializer;
+SerialTagValueTransport serialTransport(&Serial);
+TagValueRemoteServerConnection serialConnection(serialTransport, serialInitializer);
 
 // Global Menu Item declarations
 const PROGMEM char pgmStrConnectivityAuthenticatorText[] = { "Authenticator" };
@@ -87,11 +90,15 @@ void setupMenu() {
     lcd.setIoAbstraction(io23017);
     lcd.begin(20, 4);
     renderer.setUpdatesPerSecond(5);
-    switches.initialise(io23017, true);
+    switches.init(io23017, SWITCHES_POLL_EVERYTHING, true);
     menuMgr.initForEncoder(&renderer, &menuTime, 6, 7, 5);
     remoteServer.addConnection(&ethernetConnection);
+    remoteServer.addConnection(&serialConnection);
 
     // We have an IoT monitor, register the server
     menuConnectivityIoTMonitor.setRemoteServer(remoteServer);
+
+    // We have an EEPROM authenticator, it needs initialising
+    menuConnectivityAuthenticator.init();
 }
 

@@ -276,7 +276,8 @@
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
     "lastRemoteUuid": "0877131c-e03e-426b-8eaf-228e01f5e7f1",
     "lastRemoteUuids": [
-      "0877131c-e03e-426b-8eaf-228e01f5e7f1"
+      "0877131c-e03e-426b-8eaf-228e01f5e7f1",
+      "1e38dc42-672d-4c1c-a393-2c7632bf6c5c"
     ],
     "lastThemeUuid": "850dc0a3-f534-47c2-94d8-1e64ff368a54",
     "applicationUUID": "40722ec4-e8bc-4889-b54e-d81b14cb429c",
@@ -348,13 +349,8 @@
         "subsystem": "DISPLAY"
       },
       {
-        "name": "PULLUP_LOGIC",
-        "latestValue": "true",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "INTERRUPT_SWITCHES",
-        "latestValue": "false",
+        "name": "SW_POLLING_MODE",
+        "latestValue": "SWITCHES_POLL_EVERYTHING",
         "subsystem": "INPUT"
       },
       {
@@ -388,6 +384,11 @@
         "subsystem": "INPUT"
       },
       {
+        "name": "PULLUP_LOGIC",
+        "latestValue": "true",
+        "subsystem": "INPUT"
+      },
+      {
         "name": "ENCODER_IS_QUARTER_CYCLE",
         "latestValue": "false",
         "subsystem": "INPUT"
@@ -415,6 +416,11 @@
       {
         "name": "ETH_LISTEN_PORT3",
         "latestValue": "3335",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "SERIAL_PORT",
+        "latestValue": "Serial",
         "subsystem": "REMOTE"
       },
       {
@@ -454,8 +460,13 @@
     "eepromDefinition": "at24:80:PAGESIZE_AT24C128",
     "authenticatorDefinition": "rom:100:6",
     "projectIoExpanders": [
-      "deviceIO:",
-      "customIO:io23017"
-    ]
+      "customIO:io23017",
+      "deviceIO:"
+    ],
+    "menuInMenuCollection": {
+      "menuDefinitions": []
+    },
+    "packageNamespace": "",
+    "appIsModular": false
   }
 }
