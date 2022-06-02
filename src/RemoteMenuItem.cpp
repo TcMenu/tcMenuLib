@@ -139,7 +139,6 @@ int authenticationMenuItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnM
             }
             else if(row < authItem->getAuthManager()->getNumberOfEntries()) {
                 authItem->getAuthManager()->copyKeyNameToBuffer(row, buffer, bufferSize);
-                serdebugHexDump("Aname: ", buffer, bufferSize);
                 if (buffer[0] == 0) safeProgCpy(buffer, AUTH_EMPTY_KEY, bufferSize);
             }
             else {

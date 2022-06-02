@@ -15,8 +15,7 @@
 #include <tcMenu.h>
 #include "tcMenuTfteSpi.h"
 #include <graphics/MenuTouchScreenEncoder.h>
-#include "EthernetTransport.h"
-#include <RemoteConnector.h>
+#include "tcMenuEspAsyncWebServer.h"
 #include <RemoteMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
@@ -32,10 +31,7 @@ extern TfteSpiDrawable tftDrawable;
 extern GraphicsDeviceRenderer renderer;
 extern iotouch::ResistiveTouchInterrogator touchInterrogator;
 extern MenuTouchScreenManager touchScreen;
-extern WiFiServer server;
-extern EthernetInitialisation ethernetInitialisation;
-extern WiFiServer server2;
-extern EthernetInitialisation ethernetInitialisation2;
+extern EspAsyncWebserver webServer;
 
 // Any externals needed by IO expanders, EEPROMs etc
 
