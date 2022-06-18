@@ -9,7 +9,7 @@ using namespace tcremote;
 
 BaseBufferedRemoteTransport::BaseBufferedRemoteTransport(BufferingMode bufferMode, uint8_t readBufferSize, uint8_t writeBufferSize)
         : TagValueTransport(TVAL_BUFFERED), writeBufferSize(writeBufferSize), writeBufferPos(0),
-        readBufferSize(readBufferSize), readBufferPos(0), readBufferAvail(0), mode(bufferMode), bufferWriteCheckTask(0), ticksSinceWrite(0) {
+        readBufferSize(readBufferSize), readBufferPos(0), readBufferAvail(0), mode(bufferMode), ticksSinceWrite(0) {
     readBuffer = new uint8_t[readBufferSize];
     writeBuffer = new uint8_t[writeBufferSize];
 }
@@ -17,7 +17,6 @@ BaseBufferedRemoteTransport::BaseBufferedRemoteTransport(BufferingMode bufferMod
 BaseBufferedRemoteTransport::~BaseBufferedRemoteTransport() {
     delete[] readBuffer;
     delete[] writeBuffer;
-    if(bufferWriteCheckTask != TASKMGR_INVALIDID) taskManager.cancelTask(bufferWriteCheckTask);
 }
 
 void BaseBufferedRemoteTransport::endMsg() {
@@ -86,4 +85,8 @@ void BaseBufferedRemoteTransport::close() {
     readBufferAvail = 0;
     currentField.msgType = UNKNOWN_MSG_TYPE;
     currentField.fieldType = FVAL_PROCESSING_AWAITINGMSG;
+}
+
+bool BaseBufferedRemoteTransport::canRead(int amt) {
+    return (readBufferPos + amt) < readBufferAvail;
 }

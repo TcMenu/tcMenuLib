@@ -14,8 +14,7 @@
 #include <Arduino.h>
 #include <tcMenu.h>
 #include "tcMenuU8g2.h"
-#include "EthernetTransport.h"
-#include <RemoteConnector.h>
+#include "tcMenuECWebServer.h"
 #include <RemoteMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
@@ -26,14 +25,10 @@
 
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
-extern TcMenuRemoteServer remoteServer;
 extern U8G2_SSD1306_128X64_NONAME_F_4W_HW_SPI gfx;
 extern GraphicsDeviceRenderer renderer;
-extern EthernetServer server;
-extern EthernetInitialisation ethernetInitialisation;
 
 // Any externals needed by IO expanders, EEPROMs etc
-
 
 // Global Menu Item exports
 extern EepromAuthenticationInfoMenuItem menuRuntimesAuthenticator;

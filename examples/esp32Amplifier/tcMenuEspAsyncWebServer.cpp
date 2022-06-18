@@ -168,9 +168,11 @@ void EspAsyncWebSocketClient::markNotInUse() {
 }
 
 bool EspAsyncWebSocketClient::dataAvailable(uint8_t *data, size_t len) {
+    ESP_LOGI("AvailS");
     for(size_t i=0;i<len;i++) {
         readThreadBuffer.put(data[i]);
     }
+    ESP_LOGI("AvailE");
     return true;
 }
 

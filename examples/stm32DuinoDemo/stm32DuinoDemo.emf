@@ -236,9 +236,9 @@
     "embeddedPlatform": "STM32DUINO",
     "lastDisplayUuid": "fd998437-c4b2-4386-ba88-d0ae7c20620b",
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
-    "lastRemoteUuid": "0877131c-e03e-426b-8eaf-228e01f5e7f1",
+    "lastRemoteUuid": "da552323-157d-4914-8410-d5b4ff2293a4",
     "lastRemoteUuids": [
-      "0877131c-e03e-426b-8eaf-228e01f5e7f1"
+      "da552323-157d-4914-8410-d5b4ff2293a4"
     ],
     "lastThemeUuid": "0dd60ceb-7e0f-46e2-8d40-b264eb3aa7e0",
     "applicationUUID": "ecd5607f-55eb-4252-a512-aab769452dd3",
@@ -340,28 +340,23 @@
         "subsystem": "INPUT"
       },
       {
-        "name": "ETH_CONCURRENT_CONNECTIONS",
-        "latestValue": "1",
+        "name": "ASWEB_USE_PREPACKAGED",
+        "latestValue": "true",
         "subsystem": "REMOTE"
       },
       {
-        "name": "ETH_LIBRARY_TYPE",
-        "latestValue": "STM32ETHERNET",
+        "name": "ASWEB_CONCURRENT",
+        "latestValue": "2",
         "subsystem": "REMOTE"
       },
       {
-        "name": "ETH_LISTEN_PORT1",
-        "latestValue": "3333",
+        "name": "WEBSOCKET_ENDPOINT",
+        "latestValue": "/ws",
         "subsystem": "REMOTE"
       },
       {
-        "name": "ETH_LISTEN_PORT2",
-        "latestValue": "3334",
-        "subsystem": "REMOTE"
-      },
-      {
-        "name": "ETH_LISTEN_PORT3",
-        "latestValue": "3335",
+        "name": "WEBSERVER_PORT",
+        "latestValue": "80",
         "subsystem": "REMOTE"
       },
       {

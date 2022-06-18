@@ -5,6 +5,7 @@
  */
 
 #include "stm32DuinoDemo_menu.h"
+#include <STM32Ethernet.h>
 #include <PlatformDetermination.h>
 #include <SPI.h>
 
