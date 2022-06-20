@@ -3,6 +3,8 @@
 #include <tcMenu.h>
 #include <remote/BaseRemoteComponents.h>
 #include <SimpleCollections.h>
+#include <remote/TcMenuWebSocket.h>
+#include "SimpleTestFixtures.h"
 
 using namespace aunit;
 using namespace tcremote;
@@ -40,6 +42,7 @@ private:
     bool flushed = false;
     bool closed = false;
 public:
+    TestTagValTransport() : TagValueTransport(TVAL_UNBUFFERED) {}
 
     void reset() {
         flushed = false;
@@ -147,9 +150,10 @@ public:
         return connectionMade;
     }
 
-    bool attemptNewConnection(TagValueTransport *transport) override {
+    bool attemptNewConnection(BaseRemoteServerConnection *connection) override {
         if(initialised) {
-            auto* testTransport = reinterpret_cast<TestTagValTransport*>(transport);
+            auto* tagValConnector = reinterpret_cast<TagValueRemoteServerConnection*>(connection);
+            auto* testTransport = reinterpret_cast<TestTagValTransport*>(tagValConnector->transport());
             testTransport->reset();
             connectionMade = true;
             initCount = 0;
@@ -174,9 +178,11 @@ bool checkForMessageOfType(BtreeList<uint16_t, ReceivedMessage> msgs, uint16_t m
 }
 
 test(testTcMenuRemoteServer) {
+    menuMgr.setRootMenu(&menuVolume);
+
     TestTagValTransport testTransport;
     TestTransportInitialisation testInitialisation;
-    RemoteServerConnection rsc(testTransport, testInitialisation);
+    TagValueRemoteServerConnection rsc(testTransport, testInitialisation);
     remoteServer.addConnection(&rsc);
 
     assertEqual(&connector0, remoteServer.getRemoteConnector(0));
