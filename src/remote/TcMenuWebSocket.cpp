@@ -227,43 +227,44 @@ void AbstractWebSocketTcMenuTransport::close() {
 
 uint8_t AbstractWebSocketTcMenuTransport::readByte() {
     if(currentState == WSS_UPGRADING) {
-        uint8_t sz[1];
-        performRawRead(sz, 1);
-        return sz[0];
+        return readRawByte();
+    } else {
+        auto data = readBuffer[readPosition] ^ frameMask[frameMaskingPosition];
+        readPosition++;
+        bytesLeftInCurrentMsg--;
+        frameMaskingPosition = (frameMaskingPosition + 1) % 4;
+        return data;
+    }
+}
+
+bool AbstractWebSocketTcMenuTransport::available() {
+    if(currentState == WSS_UPGRADING) {
+        return rawAvailable();
     }
     else if(bytesLeftInCurrentMsg > 0) {
         if(readPosition >= readAvailable) {
             // here we read but not past the end of the current message, each message has new framing
             readAvailable = performRawRead(readBuffer, bytesLeftInCurrentMsg);
             readPosition = 0;
-            if(readAvailable == 0) {
-                close();
-            }
-        }
-        auto data = readBuffer[readPosition] ^ frameMask[frameMaskingPosition];
-        readPosition++;
-        bytesLeftInCurrentMsg--;
-        frameMaskingPosition = (frameMaskingPosition + 1) % 4;
-        return data;
+            return readPosition < readAvailable;
         }
     }
     else {
         // we need to read a new frame
-        if(!canRead(2)) {
-            if(!canRead(2)) return 0;
+
+        readAvailable = performRawRead(&readBuffer[readPosition], WS_BUFFER_SIZE - readPosition);
+        readPosition = 0;
+
+        if(!rawAvailable()) return false;
+        uint8_t flags = readRawByte();
+        bsize_t overallLength;
+        uint8_t len = readRawByte();
+        if(!bitRead(len, WS_MASK)) {
+            close();
+             return false;
         }
-
-            uint8_t flags = readByte();
-            bsize_t overallLength;
-            uint8_t len = readByte();
-            if(!bitRead(len, WS_MASK)) return 0;
-            len = len & 0x7f;
-
-
-            // Make sure that we can read as much as needed for at least the header.
-            if(!canRead((len == WS_EXTENDED_PAYLOAD) ? 6 : 4)) {
-                return readAmt;
-            }
+        len = len & 0x7f;
+        currentState = WSS_FLAGS_READ;
 
             size_t offset;
             if(len == WS_FAIL_PAYLOAD_LEN) return 0;
@@ -346,4 +347,10 @@ void AbstractWebSocketTcMenuTransport::sendMessageOnWire(WebSocketOpcode opcode,
 void AbstractWebSocketTcMenuTransport::endMsg() {
     TagValueTransport::endMsg();
     flush();
+}
+
+uint8_t AbstractWebSocketTcMenuTransport::readRawByte() {
+    uint8_t sz[1];
+    performRawRead(sz, 1);
+    return sz[0];
 }

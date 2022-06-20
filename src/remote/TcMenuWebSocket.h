@@ -59,6 +59,9 @@ namespace tcremote {
         // these will be used to write web socket data directly, not put things in the buffer.
         virtual int performRawRead(uint8_t* buffer, size_t bufferSize)=0;
         virtual int performRawWrite(uint8_t* data, size_t dataSize)=0;
+        virtual bool rawAvailable()=0;
+
+        uint8_t readRawByte();
 
         void setState(WebSocketTransportState state) { currentState = state;}
     private:
