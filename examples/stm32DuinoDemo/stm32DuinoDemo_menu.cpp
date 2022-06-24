@@ -21,8 +21,12 @@ U8G2_SSD1306_128X64_NONAME_F_4W_HW_SPI gfx(U8G2_R0, PF13, PD15, PF12);
 U8g2Drawable gfxDrawable(&gfx);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 
+EthernetServer httpServer(80);
+TcMenuWebServer webServer(&httpServer);
+
+EthernetServer wsServer(3333);
 TcMenuWebSockTransport wsTransport2;
-TcMenuWebSockInitialisation wsInitialisation2("/ws");
+TcMenuWebSockInitialisation wsInitialisation2(&wsServer, "/ws");
 tcremote::TagValueRemoteServerConnection remoteServerConnection2(wsTransport2, wsInitialisation2);
 
 
@@ -77,7 +81,12 @@ void setupMenu() {
     renderer.setUpdatesPerSecond(5);
     switches.init(internalDigitalIo(), SWITCHES_POLL_EVERYTHING, true);
     menuMgr.initForEncoder(&renderer, &menuDecimal, PC8, PC10, PC9);
+
     remoteServer.addConnection(&remoteServerConnection2);
+    prepareWebServer(webServer);
+    httpServer.begin();
+    wsServer.begin();
+
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_ALWAYS);
     renderer.setUseSliderForAnalog(false);
     installMonoInverseTitleTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(u8g2_font_prospero_bold_nbp_tr, 1), true);

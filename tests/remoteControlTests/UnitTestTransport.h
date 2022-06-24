@@ -2,9 +2,14 @@
 #ifndef UNITTEST_TRANSPORT_H
 #define UNITTEST_TRANSPORT_H
 
+#include <Arduino.h>
 #include <SCCircularBuffer.h>
 #include <RemoteConnector.h>
-#include <inttypes.h>
+#include <remote/TcMenuWebSocket.h>
+
+using namespace tcremote;
+
+extern const uint8_t serverMask[];
 
 class ReceivedMessage {
 private:
@@ -129,5 +134,87 @@ public:
 };
 
 bool checkForMessageOfType(BtreeList<uint16_t, ReceivedMessage> msgs, uint16_t msgType, const char* expected);
+
+class UnitTestWebSockTransport : public AbstractWebSocketTcMenuTransport {
+private:
+    bool isConnected;
+    bool hasClosed;
+    SCCircularBuffer readScBuffer;
+    SCCircularBuffer writeScBuffer;
+    BtreeList<uint16_t, ReceivedMessage> receivedMessages;
+public:
+    explicit UnitTestWebSockTransport(bsize_t sz = 125): AbstractWebSocketTcMenuTransport(sz), isConnected(false), hasClosed(false), readScBuffer(512), writeScBuffer(512) {}
+
+    int performRawRead(uint8_t *buffer, size_t bufferSize) override {
+        int pos = 0;
+        while(readScBuffer.available() && pos < bufferSize) {
+            buffer[pos] = readScBuffer.get();
+            pos++;
+        }
+        return pos;
+    }
+
+    void simulateRxFromClient(const char* data) {
+        while(*data) {
+            readScBuffer.put(*data);
+            data++;
+        }
+    }
+
+    int performRawWrite(const uint8_t *data, size_t dataSize) override {
+        size_t pos = 0;
+        while(pos < dataSize) {
+            writeScBuffer.put(data[pos]);
+            pos++;
+        }
+        return pos;
+    }
+
+    bool available() override { return true;}
+
+    int getClientTxBytesRaw(char *data, int size) {
+        int pos=0;
+        while(writeScBuffer.available() && pos < size ) {
+            data[pos] = (char)(writeScBuffer.get());
+            pos++;
+        }
+        return pos;
+    }
+
+    void reset(bool connectionState = false) {
+        // clear out both buffers and reset to not connected.
+        while(readScBuffer.available()) readScBuffer.get();
+        while(writeScBuffer.available()) writeScBuffer.get();
+        isConnected = connectionState;
+        bytesLeftInCurrentMsg = 0;
+        frameMaskingPosition = 0;
+        writePosition = 0;
+        readAvail = 0;
+        readPosition = 0;
+        currentState = tcremote::WSS_NOT_CONNECTED;
+    }
+
+    void close() override {
+        hasClosed = true;
+    }
+
+    bool didClose() {
+        return hasClosed;
+    }
+
+    bool connected() override {
+        return isConnected;
+    }
+
+    WebSocketTransportState getState() { return currentState; }
+
+    void simulateIncomingMsg(uint16_t msgType, const char *data, bool masked);
+
+    BtreeList<uint16_t, ReceivedMessage>& getReceivedMessages() {
+        return receivedMessages;
+    }
+
+    void flush() override;
+};
 
 #endif // UNITTEST_TRANSPORT_H

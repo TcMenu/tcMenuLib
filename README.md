@@ -65,3 +65,9 @@ There is a forum where questions can be asked, but the rules of engagement are: 
 * [TCC Community forum](https://www.thecoderscorner.com/jforum/)
 * [Commercial support](https://www.thecoderscorner.com/all-contact)
 * I also monitor the Arduino forum [https://forum.arduino.cc/], Arduino related questions can be asked there too, please make sure the library name is in the subject.
+
+## Notes about code used from other sources
+
+### Arduino WebServer/WebSocket support
+
+* SHA1 implementation in remote directory is heavily based on the version from @CTrabant - https://github.com/CTrabant/teeny-sha1, using tcMenu direct websockets assumes you are also happy with its MIT license.

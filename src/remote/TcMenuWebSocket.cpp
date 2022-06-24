@@ -56,18 +56,24 @@ using namespace tcremote;
 
 // initialisation class
 
-char AbstractWebSocketTcMenuInitialisation::readCharFromTransport() {
+char HttpProcessor::readCharFromTransport() {
     while(transport->connected()) {
         if(transport->available()) {
             return transport->readByte();
         } else {
-            taskManager.yieldForMicros(100);
+#ifndef TC_DEBUG_SOCKET_LAYER
+            if((millis() - millisStart) > 2000) {
+                protocolError = true;
+                return -1;
+            }
+#endif
+            taskManager.yieldForMicros(1000);
         }
     }
     return 0;
 }
 
-bool AbstractWebSocketTcMenuInitialisation::readWordUntilTrim(char* buffer, size_t bufferSize, bool skipSeparator) {
+bool HttpProcessor::readWordUntilTrim(char* buffer, size_t bufferSize, bool skipSeparator) {
     unsigned int pos = 0;
     bool wordRead = false;
     bool trimming = true;
@@ -94,32 +100,55 @@ bool AbstractWebSocketTcMenuInitialisation::readWordUntilTrim(char* buffer, size
     return endOfLine;
 }
 
-WebSocketHeader AbstractWebSocketTcMenuInitialisation::processHeader(char* buffer, size_t bufferSize) {
+WebServerHeader HttpProcessor::processHeader(char* buffer, size_t bufferSize) {
     if(readWordUntilTrim(buffer, bufferSize)) return WSH_FINISHED;
-    if(strcmp(buffer, "GET") == 0) {
-        bool eol = readWordUntilTrim(buffer, bufferSize);
-        if(strcmp_P(buffer, expectedPath)!=0) return WSH_ERROR;
-        if(!eol) readWordUntilTrim(buffer, bufferSize, true); // and chew up the protocol if needed.
-        return WSH_GET;
+    bool getRequest = strcmp(buffer, "GET") == 0;
+    bool postRequest = strcmp(buffer, "POST") == 0;
+    if(getRequest || postRequest) {
+        if(readWordUntilTrim(buffer, bufferSize)) return WSH_ERROR; // missing HTTP/1.1
+        char sz[10];
+        if(!readWordUntilTrim(sz, sizeof sz, true)) return WSH_ERROR; // protocol eg HTTP*
+        if(protocolError || strncmp(sz, "HTTP", 4) != 0) return WSH_ERROR;
+        return getRequest ? WSH_GET : WSH_POST;
     } else {
+        if(strcmp(buffer, "Host") == 0) {
+            if(!readWordUntilTrim(buffer, bufferSize)) return WSH_ERROR;
+            if(protocolError) return WSH_ERROR;
+            return WSH_HOST;
+        }
+        if(strcmp(buffer, "User-Agent") == 0) {
+            if(!readWordUntilTrim(buffer, bufferSize)) return WSH_ERROR;
+            if(protocolError) return WSH_ERROR;
+            return WSH_USER_AGENT;
+        }
         if(strcmp(buffer, "Upgrade")==0) {
             if(!readWordUntilTrim(buffer, bufferSize)) return WSH_ERROR;
+            if(protocolError) return WSH_ERROR;
             if(strcmp(buffer, "websocket") == 0) {
                 return WSH_UPGRADE_TO_WEBSOCKET;
             }
         } else if(strcmp(buffer, "Connection") == 0) {
             readWordUntilTrim(buffer, bufferSize);
+            if(protocolError) return WSH_ERROR;
             if(strcmp(buffer, "Upgrade") == 0) {
                 return WSH_UPGRADE_TO_WEBSOCKET;
             }
         } else if(strcmp(buffer, "Sec-WebSocket-Key") == 0) {
             if(!readWordUntilTrim(buffer, bufferSize, true)) return WSH_ERROR;
+            if(protocolError) return WSH_ERROR;
             return WSH_SEC_WS_KEY;
         } else {
             readWordUntilTrim(buffer, bufferSize, true);
+            if(protocolError) return WSH_ERROR;
         }
     }
     return WSH_UNPROCESSED;
+}
+
+void HttpProcessor::setTransport(AbstractWebSocketTcMenuTransport *tx) {
+    transport = tx;
+    millisStart = millis();
+    protocolError = false;
 }
 
 void writePgmStrToTransport(AbstractWebSocketTcMenuTransport* transport, const char* pgmData) {
@@ -130,14 +159,16 @@ void writePgmStrToTransport(AbstractWebSocketTcMenuTransport* transport, const c
 
 bool AbstractWebSocketTcMenuInitialisation::performUpgradeOnClient(AbstractWebSocketTcMenuTransport* t) {
     this->transport = t;
-    this->transport->setState(WSS_UPGRADING);
+    processor.setTransport(t);
+    this->transport->setState(WSS_HTTP_REQUEST);
     bool reachedEndOfHeader = false;
     bool getReceivedOK = false;
     bool hasUpgraded = false;
     char sz[64];
     char sha1Space[32];
     while(!reachedEndOfHeader && transport->connected()) {
-        auto hdrName = processHeader(sz, sizeof sz);
+        auto hdrName = processor.processHeader(sz, sizeof sz);
+
         switch(hdrName) {
         case WSH_ERROR:
             reachedEndOfHeader = true;
@@ -146,7 +177,7 @@ bool AbstractWebSocketTcMenuInitialisation::performUpgradeOnClient(AbstractWebSo
             hasUpgraded = true;
             break;
         case WSH_GET:
-            getReceivedOK = true;
+            getReceivedOK = strcmp_P(sz, expectedPath)==0;
             break;
         case WSH_FINISHED:
             reachedEndOfHeader = true;
@@ -301,10 +332,11 @@ bool AbstractWebSocketTcMenuTransport::readAvailable() {
                 break;
         }
     }
+    return false;
 }
 
 uint8_t AbstractWebSocketTcMenuTransport::readByte() {
-    if(currentState == WSS_UPGRADING) {
+    if(currentState == WSS_HTTP_REQUEST) {
         uint8_t sz[1];
         performRawRead(sz, 1);
         return sz[0];
@@ -361,4 +393,214 @@ void AbstractWebSocketTcMenuTransport::sendMessageOnWire(WebSocketOpcode opcode,
 void AbstractWebSocketTcMenuTransport::endMsg() {
     TagValueTransport::endMsg();
     flush();
+}
+
+// ------------ Web server
+
+AbstractLightweightWebServer::AbstractLightweightWebServer() {}
+
+void AbstractLightweightWebServer::init() {
+    taskManager.registerEvent(this);
+}
+
+void AbstractLightweightWebServer::exec() {
+    if(response.getMode() == WebServerResponse::TRANSPORT_ASSIGNED) {
+        response.setMode(WebServerResponse::READING_HEADERS);
+        if (!response.processHeaders()) return;
+        findAndAssociateUrl(response.getPath(), response.getMethod());
+    }
+}
+
+uint32_t AbstractLightweightWebServer::timeOfNextCheck() {
+    if(response.getMode() != WebServerResponse::NOT_IN_USE) {
+        markTriggeredAndNotify();
+        return millisToMicros(1);
+    } else {
+        AbstractWebSocketTcMenuTransport *pTransport = attemptNewConnection();
+        if(pTransport) {
+            response.setTransport(pTransport);
+            markTriggeredAndNotify();
+            return millisToMicros(1);
+        }
+        return millisToMicros(100);
+    }
+}
+
+void AbstractLightweightWebServer::findAndAssociateUrl(const char* path, WebServerMethod method) {
+    for(auto urlWithHandler : urlHandlers) {
+        if(urlWithHandler.isRequestCompatible(path, method)) {
+            urlWithHandler.handleUrl(response);
+            if(response.getMode() != WebServerResponse::NOT_IN_USE) {
+                response.end();
+            }
+            return;
+        }
+    }
+
+    // we didn't find a handler...
+
+    response.startHeader(WS_INT_RESPONSE_NOT_FOUND, WS_TEXT_RESPONSE_NOT_FOUND);
+    response.contentInfo(WebServerResponse::PLAIN_TEXT, 0);
+    response.end();
+
+}
+
+void WebServerResponse::contentInfo(WSRContentType contentType, size_t len) {
+    const char *headerText;
+    switch(contentType) {
+        case WebServerResponse::HTML_TEXT:
+            headerText = "text/html";
+            break;
+        case WebServerResponse::PNG_IMAGE:
+            headerText = "image/png";
+            break;
+        case WebServerResponse::JPG_IMAGE:
+            headerText = "image/jpeg";
+            break;
+        case WebServerResponse::JSON_TEXT:
+            headerText = "application/json";
+            break;
+        default:
+            headerText = "text/plain";
+            break;
+    }
+    setHeader(WSH_CONTENT_TYPE, headerText);
+
+    char sz[10];
+    itoa((int)len, sz, 10);
+    setHeader(WSH_CONTENT_LENGTH, sz);
+}
+
+void WebServerResponse::startHeader(int code, const char* textualInfo) {
+    mode = PREPARING_HEADER;
+    uint8_t* dataArea = transport->getReadBuffer();
+    size_t buffSize = transport->getReadBufferSize();
+    strcpy((char*)dataArea, "HTTP/1.1 ");
+    char sz[32];
+    itoa(code, sz, 10);
+    strcat((char*)dataArea, sz);
+    appendChar((char*)dataArea, ' ', buffSize);
+    strcat((char*)dataArea, textualInfo);
+    strcat((char*)dataArea, "\r\n");
+    transport->performRawWrite(dataArea, strlen((char*)dataArea));
+    setHeader(WSH_SERVER, WS_SERVER_NAME);
+#if defined(WS_RTC_INTEGRATED)
+    rtcUTCDateInWebForm(sz, sizeof sz);
+    setHeader(WSH_DATE, sz)
+#endif
+}
+
+const char* getHeaderAsText(WebServerHeader header) {
+    switch(header) {
+        case WebServerHeader::WSH_SERVER: return "Server: ";
+        case WebServerHeader::WSH_CONTENT_TYPE: return "Content-Type: ";
+        case WebServerHeader::WSH_CONTENT_LENGTH: return "Content-Length: ";
+        case WebServerHeader::WSH_DATE: return "Date: ";
+        case WebServerHeader::WSH_LAST_MODIFIED: return "Last-Modified: ";
+        case WebServerHeader::WSH_CACHE_CONTROL: return "Cache-Control: ";
+        case WebServerHeader::WSH_CONTENT_ENCODING: return "Content-Encoding: ";
+        default: return nullptr; // shouldn't be sent
+    }
+}
+
+void WebServerResponse::setHeader(WebServerHeader header, const char *headerValue) {
+    auto hdrField = getHeaderAsText(header);
+    if(!hdrField || !headerValue) return; // can't be encoded safely
+
+    uint8_t* dataArea = transport->getReadBuffer();
+    strcpy((char*)dataArea, hdrField);
+    strcat((char*)dataArea, headerValue);
+    strcat((char*)dataArea, "\r\n");
+    transport->performRawWrite(dataArea, strlen((char*)dataArea));
+}
+
+void WebServerResponse::startData() {
+    mode = PREPARING_CONTENT;
+    transport->performRawWrite((uint8_t*)"\r\n", 2);
+}
+
+bool WebServerResponse::send(const uint8_t *startingLocation, size_t numBytes) {
+    if(mode != PREPARING_CONTENT) startData();
+    size_t bytesSent = 0;
+    while(bytesSent < numBytes) {
+        size_t toSend = min(500U, numBytes);
+        int iterations = 0;
+        while(!transport->available() && transport->connected() && ++iterations < 100) {
+            taskManager.yieldForMicros(1000);
+        }
+        auto actual = transport->performRawWrite(&startingLocation[bytesSent], toSend);
+        if(actual == 0) {
+            transport->close();
+            return false;
+        }
+        bytesSent += actual;
+    }
+    return bytesSent == numBytes;
+}
+
+bool WebServerResponse::send_P(const uint8_t *startingLocation, size_t numBytes) {
+    if(mode != PREPARING_CONTENT) startData();
+    size_t bytesSent = 0;
+    while(bytesSent < numBytes) {
+        size_t toSend = min(transport->getReadBufferSize(), numBytes);
+        memcpy_P(transport->getReadBuffer(), &startingLocation[bytesSent], toSend);
+        int iterations = 0;
+        while(!transport->available() && transport->connected() && ++iterations < 100) {
+            taskManager.yieldForMicros(1000);
+        }
+        auto actual = transport->performRawWrite(transport->getReadBuffer(), toSend);
+        if(actual == 0) {
+            transport->close();
+            return false;
+        }
+        bytesSent += actual;
+    }
+    return bytesSent == numBytes;
+}
+
+bool WebServerResponse::processHeaders() {
+    HttpProcessor processor;
+    processor.setTransport(transport);
+    bool foundEndOfRequest = false;
+    bool validGetReceived = false;
+    while(!foundEndOfRequest) {
+        auto hdrType = processor.processHeader((char*)transport->getReadBuffer(), transport->getReadBufferSize());
+        switch (hdrType) {
+            case WSH_GET:
+            case WSH_POST:
+                strncpy(pathText, (char*)transport->getReadBuffer(), sizeof pathText);
+                method = hdrType == WSH_GET ? GET : POST;
+                validGetReceived = true;
+                break;
+            case WSH_FINISHED:
+                foundEndOfRequest = true;
+                break;
+            case WSH_ERROR:
+                validGetReceived = false;
+                foundEndOfRequest = true;
+                break;
+            default:
+                break;
+        }
+    }
+    if(!validGetReceived) {
+        startHeader(WS_INT_RESPONSE_INT_ERR, "Parse error");
+        contentInfo(PLAIN_TEXT, 0);
+        end();
+    }
+    return validGetReceived;
+}
+
+void WebServerResponse::end() {
+    if(mode != PREPARING_CONTENT) {
+        transport->performRawWrite((uint8_t*)"\r\n", 2);
+    }
+    transport->close();
+    mode = NOT_IN_USE;
+}
+
+void WebServerResponse::setTransport(AbstractWebSocketTcMenuTransport *tx) {
+    transport = tx;
+    transport->setState(WSS_HTTP_REQUEST); // regular http request.
+    mode = TRANSPORT_ASSIGNED;
 }

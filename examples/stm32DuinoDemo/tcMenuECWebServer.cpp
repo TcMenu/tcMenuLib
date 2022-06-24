@@ -32,14 +32,28 @@ bool TcMenuWebSockInitialisation::attemptNewConnection(tcremote::BaseRemoteServe
     if(client) {
         serdebugF("Client found");
         auto* tvCon = reinterpret_cast<TagValueRemoteServerConnection*>(remoteConnection);
-        reinterpret_cast<TcMenuWebSockTransport*>(tvCon->transport())->setClient(client);
-        if(performUpgradeOnClient(tvCon->transport())) {
+        auto* wsTransport = reinterpret_cast<TcMenuWebSockTransport*>(tvCon->transport());
+        wsTransport->setClient(client);
+        if(performUpgradeOnClient(wsTransport)) {
             serdebugF("Transport upgraded");
             return true;
         } else {
             tvCon->transport()->close();
             return false;
         }
-    }
+    } else return false;
 }
 
+AbstractWebSocketTcMenuTransport *TcMenuWebServer::attemptNewConnection() {
+    if(transport.connected()) return nullptr; // doing something already, cannot reconnect yet.
+
+    EthernetClient cl = server->available();
+    if(cl) {
+        transport.setClient(cl);
+        return &transport;
+    }
+
+    return nullptr;
+}
+
+TcMenuWebServer::TcMenuWebServer(EthernetServer *server) : transport(), server(server) {}

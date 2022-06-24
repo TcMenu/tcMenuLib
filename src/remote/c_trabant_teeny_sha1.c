@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Teeny SHA-1
+ * Teeny SHA-1 - https://github.com/CTrabant/teeny-sha1
  *
  * The below sha1digest() calculates a SHA-1 hash value for a
  * specified data buffer and generates a hex representation of the

@@ -23,6 +23,10 @@ public:
         setState(tcremote::WSS_UPGRADING);
     }
 
+    bool available() {
+        return client.availableForWrite();
+    }
+
     bool connected() override {
         return client.connected();
     }
@@ -40,11 +44,23 @@ class TcMenuWebSockInitialisation : public tcremote::AbstractWebSocketTcMenuInit
 private:
     EthernetServer* server;
 public:
-    TcMenuWebSockInitialisation(const char *expectedPath) : AbstractWebSocketTcMenuInitialisation(expectedPath) {}
+    TcMenuWebSockInitialisation(EthernetServer* server, const char *expectedPath) : AbstractWebSocketTcMenuInitialisation(expectedPath) {}
     bool attemptInitialisation() override;
     bool attemptNewConnection(tcremote::BaseRemoteServerConnection* remoteConnection) override;
 };
 
 void webServerInitialise();
+
+class TcMenuWebServer : public tcremote::AbstractLightweightWebServer {
+private:
+    TcMenuWebSockTransport transport;
+    EthernetServer* server;
+public:
+    TcMenuWebServer(EthernetServer *server);
+
+    tcremote::AbstractWebSocketTcMenuTransport *attemptNewConnection() override;
+};
+
+void prepareWebServer(TcMenuWebServer& webServer);
 
 #endif //TCLIBRARYDEV_TCMENUECWEBSERVER_H

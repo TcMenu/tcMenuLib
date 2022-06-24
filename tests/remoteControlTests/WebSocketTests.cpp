@@ -27,138 +27,6 @@ const char EXPECTED_HTTP_RESPONSE[] = "HTTP/1.1 101 Switching Protocols\r\n"
                                     "Connection: Upgrade\r\n"
                                     "Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=\r\n\r\n";
 
-class UnitTestWebSockTransport : public AbstractWebSocketTcMenuTransport {
-private:
-    bool isConnected;
-    bool hasClosed;
-    SCCircularBuffer readScBuffer;
-    SCCircularBuffer writeScBuffer;
-    BtreeList<uint16_t, ReceivedMessage> receivedMessages;
-public:
-    UnitTestWebSockTransport(): isConnected(false), hasClosed(false), readScBuffer(512), writeScBuffer(512) {}
-
-    int performRawRead(uint8_t *buffer, size_t bufferSize) override {
-        int pos = 0;
-        while(readScBuffer.available() && pos < bufferSize) {
-            buffer[pos] = readScBuffer.get();
-            pos++;
-        }
-        return pos;
-    }
-
-    void simulateRxFromClient(const char* data) {
-        while(*data) {
-            readScBuffer.put(*data);
-            data++;
-        }
-    }
-
-    int performRawWrite(const uint8_t *data, size_t dataSize) override {
-        size_t pos = 0;
-        while(pos < dataSize) {
-            writeScBuffer.put(data[pos]);
-            pos++;
-        }
-        return pos;
-    }
-
-    bool available() override { return true;}
-
-    int getClientTxBytesRaw(char *data, int size) {
-        int pos=0;
-        while(writeScBuffer.available() && pos < size ) {
-            data[pos] = (char)(writeScBuffer.get());
-            pos++;
-        }
-        return pos;
-    }
-
-    void reset(bool connectionState = false) {
-        // clear out both buffers and reset to not connected.
-        while(readScBuffer.available()) readScBuffer.get();
-        while(writeScBuffer.available()) writeScBuffer.get();
-        isConnected = connectionState;
-        bytesLeftInCurrentMsg = 0;
-        frameMaskingPosition = 0;
-        writePosition = 0;
-        readAvail = 0;
-        readPosition = 0;
-        currentState = WSS_NOT_CONNECTED;
-    }
-
-    void close() override {
-        hasClosed = true;
-    }
-
-    bool connected() override {
-        return isConnected;
-    }
-
-    WebSocketTransportState getState() { return currentState; }
-
-    void simulateIncomingMsg(uint16_t msgType, const char *data, bool masked) {
-
-        readScBuffer.put(0x81);
-        auto dataLen = strlen(data) + 5;
-        uint8_t maskData = masked ? 0x80 : 0;
-        if(dataLen > 125) {
-            readScBuffer.put(maskData | 126);
-            readScBuffer.put(dataLen >> 8);
-            readScBuffer.put(dataLen & 0xff);
-        } else {
-            readScBuffer.put(maskData | dataLen);
-        }
-
-        if(masked) {
-            readScBuffer.put(serverMask[0]); // mask 4 bytes
-            readScBuffer.put(serverMask[1]);
-            readScBuffer.put(serverMask[2]);
-            readScBuffer.put(serverMask[3]);
-        }
-        else {
-            readScBuffer.put(dataLen);
-        }
-        readScBuffer.put(0x01 ^ serverMask[0]); // start
-        readScBuffer.put(0x01 ^ serverMask[1]); // tag val
-        readScBuffer.put((msgType >> 8) ^ serverMask[2]);
-        readScBuffer.put((msgType & 0xff) ^ serverMask[3]);
-        int maskPosition = 0;
-        while(*data) { // data
-            readScBuffer.put(*data ^ serverMask[maskPosition%4]);
-            maskPosition++;
-            data++;
-        }
-        readScBuffer.put(0x02 ^ serverMask[maskPosition%4]); // end
-    }
-
-    BtreeList<uint16_t, ReceivedMessage>& getReceivedMessages() {
-        return receivedMessages;
-    }
-
-    void flush() override {
-        AbstractWebSocketTcMenuTransport::flush();
-        int fl = writeScBuffer.get();
-        if(fl != 0x81) return; // Final message, text
-        int len = writeScBuffer.get();
-        if(len > 125) {
-            return; // don't handle extended case
-        }
-        char sz[128];
-        int i;
-        for(i=0;i<len;i++) {
-            sz[i] = writeScBuffer.get();
-        }
-        sz[i]=0;
-        int pos = 0;
-        if(sz[pos++] != 0x01 || sz[pos++] != 0x01) return;
-        uint16_t msgTy = sz[pos++] << 8U;
-        msgTy |= sz[pos++];
-
-        receivedMessages.add(ReceivedMessage(receivedMessages.count(), msgTy, &sz[pos]));
-
-    }
-};
-
 class UnitTestWebSockInitialisation : public AbstractWebSocketTcMenuInitialisation {
 private:
     bool connectionMade = false;
@@ -219,4 +87,64 @@ test(testPromoteWebSocket) {
 
     wsTransport.reset();
     remoteServer.clearRemotes();
+}
+
+
+void UnitTestWebSockTransport::flush() {
+    AbstractWebSocketTcMenuTransport::flush();
+    int fl = writeScBuffer.get();
+    if(fl != 0x81) return; // Final message, text
+    int len = writeScBuffer.get();
+    if(len > 125) {
+        return; // don't handle extended case
+    }
+    char sz[128];
+    int i;
+    for(i=0;i<len;i++) {
+        sz[i] = writeScBuffer.get();
+    }
+    sz[i]=0;
+    int pos = 0;
+    if(sz[pos++] != 0x01 || sz[pos++] != 0x01) return;
+    uint16_t msgTy = sz[pos++] << 8U;
+    msgTy |= sz[pos++];
+
+    receivedMessages.add(ReceivedMessage(receivedMessages.count(), msgTy, &sz[pos]));
+}
+
+void UnitTestWebSockTransport::simulateIncomingMsg(uint16_t msgType, const char *data, bool masked) {
+    {
+
+        readScBuffer.put(0x81);
+        auto dataLen = strlen(data) + 5;
+        uint8_t maskData = masked ? 0x80 : 0;
+        if(dataLen > 125) {
+            readScBuffer.put(maskData | 126);
+            readScBuffer.put(dataLen >> 8);
+            readScBuffer.put(dataLen & 0xff);
+        } else {
+            readScBuffer.put(maskData | dataLen);
+        }
+
+        if(masked) {
+            readScBuffer.put(serverMask[0]); // mask 4 bytes
+            readScBuffer.put(serverMask[1]);
+            readScBuffer.put(serverMask[2]);
+            readScBuffer.put(serverMask[3]);
+        }
+        else {
+            readScBuffer.put(dataLen);
+        }
+        readScBuffer.put(0x01 ^ serverMask[0]); // start
+        readScBuffer.put(0x01 ^ serverMask[1]); // tag val
+        readScBuffer.put((msgType >> 8) ^ serverMask[2]);
+        readScBuffer.put((msgType & 0xff) ^ serverMask[3]);
+        int maskPosition = 0;
+        while(*data) { // data
+            readScBuffer.put(*data ^ serverMask[maskPosition%4]);
+            maskPosition++;
+            data++;
+        }
+        readScBuffer.put(0x02 ^ serverMask[maskPosition%4]); // end
+    }
 }
