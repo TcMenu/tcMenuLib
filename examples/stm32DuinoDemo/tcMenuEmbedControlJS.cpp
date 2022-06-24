@@ -75,10 +75,26 @@ const char webs_static_js_2_70c1c58c_chunk_js_LICENSE_txt[] PROGMEM = {
     " */" \
 };
 
+const char index_html[] PROGMEM = "<html>\n"
+ "    <head><title>Hello</title></head>\n"
+ "    <body>\n"
+ "        <h1>Hello world</h1>\n"
+ "        <p>This is served by tcMenu</p>\n"
+ "    </body>\n"
+ "</html>";
+
 const char lastModifiedStatic[] = "Wed, 22 Jul 2009 19:15:56 GMT";
 
 void prepareWebServer(TcMenuWebServer& webServer) {
-    webServer.onUrlGet("/asset-manifest.json", [](tcremote::WebServerResponse response) {
+    //webServer.setRootWelome("/index.html");
+
+    webServer.onUrlGet("/index.html", [](tcremote::WebServerResponse &response) {
+        response.startHeader();
+        response.setHeader(tcremote::WSH_LAST_MODIFIED, lastModifiedStatic);
+        response.contentInfo(tcremote::WebServerResponse::HTML_TEXT, sizeof(index_html) -1);
+        response.send_P(index_html, sizeof(index_html) - 1);
+    });
+    webServer.onUrlGet("/asset-manifest.json", [](tcremote::WebServerResponse& response) {
         response.startHeader();
         response.setHeader(tcremote::WSH_CONTENT_ENCODING, "gzip");
         response.setHeader(tcremote::WSH_CACHE_CONTROL, "max-age=2592000");

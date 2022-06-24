@@ -20,10 +20,10 @@ public:
 
     void setClient(EthernetClient newClient) {
         client = newClient;
-        setState(tcremote::WSS_UPGRADING);
+        setState(tcremote::WSS_HTTP_REQUEST);
     }
 
-    bool available() {
+    bool available() override {
         return client.availableForWrite();
     }
 
@@ -36,7 +36,7 @@ public:
     }
 
     int performRawWrite(const uint8_t* data, size_t dataSize) override {
-        return client.write(data, dataSize);
+        return (int)client.write(data, dataSize);
     }
 };
 
@@ -44,19 +44,17 @@ class TcMenuWebSockInitialisation : public tcremote::AbstractWebSocketTcMenuInit
 private:
     EthernetServer* server;
 public:
-    TcMenuWebSockInitialisation(EthernetServer* server, const char *expectedPath) : AbstractWebSocketTcMenuInitialisation(expectedPath) {}
+    TcMenuWebSockInitialisation(EthernetServer* server, const char *expectedPath) : AbstractWebSocketTcMenuInitialisation(expectedPath), server(server) {}
     bool attemptInitialisation() override;
     bool attemptNewConnection(tcremote::BaseRemoteServerConnection* remoteConnection) override;
 };
-
-void webServerInitialise();
 
 class TcMenuWebServer : public tcremote::AbstractLightweightWebServer {
 private:
     TcMenuWebSockTransport transport;
     EthernetServer* server;
 public:
-    TcMenuWebServer(EthernetServer *server);
+    explicit TcMenuWebServer(EthernetServer *server);
 
     tcremote::AbstractWebSocketTcMenuTransport *attemptNewConnection() override;
 };

@@ -132,6 +132,8 @@ namespace tcremote {
         void setHeader(WebServerHeader header, const char* headerValue);
         void contentInfo(WSRContentType contentType, size_t len);
         void startData();
+        bool send_P(const char* startingLocation, size_t numBytes) { send_P((uint8_t*) startingLocation, numBytes);}
+        bool send(const char* startingLocation, size_t numBytes) { send((uint8_t*)startingLocation, numBytes);}
         bool send_P(const uint8_t* startingLocation, size_t numBytes);
         bool send(const uint8_t* startingLocation, size_t numBytes);
         void end();
