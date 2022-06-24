@@ -15,7 +15,7 @@ private:
     bool shouldFillBuffer = true;
 public:
     UnitTestBufferedTransport(BufferingMode bufferMode, const char *expected)
-                : BaseBufferedRemoteTransport(bufferMode, 24, 24), expectedData(expected) {}
+                : BaseBufferedRemoteTransport(bufferMode, 24, 32), expectedData(expected) {}
 
     int fillReadBuffer(uint8_t *dataBuffer, int maxSize) override {
         if(shouldFillBuffer) {
@@ -59,9 +59,12 @@ test(testBufferedTransportReadB) {
 
     int availableCount = 0;
     for(int i=1; i<100; i++) {
-        availableCount++;
-        transport.readByte();
+        if(transport.readAvailable()) {
+            availableCount++;
+            transport.readByte();
+        }
     }
+    assertTrue(availableCount < 25);
 }
 
 test(testBufferTransportWriteBufferOneMsg) {
@@ -76,15 +79,16 @@ test(testBufferTransportWriteBufferOneMsg) {
 }
 
 test(testBufferTransportWriteBufferMulti) {
-    UnitTestBufferedTransport transport(BUFFER_MESSAGES_TILL_FULL, "\001\001NJB1=12|\002\001\001HBB1=2\002");
+    UnitTestBufferedTransport transport(BUFFER_MESSAGES_TILL_FULL, "\001\001NJB1=12|\002\001\001HBB1=2|\002");
 
     transport.startMsg(MSG_JOIN);
     transport.writeFieldInt(FIELD_BUTTON1, 12);
     transport.endMsg();
 
     transport.startMsg(MSG_HEARTBEAT);
-    transport.writeFieldInt(2);
+    transport.writeFieldInt(FIELD_BUTTON1, 2);
     transport.endMsg();
 
+    transport.flush();
     assertTrue(transport.didCompleteSuccessfully());
 }

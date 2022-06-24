@@ -20,10 +20,7 @@ public:
 
     void setClient(EthernetClient newClient) {
         client = newClient;
-    }
-
-    bool available() override {
-        return client.availableForWrite();
+        setState(tcremote::WSS_UPGRADING);
     }
 
     bool connected() override {
@@ -34,13 +31,8 @@ public:
         return client.read(buffer, bufferSize);
     }
 
-    int performRawWrite(uint8_t data) override {
-        client.write(data);
-        return 1;
-    }
-
-    void performRawFlush() override {
-        client.flush();
+    int performRawWrite(const uint8_t* data, size_t dataSize) override {
+        return client.write(data, dataSize);
     }
 };
 

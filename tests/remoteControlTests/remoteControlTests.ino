@@ -1,4 +1,4 @@
-#line 2 "tcMenuCoreTests.ino"
+#line 2 "remoteControlTests.ino"
 
 #include <AUnit.h>
 #include <tcMenu.h>
@@ -12,7 +12,7 @@ BooleanMenuItem menu12VStandby(&minfo12VStandby, false, nullptr);
 RENDERING_CALLBACK_NAME_INVOKE(backSubSettingsFn, backSubItemRenderFn, "Settings", 0xffff, NULL)
 BackMenuItem menuBackSettings(backSubSettingsFn, &menu12VStandby);
 const PROGMEM SubMenuInfo minfoSettings = { "Settings", 3, 0xffff, 0, NO_CALLBACK };
-SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, &menuStatus);
+SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, nullptr);
 const char enumStrChannel_0[] PROGMEM = "CD Player";
 const char enumStrChannel_1[] PROGMEM = "Turntable";
 const char enumStrChannel_2[] PROGMEM = "Computer";

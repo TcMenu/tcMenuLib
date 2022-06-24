@@ -86,7 +86,3 @@ void BaseBufferedRemoteTransport::close() {
     currentField.msgType = UNKNOWN_MSG_TYPE;
     currentField.fieldType = FVAL_PROCESSING_AWAITINGMSG;
 }
-
-bool BaseBufferedRemoteTransport::canRead(int amt) {
-    return (readBufferPos + amt) < readBufferAvail;
-}

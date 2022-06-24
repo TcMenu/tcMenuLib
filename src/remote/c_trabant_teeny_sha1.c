@@ -15,7 +15,6 @@
  * the declaration (example below) in the sources files where needed.
  ******************************************************************************/
 
-#include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,6 +22,13 @@
 /* Declaration:
 extern int sha1digest(uint8_t *digest, char *hexdigest, const uint8_t *data, size_t databytes);
 */
+
+void hexDigestOut(uint8_t* hexDigest, uint32_t d) {
+    hexDigest[3] = d & 0xff;
+    hexDigest[2] = (d >> 8) & 0xff;
+    hexDigest[1] = (d >> 16) & 0xff;
+    hexDigest[0] = (d >> 24) & 0xff;
+}
 
 /*******************************************************************************
  * sha1digest: https://github.com/CTrabant/teeny-sha1
@@ -39,14 +45,14 @@ extern int sha1digest(uint8_t *digest, char *hexdigest, const uint8_t *data, siz
  *    databytes -- bytes in data buffer to be hashed
  *
  * @output:
- *    hexDigest    -- the result, in raw form, 5 32 bit words in an array
+ *    hexDigest    -- the result, in raw form, 20 8 bit words in an array
  *
  * At least one of the output buffers must be supplied.  The other, if not
  * desired, may be set to NULL.
  *
  * @return: 0 on success and non-zero on error.
  ******************************************************************************/
-int sha1digest(uint32_t *hexDigest, const uint8_t *data, size_t databytes)
+int sha1digest(uint8_t *hexDigest, const uint8_t *data, size_t databytes)
 {
 #define SHA1ROTATELEFT(value, bits) (((value) << (bits)) | ((value) >> (32 - (bits))))
 
@@ -174,11 +180,11 @@ int sha1digest(uint32_t *hexDigest, const uint8_t *data, size_t databytes)
         H[4] += e;
     }
 
-    hexDigest[0] = H[0];
-    hexDigest[1] = H[1];
-    hexDigest[2] = H[2];
-    hexDigest[3] = H[3];
-    hexDigest[4] = H[4];
+    hexDigestOut(&hexDigest[0], H[0]);
+    hexDigestOut(&hexDigest[4], H[1]);
+    hexDigestOut(&hexDigest[8], H[2]);
+    hexDigestOut(&hexDigest[12], H[3]);
+    hexDigestOut(&hexDigest[16], H[4]);
     return 0;
 
     // Commented out to reduce size on smaller boards, we only need the raw output.

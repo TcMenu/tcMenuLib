@@ -7,15 +7,14 @@
 #include "TcMenuWebSocket.h"
 
 // byte 1
-#define WS_FIN              0
-#define WS_RSV1             1
-#define WS_RSV2             2
-#define WS_RSV3             3
-#define WS_OPCODE_STRT      4
+#define WS_FIN              0x80
+#define WS_RSV1             6
+#define WS_RSV2             5
+#define WS_RSV3             4
 #define WS_OPCODE_MASK      0x0f
 
 // byte 2
-#define WS_MASK             7
+#define WS_MASKED_PAYLOAD   7
 #define WS_EXTENDED_PAYLOAD 126
 #define WS_FAIL_PAYLOAD_LEN 127
 
@@ -27,7 +26,10 @@ const char pgmWebSockUuid[] PROGMEM = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 /**
  * This is the HTTP message to allow upgrade to the WS protocol, up to the security key which will be appended.
  */
-const char pgmWebSockHeader[] PROGMEM = "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: ";
+//                                              0123456789012345678901234567890123456
+const char pgmWebSockHeaderSwitch[] PROGMEM =  "HTTP/1.1 101 Switching Protocols\r\n";
+const char pgmWebSockHeaderUpgrade[] PROGMEM = "Upgrade: websocket\r\nConnection: Upgrade\r\n";
+const char pgmWsAcceptHeaderStart[] = "Sec-WebSocket-Accept: ";
 /**
  * This comes after the security key in the response header, it is the EOL and blank line needed to terminate the HTTP side.
  */
@@ -47,7 +49,7 @@ namespace tc_b64 {
 
 // See the associated C file in this directory
 extern "C" {
-int sha1digest(uint32_t *hexDigest, const uint8_t *data, size_t databytes);
+int sha1digest(uint8_t *hexDigest, const uint8_t *data, size_t databytes);
 }
 
 using namespace tcremote;
@@ -56,7 +58,7 @@ using namespace tcremote;
 
 char AbstractWebSocketTcMenuInitialisation::readCharFromTransport() {
     while(transport->connected()) {
-        if(transport->readAvailable()) {
+        if(transport->available()) {
             return transport->readByte();
         } else {
             taskManager.yieldForMicros(100);
@@ -65,24 +67,27 @@ char AbstractWebSocketTcMenuInitialisation::readCharFromTransport() {
     return 0;
 }
 
-bool AbstractWebSocketTcMenuInitialisation::readWordUntilTrim(char* buffer, size_t bufferSize) {
+bool AbstractWebSocketTcMenuInitialisation::readWordUntilTrim(char* buffer, size_t bufferSize, bool skipSeparator) {
     unsigned int pos = 0;
     bool wordRead = false;
+    bool trimming = true;
     bool endOfLine = false;
     buffer[0] = 0;
 
     while(pos < bufferSize && !wordRead && transport->connected()) {
         auto ch = readCharFromTransport();
-        if(ch == ':') wordRead = true;
+        if(trimming && ch == ' ') continue;
+        if(!skipSeparator && (ch == ':' || ch == ' ')) wordRead = true;
         else if(ch == '\n') {
             wordRead = true;
             endOfLine = true;
         } else if(ch == '\r') {
             // ignore the \r, we are supposed to read \r\n
         } else {
+            trimming = false;
             buffer[pos] = ch;
+            pos++;
         }
-        pos++;
     }
 
     buffer[min(pos, bufferSize -1)] = 0;
@@ -91,13 +96,12 @@ bool AbstractWebSocketTcMenuInitialisation::readWordUntilTrim(char* buffer, size
 
 WebSocketHeader AbstractWebSocketTcMenuInitialisation::processHeader(char* buffer, size_t bufferSize) {
     if(readWordUntilTrim(buffer, bufferSize)) return WSH_FINISHED;
-    if(strncmp(buffer, "GET ", 4) == 0) {
+    if(strcmp(buffer, "GET") == 0) {
         bool eol = readWordUntilTrim(buffer, bufferSize);
-        if(!strcmp_P(buffer, expectedPath)) return WSH_ERROR;
-        if(!eol) readWordUntilTrim(buffer, bufferSize);
+        if(strcmp_P(buffer, expectedPath)!=0) return WSH_ERROR;
+        if(!eol) readWordUntilTrim(buffer, bufferSize, true); // and chew up the protocol if needed.
         return WSH_GET;
     } else {
-        if(readWordUntilTrim(buffer, bufferSize)) return WSH_ERROR;
         if(strcmp(buffer, "Upgrade")==0) {
             if(!readWordUntilTrim(buffer, bufferSize)) return WSH_ERROR;
             if(strcmp(buffer, "websocket") == 0) {
@@ -109,18 +113,19 @@ WebSocketHeader AbstractWebSocketTcMenuInitialisation::processHeader(char* buffe
                 return WSH_UPGRADE_TO_WEBSOCKET;
             }
         } else if(strcmp(buffer, "Sec-WebSocket-Key") == 0) {
-            if(!readWordUntilTrim(buffer, bufferSize)) return WSH_ERROR;
+            if(!readWordUntilTrim(buffer, bufferSize, true)) return WSH_ERROR;
             return WSH_SEC_WS_KEY;
+        } else {
+            readWordUntilTrim(buffer, bufferSize, true);
         }
     }
     return WSH_UNPROCESSED;
 }
 
-void writePgmStrToTransport(TagValueTransport* transport, const char* pgmData) {
-    while(*pgmData) {
-        transport->writeChar(*pgmData);
-        pgmData++;
-    }
+void writePgmStrToTransport(AbstractWebSocketTcMenuTransport* transport, const char* pgmData) {
+    char sz[42];
+    strcpy_P(sz, pgmData);
+    transport->performRawWrite((uint8_t*)sz, strlen(sz));
 }
 
 bool AbstractWebSocketTcMenuInitialisation::performUpgradeOnClient(AbstractWebSocketTcMenuTransport* t) {
@@ -133,27 +138,35 @@ bool AbstractWebSocketTcMenuInitialisation::performUpgradeOnClient(AbstractWebSo
     char sha1Space[32];
     while(!reachedEndOfHeader && transport->connected()) {
         auto hdrName = processHeader(sz, sizeof sz);
-        if(hdrName == WSH_ERROR) {
+        switch(hdrName) {
+        case WSH_ERROR:
             reachedEndOfHeader = true;
-        } else if(hdrName == WSH_UPGRADE_TO_WEBSOCKET) {
+            break;
+        case WSH_UPGRADE_TO_WEBSOCKET:
             hasUpgraded = true;
-        } else if(hdrName == WSH_GET) {
+            break;
+        case WSH_GET:
             getReceivedOK = true;
-        } else if(hdrName == WSH_FINISHED) {
+            break;
+        case WSH_FINISHED:
             reachedEndOfHeader = true;
-        } else if(hdrName == WSH_SEC_WS_KEY) {
-            unsigned long shaRaw[5];
+            break;
+        case WSH_SEC_WS_KEY: {
+            uint8_t shaRaw[20];
             strncat_P(sz, pgmWebSockUuid, sizeof(sz) - strlen(sz) - 1);
-            sha1digest(shaRaw, (uint8_t*)sz, strlen(sz));
-            tc_b64::base64((const uint8_t*)shaRaw, sizeof(shaRaw), (uint8_t*)sha1Space, sizeof sha1Space);
+            sha1digest(shaRaw, (uint8_t *) sz, strlen(sz));
+            tc_b64::base64((const uint8_t *) shaRaw, sizeof(shaRaw), (uint8_t *) sha1Space, sizeof sha1Space);
+            break;
+        }
         }
     }
 
     if(transport->connected() && reachedEndOfHeader && getReceivedOK && hasUpgraded) {
-        writePgmStrToTransport(transport, pgmWebSockHeader);
-        transport->writeStr(sha1Space);
+        writePgmStrToTransport(transport, pgmWebSockHeaderSwitch);
+        writePgmStrToTransport(transport, pgmWebSockHeaderUpgrade);
+        writePgmStrToTransport(transport, pgmWsAcceptHeaderStart);
+        transport->performRawWrite((uint8_t*)sha1Space, strlen(sha1Space));
         writePgmStrToTransport(transport, pgmWebSockHeaderPostfix);
-        transport->flush();
         this->transport->setState(WSS_IDLE);
         return true;
     } else {
@@ -196,22 +209,20 @@ namespace tc_b64 {
             innerBase64(&data[i * 3], 3, &buffer[i * 4]);
         }
         if (dataSize % 3 > 0) {
+            writtenBytes += 4;
             // It doesn't fit neatly into a 3-byte chunk, so process what's left
             innerBase64(&data[i * 3], dataSize % 3, &buffer[i * 4]);
         }
 
-        writtenBytes++;
         if(writtenBytes < bufferSize) {
             buffer[writtenBytes] = 0;
         }
         return writtenBytes;
     }
-
 }
 
-
 inline WebSocketOpcode getOpcode(uint8_t header) {
-    return (WebSocketOpcode)((header >> WS_OPCODE_STRT) & WS_OPCODE_MASK);
+    return (WebSocketOpcode)(header & WS_OPCODE_MASK);
 }
 
 void AbstractWebSocketTcMenuTransport::close() {
@@ -220,93 +231,96 @@ void AbstractWebSocketTcMenuTransport::close() {
     bytesLeftInCurrentMsg = 0;
     frameMaskingPosition = 0;
     writePosition = 0;
-    readAvailable = 0;
+    readAvail = 0;
     readPosition = 0;
     currentState = WSS_NOT_CONNECTED;
 }
 
+bool AbstractWebSocketTcMenuTransport::readAvailable() {
+    // short circuit when there's room in the buffer already.
+    if(readPosition < readAvail && currentState == WSS_PROCESSING_MSG) return true;
+
+    bool processing = true;
+    while(processing) {
+        switch (currentState) {
+            case WSS_PROCESSING_MSG:
+                if(bytesLeftInCurrentMsg > 0) {
+                    readAvail = performRawRead(readBuffer, bytesLeftInCurrentMsg);
+                    readPosition = 0;
+                    if(readAvail > 0) return true;
+                }
+                setState(WSS_IDLE); // we are now idle and trying to read the two byte frame
+                readPosition = 0;
+                processing = false;
+                break;
+            case WSS_IDLE:
+            case WSS_LEN_READ: {
+                auto actual = performRawRead(&readBuffer[readPosition], readPosition == 0 ? 2 : 1);
+                readPosition += actual;
+                if (readPosition < 2) return false;
+                setState(WSS_LEN_READ);
+                int len = readBuffer[1] & 0x7f;
+                if (len == WS_FAIL_PAYLOAD_LEN) {
+                    close();
+                    processing = false;
+                } else if (len == WS_EXTENDED_PAYLOAD) {
+                    setState(WSS_EXT_LEN_READ);
+                    processing = true;
+                } else if (len > 0) {
+                    bytesLeftInCurrentMsg = len;
+                    setState(WSS_MASK_READ);
+                }
+                if ((readBuffer[1] & 0x80) == 0) return false;
+                break;
+            }
+            case WSS_EXT_LEN_READ: {
+                auto actual = performRawRead(&readBuffer[readPosition], readPosition == 2 ? 2 : 1);
+                readPosition += actual;
+                if (readPosition < 4) return false;
+                bytesLeftInCurrentMsg = readBuffer[2] << 8;
+                bytesLeftInCurrentMsg |= readBuffer[3];
+                setState(WSS_MASK_READ);
+                processing = true;
+                break;
+            }
+            case WSS_MASK_READ: {
+                int start = (bytesLeftInCurrentMsg > 125) ? 4 : 2;
+                auto actual = performRawRead(&readBuffer[readPosition], (start + 4) - (readPosition));
+                readPosition += actual;
+                frameMask[0] = readBuffer[start];
+                frameMask[1] = readBuffer[start + 1];
+                frameMask[2] = readBuffer[start + 2];
+                frameMask[3] = readBuffer[start + 3];
+                frameMaskingPosition = 0;
+                setState(WSS_PROCESSING_MSG);
+                processing = true;
+                break;
+            }
+            default:
+                processing = false;
+                break;
+        }
+    }
+}
+
 uint8_t AbstractWebSocketTcMenuTransport::readByte() {
     if(currentState == WSS_UPGRADING) {
-        return readRawByte();
-    } else {
+        uint8_t sz[1];
+        performRawRead(sz, 1);
+        return sz[0];
+    }
+    else if(readPosition < readAvail && currentState == WSS_PROCESSING_MSG) {
         auto data = readBuffer[readPosition] ^ frameMask[frameMaskingPosition];
         readPosition++;
         bytesLeftInCurrentMsg--;
         frameMaskingPosition = (frameMaskingPosition + 1) % 4;
         return data;
     }
-}
-
-bool AbstractWebSocketTcMenuTransport::available() {
-    if(currentState == WSS_UPGRADING) {
-        return rawAvailable();
-    }
-    else if(bytesLeftInCurrentMsg > 0) {
-        if(readPosition >= readAvailable) {
-            // here we read but not past the end of the current message, each message has new framing
-            readAvailable = performRawRead(readBuffer, bytesLeftInCurrentMsg);
-            readPosition = 0;
-            return readPosition < readAvailable;
-        }
-    }
-    else {
-        // we need to read a new frame
-
-        readAvailable = performRawRead(&readBuffer[readPosition], WS_BUFFER_SIZE - readPosition);
-        readPosition = 0;
-
-        if(!rawAvailable()) return false;
-        uint8_t flags = readRawByte();
-        bsize_t overallLength;
-        uint8_t len = readRawByte();
-        if(!bitRead(len, WS_MASK)) {
-            close();
-             return false;
-        }
-        len = len & 0x7f;
-        currentState = WSS_FLAGS_READ;
-
-            size_t offset;
-            if(len == WS_FAIL_PAYLOAD_LEN) return 0;
-            if(len == WS_EXTENDED_PAYLOAD) {
-                uint8_t extLenHi = readByte();
-                uint8_t extLenLo = readByte();
-                overallLength = ((size_t)extLenHi << 8U) | extLenLo;
-                offset = 2;
-            } else {
-                overallLength = len;
-                offset = 4;
-            }
-
-            // we must be masked as it is a read op
-            for(int i=0;i<4;i++) {
-                frameMask[i]=readByte();
-            }
-
-            bytesLeftInCurrentMsg = overallLength - offset;
-            frameMaskingPosition = 0;
-
-            auto op = getOpcode(flags);
-
-            if(op == OPC_PING) {
-                uint8_t sz[2];
-                sendMessageOnWire(OPC_PONG, sz, 0);
-            }
-            else if(op == OPC_CLOSE) {
-                close();
-                return 0;
-            }
-
-
-            return overallLength;
-        }
-
-        return data;
-    }
+    else return 0xff; // fault. called without checking readAvailable
 }
 
 int AbstractWebSocketTcMenuTransport::writeChar(char data) {
-    if(writePosition >= (WS_BUFFER_SIZE - 2)) {
+    if(writePosition >= (bufferSize - 2)) {
         // we've exceeded the buffer size so we must flush, and then ensure
         // that flush actually did something and there is now capacity.
         flush();
@@ -339,7 +353,7 @@ void AbstractWebSocketTcMenuTransport::flush() {
 }
 
 void AbstractWebSocketTcMenuTransport::sendMessageOnWire(WebSocketOpcode opcode, uint8_t* buffer, size_t size) {
-    buffer[0] = (uint8_t)(WS_FIN | (opcode << 4));
+    buffer[0] = (uint8_t)(WS_FIN | opcode);
     buffer[1] = (uint8_t)size;
     performRawWrite(buffer, size + 2);
 }
@@ -347,10 +361,4 @@ void AbstractWebSocketTcMenuTransport::sendMessageOnWire(WebSocketOpcode opcode,
 void AbstractWebSocketTcMenuTransport::endMsg() {
     TagValueTransport::endMsg();
     flush();
-}
-
-uint8_t AbstractWebSocketTcMenuTransport::readRawByte() {
-    uint8_t sz[1];
-    performRawRead(sz, 1);
-    return sz[0];
 }

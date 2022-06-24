@@ -5,127 +5,13 @@
 #include <SimpleCollections.h>
 #include <remote/TcMenuWebSocket.h>
 #include "SimpleTestFixtures.h"
+#include "UnitTestTransport.h"
 
 using namespace aunit;
 using namespace tcremote;
 
 const ConnectorLocalInfo localInfo PROGMEM = { "unitTest", "699cb00d-200f-47f5-8d2e-471acbe4adb3"};
-TagValueRemoteConnector connector0(0);
 TcMenuRemoteServer remoteServer(localInfo);
-
-class ReceivedMessage {
-private:
-    uint16_t messageType;
-    char data[100];
-
-public:
-    ReceivedMessage() : messageType(0), data {} { }
-    ReceivedMessage(const ReceivedMessage& other) = default;
-    ReceivedMessage(uint8_t order, uint16_t msgType, const char* dat) : messageType(msgType) {
-        strncpy(data, dat, sizeof(data));
-    }
-    ReceivedMessage& operator= (const ReceivedMessage& other) = default;
-    uint16_t getKey() const {
-        return messageType;
-    }
-    char* getData() { return data; }
-};
-
-class TestTagValTransport : public TagValueTransport {
-private:
-    BtreeList<uint16_t, ReceivedMessage> receivedMessages;
-
-    uint16_t rawDataInPosition = 0;
-    uint16_t rawDataOutPosition = 0;
-    char rawDataIn[100];
-    char rawDataOut[100];
-    bool flushed = false;
-    bool closed = false;
-public:
-    TestTagValTransport() : TagValueTransport(TVAL_UNBUFFERED) {}
-
-    void reset() {
-        flushed = false;
-        closed = false;
-        rawDataOutPosition = 0;
-        rawDataInPosition = 0;
-        receivedMessages.clear();
-    }
-
-    void flush() override {
-        flushed = true;
-    }
-
-    int writeChar(char data) override {
-        if(rawDataInPosition >= sizeof(rawDataIn)) return 0;
-        rawDataIn[rawDataInPosition++] = data;
-        return 1;
-    }
-
-    int writeStr(const char *data) override {
-        int written = 0;
-        while(data[written] != 0) {
-            if(writeChar(data[written]) == 0) return written;
-            written++;
-        }
-    }
-
-    uint8_t readByte() override {
-        if(!readAvailable()) return -1;
-        return rawDataOut[rawDataOutPosition++];
-    }
-
-    bool readAvailable() override {
-        return (rawDataOutPosition < sizeof(rawDataOut));
-    }
-
-    bool available() override {
-        return !closed;
-    }
-
-    bool connected() override {
-        return !closed;
-    }
-
-    void close() override {
-        closed = true;
-    }
-
-    void endMsg() override {
-        TagValueTransport::endMsg();
-        rawDataIn[rawDataInPosition] = 0;
-        uint16_t pos = 0;
-        while(rawDataIn[pos] != START_OF_MESSAGE && pos < sizeof(rawDataIn)) pos++;
-        if(rawDataIn[rawDataInPosition++] == START_OF_MESSAGE && rawDataIn[pos++] == TAG_VAL_PROTOCOL) {
-            uint16_t msgTy = rawDataIn[pos++] << 8U;
-            msgTy |= rawDataIn[pos++];
-            receivedMessages.add(ReceivedMessage(receivedMessages.count(), msgTy, &rawDataIn[pos]));
-        }
-        rawDataInPosition = 0;
-    }
-
-    void pushByte(uint8_t data) {
-        if(rawDataOutPosition < sizeof(rawDataOut)) {
-            rawDataOut[rawDataOutPosition++] = (char)data;
-        }
-    }
-
-    void simulateIncomingMsg(uint16_t msgType, const char* data) {
-        pushByte(START_OF_MESSAGE);
-        pushByte(TAG_VAL_PROTOCOL);
-        pushByte(msgType >> 8U);
-        pushByte(msgType & 0xffU);
-        while(*data) {
-            pushByte(*data);
-            data++;
-        }
-        pushByte(0x02);
-    }
-
-    BtreeList<uint16_t, ReceivedMessage>& getReceivedMessages() {
-        return receivedMessages;
-    }
-};
 
 class TestTransportInitialisation : public DeviceInitialisation {
 private:
@@ -178,6 +64,7 @@ bool checkForMessageOfType(BtreeList<uint16_t, ReceivedMessage> msgs, uint16_t m
 }
 
 test(testTcMenuRemoteServer) {
+    remoteServer.clearRemotes();
     menuMgr.setRootMenu(&menuVolume);
 
     TestTagValTransport testTransport;
@@ -185,30 +72,35 @@ test(testTcMenuRemoteServer) {
     TagValueRemoteServerConnection rsc(testTransport, testInitialisation);
     remoteServer.addConnection(&rsc);
 
-    assertEqual(&connector0, remoteServer.getRemoteConnector(0));
+    assertNotEqual(nullptr, remoteServer.getRemoteConnector(0));
     assertEqual(&testTransport, remoteServer.getTransport(0));
     assertEqual(1, remoteServer.remoteCount());
     assertEqual(nullptr, remoteServer.getRemoteConnector(1));
     assertEqual(nullptr, remoteServer.getTransport(1));
 
-    taskManager.runLoop();
+    rsc.runLoop();
     assertEqual(1, testInitialisation.getInitialisationAttempts());
     testInitialisation.setInialisationDone(true);
-    taskManager.runLoop();
+    rsc.runLoop();
     assertTrue(testInitialisation.isConnectionMade());
+    testTransport.simulateConnection();
 
     testTransport.simulateIncomingMsg(MSG_HEARTBEAT, "HI=5000|");
     testTransport.simulateIncomingMsg(MSG_JOIN, "NM=unitTest|VE=103|PF=0|UU=db598308-9e31-451c-8511-25027bcf15fb|");
-
     bool commsEnded = false;
-    int iterations = 0;
-    while(!commsEnded || iterations++ > 1000) {
-        taskManager.yieldForMicros(500);
+    uint32_t iterations = 0;
+    while(!commsEnded && iterations++ < 100000) {
+        rsc.runLoop();
         auto* msg = testTransport.getReceivedMessages().getByKey(MSG_BOOTSTRAP);
         commsEnded = msg != nullptr && strncmp(msg->getData(), "BT=END|", 7) == 0;
     }
 
-    checkForMessageOfType(testTransport.getReceivedMessages(), MSG_BOOT_ANALOG, "");
+    assertTrue(checkForMessageOfType(testTransport.getReceivedMessages(), MSG_BOOT_ANALOG, "PI=0|ID=1|IE=2|RO=0|VI=1|NM=Volume|AU=dB|AM=255|AO=-190|AD=2|VC=0|\002"));
+    assertTrue(checkForMessageOfType(testTransport.getReceivedMessages(), MSG_BOOT_ENUM, "PI=0|ID=2|IE=4|RO=0|VI=1|NM=Channel|VC=0|NC=3|CA=CD Player|CB=Turntable|CC=Computer|\002"));
+    assertTrue(checkForMessageOfType(testTransport.getReceivedMessages(), MSG_BOOT_SUBMENU, "PI=0|ID=3|IE=65535|RO=0|VI=1|NM=Settings|\002"));
+    assertTrue(checkForMessageOfType(testTransport.getReceivedMessages(), MSG_BOOT_BOOL, "PI=3|ID=4|IE=65535|RO=0|VI=1|NM=12V Standby|VC=0|BN=2|\002"));
+    assertTrue(commsEnded);
+
     remoteServer.clearRemotes();
     testTransport.reset();
 }
