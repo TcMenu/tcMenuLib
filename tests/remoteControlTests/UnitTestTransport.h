@@ -133,7 +133,7 @@ public:
     }
 };
 
-bool checkForMessageOfType(BtreeList<uint16_t, ReceivedMessage> msgs, uint16_t msgType, const char* expected);
+bool checkForMessageOfType(BtreeList<uint16_t, ReceivedMessage>& msgs, uint16_t msgType, const char* expected);
 
 class UnitTestWebSockTransport : public AbstractWebSocketTcMenuTransport {
 private:
