@@ -198,7 +198,7 @@ WholeAndFraction AnalogMenuItem::getWholeAndFraction() const {
     wf.negative = (calcVal < 0);
 
 	if (divisor < 2) {
-		wf.whole = calcVal;
+		wf.whole = abs(calcVal);
 		wf.fraction = 0;
 	}
 	else {
