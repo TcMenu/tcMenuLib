@@ -5,7 +5,7 @@
 #include <Arduino.h>
 #include <SCCircularBuffer.h>
 #include <RemoteConnector.h>
-#include <remote/TcMenuWebSocket.h>
+#include <remote/TcMenuWebServer.h>
 
 using namespace tcremote;
 

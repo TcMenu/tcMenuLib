@@ -2,7 +2,7 @@
 #include <AUnit.h>
 #include <remote/BaseRemoteComponents.h>
 #include <SimpleCollections.h>
-#include <remote/TcMenuWebSocket.h>
+#include <remote/TcMenuWebServer.h>
 #include "SimpleTestFixtures.h"
 #include "UnitTestTransport.h"
 
@@ -13,12 +13,23 @@ extern TcMenuRemoteServer remoteServer;
 const char HTTP_REQ_GET1[]= "GET /index.html HTTP/1.1\r\n"
                             "Host: server.example.com\r\n"
                             "User-Agent: TurboBanger\r\n"
+                            "Connection: close\r\n"
                             "Accept-Language: en, de\r\n\r\n";
 const char HTTP_REQ_404[]= "GET /notFound.html HTTP/1.1\r\n"
                             "Host: server.example.com\r\n"
                             "User-Agent: TurboBanger\r\n"
+                            "Connection: close\r\n"
                             "Accept-Language: en, de\r\n\r\n";
 const char HTTP_REQ_POST[]= "POST /my/post.do HTTP/1.1\r\n"
+                            "Host: server.example.com\r\n"
+                            "User-Agent: TurboBanger\r\n"
+                            "Connection: close\r\n"
+                            "Accept-Language: en, de\r\n\r\n";
+const char HTTP_REQ_GET2[]= "GET /data1.txt HTTP/1.1\r\n"
+                            "Host: server.example.com\r\n"
+                            "User-Agent: TurboBanger\r\n"
+                            "Accept-Language: en, de\r\n\r\n"
+                            "GET /data2.txt HTTP/1.1\r\n"
                             "Host: server.example.com\r\n"
                             "User-Agent: TurboBanger\r\n"
                             "Accept-Language: en, de\r\n\r\n";
@@ -44,11 +55,26 @@ const char EXPECTED_RESP3[] = "HTTP/1.1 200 OK\r\n"
                               "Content-Length: 72\r\n"
                               "\r\n"
                               "<html><head><title>hello</title></head><body><h1>post</h1></body></html>";
-const char EXPECTED_RESP4[] = "HTTP/1.1 500 Parse error\r\n"
+const char EXPECTED_RESP4[] = "HTTP/1.1 500 Internal error\r\n"
                               "Server: tccWS\r\n"
                               "Content-Type: text/plain\r\n"
                               "Content-Length: 0\r\n"
                               "\r\n";
+const char EXPECTED_RESP5[] = "HTTP/1.1 200 OK\r\n"
+                              "Server: tccWS\r\n"
+                              "Content-Type: text/plain\r\n"
+                              "Content-Length: 11\r\n"
+                              "\r\n"
+                              "Hello WorldHTTP/1.1 200 OK\r\n"
+                              "Server: tccWS\r\n"
+                              "Content-Type: text/plain\r\n"
+                              "Content-Length: 5\r\n"
+                              "\r\n"
+                              "Aloha";
+
+bool tcremote::areWeConnected() {
+    return true;
+}
 
 void copyHtmlWithTitleAndText(const char* title, const char* heading, char* buffer) {
     strcpy(buffer, "<html><head><title>");
@@ -67,6 +93,10 @@ public:
 
     void setRequestUrl(const char* r) { requestUrl = r; }
 
+    void initialiseConnection() override {
+        socketInitialised = true;
+    }
+
     AbstractWebSocketTcMenuTransport* attemptNewConnection() override {
         if(requestUrl) {
             transport.reset(true);
@@ -77,9 +107,11 @@ public:
 
     bool checkResponseAgainst(const char* expected) {
         transport.getClientTxBytesRaw((char*)transport.getReadBuffer(), strlen(expected));
-        bool cmp = strncmp(expected, (char*)transport.getReadBuffer(), strlen(expected)) == 0;
+        char* actual = (char*)transport.getReadBuffer();
+        actual[strlen(expected)] = 0;
+        bool cmp = strncmp(expected, actual, strlen(expected)) == 0;
         if(!cmp) {
-            serdebugF("Mismatch between exp,act");
+            serdebugF2("Mismatch actual was ", actual);
         }
         return cmp;
     }
@@ -101,6 +133,20 @@ test(testAbstractTcMenuWebServer) {
         response.send((uint8_t*)sz, sizeof sz);
     });
 
+    webServer.onUrlGet("/data1.txt", [](tcremote::WebServerResponse& response) {
+        response.startHeader();
+        response.contentInfo(tcremote::WebServerResponse::PLAIN_TEXT, 11);
+        response.send("Hello World", 11);
+    });
+
+    webServer.onUrlGet("/data2.txt", [](tcremote::WebServerResponse& response) {
+        response.startHeader();
+        response.contentInfo(tcremote::WebServerResponse::PLAIN_TEXT, 5);
+        response.startData();
+        response.send("Aloha", 5);
+        response.end();
+    });
+
     webServer.onUrlPost("/my/post.do", [](tcremote::WebServerResponse& response) {
         response.startHeader();
         response.setHeader(WSH_CACHE_CONTROL, "never");
@@ -111,6 +157,9 @@ test(testAbstractTcMenuWebServer) {
         response.send((uint8_t*)sz, sizeof sz);
         response.end();
     });
+
+    webServer.exec();
+    assertTrue(webServer.isInitialised());
 
     webServer.setRequestUrl(HTTP_REQ_GET1);
     webServer.timeOfNextCheck();
@@ -137,7 +186,6 @@ test(testAbstractTcMenuWebServer) {
     assertTrue(webServer.isTriggered());
     webServer.exec();
     assertTrue(webServer.checkResponseAgainst(EXPECTED_RESP3));
-    assertTrue(webServer.isTransportClosed());
 
     webServer.setRequestUrl(HTTP_REQ_ERROR1);
     webServer.timeOfNextCheck();
@@ -153,4 +201,12 @@ test(testAbstractTcMenuWebServer) {
     assertTrue(webServer.checkResponseAgainst(EXPECTED_RESP4));
     assertTrue(webServer.isTransportClosed());
 
+    webServer.setRequestUrl(HTTP_REQ_GET2); // get 2 items in same connection
+    webServer.timeOfNextCheck();
+    assertTrue(webServer.isTriggered());
+    webServer.exec();
+    assertTrue(webServer.checkResponseAgainst(EXPECTED_RESP5));
+    delay(3000); // make sure we exceed the delay for closing the socket when idle.
+    webServer.exec();
+    assertTrue(webServer.isTransportClosed());
 }

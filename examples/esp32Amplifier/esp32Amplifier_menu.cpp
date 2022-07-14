@@ -14,7 +14,7 @@
 
 // Global variable declarations
 const PROGMEM  ConnectorLocalInfo applicationInfo = { "ESP Amplifier", "4656c798-10c6-4110-8e03-b9c51ed8fffb" };
-TcMenuRemoteServer remoteServer(applicationInfo);
+tcremote::TcMenuRemoteServer remoteServer(applicationInfo);
 ArduinoEEPROMAbstraction glArduinoEeprom(&EEPROM);
 EepromAuthenticatorManager authManager(6);
 TFT_eSPI tft;
@@ -22,9 +22,9 @@ TfteSpiDrawable tftDrawable(&tft, 45);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &tftDrawable);
 iotouch::ResistiveTouchInterrogator touchInterrogator(2, 33, 32, 0);
 MenuTouchScreenManager touchScreen(&touchInterrogator, &renderer, iotouch::TouchInterrogator::LANDSCAPE);
-EspAsyncWebserver webServer("/ws", 80);
-EspWebSocketRemoteConnection webClient1(webServer);
-EspWebSocketRemoteConnection webClient2(webServer);
+
+WiFiServer webServerPort(80);
+tcremote::TcMenuWebServer webServer(&webServerPort);
 
 // Global Menu Item declarations
 const PROGMEM char pgmStrConnectivityAuthenticatorText[] = { "Authenticator" };
@@ -109,8 +109,10 @@ void setupMenu() {
     renderer.setUpdatesPerSecond(10);
     touchScreen.start();
     menuMgr.initWithoutInput(&renderer, &menuVolume);
-    remoteServer.addConnection(&webClient1);
-    remoteServer.addConnection(&webClient2);
+
+    webServer.init();
+    prepareWebServer(webServer);
+
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_ALWAYS);
     renderer.setUseSliderForAnalog(true);
     installCoolBlueModernTheme(renderer, MenuFontDef(nullptr, 4), MenuFontDef(nullptr, 4), false);

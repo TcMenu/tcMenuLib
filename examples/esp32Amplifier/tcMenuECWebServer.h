@@ -3,7 +3,7 @@
 #define TCLIBRARYDEV_TCMENUECWEBSERVER_H
 
 #include <Arduino.h>
-#include <STM32Ethernet.h>
+#include <WiFi.h>
 #include <remote/TcMenuWebServer.h>
 #include <remote/BaseRemoteComponents.h>
 
@@ -18,11 +18,11 @@ namespace tcremote {
 
     class TcMenuWebSockTransport : public tcremote::AbstractWebSocketTcMenuTransport {
     private:
-        EthernetClient client;
+        WiFiClient client;
     public:
         TcMenuWebSockTransport() = default;
 
-        void setClient(EthernetClient newClient) {
+        void setClient(WiFiClient newClient) {
             client = newClient;
             setState(tcremote::WSS_HTTP_REQUEST);
         }
@@ -50,9 +50,9 @@ namespace tcremote {
 
     class TcMenuWebSockInitialisation : public tcremote::AbstractWebSocketTcMenuInitialisation {
     private:
-        EthernetServer *server;
+        WiFiServer *server;
     public:
-        TcMenuWebSockInitialisation(EthernetServer *server, const char *expectedPath)
+        TcMenuWebSockInitialisation(WiFiServer *server, const char *expectedPath)
                 : AbstractWebSocketTcMenuInitialisation(expectedPath), server(server) {}
 
         bool attemptInitialisation() override;
@@ -63,10 +63,10 @@ namespace tcremote {
     class TcMenuWebServer : public tcremote::AbstractLightweightWebServer {
     private:
         TcMenuWebSockTransport transport;
-        EthernetServer *server;
+        WiFiServer *server;
         unsigned long timeStart;
     public:
-        explicit TcMenuWebServer(EthernetServer *server);
+        explicit TcMenuWebServer(WiFiServer *server);
 
         tcremote::AbstractWebSocketTcMenuTransport *attemptNewConnection() override;
 

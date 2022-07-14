@@ -3,47 +3,43 @@
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
-#ifndef TCLIBRARYDEV_TCMENUWEBSOCKET_H
-#define TCLIBRARYDEV_TCMENUWEBSOCKET_H
+#ifndef TCLIBRARYDEV_TCMENUWEBSERVER_H
+#define TCLIBRARYDEV_TCMENUWEBSERVER_H
 
 #include <Arduino.h>
 #include "../RemoteConnector.h"
 #include "BaseRemoteComponents.h"
 #include "BaseBufferedRemoteTransport.h"
-
-#define WS_SERVER_NAME "tccWS"
-#define WS_TEXT_RESPONSE_NOT_FOUND "Not found"
-#define WS_INT_RESPONSE_NOT_FOUND 404
-#define WS_INT_RESPONSE_OK 200
-#define WS_TEXT_RESPONSE_OK "OK"
-#define WS_INT_RESPONSE_INT_ERR 500
+#include "TcMenuHttpRequestProcessor.h"
 
 #if defined(WS_RTC_INTEGRATED)
 void rtcUTCDateInWebForm(const char* buffer, size_t bufferLen);
 #endif
 
 /**
- * A very cut down and basic web socket implementation that can act as a web socket endpoint on a given port ONLY for
- * a embedCONTROL connection, be aware that this is not a full websocket implementation. Rather just enough to meet
- * the protocol for this special case.
+ * A very cut down and basic web server with webSocket implementation that can act as a web socket endpoint on a given
+ * port ONLY for an embedCONTROL connection, be aware that this is not a full websocket implementation. Rather just enough to meet
+ * the protocol for this special case. The webserver is reasonably complete for static content purposes and is optimized for
+ * serving large files in chunks.
  */
 
 namespace tcremote {
 
+    /**
+     * Must be implemented for the device being used, works out if we are in a good state to start port connections
+     * IE connected to wifi, ethernet enabled etc.
+     * @return true if connected, otherwise false.
+     */
+    bool areWeConnected();
+
     enum WebSocketOpcode {
         OPC_CONTINUATION, OPC_TEXT, OPC_BINARY, OPC_CLOSE = 8, OPC_PING, OPC_PONG
-    };
-
-    enum WebServerHeader {
-        WSH_UNPROCESSED, WSH_GET, WSH_POST, WSH_FINISHED, WSH_UPGRADE_TO_WEBSOCKET, WSH_SEC_WS_KEY, WSH_DATE, WSH_SERVER, WSH_LAST_MODIFIED, WSH_CONTENT_TYPE,
-        WSH_CONTENT_LENGTH, WSH_CONTENT_ENCODING, WSH_CACHE_CONTROL, WSH_HOST, WSH_USER_AGENT, WSH_ERROR
     };
 
     enum WebSocketTransportState {
         WSS_NOT_CONNECTED, WSS_HTTP_REQUEST, WSS_IDLE, WSS_LEN_READ, WSS_EXT_LEN_READ, WSS_MASK_READ, WSS_PROCESSING_MSG
     };
 
-    enum WebServerMethod { GET, POST };
 
     class AbstractWebSocketTcMenuTransport : public TagValueTransport {
     protected:
@@ -85,62 +81,20 @@ namespace tcremote {
         void sendMessageOnWire(WebSocketOpcode opcode, uint8_t* buffer, size_t size);
     };
 
-    class HttpProcessor {
-    private:
-        AbstractWebSocketTcMenuTransport* transport;
-        unsigned long millisStart;
-        bool protocolError = false;
-    public:
-        HttpProcessor() : transport(nullptr), millisStart(0) {}
-        void setTransport(AbstractWebSocketTcMenuTransport* tx);
-        bool readWordUntilTrim(char* buffer, size_t bufferSize, bool skipSeparator = false);
-        char readCharFromTransport();
-        WebServerHeader processHeader(char* buffer, size_t bufferSize);
-    };
 
     class AbstractWebSocketTcMenuInitialisation : public DeviceInitialisation {
     private:
         const char* expectedPath;
         AbstractWebSocketTcMenuTransport* transport;
         HttpProcessor processor;
+        WebServerResponse response;
     public:
         explicit AbstractWebSocketTcMenuInitialisation(const char *expectedPath) : expectedPath(expectedPath), transport(nullptr),
                                                                                    processor() {}
-
+        bool processRequestLine(AbstractWebSocketTcMenuTransport* t);
         bool performUpgradeOnClient(AbstractWebSocketTcMenuTransport* t);
     };
 
-    class WebServerResponse {
-    public:
-        enum WSRMode { NOT_IN_USE, TRANSPORT_ASSIGNED, READING_HEADERS, PREPARING_HEADER, PREPARING_CONTENT };
-        enum WSRContentType { PLAIN_TEXT, HTML_TEXT, PNG_IMAGE, JPG_IMAGE, JSON_TEXT };
-    private:
-        WebServerMethod method;
-        char pathText[100];
-        AbstractWebSocketTcMenuTransport* transport;
-        enum WSRMode mode;
-    public:
-        WebServerResponse() : method(GET), transport(nullptr), mode(NOT_IN_USE) {}
-        void setTransport(AbstractWebSocketTcMenuTransport* tx);
-        bool processHeaders();
-
-        WSRMode getMode() { return mode; }
-        void setMode(WSRMode newMode) { mode = newMode; }
-
-        void startHeader() { startHeader(WS_INT_RESPONSE_OK, WS_TEXT_RESPONSE_OK); }
-        void startHeader(int code, const char* textualInfo);
-        void setHeader(WebServerHeader header, const char* headerValue);
-        void contentInfo(WSRContentType contentType, size_t len);
-        void startData();
-        bool send_P(const char* startingLocation, size_t numBytes) { return send_P((uint8_t*) startingLocation, numBytes);}
-        bool send(const char* startingLocation, size_t numBytes) { return send((uint8_t*)startingLocation, numBytes);}
-        bool send_P(const uint8_t* startingLocation, size_t numBytes);
-        bool send(const uint8_t* startingLocation, size_t numBytes);
-        void end();
-
-        const char* getPath() { return pathText; }
-        WebServerMethod getMethod() { return method; }
-    };
 
     typedef void (*WebPageHandler)(WebServerResponse&);
 
@@ -162,22 +116,26 @@ namespace tcremote {
     };
 
     class AbstractLightweightWebServer : public BaseEvent {
-    private:
+    protected:
         BtreeList<uint16_t, UrlWithHandler> urlHandlers;
         WebServerResponse response;
+        bool socketInitialised;
     public:
         AbstractLightweightWebServer();
         void init();
         void exec() override;
         uint32_t timeOfNextCheck() override;
         virtual AbstractWebSocketTcMenuTransport* attemptNewConnection()=0;
+        virtual void initialiseConnection()=0;
+        virtual void sendErrorCode(int errorCode);
 
         void onUrlGet(const char* url, WebPageHandler pageHandler) { urlHandlers.add(UrlWithHandler(urlHandlers.count(), GET, url, pageHandler));}
         void onUrlPost(const char* url, WebPageHandler pageHandler) { urlHandlers.add(UrlWithHandler(urlHandlers.count(), POST, url, pageHandler)); }
-    private:
 
-        void findAndAssociateUrl(const char* path, WebServerMethod method);
+        bool isInitialised() const { return socketInitialised; }
+    private:
+        bool attemptToHandleRequest(WebServerMethod &method);
     };
 }
 
-#endif //TCLIBRARYDEV_TCMENUWEBSOCKET_H
+#endif //TCLIBRARYDEV_TCMENUWEBSERVER_H

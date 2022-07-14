@@ -22,11 +22,11 @@ U8g2Drawable gfxDrawable(&gfx);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 
 EthernetServer httpServer(80);
-TcMenuWebServer webServer(&httpServer);
+tcremote::TcMenuWebServer webServer(&httpServer);
 
 EthernetServer wsServer(3333);
-TcMenuWebSockTransport wsTransport2;
-TcMenuWebSockInitialisation wsInitialisation2(&wsServer, "/ws");
+tcremote::TcMenuWebSockTransport wsTransport2;
+tcremote::TcMenuWebSockInitialisation wsInitialisation2(&wsServer, "/ws");
 tcremote::TagValueRemoteServerConnection remoteServerConnection2(wsTransport2, wsInitialisation2);
 
 
@@ -84,6 +84,7 @@ void setupMenu() {
 
     remoteServer.addConnection(&remoteServerConnection2);
     prepareWebServer(webServer);
+    taskManager.registerEvent(&webServer);
     httpServer.begin();
     wsServer.begin();
 

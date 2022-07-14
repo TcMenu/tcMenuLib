@@ -6,7 +6,7 @@
 #include <tcMenu.h>
 #include <remote/BaseRemoteComponents.h>
 #include <SimpleCollections.h>
-#include <remote/TcMenuWebSocket.h>
+#include <remote/TcMenuWebServer.h>
 
 using namespace aunit;
 using namespace tcremote;

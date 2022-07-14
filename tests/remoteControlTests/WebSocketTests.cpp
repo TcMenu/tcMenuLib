@@ -3,7 +3,7 @@
 #include <tcMenu.h>
 #include <remote/BaseRemoteComponents.h>
 #include <SimpleCollections.h>
-#include <remote/TcMenuWebSocket.h>
+#include <remote/TcMenuWebServer.h>
 #include "SimpleTestFixtures.h"
 #include "UnitTestTransport.h"
 
@@ -23,9 +23,10 @@ const char HTTP_REQUEST[] = "GET /chat HTTP/1.1\r\n"
                           "Sec-WebSocket-Version: 13\r\n\r\n";
 
 const char EXPECTED_HTTP_RESPONSE[] = "HTTP/1.1 101 Switching Protocols\r\n"
-                                    "Upgrade: websocket\r\n"
-                                    "Connection: Upgrade\r\n"
-                                    "Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=\r\n\r\n";
+                                      "Server: tccWS\r\n"
+                                      "Upgrade: websocket\r\n"
+                                      "Connection: Upgrade\r\n"
+                                      "Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=\r\n\r\n";
 
 class UnitTestWebSockInitialisation : public AbstractWebSocketTcMenuInitialisation {
 private:
@@ -44,10 +45,12 @@ public:
         testTransport->reset(true);
         connectionMade = true;
         testTransport->simulateRxFromClient(HTTP_REQUEST);
-        return performUpgradeOnClient(testTransport);
+        if(processRequestLine(testTransport)) {
+            return performUpgradeOnClient(testTransport);
+        } else return false;
     }
 
-    bool isConnectionMade() { return connectionMade; }
+    bool isConnectionMade() const { return connectionMade; }
 };
 
 UnitTestWebSockTransport wsTransport;
@@ -68,6 +71,7 @@ test(testPromoteWebSocket) {
     char header[192];
     int actual = wsTransport.getClientTxBytesRaw(header, sizeof header);
     header[actual] = 0;
+    serdebugF2("Header sent: ", header);
     assertTrue(strcmp(EXPECTED_HTTP_RESPONSE, header)==0);
 
     wsTransport.simulateIncomingMsg(MSG_HEARTBEAT, "HI=5000|", true);

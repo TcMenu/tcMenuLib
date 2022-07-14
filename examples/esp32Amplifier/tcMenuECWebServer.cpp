@@ -47,7 +47,7 @@ bool TcMenuWebSockInitialisation::attemptNewConnection(tcremote::BaseRemoteServe
 AbstractWebSocketTcMenuTransport *TcMenuWebServer::attemptNewConnection() {
     if(transport.connected() && (millis() - timeStart) < 2000) return nullptr; // doing something already, cannot reconnect yet.
 
-    EthernetClient cl = server->available();
+    WiFiClient cl = server->available();
     if(cl) {
         serdebugF("HTTPClient found");
         timeStart = millis();
@@ -58,7 +58,7 @@ AbstractWebSocketTcMenuTransport *TcMenuWebServer::attemptNewConnection() {
     return nullptr;
 }
 
-TcMenuWebServer::TcMenuWebServer(EthernetServer *server) : transport(), server(server), timeStart(0) {}
+TcMenuWebServer::TcMenuWebServer(WiFiServer *server) : transport(), server(server), timeStart(0) {}
 
 void TcMenuWebServer::initialiseConnection() {
     server->begin();
