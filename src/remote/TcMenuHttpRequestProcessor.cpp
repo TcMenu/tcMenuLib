@@ -6,6 +6,22 @@
 
 using namespace tcremote;
 
+const char pgmWebSockUuid[] PROGMEM = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+
+namespace tc_b64 {
+    int base64(const uint8_t *data, int dataSize, uint8_t *buffer, int bufferSize);
+}
+
+// See the associated C file in this directory
+extern "C" {
+int sha1digest(uint8_t *hexDigest, const uint8_t *data, size_t databytes);
+}
+
+
+inline WebSocketOpcode getOpcode(uint8_t header) {
+    return (WebSocketOpcode)(header & WS_OPCODE_MASK);
+}
+
 char HttpProcessor::readCharFromTransport() {
     while(transport->connected()) {
         uint8_t sz[1];
@@ -88,6 +104,9 @@ WebServerMethod HttpProcessor::processRequest(char* buffer, size_t bufferSize) {
 }
 
 WebServerHeader HttpProcessor::processHeader(char* buffer, size_t bufferSize) {
+    millisStart = millis();
+    protocolError = false;
+
     if(readWordUntilTrim(buffer, bufferSize)) return WSH_FINISHED;
     if(!transport->connected()) return WSH_ERROR;
     if(strcmp(buffer, "Host") == 0) {
@@ -150,16 +169,13 @@ WebServerHeader HttpProcessor::processHeader(char* buffer, size_t bufferSize) {
     return WSH_UNPROCESSED;
 }
 
-void HttpProcessor::setTransport(AbstractWebSocketTcMenuTransport *tx) {
-    transport = tx;
-    millisStart = millis();
-    protocolError = false;
-}
-
 void tcremote::HttpProcessor::tick() {
     millisStart = millis();
 }
 
+WebServerResponse::WebServerResponse(TcMenuLightweightWebServer *webServer, TcMenuWebServerTransport *tx,
+                                     WebServerResponse::WSRConnectionType conType)
+        : webServer(webServer), method(GET), transport(nullptr), processor(tx), mode(NOT_IN_USE), connectionType(conType), webSocketSha1KeyToRespond{} {}
 
 void WebServerResponse::contentInfo(WSRContentType contentType, size_t len) {
     const char *headerText;
@@ -202,7 +218,7 @@ void WebServerResponse::contentInfo(WSRContentType contentType, size_t len) {
 void WebServerResponse::startHeader(int code, const char* textualInfo) {
     serdebugF3("Start header response", code, textualInfo);
     mode = PREPARING_HEADER;
-    if(code == WS_CODE_CHANGING_PROTOCOL) singleRequestMode = false; // websockets don't get closed after the request.
+    if(code == WS_CODE_CHANGING_PROTOCOL) connectionType = WEB_SOCKET; // websockets don't get closed after the request.
     uint8_t* dataArea = transport->getReadBuffer();
     size_t buffSize = transport->getReadBufferSize();
     strcpy((char*)dataArea, "HTTP/1.1 ");
@@ -214,10 +230,20 @@ void WebServerResponse::startHeader(int code, const char* textualInfo) {
     strcat((char*)dataArea, "\r\n");
     transport->performRawWrite(dataArea, strlen((char*)dataArea));
     setHeader(WSH_SERVER, WS_SERVER_NAME);
+
+// if you have an RTC device, you can implement `rtcUTCDateInWebForm` which allows you to give the current date from
+// the RTC device for submission in the headers as the DATE header. It is assumed the format is correct.
 #if defined(WS_RTC_INTEGRATED)
     rtcUTCDateInWebForm(sz, sizeof sz);
     setHeader(WSH_DATE, sz)
 #endif
+
+    // for synchronous single clients (IE one at a time), it's best that we close the connection immediately
+    // rather than delay and wait, as otherwise it's probable we will just slow things down waiting around while
+    // only one connection at once is allowed
+    if(connectionType == CLOSE_AFTER_RESPONSE) {
+        setHeader(WSH_CONNECTION, "close");
+    }
 }
 
 const char* getHeaderAsText(WebServerHeader header) {
@@ -248,6 +274,12 @@ void WebServerResponse::setHeader(WebServerHeader header, const char *headerValu
     serdebugF3("Add header ", hdrField, headerValue);
 
     transport->performRawWrite(dataArea, strlen((char*)dataArea));
+}
+
+void WebServerResponse::addSecResponseWebSocketHeader() {
+    char sz[32];
+    tc_b64::base64(webSocketSha1KeyToRespond, sizeof(webSocketSha1KeyToRespond), (uint8_t *) sz, sizeof sz);
+    setHeader(WSH_SEC_WS_ACCEPT_KEY, sz);
 }
 
 void WebServerResponse::startData() {
@@ -295,21 +327,41 @@ bool WebServerResponse::send_P(const uint8_t *startingLocation, size_t numBytes)
     return bytesSent == numBytes;
 }
 
+/*
+        response.startHeader(WS_CODE_CHANGING_PROTOCOL, "Switching Protocols");
+        response.setHeader(WSH_UPGRADE_TO_WEBSOCKET, "websocket");
+        response.setHeader(WSH_CONNECTION, "Upgrade");
+        response.setHeader(WSH_SEC_WS_ACCEPT_KEY, sha1Space);
+        response.end();
+        this->transport->setState(WSS_IDLE);
+        return true;
+*/
+
 bool WebServerResponse::processHeaders() {
-    processor.setTransport(transport);
+    char* buffer = (char*)transport->getReadBuffer();
+    size_t bufferSize = transport->getReadBufferSize();
     bool foundEndOfRequest = false;
+
     serdebugF("Process header");
     while(!foundEndOfRequest) {
-        auto hdrType = processor.processHeader((char*)transport->getReadBuffer(), transport->getReadBufferSize());
+        auto hdrType = processor.processHeader(buffer, bufferSize);
         switch (hdrType) {
+            case WSH_SEC_WS_KEY: {
+                strncat_P(buffer, pgmWebSockUuid, bufferSize - strlen(buffer) - 1);
+                sha1digest(webSocketSha1KeyToRespond, (uint8_t *) buffer, strlen(buffer));
+                break;
+            }
             case WSH_FINISHED:
                 serdebugF("Request processed");
                 foundEndOfRequest = true;
                 return true;
+            case WSH_UPGRADE_TO_WEBSOCKET:
+                method = WS_UPGRADE;
+                break;
             case WSH_ERROR:
                 serdebugF("Request error");
                 foundEndOfRequest = false;
-                singleRequestMode = true; // tell end to close the connection as the request is faulty.
+                connectionType = CLOSE_AFTER_RESPONSE; // tell end to close the connection as the request is faulty.
                 return false;
             default:
                 break;
@@ -323,7 +375,8 @@ void WebServerResponse::end() {
     if(mode != PREPARING_CONTENT) {
         transport->performRawWrite((uint8_t*)"\r\n", 2);
     }
-    if(singleRequestMode) {
+
+    if(connectionType == CLOSE_AFTER_RESPONSE) {
         transport->close();
         mode = NOT_IN_USE;
     } else {
@@ -332,19 +385,39 @@ void WebServerResponse::end() {
     }
 }
 
-void WebServerResponse::setTransport(AbstractWebSocketTcMenuTransport *tx) {
-    transport = tx;
-    transport->setState(WSS_HTTP_REQUEST); // regular http request.
-    mode = TRANSPORT_ASSIGNED;
+void WebServerResponse::serviceClient(socket_t sock) {
+    transport->setClient(sock);
+    setMode(TRANSPORT_ASSIGNED);
+    markTriggeredAndNotify();
 }
 
-WebServerMethod WebServerResponse::processRequestLine() {
-    processor.setTransport(transport);
-    return processor.processRequest(reinterpret_cast<char *>(transport->getReadBuffer()), transport->getReadBufferSize());
+uint32_t WebServerResponse::timeOfNextCheck() {
+    return millisToMicros(100);
 }
 
-const char *WebServerResponse::getLastData() {
-    return reinterpret_cast<const char *>(transport->getReadBuffer());
+void WebServerResponse::exec() {
+    if(mode == TRANSPORT_ASSIGNED) {
+        transport->setState(WSS_HTTP_REQUEST); // regular http request.
+        mode = TRANSPORT_ASSIGNED;
+
+        bool needAnotherGo = true;
+        while (needAnotherGo) {
+            method = processor.processRequest(reinterpret_cast<char *>(transport->getReadBuffer()),
+                                              transport->getReadBufferSize());
+            if (method == POST || method == GET) {
+                setMode(WebServerResponse::READING_HEADERS);
+                needAnotherGo = webServer->attemptToHandleRequest(*this, (const char *) transport->getReadBuffer());
+                if (!needAnotherGo) closeConnection();
+            } else if (method == REQ_ERROR) {
+                needAnotherGo = false;
+                webServer->sendErrorCode(this, WS_INT_RESPONSE_INT_ERR);
+                closeConnection();
+            } else {
+                needAnotherGo = false;
+                closeConnection();
+            }
+        }
+    }
 }
 
 void WebServerResponse::closeConnection() {
@@ -356,3 +429,4 @@ void WebServerResponse::closeConnection() {
 bool WebServerResponse::hasErrorOccurred() {
     return processor.isProtocolError();
 }
+

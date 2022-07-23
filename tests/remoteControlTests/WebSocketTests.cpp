@@ -5,13 +5,10 @@
 #include <SimpleCollections.h>
 #include <remote/TcMenuWebServer.h>
 #include "SimpleTestFixtures.h"
-#include "UnitTestTransport.h"
+#include "UnitTestDriver.h"
 
 using namespace aunit;
 using namespace tcremote;
-extern TcMenuRemoteServer remoteServer;
-
-const uint8_t serverMask[] = {0xaa, 0xee, 0xdd, 0xa0};
 
 const char HTTP_REQUEST[] = "GET /chat HTTP/1.1\r\n"
                           "Host: server.example.com\r\n"
@@ -28,37 +25,11 @@ const char EXPECTED_HTTP_RESPONSE[] = "HTTP/1.1 101 Switching Protocols\r\n"
                                       "Connection: Upgrade\r\n"
                                       "Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=\r\n\r\n";
 
-class UnitTestWebSockInitialisation : public AbstractWebSocketTcMenuInitialisation {
-private:
-    bool connectionMade = false;
-public:
-    UnitTestWebSockInitialisation(const char *expectedPath) : AbstractWebSocketTcMenuInitialisation(expectedPath) {}
-
-    bool attemptInitialisation() override {
-        initialised = true;
-        return initialised;
-    }
-
-    bool attemptNewConnection(BaseRemoteServerConnection *connection) override {
-        auto* tagValConnector = reinterpret_cast<TagValueRemoteServerConnection*>(connection);
-        auto* testTransport = reinterpret_cast<UnitTestWebSockTransport*>(tagValConnector->transport());
-        testTransport->reset(true);
-        connectionMade = true;
-        testTransport->simulateRxFromClient(HTTP_REQUEST);
-        if(processRequestLine(testTransport)) {
-            return performUpgradeOnClient(testTransport);
-        } else return false;
-    }
-
-    bool isConnectionMade() const { return connectionMade; }
-};
-
-UnitTestWebSockTransport wsTransport;
-UnitTestWebSockInitialisation wsInitialisation("/chat");
-TagValueRemoteServerConnection rsc(wsTransport, wsInitialisation);
+TcMenuLightweightWebServer webServer(1);
 
 test(testPromoteWebSocket) {
     serdebugF("Starting websocket promote and protocol test");
+    webServer.init();
     remoteServer.clearRemotes();
     remoteServer.addConnection(&rsc);
 
@@ -99,64 +70,4 @@ test(testPromoteWebSocket) {
     wsTransport.reset();
     remoteServer.clearRemotes();
     serdebugF("WS protocol test finished");
-}
-
-
-void UnitTestWebSockTransport::flush() {
-    AbstractWebSocketTcMenuTransport::flush();
-    int fl = writeScBuffer.get();
-    if(fl != 0x81) return; // Final message, text
-    int len = writeScBuffer.get();
-    if(len > 125) {
-        return; // don't handle extended case
-    }
-    char sz[128];
-    int i;
-    for(i=0;i<len;i++) {
-        sz[i] = writeScBuffer.get();
-    }
-    sz[i]=0;
-    int pos = 0;
-    if(sz[pos++] != 0x01 || sz[pos++] != 0x01) return;
-    uint16_t msgTy = sz[pos++] << 8U;
-    msgTy |= sz[pos++];
-
-    receivedMessages.add(ReceivedMessage(receivedMessages.count(), msgTy, &sz[pos]));
-}
-
-void UnitTestWebSockTransport::simulateIncomingMsg(uint16_t msgType, const char *data, bool masked) {
-    {
-
-        readScBuffer.put(0x81);
-        auto dataLen = strlen(data) + 5;
-        uint8_t maskData = masked ? 0x80 : 0;
-        if(dataLen > 125) {
-            readScBuffer.put(maskData | 126);
-            readScBuffer.put(dataLen >> 8);
-            readScBuffer.put(dataLen & 0xff);
-        } else {
-            readScBuffer.put(maskData | dataLen);
-        }
-
-        if(masked) {
-            readScBuffer.put(serverMask[0]); // mask 4 bytes
-            readScBuffer.put(serverMask[1]);
-            readScBuffer.put(serverMask[2]);
-            readScBuffer.put(serverMask[3]);
-        }
-        else {
-            readScBuffer.put(dataLen);
-        }
-        readScBuffer.put(0x01 ^ serverMask[0]); // start
-        readScBuffer.put(0x01 ^ serverMask[1]); // tag val
-        readScBuffer.put((msgType >> 8) ^ serverMask[2]);
-        readScBuffer.put((msgType & 0xff) ^ serverMask[3]);
-        int maskPosition = 0;
-        while(*data) { // data
-            readScBuffer.put(*data ^ serverMask[maskPosition%4]);
-            maskPosition++;
-            data++;
-        }
-        readScBuffer.put(0x02 ^ serverMask[maskPosition%4]); // end
-    }
 }

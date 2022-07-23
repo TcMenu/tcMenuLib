@@ -11,10 +11,29 @@
 #include "BaseRemoteComponents.h"
 #include "BaseBufferedRemoteTransport.h"
 #include "TcMenuHttpRequestProcessor.h"
+#include <SCCircularBuffer.h>
+#include <SimpleCollections.h>
+#include "TransportNetworkDriver.h"
 
 #if defined(WS_RTC_INTEGRATED)
 void rtcUTCDateInWebForm(const char* buffer, size_t bufferLen);
 #endif
+
+#ifndef MAX_WEBSERVER_RESPONSES
+#define MAX_WEBSERVER_RESPONSES 4
+#endif
+
+// byte 1
+#define WS_FIN              0x80
+#define WS_RSV1             6
+#define WS_RSV2             5
+#define WS_RSV3             4
+#define WS_OPCODE_MASK      0x0f
+
+// byte 2
+#define WS_MASKED_PAYLOAD   7
+#define WS_EXTENDED_PAYLOAD 126
+#define WS_FAIL_PAYLOAD_LEN 127
 
 /**
  * A very cut down and basic web server with webSocket implementation that can act as a web socket endpoint on a given
@@ -25,13 +44,6 @@ void rtcUTCDateInWebForm(const char* buffer, size_t bufferLen);
 
 namespace tcremote {
 
-    /**
-     * Must be implemented for the device being used, works out if we are in a good state to start port connections
-     * IE connected to wifi, ethernet enabled etc.
-     * @return true if connected, otherwise false.
-     */
-    bool areWeConnected();
-
     enum WebSocketOpcode {
         OPC_CONTINUATION, OPC_TEXT, OPC_BINARY, OPC_CLOSE = 8, OPC_PING, OPC_PONG
     };
@@ -41,8 +53,9 @@ namespace tcremote {
     };
 
 
-    class AbstractWebSocketTcMenuTransport : public TagValueTransport {
+    class TcMenuWebServerTransport : public TagValueTransport {
     protected:
+        socket_t clientFd;
         size_t bytesLeftInCurrentMsg;
         uint8_t frameMask[4];
         uint8_t* writeBuffer;
@@ -53,24 +66,40 @@ namespace tcremote {
         uint8_t readPosition;
         uint8_t readAvail;
         uint8_t writePosition;
+        bool consideredOpen;
     public:
-        explicit AbstractWebSocketTcMenuTransport(uint8_t buffSz = 125) : TagValueTransport(TVAL_UNBUFFERED),
+        explicit TcMenuWebServerTransport(uint8_t buffSz = 125) : TagValueTransport(TVAL_UNBUFFERED), clientFd(TC_BAD_SOCKET_ID),
                                              bytesLeftInCurrentMsg(0), frameMask{}, writeBuffer(new uint8_t[buffSz]),
                                              readBuffer(new uint8_t[buffSz]), currentState(WSS_NOT_CONNECTED),
-                                             bufferSize(buffSz), frameMaskingPosition(0), readPosition(0), readAvail(0), writePosition(0) {}
+                                             bufferSize(buffSz), frameMaskingPosition(0), readPosition(0), readAvail(0),
+                                             writePosition(0), consideredOpen(false) {}
         void flush() override;
         void close() override;
         uint8_t readByte() override;
         void endMsg() override;
 
+        void setClient(socket_t client) {
+            clientFd = client;
+            consideredOpen = true;
+            setState(tcremote::WSS_HTTP_REQUEST);
+        }
+
         int writeChar(char data) override;
         int writeStr(const char *data) override;
 
         bool readAvailable() override;
+        bool available() override { return consideredOpen; }
+
+        bool connected() override;
 
         // these will be used to write web socket data directly, not put things in the buffer.
-        virtual int performRawRead(uint8_t* buffer, size_t bufferSize)=0;
-        virtual int performRawWrite(const uint8_t* data, size_t dataSize)=0;
+        inline int performRawRead(uint8_t* buffer, size_t bufferSize) const {
+            return rawReadData(clientFd, buffer, bufferSize);
+        }
+
+        inline bool performRawWrite(const uint8_t* data, size_t dataSize) const {
+            return rawWriteData(clientFd, data, dataSize) == SOCK_ERR_OK;
+        }
 
         void setState(WebSocketTransportState state) { currentState = state;}
         size_t getReadBufferSize() const { return bufferSize; }
@@ -80,21 +109,6 @@ namespace tcremote {
     private:
         void sendMessageOnWire(WebSocketOpcode opcode, uint8_t* buffer, size_t size);
     };
-
-
-    class AbstractWebSocketTcMenuInitialisation : public DeviceInitialisation {
-    private:
-        const char* expectedPath;
-        AbstractWebSocketTcMenuTransport* transport;
-        HttpProcessor processor;
-        WebServerResponse response;
-    public:
-        explicit AbstractWebSocketTcMenuInitialisation(const char *expectedPath) : expectedPath(expectedPath), transport(nullptr),
-                                                                                   processor() {}
-        bool processRequestLine(AbstractWebSocketTcMenuTransport* t);
-        bool performUpgradeOnClient(AbstractWebSocketTcMenuTransport* t);
-    };
-
 
     typedef void (*WebPageHandler)(WebServerResponse&);
 
@@ -115,26 +129,31 @@ namespace tcremote {
         void handleUrl(WebServerResponse& response) { handlerFn(response); }
     };
 
-    class AbstractLightweightWebServer : public BaseEvent {
+    class TcMenuLightweightWebServer : public BaseEvent {
     protected:
+        int numConcurrent;
+        WebServerResponse* responses[MAX_WEBSERVER_RESPONSES];
         BtreeList<uint16_t, UrlWithHandler> urlHandlers;
-        WebServerResponse response;
         bool socketInitialised;
+        GenericCircularBuffer<socket_t> connectionsWaiting;
+        int port;
     public:
-        AbstractLightweightWebServer();
+        explicit TcMenuLightweightWebServer(int port, int numConcurrent);
+
         void init();
         void exec() override;
         uint32_t timeOfNextCheck() override;
-        virtual AbstractWebSocketTcMenuTransport* attemptNewConnection()=0;
-        virtual void initialiseConnection()=0;
-        virtual void sendErrorCode(int errorCode);
+        void pushClientSocket(socket_t socketIncoming);
 
         void onUrlGet(const char* url, WebPageHandler pageHandler) { urlHandlers.add(UrlWithHandler(urlHandlers.count(), GET, url, pageHandler));}
         void onUrlPost(const char* url, WebPageHandler pageHandler) { urlHandlers.add(UrlWithHandler(urlHandlers.count(), POST, url, pageHandler)); }
+        void onWebSocket(const char* url, WebPageHandler pageHandler) { urlHandlers.add(UrlWithHandler(urlHandlers.count(), WS_UPGRADE, url, pageHandler)); }
 
         bool isInitialised() const { return socketInitialised; }
-    private:
-        bool attemptToHandleRequest(WebServerMethod &method);
+        bool attemptToHandleRequest(WebServerResponse& method, const char* url);
+        virtual void sendErrorCode(WebServerResponse* response, int errorCode);
+
+        WebServerResponse *nextAvailableResponse();
     };
 }
 

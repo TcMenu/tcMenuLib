@@ -21,12 +21,10 @@ U8G2_SSD1306_128X64_NONAME_F_4W_HW_SPI gfx(U8G2_R0, PF13, PD15, PF12);
 U8g2Drawable gfxDrawable(&gfx);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 
-EthernetServer httpServer(80);
-tcremote::TcMenuWebServer webServer(&httpServer);
+tcremote::TcMenuLightweightWebServer webServer(4);
 
-EthernetServer wsServer(3333);
-tcremote::TcMenuWebSockTransport wsTransport2;
-tcremote::TcMenuWebSockInitialisation wsInitialisation2(&wsServer, "/ws");
+tcremote::TcMenuWebServerTransport wsTransport2;
+tcremote::TcMenuWebSocketInitialisation wsInitialisation2(&webServer, &wsTransport2, "/ws");
 tcremote::TagValueRemoteServerConnection remoteServerConnection2(wsTransport2, wsInitialisation2);
 
 

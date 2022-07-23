@@ -224,14 +224,15 @@ void TagValueRemoteConnector::dealWithHeartbeating() {
 	++ticksLastSend;
 
     // pairing will not send heartbeats, so we wait about 10 seconds before closing out
-    unsigned int interval = isPairing() ? (PAIRING_TIMEOUT_TICKS) : (HEARTBEAT_INTERVAL_TICKS * 3);
+    unsigned int maximumWaitTime = isPairing() ? (PAIRING_TIMEOUT_TICKS) : (HEARTBEAT_INTERVAL_TICKS * 3);
 
-	if(ticksLastRead > interval) {
-		if(isConnected()) {
-         	serdebugF3("Remote disconnected (rNo, ticks): ", remoteNo, ticksLastSend);
-			close();
-		}
-	} else if(!isConnected() && transport->connected()) {
+	if(ticksLastRead > maximumWaitTime && isConnected()) {
+        serdebugF3("Remote disconnected (rNo, ticks): ", remoteNo, ticksLastSend);
+        close();
+        return;
+	}
+
+    if(!isConnected() && transport->connected()) {
        	serdebugF2("Remote connected: ", remoteNo);
         encodeHeartbeat(HBMODE_STARTCONNECT);
 		setConnected(true);
@@ -770,7 +771,12 @@ FieldAndValue* TagValueTransport::fieldIfAvailable() {
 
 		case FVAL_PROCESSING_PROTOCOL: // we need to make sure the protocol is valid
 			if(readAvailable()) {
-                currentField.fieldType = (readByte() == protocolUsed) ? FVAL_PROCESSING_MSGTYPE_HI : FVAL_ERROR_PROTO;
+                if(readByte() == protocolUsed) {
+                    currentField.fieldType = FVAL_PROCESSING_MSGTYPE_HI;
+                } else {
+                    currentField.fieldType = FVAL_ERROR_PROTO;
+                    contProcessing = false;
+                }
             }
 			break;
 
@@ -811,6 +817,7 @@ FieldAndValue* TagValueTransport::fieldIfAvailable() {
 		case FVAL_PROCESSING_VALUE: // and lastly a value followed by pipe.
 			if(!processValuePart()) {
 				clearFieldStatus(FVAL_ERROR_PROTO);
+                contProcessing = false;
 			}
 			if(currentField.fieldType != FVAL_PROCESSING_VALUE) return &currentField;
 			break;

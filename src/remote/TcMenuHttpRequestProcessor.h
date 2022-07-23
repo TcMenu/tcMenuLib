@@ -2,6 +2,9 @@
 #ifndef TCMENU_TCMENUHTTPREQUESTPROCESSOR_H
 #define TCMENU_TCMENUHTTPREQUESTPROCESSOR_H
 
+#include "TransportNetworkDriver.h"
+#include <TaskManagerIO.h>
+
 #define WS_SERVER_NAME "tccWS"
 #define WS_TEXT_RESPONSE_NOT_FOUND "Not found"
 #define WS_INT_RESPONSE_NOT_FOUND 404
@@ -9,6 +12,8 @@
 #define WS_TEXT_RESPONSE_OK "OK"
 #define WS_INT_RESPONSE_INT_ERR 500
 #define WS_CODE_CHANGING_PROTOCOL 101
+
+#define WS_FORCE_CLOSE_ON_END true
 
 namespace tcremote {
 
@@ -18,7 +23,7 @@ namespace tcremote {
      * Enumerates the various types of request that this server can handle, or none/error for the case that we cannot
      * process a given request.
      */
-    enum WebServerMethod { GET, POST, REQ_NONE, REQ_ERROR };
+    enum WebServerMethod { GET, POST, WS_UPGRADE, REQ_NONE, REQ_ERROR };
 
     /**
      * Provides an enumeration of all supported web server headers that we process, any other header will come through as
@@ -63,6 +68,8 @@ namespace tcremote {
         WSH_ERROR
     };
 
+    class TcMenuWebServerTransport;
+
     /**
      * The HTTP processor is responsible for actually parsing data from a HTTP request, it can read data from a socket
      * asynchronously allowing other tasks to run while the read is completed. It allows other code to run while the
@@ -72,13 +79,11 @@ namespace tcremote {
      */
     class HttpProcessor {
     private:
-        AbstractWebSocketTcMenuTransport *transport;
+        TcMenuWebServerTransport *transport;
         unsigned long millisStart;
         bool protocolError = false;
     public:
-        HttpProcessor() : transport(nullptr), millisStart(0) {}
-
-        void setTransport(AbstractWebSocketTcMenuTransport *tx);
+        explicit HttpProcessor(TcMenuWebServerTransport* transport) : transport(transport), millisStart(0) {}
 
         bool readWordUntilTrim(char *buffer, size_t bufferSize, bool skipSeparator = false);
 
@@ -91,7 +96,11 @@ namespace tcremote {
         void tick();
 
         bool isProtocolError() const {return protocolError;}
+
+        void webSocketUpgrade();
     };
+
+    class TcMenuLightweightWebServer;
 
     /**
      * A Webserver Response object is responsible for parsing the request line and header data out of an incoming request
@@ -99,19 +108,22 @@ namespace tcremote {
      * in the usual manner (eg sending headers, then data, then calling end, once end() is called, you can check if there
      * is another request within the same transport.
      */
-    class WebServerResponse {
+    class WebServerResponse : public BaseEvent {
     public:
         enum WSRMode { NOT_IN_USE, TRANSPORT_ASSIGNED, READING_HEADERS, PREPARING_HEADER, PREPARING_CONTENT };
         enum WSRContentType { PLAIN_TEXT, HTML_TEXT, PNG_IMAGE, JPG_IMAGE, WEBP_IMAGE, JSON_TEXT, TEXT_CSS, JAVASCRIPT, IMG_ICON };
+        enum WSRConnectionType { KEEP_REQ_OPEN, CLOSE_AFTER_RESPONSE, WEB_SOCKET };
     private:
+        TcMenuLightweightWebServer* webServer;
         WebServerMethod method;
-        AbstractWebSocketTcMenuTransport* transport;
+        TcMenuWebServerTransport* transport;
         HttpProcessor processor;
         enum WSRMode mode;
-        bool singleRequestMode;
+        WSRConnectionType connectionType;
+        uint8_t webSocketSha1KeyToRespond[20];
     public:
-        WebServerResponse() : method(GET), transport(nullptr), mode(NOT_IN_USE), singleRequestMode(false) {}
-        void setTransport(AbstractWebSocketTcMenuTransport* tx);
+        WebServerResponse(TcMenuLightweightWebServer* webServer, TcMenuWebServerTransport* tx, WSRConnectionType conType);
+        void serviceClient(socket_t sock);
         WebServerMethod processRequestLine();
         bool processHeaders();
 
@@ -121,6 +133,7 @@ namespace tcremote {
         void startHeader() { startHeader(WS_INT_RESPONSE_OK, WS_TEXT_RESPONSE_OK); }
         void startHeader(int code, const char* textualInfo);
         void setHeader(WebServerHeader header, const char* headerValue);
+        void addSecResponseWebSocketHeader();
         void contentInfo(WSRContentType contentType, size_t len);
         void startData();
         bool send_P(const char* startingLocation, size_t numBytes) { return send_P((uint8_t*) startingLocation, numBytes);}
@@ -129,12 +142,16 @@ namespace tcremote {
         bool send(const uint8_t* startingLocation, size_t numBytes);
         void end();
 
-        void closeConnection();
 
-        const char* getLastData();
+        void closeConnection();
+        bool isInSingleShotMode() { return connectionType == CLOSE_AFTER_RESPONSE; }
+
         WebServerMethod getMethod() { return method; }
 
         bool hasErrorOccurred();
+
+        uint32_t timeOfNextCheck() override;
+        void exec() override;
     };
 }
 

@@ -7,176 +7,15 @@
 #include "TcMenuWebServer.h"
 #include "TcMenuHttpRequestProcessor.h"
 
-// byte 1
-#define WS_FIN              0x80
-#define WS_RSV1             6
-#define WS_RSV2             5
-#define WS_RSV3             4
-#define WS_OPCODE_MASK      0x0f
-
-// byte 2
-#define WS_MASKED_PAYLOAD   7
-#define WS_EXTENDED_PAYLOAD 126
-#define WS_FAIL_PAYLOAD_LEN 127
-
-/**
- * When a websocket is upgraded from HTTP to WS protocol, it must answer with a security key, this is made up of the
- * key provided, this UUID, turned into a sha1 and base64 encoded.
- */
-const char pgmWebSockUuid[] PROGMEM = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
-
-namespace tc_b64 {
-    /**
-     * A lightweight base 64 facility that takes in some data and writes out base 64 into the buffer
-     * @param data input data
-     * @param dataSize input data size
-     * @param buffer the buffer to write to
-     * @param bufferSize buffer size
-     * @return the number of bytes written.
-     */
-    int base64(const uint8_t *data, int dataSize, uint8_t *buffer, int bufferSize);
-}
-
-// See the associated C file in this directory
-extern "C" {
-int sha1digest(uint8_t *hexDigest, const uint8_t *data, size_t databytes);
-}
-
 using namespace tcremote;
 
-
-bool AbstractWebSocketTcMenuInitialisation::processRequestLine(AbstractWebSocketTcMenuTransport *t) {
-    this->transport = t;
-    this->transport->setState(WSS_HTTP_REQUEST);
-    this->processor.setTransport(transport);
-    this->response.setTransport(transport);
-
-    char* buffer = (char*)transport->getReadBuffer();
-    size_t bufferSize = transport->getReadBufferSize();
-
-    WebServerMethod method = processor.processRequest(buffer, bufferSize);
-    if(method == REQ_ERROR || method == REQ_NONE) {
-        response.startHeader(WS_INT_RESPONSE_INT_ERR, "Bad request");
-        response.contentInfo(WebServerResponse::PLAIN_TEXT, 0);
-        response.end();
-        response.closeConnection();
-        return false;
+void TcMenuWebServerTransport::close() {
+    consideredOpen = false;
+    if(currentState != WSS_HTTP_REQUEST && currentState != WSS_NOT_CONNECTED) {
+        // don't send a ws close event unless we are in web socket mode.
+        uint8_t sz[2];
+        sendMessageOnWire(OPC_CLOSE, sz, 0);
     }
-
-    if(strcmp(buffer, expectedPath) != 0) {
-        response.startHeader(WS_INT_RESPONSE_NOT_FOUND, WS_TEXT_RESPONSE_NOT_FOUND);
-        response.contentInfo(WebServerResponse::PLAIN_TEXT, 0);
-        response.end();
-        response.closeConnection();
-        return false;
-    }
-
-    return true;
-}
-
-bool AbstractWebSocketTcMenuInitialisation::performUpgradeOnClient(AbstractWebSocketTcMenuTransport* t) {
-    this->transport = t;
-    processor.setTransport(t);
-    response.setTransport(t);
-    transport->setState(WSS_HTTP_REQUEST);
-    bool reachedEndOfHeader = false;
-    bool hasUpgraded = false;
-    char sha1Space[32];
-    char* buffer = (char*)transport->getReadBuffer();
-    size_t bufferSize = transport->getReadBufferSize();
-
-    while(!reachedEndOfHeader && transport->connected()) {
-        auto hdrName = processor.processHeader((char*)transport->getReadBuffer(), transport->getReadBufferSize());
-        switch(hdrName) {
-        case WSH_ERROR:
-            reachedEndOfHeader = true;
-            break;
-        case WSH_UPGRADE_TO_WEBSOCKET:
-            hasUpgraded = true;
-            break;
-        case WSH_FINISHED:
-            reachedEndOfHeader = true;
-            break;
-        case WSH_SEC_WS_KEY: {
-            uint8_t shaRaw[20];
-            strncat_P(buffer, pgmWebSockUuid, bufferSize - strlen(buffer) - 1);
-            sha1digest(shaRaw, (uint8_t*)buffer, strlen(buffer));
-            tc_b64::base64(shaRaw, sizeof(shaRaw), (uint8_t *) sha1Space, sizeof sha1Space);
-            break;
-        }
-        default:
-            break;
-        }
-    }
-
-    if(transport->connected() && reachedEndOfHeader && hasUpgraded) {
-        response.setTransport(transport);
-        response.startHeader(WS_CODE_CHANGING_PROTOCOL, "Switching Protocols");
-        response.setHeader(WSH_UPGRADE_TO_WEBSOCKET, "websocket");
-        response.setHeader(WSH_CONNECTION, "Upgrade");
-        response.setHeader(WSH_SEC_WS_ACCEPT_KEY, sha1Space);
-        response.end();
-        this->transport->setState(WSS_IDLE);
-        return true;
-    } else {
-        response.closeConnection();
-        return false;
-    }
-}
-
-namespace tc_b64 {
-    const char *b64Dictionary = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-    void innerBase64(const uint8_t *data, int size, uint8_t *buffer) {
-        if (size == 3) {
-            buffer[0] = b64Dictionary[data[0] >> 2];
-            buffer[1] = b64Dictionary[(data[0] & 0x3) << 4 | (data[1] >> 4)];
-            buffer[2] = b64Dictionary[(data[1] & 0x0F) << 2 | (data[2] >> 6)];
-            buffer[3] = b64Dictionary[data[2] & 0x3F];
-        } else if (size == 2) {
-            buffer[0] = b64Dictionary[data[0] >> 2];
-            buffer[1] = b64Dictionary[(data[0] & 0x3) << 4 | (data[1] >> 4)];
-            buffer[2] = b64Dictionary[(data[1] & 0x0F) << 2];
-            buffer[3] = '=';
-        } else if (size == 1) {
-            buffer[0] = b64Dictionary[data[0] >> 2];
-            buffer[1] = b64Dictionary[(data[0] & 0x3) << 4];
-            buffer[2] = '=';
-            buffer[3] = '=';
-        }
-    }
-
-    int base64(const uint8_t *data, int dataSize, uint8_t *buffer, int bufferSize) {
-        // If we get here we've got enough space to do the encoding
-
-        int writtenBytes = 0;
-        // Break the input into 3-byte chunks and process each of them
-        int i;
-        for (i = 0; i < dataSize / 3; i++) {
-            writtenBytes += 4;
-            if(writtenBytes >= bufferSize) return -1;
-            innerBase64(&data[i * 3], 3, &buffer[i * 4]);
-        }
-        if (dataSize % 3 > 0) {
-            writtenBytes += 4;
-            // It doesn't fit neatly into a 3-byte chunk, so process what's left
-            innerBase64(&data[i * 3], dataSize % 3, &buffer[i * 4]);
-        }
-
-        if(writtenBytes < bufferSize) {
-            buffer[writtenBytes] = 0;
-        }
-        return writtenBytes;
-    }
-}
-
-inline WebSocketOpcode getOpcode(uint8_t header) {
-    return (WebSocketOpcode)(header & WS_OPCODE_MASK);
-}
-
-void AbstractWebSocketTcMenuTransport::close() {
-    uint8_t sz[2];
-    sendMessageOnWire(OPC_CLOSE, sz, 0);
     bytesLeftInCurrentMsg = 0;
     frameMaskingPosition = 0;
     writePosition = 0;
@@ -185,7 +24,8 @@ void AbstractWebSocketTcMenuTransport::close() {
     currentState = WSS_NOT_CONNECTED;
 }
 
-bool AbstractWebSocketTcMenuTransport::readAvailable() {
+bool TcMenuWebServerTransport::readAvailable() {
+    if(!consideredOpen) return false;
     // short circuit when there's room in the buffer already.
     if(readPosition < readAvail && currentState == WSS_PROCESSING_MSG) return true;
 
@@ -194,9 +34,10 @@ bool AbstractWebSocketTcMenuTransport::readAvailable() {
         switch (currentState) {
             case WSS_PROCESSING_MSG:
                 if(bytesLeftInCurrentMsg > 0) {
-                    readAvail = performRawRead(readBuffer, bytesLeftInCurrentMsg);
+                    readAvail = performRawRead(readBuffer, min(bytesLeftInCurrentMsg, (size_t)bufferSize));
+                    bytesLeftInCurrentMsg = bytesLeftInCurrentMsg - readAvail;
                     readPosition = 0;
-                    if(readAvail > 0) return true;
+                    return readAvail > 0;
                 }
                 setState(WSS_IDLE); // we are now idle and trying to read the two byte frame
                 readPosition = 0;
@@ -205,6 +46,9 @@ bool AbstractWebSocketTcMenuTransport::readAvailable() {
             case WSS_IDLE:
             case WSS_LEN_READ: {
                 auto actual = performRawRead(&readBuffer[readPosition], readPosition == 0 ? 2 : 1);
+                if(actual < 0) {
+                    return false;
+                }
                 readPosition += actual;
                 if (readPosition < 2) return false;
                 setState(WSS_LEN_READ);
@@ -253,7 +97,7 @@ bool AbstractWebSocketTcMenuTransport::readAvailable() {
     return false;
 }
 
-uint8_t AbstractWebSocketTcMenuTransport::readByte() {
+uint8_t TcMenuWebServerTransport::readByte() {
     if(currentState == WSS_HTTP_REQUEST) {
         uint8_t sz[1];
         performRawRead(sz, 1);
@@ -262,14 +106,13 @@ uint8_t AbstractWebSocketTcMenuTransport::readByte() {
     else if(readPosition < readAvail && currentState == WSS_PROCESSING_MSG) {
         auto data = readBuffer[readPosition] ^ frameMask[frameMaskingPosition];
         readPosition++;
-        bytesLeftInCurrentMsg--;
         frameMaskingPosition = (frameMaskingPosition + 1) % 4;
         return data;
     }
     else return 0xff; // fault. called without checking readAvailable
 }
 
-int AbstractWebSocketTcMenuTransport::writeChar(char data) {
+int TcMenuWebServerTransport::writeChar(char data) {
     if(writePosition >= (bufferSize - 2)) {
         // we've exceeded the buffer size so we must flush, and then ensure
         // that flush actually did something and there is now capacity.
@@ -281,7 +124,7 @@ int AbstractWebSocketTcMenuTransport::writeChar(char data) {
     return 1;
 }
 
-int AbstractWebSocketTcMenuTransport::writeStr(const char *data) {
+int TcMenuWebServerTransport::writeStr(const char *data) {
     // only uncomment below for worst case debugging..
     //	serdebug2("writing ", data);
 
@@ -294,108 +137,114 @@ int AbstractWebSocketTcMenuTransport::writeStr(const char *data) {
     return (int)len;
 }
 
-void AbstractWebSocketTcMenuTransport::flush() {
-    if(writePosition == 0) return;
+bool TcMenuWebServerTransport::connected() {
+    return consideredOpen;
+}
+
+void TcMenuWebServerTransport::flush() {
+    if(!consideredOpen || writePosition == 0) return;
 
     sendMessageOnWire(OPC_TEXT, writeBuffer, writePosition);
     serdebugF2("Buffer written ", writePosition);
     writePosition = 0;
 }
 
-void AbstractWebSocketTcMenuTransport::sendMessageOnWire(WebSocketOpcode opcode, uint8_t* buffer, size_t size) {
+void TcMenuWebServerTransport::sendMessageOnWire(WebSocketOpcode opcode, uint8_t* buffer, size_t size) {
     buffer[0] = (uint8_t)(WS_FIN | opcode);
     buffer[1] = (uint8_t)size;
     performRawWrite(buffer, size + 2);
 }
 
-void AbstractWebSocketTcMenuTransport::endMsg() {
+void TcMenuWebServerTransport::endMsg() {
     TagValueTransport::endMsg();
     flush();
 }
 
 // ------------ Web server
 
-AbstractLightweightWebServer::AbstractLightweightWebServer(): socketInitialised(false) {}
+TcMenuLightweightWebServer::TcMenuLightweightWebServer(int port, int numConcurrent): numConcurrent(numConcurrent), responses {}, socketInitialised(false),
+                                                                                     connectionsWaiting(5), port(port) {
+    if(numConcurrent > MAX_WEBSERVER_RESPONSES) numConcurrent = MAX_WEBSERVER_RESPONSES;
 
-void AbstractLightweightWebServer::init() {
-    taskManager.registerEvent(this);
+    for(int i=0; i<numConcurrent; i++){
+        responses[i] = new WebServerResponse(this, new TcMenuWebServerTransport(), WebServerResponse::CLOSE_AFTER_RESPONSE);
+    }
 }
 
-void AbstractLightweightWebServer::exec() {
+void TcMenuLightweightWebServer::init() {
+    taskManager.registerEvent(this);
+    initialiseAccept(port, [](socket_t fd, void* d) { reinterpret_cast<TcMenuLightweightWebServer*>(d)->pushClientSocket(fd); }, this);
+}
+
+void TcMenuLightweightWebServer::exec() {
     if(!socketInitialised) {
-        if(areWeConnected()) {
-            initialiseConnection();
-            socketInitialised = true;
+        socketInitialised = isNetworkUp();
+        if (socketInitialised) {
+            markTriggeredAndNotify();
         }
-    } else if(response.getMode() == WebServerResponse::TRANSPORT_ASSIGNED) {
-        bool needAnotherGo = true;
-        while(needAnotherGo) {
-            auto method = response.processRequestLine();
-            if(method == POST || method == GET) {
-                response.setMode(WebServerResponse::READING_HEADERS);
-                needAnotherGo = attemptToHandleRequest(method);
-                if(!needAnotherGo) response.closeConnection();
-            } else if(method == REQ_ERROR){
-                needAnotherGo = false;
-                sendErrorCode(WS_INT_RESPONSE_INT_ERR);
-                response.closeConnection();
-            } else if(method == REQ_NONE && response.hasErrorOccurred()) {
-                needAnotherGo = false;
-                response.closeConnection();
+    } else {
+        while(connectionsWaiting.available()) {
+            socket_t sockFd = connectionsWaiting.get();
+            WebServerResponse* response = nextAvailableResponse();
+            if(response) {
+                response->serviceClient(sockFd);
             } else {
-                needAnotherGo = false;
+                serdebugF("Too many connections");
+                return;
             }
         }
     }
 }
 
-bool AbstractLightweightWebServer::attemptToHandleRequest(WebServerMethod &method) {
+void TcMenuLightweightWebServer::pushClientSocket(socket_t socketIncoming) {
+    connectionsWaiting.put(socketIncoming);
+    markTriggeredAndNotify();
+}
+
+uint32_t TcMenuLightweightWebServer::timeOfNextCheck() {
+    if(connectionsWaiting.available() || !socketInitialised) {
+        markTriggeredAndNotify();
+    }
+    return millisToMicros(200);
+}
+
+bool TcMenuLightweightWebServer::attemptToHandleRequest(WebServerResponse& response, const char* url) {
     for(auto urlWithHandler : urlHandlers) {
-        if(urlWithHandler.isRequestCompatible(response.getLastData(), method)) {
+        if(urlWithHandler.isRequestCompatible(url, response.getMethod())) {
             if(response.processHeaders()) {
                 urlWithHandler.handleUrl(response);
                 if (response.getMode() != WebServerResponse::NOT_IN_USE) {
                     response.end();
                 }
-                return true;
+                // we return if it is likley that more request will be on the same connection, if in single shot mode
+                // then this should be false. Otherwise true, to keep the connection open.
+                return !response.isInSingleShotMode();
             } else {
-                sendErrorCode(WS_INT_RESPONSE_INT_ERR);
+                sendErrorCode(&response, WS_INT_RESPONSE_INT_ERR);
                 return false;
             }
         }
     }
-    sendErrorCode(WS_INT_RESPONSE_NOT_FOUND);
+    sendErrorCode(&response, WS_INT_RESPONSE_NOT_FOUND);
     return false;
 }
 
-uint32_t AbstractLightweightWebServer::timeOfNextCheck() {
-    if(!socketInitialised) {
-        markTriggeredAndNotify();
-        return millisToMicros(10);
-    }
-    if(response.getMode() != WebServerResponse::NOT_IN_USE) {
-        markTriggeredAndNotify();
-        return millisToMicros(1);
+void TcMenuLightweightWebServer::sendErrorCode(WebServerResponse* response, int errorCode) {
+    if(errorCode == WS_INT_RESPONSE_NOT_FOUND) {
+        response->startHeader(WS_INT_RESPONSE_NOT_FOUND, WS_TEXT_RESPONSE_NOT_FOUND);
+        response->contentInfo(WebServerResponse::PLAIN_TEXT, 0);
+        response->end();
     } else {
-        AbstractWebSocketTcMenuTransport *pTransport = attemptNewConnection();
-        if(pTransport) {
-            response.setTransport(pTransport);
-            markTriggeredAndNotify();
-            return millisToMicros(1);
-        }
-        return millisToMicros(100);
+        response->startHeader(WS_INT_RESPONSE_INT_ERR, "Internal error");
+        response->contentInfo(WebServerResponse::PLAIN_TEXT, 0);
+        response->end();
+
     }
 }
 
-void AbstractLightweightWebServer::sendErrorCode(int errorCode) {
-    if(errorCode == WS_INT_RESPONSE_NOT_FOUND) {
-        response.startHeader(WS_INT_RESPONSE_NOT_FOUND, WS_TEXT_RESPONSE_NOT_FOUND);
-        response.contentInfo(WebServerResponse::PLAIN_TEXT, 0);
-        response.end();
-    } else {
-        response.startHeader(WS_INT_RESPONSE_INT_ERR, "Internal error");
-        response.contentInfo(WebServerResponse::PLAIN_TEXT, 0);
-        response.end();
-
+WebServerResponse *TcMenuLightweightWebServer::nextAvailableResponse() {
+    for(int i=0;i<numConcurrent;i++) {
+        if(responses[i] != nullptr && responses[i]->getMode() == WebServerResponse::NOT_IN_USE) return responses[i];
     }
+    return nullptr;
 }

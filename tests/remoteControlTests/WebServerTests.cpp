@@ -4,7 +4,7 @@
 #include <SimpleCollections.h>
 #include <remote/TcMenuWebServer.h>
 #include "SimpleTestFixtures.h"
-#include "UnitTestTransport.h"
+#include "UnitTestDriver.h"
 
 using namespace aunit;
 using namespace tcremote;
@@ -72,10 +72,6 @@ const char EXPECTED_RESP5[] = "HTTP/1.1 200 OK\r\n"
                               "\r\n"
                               "Aloha";
 
-bool tcremote::areWeConnected() {
-    return true;
-}
-
 void copyHtmlWithTitleAndText(const char* title, const char* heading, char* buffer) {
     strcpy(buffer, "<html><head><title>");
     strcat(buffer, title);
@@ -84,7 +80,7 @@ void copyHtmlWithTitleAndText(const char* title, const char* heading, char* buff
     strcat(buffer, "</h1></body></html>");
 }
 
-class TestTcMenuWebServer : public AbstractLightweightWebServer {
+class TestTcMenuWebServer : public TcMenuLightweightWebServer {
 private:
     UnitTestWebSockTransport transport;
     const char* requestUrl{};
@@ -92,10 +88,6 @@ public:
     explicit TestTcMenuWebServer(bsize_t sz) : transport(sz) {}
 
     void setRequestUrl(const char* r) { requestUrl = r; }
-
-    void initialiseConnection() override {
-        socketInitialised = true;
-    }
 
     AbstractWebSocketTcMenuTransport* attemptNewConnection() override {
         if(requestUrl) {

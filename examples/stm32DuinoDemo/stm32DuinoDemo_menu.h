@@ -14,7 +14,6 @@
 #include <Arduino.h>
 #include <tcMenu.h>
 #include "tcMenuU8g2.h"
-#include "tcMenuECWebServer.h"
 #include <RemoteMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
@@ -22,6 +21,7 @@
 #include <IoAbstraction.h>
 #include <mbed/HalStm32EepromAbstraction.h>
 #include <RemoteAuthentication.h>
+#include <remote/TcMenuWebServer.h>
 
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
