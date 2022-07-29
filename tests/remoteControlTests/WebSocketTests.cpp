@@ -25,7 +25,7 @@ const char EXPECTED_HTTP_RESPONSE[] = "HTTP/1.1 101 Switching Protocols\r\n"
                                       "Connection: Upgrade\r\n"
                                       "Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=\r\n\r\n";
 
-TcMenuLightweightWebServer webServer(1);
+TcMenuLightweightWebServer webServer(80, 1);
 
 test(testPromoteWebSocket) {
     serdebugF("Starting websocket promote and protocol test");
