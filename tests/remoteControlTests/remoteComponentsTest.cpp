@@ -48,7 +48,7 @@ public:
     }
 };
 
-bool checkForMessageOfType(BtreeList<uint16_t, ReceivedMessage>& msgs, uint16_t msgType, const char* expected) {
+bool tcremote::checkForMessageOfType(BtreeList<uint16_t, ReceivedMessage>& msgs, uint16_t msgType, const char* expected) {
     serdebugF2("Check msg ", expected);
     auto* rxMsg = msgs.getByKey(msgType);
     if(rxMsg == nullptr) {

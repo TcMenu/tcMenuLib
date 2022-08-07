@@ -350,8 +350,13 @@
         "subsystem": "REMOTE"
       },
       {
-        "name": "WEBSOCKET_ENDPOINT",
-        "latestValue": "/ws",
+        "name": "ASWEB_NUM_WEBSOCKETS",
+        "latestValue": "2",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "ASWEB_NETWORK_LIB",
+        "latestValue": "ESP32_LWIP",
         "subsystem": "REMOTE"
       },
       {

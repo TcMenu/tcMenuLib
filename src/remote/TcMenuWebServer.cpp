@@ -16,12 +16,18 @@ void TcMenuWebServerTransport::close() {
         uint8_t sz[2];
         sendMessageOnWire(OPC_CLOSE, sz, 0);
     }
+    closeSocket(clientFd);
     bytesLeftInCurrentMsg = 0;
     frameMaskingPosition = 0;
     writePosition = 0;
     readAvail = 0;
     readPosition = 0;
     currentState = WSS_NOT_CONNECTED;
+}
+
+bool TcMenuWebServerTransport::available() {
+    if(!consideredOpen) return false;
+    return rawWriteAvailable(clientFd);
 }
 
 bool TcMenuWebServerTransport::readAvailable() {
@@ -147,6 +153,7 @@ void TcMenuWebServerTransport::flush() {
     sendMessageOnWire(OPC_TEXT, writeBuffer, writePosition);
     serdebugF2("Buffer written ", writePosition);
     writePosition = 0;
+    rawFlushAll(clientFd);
 }
 
 void TcMenuWebServerTransport::sendMessageOnWire(WebSocketOpcode opcode, uint8_t* buffer, size_t size) {
@@ -160,6 +167,13 @@ void TcMenuWebServerTransport::endMsg() {
     flush();
 }
 
+void TcMenuWebServerTransport::setClient(socket_t client) {
+    clientFd = client;
+    consideredOpen = true;
+    readPosition = readAvail = writePosition = frameMaskingPosition = 0;
+    setState(tcremote::WSS_HTTP_REQUEST);
+}
+
 // ------------ Web server
 
 TcMenuLightweightWebServer::TcMenuLightweightWebServer(int port, int numConcurrent): numConcurrent(numConcurrent), responses {}, socketInitialised(false),
@@ -171,17 +185,28 @@ TcMenuLightweightWebServer::TcMenuLightweightWebServer(int port, int numConcurre
     }
 }
 
+TcMenuLightweightWebServer::~TcMenuLightweightWebServer() {
+    if(wsTaskId != TASKMGR_INVALIDID) {
+        taskManager.cancelTask(wsTaskId);
+    }
+
+    for(int i=0; i<numConcurrent; i++) {
+        responses[i]->stop();
+        delete responses[i];
+    }
+}
+
 void TcMenuLightweightWebServer::init() {
-    taskManager.registerEvent(this);
+    wsTaskId = taskManager.registerEvent(this);
     initialiseAccept(port, [](socket_t fd, void* d) { reinterpret_cast<TcMenuLightweightWebServer*>(d)->pushClientSocket(fd); }, this);
+    for(int i=0; i<numConcurrent; i++) {
+        responses[i]->init();
+    }
 }
 
 void TcMenuLightweightWebServer::exec() {
     if(!socketInitialised) {
         socketInitialised = isNetworkUp();
-        if (socketInitialised) {
-            markTriggeredAndNotify();
-        }
     } else {
         while(connectionsWaiting.available()) {
             socket_t sockFd = connectionsWaiting.get();
@@ -205,7 +230,7 @@ uint32_t TcMenuLightweightWebServer::timeOfNextCheck() {
     if(connectionsWaiting.available() || !socketInitialised) {
         markTriggeredAndNotify();
     }
-    return millisToMicros(200);
+    return millisToMicros(100);
 }
 
 bool TcMenuLightweightWebServer::attemptToHandleRequest(WebServerResponse& response, const char* url) {
@@ -213,7 +238,7 @@ bool TcMenuLightweightWebServer::attemptToHandleRequest(WebServerResponse& respo
         if(urlWithHandler.isRequestCompatible(url, response.getMethod())) {
             if(response.processHeaders()) {
                 urlWithHandler.handleUrl(response);
-                if (response.getMode() != WebServerResponse::NOT_IN_USE) {
+                if (response.getMode() != WebServerResponse::NOT_IN_USE && response.getMode() != WebServerResponse::WEBSOCKET_BUSY) {
                     response.end();
                 }
                 // we return if it is likley that more request will be on the same connection, if in single shot mode

@@ -29,6 +29,10 @@ void setup() {
     while(!Serial);
 
     menuMgr.initWithoutInput(&noRenderer, &menuVolume);
+
+    //TestRunner::exclude("*");
+    //TestRunner::include("testPromoteWebSocket");
+
 }
 
 void loop() {

@@ -2,7 +2,7 @@
 #include <PlatformDetermination.h>
 #include "TcMenuHttpRequestProcessor.h"
 #include "TcMenuWebServer.h"
-#include <TaskManager.h>
+#include <TaskManagerIO.h>
 
 using namespace tcremote;
 
@@ -173,9 +173,18 @@ void tcremote::HttpProcessor::tick() {
     millisStart = millis();
 }
 
+void HttpProcessor::reset() {
+    millisStart = millis();
+    protocolError = false;
+}
+
 WebServerResponse::WebServerResponse(TcMenuLightweightWebServer *webServer, TcMenuWebServerTransport *tx,
                                      WebServerResponse::WSRConnectionType conType)
-        : webServer(webServer), method(GET), transport(nullptr), processor(tx), mode(NOT_IN_USE), connectionType(conType), webSocketSha1KeyToRespond{} {}
+        : webServer(webServer), method(GET), transport(tx), processor(tx), mode(NOT_IN_USE), connectionType(conType), webSocketSha1KeyToRespond{} {}
+
+void WebServerResponse::init() {
+    scheduledTaskId = taskManager.scheduleFixedRate(20, this);
+}
 
 void WebServerResponse::contentInfo(WSRContentType contentType, size_t len) {
     const char *headerText;
@@ -276,10 +285,21 @@ void WebServerResponse::setHeader(WebServerHeader header, const char *headerValu
     transport->performRawWrite(dataArea, strlen((char*)dataArea));
 }
 
-void WebServerResponse::addSecResponseWebSocketHeader() {
-    char sz[32];
+void WebServerResponse::turnRequestIntoWebSocket() {
+    char sz[34];
+
+    startHeader(WS_CODE_CHANGING_PROTOCOL, "Switching Protocols");
+    setHeader(WSH_UPGRADE_TO_WEBSOCKET, "websocket");
+    setHeader(WSH_CONNECTION, "Upgrade");
+    this->transport->setState(WSS_IDLE);
     tc_b64::base64(webSocketSha1KeyToRespond, sizeof(webSocketSha1KeyToRespond), (uint8_t *) sz, sizeof sz);
     setHeader(WSH_SEC_WS_ACCEPT_KEY, sz);
+
+    // at this point the connection is fully established and in web socket mode
+    connectionType = WEB_SOCKET;
+    setMode(WEBSOCKET_BUSY);
+    transport->setState(WSS_IDLE);
+    end(); // terminate the header, won't close connection because we've switched to websocket mode.
 }
 
 void WebServerResponse::startData() {
@@ -290,21 +310,12 @@ void WebServerResponse::startData() {
 
 bool WebServerResponse::send(const uint8_t *startingLocation, size_t numBytes) {
     if(mode != PREPARING_CONTENT) startData();
-    size_t bytesSent = 0;
-    while(bytesSent < numBytes) {
-        size_t toSend = min(500U, numBytes);
-        int iterations = 0;
-        while(!transport->available() && transport->connected() && ++iterations < 100) {
-            taskManager.yieldForMicros(1000);
-        }
-        auto actual = transport->performRawWrite(&startingLocation[bytesSent], toSend);
-        if(actual == 0) {
-            closeConnection();
-            return false;
-        }
-        bytesSent += actual;
+    auto didSend = transport->performRawWrite(startingLocation, numBytes);
+    if(!didSend) {
+        closeConnection();
+        return false;
     }
-    return bytesSent == numBytes;
+    return true;
 }
 
 bool WebServerResponse::send_P(const uint8_t *startingLocation, size_t numBytes) {
@@ -313,29 +324,16 @@ bool WebServerResponse::send_P(const uint8_t *startingLocation, size_t numBytes)
     while(bytesSent < numBytes) {
         size_t toSend = min(transport->getReadBufferSize(), numBytes);
         memcpy_P(transport->getReadBuffer(), &startingLocation[bytesSent], toSend);
-        int iterations = 0;
-        while(!transport->available() && transport->connected() && ++iterations < 100) {
-            taskManager.yieldForMicros(1000);
-        }
-        auto actual = transport->performRawWrite(transport->getReadBuffer(), toSend);
-        if(actual == 0) {
-            transport->close();
+        bool didSend = transport->performRawWrite(transport->getReadBuffer(), toSend);
+        if(!didSend) {
+            closeConnection();
             return false;
         }
-        bytesSent += actual;
+        bytesSent += toSend;
     }
     return bytesSent == numBytes;
 }
 
-/*
-        response.startHeader(WS_CODE_CHANGING_PROTOCOL, "Switching Protocols");
-        response.setHeader(WSH_UPGRADE_TO_WEBSOCKET, "websocket");
-        response.setHeader(WSH_CONNECTION, "Upgrade");
-        response.setHeader(WSH_SEC_WS_ACCEPT_KEY, sha1Space);
-        response.end();
-        this->transport->setState(WSS_IDLE);
-        return true;
-*/
 
 bool WebServerResponse::processHeaders() {
     char* buffer = (char*)transport->getReadBuffer();
@@ -377,9 +375,10 @@ void WebServerResponse::end() {
     }
 
     if(connectionType == CLOSE_AFTER_RESPONSE) {
+        transport->flush();
         transport->close();
         mode = NOT_IN_USE;
-    } else {
+    } else if(connectionType != WEB_SOCKET) {
         mode = TRANSPORT_ASSIGNED;
         processor.tick(); // wait 2 seconds from end of last message.
     }
@@ -388,17 +387,13 @@ void WebServerResponse::end() {
 void WebServerResponse::serviceClient(socket_t sock) {
     transport->setClient(sock);
     setMode(TRANSPORT_ASSIGNED);
-    markTriggeredAndNotify();
-}
-
-uint32_t WebServerResponse::timeOfNextCheck() {
-    return millisToMicros(100);
+    connectionType = CLOSE_AFTER_RESPONSE;
 }
 
 void WebServerResponse::exec() {
     if(mode == TRANSPORT_ASSIGNED) {
         transport->setState(WSS_HTTP_REQUEST); // regular http request.
-        mode = TRANSPORT_ASSIGNED;
+        processor.reset();
 
         bool needAnotherGo = true;
         while (needAnotherGo) {
@@ -407,7 +402,14 @@ void WebServerResponse::exec() {
             if (method == POST || method == GET) {
                 setMode(WebServerResponse::READING_HEADERS);
                 needAnotherGo = webServer->attemptToHandleRequest(*this, (const char *) transport->getReadBuffer());
-                if (!needAnotherGo) closeConnection();
+
+                // if we upgraded to a websocket, we don't need another go, and we mark the response object busy.
+                // It is the responsibility of the websocket handler to close the connection once completed.
+                if(connectionType == WEB_SOCKET) {
+                    needAnotherGo = false;
+                } else if(!needAnotherGo) {
+                    closeConnection();
+                }
             } else if (method == REQ_ERROR) {
                 needAnotherGo = false;
                 webServer->sendErrorCode(this, WS_INT_RESPONSE_INT_ERR);
@@ -428,5 +430,15 @@ void WebServerResponse::closeConnection() {
 
 bool WebServerResponse::hasErrorOccurred() {
     return processor.isProtocolError();
+}
+
+void WebServerResponse::stop() {
+    if(scheduledTaskId != TASKMGR_INVALIDID) {
+        taskManager.cancelTask(scheduledTaskId);
+    }
+}
+
+void WebServerResponse::sendError(int code) {
+    this->webServer->sendErrorCode(this, code);
 }
 

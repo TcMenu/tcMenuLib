@@ -106,14 +106,21 @@ namespace tcremote {
     int rawReadData(socket_t socketNum, void* data, size_t dataLen);
 
     /**
-     * Determine if it is possible to do a raw read on this network interface, return true if possible otherwise false
+     * Determine if it is possible to do a raw read on this connecetion, return true if possible otherwise false
      * @return if it is possible to do a read now.
      */
     bool rawReadAvailable(socket_t sockFd);
 
     /**
+     * Determine if we can write now without blocking on this connection
+     * @param sockFd the socket to check
+     * @return true if write wont block, otherwise false.
+     */
+    bool rawWriteAvailable(socket_t sockFd);
+
+    /**
      * Write the amount of data specified by dataLen to the socket, this will block safely through the first task
-     * manager if needed using it's yield function.
+     * manager if needed using it's yield function. It may or may not flush data to the socket.
      * @param socketNum the socket to write to
      * @param data the buffer to write
      * @param dataLen the amount to write from the buffer
@@ -121,6 +128,13 @@ namespace tcremote {
      * @return an error code to indicate call status
      */
     SocketErrCode rawWriteData(socket_t socketNum, const void* data, size_t dataLen, int timeoutMillis = 1500);
+
+    /**
+     * Flush any data that has been cached for the socket provided.
+     * @param socketNum the socket to flush
+     * @return an error code to indicate call status
+     */
+    SocketErrCode rawFlushAll(socket_t socketNum);
 
     /**
      * closes the current socket

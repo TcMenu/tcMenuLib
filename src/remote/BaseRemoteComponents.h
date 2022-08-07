@@ -13,7 +13,12 @@
 #include <PlatformDetermination.h>
 #include "../RemoteConnector.h"
 
+// This defines the number of different connections that can be established, for example each websocket, or each
+// tagval connection takes one of these, you can define this to a different number as a build flag. Web server static
+// content servers don't count toward this.
+#ifndef ALLOWED_CONNECTIONS
 #define ALLOWED_CONNECTIONS 4
+#endif
 
 namespace tcremote {
 
@@ -39,7 +44,10 @@ namespace tcremote {
      */
     class NoInitialisationNeeded : public DeviceInitialisation {
     private:
+        bool attemptConnectionReturn;
     public:
+        explicit NoInitialisationNeeded(bool attemptConnectionReturn = true) : attemptConnectionReturn(attemptConnectionReturn) {}
+
         bool attemptInitialisation() override {
             initialised = true;
             return true;

@@ -11,8 +11,14 @@
 
 #include <TaskManagerIO.h>
 
-//                        0123456789 0123456789 0123456789 0123456789 0123456789
-const char* ramDataSet = "Item 1\0   Item 2\0   Item 3\0   Item 4\0   Item 5\0   ";
+// This variable is the RAM data for scroll choice item Scroll
+char ramDataSet[] = "1\0        2\0        3\0        4\0        5\0        ~";
+
+const uint8_t myManualIp[] = { 192, 168, 0, 202 };
+const uint8_t myManualMac[] = { 0xde, 0xed, 0xbe, 0xef, 0xfe, 0xed };
+const uint8_t standardNetMask[] = { 255, 255, 255, 0 };
+
+using namespace tcremote;
 
 class MyCustomDrawing : public CustomDrawing {
 private:
@@ -68,10 +74,15 @@ void setup() {
     SPI.setSCLK(PB3);
 
     // Now start up the ethernet library.
-    Ethernet.begin();
-    Serial.print("My IP address is ");
-    Ethernet.localIP().printTo(Serial);
-    Serial.println();
+    startNetLayerManual(myManualIp, myManualMac, standardNetMask);
+    if(isNetworkUp()) {
+        char sz[30];
+        copyIpAddress(TC_LOCALHOST_SOCKET_ID, sz, sizeof sz);
+        Serial.print("My IP address is ");
+        Serial.println(sz);
+    } else {
+        Serial.println("Network did not start!");
+    }
 
     // and then run the menu setup
     setupMenu();

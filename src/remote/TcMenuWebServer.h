@@ -78,17 +78,13 @@ namespace tcremote {
         uint8_t readByte() override;
         void endMsg() override;
 
-        void setClient(socket_t client) {
-            clientFd = client;
-            consideredOpen = true;
-            setState(tcremote::WSS_HTTP_REQUEST);
-        }
+        void setClient(socket_t client);
 
         int writeChar(char data) override;
         int writeStr(const char *data) override;
 
         bool readAvailable() override;
-        bool available() override { return consideredOpen; }
+        bool available() override;
 
         bool connected() override;
 
@@ -137,8 +133,10 @@ namespace tcremote {
         bool socketInitialised;
         GenericCircularBuffer<socket_t> connectionsWaiting;
         int port;
+        taskid_t wsTaskId = TASKMGR_INVALIDID;
     public:
         explicit TcMenuLightweightWebServer(int port, int numConcurrent);
+        ~TcMenuLightweightWebServer() override;
 
         void init();
         void exec() override;
@@ -147,13 +145,13 @@ namespace tcremote {
 
         void onUrlGet(const char* url, WebPageHandler pageHandler) { urlHandlers.add(UrlWithHandler(urlHandlers.count(), GET, url, pageHandler));}
         void onUrlPost(const char* url, WebPageHandler pageHandler) { urlHandlers.add(UrlWithHandler(urlHandlers.count(), POST, url, pageHandler)); }
-        void onWebSocket(const char* url, WebPageHandler pageHandler) { urlHandlers.add(UrlWithHandler(urlHandlers.count(), WS_UPGRADE, url, pageHandler)); }
 
         bool isInitialised() const { return socketInitialised; }
         bool attemptToHandleRequest(WebServerResponse& method, const char* url);
         virtual void sendErrorCode(WebServerResponse* response, int errorCode);
 
         WebServerResponse *nextAvailableResponse();
+        WebServerResponse* getWebResponse(int num) { return responses[num]; }
     };
 }
 

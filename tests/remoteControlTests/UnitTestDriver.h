@@ -133,7 +133,7 @@ namespace tcremote {
             pushByte(0x02);
         }
 
-        BtreeList<uint16_t, ReceivedMessage> &getReceivedMessages() {
+        BtreeList<uint16_t, ReceivedMessage>& getReceivedMessages() {
             return receivedMessages;
         }
     };
@@ -142,6 +142,7 @@ namespace tcremote {
 
     class UnitDriverSocket {
     private:
+        bool shouldBeInWebSocketMode = false;
         bool isConnected;
         bool hasClosed;
         SCCircularBuffer readScBuffer;
@@ -182,21 +183,25 @@ namespace tcremote {
             return (int) pos;
         }
 
-        int getClientTxBytesRaw(char *data, int size) {
-            int pos = 0;
-            while (writeScBuffer.available() && pos < size) {
-                data[pos] = (char) (writeScBuffer.get());
-                pos++;
-            }
-            return pos;
+        void markAsClosed() {
+            hasClosed = true;
         }
 
         void reset(bool connectionState = false) {
+            // clear all received messages
+            receivedMessages.clear();
+
             // clear out both buffers and reset to not connected.
             while (readScBuffer.available()) readScBuffer.get();
             while (writeScBuffer.available()) writeScBuffer.get();
+
+            // reset state
             isConnected = connectionState;
+            shouldBeInWebSocketMode = false;
+            hasClosed = false;
         }
+
+        void setShouldBeInWebSocketMode(bool b) { shouldBeInWebSocketMode = b; }
 
         void close() {
             hasClosed = true;
@@ -209,12 +214,27 @@ namespace tcremote {
         void flush();
 
         void simulateIncomingMsg(uint16_t msgType, const char *data, bool masked);
+        void simulateIncomingRaw(const char* rawData);
+        bool checkResponseAgainst(const char* expected);
 
-        BtreeList<uint16_t, ReceivedMessage> &getReceivedMessages() {
+        BtreeList<uint16_t, ReceivedMessage>& getReceivedMessages() {
             return receivedMessages;
+        }
+
+        int getClientTxBytesRaw(char *data, int size) {
+            int pos = 0;
+            while (writeScBuffer.available() && pos < size) {
+                data[pos] = (char) (writeScBuffer.get());
+                pos++;
+            }
+            return pos;
         }
     };
 
+    void resetUnitLayer();
+    void simulateAccept();
+
+    extern UnitDriverSocket driverSocket;
 }
 
 #endif // UNITTEST_TRANSPORT_H

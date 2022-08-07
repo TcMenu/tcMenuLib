@@ -85,6 +85,8 @@ namespace tcremote {
     public:
         explicit HttpProcessor(TcMenuWebServerTransport* transport) : transport(transport), millisStart(0) {}
 
+        void reset();
+
         bool readWordUntilTrim(char *buffer, size_t bufferSize, bool skipSeparator = false);
 
         char readCharFromTransport();
@@ -96,8 +98,6 @@ namespace tcremote {
         void tick();
 
         bool isProtocolError() const {return protocolError;}
-
-        void webSocketUpgrade();
     };
 
     class TcMenuLightweightWebServer;
@@ -108,9 +108,9 @@ namespace tcremote {
      * in the usual manner (eg sending headers, then data, then calling end, once end() is called, you can check if there
      * is another request within the same transport.
      */
-    class WebServerResponse : public BaseEvent {
+    class WebServerResponse : public Executable {
     public:
-        enum WSRMode { NOT_IN_USE, TRANSPORT_ASSIGNED, READING_HEADERS, PREPARING_HEADER, PREPARING_CONTENT };
+        enum WSRMode { NOT_IN_USE, TRANSPORT_ASSIGNED, READING_HEADERS, PREPARING_HEADER, PREPARING_CONTENT, WEBSOCKET_BUSY };
         enum WSRContentType { PLAIN_TEXT, HTML_TEXT, PNG_IMAGE, JPG_IMAGE, WEBP_IMAGE, JSON_TEXT, TEXT_CSS, JAVASCRIPT, IMG_ICON };
         enum WSRConnectionType { KEEP_REQ_OPEN, CLOSE_AFTER_RESPONSE, WEB_SOCKET };
     private:
@@ -121,10 +121,12 @@ namespace tcremote {
         enum WSRMode mode;
         WSRConnectionType connectionType;
         uint8_t webSocketSha1KeyToRespond[20];
+        taskid_t scheduledTaskId = TASKMGR_INVALIDID;
     public:
         WebServerResponse(TcMenuLightweightWebServer* webServer, TcMenuWebServerTransport* tx, WSRConnectionType conType);
+        void init();
+        void stop();
         void serviceClient(socket_t sock);
-        WebServerMethod processRequestLine();
         bool processHeaders();
 
         WSRMode getMode() { return mode; }
@@ -133,7 +135,7 @@ namespace tcremote {
         void startHeader() { startHeader(WS_INT_RESPONSE_OK, WS_TEXT_RESPONSE_OK); }
         void startHeader(int code, const char* textualInfo);
         void setHeader(WebServerHeader header, const char* headerValue);
-        void addSecResponseWebSocketHeader();
+        void turnRequestIntoWebSocket();
         void contentInfo(WSRContentType contentType, size_t len);
         void startData();
         bool send_P(const char* startingLocation, size_t numBytes) { return send_P((uint8_t*) startingLocation, numBytes);}
@@ -141,16 +143,16 @@ namespace tcremote {
         bool send_P(const uint8_t* startingLocation, size_t numBytes);
         bool send(const uint8_t* startingLocation, size_t numBytes);
         void end();
-
+        void sendError(int code);
 
         void closeConnection();
         bool isInSingleShotMode() { return connectionType == CLOSE_AFTER_RESPONSE; }
 
         WebServerMethod getMethod() { return method; }
+        TcMenuWebServerTransport* getTransport() { return transport; }
 
         bool hasErrorOccurred();
 
-        uint32_t timeOfNextCheck() override;
         void exec() override;
     };
 }
