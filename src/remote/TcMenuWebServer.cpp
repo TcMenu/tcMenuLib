@@ -148,12 +148,16 @@ bool TcMenuWebServerTransport::connected() {
 }
 
 void TcMenuWebServerTransport::flush() {
-    if(!consideredOpen || writePosition == 0) return;
+    if(!consideredOpen) return;
 
-    sendMessageOnWire(OPC_TEXT, writeBuffer, writePosition);
-    serdebugF2("Buffer written ", writePosition);
-    writePosition = 0;
-    rawFlushAll(clientFd);
+    if(currentState == WSS_HTTP_REQUEST) {
+        rawFlushAll(clientFd);
+    } else if(writePosition != 0) {
+        sendMessageOnWire(OPC_TEXT, writeBuffer, writePosition);
+        serdebugF2("Buffer written ", writePosition);
+        writePosition = 0;
+        rawFlushAll(clientFd);
+    }
 }
 
 void TcMenuWebServerTransport::sendMessageOnWire(WebSocketOpcode opcode, uint8_t* buffer, size_t size) {

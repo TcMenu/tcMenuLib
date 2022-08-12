@@ -7,10 +7,15 @@
 #include "tcUtil.h"
 #include "lwip/timeouts.h"
 #include "IoLogging.h"
+#include <SCCircularBuffer.h>
 
 #define MAX_TCP_ACCEPTS 2
-#define MAX_TCP_CLIENTS 6
+#define MAX_TCP_CLIENTS 4
+// The write buffer is to prevent small packets with only a few bytes from being written.
 #define WRITE_BUFFER_SIZE 128
+// The read buffer takes data straight off the socket, and must be of a reasonable size, usually at least 1024 bytes
+// as it takes an immediate copy of the socket data.
+#define READ_BUFFER_SIZE 1024
 
 extern struct netif gnetif;
 
@@ -26,11 +31,12 @@ namespace tcremote {
         tcp_struct clientStruct;
         uint8_t writeBuffer[WRITE_BUFFER_SIZE];
         uint16_t writeBufferPos;
-        uint16_t bytesWeAreWaitingFor;
+        tccollection::SCCircularBuffer readBuffer;
+        volatile uint16_t bytesWeAreWaitingFor;
         uint16_t timeOutMillis;
         uint16_t lastWriteTick;
     public:
-        StmTcpClient() : clientStruct{}, writeBuffer{}, writeBufferPos(0), bytesWeAreWaitingFor(0), timeOutMillis(1000), lastWriteTick(0) {}
+        StmTcpClient() : clientStruct{}, writeBuffer{}, writeBufferPos(0), readBuffer(READ_BUFFER_SIZE), bytesWeAreWaitingFor(0), timeOutMillis(1000), lastWriteTick(0) {}
 
         void initialise(tcp_pcb* pcb) {
             clientStruct.pcb = pcb;
@@ -66,18 +72,21 @@ namespace tcremote {
             uint32_t then = millis();
 
             do {
+                if(!clientStruct.pcb) return SOCK_ERR_FAILED;
                 size_t maxSendSize = tcp_sndbuf(clientStruct.pcb);
 
-                if(bytesWeAreWaitingFor > 5000 || maxSendSize < 50) {
+                if(bytesWeAreWaitingFor > 1000 || maxSendSize < 50) {
                     // if we are getting ahead of ourselves by too far, or we've run out of space we back off
                     taskManager.yieldForMicros(50);
                 } else {
                     size_t thisTime = left > maxSendSize ? maxSendSize : left;
-                    auto err = tcp_write(clientStruct.pcb, &writeBuffer, writeBufferPos, TCP_WRITE_FLAG_COPY);
+                    auto err = tcp_write(clientStruct.pcb, buffer, thisTime, TCP_WRITE_FLAG_COPY);
                     if (err != ERR_OK) {
-                        serdebugF("Socket write error");
+                        serdebugF("Socket write error ");
                         return SOCK_ERR_FAILED;
-                    }
+                    } /*else {
+                        serdebugF3("Written this time, left ", thisTime, left);
+                    }*/
 
                     bytesWeAreWaitingFor += left;
                     left -= thisTime;
@@ -104,16 +113,20 @@ namespace tcremote {
 
         void close() {
             if(clientStruct.pcb) {
+                if(writeBufferPos != 0) {
+                    serdebugF("Close with buffer full");
+                }
                 tcp_connection_close(clientStruct.pcb, &clientStruct);
             }
         }
 
         int read(uint8_t * buffer, size_t bufferSize) {
-            if(clientStruct.data.p != nullptr) {
-                return (int) stm32_get_data(&clientStruct.data, buffer, bufferSize);
+            size_t pos = 0;
+            while(readBuffer.available() && pos < bufferSize) {
+                buffer[pos] = readBuffer.get();
             }
-            // No data available
-            return 0;
+            // Number of bytes read into buffer
+            return (int)pos;
         }
 
         SocketErrCode write(uint8_t data) {
@@ -132,7 +145,7 @@ namespace tcremote {
 
         SocketErrCode write(const void* data, size_t len, int timeout) {
             timeOutMillis = timeout;
-            if(len > WRITE_BUFFER_SIZE) {
+            if(len > 100) {
                 // this is a large data set, flush what we've got and send in one go
                 if(flush() != SOCK_ERR_OK) return SOCK_ERR_FAILED;
                 return doRawTcpWrite((uint8_t*)data, len);
@@ -157,8 +170,7 @@ namespace tcremote {
 
             /* if we receive an empty tcp frame from server => close connection */
             if (p == nullptr) {
-                /* we're done sending, close connection */
-                close();
+                /* probably a closed socket here, we ignore, the higher level protocols will time this out */
                 ret_err = ERR_OK;
             } else if (err != ERR_OK) {
                 /* free received pbuf*/
@@ -168,13 +180,17 @@ namespace tcremote {
                 /* Acknowledge data reception and store*/
                 tcp_recved(pcb, p->tot_len);
 
-                if (clientStruct.data.p == nullptr) {
-                    clientStruct.data.p = p;
-                } else {
-                    pbuf_chain(clientStruct.data.p, p);
+                pbuf* buff = p;
+                bool goAgain = true;
+                while(buff && goAgain) {
+                    goAgain = buff->tot_len != buff->len
+                    for (size_t i = 0; i < buff->len; i++) {
+                        auto data = (uint8_t*)buff->payload;
+                        readBuffer.put(data[i]);
+                    }
+                    buff = buff->next;
                 }
-
-                clientStruct.data.available += p->len;
+                pbuf_free(p);
                 ret_err = ERR_OK;
             } else {
                 /* data received when connection already closed */
@@ -193,7 +209,7 @@ namespace tcremote {
         }
 
         bool readAvailable() {
-            return clientStruct.data.available;
+            return clientStruct.data.available > 0;
         }
 
         bool writeAvailable() {
@@ -225,9 +241,9 @@ namespace tcremote {
         tcp_struct tcpServer;
         void* userData;
         ServerAcceptedCallback theCallback;
-        tcp_pcb volatile* queuedPcb;
+        tccollection::GenericCircularBuffer<tcp_pcb*> newClientQueue;
     public:
-        StmTcpServer() : portNum(0), tcpServer{}, userData(nullptr), theCallback(nullptr), queuedPcb(nullptr) {
+        StmTcpServer() : portNum(0), tcpServer{}, userData(nullptr), theCallback(nullptr), newClientQueue(5) {
         }
 
         uint16_t getPortNum() const { return portNum; }
@@ -281,20 +297,20 @@ namespace tcremote {
 
     void StmTcpServer::onNewClient(tcp_pcb* clientPcb) {
         tcp_setprio(clientPcb, TCP_PRIO_MIN);
-        if(queuedPcb == nullptr) {
-            queuedPcb = clientPcb;
-            markTriggeredAndNotify();
-        }
+        newClientQueue.put(clientPcb);
+        markTriggeredAndNotify();
     }
 
     void StmTcpServer::exec() {
-        if(queuedPcb != nullptr) {
-            auto pcb = (tcp_pcb*)queuedPcb;
-            queuedPcb = nullptr;
+        while(newClientQueue.available()) {
+            auto pcb = (tcp_pcb*)newClientQueue.get();
             int client = nextFreeClient();
-            if(client == TC_BAD_SOCKET_ID) return;
-            tcpClients[client].initialise(pcb);
-            theCallback(client, userData);
+            if(client == TC_BAD_SOCKET_ID) {
+                serdebugF2("Accepted too many clients to port, config error", portNum);
+            } else {
+                tcpClients[client].initialise(pcb);
+                theCallback(client, userData);
+            }
         }
     }
 

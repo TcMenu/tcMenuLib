@@ -31,7 +31,6 @@
 
 namespace tcremote {
 
-
     /**
      * We define socket_t so that there is a standard way of referring to all socket connections, you should not
      * rely on anything other that comparing against TC_BAD_SOCKET_ID and  TC_LOCALHOST_SOCKET_ID
@@ -127,7 +126,7 @@ namespace tcremote {
      * @param timeoutMillis how long in milliseconds to wait for write to become available
      * @return an error code to indicate call status
      */
-    SocketErrCode rawWriteData(socket_t socketNum, const void* data, size_t dataLen, int timeoutMillis = 1500);
+    SocketErrCode rawWriteData(socket_t socketNum, const void* data, size_t dataLen, int timeoutMillis = 30000);
 
     /**
      * Flush any data that has been cached for the socket provided.
