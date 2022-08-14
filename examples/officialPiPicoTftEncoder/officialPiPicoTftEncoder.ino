@@ -3,6 +3,8 @@
 #include <IoLogging.h>
 #include <TaskManagerIO.h>
 
+// TFT_eSPI setup is "Setup60_RP2040_ILI9341.h".
+
 void setup() {
     Serial.begin(115200);
     while(!Serial);
