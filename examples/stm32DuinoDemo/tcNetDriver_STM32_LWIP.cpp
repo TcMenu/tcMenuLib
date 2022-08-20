@@ -61,13 +61,13 @@ namespace tcremote {
             }
 
             if(writeBufferPos == 0) return SOCK_ERR_OK; // nothing to do
-            auto err = doRawTcpWrite(writeBuffer, writeBufferPos);
+            auto err = doRawTcpWrite(writeBuffer, writeBufferPos, false);
             writeBufferPos = 0;
 
             return err;
         }
 
-        SocketErrCode doRawTcpWrite(const uint8_t* buffer, size_t len) {
+        SocketErrCode doRawTcpWrite(const uint8_t* buffer, size_t len, bool constMem) {
             size_t left = len;
             uint32_t then = millis();
 
@@ -80,7 +80,8 @@ namespace tcremote {
                     taskManager.yieldForMicros(50);
                 } else {
                     size_t thisTime = left > maxSendSize ? maxSendSize : left;
-                    auto err = tcp_write(clientStruct.pcb, buffer, thisTime, TCP_WRITE_FLAG_COPY);
+                    int flags = constMem ? 0 : TCP_WRITE_FLAG_COPY;
+                    auto err = tcp_write(clientStruct.pcb, buffer, thisTime,  flags);
                     if (err != ERR_OK) {
                         serdebugF("Socket write error ");
                         return SOCK_ERR_FAILED;
@@ -117,6 +118,8 @@ namespace tcremote {
                     serdebugF("Close with buffer full");
                 }
                 tcp_connection_close(clientStruct.pcb, &clientStruct);
+                // clear the read buffer out.
+                while(readBuffer.available()) readBuffer.get();
             }
         }
 
@@ -124,6 +127,7 @@ namespace tcremote {
             size_t pos = 0;
             while(readBuffer.available() && pos < bufferSize) {
                 buffer[pos] = readBuffer.get();
+                pos++;
             }
             // Number of bytes read into buffer
             return (int)pos;
@@ -143,12 +147,12 @@ namespace tcremote {
             return SOCK_ERR_OK;
         }
 
-        SocketErrCode write(const void* data, size_t len, int timeout) {
+        SocketErrCode write(const void* data, size_t len, int timeout, bool constMemory) {
             timeOutMillis = timeout;
             if(len > 100) {
                 // this is a large data set, flush what we've got and send in one go
                 if(flush() != SOCK_ERR_OK) return SOCK_ERR_FAILED;
-                return doRawTcpWrite((uint8_t*)data, len);
+                return doRawTcpWrite((uint8_t*)data, len, constMemory);
             } else {
                 for (size_t i = 0; i < len; i++) {
                     auto ret = write(((uint8_t *) data)[i]);
@@ -183,7 +187,7 @@ namespace tcremote {
                 pbuf* buff = p;
                 bool goAgain = true;
                 while(buff && goAgain) {
-                    goAgain = buff->tot_len != buff->len
+                    goAgain = buff->tot_len != buff->len;
                     for (size_t i = 0; i < buff->len; i++) {
                         auto data = (uint8_t*)buff->payload;
                         readBuffer.put(data[i]);
@@ -389,9 +393,10 @@ namespace tcremote {
         return tcpClients[socketNum].readAvailable();
     }
 
-    SocketErrCode rawWriteData(socket_t socketNum, const void* data, size_t dataLen, int timeoutMillis) {
+    SocketErrCode rawWriteData(socket_t socketNum, const void* data, size_t dataLen, MemoryLocationType locationType, int timeoutMillis) {
         if(socketNum < 0 || socketNum >= MAX_TCP_CLIENTS || !tcpClients[socketNum].isInUse()) return SOCK_ERR_FAILED;
-        return tcpClients[socketNum].write(data, dataLen, timeoutMillis);
+        if(locationType == IN_PROGRAM_MEM) return SOCK_ERR_NO_PROGMEM_SUPPORT;
+        return tcpClients[socketNum].write(data, dataLen, timeoutMillis, locationType == CONSTANT_NO_COPY);
     }
 
     SocketErrCode rawFlushAll(socket_t socketNum) {

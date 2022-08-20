@@ -65,7 +65,12 @@ namespace tcremote {
         return driverSocket.performRawRead((uint8_t *) data, dataLen);
     }
 
-    SocketErrCode rawWriteData(socket_t socketNum, const void *data, size_t dataLen, int timeoutMillis) {
+    bool rawWriteAvailable(socket_t socketNum) {
+        return true;
+    }
+
+    SocketErrCode rawWriteData(socket_t socketNum, const void *data, size_t dataLen, MemoryLocationType memType, int timeoutMillis) {
+        if(memType == IN_PROGRAM_MEM) return SOCK_ERR_NO_PROGMEM_SUPPORT;
         if (socketNum < 0) return SOCK_ERR_FAILED;
         if (driverSocket.isIdle()) return SOCK_ERR_FAILED;
         if (driverSocket.performRawWrite((uint8_t *) data, dataLen) == dataLen) return SOCK_ERR_OK;

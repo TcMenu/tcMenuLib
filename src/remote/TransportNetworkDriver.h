@@ -37,6 +37,8 @@ namespace tcremote {
      */
     typedef int socket_t;
     enum SocketErrCode {
+        /** This driver doesn't support reading from PROGMEM */
+        SOCK_ERR_NO_PROGMEM_SUPPORT = -4,
         /** The operation timed out */
         SOCK_ERR_TIMEOUT = -3,
         /** The operation was not supported */
@@ -47,6 +49,20 @@ namespace tcremote {
         SOCK_ERR_CLOSED = 0,
         /** Operation was successful */
         SOCK_ERR_OK = 1
+    };
+
+    /**
+     * Indicates where the memory for a given buffer resides, so write knows how to process it. This allows write to
+     * make optimisations when possible. Note that program memory is not supported by all stacks and may return
+     * SOCK_ERR_NO_PROGMEM_SUPPORT in some cases.
+     */
+    enum MemoryLocationType {
+        /** the buffer is stored in program memory, as must be read from there as needed */
+        IN_PROGRAM_MEM,
+        /** the buffer is in constant memory and doesn't therefore need to be copied */
+        CONSTANT_NO_COPY,
+        /** the buffer is in transient RAM memory and therefore must be copied */
+        RAM_NEEDS_COPY
     };
 
     /**
@@ -123,10 +139,11 @@ namespace tcremote {
      * @param socketNum the socket to write to
      * @param data the buffer to write
      * @param dataLen the amount to write from the buffer
+     * @param locationType what type of memory the data is stored in (eg, constant, program, RAM).
      * @param timeoutMillis how long in milliseconds to wait for write to become available
      * @return an error code to indicate call status
      */
-    SocketErrCode rawWriteData(socket_t socketNum, const void* data, size_t dataLen, int timeoutMillis = 30000);
+    SocketErrCode rawWriteData(socket_t socketNum, const void* data, size_t dataLen, MemoryLocationType locationType, int timeoutMillis = 30000);
 
     /**
      * Flush any data that has been cached for the socket provided.

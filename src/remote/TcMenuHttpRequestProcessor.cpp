@@ -25,7 +25,7 @@ inline WebSocketOpcode getOpcode(uint8_t header) {
 char HttpProcessor::readCharFromTransport() {
     while(transport->connected()) {
         uint8_t sz[1];
-        auto actual = transport->performRawRead(sz, 1);
+        auto actual = rawReadData(transport->getClientFd(), sz, 1);
         if(actual) {
             return (char)sz[0];
         } else {
@@ -237,7 +237,7 @@ void WebServerResponse::startHeader(int code, const char* textualInfo) {
     appendChar((char*)dataArea, ' ', buffSize);
     strcat((char*)dataArea, textualInfo);
     strcat((char*)dataArea, "\r\n");
-    transport->performRawWrite(dataArea, strlen((char*)dataArea));
+    rawWriteData(transport->getClientFd(), dataArea, strlen((char*)dataArea), RAM_NEEDS_COPY);
     setHeader(WSH_SERVER, WS_SERVER_NAME);
 
 // if you have an RTC device, you can implement `rtcUTCDateInWebForm` which allows you to give the current date from
@@ -282,7 +282,7 @@ void WebServerResponse::setHeader(WebServerHeader header, const char *headerValu
 
     serdebugF3("Add header ", hdrField, headerValue);
 
-    transport->performRawWrite(dataArea, strlen((char*)dataArea));
+    rawWriteData(transport->getClientFd(), dataArea, strlen((char*)dataArea), RAM_NEEDS_COPY);
 }
 
 void WebServerResponse::turnRequestIntoWebSocket() {
@@ -305,12 +305,13 @@ void WebServerResponse::turnRequestIntoWebSocket() {
 void WebServerResponse::startData() {
     serdebugF("Start data response");
     mode = PREPARING_CONTENT;
-    transport->performRawWrite((uint8_t*)"\r\n", 2);
+    rawWriteData(transport->getClientFd(), (uint8_t*)"\r\n", 2, RAM_NEEDS_COPY);
 }
 
-bool WebServerResponse::send(const uint8_t *startingLocation, size_t numBytes) {
+bool WebServerResponse::send(const uint8_t *startingLocation, size_t numBytes, bool memoryIsConst) {
     if(mode != PREPARING_CONTENT) startData();
-    auto didSend = transport->performRawWrite(startingLocation, numBytes);
+    MemoryLocationType memType = memoryIsConst ? CONSTANT_NO_COPY : RAM_NEEDS_COPY;
+    auto didSend = rawWriteData(transport->getClientFd(), startingLocation, numBytes, memType);
     if(!didSend) {
         closeConnection();
         return false;
@@ -320,18 +321,26 @@ bool WebServerResponse::send(const uint8_t *startingLocation, size_t numBytes) {
 
 bool WebServerResponse::send_P(const uint8_t *startingLocation, size_t numBytes) {
     if(mode != PREPARING_CONTENT) startData();
-    size_t bytesSent = 0;
-    while(bytesSent < numBytes) {
-        size_t toSend = min(transport->getReadBufferSize(), numBytes);
-        memcpy_P(transport->getReadBuffer(), &startingLocation[bytesSent], toSend);
-        bool didSend = transport->performRawWrite(transport->getReadBuffer(), toSend);
-        if(!didSend) {
-            closeConnection();
-            return false;
+
+    auto err = rawWriteData(transport->getClientFd(), startingLocation, numBytes, IN_PROGRAM_MEM);
+    if(err == SOCK_ERR_OK) {
+        return true;
+    } else if(err == SOCK_ERR_NO_PROGMEM_SUPPORT) {
+        size_t bytesSent = 0;
+        while (bytesSent < numBytes) {
+            size_t toSend = min(transport->getReadBufferSize(), numBytes);
+            memcpy_P(transport->getReadBuffer(), &startingLocation[bytesSent], toSend);
+            bool didSend = rawWriteData(transport->getClientFd(), transport->getReadBuffer(), toSend, RAM_NEEDS_COPY);
+            if (!didSend) {
+                closeConnection();
+                return false;
+            }
+            bytesSent += toSend;
         }
-        bytesSent += toSend;
+        return bytesSent == numBytes;
     }
-    return bytesSent == numBytes;
+
+    return false;
 }
 
 
@@ -371,7 +380,7 @@ bool WebServerResponse::processHeaders() {
 void WebServerResponse::end() {
     serdebugF("Finished response");
     if(mode != PREPARING_CONTENT) {
-        transport->performRawWrite((uint8_t*)"\r\n", 2);
+        rawWriteData(transport->getClientFd(), (uint8_t*)"\r\n", 2, RAM_NEEDS_COPY);
     }
 
     if(connectionType == CLOSE_AFTER_RESPONSE) {

@@ -40,7 +40,7 @@ bool TcMenuWebServerTransport::readAvailable() {
         switch (currentState) {
             case WSS_PROCESSING_MSG:
                 if(bytesLeftInCurrentMsg > 0) {
-                    readAvail = performRawRead(readBuffer, min(bytesLeftInCurrentMsg, (size_t)bufferSize));
+                    readAvail = rawReadData(clientFd, readBuffer, min(bytesLeftInCurrentMsg, (size_t)bufferSize));
                     bytesLeftInCurrentMsg = bytesLeftInCurrentMsg - readAvail;
                     readPosition = 0;
                     return readAvail > 0;
@@ -51,7 +51,7 @@ bool TcMenuWebServerTransport::readAvailable() {
                 break;
             case WSS_IDLE:
             case WSS_LEN_READ: {
-                auto actual = performRawRead(&readBuffer[readPosition], readPosition == 0 ? 2 : 1);
+                auto actual = rawReadData(clientFd, &readBuffer[readPosition], readPosition == 0 ? 2 : 1);
                 if(actual < 0) {
                     return false;
                 }
@@ -73,7 +73,7 @@ bool TcMenuWebServerTransport::readAvailable() {
                 break;
             }
             case WSS_EXT_LEN_READ: {
-                auto actual = performRawRead(&readBuffer[readPosition], readPosition == 2 ? 2 : 1);
+                auto actual = rawReadData(clientFd, &readBuffer[readPosition], readPosition == 2 ? 2 : 1);
                 readPosition += actual;
                 if (readPosition < 4) return false;
                 bytesLeftInCurrentMsg = readBuffer[2] << 8;
@@ -84,7 +84,7 @@ bool TcMenuWebServerTransport::readAvailable() {
             }
             case WSS_MASK_READ: {
                 int start = (bytesLeftInCurrentMsg > 125) ? 4 : 2;
-                auto actual = performRawRead(&readBuffer[readPosition], (start + 4) - (readPosition));
+                auto actual = rawReadData(clientFd, &readBuffer[readPosition], (start + 4) - (readPosition));
                 readPosition += actual;
                 frameMask[0] = readBuffer[start];
                 frameMask[1] = readBuffer[start + 1];
@@ -106,7 +106,7 @@ bool TcMenuWebServerTransport::readAvailable() {
 uint8_t TcMenuWebServerTransport::readByte() {
     if(currentState == WSS_HTTP_REQUEST) {
         uint8_t sz[1];
-        performRawRead(sz, 1);
+        rawReadData(clientFd, sz, 1);
         return sz[0];
     }
     else if(readPosition < readAvail && currentState == WSS_PROCESSING_MSG) {
@@ -163,7 +163,7 @@ void TcMenuWebServerTransport::flush() {
 void TcMenuWebServerTransport::sendMessageOnWire(WebSocketOpcode opcode, uint8_t* buffer, size_t size) {
     buffer[0] = (uint8_t)(WS_FIN | opcode);
     buffer[1] = (uint8_t)size;
-    performRawWrite(buffer, size + 2);
+    rawWriteData(clientFd, buffer, size + 2, RAM_NEEDS_COPY);
 }
 
 void TcMenuWebServerTransport::endMsg() {

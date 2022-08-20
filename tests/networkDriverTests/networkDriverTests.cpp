@@ -69,7 +69,7 @@ void loop() {
     copyIpAddress(clientSocketFd, sz, sizeof sz);
     serdebugF2("Client IP is ", sz);
 
-    if(rawWriteData(clientSocketFd, "hello world", 11, 1000) != SOCK_ERR_OK) {
+    if(rawWriteData(clientSocketFd, "hello world", 11, tcremote::CONSTANT_NO_COPY, 1000) != SOCK_ERR_OK) {
         fail("Write returned error code");
     }
     if (shouldFlush) {
@@ -81,7 +81,7 @@ void loop() {
     // read and write quite a few times.
     for (int j = 0; j < 500; j++) {
 
-        if(rawWriteData(clientSocketFd, sz1, sizeof(sz1), 1000) != SOCK_ERR_OK) {
+        if(rawWriteData(clientSocketFd, sz1, sizeof(sz1), tcremote::RAM_NEEDS_COPY, 1000) != SOCK_ERR_OK) {
             fail("Write sz1 failed");
         }
 
@@ -92,7 +92,7 @@ void loop() {
         }
 
         taskManager.yieldForMicros(millisToMicros(500U));
-        if(rawWriteData(clientSocketFd, sz2, sizeof(sz2), 1000) != SOCK_ERR_OK) {
+        if(rawWriteData(clientSocketFd, sz2, sizeof(sz2), tcremote::CONSTANT_NO_COPY, 1000) != SOCK_ERR_OK) {
             fail("Write sz2 failed");
         }
         taskManager.yieldForMicros(millisToMicros(100U));

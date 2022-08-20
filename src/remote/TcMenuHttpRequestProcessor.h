@@ -132,27 +132,129 @@ namespace tcremote {
         WSRMode getMode() { return mode; }
         void setMode(WSRMode newMode) { mode = newMode; }
 
+        /**
+         * Starts a standard response to the server, IE 200 and OK
+         */
         void startHeader() { startHeader(WS_INT_RESPONSE_OK, WS_TEXT_RESPONSE_OK); }
+
+        /**
+         * Starts a header given a HTTP response code and the text for that code
+         * @param code the response code
+         * @param textualInfo the text for that response
+         */
         void startHeader(int code, const char* textualInfo);
+
+        /**
+         * Set a header onto the response
+         * @param header the header type
+         * @param headerValue the value for the header
+         */
         void setHeader(WebServerHeader header, const char* headerValue);
+
+        /**
+         * Tells this request handler that the request we are processing is a websocket, usually called during
+         * header processing, this automatically starts the header and adds most web socket headers. Including the
+         * base64 sec header.
+         */
         void turnRequestIntoWebSocket();
+
+        /**
+         * Called during header processing to send the content type and length of the data, this should always be
+         * called before starting data transmission
+         * @param contentType one of the standard content types
+         * @param len the length of the data to send
+         */
         void contentInfo(WSRContentType contentType, size_t len);
+
+        /**
+         * Tells the HTTP layer that the header is complete and we will start the data response, can be omitted and
+         * the first call to send.. will call this.
+         */
         void startData();
+
+        /**
+         * Sends data to the HTTP client using the buffer provided, where the data is in program memory. This will block
+         * until the bytes are sent, but it will yield to taskmanager frequently so other tasks still run.
+         * @param startingLocation the starting location
+         * @param numBytes the number of bytes to send
+         * @return true if the bytes were sent.
+         */
         bool send_P(const char* startingLocation, size_t numBytes) { return send_P((uint8_t*) startingLocation, numBytes);}
-        bool send(const char* startingLocation, size_t numBytes) { return send((uint8_t*)startingLocation, numBytes);}
+
+        /**
+         * Sends data to the HTTP client using the buffer provided, where the data is in program memory. This will block
+         * until the bytes are sent, but it will yield to taskmanager frequently so other tasks still run.
+         * @param startingLocation the starting location
+         * @param numBytes the number of bytes to send
+         * @return true if the bytes were sent.
+         */
         bool send_P(const uint8_t* startingLocation, size_t numBytes);
-        bool send(const uint8_t* startingLocation, size_t numBytes);
+
+        /**
+         * Sends data to the HTTP client using the buffer provided, if the memory is constant, in many cases it
+         * optimises the amount of memory needed in the network layer. This will block until the bytes are sent,
+         * but it will yield to taskmanager frequently so other tasks still run.
+         * @param startingLocation the starting location
+         * @param numBytes the number of bytes to send
+         * @param memIsConst indicates if the memory is constant and doesn't need copying.
+         * @return true if the bytes were sent.
+         */
+        bool send(const char* startingLocation, size_t numBytes, bool memIsConst = false) { return send((uint8_t*)startingLocation, numBytes, memIsConst);}
+
+        /**
+         * Sends data to the HTTP client using the buffer provided, if the memory is constant, in many cases it
+         * optimises the amount of memory needed in the network layer. This will block until the bytes are sent,
+         * but it will yield to taskmanager frequently so other tasks still run.
+         * @param startingLocation the starting location
+         * @param numBytes the number of bytes to send
+         * @param memIsConst indicates if the memory is constant and doesn't need copying.
+         * @return true if the bytes were sent.
+         */
+        bool send(const uint8_t* startingLocation, size_t numBytes, bool memIsConst = false);
+
+        /**
+         * Use this to end the request after the data and headers has been sent. Can be omitted in most cases and the
+         * transport will do this automatically
+         */
         void end();
+
+        /**
+         * Send an error back to the client in the event we couldn't process the request properly
+         * @param code the HTTP error to send back
+         */
         void sendError(int code);
 
+        /**
+         * Close the HTTP connection, usually called by end or sendError, but this is there for special cases.
+         */
         void closeConnection();
+
+        /**
+         * Indicates if the request should close directly after the first HTTP request is processed.
+         * @return
+         */
         bool isInSingleShotMode() { return connectionType == CLOSE_AFTER_RESPONSE; }
 
+        /**
+         * Get the http method of the present request, this can also be used to check if we have a websocket upgrade
+         * request in progress too.
+         * @return the http method.
+         */
         WebServerMethod getMethod() { return method; }
+
+        /**
+         * @return the underlying transport for this request.
+         */
         TcMenuWebServerTransport* getTransport() { return transport; }
 
+        /**
+         * @return true if there has been an error during processing, otherwise false.
+         */
         bool hasErrorOccurred();
 
+        /**
+         * This is the executable implementation, it is used to service the request when active.
+         */
         void exec() override;
     };
 }

@@ -88,20 +88,12 @@ namespace tcremote {
 
         bool connected() override;
 
-        // these will be used to write web socket data directly, not put things in the buffer.
-        inline int performRawRead(uint8_t* buffer, size_t bufferSize) const {
-            return rawReadData(clientFd, buffer, bufferSize);
-        }
-
-        inline bool performRawWrite(const uint8_t* data, size_t dataSize) const {
-            return rawWriteData(clientFd, data, dataSize) == SOCK_ERR_OK;
-        }
-
         void setState(WebSocketTransportState state) { currentState = state;}
         size_t getReadBufferSize() const { return bufferSize; }
         uint8_t* getReadBuffer() { return readBuffer; }
         size_t getWriteBufferSize() const { return bufferSize; }
         uint8_t* getWriteBuffer() { return writeBuffer; }
+        socket_t getClientFd() { return clientFd; }
     private:
         void sendMessageOnWire(WebSocketOpcode opcode, uint8_t* buffer, size_t size);
     };
