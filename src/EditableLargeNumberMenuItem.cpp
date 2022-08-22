@@ -67,7 +67,7 @@ float LargeFixedNumber::getAsFloat() {
 
     float fraction = ((float)getFraction() / (float)dpToDivisor(fractionDp));
     float asFlt = (float)getWhole() + fraction;
-    serdebugF3("fract, asFlt ", fraction, asFlt);
+    serlogF3(SER_TCMENU_DEBUG, "fract, asFlt ", fraction, asFlt);
     if (negative) asFlt = -asFlt;
     return asFlt;
 }
@@ -137,7 +137,8 @@ int largeNumItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, 
 		for (int i = num->decimalPointIndex(); i < numParts; i++) {
 			char txtVal = num->getDigit(i) + '0';
 			hadNonZero |= txtVal != '0';
-			if (hadNonZero || editingMode) {
+            bool lastDigit = i == (numParts - 1);
+			if (hadNonZero || editingMode || lastDigit) {
 				wrapEditor(row == editPosition, txtVal, buffer, bufferSize);
 			}
 			editPosition++;

@@ -51,7 +51,7 @@ test(testValueAtPositionEeeprom) {
     strcpy(buffer, "turntable123");
     eeprom.writeArrayToRom(25, reinterpret_cast<const uint8_t *>(buffer), sizeof buffer);
 
-    eeprom.serDebugContents(0, 35);
+    eeprom.serPrintContents(0, 35);
 
     menuMgr.setEepromRef(&eeprom);
     ScrollChoiceMenuItem choice(101, enumItemRenderFn, 0, 15, 10, 2, nullptr);
