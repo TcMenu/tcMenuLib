@@ -132,7 +132,7 @@ namespace tcgfx {
          * @param h display height in current rotation
          */
         void setDisplayDimensions(int w, int h) {
-            serdebugF3("Set dimensions: ", w, h);
+            serlogF3(SER_TCMENU_INFO, "Set dimensions: ", w, h);
             width = w;
             height = h;
         }

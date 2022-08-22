@@ -19,7 +19,7 @@ void BaseGraphicalRenderer::render() {
     drawingCommand(DRAW_COMMAND_START);
 
     if (locRedrawMode == MENUDRAW_COMPLETE_REDRAW) {
-        serdebugF("Complete redraw")
+        serlogF(SER_TCMENU_DEBUG, "Complete redraw")
         drawingCommand(DRAW_COMMAND_CLEAR);
         taskManager.yieldForMicros(0);
     }
@@ -61,7 +61,7 @@ void BaseGraphicalRenderer::render() {
         // the screen has moved, we must completely redraw the area, and we need a clear first.
         if(locRedrawMode != MENUDRAW_COMPLETE_REDRAW && lastOffset != startRow) {
             locRedrawMode = MENUDRAW_COMPLETE_REDRAW;
-            serdebugF3("Screen Row moved ", lastOffset, startRow);
+            serlogF3(SER_TCMENU_DEBUG, "Screen Row moved ", lastOffset, startRow);
             drawCompleteScreen = true;
         }
         lastOffset = startRow;
@@ -173,7 +173,7 @@ bool BaseGraphicalRenderer::drawTheMenuItems(int startRow, int startY, bool draw
             if(extentsY > height) break;
 
             if (drawEveryLine || item->isChanged()) {
-                serdebugF4("draw item (pos,id,chg)", i, item->getId(), item->isChanged());
+                serlogF4(SER_TCMENU_DEBUG, "draw item (pos,id,chg)", i, item->getId(), item->isChanged());
                 item->setChanged(false);
                 taskManager.yieldForMicros(0);
                 if(itemCfg->getPosition().getGridSize() > 1) {
@@ -259,7 +259,7 @@ void BaseGraphicalRenderer::checkIfRootHasChanged() {
     auto* rootItem = menuMgr.getCurrentMenu();
     if(currentRootMenu != rootItem)
     {
-        serdebugF("root has changed");
+        serlogF(SER_TCMENU_INFO, "root has changed");
         currentRootMenu = rootItem;
         redrawMode = MENUDRAW_COMPLETE_REDRAW;
         recalculateDisplayOrder(rootItem, false);
@@ -268,13 +268,13 @@ void BaseGraphicalRenderer::checkIfRootHasChanged() {
 }
 
 void BaseGraphicalRenderer::recalculateDisplayOrder(MenuItem *root, bool safeMode) {
-    serdebugF2("Recalculate display order, safe=", safeMode);
+    serlogF2(SER_TCMENU_INFO, "Recalculate display order, safe=", safeMode);
 
     itemOrderByRow.clear();
     if(root == nullptr || root->getMenuType() == MENUTYPE_RUNTIME_LIST) return;
 
     if(root == menuMgr.getRoot() && titleMode != NO_TITLE) {
-        serdebugF("Add title");
+        serlogF(SER_TCMENU_DEBUG, "Add title");
         auto* myProps = getDisplayPropertiesFactory().configFor(nullptr, ItemDisplayProperties::COMPTYPE_TITLE);
         appTitleMenuItem.setTitleHeaderPgm(pgmTitle);
         itemOrderByRow.add(GridPositionRowCacheEntry(&appTitleMenuItem, GridPosition(GridPosition::DRAW_TITLE_ITEM, myProps->getDefaultJustification(), 0), myProps));
@@ -282,7 +282,7 @@ void BaseGraphicalRenderer::recalculateDisplayOrder(MenuItem *root, bool safeMod
 
     auto* item = root;
     if(root->getMenuType() == MENUTYPE_BACK_VALUE) {
-        serdebugF2("Handling back item", root->getId());
+        serlogF2(SER_TCMENU_DEBUG, "Handling back item", root->getId());
         auto* myProps = getDisplayPropertiesFactory().configFor(root, ItemDisplayProperties::COMPTYPE_TITLE);
         itemOrderByRow.add(GridPositionRowCacheEntry(root, GridPosition(GridPosition::DRAW_TITLE_ITEM, myProps->getDefaultJustification(), 0), myProps));
         item = root->getNext();
@@ -292,14 +292,14 @@ void BaseGraphicalRenderer::recalculateDisplayOrder(MenuItem *root, bool safeMod
         if(item->isVisible()) {
             auto* conf = getDisplayPropertiesFactory().gridPositionForItem(item);
             if (conf && !safeMode) {
-                serdebugF3("Add config id at row", item->getId(), conf->getPosition().getRow());
+                serlogF3(SER_TCMENU_DEBUG, "Add config id at row", item->getId(), conf->getPosition().getRow());
                 auto compType = toComponentType(conf->getPosition().getDrawingMode(), item);
                 itemOrderByRow.add(GridPositionRowCacheEntry(item, conf->getPosition(), getDisplayPropertiesFactory().configFor(item, compType)));
             } else {
                 // We just find the first unused row and put the next item there.
                 int row = 0;
                 while(itemOrderByRow.getByKey(rowCol(row, 1)) != nullptr) row++;
-                serdebugF3("Add manual id at row", item->getId(), row);
+                serlogF3(SER_TCMENU_DEBUG, "Add manual id at row", item->getId(), row);
                 auto mode = modeFromItem(item, useSliderForAnalog);
                 auto* itemProps = getDisplayPropertiesFactory().configFor(item, toComponentType(mode, item));
                 itemOrderByRow.add(GridPositionRowCacheEntry(item, GridPosition(mode, itemProps->getDefaultJustification(), 1, 1, row, 0), itemProps));
@@ -321,7 +321,7 @@ bool BaseGraphicalRenderer::areRowsOutOfOrder() {
         if(itemOrderByRow.itemAtIndex(i)->getPosition().getRow() > (lastSequence + 1)) {
             char sz[20];
             itemOrderByRow.itemAtIndex(i)->getMenuItem()->copyNameToBuffer(sz, sizeof sz);
-            serdebugF2("Row out of order at ", sz);
+            serlogF2(SER_TCMENU_INFO, "Row out of order at ", sz);
             return true;
         }
         lastSequence = itemOrderByRow.itemAtIndex(i)->getPosition().getRow();

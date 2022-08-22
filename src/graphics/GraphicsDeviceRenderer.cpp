@@ -117,7 +117,7 @@ namespace tcgfx {
             // special case, title left, value right.
             Coord wh = Coord(where.x + padding.left, where.y + padding.top);
             pEntry->getMenuItem()->copyNameToBuffer(buffer, bufferSize);
-            serdebugF4("item: ", buffer, size.y, where.y);
+            serlogF4(SER_TCMENU_DEBUG, "item: ", buffer, size.y, where.y);
             drawable->setDrawColor(fg);
             drawable->drawText(wh, props->getFont(), props->getFontMagnification(), buffer);
 
@@ -148,13 +148,13 @@ namespace tcgfx {
             }
             drawable->setDrawColor(fg);
             drawable->drawText(Coord(startPosition + where.x, where.y + padding.top), props->getFont(), props->getFontMagnification(), sz);
-            serdebugF4("intTx ", sz, startPosition + where.x, (where.y + size.y) - padding.bottom);
+            serlogF4(SER_TCMENU_DEBUG, "intTx ", sz, startPosition + where.x, (where.y + size.y) - padding.bottom);
         }
     }
 
     void GraphicsDeviceRenderer::drawCoreLineItem(GridPositionRowCacheEntry* entry, DrawableIcon* icon, Coord &where, Coord &size, bool drawBg) {
         auto pad = entry->getDisplayProperties()->getPadding();
-        serdebugF4("Drawing at: ", where.y, size.x, size.y);
+        serlogF4(SER_TCMENU_DEBUG, "Drawing at: ", where.y, size.x, size.y);
 
         // work out what background and drawing colors to use
         color_t bgColor, textColor;

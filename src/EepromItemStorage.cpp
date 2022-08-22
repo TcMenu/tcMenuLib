@@ -68,7 +68,7 @@ void saveRecursively(EepromAbstraction* eeprom, MenuItem* nextMenuItem) {
 }
 
 void saveMenuStructure(EepromAbstraction* eeprom, uint16_t magicKey) {
-	serdebugF2("Save to EEPROM with key ", magicKey);
+	serlogF2(SER_TCMENU_INFO, "Save to EEPROM with key ", magicKey);
 	eeprom->write16(0, magicKey);
 	saveRecursively(eeprom, menuMgr.getRoot());
 }
@@ -145,13 +145,13 @@ void loadRecursively(EepromAbstraction* eeprom, MenuItem* nextMenuItem) {
 
 bool loadMenuStructure(EepromAbstraction* eeprom, uint16_t magicKey) {
 	if (eeprom->read16(0) == magicKey) {
-		serdebugF2("Load from EEPROM key found ", magicKey);
+		serlogFHex(SER_TCMENU_INFO, "Load from EEPROM key found ", magicKey);
 		MenuItem* nextMenuItem = menuMgr.getRoot();
 		loadRecursively(eeprom, nextMenuItem);
 		return true;
 	}
 	else {
-		serdebugF2("EEPROM Key NOT found ", magicKey);
+		serlogFHex(SER_WARNING, "EEPROM Key NOT found ", magicKey);
 		return false;
 	}
 }

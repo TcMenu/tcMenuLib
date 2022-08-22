@@ -9,6 +9,9 @@
 #include "IoLogging.h"
 #include <SCCircularBuffer.h>
 
+#define NET_LOGGING_CHANNEL SER_USER_1
+#define LOGGING_IO_OP_DEBUG true
+
 #define MAX_TCP_ACCEPTS 2
 #define MAX_TCP_CLIENTS 4
 // The write buffer is to prevent small packets with only a few bytes from being written.
@@ -77,17 +80,20 @@ namespace tcremote {
 
                 if(bytesWeAreWaitingFor > 1000 || maxSendSize < 50) {
                     // if we are getting ahead of ourselves by too far, or we've run out of space we back off
+                    serlogF3(NET_LOGGING_CHANNEL, "Waiting for, maxSend ", bytesWeAreWaitingFor, maxSendSize);
                     taskManager.yieldForMicros(50);
                 } else {
                     size_t thisTime = left > maxSendSize ? maxSendSize : left;
                     int flags = constMem ? 0 : TCP_WRITE_FLAG_COPY;
                     auto err = tcp_write(clientStruct.pcb, buffer, thisTime,  flags);
                     if (err != ERR_OK) {
-                        serdebugF("Socket write error ");
+                        serlogF(NET_LOGGING_CHANNEL, "Socket write error ");
                         return SOCK_ERR_FAILED;
-                    } /*else {
-                        serdebugF3("Written this time, left ", thisTime, left);
-                    }*/
+                    } else {
+#ifdef LOGGING_IO_OP_DEBUG
+                        serlogF4(NET_LOGGING_CHANNEL, "Written this time, left , maxSend ", thisTime, left, maxSendSize);
+#endif
+                    }
 
                     bytesWeAreWaitingFor += left;
                     left -= thisTime;
@@ -115,7 +121,7 @@ namespace tcremote {
         void close() {
             if(clientStruct.pcb) {
                 if(writeBufferPos != 0) {
-                    serdebugF("Close with buffer full");
+                    serlogF(SER_WARNING, "Close with buffer full");
                 }
                 tcp_connection_close(clientStruct.pcb, &clientStruct);
                 // clear the read buffer out.
@@ -164,7 +170,7 @@ namespace tcremote {
 
         void errorOccurred(err_t e) {
             if(e != ERR_OK) {
-                serdebugF2("Socket err ", e)
+                serlogF2(NET_LOGGING_CHANNEL, "Socket err ", e)
                 close();
             }
         }
@@ -262,7 +268,7 @@ namespace tcremote {
 
     err_t tcpConnectionEstablished(void *arg, struct tcp_pcb *newpcb, err_t err) {
         if(ERR_OK != err) {
-            serdebugF("Accept error");
+            serlogF(SER_WARNING, "Accept error");
             return err;
         } else {
             auto tcpServer = reinterpret_cast<StmTcpServer *>(arg);
@@ -310,7 +316,7 @@ namespace tcremote {
             auto pcb = (tcp_pcb*)newClientQueue.get();
             int client = nextFreeClient();
             if(client == TC_BAD_SOCKET_ID) {
-                serdebugF2("Accepted too many clients to port, config error", portNum);
+                serlogF2(SER_ERROR, "Accepted too many clients to port, config error", portNum);
             } else {
                 tcpClients[client].initialise(pcb);
                 theCallback(client, userData);

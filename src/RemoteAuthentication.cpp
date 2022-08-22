@@ -18,14 +18,14 @@ void EepromAuthenticatorManager::initialise(EepromAbstraction* eeprom, EepromPos
 
 bool EepromAuthenticatorManager::addAdditionalUUIDKey(const char* connectionName, const char* uuid) {
     if(eeprom == NULL) {
-        serdebugF("EEPROM Auth not initialised!!");
+        serlogF(SER_ERROR, "EEPROM Auth not initialised!!");
         return false;
     }
 
     // find a space for the key
     int insertAt = findSlotFor(connectionName);
     if(insertAt == -1) {
-        serdebugF2("Add Key failure ", connectionName);
+        serlogF2(SER_ERROR, "Add Key failure ", connectionName);
         return false; // no spaces left
     } 
 
@@ -42,13 +42,13 @@ bool EepromAuthenticatorManager::addAdditionalUUIDKey(const char* connectionName
     buffer[UUID_KEY_SIZE-1] = 0;
     eeprom->writeArrayToRom(eepromOffset(insertAt) + CLIENT_DESC_SIZE, reinterpret_cast<const uint8_t*>(buffer), UUID_KEY_SIZE);
 
-    serdebugF2("Add Key success ", connectionName);
+    serlogF2(SER_TCMENU_INFO, "Add Key success ", connectionName);
     return true;
 }
 
 bool EepromAuthenticatorManager::isAuthenticated(const char* connectionName, const char* authResponse) {
     if(eeprom == NULL) {
-        serdebugF("EEPROM Auth not initialised!!");
+        serlogF(SER_ERROR, "EEPROM Auth not initialised!!");
         return false;
     }
     char buffer[UUID_KEY_SIZE];
@@ -56,16 +56,16 @@ bool EepromAuthenticatorManager::isAuthenticated(const char* connectionName, con
     if(i != -1) {
         eeprom->readIntoMemArray(reinterpret_cast<uint8_t*>(buffer), eepromOffset(i) + CLIENT_DESC_SIZE, sizeof(buffer));
         buffer[UUID_KEY_SIZE-1] = 0;
-        serdebugF3("uuid rom, mem ", buffer, authResponse)
+        serlogF3(SER_TCMENU_DEBUG, "uuid rom, mem ", buffer, authResponse)
         if(strcmp(buffer, authResponse) == 0) {
-            serdebugF2("Authenticated ", connectionName);
+            serlogF2(SER_TCMENU_INFO, "Authenticated ", connectionName);
             return true;
         }
         else {
-             serdebugF2("Invalid Key ", connectionName);
+            serlogF2(SER_TCMENU_INFO, "Invalid Key ", connectionName);
         }
     }
-    serdebugF2("Not found ", connectionName);
+    serlogF2(SER_TCMENU_INFO, "Not found ", connectionName);
     return false;
 }
 
@@ -80,7 +80,7 @@ void EepromAuthenticatorManager::copyKeyNameToBuffer(int idx, char* buffer, int 
 }
 
 void EepromAuthenticatorManager::resetAllKeys() {
-    serdebugF2("Resetting auth store: ", numberOfEntries);
+    serlogF2(SER_WARNING, "Resetting auth store: ", numberOfEntries);
     eeprom->write16(romStart, magicKey);
     for(int i=0; i<numberOfEntries;i++) {
         // we just zero the name and UUID first character, to clear it.
@@ -88,7 +88,7 @@ void EepromAuthenticatorManager::resetAllKeys() {
         eeprom->write8(eepromOffset(i) + CLIENT_DESC_SIZE, 0);
     }
 	changePin("1234");
-    serdebugF("Finished reset of auth store. Pin is now 1234");
+    serlogF(SER_WARNING, "Finished reset of auth store. Pin is now 1234");
 }
 
 int EepromAuthenticatorManager::findSlotFor(const char* name) {
@@ -135,10 +135,10 @@ bool ReadOnlyAuthenticationManager::isAuthenticated(const char* connectionName, 
     for(int i=0;i<numberOfEntries;i++) {
         if(strcmp_P(connectionName, authBlocksPgm[i].name) == 0) {                
             bool keyMatch = strcmp_P(authResponse, authBlocksPgm[i].uuid) == 0;
-            serdebugF3("AuthBlock found (name, match) ", connectionName, keyMatch);
+            serlogF3(SER_TCMENU_INFO, "AuthBlock found (name, match) ", connectionName, keyMatch);
             return keyMatch;
         }
     }
-    serdebugF2("AuthBlock not found for ", connectionName);
+    serlogF2(SER_TCMENU_INFO, "AuthBlock not found for ", connectionName);
     return false;
 }

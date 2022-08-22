@@ -52,7 +52,7 @@ bool HttpProcessor::readWordUntilTrim(char* buffer, size_t bufferSize, bool skip
         auto ch = readCharFromTransport();
         if(protocolError || !transport->connected()) {
             protocolError = true;
-            serdebugF("read loop error");
+            serlogF(SER_NETWORK_DEBUG, "read loop error");
             buffer[0] = 0;
             return false;
         }
@@ -78,7 +78,7 @@ WebServerMethod HttpProcessor::processRequest(char* buffer, size_t bufferSize) {
         return REQ_NONE;
     }
     if(protocolError) {
-        serdebugF("Socket closed or timeout");
+        serlogF(SER_NETWORK_DEBUG, "Socket closed or timeout");
         return REQ_NONE;
     }
     bool getRequest = strcmp(buffer, "GET") == 0;
@@ -87,18 +87,18 @@ WebServerMethod HttpProcessor::processRequest(char* buffer, size_t bufferSize) {
         if(readWordUntilTrim(buffer, bufferSize)) return REQ_ERROR; // missing HTTP/1.1
         char sz[10];
         if(!readWordUntilTrim(sz, sizeof sz, true)) {
-            serdebugF4("Request missing protocol (buffer, proto, isGet)", buffer, sz, getRequest);
+            serlogF4(SER_NETWORK_INFO, "Request missing protocol (buffer, proto, isGet)", buffer, sz, getRequest);
             return REQ_ERROR; // protocol eg HTTP*
         }
         if(protocolError || strncmp(sz, "HTTP", 4) != 0) {
-            serdebugF4("Request without HTTP (buffer, proto, isGet)", buffer, sz, getRequest);
+            serlogF4(SER_NETWORK_INFO, "Request without HTTP (buffer, proto, isGet)", buffer, sz, getRequest);
             return REQ_ERROR;
         }
-        serdebugF4("Request processed (buffer, proto, isGet)", buffer, sz, getRequest);
+        serlogF4(SER_NETWORK_INFO, "Request processed (buffer, proto, isGet)", buffer, sz, getRequest);
         return getRequest ? GET : POST;
     }
     else {
-        serdebugF("Not POST or GET");
+        serlogF(SER_NETWORK_INFO,"Not POST or GET");
         return REQ_ERROR;
     }
 }
@@ -111,59 +111,60 @@ WebServerHeader HttpProcessor::processHeader(char* buffer, size_t bufferSize) {
     if(!transport->connected()) return WSH_ERROR;
     if(strcmp(buffer, "Host") == 0) {
         if(!readWordUntilTrim(buffer, bufferSize, true)) {
-            serdebugF2("Host tag not terminated", buffer);
+            serlogF2(SER_NETWORK_INFO, "Host tag not terminated", buffer);
             return WSH_ERROR;
         }
         if(protocolError) return WSH_ERROR;
-        serdebugF2("Host ", buffer);
+        serlogF2(SER_NETWORK_DEBUG, "Host ", buffer);
         return WSH_HOST;
     }
     if(strcmp(buffer, "User-Agent") == 0) {
         if(!readWordUntilTrim(buffer, bufferSize, true)) {
-            serdebugF2("User-Agent not terminated", buffer);
+            serlogF2(SER_NETWORK_INFO, "User-Agent not terminated", buffer);
             return WSH_ERROR;
         }
         if(protocolError) return WSH_ERROR;
-        serdebugF2("User-Agent ", buffer);
+        serlogF2(SER_NETWORK_DEBUG, "User-Agent ", buffer);
         return WSH_USER_AGENT;
     }
     if(strcmp(buffer, "Upgrade")==0) {
         if(!readWordUntilTrim(buffer, bufferSize, true)) {
-            serdebugF2("Upgrade not terminated", buffer);
+            serlogF2(SER_NETWORK_INFO, "Upgrade not terminated", buffer);
             return WSH_ERROR;
         }
         if(protocolError) return WSH_ERROR;
         if(strcmp(buffer, "websocket") == 0) {
-            serdebugF("Upgrade to websocket OK");
+            serlogF(SER_NETWORK_DEBUG, "Upgrade to websocket OK");
             return WSH_UPGRADE_TO_WEBSOCKET;
         }
     } else if(strcmp(buffer, "Connection") == 0) {
         readWordUntilTrim(buffer, bufferSize, true);
         if(protocolError) return WSH_ERROR;
         if(strcmp(buffer, "Upgrade") == 0) {
-            serdebugF2("Connection upgrade OK", buffer);
+            serlogF2(SER_NETWORK_DEBUG, "Connection upgrade OK", buffer);
             return WSH_UPGRADE_TO_WEBSOCKET;
         }
     } else if(strcmp(buffer, "Sec-WebSocket-Key") == 0) {
         if (!readWordUntilTrim(buffer, bufferSize, true)) {
-            serdebugF2("SecKey not terminated", buffer);
+            serlogF2(SER_NETWORK_INFO, "SecKey not terminated", buffer);
             return WSH_ERROR;
         }
         if (protocolError) return WSH_ERROR;
-        serdebugF2("SecKey OK", buffer);
+        serlogF2(SER_NETWORK_DEBUG, "SecKey OK", buffer);
         return WSH_SEC_WS_KEY;
     } else if(strcmp(buffer, "Accept-Encoding") == 0) {
         if (!readWordUntilTrim(buffer, bufferSize, true)) {
-            serdebugF2("AcceptEncoding not terminated", buffer);
+            serlogF2(SER_NETWORK_INFO, "AcceptEncoding not terminated", buffer);
             return WSH_ERROR;
         }
         if (protocolError) return WSH_ERROR;
-        serdebugF2("Accept encoding ", buffer);
+        serlogF2(SER_NETWORK_DEBUG,"Accept encoding ", buffer);
         return WSH_ACCEPT_ENCODING;
     } else {
-        serdebugF2("Unprocessed ", buffer);
         readWordUntilTrim(buffer, bufferSize, true);
-        serdebugF3("Content: ", buffer, protocolError);
+        // you can enable the below if you want to see every single header for debugging.
+        serlogF2(SER_NETWORK_DEBUG, "Unprocessed ", buffer);
+        serlogF3(SER_NETWORK_DEBUG, "Content: ", buffer, protocolError);
         if(protocolError) return WSH_ERROR;
     }
     return WSH_UNPROCESSED;
@@ -225,7 +226,7 @@ void WebServerResponse::contentInfo(WSRContentType contentType, size_t len) {
 }
 
 void WebServerResponse::startHeader(int code, const char* textualInfo) {
-    serdebugF3("Start header response", code, textualInfo);
+    serlogF3(SER_NETWORK_INFO, "Start header response", code, textualInfo);
     mode = PREPARING_HEADER;
     if(code == WS_CODE_CHANGING_PROTOCOL) connectionType = WEB_SOCKET; // websockets don't get closed after the request.
     uint8_t* dataArea = transport->getReadBuffer();
@@ -280,7 +281,7 @@ void WebServerResponse::setHeader(WebServerHeader header, const char *headerValu
     strcat((char*)dataArea, headerValue);
     strcat((char*)dataArea, "\r\n");
 
-    serdebugF3("Add header ", hdrField, headerValue);
+    serlogF3(SER_NETWORK_DEBUG, "Add header ", hdrField, headerValue);
 
     rawWriteData(transport->getClientFd(), dataArea, strlen((char*)dataArea), RAM_NEEDS_COPY);
 }
@@ -288,6 +289,7 @@ void WebServerResponse::setHeader(WebServerHeader header, const char *headerValu
 void WebServerResponse::turnRequestIntoWebSocket() {
     char sz[34];
 
+    serlogF(SER_NETWORK_INFO, "Convert request to websocket");
     startHeader(WS_CODE_CHANGING_PROTOCOL, "Switching Protocols");
     setHeader(WSH_UPGRADE_TO_WEBSOCKET, "websocket");
     setHeader(WSH_CONNECTION, "Upgrade");
@@ -303,7 +305,7 @@ void WebServerResponse::turnRequestIntoWebSocket() {
 }
 
 void WebServerResponse::startData() {
-    serdebugF("Start data response");
+    serlogF(SER_NETWORK_DEBUG, "Start data response");
     mode = PREPARING_CONTENT;
     rawWriteData(transport->getClientFd(), (uint8_t*)"\r\n", 2, RAM_NEEDS_COPY);
 }
@@ -349,7 +351,7 @@ bool WebServerResponse::processHeaders() {
     size_t bufferSize = transport->getReadBufferSize();
     bool foundEndOfRequest = false;
 
-    serdebugF("Process header");
+    serlogF(SER_NETWORK_DEBUG, "Process header");
     while(!foundEndOfRequest) {
         auto hdrType = processor.processHeader(buffer, bufferSize);
         switch (hdrType) {
@@ -359,14 +361,14 @@ bool WebServerResponse::processHeaders() {
                 break;
             }
             case WSH_FINISHED:
-                serdebugF("Request processed");
+                serlogF(SER_NETWORK_INFO, "Request processed");
                 foundEndOfRequest = true;
                 return true;
             case WSH_UPGRADE_TO_WEBSOCKET:
                 method = WS_UPGRADE;
                 break;
             case WSH_ERROR:
-                serdebugF("Request error");
+                serlogF(SER_NETWORK_INFO, "Request error");
                 foundEndOfRequest = false;
                 connectionType = CLOSE_AFTER_RESPONSE; // tell end to close the connection as the request is faulty.
                 return false;
@@ -378,7 +380,7 @@ bool WebServerResponse::processHeaders() {
 }
 
 void WebServerResponse::end() {
-    serdebugF("Finished response");
+    serlogF(SER_NETWORK_INFO, "Finished response");
     if(mode != PREPARING_CONTENT) {
         rawWriteData(transport->getClientFd(), (uint8_t*)"\r\n", 2, RAM_NEEDS_COPY);
     }
@@ -432,7 +434,7 @@ void WebServerResponse::exec() {
 }
 
 void WebServerResponse::closeConnection() {
-    serdebugF("HTTP close");
+    serlogF(SER_NETWORK_INFO, "HTTP close");
     mode = NOT_IN_USE;
     if(transport) transport->close();
 }

@@ -132,7 +132,7 @@ int TcMenuWebServerTransport::writeChar(char data) {
 
 int TcMenuWebServerTransport::writeStr(const char *data) {
     // only uncomment below for worst case debugging..
-    //	serdebug2("writing ", data);
+    //	serlogF2(SER_DEBUG, "writing ", data);
 
     size_t len = strlen(data);
     for(size_t i = 0; i < len; ++i) {
@@ -154,7 +154,7 @@ void TcMenuWebServerTransport::flush() {
         rawFlushAll(clientFd);
     } else if(writePosition != 0) {
         sendMessageOnWire(OPC_TEXT, writeBuffer, writePosition);
-        serdebugF2("Buffer written ", writePosition);
+        serlogF2(SER_NETWORK_INFO, "Buffer written ", writePosition);
         writePosition = 0;
         rawFlushAll(clientFd);
     }
@@ -218,7 +218,7 @@ void TcMenuLightweightWebServer::exec() {
             if(response) {
                 response->serviceClient(sockFd);
             } else {
-                serdebugF("Too many connections");
+                serlogF(SER_ERROR, "Too many connections");
                 return;
             }
         }

@@ -63,11 +63,11 @@ uint8_t tcremote::TcMenuRemoteServer::addConnection(tcremote::BaseRemoteServerCo
     if(remotesAdded >= ALLOWED_CONNECTIONS) return 0xff;
 
     if(remotesAdded == 0) {
-        serdebugF("Starting remote server tick handler");
+        serlogF(SER_NETWORK_INFO, "Starting remote server tick handler");
         taskManager.scheduleFixedRate(TICK_INTERVAL, this, TIME_MILLIS);
     }
 
-    serdebugF2("Adding connection #", remotesAdded);
+    serlogF2(SER_NETWORK_INFO, "Adding connection #", remotesAdded);
 
     // and then add it to our array.
     connections[remotesAdded] = toAdd;

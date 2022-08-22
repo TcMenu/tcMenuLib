@@ -44,7 +44,7 @@ void BaseDialog::showRam(const char* headerRam, bool allowRemote, CompletedHandl
 
 void BaseDialog::showController(bool allowRemote, BaseDialogController* dialogController) {
     if(dialogController == nullptr) {
-        serdebugF("Dialog controller was null, not showing");
+        serlogF(SER_TCMENU_INFO, "Dialog controller was null, not showing");
         return;
     }
     this->headerPgm = nullptr;
@@ -56,7 +56,7 @@ void BaseDialog::showController(bool allowRemote, BaseDialogController* dialogCo
 }
 
 void BaseDialog::internalShow(bool allowRemote) {
-    serdebugF("showing new dialog");
+    serlogF(SER_TCMENU_INFO, "showing new dialog");
     setInUse(true);
     setRemoteAllowed(allowRemote);
     setRemoteUpdateNeededAll();
@@ -77,7 +77,7 @@ void BaseDialog::internalSetVisible(bool visible) {
 }
 
 void BaseDialog::hide() {
-    serdebugF("hide() - give back display");
+    serlogF(SER_TCMENU_INFO, "hide() - give back display");
     setRemoteUpdateNeededAll();
 
     // stop the renderer from doing any more rendering, and tell it to reset the menu
@@ -95,7 +95,7 @@ ButtonType BaseDialog::findActiveBtn(unsigned int currentValue) {
     if(currentValue==0) {
         b = (button1 == BTNTYPE_NONE) ? button2 : button1;
     }
-    serdebugF4("findActiveBtn: ", currentValue, button1, button2);
+    serlogF4(SER_TCMENU_DEBUG,"findActiveBtn: ", currentValue, button1, button2);
     return b;
 }
 
@@ -106,7 +106,7 @@ void BaseDialog::actionPerformed(int btnNum) {
     if(canDismiss) {
         // must be done before hide, which resets the encoder
         ButtonType btn = findActiveBtn(btnNum);
-        serdebugF2("User clicked button: ", btn);
+        serlogF2(SER_TCMENU_INFO, "User clicked button: ", btn);
         hide();
         if (completedHandler) {
             if(isUsingOOController()) {
@@ -189,7 +189,7 @@ void BaseDialog::copyIntoBuffer(const char* sz) {
 }
 
 void BaseDialog::setButtons(ButtonType btn1, ButtonType btn2, int defVal) {
-    serdebugF3("Set buttons on dialog", btn1, btn2);
+    serlogF3(SER_TCMENU_INFO, "Set buttons on dialog", btn1, btn2);
     button1 = btn1;
     button2 = btn2;
     lastBtnVal = defVal;
@@ -201,7 +201,7 @@ void BaseDialog::encodeMessage(TagValueRemoteConnector* remote) {
 }
 
 void BaseDialog::remoteAction(ButtonType btn) {
-    serdebugF2("Remote clicked button: ", btn);
+    serlogF2(SER_TCMENU_INFO, "Remote clicked button: ", btn);
     hide();
     if(completedHandler) {
         if(isUsingOOController())

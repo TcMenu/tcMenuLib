@@ -105,11 +105,11 @@ void MenuManager::valueChanged(int value) {
         MenuItem* currentActive = menuMgr.findCurrentActive();
         currentActive->setActive(false);
         if(renderer->getRendererType() != RENDER_TYPE_NOLOCAL) {
-            serdebugF2("activate item ", value);
+            serlogF2(SER_TCMENU_DEBUG, "activate item ", value);
             currentActive = reinterpret_cast<BaseMenuRenderer*>(renderer)->getMenuItemAtIndex(getCurrentMenu(), value);
             if(currentActive) {
                 currentActive->setActive(true);
-                serdebugF3("Change active (V, ID) ", value, currentActive->getId());
+                serlogF3(SER_TCMENU_DEBUG, "Change active (V, ID) ", value, currentActive->getId());
             }
         }
 	}
@@ -141,7 +141,7 @@ void MenuManager::onMenuSelect(bool held) {
 void MenuManager::actionOnSubMenu(MenuItem* nextSub) {
 	SubMenuItem* subMenu = reinterpret_cast<SubMenuItem*>(nextSub);
 	if (subMenu->isSecured() && authenticationManager != nullptr) {
-		serdebugF2("Submenu is secured: ", nextSub->getId());
+		serlogF2(SER_TCMENU_INFO, "Submenu is secured: ", nextSub->getId());
 		SecuredMenuPopup* popup = secureMenuInstance();
 		popup->start(subMenu);
 		navigateToMenu(popup->getRootItem(), popup->getItemToActivate(), true);
@@ -167,7 +167,7 @@ void MenuManager::actionOnCurrentItem(MenuItem* toEdit) {
 	if (toEdit->getMenuType() == MENUTYPE_RUNTIME_LIST) {
 		if (menuMgr.getCurrentMenu() == toEdit) {
 			auto* listItem = reinterpret_cast<ListRuntimeMenuItem*>(toEdit);
-			serdebugF2("List select: ", listItem->getActiveIndex());
+            serlogF2(SER_TCMENU_INFO, "List select: ", listItem->getActiveIndex());
 			if (listItem->getActiveIndex() == 0) {
 				resetMenu(false);
 			}
@@ -185,9 +185,11 @@ void MenuManager::actionOnCurrentItem(MenuItem* toEdit) {
 		resetMenu(false);
 	}
 	else if (isItemActionable(toEdit)) {
+        serlogF2(SER_TCMENU_INFO, "Callback trigger ", toEdit->getId());
 		toEdit->triggerCallback();
 	}
 	else {
+        serlogF2(SER_TCMENU_INFO, "Edit start ", toEdit->getId());
 		menuMgr.setupForEditing(toEdit);
 		baseRenderer->redrawRequirement(MENUDRAW_EDITOR_CHANGE);
 	}
@@ -323,7 +325,7 @@ const char pszEmptyList[] = "No Items";
 void MenuManager::changeMenu(MenuItem* possibleActive) {
     if (renderer->getRendererType() == RENDER_TYPE_NOLOCAL) return;
 
-    serdebugF2("changeMenu: ", navigator.getCurrentRoot()->getId());
+    serlogF2(SER_TCMENU_DEBUG, "changeMenu: ", navigator.getCurrentRoot()->getId());
 
     // clear the current editor and ensure all active / editing flags removed.
 	menuMgr.setCurrentEditor(nullptr);
@@ -387,6 +389,7 @@ void MenuManager::addChangeNotification(MenuManagerObserver *observer) {
 
 void MenuManager::load(uint16_t magicKey, TimerFn onEepromEmpty) {
     if(!loadMenuStructure(eepromRef, magicKey) && onEepromEmpty != nullptr) {
+        serlogF(SER_TCMENU_INFO, "Run EEPROM empty cb");
         onEepromEmpty();
     }
 }
@@ -394,6 +397,7 @@ void MenuManager::load(uint16_t magicKey, TimerFn onEepromEmpty) {
 void MenuManager::load(EepromAbstraction &eeprom, uint16_t magicKey, TimerFn onEepromEmpty) {
     eepromRef = &eeprom;
     if(!loadMenuStructure(&eeprom, magicKey) && onEepromEmpty != nullptr) {
+        serlogF(SER_TCMENU_INFO, "Run EEPROM empty cb");
         onEepromEmpty();
     }
 }
@@ -405,6 +409,7 @@ void MenuManager::notifyEditEnd(MenuItem *item) {
             obs->menuEditEnded(item);
         }
     }
+    serlogF2(SER_TCMENU_INFO, "Menu edit end ", item->getId());
 }
 
 bool MenuManager::notifyEditStarting(MenuItem *item) {
@@ -416,10 +421,14 @@ bool MenuManager::notifyEditStarting(MenuItem *item) {
             goAhead = goAhead && obs->menuEditStarting(item);
         }
     }
+    if(!goAhead) {
+        serlogF2(SER_TCMENU_INFO, "Edit start cancelled ", item->getId());
+    }
     return goAhead;
 }
 
 void MenuManager::notifyStructureChanged() {
+    serlogF(SER_TCMENU_INFO, "Menu structure change");
     for(auto & i : structureNotifier) {
         if(i != nullptr) {
             i->structureHasChanged();
@@ -430,7 +439,7 @@ void MenuManager::notifyStructureChanged() {
 void MenuManager::setItemsInCurrentMenu(int size, int offs) {
     auto enc = switches.getEncoder();
     if(!enc) return;
-    serdebugF3("Set items in menu (size, offs) ", size, offs);
+    serlogF3(SER_TCMENU_INFO, "Set items in menu (size, offs) ", size, offs);
     enc->changePrecision(size, offs, useWrapAroundByDefault);
     enc->setUserIntention(SCROLL_THROUGH_ITEMS);
 }

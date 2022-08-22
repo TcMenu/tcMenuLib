@@ -28,8 +28,8 @@ uint8_t BaseBufferedRemoteTransport::readByte() {
     if(!readAvailable()) return -1;
     auto ch = readBuffer[readBufferPos];
     readBufferPos += 1;
-    // only uncomment the below for debugging.
-    //serdebugF2("readByte ", ch);
+    // only uncomment the below for worst case debugging.
+    //serlogF2(SER_DEBUG, "readByte ", ch);
     return ch;
 }
 
@@ -57,7 +57,7 @@ int BaseBufferedRemoteTransport::writeChar(char data) {
 
 int BaseBufferedRemoteTransport::writeStr(const char *data) {
     // only uncomment below for worst case debugging..
-    //	serdebug2("writing ", data);
+    //	serlogF2(SER_NETWORK_DEBUG, "writing ", data);
 
     size_t len = strlen(data);
     for(size_t i = 0; i < len; ++i) {

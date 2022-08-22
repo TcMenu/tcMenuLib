@@ -17,15 +17,10 @@ const char webs_asset_manifest_json[] PROGMEM = {
     "  \"files\": {" \
     "    \"main.css\": \"/static/css/main.1a3c7d45.chunk.css\"," \
     "    \"main.js\": \"/static/js/main.288eee91.chunk.js\"," \
-    "    \"main.js.map\": \"/static/js/main.288eee91.chunk.js.map\"," \
     "    \"runtime-main.js\": \"/static/js/runtime-main.a1d4d675.js\"," \
-    "    \"runtime-main.js.map\": \"/static/js/runtime-main.a1d4d675.js.map\"," \
     "    \"static/js/2.70c1c58c.chunk.js\": \"/static/js/2.70c1c58c.chunk.js\"," \
-    "    \"static/js/2.70c1c58c.chunk.js.map\": \"/static/js/2.70c1c58c.chunk.js.map\"," \
     "    \"static/js/3.30ad73c1.chunk.js\": \"/static/js/3.30ad73c1.chunk.js\"," \
-    "    \"static/js/3.30ad73c1.chunk.js.map\": \"/static/js/3.30ad73c1.chunk.js.map\"," \
     "    \"index.html\": \"/index.html\"," \
-    "    \"static/css/main.1a3c7d45.chunk.css.map\": \"/static/css/main.1a3c7d45.chunk.css.map\"," \
     "    \"static/js/2.70c1c58c.chunk.js.LICENSE.txt\": \"/static/js/2.70c1c58c.chunk.js.LICENSE.txt\"," \
     "    \"static/media/large_icon.5be57cbe.webp\": \"/static/media/large_icon.5be57cbe.webp\"," \
     "    \"static/media/pairing.63065c5a.webp\": \"/static/media/pairing.63065c5a.webp\"" \
@@ -4316,7 +4311,7 @@ void prepareWebServer(TcMenuLightweightWebServer& webServer) {
     });
 
     webServer.onUrlGet("/ws", [](WebServerResponse& response) {
-        if(connectionHandler.hasFreeConnection()) {
+        if(connectionHandler.hasFreeConnection() && response.getMethod() == WS_UPGRADE) {
             response.turnRequestIntoWebSocket();
             connectionHandler.takeConnection(&response);
         } else {

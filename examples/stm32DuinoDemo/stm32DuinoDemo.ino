@@ -87,7 +87,11 @@ void setup() {
     // and then run the menu setup
     setupMenu();
 
-    menuMgr.load();
+    menuMgr.load(0xd00d, [] {
+        // this gets called when the menu hasn't been saved before, to initialise the first time.
+        menuDecimal.setCurrentValue(4);
+        menuHalves.setCurrentValue(6);
+    });
 
     myCustomDrawing.registerWithRenderer();
     setTitlePressedCallback([](int) {
@@ -128,7 +132,7 @@ void CALLBACK_FUNCTION decimalDidChange(int id) {
 
 void CALLBACK_FUNCTION saveWasPressed(int id) {
      auto bspBackupRam = reinterpret_cast<HalStm32EepromAbstraction*>(menuMgr.getEepromAbstraction());
-     menuMgr.save();
+     menuMgr.save(0xd00d);
      bspBackupRam->commit();
 }
 

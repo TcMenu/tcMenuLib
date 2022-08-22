@@ -21,7 +21,7 @@ public:
             auto gfxRenderer = reinterpret_cast<tcgfx::BaseGraphicalRenderer*>(myRenderer);
             gfxRenderer->displayPropertiesHaveChanged();
         } else if(myRenderer->getRendererType() != RENDER_TYPE_NOLOCAL) {
-            serdebugF("Completely invalidate the display");
+            serlogF(SER_TCMENU_DEBUG, "Completely invalidate the display");
             reinterpret_cast<BaseMenuRenderer*>(myRenderer)->invalidateAll();
         }
     }
@@ -97,7 +97,7 @@ void BaseMenuRenderer::exec() {
 }
 
 void BaseMenuRenderer::resetToDefault() {
-    serdebugF2("Display reset - timeout ticks: ", resetValInTicks);
+    serlogF2(SER_TCMENU_INFO, "Display reset - timeout ticks: ", resetValInTicks);
 	menuMgr.resetMenu(true);
 	ticksToReset = MAX_TICKS;
 
