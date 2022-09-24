@@ -20,7 +20,7 @@ EepromAuthenticatorManager authManager(4);
 U8G2_SSD1306_128X64_NONAME_F_4W_HW_SPI gfx(U8G2_R0, PF13, PD15, PF12);
 U8g2Drawable gfxDrawable(&gfx);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
-tcremote::TcMenuLightweightWebServer webServer(80, 4);
+tcremote::TcMenuLightweightWebServer webServer(80, 4, true);
 void prepareWebServer(tcremote::TcMenuLightweightWebServer& webServer);
 
 // Global Menu Item declarations

@@ -4,11 +4,11 @@
 #include <remote/BaseRemoteComponents.h>
 #include <RemoteConnector.h>
 #include <SimpleCollections.h>
-#include <remote/TcMenuWebServer.h>
+#include "remote/TcMenuWebServer.h"
 #include "SimpleTestFixtures.h"
 #include "UnitTestDriver.h"
 #include "UnitTestDriver.h"
-#include <remote/TcWebSocketRemoteConnection.h>
+#include "remote/TcWebSocketRemoteConnection.h"
 
 using namespace aunit;
 using namespace tcremote;

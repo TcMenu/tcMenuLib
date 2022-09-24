@@ -67,6 +67,8 @@ public:
 } myCustomDrawing(renderer);
 
 void setup() {
+    serEnableLevel(SER_NETWORK_DEBUG, true);
+
     // Start up serial and prepare the correct SPI
     Serial.begin(115200);
     SPI.setMISO(PB4);
