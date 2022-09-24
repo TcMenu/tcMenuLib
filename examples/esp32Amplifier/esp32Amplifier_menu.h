@@ -15,11 +15,8 @@
 #include <tcMenu.h>
 #include "tcMenuTfteSpi.h"
 #include <graphics/MenuTouchScreenEncoder.h>
-
-
-#include "tcMenuECWebServer.h"
-
-
+#include "EthernetTransport.h"
+#include <RemoteConnector.h>
 #include <RemoteMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
@@ -29,12 +26,14 @@
 
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
-extern tcremote::TcMenuRemoteServer remoteServer;
+extern TcMenuRemoteServer remoteServer;
 extern TFT_eSPI tft;
 extern TfteSpiDrawable tftDrawable;
 extern GraphicsDeviceRenderer renderer;
 extern iotouch::ResistiveTouchInterrogator touchInterrogator;
 extern MenuTouchScreenManager touchScreen;
+extern WiFiServer server;
+extern EthernetInitialisation ethernetInitialisation;
 
 // Any externals needed by IO expanders, EEPROMs etc
 
