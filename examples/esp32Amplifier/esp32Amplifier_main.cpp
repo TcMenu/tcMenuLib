@@ -22,6 +22,8 @@
 #include "TestingDialogController.h"
 #include <extras/DrawableTouchCalibrator.h>
 
+using namespace tcremote;
+
 const char pgmVersionHeader[] PROGMEM = "tcMenu Version";
 
 bool connectedToWifi = false;

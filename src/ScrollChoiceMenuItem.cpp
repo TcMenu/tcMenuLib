@@ -66,26 +66,26 @@ void ScrollChoiceMenuItem::valueAtPosition(char *buffer, size_t bufferSize, int 
     auto safeSize = min((size_t)itemSize, bufferSize - 1);
 
     if (rangeValues != nullptr) {
-        serdebugF4("Start Cached ", idx, (int)rangeValues, itemSize);
+        serlogF4(SER_TCMENU_DEBUG, "Start Cached ", idx, (int)rangeValues, itemSize);
         strncpy(buffer, &rangeValues[itemSize * idx], safeSize);
         buffer[safeSize] = 0;
-        serdebugF2("Cached ", idx);
+        serlogF2(SER_TCMENU_DEBUG, "Cached ", idx);
     }
     else if(memMode == EEPROM_BASED) {
         if(!menuMgr.getEepromAbstraction()) {
             strncpy(buffer, "!ROM", bufferSize);
-            serdebugF("No Rom set");
+            serlogF(SER_TCMENU_DEBUG, "No Rom set");
         }
         else {
             EepromPosition position = eepromStart + (idx * itemSize);
             menuMgr.getEepromAbstraction()->readIntoMemArray((uint8_t *) buffer, position, safeSize);
-            serdebugF3("Rom ", idx, position);
+            serlogF3(SER_TCMENU_DEBUG, "Rom ", idx, position);
         }
         buffer[safeSize] = 0;
     }
     else if(memMode == CUSTOM){
         renderFn(this, idx, RENDERFN_VALUE, buffer, bufferSize);
-        serdebugF2("Custom ", idx);
+        serlogF2(SER_TCMENU_DEBUG, "Custom ", idx);
     }
 }
 

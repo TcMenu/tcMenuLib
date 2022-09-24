@@ -176,10 +176,10 @@ void AnalogMenuItem::copyValue(char * buffer, uint8_t bufferSize) const {
 
 float AnalogMenuItem::getAsFloatingPointValue() const {
 	WholeAndFraction wf = getWholeAndFraction();
-	serdebugF4("getasF ", wf.whole, wf.fraction, wf.negative);
+	serlogF4(SER_TCMENU_DEBUG, "getasF ", wf.whole, wf.fraction, wf.negative);
 	float fract = (float(wf.fraction) / float(getActualDecimalDivisor()));
 	float whole = (wf.negative) ? -float(wf.whole) : float(wf.whole);
-	serdebugF3("whole, fract ", whole, fract);
+    serlogF3(SER_TCMENU_DEBUG, "whole, fract ", whole, fract);
 	return (wf.negative) ? (whole - fract) : (whole + fract);
 
 }
@@ -198,7 +198,7 @@ WholeAndFraction AnalogMenuItem::getWholeAndFraction() const {
     wf.negative = (calcVal < 0);
 
 	if (divisor < 2) {
-		wf.whole = calcVal;
+		wf.whole = abs(calcVal);
 		wf.fraction = 0;
 	}
 	else {
@@ -223,7 +223,7 @@ void AnalogMenuItem::setFromWholeAndFraction(WholeAndFraction wf) {
 	}
 	setCurrentValue(val - getOffset());
 
-	serdebugF4("setWF ", wf.whole, wf.fraction, getCurrentValue());
+    serlogF4(SER_TCMENU_DEBUG, "setWF ", wf.whole, wf.fraction, getCurrentValue());
 }
 
 void AnalogMenuItem::setFromFloatingPointValue(float value) {

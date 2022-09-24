@@ -140,6 +140,21 @@ test(testAnalogMenuItem) {
     assertNear(-0.2F, menuAnalog2.getAsFloatingPointValue(), 0.0001F);
 }
 
+test(testAnalogItemNegativeInteger) {
+    AnalogMenuInfo myInfo = { "Analog12", 1055, 0xffff, 255, nullptr, -20, 1, "dB" };
+    AnalogMenuItem localAnalog(&myInfo, 0, nullptr, INFO_LOCATION_RAM);
+
+    assertEqual(-20, localAnalog.getIntValueIncludingOffset());
+    assertEqual((uint16_t)0, localAnalog.getCurrentValue());
+    assertTrue(checkWholeFraction(&localAnalog, 20, 0, true));
+    assertNear(float(-20.0), localAnalog.getAsFloatingPointValue(), float(0.0001));
+
+    localAnalog.setCurrentValue(255);
+    assertTrue(checkWholeFraction(&localAnalog, 235, 0));
+    assertNear(float(235.0), localAnalog.getAsFloatingPointValue(), float(0.0001));
+    assertEqual(235, localAnalog.getIntValueIncludingOffset());
+}
+
 test(testGetIntValueIncudingOffset) {
     AnalogMenuInfo myInfo = { "Analog12", 102, 0xffff, 200, nullptr, 100, 1, "xyz" };
     AnalogMenuItem localAnalog(&myInfo, 0, nullptr, INFO_LOCATION_RAM);

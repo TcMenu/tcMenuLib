@@ -53,7 +53,7 @@ bool isTouchActionable(MenuItem* pItem) {
 }
 
 void MenuTouchScreenEncoder::touched(const TouchNotification &evt) {
-    serdebugF4("Touch at (x,y,mode)", evt.getCursorPosition().x, evt.getCursorPosition().y, evt.isWithinItem())
+    serlogF4(SER_TCMENU_DEBUG, "Touch at (x,y,mode)", evt.getCursorPosition().x, evt.getCursorPosition().y, evt.isWithinItem())
     if(evt.isWithinItem()) {
         MenuItem *theItem = evt.getEntry()->getMenuItem();
         if(menuMgr.getCurrentEditor() && theItem != menuMgr.getCurrentEditor()) {

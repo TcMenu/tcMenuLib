@@ -5,13 +5,20 @@
  */
 
 #include "stm32DuinoDemo_menu.h"
+#include <STM32Ethernet.h>
 #include <PlatformDetermination.h>
 #include <SPI.h>
 
 #include <TaskManagerIO.h>
 
-//                        0123456789 0123456789 0123456789 0123456789 0123456789
-const char* ramDataSet = "Item 1\0   Item 2\0   Item 3\0   Item 4\0   Item 5\0   ";
+// This variable is the RAM data for scroll choice item Scroll
+char ramDataSet[] = "1\0        2\0        3\0        4\0        5\0        ~";
+
+const uint8_t myManualIp[] = { 192, 168, 0, 202 };
+const uint8_t myManualMac[] = { 0xde, 0xed, 0xbe, 0xef, 0xfe, 0xed };
+const uint8_t standardNetMask[] = { 255, 255, 255, 0 };
+
+using namespace tcremote;
 
 class MyCustomDrawing : public CustomDrawing {
 private:
@@ -60,6 +67,8 @@ public:
 } myCustomDrawing(renderer);
 
 void setup() {
+    serEnableLevel(SER_NETWORK_DEBUG, true);
+
     // Start up serial and prepare the correct SPI
     Serial.begin(115200);
     SPI.setMISO(PB4);
@@ -67,15 +76,24 @@ void setup() {
     SPI.setSCLK(PB3);
 
     // Now start up the ethernet library.
-    Ethernet.begin();
-    Serial.print("My IP address is ");
-    Ethernet.localIP().printTo(Serial);
-    Serial.println();
+    startNetLayerManual(myManualIp, myManualMac, standardNetMask);
+    if(isNetworkUp()) {
+        char sz[30];
+        copyIpAddress(TC_LOCALHOST_SOCKET_ID, sz, sizeof sz);
+        Serial.print("My IP address is ");
+        Serial.println(sz);
+    } else {
+        Serial.println("Network did not start!");
+    }
 
     // and then run the menu setup
     setupMenu();
 
-    menuMgr.load();
+    menuMgr.load(0xd00d, [] {
+        // this gets called when the menu hasn't been saved before, to initialise the first time.
+        menuDecimal.setCurrentValue(4);
+        menuHalves.setCurrentValue(6);
+    });
 
     myCustomDrawing.registerWithRenderer();
     setTitlePressedCallback([](int) {
@@ -116,7 +134,7 @@ void CALLBACK_FUNCTION decimalDidChange(int id) {
 
 void CALLBACK_FUNCTION saveWasPressed(int id) {
      auto bspBackupRam = reinterpret_cast<HalStm32EepromAbstraction*>(menuMgr.getEepromAbstraction());
-     menuMgr.save();
+     menuMgr.save(0xd00d);
      bspBackupRam->commit();
 }
 

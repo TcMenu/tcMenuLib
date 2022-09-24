@@ -1,0 +1,23 @@
+#include "officialPiPicoTftEncoder_menu.h"
+// default CPP main file for sketch
+#include <PlatformDetermination.h>
+
+#include <TaskManagerIO.h>
+
+void setup() {
+    setupMenu();
+}
+
+void loop() {
+    taskManager.runLoop();
+}
+
+
+void CALLBACK_FUNCTION onRestart(int id) {
+    // TODO - your menu change code
+}
+
+
+void CALLBACK_FUNCTION onVolumeChanged(int id) {
+    // TODO - your menu change code
+}

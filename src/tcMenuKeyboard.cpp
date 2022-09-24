@@ -55,13 +55,12 @@ void MenuEditingKeyListener::keyPressed(char key, bool held) {
         MenuItem* currentActive = menuMgr.findCurrentActive();
         uint16_t indexOfActive = offsetOfCurrentActive(currentActive) + dir;
         uint8_t numItems = itemCount(menuMgr.getCurrentMenu(), false);
-        serdebugF4("act, items", indexOfActive, numItems, dir);
         if(indexOfActive > numItems) return;
         MenuItem* newActive = getItemAtPosition(menuMgr.getCurrentMenu(), indexOfActive);
         if(currentActive && newActive) {
             currentActive->setActive(false);
             newActive->setActive(true);
-            serdebugF2("activate item ", newActive->getId());
+            serlogF2(SER_TCMENU_DEBUG, "activate item ", newActive->getId());
         }
     } else if (key == deleteKey) {
         clearState();
@@ -129,23 +128,22 @@ void MenuEditingKeyListener::processIntegerMultiEdit(EditableMultiPartMenuItem *
     if (key == enterKey) {
         int range = item->nextPart();
         if (range == 0) {
-            serdebugF("Finished with multi-edit");
+            serlogF(SER_TCMENU_DEBUG, "Finished with multi-edit");
             clearState();
             return;
         }
-        serdebugF2("Next editable part: ", range);
+        serlogF2(SER_TCMENU_DEBUG, "Next editable part: ", range);
         switches.changeEncoderPrecision(range, 0);
         item->valueChanged(0);
     } else if (key >= '0' && key <= '9') {
         int partVal = item->getPartValueAsInt();
         partVal = (partVal * 10) + (key - '0');
         if (partVal > item->getCurrentRange()) {
-            serdebugF3("Edited multi overvalue: ", partVal, item->getCurrentRange());
+            serlogF3(SER_TCMENU_DEBUG, "Edited multi overvalue: ", partVal, item->getCurrentRange());
             clearState();
             return;
         }
-
-        serdebugF2("Edited multi: ", partVal);
+        serlogF2(SER_TCMENU_DEBUG, "Edited multi: ", partVal);
         item->valueChanged(partVal);
     }
 }
@@ -158,17 +156,17 @@ void MenuEditingKeyListener::processAnalogKeyPress(AnalogMenuItem *item, char ke
         currentEditor = item;
         currentValue.whole = 0;
         currentValue.fraction = 0;
-        serdebugF("Starting analog edit");
+        serlogF(SER_TCMENU_DEBUG, "Starting analog edit");
     }
 
     if (mode == KEYEDIT_ANALOG_EDIT_WHOLE && (key == deleteKey || key == '-')) {
             currentValue.negative = !currentValue.negative;
-            serdebugF2("Negate to ", currentValue.whole);
+        serlogF2(SER_TCMENU_DEBUG, "Negate to ", currentValue.whole);
             item->setFromWholeAndFraction(currentValue);
     } else if (key == enterKey) {
         if(mode == KEYEDIT_ANALOG_EDIT_WHOLE && item->getDivisor() > 1) {
             mode = KEYEDIT_ANALOG_EDIT_FRACT;
-            serdebugF("Start fraction edit");
+            serlogF(SER_TCMENU_DEBUG, "Start fraction edit");
         }
         else {
             clearState();
@@ -179,16 +177,16 @@ void MenuEditingKeyListener::processAnalogKeyPress(AnalogMenuItem *item, char ke
         // numeric handling
         if (mode == KEYEDIT_ANALOG_EDIT_WHOLE) {
             currentValue.whole = (currentValue.whole * 10) + num;
-            serdebugF2("New digit ", currentValue.whole);
+            serlogF2(SER_TCMENU_DEBUG, "New digit ", currentValue.whole);
         } else if (mode == KEYEDIT_ANALOG_EDIT_FRACT) {
             if (item->getDivisor() <= 10) {
                 currentValue.fraction = num;
-                serdebugF2("New fraction digit ", currentValue.fraction);
+                serlogF2(SER_TCMENU_DEBUG, "New fraction digit ", currentValue.fraction);
             } else {
                 unsigned int frac = (currentValue.fraction * 10) + num;
                 if (frac > item->getDivisor()) {
                     // the number entered is too big, exit.
-                    serdebugF2("Number too large ", frac);
+                    serlogF2(SER_TCMENU_INFO, "Number too large ", frac);
                     item->setEditing(false);
                     clearState();
                     return;
@@ -197,7 +195,7 @@ void MenuEditingKeyListener::processAnalogKeyPress(AnalogMenuItem *item, char ke
             }
         }
     }
-    serdebugF3("Setting to ", currentValue.whole, currentValue.fraction);
+    serlogF3(SER_TCMENU_DEBUG, "Setting to ", currentValue.whole, currentValue.fraction);
     item->setFromWholeAndFraction(currentValue);
 }
 

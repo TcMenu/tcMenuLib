@@ -9,7 +9,7 @@ using namespace tcremote;
 
 BaseBufferedRemoteTransport::BaseBufferedRemoteTransport(BufferingMode bufferMode, uint8_t readBufferSize, uint8_t writeBufferSize)
         : TagValueTransport(TVAL_BUFFERED), writeBufferSize(writeBufferSize), writeBufferPos(0),
-        readBufferSize(readBufferSize), readBufferPos(0), readBufferAvail(0), mode(bufferMode), bufferWriteCheckTask(0), ticksSinceWrite(0) {
+        readBufferSize(readBufferSize), readBufferPos(0), readBufferAvail(0), mode(bufferMode), ticksSinceWrite(0) {
     readBuffer = new uint8_t[readBufferSize];
     writeBuffer = new uint8_t[writeBufferSize];
 }
@@ -17,7 +17,6 @@ BaseBufferedRemoteTransport::BaseBufferedRemoteTransport(BufferingMode bufferMod
 BaseBufferedRemoteTransport::~BaseBufferedRemoteTransport() {
     delete[] readBuffer;
     delete[] writeBuffer;
-    if(bufferWriteCheckTask != TASKMGR_INVALIDID) taskManager.cancelTask(bufferWriteCheckTask);
 }
 
 void BaseBufferedRemoteTransport::endMsg() {
@@ -29,8 +28,8 @@ uint8_t BaseBufferedRemoteTransport::readByte() {
     if(!readAvailable()) return -1;
     auto ch = readBuffer[readBufferPos];
     readBufferPos += 1;
-    // only uncomment the below for debugging.
-    //serdebugF2("readByte ", ch);
+    // only uncomment the below for worst case debugging.
+    //serlogF2(SER_DEBUG, "readByte ", ch);
     return ch;
 }
 
@@ -58,7 +57,7 @@ int BaseBufferedRemoteTransport::writeChar(char data) {
 
 int BaseBufferedRemoteTransport::writeStr(const char *data) {
     // only uncomment below for worst case debugging..
-    //	serdebug2("writing ", data);
+    //	serlogF2(SER_NETWORK_DEBUG, "writing ", data);
 
     size_t len = strlen(data);
     for(size_t i = 0; i < len; ++i) {

@@ -29,7 +29,6 @@ namespace tcremote {
         uint8_t readBufferPos;
         uint8_t readBufferAvail;
         BufferingMode mode;
-        taskid_t bufferWriteCheckTask;
         uint8_t ticksSinceWrite;
     public:
         BaseBufferedRemoteTransport(BufferingMode bufferMode, uint8_t readBufferSize, uint8_t writeBufferSize);

@@ -24,15 +24,15 @@ const char PGM_TCM pmemBootEndText[] = "END";
 
 #ifdef IO_LOGGING_DEBUG
 // utility function to write out a debug line with the message type attached.
-inline void serdebugMsgHdr(const char* tx, int remoteNo, uint16_t msgType) {
+inline void logMessageHeader(const char* tx, int remoteNo, uint16_t msgType) {
     char sz[3];
     sz[0] = char(msgType>>8);
     sz[1] = char(msgType & 0xff);
     sz[2] = 0;
-    serdebug3(tx, remoteNo, sz);
+    serlog2(SER_NETWORK_DEBUG, remoteNo, sz);
 }
 #else
-#define serdebugMsgHdr(x, y, z)
+#define logMessageHeader(x, y, z)
 #endif
 
 void stopPairing();
@@ -70,7 +70,7 @@ void TagValueRemoteConnector::setRemoteName(const char* name) {
 
 void TagValueRemoteConnector::setRemoteConnected(uint8_t major, uint8_t minor, ApiPlatform platform) {
     if(isAuthenticated()) {
-        serdebugF("Fully authenticated connection");
+        serlogF(SER_NETWORK_INFO, "Fully authenticated connection");
         remoteMajorVer = major;
         remoteMinorVer = minor;
         remotePlatform = platform;
@@ -78,14 +78,14 @@ void TagValueRemoteConnector::setRemoteConnected(uint8_t major, uint8_t minor, A
         initiateBootstrap();
     }
     else {
-        serdebugF("Not authenticated, dropping");
+        serlogF(SER_NETWORK_INFO, "Not authenticated, dropping");
         close();
     }
 }
 
 void TagValueRemoteConnector::provideAuthentication(const char* auth) {
     if(auth == nullptr || !authManager->isAuthenticated(remoteName, auth)) {
-        serdebugF2("Authentication failed for ", remoteName);
+        serlogF2(SER_NETWORK_INFO, "Authentication failed for ", remoteName);
         // wait before returning the state to prevent denial of service.
         encodeAcknowledgement(0, ACK_CREDENTIALS_INVALID);
         taskManager.yieldForMicros(15000); 
@@ -96,7 +96,7 @@ void TagValueRemoteConnector::provideAuthentication(const char* auth) {
     else {
         encodeAcknowledgement(0, ACK_SUCCESS);
         setAuthenticated(true);
-        serdebugF2("Authenticated device ", remoteName);
+        serlogF2(SER_NETWORK_INFO, "Authenticated device ", remoteName);
         commsNotify(COMMSERR_CONNECTED);
     }
 }
@@ -108,12 +108,12 @@ const char* lastUuid;
 void onPairingFinished(ButtonType ty, void* voidConnector) {
     auto* connector = reinterpret_cast<TagValueRemoteConnector*>(voidConnector);
     if(ty==BTNTYPE_ACCEPT) {
-        serdebugF("Adding key after user pressed accept");
+        serlogF(SER_NETWORK_INFO, "Adding key after user pressed accept");
         bool added = connector->getAuthManager()->addAdditionalUUIDKey(connector->getRemoteName(), lastUuid);
         connector->encodeAcknowledgement(0, added ? ACK_SUCCESS : ACK_CREDENTIALS_INVALID);
     }
     else {
-        serdebugF("Not adding key, close pressed");
+        serlogF(SER_NETWORK_INFO, "Not adding key, close pressed");
         connector->encodeAcknowledgement(0, ACK_CREDENTIALS_INVALID);
     }
 } 
@@ -157,7 +157,7 @@ void TagValueRemoteConnector::commsNotify(uint16_t err) {
 }
 
 void TagValueRemoteConnector::close() {
-	serdebugF("Closing connection");
+	serlogF(SER_NETWORK_INFO, "Closing connection");
 	if (transport->connected()) {
 		encodeHeartbeat(HBMODE_ENDCONNECT);
 	}
@@ -187,15 +187,15 @@ void TagValueRemoteConnector::tick() {
 	FieldAndValue* field = transport->fieldIfAvailable();
 	switch(field->fieldType) {
 	case FVAL_NEW_MSG:
-        serdebugMsgHdr("Msg In S: ", remoteNo, field->msgType);
+        logMessageHeader("Msg In S: ", remoteNo, field->msgType);
 		processor->newMsg(field->msgType);
 		break;
 	case FVAL_FIELD:
-        serdebugMsgHdr("Fld: ", remoteNo, field->field);
+        logMessageHeader("Fld: ", remoteNo, field->field);
 		processor->fieldUpdate(this, field);
         break;
 	case FVAL_END_MSG:
-        serdebugMsgHdr("Msg In E: ", remoteNo, field->msgType);
+        logMessageHeader("Msg In E: ", remoteNo, field->msgType);
 		processor->fieldUpdate(this, field);
 		ticksLastRead = 0;
 		break;
@@ -224,22 +224,23 @@ void TagValueRemoteConnector::dealWithHeartbeating() {
 	++ticksLastSend;
 
     // pairing will not send heartbeats, so we wait about 10 seconds before closing out
-    unsigned int interval = isPairing() ? (PAIRING_TIMEOUT_TICKS) : (HEARTBEAT_INTERVAL_TICKS * 3);
+    unsigned int maximumWaitTime = isPairing() ? (PAIRING_TIMEOUT_TICKS) : (HEARTBEAT_INTERVAL_TICKS * 3);
 
-	if(ticksLastRead > interval) {
-		if(isConnected()) {
-         	serdebugF3("Remote disconnected (rNo, ticks): ", remoteNo, ticksLastSend);
-			close();
-		}
-	} else if(!isConnected() && transport->connected()) {
-       	serdebugF2("Remote connected: ", remoteNo);
+	if(ticksLastRead > maximumWaitTime && isConnected()) {
+        serlogF3(SER_NETWORK_INFO, "Remote disconnected (rNo, ticks): ", remoteNo, ticksLastSend);
+        close();
+        return;
+	}
+
+    if(!isConnected() && transport->connected()) {
+        serlogF2(SER_NETWORK_INFO, "Remote connected: ", remoteNo);
         encodeHeartbeat(HBMODE_STARTCONNECT);
 		setConnected(true);
 	}
 
 	if(ticksLastSend > HEARTBEAT_INTERVAL_TICKS) {
 		if(isConnectionFullyEstablished() && transport->available()) {
-         	serdebugF3("Sending HB (rNo, ticks) : ", remoteNo, ticksLastSend);
+            serlogF3(SER_NETWORK_INFO, "Sending HB (rNo, ticks) : ", remoteNo, ticksLastSend);
             encodeHeartbeat(HBMODE_NORMAL);
         }
 	}
@@ -265,7 +266,7 @@ void TagValueRemoteConnector::performAnyWrites() {
 }
 
 void TagValueRemoteConnector::initiateBootstrap() {
-    serdebugF2("Starting bootstrap mode", remoteNo);
+    serlogF2(SER_NETWORK_INFO, "Starting bootstrap mode", remoteNo);
     iterator.reset();
     iterator.setPredicate(&bootPredicate);
 	encodeBootstrap(false);
@@ -280,7 +281,7 @@ void TagValueRemoteConnector::nextBootstrap() {
 	MenuItem* parent = iterator.currentParent() ;
     int parentId = parent == nullptr ? 0 : parent->getId();
 	if(!bootItem) {
-        serdebugF2("Finishing bootstrap mode", remoteNo);
+        serlogF2(SER_NETWORK_INFO, "Finishing bootstrap mode", remoteNo);
 		setBootstrapMode(false);
         setBootstrapComplete(true);
 		encodeBootstrap(true);
@@ -356,7 +357,7 @@ void TagValueRemoteConnector::encodeCustomTagValMessage(uint16_t msgType, void (
     if(!prepareWriteMsg(msgType)) return;
     msgWriter(transport);
     transport->endMsg();
-    serdebugF2("Custom message write complete", msgType);
+    serlogF2(SER_NETWORK_INFO, "Custom message write complete", msgType);
 }
 
 void TagValueRemoteConnector::encodeJoin() {
@@ -370,7 +371,7 @@ void TagValueRemoteConnector::encodeJoin() {
     transport->writeFieldInt(FIELD_PLATFORM, TCMENU_DEFINED_PLATFORM);
     transport->endMsg();
 	setFullyJoinedTx(true);
-    serdebugF2("Join sent ", szName);
+    serlogF2(SER_NETWORK_INFO, "Join sent ", szName);
 }
 
 void TagValueRemoteConnector::encodeBootstrap(bool isComplete) {
@@ -389,14 +390,14 @@ void TagValueRemoteConnector::encodeHeartbeat(HeartbeatMode hbMode) {
 
 bool TagValueRemoteConnector::prepareWriteMsg(uint16_t msgType) {
     if(!transport->connected()) {
-        serdebugMsgHdr("Wr Err ", remoteNo, msgType);
+        logMessageHeader("Wr Err ", remoteNo, msgType);
         commsNotify(COMMSERR_WRITE_NOT_CONNECTED);
         setConnected(false); // we are immediately not connected in this case.
         return false;
     }
     transport->startMsg(msgType);
     ticksLastSend = 0;
-    serdebugMsgHdr("Msg Out ", remoteNo, msgType);
+    logMessageHeader("Msg Out ", remoteNo, msgType);
     return true;
 }
 
@@ -552,7 +553,7 @@ void TagValueRemoteConnector::encodeAcknowledgement(uint32_t correlation, AckRes
     transport->writeField(FIELD_CORRELATION, sz);
     transport->endMsg();
 
-    serdebugF3("Ack send: ", correlation, status);
+    serlogF3(SER_NETWORK_INFO, "Ack send: ", correlation, status);
 }
 
 void TagValueRemoteConnector::encodeBooleanMenu(int parentId, BooleanMenuItem* item) {
@@ -770,7 +771,12 @@ FieldAndValue* TagValueTransport::fieldIfAvailable() {
 
 		case FVAL_PROCESSING_PROTOCOL: // we need to make sure the protocol is valid
 			if(readAvailable()) {
-                currentField.fieldType = (readByte() == protocolUsed) ? FVAL_PROCESSING_MSGTYPE_HI : FVAL_ERROR_PROTO;
+                if(readByte() == protocolUsed) {
+                    currentField.fieldType = FVAL_PROCESSING_MSGTYPE_HI;
+                } else {
+                    currentField.fieldType = FVAL_ERROR_PROTO;
+                    contProcessing = false;
+                }
             }
 			break;
 
@@ -811,6 +817,7 @@ FieldAndValue* TagValueTransport::fieldIfAvailable() {
 		case FVAL_PROCESSING_VALUE: // and lastly a value followed by pipe.
 			if(!processValuePart()) {
 				clearFieldStatus(FVAL_ERROR_PROTO);
+                contProcessing = false;
 			}
 			if(currentField.fieldType != FVAL_PROCESSING_VALUE) return &currentField;
 			break;

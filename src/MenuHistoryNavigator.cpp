@@ -21,12 +21,12 @@ void tcnav::MenuNavigationStore::navigateTo(MenuItem *activeItem, MenuItem *newR
     if(navIdx < NAV_ITEM_ARRAY_SIZE && !currentIsCustom) {
         navItems[navIdx] = currentRoot;
         activeItems[navIdx] = activeItem ? activeItem : currentRoot;
-        serdebugF4("NavigateTo pushed ", navIdx, currentRoot->getId(), activeItems[navIdx]->getId());
+        serlogF4(SER_TCMENU_INFO, "NavigateTo pushed ", navIdx, currentRoot->getId(), activeItems[navIdx]->getId());
         currentIsCustom = custom;
         navIdx++;
     }
     else {
-        serdebugF("Nav exceeded");
+        serlogF(SER_ERROR, "Nav exceeded");
     }
     currentRoot = newRoot;
     currentSub = getSubMenuFor(newRoot);
@@ -35,7 +35,7 @@ void tcnav::MenuNavigationStore::navigateTo(MenuItem *activeItem, MenuItem *newR
 MenuItem *tcnav::MenuNavigationStore::popNavigationGetActive() {
     currentIsCustom = false;
     if(navIdx == 0) {
-        serdebugF("Nav pop root");
+        serlogF(SER_TCMENU_INFO, "Nav pop root");
         currentSub = nullptr;
         currentRoot = root;
         return root;
@@ -43,7 +43,7 @@ MenuItem *tcnav::MenuNavigationStore::popNavigationGetActive() {
         navIdx--;
         currentRoot = navItems[navIdx];
         currentSub = getSubMenuFor(currentRoot);
-        serdebugF3("Nav pop ", navIdx, currentRoot->getId());
+        serlogF3(SER_TCMENU_INFO, "Nav pop ", navIdx, currentRoot->getId());
         return activeItems[navIdx];
     }
 }

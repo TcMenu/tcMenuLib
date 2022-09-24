@@ -13,6 +13,7 @@ void BaseRemoteServerConnection::runLoop() {
         initialisation.attemptInitialisation();
     }
     else if (!connected()) {
+        notifyRemoteHasClosed();
         initialisation.attemptNewConnection(this);
     } else {
         tick();
@@ -54,15 +55,19 @@ void TagValueRemoteServerConnection::copyConnectionStatus(char *buffer, int buff
     }
 }
 
+void TagValueRemoteServerConnection::notifyRemoteHasClosed() {
+    if(remoteConnector.isConnected()) remoteConnector.close();
+}
+
 uint8_t tcremote::TcMenuRemoteServer::addConnection(tcremote::BaseRemoteServerConnection *toAdd) {
     if(remotesAdded >= ALLOWED_CONNECTIONS) return 0xff;
 
     if(remotesAdded == 0) {
-        serdebugF("Starting remote server tick handler");
+        serlogF(SER_NETWORK_INFO, "Starting remote server tick handler");
         taskManager.scheduleFixedRate(TICK_INTERVAL, this, TIME_MILLIS);
     }
 
-    serdebugF2("Adding connection #", remotesAdded);
+    serlogF2(SER_NETWORK_INFO, "Adding connection #", remotesAdded);
 
     // and then add it to our array.
     connections[remotesAdded] = toAdd;
@@ -76,4 +81,13 @@ void TcMenuRemoteServer::exec() {
         connections[i]->runLoop();
         taskManager.yieldForMicros(0);
     }
+}
+
+int tcremote::fromWiFiRSSITo4StateIndicator(int strength) {
+    int qualityIcon = 0;
+    if(strength > -50) qualityIcon = 4;
+    else if(strength > -60) qualityIcon = 3;
+    else if(strength > -75) qualityIcon = 2;
+    else if(strength > -90) qualityIcon = 1;
+    return qualityIcon;
 }

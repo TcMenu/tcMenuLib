@@ -123,6 +123,10 @@ test(testLargeNumberEditableMenuItem) {
 	editable.copyValue(sz, sizeof(sz));
 	assertStringCaseEqual("9359946.20395", sz);
 
+	editable.getLargeNumber()->setValue(0, 12, false);
+	editable.copyValue(sz, sizeof(sz));
+	assertStringCaseEqual("0.00012", sz);
+
 	editable.getLargeNumber()->setValue(23452, 12343, false);
 	editable.copyValue(sz, sizeof(sz));
 	assertStringCaseEqual("23452.12343", sz);

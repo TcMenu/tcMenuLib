@@ -142,7 +142,7 @@ public:
 	explicit TagValueTransport(TagValueTransportType type);
 	virtual ~TagValueTransport() = default;
 
-	void startMsg(uint16_t msgType);
+	virtual void startMsg(uint16_t msgType);
 	void writeField(uint16_t field, const char* value);
 	void writeFieldInt(uint16_t field, int value);
     void writeFieldLong(uint16_t field, long value);

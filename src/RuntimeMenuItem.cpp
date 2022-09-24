@@ -372,7 +372,7 @@ void IpAddressMenuItem::setIpAddress(const char * ipData) {
 			appendChar(part, *ipData, sizeof(part));
 			ipData++;
 		}
-		serdebugF3("IpPart", getId(), part);
+		serlogF3(SER_TCMENU_DEBUG, "IpPart", getId(), part);
 		setIpPart(currPart, atoi(part));
 		currPart++;
 		if(*ipData) ipData++;

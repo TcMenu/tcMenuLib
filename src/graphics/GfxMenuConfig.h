@@ -447,7 +447,7 @@ namespace tcgfx {
                 grid->setNewPosition(position);
             }
             else {
-                serdebugF2("Adding grid ", pItem->getId());
+                serlogF2(SER_TCMENU_DEBUG, "Adding grid ", pItem->getId());
                 gridByItem.add(GridPositionWithId(pItem->getId(), position));
             }
         }

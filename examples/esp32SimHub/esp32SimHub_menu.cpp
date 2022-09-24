@@ -74,7 +74,7 @@ void setupMenu() {
     gfx.begin();
     gfx.setRotation(1);
     renderer.setUpdatesPerSecond(5);
-    switches.init(internalDigitalIo(), SWITCHES_POLL_EVERYTHING, false);
+    switches.init(&esp32Touch, SWITCHES_POLL_EVERYTHING, false);
     menuMgr.initForUpDownOk(&renderer, &menuSpeed, 7, 5, 6);
     esp32Touch.ensureInterruptRegistered();
     remoteServer.addConnection(&simhubConnection);

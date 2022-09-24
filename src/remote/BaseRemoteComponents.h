@@ -13,7 +13,12 @@
 #include <PlatformDetermination.h>
 #include "../RemoteConnector.h"
 
+// This defines the number of different connections that can be established, for example each websocket, or each
+// tagval connection takes one of these, you can define this to a different number as a build flag. Web server static
+// content servers don't count toward this.
+#ifndef ALLOWED_CONNECTIONS
 #define ALLOWED_CONNECTIONS 4
+#endif
 
 namespace tcremote {
 
@@ -39,7 +44,10 @@ namespace tcremote {
      */
     class NoInitialisationNeeded : public DeviceInitialisation {
     private:
+        bool attemptConnectionReturn;
     public:
+        explicit NoInitialisationNeeded(bool attemptConnectionReturn = true) : attemptConnectionReturn(attemptConnectionReturn) {}
+
         bool attemptInitialisation() override {
             initialised = true;
             return true;
@@ -68,6 +76,7 @@ namespace tcremote {
         virtual void tick() = 0;
         virtual bool connected() = 0;
         virtual void copyConnectionStatus(char *buffer, int bufferSize) = 0;
+        virtual void notifyRemoteHasClosed() {}
     };
 
     /**
@@ -95,6 +104,8 @@ namespace tcremote {
         bool connected() override { return remoteTransport.connected(); }
 
         void copyConnectionStatus(char *buffer, int bufferSize) override;
+
+        void notifyRemoteHasClosed() override;
     };
 
     /**
@@ -169,6 +180,16 @@ namespace tcremote {
             return connections[num];
         }
     };
+
+    /**
+     * Turns a signal strength provided in S/N decibels as an integer into one of four strength icons from 1..4, as the
+     * 0 icon is usually to indicate no connection. Where 1 represents a poor connection and 4 represents a good
+     * connection.
+     * @param strength an integer value in S/N decibels
+     * @return the icon to use between 1..4
+     */
+    int fromWiFiRSSITo4StateIndicator(int strength);
+
 }
 
 #endif //TCMENU_BASEREMOTECOMPONENTS_H
