@@ -419,9 +419,9 @@
     "embeddedPlatform": "ARDUINO_ESP32",
     "lastDisplayUuid": "e6342680-6fab-4d1b-ac08-ce8dbfc0974c",
     "lastInputUuid": "183448ac-a717-4b2b-823d-ffc7c8140ab9",
-    "lastRemoteUuid": "da552323-157d-4914-8410-d5b4ff2293a4",
+    "lastRemoteUuid": "46c30011-cac6-4598-a7b8-b0630d55daab",
     "lastRemoteUuids": [
-      "da552323-157d-4914-8410-d5b4ff2293a4"
+      "46c30011-cac6-4598-a7b8-b0630d55daab"
     ],
     "lastThemeUuid": "850dc0a3-f534-47c2-94d8-1e64ff368a54",
     "applicationUUID": "4656c798-10c6-4110-8e03-b9c51ed8fffb",
@@ -473,23 +473,28 @@
         "subsystem": "INPUT"
       },
       {
-        "name": "ASWEB_USE_PREPACKAGED",
+        "name": "ESPWIFI_CONCURRENT_CONNECTIONS",
+        "latestValue": "1",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "ESPWIFI_LISTEN_PORT1",
+        "latestValue": "3333",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "ESPWIFI_LISTEN_PORT2",
+        "latestValue": "3334",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "ESPWIFI_LISTEN_PORT3",
+        "latestValue": "3335",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "ESPWIFI_BUFFERED",
         "latestValue": "true",
-        "subsystem": "REMOTE"
-      },
-      {
-        "name": "ASWEB_CONCURRENT",
-        "latestValue": "2",
-        "subsystem": "REMOTE"
-      },
-      {
-        "name": "WEBSOCKET_ENDPOINT",
-        "latestValue": "/ws",
-        "subsystem": "REMOTE"
-      },
-      {
-        "name": "WEBSERVER_PORT",
-        "latestValue": "80",
         "subsystem": "REMOTE"
       },
       {
