@@ -421,6 +421,7 @@ void TagValueRemoteConnector::encodeAnalogItem(int parentId, AnalogMenuItem* ite
     transport->writeFieldInt(FIELD_ANALOG_MAX, item->getMaximumValue());
     transport->writeFieldInt(FIELD_ANALOG_OFF, item->getOffset());
     transport->writeFieldInt(FIELD_ANALOG_DIV, item->getDivisor());
+    transport->writeFieldInt(FIELD_ANALOG_STEP, item->getStep());
     transport->writeFieldInt(FIELD_CURRENT_VAL, item->getCurrentValue());
     transport->endMsg();
 }

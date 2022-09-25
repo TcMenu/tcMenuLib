@@ -8,8 +8,8 @@
 #include <STM32Ethernet.h>
 #include <PlatformDetermination.h>
 #include <SPI.h>
-
 #include <TaskManagerIO.h>
+#include <IoLogging.h>
 
 // This variable is the RAM data for scroll choice item Scroll
 char ramDataSet[] = "1\0        2\0        3\0        4\0        5\0        ~";
@@ -76,15 +76,10 @@ void setup() {
     SPI.setSCLK(PB3);
 
     // Now start up the ethernet library.
-    startNetLayerManual(myManualIp, myManualMac, standardNetMask);
-    if(isNetworkUp()) {
-        char sz[30];
-        copyIpAddress(TC_LOCALHOST_SOCKET_ID, sz, sizeof sz);
-        Serial.print("My IP address is ");
-        Serial.println(sz);
-    } else {
-        Serial.println("Network did not start!");
-    }
+    Ethernet.begin();
+    Serial.print("My IP address is ");
+    Ethernet.localIP().printTo(Serial);
+    Serial.println();
 
     // and then run the menu setup
     setupMenu();
@@ -141,4 +136,24 @@ void CALLBACK_FUNCTION saveWasPressed(int id) {
 
 void CALLBACK_FUNCTION largeNumDidChange(int id) {
     // TODO - your menu change code
+}
+
+
+void CALLBACK_FUNCTION onDecimalStepChange(int id) {
+    int stepChoice = menuDecimalStep.getCurrentValue();
+    int stepVal;
+    switch (stepChoice) {
+        case 0:
+        default:
+            stepVal = 1;
+            break;
+        case 1:
+            stepVal = 2;
+            break;
+        case 2:
+            stepVal = 4;
+            break;
+    }
+    menuDecimal.setStep(stepVal);
+    serlogF2(SER_DEBUG, "Decimal Step now ", stepVal);
 }

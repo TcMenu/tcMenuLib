@@ -14,16 +14,24 @@
 
 // Global variable declarations
 const  ConnectorLocalInfo applicationInfo = { "stm32DuinoDemo", "ecd5607f-55eb-4252-a512-aab769452dd3" };
-tcremote::TcMenuRemoteServer remoteServer(applicationInfo);
+TcMenuRemoteServer remoteServer(applicationInfo);
 HalStm32EepromAbstraction glBspRom;
 EepromAuthenticatorManager authManager(4);
 U8G2_SSD1306_128X64_NONAME_F_4W_HW_SPI gfx(U8G2_R0, PF13, PD15, PF12);
 U8g2Drawable gfxDrawable(&gfx);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
-tcremote::TcMenuLightweightWebServer webServer(80, 4, true);
-void prepareWebServer(tcremote::TcMenuLightweightWebServer& webServer);
+EthernetServer server(3333);
+EthernetInitialisation ethernetInitialisation(&server);
+EthernetTagValTransport ethernetTransport;
+TagValueRemoteServerConnection ethernetConnection(ethernetTransport, ethernetInitialisation);
 
 // Global Menu Item declarations
+const char enumStrDecimalStep_0[] = "1x";
+const char enumStrDecimalStep_1[] = "2x";
+const char enumStrDecimalStep_2[] = "4x";
+const char* const enumStrDecimalStep[]  = { enumStrDecimalStep_0, enumStrDecimalStep_1, enumStrDecimalStep_2 };
+const EnumMenuInfo minfoDecimalStep = { "Decimal Step", 16, 23, 2, onDecimalStepChange, enumStrDecimalStep };
+EnumMenuItem menuDecimalStep(&minfoDecimalStep, 0, NULL);
 const char pgmStrRuntimesAuthenticatorText[] = { "Authenticator" };
 EepromAuthenticationInfoMenuItem menuRuntimesAuthenticator(pgmStrRuntimesAuthenticatorText, NO_CALLBACK, 15, NULL);
 const char pgmStrRuntimesIoTMonitorText[] = { "IoT Monitor" };
@@ -34,7 +42,7 @@ TextMenuItem menuRuntimesText(fnRuntimesTextRtCall, 12, 5, &menuRuntimesCustomLi
 RENDERING_CALLBACK_NAME_INVOKE(fnRuntimesRtCall, backSubItemRenderFn, "Runtimes", -1, NO_CALLBACK)
 const SubMenuInfo minfoRuntimes = { "Runtimes", 11, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackRuntimes(fnRuntimesRtCall, &menuRuntimesText);
-SubMenuItem menuRuntimes(&minfoRuntimes, &menuBackRuntimes, NULL);
+SubMenuItem menuRuntimes(&minfoRuntimes, &menuBackRuntimes, &menuDecimalStep);
 extern char ramDataSet[];
 RENDERING_CALLBACK_NAME_INVOKE(fnMoreItemsScrollRtCall, enumItemRenderFn, "Scroll", -1, NO_CALLBACK)
 ScrollChoiceMenuItem menuMoreItemsScroll(10, fnMoreItemsScrollRtCall, 0, ramDataSet, 10, 5, NULL);
@@ -74,12 +82,10 @@ void setupMenu() {
     renderer.setUpdatesPerSecond(5);
     switches.init(internalDigitalIo(), SWITCHES_POLL_EVERYTHING, true);
     menuMgr.initForEncoder(&renderer, &menuDecimal, PC8, PC10, PC9);
+    remoteServer.addConnection(&ethernetConnection);
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_ALWAYS);
     renderer.setUseSliderForAnalog(false);
     installMonoInverseTitleTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(u8g2_font_prospero_bold_nbp_tr, 1), true);
-
-    webServer.init();
-    prepareWebServer(webServer);
 
     // We have an IoT monitor, register the server
     menuRuntimesIoTMonitor.setRemoteServer(remoteServer);

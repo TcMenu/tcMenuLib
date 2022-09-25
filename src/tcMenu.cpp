@@ -286,8 +286,9 @@ void MenuManager::setupForEditing(MenuItem* item) {
 		// these are the only types we can edit with a rotary encoder & LCD.
 		currentEditor = item;
 		currentEditor->setEditing(true);
+        int step = (ty == MENUTYPE_INT_VALUE) ? reinterpret_cast<AnalogMenuItem*>(item)->getStep() : 1;
 		switches.changeEncoderPrecision(0, item->getMaximumValue(), reinterpret_cast<ValueMenuItem*>(currentEditor)->getCurrentValue(),
-                                        isWrapAroundEncoder(currentEditor));
+                                        isWrapAroundEncoder(currentEditor), step);
 		if(switches.getEncoder()) switches.getEncoder()->setUserIntention(CHANGE_VALUE);
 	}
 	else if (ty == MENUTYPE_BOOLEAN_VALUE) {

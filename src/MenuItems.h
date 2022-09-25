@@ -483,6 +483,8 @@ public:
  * @see AnalogMenuInfo
  */
 class AnalogMenuItem : public ValueMenuItem {
+private:
+    int8_t step = 1;
 public:
 	/**
 	 * Create an instance of the class
@@ -496,10 +498,19 @@ public:
 
 	/** Returns the offset from the MenuInfo structure */
 	int getOffset() const;
+
+    /** Returns the step from the menu info structure */
+    int getStep() const { return step; }
+
+    /** Change the step for incremental updates, must be an exact multiple of max value */
+    void setStep(int newStep) { step = newStep; }
+
 	/** Returns the divisor from the menu info structure */
 	uint16_t getDivisor() const;
+
 	/** Returns the length of the unit name */
 	int unitNameLength() const;
+
 	/** copies the unit name into the provided buffer */
 	void copyUnitToBuffer(char* unitBuff, uint8_t size = 5) const;
 

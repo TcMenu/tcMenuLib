@@ -11,6 +11,7 @@
         "offset": 0,
         "divisor": 10,
         "unitName": "d",
+        "step": 1,
         "name": "Decimal",
         "variableName": "Decimal",
         "id": 1,
@@ -29,6 +30,7 @@
         "offset": 0,
         "divisor": 2,
         "unitName": "dB",
+        "step": 1,
         "name": "Halves",
         "variableName": "Halves",
         "id": 2,
@@ -230,15 +232,34 @@
         "localOnly": false,
         "visible": true
       }
+    },
+    {
+      "parentId": 0,
+      "type": "enumItem",
+      "item": {
+        "enumEntries": [
+          "1x",
+          "2x",
+          "4x"
+        ],
+        "name": "Decimal Step",
+        "variableName": "DecimalStep",
+        "id": 16,
+        "eepromAddress": 23,
+        "functionName": "onDecimalStepChange",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
     }
   ],
   "codeOptions": {
     "embeddedPlatform": "STM32DUINO",
     "lastDisplayUuid": "fd998437-c4b2-4386-ba88-d0ae7c20620b",
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
-    "lastRemoteUuid": "da552323-157d-4914-8410-d5b4ff2293a4",
+    "lastRemoteUuid": "0877131c-e03e-426b-8eaf-228e01f5e7f1",
     "lastRemoteUuids": [
-      "da552323-157d-4914-8410-d5b4ff2293a4"
+      "0877131c-e03e-426b-8eaf-228e01f5e7f1"
     ],
     "lastThemeUuid": "0dd60ceb-7e0f-46e2-8d40-b264eb3aa7e0",
     "applicationUUID": "ecd5607f-55eb-4252-a512-aab769452dd3",
@@ -340,28 +361,28 @@
         "subsystem": "INPUT"
       },
       {
-        "name": "ASWEB_USE_PREPACKAGED",
-        "latestValue": "true",
+        "name": "ETH_CONCURRENT_CONNECTIONS",
+        "latestValue": "1",
         "subsystem": "REMOTE"
       },
       {
-        "name": "ASWEB_CONCURRENT",
-        "latestValue": "2",
+        "name": "ETH_LIBRARY_TYPE",
+        "latestValue": "STM32ETHERNET",
         "subsystem": "REMOTE"
       },
       {
-        "name": "ASWEB_NUM_WEBSOCKETS",
-        "latestValue": "2",
+        "name": "ETH_LISTEN_PORT1",
+        "latestValue": "3333",
         "subsystem": "REMOTE"
       },
       {
-        "name": "ASWEB_NETWORK_LIB",
-        "latestValue": "ESP32_LWIP",
+        "name": "ETH_LISTEN_PORT2",
+        "latestValue": "3334",
         "subsystem": "REMOTE"
       },
       {
-        "name": "WEBSERVER_PORT",
-        "latestValue": "80",
+        "name": "ETH_LISTEN_PORT3",
+        "latestValue": "3335",
         "subsystem": "REMOTE"
       },
       {

@@ -14,7 +14,8 @@
 #include <Arduino.h>
 #include <tcMenu.h>
 #include "tcMenuU8g2.h"
-#include "remote/TcMenuWebServer.h"
+#include "EthernetTransport.h"
+#include <RemoteConnector.h>
 #include <RemoteMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
@@ -25,15 +26,17 @@
 
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
-extern tcremote::TcMenuRemoteServer remoteServer;
-extern tcremote::TcMenuLightweightWebServer webServer;
+extern TcMenuRemoteServer remoteServer;
 extern U8G2_SSD1306_128X64_NONAME_F_4W_HW_SPI gfx;
 extern GraphicsDeviceRenderer renderer;
+extern EthernetServer server;
+extern EthernetInitialisation ethernetInitialisation;
 
 // Any externals needed by IO expanders, EEPROMs etc
 
 
 // Global Menu Item exports
+extern EnumMenuItem menuDecimalStep;
 extern EepromAuthenticationInfoMenuItem menuRuntimesAuthenticator;
 extern RemoteMenuItem menuRuntimesIoTMonitor;
 extern ListRuntimeMenuItem menuRuntimesCustomList;
@@ -62,6 +65,7 @@ void setupMenu();
 void CALLBACK_FUNCTION decimalDidChange(int id);
 int fnRuntimesCustomListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
 void CALLBACK_FUNCTION largeNumDidChange(int id);
+void CALLBACK_FUNCTION onDecimalStepChange(int id);
 void CALLBACK_FUNCTION saveWasPressed(int id);
 
 #endif // MENU_GENERATED_CODE_H
