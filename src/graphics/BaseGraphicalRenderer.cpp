@@ -263,13 +263,14 @@ void BaseGraphicalRenderer::checkIfRootHasChanged() {
         currentRootMenu = rootItem;
         redrawMode = MENUDRAW_COMPLETE_REDRAW;
         recalculateDisplayOrder(rootItem, false);
-        menuMgr.majorOrderChangeApplied(itemOrderByRow.count());
     }
 }
 
 void BaseGraphicalRenderer::recalculateDisplayOrder(MenuItem *root, bool safeMode) {
     serlogF2(SER_TCMENU_INFO, "Recalculate display order, safe=", safeMode);
 
+    // implicitly must be changing menus in this case, so reset the current root menu.
+    currentRootMenu = root;
     itemOrderByRow.clear();
     if(root == nullptr || root->getMenuType() == MENUTYPE_RUNTIME_LIST) return;
 
