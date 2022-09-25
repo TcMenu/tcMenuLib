@@ -53,14 +53,23 @@ void MenuEditingKeyListener::keyPressed(char key, bool held) {
         int dir = (key == backKey)  ? -1 : 1;
 
         MenuItem* currentActive = menuMgr.findCurrentActive();
-        uint16_t indexOfActive = offsetOfCurrentActive(currentActive) + dir;
-        uint8_t numItems = itemCount(menuMgr.getCurrentMenu(), false);
-        if(indexOfActive > numItems) return;
-        MenuItem* newActive = getItemAtPosition(menuMgr.getCurrentMenu(), indexOfActive);
-        if(currentActive && newActive) {
-            currentActive->setActive(false);
-            newActive->setActive(true);
-            serlogF2(SER_TCMENU_DEBUG, "activate item ", newActive->getId());
+        if(!currentActive) return;
+
+        if(currentActive->getMenuType() == MENUTYPE_RUNTIME_LIST) {
+            auto list = reinterpret_cast<ListRuntimeMenuItem*>(currentActive);
+            unsigned int nextPos = list->getActiveIndex() + dir;
+            if(nextPos > list->getNumberOfRows()) return;
+            list->setActiveIndex(nextPos);
+        } else {
+            uint16_t indexOfActive = offsetOfCurrentActive(currentActive) + dir;
+            uint8_t numItems = itemCount(menuMgr.getCurrentMenu(), false);
+            if (indexOfActive > numItems) return;
+            MenuItem *newActive = getItemAtPosition(menuMgr.getCurrentMenu(), indexOfActive);
+            if (newActive) {
+                currentActive->setActive(false);
+                newActive->setActive(true);
+                serlogF2(SER_TCMENU_DEBUG, "activate item ", newActive->getId());
+            }
         }
     } else if (key == deleteKey) {
         clearState();

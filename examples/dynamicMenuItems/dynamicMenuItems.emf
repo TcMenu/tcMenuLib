@@ -53,6 +53,7 @@
         "offset": 0,
         "divisor": 1,
         "unitName": "C",
+        "step": 1,
         "name": "Oven Temp",
         "variableName": "PizzaMakerOvenTemp",
         "id": 4,
@@ -282,7 +283,7 @@
       },
       {
         "name": "DISPLAY_WIDTH",
-        "latestValue": "128",
+        "latestValue": "160",
         "subsystem": "DISPLAY"
       },
       {
@@ -317,12 +318,12 @@
       },
       {
         "name": "ST7735_TAB_TYPE",
-        "latestValue": "INITR_REDTAB",
+        "latestValue": "INITR_BLACKTAB",
         "subsystem": "DISPLAY"
       },
       {
         "name": "DISPLAY_ROTATION",
-        "latestValue": "0",
+        "latestValue": "1",
         "subsystem": "DISPLAY"
       },
       {
