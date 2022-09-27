@@ -122,6 +122,7 @@
         "offset": 0,
         "divisor": 10,
         "unitName": "W",
+        "step": 1,
         "name": "Power",
         "id": 5,
         "eepromAddress": 5,
@@ -460,8 +461,8 @@
     "eepromDefinition": "at24:80:PAGESIZE_AT24C128",
     "authenticatorDefinition": "rom:100:6",
     "projectIoExpanders": [
-      "customIO:io23017",
-      "deviceIO:"
+      "deviceIO:",
+      "customIO:io23017"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []

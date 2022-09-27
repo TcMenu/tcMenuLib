@@ -141,7 +141,6 @@ void CALLBACK_FUNCTION onFoodChoice(int /*id*/) {
 // taken over, we pass this function to takeOverDisplay below.
 //
 void myDisplayFunction(unsigned int encoderValue, RenderPressMode clicked) {
-    serdebugF("mdf");
     // we initialise the display on the first call.
     if(counter == 0) {
         switches.changeEncoderPrecision(999, 50);

@@ -100,7 +100,6 @@ void EthernetTagValTransport::close() {
 
 #endif
 
-
 bool EthernetInitialisation::attemptInitialisation() {
 #ifdef ARDUINO_ARCH_STM32
     // we'll keep checking if the link is up before trying to initialise further
