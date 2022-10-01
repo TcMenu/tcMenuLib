@@ -151,7 +151,7 @@ namespace tcgfx {
                 int whereX = min(int(size.x) - MINIMUM_CURSOR_SIZE, int(wh.x + startX));
                 drawable->drawBox(Coord(whereX, where.y + size.y - 1), Coord(lenX, 1), false);
                 drawable->setDrawColor(fg);
-                if(hints.getEndIndex() > strlen(buffer)) wh.x = wh.x - MINIMUM_CURSOR_SIZE;
+                if(hints.getEndIndex() > strlen(buffer)) wh.x = wh.x - (unsigned int)MINIMUM_CURSOR_SIZE;
                 drawable->drawText(wh, props->getFont(), props->getFontMagnification(), buffer);
             }
             else {
