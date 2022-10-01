@@ -118,11 +118,19 @@ void fastftoa(char* sz, float fl, int dp, int strSize);
  */
 long dpToDivisor(int dp);
 
+/**
+ * Indicates how many integers are needed to represent the value and negative flag if provided
+ * @param value the value to represent as unsigned.
+ * @param negative if the value is negative
+ * @return the number of characters including the sign needed
+ */
+long valueToSignificantPlaces(unsigned long value, bool negative);
+
 inline float tcFltAbs(float f1) {
     return f1 > 0.0F ? f1 : -f1;
 }
 
-// There now follows pretty much internal code for dealing with program memory
+// There now follows pretty much internal code, boolean negative for dealing with program memory
 // never use direct program memory commands, always prefer these, it allows us
 // to compile it out much easier.
 

@@ -6,6 +6,7 @@
 #include <PlatformDetermination.h>
 #include <IoLogging.h>
 #include "RuntimeMenuItem.h"
+#include "tcMenu.h"
 
 static uint16_t nextAvailableRandomId = RANDOM_ID_START;
 
@@ -83,9 +84,14 @@ bool TextMenuItem::setCharValue(uint8_t location, char val) {
 void wrapForEdit(int val, int idx, uint8_t row, char* buffer, int bufferSize, bool forTime = false) {
 	--row;
 
-	if (idx == row) appendChar(buffer, '[', bufferSize);
-	fastltoa(buffer, val, forTime ? 2 : 4, forTime ? '0' : NOT_PADDED, bufferSize);
-	if (idx == row) appendChar(buffer, ']', bufferSize);
+	if (idx == row) {
+        auto start = strlen(buffer);
+        fastltoa(buffer, val, forTime ? 2 : 4, forTime ? '0' : NOT_PADDED, bufferSize);
+        auto end = strlen(buffer);
+        menuMgr.setEditorHints(CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT, start, end);
+    } else {
+        fastltoa(buffer, val, forTime ? 2 : 4, forTime ? '0' : NOT_PADDED, bufferSize);
+    }
 }
 
 int ipAddressRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
@@ -313,10 +319,9 @@ int textItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char
 			char txtVal = txtItem->getTextValue()[i];
 
 			if (i == row) {
-                appendChar(buffer, '[', bufferSize);
     			appendChar(buffer, txtVal, bufferSize);
-    			appendChar(buffer, ']', bufferSize);
-            } 
+                menuMgr.setEditorHints(CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT, row, row+1);
+            }
             else if(txtVal != 0) {
                 appendChar(buffer, (txtItem->isPasswordField()) ? '*' : txtVal, bufferSize);
             }

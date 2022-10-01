@@ -127,19 +127,6 @@ void BaseMenuRenderer::countdownToDefaulting() {
 	}
 }
 
-void BaseMenuRenderer::menuValueToText(MenuItem* item,	MenuDrawJustification justification) {
-	if(justification == JUSTIFY_TEXT_LEFT) {
-		copyMenuItemValue(item, buffer, bufferSize);
-	}
-	else {
-		char sz[20];
-		copyMenuItemValue(item, sz, sizeof(sz));
-		uint8_t count = strlen(sz);
-		int cpy = bufferSize - count;
-		strcpy(buffer + cpy, sz);
-	}
-}
-
 void BaseMenuRenderer::takeOverDisplay(RendererCallbackFn displayFn) {
     if(displayFn == nullptr && isCustomDrawing == false) return;
 	// when we set this, we are stopping tcMenu rendering and letting this take over

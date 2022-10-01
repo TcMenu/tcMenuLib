@@ -13,11 +13,12 @@
 #include <IoAbstractionWire.h>
 #include <graphics/RuntimeTitleMenuItem.h>
 #include <tcMenuVersion.h>
+#include <IoLogging.h>
 
 // Pizza toppings that we forward referenced in the scroll choice item, when in RAM or EEPROM then they are declared in
 // a flat array based on the item size.
 //                            0123456789 0123456789 0123456789 0123456789 0123456789 0123456789
-const char* pizzaToppings = {"Peperoni\0 Onions\0   Olives\0   Sweetcorn\0Mushrooms\0Peppers\0  "};
+char pizzaToppings[] = {"Peperoni\0 Onions\0   Olives\0   Sweetcorn\0Mushrooms\0Peppers\0  "};
 
 //
 // We now create two menu items that we manually add to the oven menu during initialisation. We set the sub menu child
@@ -118,6 +119,9 @@ void setup() {
     // If we use wire or serial, it's our responsibility to prepare it.
     Serial.begin(115200);
     Wire.begin();
+
+    serEnableLevel(SER_TCMENU_DEBUG, true);
+
     setupMenu();
 
     // Here we add a menu observer that is notified as events take place on the menu.

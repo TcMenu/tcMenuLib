@@ -233,8 +233,6 @@ enum MenuRedrawState: uint8_t {
 	MENUDRAW_NO_CHANGE = 0, MENUDRAW_EDITOR_CHANGE, MENUDRAW_COMPLETE_REDRAW
 };
 
-enum MenuDrawJustification: uint8_t { JUSTIFY_TEXT_LEFT, JUSTIFY_TEXT_RIGHT };
-
 /**
  * A renderer that does nothing, for cases where there's no display
  */
@@ -428,13 +426,6 @@ public:
 	 * @param state the required redraw
 	 */
 	void redrawRequirement(MenuRedrawState state) { if (state > redrawMode) redrawMode = state; }
-
-    /**
-     * Convert a menu item into a textual representation in the buffer
-     * @param item the menu item
-     * @param justification use either JUSTIFY_TEXT_LEFT or JUSTIFY_TEXT_RIGHT
-     */
-    void menuValueToText(MenuItem* item, MenuDrawJustification justification);
 
     /**
      * Completely invalidate all drawing and instigate a complete redraw of all elements.

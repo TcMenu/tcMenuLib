@@ -5,6 +5,7 @@
 
 #include <PlatformDetermination.h>
 #include "EditableLargeNumberMenuItem.h"
+#include "tcMenu.h"
 
 void LargeFixedNumber::clear() {
 	for (uint8_t i = 0; i < sizeof(bcdRepresentation); i++) bcdRepresentation[i] = 0;
@@ -102,15 +103,11 @@ void EditableLargeNumberMenuItem::setLargeNumberFromString(const char* val) {
 	setChanged(true);
 }
 
-void wrapEditor(bool editRow, char val, char* buffer, int bufferSize) {
+void wrapEditor(bool editRow, uint8_t row, char val, char* buffer, int bufferSize) {
 	if (editRow) {
-		appendChar(buffer, '[', bufferSize);
-		appendChar(buffer, val, bufferSize);
-		appendChar(buffer, ']', bufferSize);
+        menuMgr.setEditorHints(CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT, row, row+1);
 	}
-	else {
-		appendChar(buffer, val, bufferSize);
-	}
+    appendChar(buffer, val, bufferSize);
 }
 
 int largeNumItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
@@ -128,8 +125,8 @@ int largeNumItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, 
 		uint8_t editPosition = 0;
 
 		if (negativeAllowed && (editingMode ||  num->isNegative())) {
-			wrapEditor(row == 1, num->isNegative() ? '-' : '+', buffer, bufferSize);
-			row = row - 1;
+            row = row - 1;
+            wrapEditor(row == 0, row, num->isNegative() ? '-' : '+', buffer, bufferSize);
 		}
 
 		row = row - 1;
@@ -139,7 +136,7 @@ int largeNumItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, 
 			hadNonZero |= txtVal != '0';
             bool lastDigit = i == (numParts - 1);
 			if (hadNonZero || editingMode || lastDigit) {
-				wrapEditor(row == editPosition, txtVal, buffer, bufferSize);
+				wrapEditor(row == editPosition, row + 1, txtVal, buffer, bufferSize);
 			}
 			editPosition++;
 		}
@@ -147,7 +144,7 @@ int largeNumItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, 
 
 		for (int i = 0; i < num->decimalPointIndex(); i++) {
 			char txtVal = num->getDigit(i) + '0';
-			wrapEditor(row == editPosition, txtVal, buffer, bufferSize);
+			wrapEditor(row == editPosition, row + 2, txtVal, buffer, bufferSize);
 			editPosition++;
 		}
 		return true;

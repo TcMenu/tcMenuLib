@@ -32,6 +32,10 @@ extern MenuEditingKeyListener tcMenuKeyListener;
 extern IoAbstractionRef ioexp_io23017;
 
 // Global Menu Item exports
+extern IpAddressMenuItem menuIpItem;
+extern TextMenuItem menuTextItem;
+extern BackMenuItem menuBackRuntimes;
+extern SubMenuItem menuRuntimes;
 extern ListRuntimeMenuItem menuList;
 extern BooleanMenuItem menuDialogsBlockedBool;
 extern ActionMenuItem menuDialogsBlockedAction;

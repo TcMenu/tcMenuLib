@@ -97,7 +97,7 @@ void LiquidCrystalRenderer::drawMenuItem(GridPositionRowCacheEntry* entry, Coord
         uint8_t finalPos = theItem->copyNameToBuffer(buffer, offs, bufferSize);
         for(uint8_t i = finalPos; i < areaSize.x; ++i)  buffer[i] = 32;
         buffer[bufferSize] = 0;
-        menuValueToText(theItem, JUSTIFY_TEXT_RIGHT);
+        menuValueToText(theItem,);
     }
     else {
         char sz[21];
@@ -148,4 +148,8 @@ BaseDialog* LiquidCrystalRenderer::getDialog() {
         dialog = new MenuBasedDialog();
     }
     return dialog;
+}
+
+void LiquidCrystalRenderer::setupEditorPlacement(int32_t x, int32_t y) {
+    lcd
 }

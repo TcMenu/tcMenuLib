@@ -52,15 +52,14 @@ void MenuEditingKeyListener::keyPressed(char key, bool held) {
     } else if (key == backKey || key == nextKey) {
         int dir = (key == backKey)  ? -1 : 1;
 
-        MenuItem* currentActive = menuMgr.findCurrentActive();
-        if(!currentActive) return;
-
-        if(currentActive->getMenuType() == MENUTYPE_RUNTIME_LIST) {
-            auto list = reinterpret_cast<ListRuntimeMenuItem*>(currentActive);
+        if(menuMgr.getCurrentMenu()->getMenuType() == MENUTYPE_RUNTIME_LIST) {
+            auto list = reinterpret_cast<ListRuntimeMenuItem*>(menuMgr.getCurrentMenu());
             unsigned int nextPos = list->getActiveIndex() + dir;
             if(nextPos > list->getNumberOfRows()) return;
             list->setActiveIndex(nextPos);
         } else {
+            MenuItem* currentActive = menuMgr.findCurrentActive();
+            if(!currentActive) return;
             uint16_t indexOfActive = offsetOfCurrentActive(currentActive) + dir;
             uint8_t numItems = itemCount(menuMgr.getCurrentMenu(), false);
             if (indexOfActive > numItems) return;
@@ -77,8 +76,10 @@ void MenuEditingKeyListener::keyPressed(char key, bool held) {
     } else if (key == enterKey) {
         clearState();
         menuMgr.onMenuSelect(held);
+        if(menuMgr.getCurrentEditor() && menuMgr.getCurrentEditor()->getMenuType() == MENUTYPE_INT_VALUE) {
+            processAnalogKeyPress(reinterpret_cast<AnalogMenuItem*>(menuMgr.getCurrentEditor()), key);
+        }
     }
-
 }
 
 void MenuEditingKeyListener::keyReleased(char key) {
@@ -159,25 +160,25 @@ void MenuEditingKeyListener::processIntegerMultiEdit(EditableMultiPartMenuItem *
 
 void MenuEditingKeyListener::processAnalogKeyPress(AnalogMenuItem *item, char key) {
     if (mode == KEYEDIT_NONE || item != currentEditor) {
-        // we cannot edit on a keyboard items that are not factors of 10 or less than 10.
+        // we cannot edit on a keyboard items that are not either a single decimal place, 100ths, or 1000ths.
         if (item->getDivisor() > 10 && item->getDivisor() != 100 && item->getDivisor() != 1000) return;
         mode = KEYEDIT_ANALOG_EDIT_WHOLE;
         currentEditor = item;
         currentValue.whole = 0;
         currentValue.fraction = 0;
         serlogF(SER_TCMENU_DEBUG, "Starting analog edit");
-    }
-
-    if (mode == KEYEDIT_ANALOG_EDIT_WHOLE && (key == deleteKey || key == '-')) {
-            currentValue.negative = !currentValue.negative;
+    } else if (mode == KEYEDIT_ANALOG_EDIT_WHOLE && (key == deleteKey || key == '-')) {
+        currentValue.negative = !currentValue.negative;
         serlogF2(SER_TCMENU_DEBUG, "Negate to ", currentValue.whole);
-            item->setFromWholeAndFraction(currentValue);
+        item->setFromWholeAndFraction(currentValue);
     } else if (key == enterKey) {
         if(mode == KEYEDIT_ANALOG_EDIT_WHOLE && item->getDivisor() > 1) {
             mode = KEYEDIT_ANALOG_EDIT_FRACT;
+            currentEditor->setChanged(true);
             serlogF(SER_TCMENU_DEBUG, "Start fraction edit");
         }
         else {
+            menuMgr.setEditorHints(CurrentEditorRenderingHints::EDITOR_REGULAR);
             clearState();
             return;
         }
@@ -206,6 +207,29 @@ void MenuEditingKeyListener::processAnalogKeyPress(AnalogMenuItem *item, char ke
     }
     serlogF3(SER_TCMENU_DEBUG, "Setting to ", currentValue.whole, currentValue.fraction);
     item->setFromWholeAndFraction(currentValue);
+    workOutEditorPosition();
+}
+
+void MenuEditingKeyListener::workOutEditorPosition() {
+    if(currentEditor == nullptr) {
+        menuMgr.setEditorHints(CurrentEditorRenderingHints::EDITOR_REGULAR);
+        return;
+    }
+
+    switch(mode) {
+        case MenuEditingKeyMode::KEYEDIT_ANALOG_EDIT_WHOLE:
+            menuMgr.setEditorHints(CurrentEditorRenderingHints::EDITOR_WHOLE_ONLY, 0, valueToSignificantPlaces(currentValue.whole, currentValue.negative));
+            break;
+        case MenuEditingKeyMode::KEYEDIT_ANALOG_EDIT_FRACT: {
+            long start = valueToSignificantPlaces(currentValue.whole, currentValue.negative) + 1;
+            auto analogItem = reinterpret_cast<AnalogMenuItem*>(currentEditor);
+            menuMgr.setEditorHints(CurrentEditorRenderingHints::EDITOR_FRACTION_ONLY, start, valueToSignificantPlaces(analogItem->getDivisor(), false));
+            break;
+        }
+        default:
+            menuMgr.setEditorHints(CurrentEditorRenderingHints::EDITOR_REGULAR);
+            break;
+    }
 }
 
 void MenuEditingKeyListener::processLargeNumberPress(EditableLargeNumberMenuItem *item, char key) {

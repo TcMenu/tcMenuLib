@@ -15,6 +15,8 @@
 #include "BaseGraphicalRenderer.h"
 #include "GfxMenuConfig.h"
 
+#define MINIMUM_CURSOR_SIZE 6
+
 namespace tcgfx {
 
     /**
@@ -261,6 +263,7 @@ namespace tcgfx {
          */
         DeviceDrawable* getDeviceDrawable() { return rootDrawable; }
     private:
+        int calculateSpaceBetween(const void* font, const char* buffer, int start, int end);
         void internalDrawText(GridPositionRowCacheEntry* pEntry, const Coord& where, const Coord& size);
         void drawCoreLineItem(GridPositionRowCacheEntry* entry, DrawableIcon* icon, Coord &where, Coord &size, bool drawBg);
         void drawTextualItem(GridPositionRowCacheEntry* entry, Coord& where, Coord& size);

@@ -24,7 +24,15 @@ KeyboardLayout keyboardLayout(4, 4, keyboardKeys);
 MenuEditingKeyListener tcMenuKeyListener('*', '#', 'A', 'B');
 
 // Global Menu Item declarations
-ListRuntimeMenuItem menuList(13, 0, fnListRtCall, NULL);
+RENDERING_CALLBACK_NAME_INVOKE(fnIpItemRtCall, ipAddressRenderFn, "IpItem", -1, NO_CALLBACK)
+IpAddressMenuItem menuIpItem(fnIpItemRtCall, 21, NULL);
+RENDERING_CALLBACK_NAME_INVOKE(fnTextItemRtCall, textItemRenderFn, "TextItem", -1, NO_CALLBACK)
+TextMenuItem menuTextItem(fnTextItemRtCall, 20, 5, &menuIpItem);
+RENDERING_CALLBACK_NAME_INVOKE(fnRuntimesRtCall, backSubItemRenderFn, "Runtimes", -1, NO_CALLBACK)
+const SubMenuInfo minfoRuntimes = { "Runtimes", 19, 0xffff, 0, NO_CALLBACK };
+BackMenuItem menuBackRuntimes(fnRuntimesRtCall, &menuTextItem);
+SubMenuItem menuRuntimes(&minfoRuntimes, &menuBackRuntimes, NULL);
+ListRuntimeMenuItem menuList(13, 0, fnListRtCall, &menuRuntimes);
 const BooleanMenuInfo minfoDialogsBlockedBool = { "Blocked Bool", 18, 0xffff, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
 BooleanMenuItem menuDialogsBlockedBool(&minfoDialogsBlockedBool, false, NULL);
 const AnyMenuInfo minfoDialogsBlockedAction = { "Blocked Action", 17, 0xffff, 0, NO_CALLBACK };

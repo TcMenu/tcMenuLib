@@ -100,6 +100,21 @@ namespace tcgfx {
         return (pItem->isEditing() || pItem->isActive()) && mt != MENUTYPE_TITLE_ITEM && mt != MENUTYPE_BACK_VALUE;
     }
 
+    int GraphicsDeviceRenderer::calculateSpaceBetween(const void* font, const char* buffer, int start, int end) {
+        int bufferLen = (int)strlen(buffer);
+        int pos = start;
+        size_t idx = 0;
+        char sz[20];
+        while(pos < bufferLen && pos < end && idx < (sizeof(sz) - 1)) {
+            sz[idx] = buffer[pos];
+            pos++;
+            idx++;
+        }
+        sz[idx] = 0;
+        auto extents = drawable->textExtents(font, 1, sz);
+        return int(extents.x);
+    }
+
     void GraphicsDeviceRenderer::internalDrawText(GridPositionRowCacheEntry* pEntry, const Coord& where, const Coord& size) {
         GridPosition::GridJustification just = pEntry->getPosition().getJustification();
         ItemDisplayProperties *props = pEntry->getDisplayProperties();
@@ -113,7 +128,12 @@ namespace tcgfx {
             fg = props->getColor(ItemDisplayProperties::TEXT);
         }
 
-        if(just == GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT) {
+
+        auto hints = menuMgr.getEditorHints();
+        bool weAreEditingWithCursor = pEntry->getMenuItem()->isEditing() && menuMgr.getCurrentEditor() != nullptr
+                                      && hints.getEditorRenderingType() != CurrentEditorRenderingHints::EDITOR_REGULAR;
+
+        if(just == GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT || weAreEditingWithCursor) {
             // special case, title left, value right.
             Coord wh = Coord(where.x + padding.left, where.y + padding.top);
             pEntry->getMenuItem()->copyNameToBuffer(buffer, bufferSize);
@@ -124,8 +144,19 @@ namespace tcgfx {
             copyMenuItemValue(pEntry->getMenuItem(), buffer, bufferSize);
             int16_t right = where.x + size.x - (drawable->textExtents(props->getFont(), props->getFontMagnification(), buffer).x + padding.right);
             wh.x = right;
-            drawable->setDrawColor(fg);
-            drawable->drawText(wh, props->getFont(), props->getFontMagnification(), buffer);
+            if(weAreEditingWithCursor) {
+                drawable->setDrawColor(propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND, true));
+                int startX = calculateSpaceBetween(props->getFont(), buffer, 0, hints.getStartIndex() );
+                int lenX = max(MINIMUM_CURSOR_SIZE, calculateSpaceBetween(props->getFont(), buffer, hints.getStartIndex(), hints.getEndIndex()));
+                int whereX = min(int(size.x) - MINIMUM_CURSOR_SIZE, int(wh.x + startX));
+                drawable->drawBox(Coord(whereX, where.y + size.y - 1), Coord(lenX, 1), false);
+                drawable->setDrawColor(fg);
+                if(hints.getEndIndex() > strlen(buffer)) wh.x = wh.x - MINIMUM_CURSOR_SIZE;
+                drawable->drawText(wh, props->getFont(), props->getFontMagnification(), buffer);
+            }
+            else {
+                drawable->drawText(wh, props->getFont(), props->getFontMagnification(), buffer);
+            }
         }
         else {
             char sz[32];

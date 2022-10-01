@@ -87,7 +87,6 @@ void MenuManager::initWithoutInput(MenuRenderer* renderer, MenuItem* root) {
  */
 void MenuManager::valueChanged(int value) {
 	if (renderer->tryTakeSelectIfNeeded(value, RPRESS_NONE)) return;
-	MenuItem* currentEditor = getCurrentEditor();
 
 	if (currentEditor && isMenuBasedOnValueItem(currentEditor)) {
 		((ValueMenuItem*)currentEditor)->setCurrentValue(value);
@@ -214,6 +213,7 @@ void MenuManager::stopEditingCurrentItem(bool doMultiPartNext) {
     notifyEditEnd(currentEditor);
 	
     currentEditor = nullptr;
+    renderingHints.changeEditingParams(CurrentEditorRenderingHints::EDITOR_REGULAR, 0, 0);
 	setItemsInCurrentMenu(itemCount(menuMgr.getCurrentMenu()) - 1, offsetOfCurrentActive(menuMgr.getCurrentMenu()));
 
 	if (renderer->getRendererType() != RENDER_TYPE_NOLOCAL) {
@@ -284,8 +284,7 @@ void MenuManager::setupForEditing(MenuItem* item) {
 	MenuType ty = item->getMenuType();
 	if ((ty == MENUTYPE_ENUM_VALUE || ty == MENUTYPE_INT_VALUE)) {
 		// these are the only types we can edit with a rotary encoder & LCD.
-		currentEditor = item;
-		currentEditor->setEditing(true);
+		setCurrentEditor(item);
         int step = (ty == MENUTYPE_INT_VALUE) ? reinterpret_cast<AnalogMenuItem*>(item)->getStep() : 1;
 		switches.changeEncoderPrecision(0, item->getMaximumValue(), reinterpret_cast<ValueMenuItem*>(currentEditor)->getCurrentValue(),
                                         isWrapAroundEncoder(currentEditor), step);
@@ -298,14 +297,13 @@ void MenuManager::setupForEditing(MenuItem* item) {
 		notifyEditEnd(item);
 	}
 	else if (ty == MENUTYPE_SCROLLER_VALUE) {
-        currentEditor = item;
-        currentEditor->setEditing(true);
+        setCurrentEditor(item);
 	    switches.changeEncoderPrecision(0, item->getMaximumValue(), reinterpret_cast<ScrollChoiceMenuItem*>(item)->getCurrentValue(),
                                         isWrapAroundEncoder(currentEditor));
 	}
 	else if (isMenuRuntimeMultiEdit(item)) {
         switches.getEncoder()->setUserIntention(CHANGE_VALUE);
-        currentEditor = item;
+        setCurrentEditor(item);
         auto* editableItem = reinterpret_cast<EditableMultiPartMenuItem*>(item);
 		editableItem->beginMultiEdit();
 		int range = editableItem->nextPart();
@@ -319,6 +317,12 @@ void MenuManager::setCurrentEditor(MenuItem * editor) {
 		currentEditor->setActive(editor == nullptr);
 	}
 	currentEditor = editor;
+
+    if(currentEditor != nullptr) {
+        currentEditor->setEditing(true);
+    }
+
+    renderingHints.changeEditingParams(CurrentEditorRenderingHints::EDITOR_REGULAR, 0, 0);
 }
 
 const char pszEmptyList[] = "No Items";
@@ -479,4 +483,9 @@ void MenuManager::majorOrderChangeApplied(int newMax) {
     if(renderer->getRendererType() == RENDER_TYPE_CONFIGURABLE && getCurrentMenu()->getMenuType() != MENUTYPE_RUNTIME_LIST) {
         setItemsInCurrentMenu(newMax);
     }
+}
+
+void MenuManager::setEditorHints(CurrentEditorRenderingHints::EditorRenderingType hint, size_t start, size_t end) {
+    renderingHints.changeEditingParams(hint, start, end);
+    serlogF4(SER_TCMENU_DEBUG, "SetEditorHints ", hint, start, end);
 }

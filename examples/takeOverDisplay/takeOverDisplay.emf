@@ -458,11 +458,11 @@
     "namingRecursive": true,
     "saveToSrc": false,
     "useCppMain": false,
-    "eepromDefinition": "at24:80:PAGESIZE_AT24C128",
+    "eepromDefinition": "at24:80:PAGESIZE_AT24C16",
     "authenticatorDefinition": "rom:100:6",
     "projectIoExpanders": [
-      "deviceIO:",
-      "customIO:io23017"
+      "customIO:io23017",
+      "deviceIO:"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []

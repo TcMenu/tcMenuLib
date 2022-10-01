@@ -398,7 +398,7 @@ namespace tcgfx {
          * @param colorType
          * @return
          */
-        virtual color_t getSelectedColor(ItemDisplayProperties::ColorType colorType)  = 0;
+        virtual color_t getSelectedColor(ItemDisplayProperties::ColorType colorType, bool isUnderCursor = false)  = 0;
 
         /**
          * add a new grid position for a given menu item
@@ -431,7 +431,7 @@ namespace tcgfx {
             return nullptr;
         }
 
-        color_t getSelectedColor(ItemDisplayProperties::ColorType colorType) override {
+        color_t getSelectedColor(ItemDisplayProperties::ColorType colorType, bool isUnderCursor = false) override {
             return 0;
         }
 
@@ -460,6 +460,16 @@ namespace tcgfx {
     }
 
     /**
+     * How the editing cursor should be represented on the display
+     */
+    enum EditCursorMode {
+        /** Show an underline underneath the area being edited, default */
+        CURSOR_MODE_UNDERLINE,
+        /** Fill the area being edited in a different color */
+        CURSOR_MODE_BACKGROUND_BOX
+    };
+
+    /**
      * Provides full support for configurability of menu items, in terms of the their grid position and also any associated
      * icons and drawing color / font / padding overrides. Each time the renderer sets up a new menu, it calls into here
      * for each item to find out what settings to use for drawing. It is therefore possible to adjust settings either globally,
@@ -474,6 +484,9 @@ namespace tcgfx {
         BtreeList<uint16_t, GridPositionWithId> gridByItem;
         color_t selectedTextColor = RGB(0,0,0);
         color_t selectedBackgroundColor = RGB(0, 100, 255);
+        color_t editCursorColor = RGB(255, 255, 255);
+        color_t editCursorTextColor = RGB(0, 0, 0);
+        EditCursorMode editCursorMode = CURSOR_MODE_UNDERLINE;
     public:
         ConfigurableItemDisplayPropertiesFactory()
                 : displayProperties(5, GROW_BY_5),
@@ -513,7 +526,10 @@ namespace tcgfx {
          * @param colorType the color type we need
          * @return the actual color
          */
-        color_t getSelectedColor(ItemDisplayProperties::ColorType colorType) override {
+        color_t getSelectedColor(ItemDisplayProperties::ColorType colorType, bool isUnderCursor = false) override {
+            if(isUnderCursor) {
+                return colorType == ItemDisplayProperties::BACKGROUND ? editCursorColor : editCursorTextColor;
+            }
             return colorType == ItemDisplayProperties::BACKGROUND ? selectedBackgroundColor : selectedTextColor;
         }
 
@@ -613,10 +629,23 @@ namespace tcgfx {
         }
 
         /**
+         * Sets the edit cursor mode and cursor color for different display types
+         * @param mode the type of cursor to present
+         * @param cursorColor the color of the cursor itself
+         * @param textColor for filled cursors, this is the text color on the top of the cursor
+         */
+        void setEditCursorMode(EditCursorMode mode, color_t cursorCol, color_t textCol) {
+            editCursorMode = mode;
+            editCursorColor = cursorCol;
+            editCursorTextColor = textCol;
+        }
+
+        /**
          * Whenever you've called any method that adjusts the cache by adding new drawing options, you must then call refreshCache to
          * ensure the drawing functions are aware of the change
          */
         static void refreshCache();
+
     private:
         void setDrawingProperties(uint32_t key, const color_t* palette, MenuPadding pad, const void* font, uint8_t mag, uint8_t spacing,
                                   uint8_t requiredHeight, GridPosition::GridJustification defaultJustification, MenuBorder border);

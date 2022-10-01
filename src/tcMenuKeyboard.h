@@ -82,6 +82,8 @@ private:
     void processLargeNumberPress(EditableLargeNumberMenuItem*, char key);
     void processListMenuSelection(ListRuntimeMenuItem *item, char key);
 	void clearState();
+
+    void workOutEditorPosition();
 };
 
 #endif // _TCMENU_KEYBOARD_H_

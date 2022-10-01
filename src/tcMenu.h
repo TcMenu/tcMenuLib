@@ -98,6 +98,34 @@ public:
 };
 
 /**
+ * This class is somewhat internal to menuMgr although party exposed, it allows the menu manager to store hints to
+ * help rendering classes to present information about how an item is being edited, and if it is multi part which
+ * index in the array is being edited.
+ */
+class CurrentEditorRenderingHints {
+public:
+    enum EditorRenderingType {
+        EDITOR_REGULAR = 0,
+        EDITOR_WHOLE_ONLY = 0x0001, EDITOR_FRACTION_ONLY = 0x0002,
+        EDITOR_RUNTIME_TEXT = 0x0004
+    };
+private:
+    EditorRenderingType renderingType;
+    int editStart;
+    int editEnd;
+public:
+    CurrentEditorRenderingHints() : renderingType(EDITOR_REGULAR), editStart(0), editEnd(0) {}
+    void changeEditingParams(EditorRenderingType ty, int startOffset, int endOffset) {
+        renderingType = ty;
+        editStart = startOffset;
+        editEnd = endOffset;
+    }
+    EditorRenderingType getEditorRenderingType() const { return renderingType; }
+    int getStartIndex() const { return editStart; }
+    int getEndIndex() const { return editEnd; }
+};
+
+/**
  * MenuManager ties together all the parts of the menu app, it looks after the menu structure that's being presented,
  * the renderer, security, and optionally an eeprom.
  */
@@ -112,6 +140,7 @@ private:
     MenuManagerObserver* structureNotifier[MAX_MENU_NOTIFIERS];
     bool useWrapAroundByDefault = false;
     BtreeList<menuid_t, EncoderWrapOverride> encoderWrapOverrides;
+    CurrentEditorRenderingHints renderingHints;
 public:
 	MenuManager();
 
@@ -398,6 +427,8 @@ public:
 
     void majorOrderChangeApplied(int newMax);
 
+    void setEditorHints(CurrentEditorRenderingHints::EditorRenderingType hint, size_t start=0, size_t end=0);
+    const CurrentEditorRenderingHints& getEditorHints() { return renderingHints; }
 protected:
 	void setupForEditing(MenuItem* item);
 	void actionOnCurrentItem(MenuItem * toEdit);

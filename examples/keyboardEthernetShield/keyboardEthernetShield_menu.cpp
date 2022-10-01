@@ -37,7 +37,7 @@ const PROGMEM AnyMenuInfo minfoRomChoicesSave = { "Save", 23, 0xffff, 0, onSaveV
 ActionMenuItem menuRomChoicesSave(&minfoRomChoicesSave, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnRomChoicesValueRtCall, textItemRenderFn, "Value", -1, NO_CALLBACK)
 TextMenuItem menuRomChoicesValue(fnRomChoicesValueRtCall, 22, 10, &menuRomChoicesSave);
-extern const char* romSpaceNames;
+extern char romSpaceNames[];
 RENDERING_CALLBACK_NAME_INVOKE(fnRomChoicesItemNumRtCall, enumItemRenderFn, "Item Num", -1, onItemChange)
 ScrollChoiceMenuItem menuRomChoicesItemNum(21, fnRomChoicesItemNumRtCall, 0, romSpaceNames, 7, 10, &menuRomChoicesValue);
 RENDERING_CALLBACK_NAME_INVOKE(fnRomChoicesRtCall, backSubItemRenderFn, "Rom Choices", -1, NO_CALLBACK)

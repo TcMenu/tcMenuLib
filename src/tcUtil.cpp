@@ -34,6 +34,16 @@ long dpToDivisor(int dp) {
     }
 }
 
+long valueToSignificantPlaces(unsigned long value, bool negative) {
+    unsigned long divisor = 10U;
+    int places = 1;
+    while(value > divisor) {
+        divisor *= 10U;
+        places = places + 1;
+    }
+    return negative ? (places + 1) : places;
+}
+
 void ltoaClrBuff(char* str, long val, uint8_t dp, char padChar, int len) {
     str[0]=0;
     fastltoa_mv(str, val, dpToDivisor(dp), padChar, len);

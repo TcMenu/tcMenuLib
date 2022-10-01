@@ -14,7 +14,7 @@
 // Global variable declarations
 const PROGMEM  ConnectorLocalInfo applicationInfo = { "Take Over Display", "40722ec4-e8bc-4889-b54e-d81b14cb429c" };
 TcMenuRemoteServer remoteServer(applicationInfo);
-I2cAt24Eeprom glI2cRom(0x50, PAGESIZE_AT24C128);
+I2cAt24Eeprom glI2cRom(0x50, PAGESIZE_AT24C16);
 EepromAuthenticatorManager authManager(6);
 LiquidCrystal lcd(8, 9, 10, 11, 12, 13);
 LiquidCrystalRenderer renderer(lcd, 20, 4);

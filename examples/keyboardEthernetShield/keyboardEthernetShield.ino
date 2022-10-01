@@ -16,6 +16,7 @@
 #include <tcMenuKeyboard.h>
 #include <EepromAbstraction.h>
 #include <Ethernet.h>
+#include <IoLogging.h>
 
 using namespace tcremote;
 
@@ -58,6 +59,8 @@ void setup() {
 	Wire.begin();
     Wire.setClock(400000);
     lcd.setDelayTime(0, 20);
+
+    serEnableLevel(SER_TCMENU_DEBUG, true);
 
     // now we turn off the title and change the editor characters
     renderer.setTitleRequired(false);
