@@ -260,17 +260,18 @@ public:
 
     void paintItem(Adafruit_GFX *myGfx, GFXcanvas1* canvas, BaseMenuRenderer *renderer) {
         item->setChanged(false);
-        renderer->menuValueToText(item, JUSTIFY_TEXT_LEFT);
+        char sz[20];
+        copyMenuItemValue(item, sz, sizeof(sz));
         canvas->fillScreen(0);
         canvas->setFont(parameters->getFont());
         auto padding = 0;
         if(!parameters->isValueLeftAlign()) {
             int baseline;
-            Coord valueLen = gfxDrawable.textExtents(parameters->getFont(), 1, renderer->getBuffer(), &baseline);
+            Coord valueLen = gfxDrawable.textExtents(parameters->getFont(), 1, sz, &baseline);
             padding = valueWidth - (valueLen.x + 4);
         }
         canvas->setCursor(padding, titleExtents.y - 1);
-        canvas->print(renderer->getBuffer());
+        canvas->print(sz);
         auto startX = (parameters->isTitleLeftAlign()) ? screenLoc.x + titleExtents.x + 5 : screenLoc.x;
         drawCookieCutBitmap(myGfx, startX, screenLoc.y, canvas->getBuffer(), valueWidth, titleExtents.y,
                 canvas->width(), 0, 0,parameters->getFgColor(item, updateCountDown > 1),
