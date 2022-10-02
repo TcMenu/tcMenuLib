@@ -11,6 +11,7 @@
         "offset": 0,
         "divisor": 1,
         "unitName": "%",
+        "step": 1,
         "name": "Percent",
         "variableName": "Percent",
         "id": 1,
@@ -28,6 +29,7 @@
         "offset": 0,
         "divisor": 10,
         "unitName": "",
+        "step": 1,
         "name": "Tenths",
         "variableName": "Tenths",
         "id": 2,
@@ -177,7 +179,7 @@
       },
       {
         "name": "SW_POLLING_MODE",
-        "latestValue": "SWITCHES_POLL_EVERYTHING",
+        "latestValue": "SWITCHES_NO_POLLING",
         "subsystem": "INPUT"
       },
       {

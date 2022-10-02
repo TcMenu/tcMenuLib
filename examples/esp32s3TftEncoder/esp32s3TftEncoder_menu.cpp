@@ -52,7 +52,7 @@ void setupMenu() {
     gfx.begin();
     gfx.setRotation(1);
     renderer.setUpdatesPerSecond(15);
-    switches.init(internalDigitalIo(), SWITCHES_POLL_EVERYTHING, true);
+    switches.init(internalDigitalIo(), SWITCHES_NO_POLLING, true);
     menuMgr.initForEncoder(&renderer, &menuPercent, 3, 4, 5);
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
     renderer.setUseSliderForAnalog(true);

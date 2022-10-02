@@ -11,6 +11,7 @@
         "offset": -20,
         "divisor": 4,
         "unitName": "C",
+        "step": 1,
         "name": "Tomato Temp",
         "id": 1,
         "eepromAddress": -1,
@@ -27,6 +28,7 @@
         "offset": -20,
         "divisor": 4,
         "unitName": "C",
+        "step": 1,
         "name": "Cucumber Temp",
         "id": 2,
         "eepromAddress": -1,
@@ -434,12 +436,13 @@
     "eepromDefinition": "eeprom:",
     "authenticatorDefinition": "rom:100:6",
     "projectIoExpanders": [
-      "pcf8574:io8574:32:12",
-      "deviceIO:"
+      "deviceIO:",
+      "pcf8574:io8574:32:12:false"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []
     },
-    "packageNamespace": ""
+    "packageNamespace": "",
+    "appIsModular": false
   }
 }
