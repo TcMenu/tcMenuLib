@@ -128,10 +128,8 @@ namespace tcgfx {
             fg = props->getColor(ItemDisplayProperties::TEXT);
         }
 
-
-        auto hints = menuMgr.getEditorHints();
         bool weAreEditingWithCursor = pEntry->getMenuItem()->isEditing() && menuMgr.getCurrentEditor() != nullptr
-                                      && hints.getEditorRenderingType() != CurrentEditorRenderingHints::EDITOR_REGULAR;
+                                      && menuMgr.getEditorHints().getEditorRenderingType() != CurrentEditorRenderingHints::EDITOR_REGULAR;
 
         if(just == GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT || weAreEditingWithCursor) {
             // special case, title left, value right.
@@ -146,9 +144,10 @@ namespace tcgfx {
             wh.x = right;
             if(weAreEditingWithCursor) {
                 drawable->setDrawColor(propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND, true));
+                auto& hints = menuMgr.getEditorHints();
                 int startX = calculateSpaceBetween(props->getFont(), buffer, 0, hints.getStartIndex() );
                 int lenX = max(MINIMUM_CURSOR_SIZE, calculateSpaceBetween(props->getFont(), buffer, hints.getStartIndex(), hints.getEndIndex()));
-                int whereX = min(int(size.x) - MINIMUM_CURSOR_SIZE, int(wh.x + startX));
+                int whereX = min(int(width) - MINIMUM_CURSOR_SIZE, int(wh.x + startX));
                 drawable->drawBox(Coord(whereX, where.y + size.y - 1), Coord(lenX, 1), false);
                 drawable->setDrawColor(fg);
                 if(hints.getEndIndex() > strlen(buffer)) wh.x = wh.x - (unsigned int)MINIMUM_CURSOR_SIZE;

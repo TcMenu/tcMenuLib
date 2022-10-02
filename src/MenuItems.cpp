@@ -299,8 +299,8 @@ void ValueMenuItem::setCurrentValue(uint16_t val, bool silent) {
 const char ON_STR[] PGM_TCM   = "ON";
 const char OFF_STR[] PGM_TCM  = "OFF";
 const char YES_STR[] PGM_TCM  = "YES";
-const char NO_STR[] PGM_TCM   = " NO";
-const char TRUE_STR[] PGM_TCM = " TRUE";
+const char NO_STR[] PGM_TCM   = "NO";
+const char TRUE_STR[] PGM_TCM = "TRUE";
 const char FALSE_STR[] PGM_TCM= "FALSE";
 
 void copyMenuItemNameAndValue(const MenuItem* item, char* buffer, size_t bufferSize, char additionalSep) {

@@ -90,6 +90,7 @@ public:
 	void copyRuntimeName(char* buffer, int bufferSize) const { renderFn((RuntimeMenuItem*)this, itemPosition, RENDERFN_NAME, buffer, bufferSize); }
 
     uint8_t getNumberOfRows() const { return noOfParts; }
+    uint8_t getItemPosition() const { return itemPosition; }
 
     void setNumberOfRows(uint8_t rows) {
 		noOfParts = rows;
@@ -266,9 +267,16 @@ public:
 	 * state for editing. IE zero's extended to the end.
 	 */
 	void cleanUpArray();
+
+    /**
+     * Set one character at a time of the value, use with care and ensure the string is always zero terminated if
+     * not taking the full space.
+     * @param location the location in the array
+     * @param val the character value
+     * @return true if able to set, otherwise false
+     */
+    bool setCharValue(uint8_t location, char val);
 private:
-	bool setCharValue(uint8_t location, char val);
-	friend int textItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
 };
 
 /**

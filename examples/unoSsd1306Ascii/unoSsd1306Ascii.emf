@@ -117,6 +117,7 @@
         "variableName": "IntList",
         "id": 9,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true

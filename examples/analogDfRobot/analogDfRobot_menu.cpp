@@ -50,7 +50,7 @@ void setupMenu() {
     lcd.backlight();
     pinMode(A0, INPUT);
     switches.initialise(inputFromDfRobotShield(), false);
-    menuMgr.initForUpDownOk(&renderer, &menuValueA0, DF_KEY_DOWN, DF_KEY_UP, DF_KEY_SELECT);
+    menuMgr.initForUpDownOk(&renderer, &menuValueA0, DF_KEY_DOWN, DF_KEY_UP, DF_KEY_SELECT, 10);
     menuMgr.setBackButton(DF_KEY_LEFT);
     menuMgr.setNextButton(DF_KEY_RIGHT);
 }

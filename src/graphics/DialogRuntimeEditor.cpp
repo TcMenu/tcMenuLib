@@ -22,6 +22,7 @@ void DialogMultiPartEditor::startEditing(MenuBasedDialog* dlg, EditableMultiPart
 }
 
 void DialogMultiPartEditor::dialogDismissed(ButtonType buttonType) {
+    menuItemBeingEdited->stopMultiEdit();
     menuItemBeingEdited = nullptr;
     dialog = nullptr;
 }
@@ -55,5 +56,15 @@ void DialogMultiPartEditor::scrollChanged() {
     menuItemBeingEdited->valueChanged(scrollingEditor.getCurrentValue());
     char sz[32];
     copyMenuItemValue(menuItemBeingEdited, sz, sizeof sz);
-    dialog->copyIntoBuffer(sz);
+
+    int srcLoc = 0;
+    int dstLoc = 0;
+    while(sz[srcLoc] != 0) {
+        dialog->getBufferMenuItem()->setCharValue(dstLoc++, sz[srcLoc]);
+        if(srcLoc == menuItemBeingEdited->getItemPosition() - 1) {
+            dialog->getBufferMenuItem()->setCharValue(dstLoc++, '|');
+        }
+        srcLoc++;
+    }
+    dialog->getBufferMenuItem()->setCharValue(dstLoc, 0);
 }

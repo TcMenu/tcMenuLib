@@ -14,13 +14,13 @@
 
 MenuManager menuMgr;
 
-void MenuManager::initForUpDownOk(MenuRenderer* renderer, MenuItem* root, pinid_t pinDown, pinid_t pinUp, pinid_t pinOk) {
+void MenuManager::initForUpDownOk(MenuRenderer* renderer, MenuItem* root, pinid_t pinDown, pinid_t pinUp, pinid_t pinOk, int speed) {
 	this->renderer = renderer;
 	navigator.setRootItem(root);
 
 	switches.addSwitch(pinOk, nullptr);
     switches.onRelease(pinOk, [](pinid_t /*key*/, bool held) { menuMgr.onMenuSelect(held); });
-	setupUpDownButtonEncoder(pinUp, pinDown, [](int value) {menuMgr.valueChanged(value); });
+	setupUpDownButtonEncoder(pinUp, pinDown, [](int value) {menuMgr.valueChanged(value); }, speed);
 	renderer->initialise();
 }
 
@@ -302,13 +302,13 @@ void MenuManager::setupForEditing(MenuItem* item) {
                                         isWrapAroundEncoder(currentEditor));
 	}
 	else if (isMenuRuntimeMultiEdit(item)) {
-        switches.getEncoder()->setUserIntention(CHANGE_VALUE);
         setCurrentEditor(item);
         auto* editableItem = reinterpret_cast<EditableMultiPartMenuItem*>(item);
-		editableItem->beginMultiEdit();
-		int range = editableItem->nextPart();
-		switches.changeEncoderPrecision(0, range, editableItem->getPartValueAsInt(), editableItem->getId());
-	}
+        editableItem->beginMultiEdit();
+        int range = editableItem->nextPart();
+        switches.changeEncoderPrecision(0, range, editableItem->getPartValueAsInt(), editableItem->getId());
+        switches.getEncoder()->setUserIntention(CHANGE_VALUE);
+    }
 }
 
 void MenuManager::setCurrentEditor(MenuItem * editor) {
@@ -325,8 +325,6 @@ void MenuManager::setCurrentEditor(MenuItem * editor) {
     renderingHints.changeEditingParams(CurrentEditorRenderingHints::EDITOR_REGULAR, 0, 0);
 }
 
-const char pszEmptyList[] = "No Items";
-
 void MenuManager::changeMenu(MenuItem* possibleActive) {
     if (renderer->getRendererType() == RENDER_TYPE_NOLOCAL) return;
 
@@ -339,17 +337,8 @@ void MenuManager::changeMenu(MenuItem* possibleActive) {
 	// now we set up the encoder to represent the right value and mark an item as active.
     if (menuMgr.getCurrentMenu()->getMenuType() == MENUTYPE_RUNTIME_LIST) {
         auto* listMenu = reinterpret_cast<ListRuntimeMenuItem*>(menuMgr.getCurrentMenu());
-        if(listMenu->getNumberOfRows() > 0) {
-            listMenu->setActiveIndex(0);
-            menuMgr.setItemsInCurrentMenu(listMenu->getNumberOfRows());
-        } else {
-            renderer->getDialog()->setButtons(BTNTYPE_NONE, BTNTYPE_CLOSE);
-            renderer->getDialog()->show(pszEmptyList, false);
-            char sz[20];
-            listMenu->copyNameToBuffer(sz, sizeof(sz));
-            renderer->getDialog()->copyIntoBuffer(sz);
-            resetMenu(false);
-        }
+        listMenu->setActiveIndex(0);
+        menuMgr.setItemsInCurrentMenu(listMenu->getNumberOfRows());
     } else {
         auto* toActivate = (possibleActive) ? possibleActive : navigator.getCurrentRoot();
         toActivate->setActive(true);
@@ -488,4 +477,10 @@ void MenuManager::majorOrderChangeApplied(int newMax) {
 void MenuManager::setEditorHints(CurrentEditorRenderingHints::EditorRenderingType hint, size_t start, size_t end) {
     renderingHints.changeEditingParams(hint, start, end);
     serlogF4(SER_TCMENU_DEBUG, "SetEditorHints ", hint, start, end);
+}
+
+void CurrentEditorRenderingHints::changeEditingParams(CurrentEditorRenderingHints::EditorRenderingType ty, int startOffset, int endOffset) {
+    renderingType = ty;
+    editStart = startOffset;
+    editEnd = endOffset;
 }

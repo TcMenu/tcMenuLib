@@ -318,6 +318,8 @@ public:
 
     char* getBufferData() override { return const_cast<char *>(bufferItem.getTextValue()); }
 
+    TextMenuItem* getBufferMenuItem() { return &bufferItem; }
+
 protected:
     /** not used in this implementation */
     void internalRender(int currentValue) override {}

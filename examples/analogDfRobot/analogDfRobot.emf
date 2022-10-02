@@ -11,6 +11,7 @@
         "offset": 0,
         "divisor": 1,
         "unitName": "",
+        "step": 1,
         "name": "Value A0",
         "variableName": "ValueA0",
         "id": 1,
@@ -114,6 +115,7 @@
         "offset": 0,
         "divisor": 0,
         "unitName": "",
+        "step": 1,
         "name": "Commits",
         "id": 7,
         "eepromAddress": -1,
@@ -144,6 +146,11 @@
         "name": "UPDATES_PER_SEC",
         "latestValue": "2",
         "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DF_KEY_REPEAT",
+        "latestValue": "10",
+        "subsystem": "INPUT"
       },
       {
         "name": "ITEM_FONT",
@@ -183,6 +190,11 @@
     "authenticatorDefinition": "",
     "projectIoExpanders": [
       "deviceIO:"
-    ]
+    ],
+    "menuInMenuCollection": {
+      "menuDefinitions": []
+    },
+    "packageNamespace": "",
+    "appIsModular": false
   }
 }

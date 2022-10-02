@@ -104,22 +104,21 @@ public:
  */
 class CurrentEditorRenderingHints {
 public:
+    /**
+     * Espresses the intent of the current editor operation, so that a suitable cursor can be displayed.
+     */
     enum EditorRenderingType {
         EDITOR_REGULAR = 0,
         EDITOR_WHOLE_ONLY = 0x0001, EDITOR_FRACTION_ONLY = 0x0002,
         EDITOR_RUNTIME_TEXT = 0x0004
     };
 private:
-    EditorRenderingType renderingType;
-    int editStart;
-    int editEnd;
+    EditorRenderingType renderingType = EDITOR_REGULAR;
+    int editStart = 0;
+    int editEnd = 0;
 public:
-    CurrentEditorRenderingHints() : renderingType(EDITOR_REGULAR), editStart(0), editEnd(0) {}
-    void changeEditingParams(EditorRenderingType ty, int startOffset, int endOffset) {
-        renderingType = ty;
-        editStart = startOffset;
-        editEnd = endOffset;
-    }
+    CurrentEditorRenderingHints() = default;
+    void changeEditingParams(EditorRenderingType ty, int startOffset, int endOffset);
     EditorRenderingType getEditorRenderingType() const { return renderingType; }
     int getStartIndex() const { return editStart; }
     int getEndIndex() const { return editEnd; }
@@ -192,8 +191,9 @@ public:
 	 * @param downPin the button for down
 	 * @param upPin the button on up
 	 * @param okPin the OK button for the menu select / edit action
+	 * @param speed the repeat key interval in ticks (lower is faster), default 20
 	 */
-	void initForUpDownOk(MenuRenderer* renderer, MenuItem* root, pinid_t downPin, pinid_t upPin, pinid_t okPin);
+	void initForUpDownOk(MenuRenderer* renderer, MenuItem* root, pinid_t downPin, pinid_t upPin, pinid_t okPin, int speed=20);
 
 	/**
 	 * Initialise in situations where local input is not needed or where a custom type of input is needed
