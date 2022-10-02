@@ -11,6 +11,7 @@
         "offset": 0,
         "divisor": 1,
         "unitName": "%",
+        "step": 1,
         "name": "Hall",
         "variableName": "",
         "id": 1,
@@ -29,6 +30,7 @@
         "offset": 0,
         "divisor": 1,
         "unitName": "%",
+        "step": 1,
         "name": "Living",
         "variableName": "",
         "id": 2,
@@ -47,6 +49,7 @@
         "offset": 0,
         "divisor": 1,
         "unitName": "%",
+        "step": 1,
         "name": "Kitchen",
         "variableName": "",
         "id": 3,
@@ -110,6 +113,7 @@
         "offset": 0,
         "divisor": 1,
         "unitName": "S",
+        "step": 1,
         "name": "Delay",
         "variableName": "",
         "id": 7,
@@ -333,13 +337,8 @@
         "subsystem": "DISPLAY"
       },
       {
-        "name": "PULLUP_LOGIC",
-        "latestValue": "true",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "INTERRUPT_SWITCHES",
-        "latestValue": "false",
+        "name": "SW_POLLING_MODE",
+        "latestValue": "SWITCHES_POLL_EVERYTHING",
         "subsystem": "INPUT"
       },
       {
@@ -370,6 +369,11 @@
       {
         "name": "ENCODER_NEXT_PIN",
         "latestValue": "-1",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "PULLUP_LOGIC",
+        "latestValue": "true",
         "subsystem": "INPUT"
       },
       {
@@ -435,6 +439,11 @@
     "authenticatorDefinition": "rom:100:6",
     "projectIoExpanders": [
       "deviceIO:"
-    ]
+    ],
+    "menuInMenuCollection": {
+      "menuDefinitions": []
+    },
+    "packageNamespace": "",
+    "appIsModular": false
   }
 }

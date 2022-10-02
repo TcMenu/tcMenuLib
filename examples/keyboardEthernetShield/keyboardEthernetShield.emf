@@ -25,6 +25,7 @@
         "offset": -180,
         "divisor": 2,
         "unitName": "dB",
+        "step": 1,
         "name": "Analog1",
         "id": 2,
         "eepromAddress": 2,
@@ -55,6 +56,7 @@
         "offset": 100,
         "divisor": 1,
         "unitName": "",
+        "step": 1,
         "name": "Integer",
         "id": 3,
         "eepromAddress": 4,
@@ -72,6 +74,7 @@
         "offset": 0,
         "divisor": 10,
         "unitName": "V",
+        "step": 1,
         "name": "DecimalTens",
         "id": 4,
         "eepromAddress": 28,
@@ -103,6 +106,7 @@
         "offset": 0,
         "divisor": 5,
         "unitName": "A",
+        "step": 1,
         "name": "Fiths",
         "id": 5,
         "eepromAddress": 6,
@@ -573,6 +577,11 @@
         "subsystem": "INPUT"
       },
       {
+        "name": "MK_KEYBOARD_DEVICE",
+        "latestValue": "devicePins",
+        "subsystem": "INPUT"
+      },
+      {
         "name": "MK_REPEAT_START",
         "latestValue": "850",
         "subsystem": "INPUT"
@@ -580,11 +589,6 @@
       {
         "name": "MK_REPEAT_INTERVAL",
         "latestValue": "350",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "MK_KEYBOARD_DEVICE",
-        "latestValue": "devicePins",
         "subsystem": "INPUT"
       },
       {

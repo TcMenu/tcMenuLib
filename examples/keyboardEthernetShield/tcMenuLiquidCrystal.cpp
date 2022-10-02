@@ -153,7 +153,7 @@ void LiquidCrystalRenderer::drawingCommand(RenderDrawingCommand command) {
         case DRAW_COMMAND_ENDED:
             if(lcdEditorCursorX != 0xFF) {
                 lcd->setCursor(lcdEditorCursorX, lcdEditorCursorY);
-                //serlogF3(SER_TCMENU_DEBUG, "Editor cursor: ", lcdEditorCursorX, lcdEditorCursorY);
+                serlogF3(SER_TCMENU_DEBUG, "Editor cursor: ", lcdEditorCursorX, lcdEditorCursorY);
                 lcd->cursor(); // re-enable the cursor after drawing.
             }
             break;
