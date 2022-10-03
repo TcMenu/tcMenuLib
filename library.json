@@ -1,7 +1,7 @@
 {
     "name": "tcMenu",
     "keywords": "menu, IoT, display, encoder, ethernet",
-    "description": "TcMenu is a modular, IoT ready menu solution. It can draw to most Adafruit_GFX compatible libraries, most U8G2 devices, LiquidCrystalIO. Input is supported from Rotary Encoder, Digital / Analog joysticks, DfRobot, Keypad and more. Any menu can be remotely using embedCONTROL UI / API over Ethernet2, UIP ethernet and Serial / Bluetooth. Even works with no local display for remote control only.",
+    "description": "Menu library for Arduino with IoT capabilities supporting full multi level navigation. Complete with a designer UI and CLI that can round trip. It has plugins for Adafruit_GFX, U8G2, TFT_eSPI and LiquidCrystalIO. Input is supported from Touch, Rotary Encoder, Digital / Analog joysticks, DfRobot, Keypad and more. Any menu can be remotely using embedCONTROL UI / API over Ethernet2, UIP, STM32 Ethernet and Serial / Bluetooth. Even works with no local display for remote control only.",
     "repository":
     {
       "type": "git",
