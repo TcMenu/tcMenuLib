@@ -1,0 +1,32 @@
+/**
+ * BETA early access, the frame buffer is not yet fully working. Only for evaluation.
+ */
+
+#include <mbed.h>
+#include "stm32f429FrameBuffer_menu.h"
+
+BufferedSerial console(USBTX, USBRX);
+MBedLogger LoggingPort(console);
+
+void setup() {
+    // setup LTDC display controller first.
+    // by the time setupMenu is called, the display must be ready for use.
+    BSP_LCD_Init();
+    BSP_LCD_LayerDefaultInit(0, SDRAM_DEVICE_ADDR);
+
+    setupMenu();
+}
+
+int main() {
+    console.set_baud(115200);
+    setup();
+    while(1) {
+        taskManager.runLoop();
+    }
+}
+
+
+
+void CALLBACK_FUNCTION onTargetChanged(int id) {
+    // TODO - your menu change code
+}
