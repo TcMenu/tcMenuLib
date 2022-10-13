@@ -4,7 +4,7 @@
 
 Dave Cherry / TheCodersCorner.com make this framework available for you to use. It takes me significant effort to keep all my libraries current and working on a wide range of boards. Please consider making at least a one off donation via the sponsor button if you find it useful.
 
-TcMenu is a modular, IoT ready menu library for the Arduino and mbed platform, it uses plugins to support many displays, input devices and provides remote control using a simple protocol over Ethernet and Serial.
+TcMenu is a modular, IoT ready multi level menu library for the Arduino and mbed platform, it uses plugins to support many displays, input devices and provides remote control using a simple protocol over Ethernet and Serial.
 
 In any fork, please ensure all text up to here is left unaltered.
 
