@@ -132,7 +132,6 @@ void StChromaArtDrawable::drawPolygon(const Coord *points, int numPoints, bool f
     }
 }
 
-
 void StChromaArtDrawable::transaction(bool isStarting, bool redrawNeeded) {
 }
 

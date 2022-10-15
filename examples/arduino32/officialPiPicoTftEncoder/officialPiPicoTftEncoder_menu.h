@@ -27,6 +27,7 @@ extern GraphicsDeviceRenderer renderer;
 
 
 // Global Menu Item exports
+extern ActionMenuItem menuDialogs;
 extern ActionMenuItem menuStatusRestart;
 extern FloatMenuItem menuStatusLineVoltage;
 extern BooleanMenuItem menuStatusAmpPower;
@@ -49,6 +50,7 @@ void setupMenu();
 #define CALLBACK_FUNCTION
 
 void CALLBACK_FUNCTION onRestart(int id);
+void CALLBACK_FUNCTION onShowDialogs(int id);
 void CALLBACK_FUNCTION onVolumeChanged(int id);
 
 #endif // MENU_GENERATED_CODE_H

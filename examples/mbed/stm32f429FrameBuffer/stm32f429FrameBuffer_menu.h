@@ -34,6 +34,7 @@ extern const GFXfont FreeSans12pt7b;
 
 
 // Global Menu Item exports
+extern ActionMenuItem menuDialogs;
 extern EditableLargeNumberMenuItem menuSamplesLgePos;
 extern Rgb32MenuItem menuSamplesRGB;
 extern TimeFormattedMenuItem menuSamplesTime;
@@ -60,6 +61,7 @@ void setupMenu();
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
+void CALLBACK_FUNCTION onPresentDialog(int id);
 void CALLBACK_FUNCTION onTargetChanged(int id);
 
 #endif // MENU_GENERATED_CODE_H

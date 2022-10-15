@@ -22,26 +22,28 @@ StBspTouchInterrogator touchInterrogator(240, 320);
 MenuTouchScreenManager touchScreen(&touchInterrogator, &renderer, iotouch::TouchInterrogator::PORTRAIT);
 
 // Global Menu Item declarations
+const AnyMenuInfo minfoDialogs = { "Dialogs", 18, 0xffff, 0, onPresentDialog };
+ActionMenuItem menuDialogs(&minfoDialogs, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnSamplesLgePosRtCall, largeNumItemRenderFn, "LgePos", -1, NO_CALLBACK)
-EditableLargeNumberMenuItem menuSamplesLgePos(fnSamplesLgePosRtCall, 17, 7, 0, false, NULL);
+EditableLargeNumberMenuItem menuSamplesLgePos(fnSamplesLgePosRtCall, 17, 7, 0, false, LargeFixedNumber(12456U, 0U, false), NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnSamplesRGBRtCall, rgbAlphaItemRenderFn, "RGB", -1, NO_CALLBACK)
-Rgb32MenuItem menuSamplesRGB(16, fnSamplesRGBRtCall, false, &menuSamplesLgePos);
+Rgb32MenuItem menuSamplesRGB(16, fnSamplesRGBRtCall, false, RgbColor32(255, 170, 187), &menuSamplesLgePos);
 RENDERING_CALLBACK_NAME_INVOKE(fnSamplesTimeRtCall, timeItemRenderFn, "Time", -1, NO_CALLBACK)
 TimeFormattedMenuItem menuSamplesTime(fnSamplesTimeRtCall, 15, (MultiEditWireType)2, &menuSamplesRGB);
 RENDERING_CALLBACK_NAME_INVOKE(fnSamplesTextRtCall, textItemRenderFn, "Text", -1, NO_CALLBACK)
 TextMenuItem menuSamplesText(fnSamplesTextRtCall, 14, 10, &menuSamplesTime);
 const AnalogMenuInfo minfoBeltSpeed = { "Belt Speed", 13, 0xffff, 200, NO_CALLBACK, 0, 100, "mS" };
-AnalogMenuItem menuBeltSpeed(&minfoBeltSpeed, 0, &menuSamplesText);
+AnalogMenuItem menuBeltSpeed(&minfoBeltSpeed, 200, &menuSamplesText);
 const char enumStrBeltStatus_0[] = "Running";
 const char enumStrBeltStatus_1[] = "Warm Up";
 const char enumStrBeltStatus_2[] = "Stopped";
 const char* const enumStrBeltStatus[]  = { enumStrBeltStatus_0, enumStrBeltStatus_1, enumStrBeltStatus_2 };
 const EnumMenuInfo minfoBeltStatus = { "Belt Status", 12, 0xffff, 2, NO_CALLBACK, enumStrBeltStatus };
-EnumMenuItem menuBeltStatus(&minfoBeltStatus, 0, &menuBeltSpeed);
+EnumMenuItem menuBeltStatus(&minfoBeltStatus, 1, &menuBeltSpeed);
 RENDERING_CALLBACK_NAME_INVOKE(fnSamplesRtCall, backSubItemRenderFn, "Samples", -1, NO_CALLBACK)
 const SubMenuInfo minfoSamples = { "Samples", 11, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackSamples(fnSamplesRtCall, &menuBeltStatus);
-SubMenuItem menuSamples(&minfoSamples, &menuBackSamples, NULL);
+SubMenuItem menuSamples(&minfoSamples, &menuBackSamples, &menuDialogs);
 const BooleanMenuInfo minfoConnectivityEnableUSB = { "Enable USB", 10, 8, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
 BooleanMenuItem menuConnectivityEnableUSB(&minfoConnectivityEnableUSB, false, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NO_CALLBACK)
@@ -57,11 +59,11 @@ const SubMenuInfo minfoSettings = { "Settings", 5, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackSettings(fnSettingsRtCall, &menuSettingsTargetSpeed);
 SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, &menuConnectivity);
 const AnalogMenuInfo minfoConsumption = { "Consumption", 4, 0xffff, 4000, NO_CALLBACK, 0, 1, "W" };
-AnalogMenuItem menuConsumption(&minfoConsumption, 0, &menuSettings);
+AnalogMenuItem menuConsumption(&minfoConsumption, 200, &menuSettings);
 const AnalogMenuInfo minfoACLine = { "AC Line", 3, 0xffff, 2600, NO_CALLBACK, 0, 10, "V" };
-AnalogMenuItem menuACLine(&minfoACLine, 0, &menuConsumption);
+AnalogMenuItem menuACLine(&minfoACLine, 2450, &menuConsumption);
 const BooleanMenuInfo minfoPower = { "Power", 6, 0xffff, 1, NO_CALLBACK, NAMING_ON_OFF };
-BooleanMenuItem menuPower(&minfoPower, false, &menuACLine);
+BooleanMenuItem menuPower(&minfoPower, true, &menuACLine);
 
 void setupMenu() {
     // First we set up eeprom and authentication (if needed).

@@ -6,6 +6,7 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "80",
       "item": {
         "maxValue": 255,
         "offset": -180,
@@ -25,6 +26,7 @@
     {
       "parentId": 0,
       "type": "enumItem",
+      "defaultValue": "2",
       "item": {
         "enumEntries": [
           "CD Player",
@@ -44,6 +46,7 @@
     {
       "parentId": 0,
       "type": "boolItem",
+      "defaultValue": "false",
       "item": {
         "naming": "TRUE_FALSE",
         "name": "Mute",
@@ -72,6 +75,7 @@
     {
       "parentId": 4,
       "type": "analogItem",
+      "defaultValue": "144",
       "item": {
         "maxValue": 255,
         "offset": -180,
@@ -90,6 +94,7 @@
     {
       "parentId": 4,
       "type": "boolItem",
+      "defaultValue": "false",
       "item": {
         "naming": "ON_OFF",
         "name": "Protection",
@@ -118,6 +123,7 @@
     {
       "parentId": 7,
       "type": "enumItem",
+      "defaultValue": "0",
       "item": {
         "enumEntries": [
           "Standby",
@@ -138,6 +144,7 @@
     {
       "parentId": 7,
       "type": "boolItem",
+      "defaultValue": "false",
       "item": {
         "naming": "ON_OFF",
         "name": "Amp Power",
@@ -152,6 +159,7 @@
     {
       "parentId": 7,
       "type": "floatItem",
+      "defaultValue": "235.0",
       "item": {
         "numDecimalPlaces": 2,
         "name": "Line Voltage",
@@ -166,12 +174,28 @@
     {
       "parentId": 7,
       "type": "actionMenu",
+      "defaultValue": "false",
       "item": {
         "name": "Restart",
         "variableName": "StatusRestart",
         "id": 11,
         "eepromAddress": -1,
         "functionName": "onRestart",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "actionMenu",
+      "defaultValue": "false",
+      "item": {
+        "name": "Dialogs",
+        "variableName": "Dialogs",
+        "id": 12,
+        "eepromAddress": -1,
+        "functionName": "onShowDialogs",
         "readOnly": false,
         "localOnly": false,
         "visible": true
@@ -262,7 +286,7 @@
       },
       {
         "name": "TITLE_FONT",
-        "latestValue": "def:,2",
+        "latestValue": "num:,2",
         "subsystem": "THEME"
       },
       {

@@ -5,6 +5,8 @@
 #include <mbed.h>
 #include "stm32f429FrameBuffer_menu.h"
 
+
+
 BufferedSerial console(USBTX, USBRX);
 MBedLogger LoggingPort(console);
 
@@ -15,6 +17,11 @@ void setup() {
     BSP_LCD_LayerDefaultInit(0, SDRAM_DEVICE_ADDR);
 
     setupMenu();
+
+    taskManager.scheduleFixedRate(100, [] {
+        menuACLine.setCurrentValue(2350 + (rand() % 100));
+        menuConsumption.setCurrentValue(1900 + (rand() % 200));
+    });
 }
 
 int main() {
@@ -29,4 +36,22 @@ int main() {
 
 void CALLBACK_FUNCTION onTargetChanged(int id) {
     // TODO - your menu change code
+}
+
+void onFirstDialogCompleted(ButtonType btnType, void* data) {
+    if(btnType != BTNTYPE_ACCEPT) return;
+
+    auto dlg = reinterpret_cast<MenuBasedDialog*>(data);
+    dlg->setButtons(BTNTYPE_NONE, BTNTYPE_CLOSE);
+    dlg->show("Second dialog", false);
+    dlg->copyIntoBuffer("Extra data");
+}
+
+void CALLBACK_FUNCTION onPresentDialog(int id) {
+    withMenuDialogIfAvailable([](MenuBasedDialog *dlg) {
+        dlg->setButtons(BTNTYPE_ACCEPT, BTNTYPE_CANCEL, 1);
+        dlg->setUserData(dlg);
+        dlg->show("More dialogs?", true, onFirstDialogCompleted);
+        dlg->copyIntoBuffer("Accept for more");
+    });
 }

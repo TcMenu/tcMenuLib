@@ -20,10 +20,12 @@ TfteSpiDrawable gfxDrawable(&gfx, 45);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 
 // Global Menu Item declarations
+const AnyMenuInfo minfoDialogs = { "Dialogs", 12, 0xffff, 0, onShowDialogs };
+ActionMenuItem menuDialogs(&minfoDialogs, NULL);
 const AnyMenuInfo minfoStatusRestart = { "Restart", 11, 0xffff, 0, onRestart };
 ActionMenuItem menuStatusRestart(&minfoStatusRestart, NULL);
 const FloatMenuInfo minfoStatusLineVoltage = { "Line Voltage", 10, 0xffff, 2, NO_CALLBACK };
-FloatMenuItem menuStatusLineVoltage(&minfoStatusLineVoltage, &menuStatusRestart);
+FloatMenuItem menuStatusLineVoltage(&minfoStatusLineVoltage, 235.0, &menuStatusRestart);
 const BooleanMenuInfo minfoStatusAmpPower = { "Amp Power", 9, 0xffff, 1, NO_CALLBACK, NAMING_ON_OFF };
 BooleanMenuItem menuStatusAmpPower(&minfoStatusAmpPower, false, &menuStatusLineVoltage);
 const char enumStrStatusAmpStatus_0[] = "Standby";
@@ -37,11 +39,11 @@ EnumMenuItem menuStatusAmpStatus(&minfoStatusAmpStatus, 0, &menuStatusAmpPower);
 RENDERING_CALLBACK_NAME_INVOKE(fnStatusRtCall, backSubItemRenderFn, "Status", -1, NO_CALLBACK)
 const SubMenuInfo minfoStatus = { "Status", 7, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackStatus(fnStatusRtCall, &menuStatusAmpStatus);
-SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, NULL);
+SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuDialogs);
 const BooleanMenuInfo minfoSettingsProtection = { "Protection", 6, 0xffff, 1, NO_CALLBACK, NAMING_ON_OFF };
 BooleanMenuItem menuSettingsProtection(&minfoSettingsProtection, false, NULL);
 const AnalogMenuInfo minfoSettingsMaxOnVolume = { "Max On Volume", 5, 7, 255, NO_CALLBACK, -180, 2, "dB" };
-AnalogMenuItem menuSettingsMaxOnVolume(&minfoSettingsMaxOnVolume, 0, &menuSettingsProtection);
+AnalogMenuItem menuSettingsMaxOnVolume(&minfoSettingsMaxOnVolume, 144, &menuSettingsProtection);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings", -1, NO_CALLBACK)
 const SubMenuInfo minfoSettings = { "Settings", 4, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackSettings(fnSettingsRtCall, &menuSettingsMaxOnVolume);
@@ -54,9 +56,9 @@ const char enumStrInput_2[] = "Turntable";
 const char enumStrInput_3[] = "Line 1";
 const char* const enumStrInput[]  = { enumStrInput_0, enumStrInput_1, enumStrInput_2, enumStrInput_3 };
 const EnumMenuInfo minfoInput = { "Input", 2, 5, 3, NO_CALLBACK, enumStrInput };
-EnumMenuItem menuInput(&minfoInput, 0, &menuMute);
+EnumMenuItem menuInput(&minfoInput, 2, &menuMute);
 const AnalogMenuInfo minfoVolume = { "Volume", 1, 2, 255, onVolumeChanged, -180, 2, "dB" };
-AnalogMenuItem menuVolume(&minfoVolume, 0, &menuInput);
+AnalogMenuItem menuVolume(&minfoVolume, 80, &menuInput);
 
 void setupMenu() {
     // First we set up eeprom and authentication (if needed).

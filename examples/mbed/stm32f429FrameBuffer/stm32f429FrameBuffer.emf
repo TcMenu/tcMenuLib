@@ -6,6 +6,7 @@
     {
       "parentId": 0,
       "type": "boolItem",
+      "defaultValue": "true",
       "item": {
         "naming": "ON_OFF",
         "name": "Power",
@@ -20,6 +21,7 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "2450",
       "item": {
         "maxValue": 2600,
         "offset": 0,
@@ -38,6 +40,7 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "200",
       "item": {
         "maxValue": 4000,
         "offset": 0,
@@ -70,6 +73,7 @@
     {
       "parentId": 5,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 200,
         "offset": 0,
@@ -89,6 +93,7 @@
     {
       "parentId": 5,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 5,
         "itemType": "TIME_DURATION_SECONDS",
@@ -118,6 +123,7 @@
     {
       "parentId": 9,
       "type": "boolItem",
+      "defaultValue": "false",
       "item": {
         "naming": "TRUE_FALSE",
         "name": "Enable USB",
@@ -146,6 +152,7 @@
     {
       "parentId": 11,
       "type": "enumItem",
+      "defaultValue": "1",
       "item": {
         "enumEntries": [
           "Running",
@@ -164,6 +171,7 @@
     {
       "parentId": 11,
       "type": "analogItem",
+      "defaultValue": "200",
       "item": {
         "maxValue": 200,
         "offset": 0,
@@ -182,6 +190,7 @@
     {
       "parentId": 11,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 10,
         "itemType": "PLAIN_TEXT",
@@ -197,6 +206,7 @@
     {
       "parentId": 11,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 5,
         "itemType": "TIME_24H",
@@ -212,6 +222,7 @@
     {
       "parentId": 11,
       "type": "rgbItem",
+      "defaultValue": "#FFAABBFF",
       "item": {
         "includeAlphaChannel": false,
         "name": "RGB",
@@ -226,6 +237,7 @@
     {
       "parentId": 11,
       "type": "largeNumItem",
+      "defaultValue": "12456",
       "item": {
         "digitsAllowed": 7,
         "decimalPlaces": 0,
@@ -234,6 +246,21 @@
         "variableName": "SamplesLgePos",
         "id": 17,
         "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "actionMenu",
+      "defaultValue": "false",
+      "item": {
+        "name": "Dialogs",
+        "variableName": "Dialogs",
+        "id": 18,
+        "eepromAddress": -1,
+        "functionName": "onPresentDialog",
         "readOnly": false,
         "localOnly": false,
         "visible": true
