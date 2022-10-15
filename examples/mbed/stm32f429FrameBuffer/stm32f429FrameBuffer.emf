@@ -338,7 +338,7 @@
     "namingRecursive": true,
     "saveToSrc": false,
     "useCppMain": true,
-    "eepromDefinition": "",
+    "eepromDefinition": "bsp:0",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
       "deviceIO:"

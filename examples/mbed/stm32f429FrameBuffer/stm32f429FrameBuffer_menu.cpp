@@ -15,7 +15,7 @@
 
 // Global variable declarations
 const  ConnectorLocalInfo applicationInfo = { "Factory", "4df3d784-674a-4a3d-bcee-54a49693788e" };
-
+HalStm32EepromAbstraction glBspRom;
 StChromaArtDrawable Drawable;
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &Drawable);
 StBspTouchInterrogator touchInterrogator(240, 320);
@@ -67,7 +67,8 @@ BooleanMenuItem menuPower(&minfoPower, true, &menuACLine);
 
 void setupMenu() {
     // First we set up eeprom and authentication (if needed).
-
+    glBspRom.initialise(0);
+    menuMgr.setEepromRef(&glBspRom);
     // Now add any readonly, non-remote and visible flags.
     menuBeltSpeed.setReadOnly(true);
     menuBeltStatus.setReadOnly(true);

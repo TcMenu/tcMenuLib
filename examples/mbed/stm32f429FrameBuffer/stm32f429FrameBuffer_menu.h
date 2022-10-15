@@ -21,6 +21,7 @@
 #include <EditableLargeNumberMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 #include <IoAbstraction.h>
+#include <mbed/HalStm32EepromAbstraction.h>
 
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
