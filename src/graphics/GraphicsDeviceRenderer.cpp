@@ -129,7 +129,7 @@ namespace tcgfx {
         }
 
         bool weAreEditingWithCursor = pEntry->getMenuItem()->isEditing() && menuMgr.getCurrentEditor() != nullptr
-                                      && menuMgr.getEditorHints().getEditorRenderingType() != CurrentEditorRenderingHints::EDITOR_REGULAR;
+                                      && editorHintNeedsCursor(menuMgr.getEditorHints().getEditorRenderingType());
 
         if(just == GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT || weAreEditingWithCursor) {
             // special case, title left, value right.

@@ -636,11 +636,23 @@ public:
 	 * 
 	 * @param info a FloatMenuInfo structure
 	 * @param next the next menu in the chain if there is one, or NULL.
+	 * @param infoInPgm if the info block is in program memory
 	 */
 	FloatMenuItem(const FloatMenuInfo* info, MenuItem* next, bool infoInPgm = INFO_LOCATION_PGM)
 	        : MenuItem(MENUTYPE_FLOAT_VALUE, (const AnyMenuInfo*)info, next, infoInPgm) { currValue = 0; }
 
-	/**
+    /**
+     * Create an instance of the class setting the default value.
+     *
+     * @param info a FloatMenuInfo structure
+     * @param current current value as a float
+     * @param next the next menu in the chain if there is one, or NULL.
+	 * @param infoInPgm if the info block is in program memory
+     */
+    FloatMenuItem(const FloatMenuInfo* info, float current, MenuItem* next, bool infoInPgm = INFO_LOCATION_PGM)
+            : MenuItem(MENUTYPE_FLOAT_VALUE, (const AnyMenuInfo*)info, next, infoInPgm) { currValue = current; }
+
+    /**
 	 * return the number of decimal places to display for this value
 	 */
 	int getDecimalPlaces() const;

@@ -479,7 +479,13 @@ void MenuManager::setEditorHints(CurrentEditorRenderingHints::EditorRenderingTyp
     serlogF4(SER_TCMENU_DEBUG, "SetEditorHints ", hint, start, end);
 }
 
+void MenuManager::setEditorHintsLocked(bool locked) {
+    renderingHints.lockEditor(locked);
+    serlogF2(SER_TCMENU_DEBUG, "EditorHints Locked = ", locked);
+}
+
 void CurrentEditorRenderingHints::changeEditingParams(CurrentEditorRenderingHints::EditorRenderingType ty, int startOffset, int endOffset) {
+    if(renderingType == EDITOR_OVERRIDE_LOCK) return;
     renderingType = ty;
     editStart = startOffset;
     editEnd = endOffset;

@@ -110,7 +110,8 @@ public:
     enum EditorRenderingType {
         EDITOR_REGULAR = 0,
         EDITOR_WHOLE_ONLY = 0x0001, EDITOR_FRACTION_ONLY = 0x0002,
-        EDITOR_RUNTIME_TEXT = 0x0004
+        EDITOR_RUNTIME_TEXT = 0x0004,
+        EDITOR_OVERRIDE_LOCK = 0x8000
     };
 private:
     EditorRenderingType renderingType = EDITOR_REGULAR;
@@ -119,6 +120,7 @@ private:
 public:
     CurrentEditorRenderingHints() = default;
     void changeEditingParams(EditorRenderingType ty, int startOffset, int endOffset);
+    void lockEditor(bool lock) { renderingType = lock ? EDITOR_OVERRIDE_LOCK : EDITOR_REGULAR; }
     EditorRenderingType getEditorRenderingType() const { return renderingType; }
     int getStartIndex() const { return editStart; }
     int getEndIndex() const { return editEnd; }
@@ -429,6 +431,9 @@ public:
 
     void setEditorHints(CurrentEditorRenderingHints::EditorRenderingType hint, size_t start=0, size_t end=0);
     const CurrentEditorRenderingHints& getEditorHints() { return renderingHints; }
+
+    void setEditorHintsLocked(bool locked);
+
 protected:
 	void setupForEditing(MenuItem* item);
 	void actionOnCurrentItem(MenuItem * toEdit);
@@ -437,6 +442,10 @@ protected:
     void notifyEditEnd(MenuItem *pItem);
     bool notifyEditStarting(MenuItem *pItem);
 };
+
+inline bool editorHintNeedsCursor(CurrentEditorRenderingHints::EditorRenderingType ty) {
+    return ty != CurrentEditorRenderingHints::EDITOR_REGULAR && ty != CurrentEditorRenderingHints::EDITOR_OVERRIDE_LOCK;
+}
 
 /**
  * The global instance of MenuManager, always use this instance.

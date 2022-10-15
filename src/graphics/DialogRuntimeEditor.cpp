@@ -13,6 +13,7 @@ void onScrollingChanged(int id) {
 }
 
 void DialogMultiPartEditor::startEditing(MenuBasedDialog* dlg, EditableMultiPartMenuItem *item) {
+    menuMgr.setEditorHintsLocked(true);
     dialog = reinterpret_cast<MenuBasedDialog*>(dlg);
     menuItemBeingEdited = item;
     dlg->setButtons(BTNTYPE_OK, BTNTYPE_CUSTOM0);
@@ -22,6 +23,7 @@ void DialogMultiPartEditor::startEditing(MenuBasedDialog* dlg, EditableMultiPart
 }
 
 void DialogMultiPartEditor::dialogDismissed(ButtonType buttonType) {
+    menuMgr.setEditorHintsLocked(false);
     menuItemBeingEdited->stopMultiEdit();
     menuItemBeingEdited = nullptr;
     dialog = nullptr;

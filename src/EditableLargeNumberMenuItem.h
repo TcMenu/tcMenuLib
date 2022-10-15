@@ -26,18 +26,17 @@
  */
 class LargeFixedNumber {
 private:
-	uint8_t bcdRepresentation[LARGE_NUM_ALLOC_SIZE];
-    bool negative;
-    uint8_t totalSize;
-    uint8_t fractionDp;
+	uint8_t bcdRepresentation[LARGE_NUM_ALLOC_SIZE] = {};
+    bool negative = false;
+    uint8_t totalSize = 12;
+    uint8_t fractionDp = 0;
 public:
     /**
      * Create a default instance with decimal places set to 4 and total size 12.
      */
-    LargeFixedNumber() {
-        totalSize = 12;
-		setPrecision(4);
-    }
+    LargeFixedNumber() = default;
+    LargeFixedNumber(uint32_t whole, uint32_t fraction, bool negative) {setValue(whole, fraction, negative);}
+    LargeFixedNumber& operator=(const LargeFixedNumber& other) = default;
 
     /**
      * Clears the whole structure before setting to a new value
@@ -168,6 +167,13 @@ private:
     LargeFixedNumber data;
     bool negativeAllowed;
 public:
+    EditableLargeNumberMenuItem(RuntimeRenderingFn renderFn, uint16_t id, int maxDigits, int dps, bool allowNeg, const LargeFixedNumber& initial, MenuItem* next = nullptr)
+            : EditableMultiPartMenuItem(MENUTYPE_LARGENUM_VALUE, id, maxDigits + (allowNeg ? 1 : 0), renderFn, next) {
+        data.setPrecision(dps, maxDigits);
+        negativeAllowed = allowNeg;
+        data = initial;
+    }
+
     EditableLargeNumberMenuItem(RuntimeRenderingFn renderFn, uint16_t id, int maxDigits, int dps, bool allowNeg, MenuItem* next = nullptr)
             : EditableMultiPartMenuItem(MENUTYPE_LARGENUM_VALUE, id, maxDigits + (allowNeg ? 1 : 0), renderFn, next) {
         data.setPrecision(dps, maxDigits);
@@ -186,7 +192,7 @@ public:
     /** sets a number from a string in the form whole.fraction */
     void setLargeNumberFromString(const char* largeNum);
 
-    bool isNegativeAllowed() { return negativeAllowed; }
+    bool isNegativeAllowed() const { return negativeAllowed; }
 };
 
 #endif //_EDITABLE_LARGE_NUMBER_MENU_ITEM_H_

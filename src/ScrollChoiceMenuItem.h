@@ -184,6 +184,16 @@ public:
      * @param id the id of the item
      * @param renderFn the rendering function to use - see default in the class definition
      * @param includeAlpha true to include alpha channel, otherwise false.
+     * @param initial the initial value
+     * @param next optional pointer to the next menu item
+     */
+    Rgb32MenuItem(uint16_t id, RuntimeRenderingFn renderFn, bool includeAlpha, const RgbColor32& color, MenuItem* next = nullptr);
+
+    /**
+     * Creates a color data menu item that can be edited, optionally including an alpha channel
+     * @param id the id of the item
+     * @param renderFn the rendering function to use - see default in the class definition
+     * @param includeAlpha true to include alpha channel, otherwise false.
      * @param next optional pointer to the next menu item
      */
     Rgb32MenuItem(uint16_t id, RuntimeRenderingFn renderFn, bool includeAlpha, MenuItem* next = nullptr);
