@@ -16,37 +16,39 @@
 #include <SSD1306Ascii.h>
 #include <SSD1306AsciiAvrI2c.h>
 #include "ssd1306asciiRenderer.h"
-#include <RuntimeMenuItem.h>
-#include <ScrollChoiceMenuItem.h>
-#include <EditableLargeNumberMenuItem.h>
+#include <JoystickSwitchInput.h>
 #include <IoAbstraction.h>
+#include <EepromAbstraction.h>
 
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
 extern SSD1306AsciiAvrI2c gfx;
 extern SSD1306AsciiRenderer renderer;
+extern MultiIoAbstraction joystickMultiIo;
+extern AnalogJoystickToButtons joystickIoXAxis;
 
 // Any externals needed by IO expanders, EEPROMs etc
 
 
 // Global Menu Item exports
-extern ListRuntimeMenuItem menuIntList;
-extern Rgb32MenuItem menuSubTestRGB;
-extern EditableLargeNumberMenuItem menuSubTestLgeNum;
-extern BackMenuItem menuBackSubTest;
-extern SubMenuItem menuSubTest;
-extern TextMenuItem menuText;
-extern BooleanMenuItem menuBool;
-extern FloatMenuItem menuFloat;
-extern AnalogMenuItem menuAnalog;
+extern ActionMenuItem menuSettingsSaveAll;
+extern EnumMenuItem menuSettingsDifficulty;
+extern AnalogMenuItem menuSettingsFrameRate;
+extern BackMenuItem menuBackSettings;
+extern SubMenuItem menuSettings;
+extern AnalogMenuItem menuHighScore;
+extern ActionMenuItem menuStartGame;
+extern ActionMenuItem menuInstructions;
 
 // Provide a wrapper to get hold of the root menu item and export setupMenu
-inline MenuItem& rootMenuItem() { return menuAnalog; }
+inline MenuItem& rootMenuItem() { return menuInstructions; }
 void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
-int fnIntListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
+void CALLBACK_FUNCTION onInstructions(int id);
+void CALLBACK_FUNCTION onSave(int id);
+void CALLBACK_FUNCTION onStartGame(int id);
 
 #endif // MENU_GENERATED_CODE_H

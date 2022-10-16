@@ -1,0 +1,255 @@
+{
+  "version": "1.00",
+  "projectName": "A very simple analog game written with the library stack.",
+  "author": "dave",
+  "items": [
+    {
+      "parentId": 0,
+      "type": "actionMenu",
+      "defaultValue": "false",
+      "item": {
+        "name": "Instructions",
+        "variableName": "Instructions",
+        "id": 1,
+        "eepromAddress": -1,
+        "functionName": "onInstructions",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "actionMenu",
+      "defaultValue": "false",
+      "item": {
+        "name": "Start Game",
+        "variableName": "StartGame",
+        "id": 2,
+        "eepromAddress": -1,
+        "functionName": "onStartGame",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "defaultValue": "0",
+      "item": {
+        "maxValue": 10000,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "",
+        "step": 1,
+        "name": "High Score",
+        "variableName": "HighScore",
+        "id": 3,
+        "eepromAddress": 2,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "Settings",
+        "variableName": "Settings",
+        "id": 4,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "analogItem",
+      "defaultValue": "5",
+      "item": {
+        "maxValue": 10,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "fps",
+        "step": 1,
+        "name": "Frame Rate",
+        "variableName": "SettingsFrameRate",
+        "id": 5,
+        "eepromAddress": 4,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "enumItem",
+      "defaultValue": "0",
+      "item": {
+        "enumEntries": [
+          "Easy",
+          "Medium",
+          "Hard"
+        ],
+        "name": "Difficulty",
+        "variableName": "SettingsDifficulty",
+        "id": 6,
+        "eepromAddress": 6,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "actionMenu",
+      "defaultValue": "false",
+      "item": {
+        "name": "Save All",
+        "variableName": "SettingsSaveAll",
+        "id": 7,
+        "eepromAddress": -1,
+        "functionName": "onSave",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    }
+  ],
+  "codeOptions": {
+    "embeddedPlatform": "ARDUINO",
+    "lastDisplayUuid": "5EED8D08-CF04-420E-A190-E40743FEA20F",
+    "lastInputUuid": "20409bb8-b8a1-4d1d-b632-2cf9b57353e3",
+    "lastRemoteUuid": "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb",
+    "lastRemoteUuids": [
+      "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
+    ],
+    "lastThemeUuid": "2026a7f2-0d5b-43f5-9f98-4f0eacac4c0e",
+    "applicationUUID": "5049a016-0d7e-4004-a183-cabe4e9cf6b8",
+    "applicationName": "Space Junk",
+    "lastProperties": [
+      {
+        "name": "DISPLAY_VARIABLE",
+        "latestValue": "gfx",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_TYPE",
+        "latestValue": "SSD1306AsciiAvrI2c",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DEVICE_CONFIGURATION",
+        "latestValue": "SH1106_128x64",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_I2C_ADDR",
+        "latestValue": "0x3C",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_SPI_CS",
+        "latestValue": "-1",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_SPI_DC",
+        "latestValue": "-1",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "CHAR_WIDTH",
+        "latestValue": "20",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TITLE_FONT",
+        "latestValue": "Arial14",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "ITEM_FONT",
+        "latestValue": "System5x7",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "SW_POLLING_MODE",
+        "latestValue": "SWITCHES_POLL_EVERYTHING",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "JOYSTICK_PIN",
+        "latestValue": "A0",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "JOYSTICK_Y_CENTRE_VALUE",
+        "latestValue": "0.5",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "JOYSTICK_THRESHOLD_Y",
+        "latestValue": "0.05",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "BUTTON_PIN",
+        "latestValue": "A2",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "PULLUP_LOGIC",
+        "latestValue": "true",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SEPARATOR",
+        "latestValue": "",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "JOYSTICK_NEED_X",
+        "latestValue": "true",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "JOYSTICK_PINX",
+        "latestValue": "A1",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "JOYSTICK_PINX_LEFT",
+        "latestValue": "200",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "JOYSTICK_PINX_RIGHT",
+        "latestValue": "201",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "JOYSTICK_X_CENTRE_VALUE",
+        "latestValue": "0.5",
+        "subsystem": "INPUT"
+      }
+    ],
+    "namingRecursive": true,
+    "saveToSrc": false,
+    "useCppMain": false,
+    "eepromDefinition": "avr:",
+    "authenticatorDefinition": "",
+    "projectIoExpanders": [
+      "deviceIO:"
+    ],
+    "menuInMenuCollection": {
+      "menuDefinitions": []
+    },
+    "packageNamespace": "",
+    "appIsModular": false
+  }
+}

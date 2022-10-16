@@ -180,19 +180,28 @@ void SSD1306AsciiRenderer::renderMenuItem(uint8_t row, MenuItem* item) {
         if(menuMgr.getCurrentEditor() && hints.getEditorRenderingType() != CurrentEditorRenderingHints::EDITOR_REGULAR && item->isEditing()) {
             int startIndex = min(count, hints.getStartIndex());
             int endIndex = min(count, hints.getEndIndex());
+            Serial.print("0");
             strncpy(buffer + cpy, sz, startIndex);
+            Serial.print("00");
             buffer[cpy + startIndex] = 0;
+            Serial.print("1");
             ssd1306->print(buffer);
+            Serial.print("2");
             if(startIndex != endIndex) {
                 ssd1306->setInvertMode(true);
+                Serial.print("3");
                 strncpy(buffer, &sz[startIndex], endIndex - startIndex);
+                Serial.print("4");
                 buffer[endIndex - startIndex] = 0;
                 ssd1306->print(buffer);
                 ssd1306->setInvertMode(false);
+                Serial.print("5");
             }
             strncpy(buffer, &sz[endIndex], bufferSize);
+            Serial.print("6");
             buffer[bufferSize-1]=0;
             ssd1306->print(buffer);
+            Serial.print("7");
         } else {
             strcpy(buffer + cpy, sz);
             buffer[bufferSize - 1] = 0;
