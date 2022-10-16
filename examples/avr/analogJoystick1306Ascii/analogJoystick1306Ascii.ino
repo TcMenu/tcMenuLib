@@ -67,8 +67,13 @@ void CALLBACK_FUNCTION onStartGame(int id) {
     renderer.takeOverDisplay(gameRenderer);
 }
 
-
-
+const char pgmSaved[] PROGMEM = "Saved to ROM";
 void CALLBACK_FUNCTION onSave(int id) {
     menuMgr.save();
+    auto dlg = renderer.getDialog();
+    if(dlg && !dlg->isInUse()) {
+        dlg->setButtons(BTNTYPE_CLOSE, BTNTYPE_NONE);
+        dlg->show(pgmSaved, true);
+        dlg->copyIntoBuffer("Settings");
+    }
 }
