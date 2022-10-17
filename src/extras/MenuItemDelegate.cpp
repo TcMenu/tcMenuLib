@@ -19,7 +19,7 @@ bool MenuItemDelegate::onEachItem(MenuItemDelegate::ItemDelegateFn itemDelegateF
 
 void MenuItemDelegate::setReadOnly(bool readOnly) {
     internalFlag = readOnly;
-    onEachItem([](MenuItem* item, bool flg) {
+    onEachItem([](MenuItem* item, bool flg)->bool {
         item->setReadOnly(flg);
         return false;
     }, ALL);
@@ -27,7 +27,7 @@ void MenuItemDelegate::setReadOnly(bool readOnly) {
 
 void MenuItemDelegate::setLocalOnly(bool localOnly) {
     internalFlag = localOnly;
-    onEachItem([](MenuItem* item, bool flg) {
+    onEachItem([](MenuItem* item, bool flg)->bool {
         item->setLocalOnly(flg);
         return true;
         }, ALL);
@@ -35,14 +35,14 @@ void MenuItemDelegate::setLocalOnly(bool localOnly) {
 
 void MenuItemDelegate::setVisible(bool visible) {
     internalFlag = visible;
-    onEachItem([](MenuItem* item, bool flg) {
+    onEachItem([](MenuItem* item, bool flg)->bool {
         item->setVisible(flg);
         return true;
         }, ALL);
 }
 
 void MenuItemDelegate::setChangedAndRemoteSend() {
-    onEachItem([](MenuItem* item, bool flg) {
+    onEachItem([](MenuItem* item, bool flg)->bool {
         item->setChanged(true);
         item->setSendRemoteNeededAll();
         return true;
@@ -50,7 +50,7 @@ void MenuItemDelegate::setChangedAndRemoteSend() {
 }
 
 void MenuItemDelegate::setChangedOnly() {
-    onEachItem([](MenuItem* item, bool flg) {
+    onEachItem([](MenuItem* item, bool flg)->bool {
         item->setChanged(true);
         return true;
         }, ALL);
