@@ -148,7 +148,7 @@ namespace tcgfx {
                 int startX = calculateSpaceBetween(props->getFont(), buffer, 0, hints.getStartIndex() );
                 int lenX = max(MINIMUM_CURSOR_SIZE, calculateSpaceBetween(props->getFont(), buffer, hints.getStartIndex(), hints.getEndIndex()));
                 int whereX = min(int(width) - MINIMUM_CURSOR_SIZE, int(wh.x + startX));
-                drawable->drawBox(Coord(whereX, where.y + size.y - 1), Coord(lenX, 1), false);
+                drawable->drawBox(Coord(whereX, where.y + size.y - 1), Coord(lenX, 1), true);
                 drawable->setDrawColor(fg);
                 if(hints.getEndIndex() > strlen(buffer)) wh.x = wh.x - (unsigned int)MINIMUM_CURSOR_SIZE;
                 drawable->drawText(wh, props->getFont(), props->getFontMagnification(), buffer);
