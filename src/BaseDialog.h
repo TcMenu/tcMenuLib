@@ -280,10 +280,9 @@ public:
      * @param btnNum the button number
      * @param next the next menu item in the list
      */
-    LocalDialogButtonMenuItem(RuntimeRenderingFn renderFn, int id, int btnNum, MenuItem* next)
-            : RuntimeMenuItem(MENUTYPE_DIALOG_BUTTON, id, renderFn, 0, 1, next) {
+    LocalDialogButtonMenuItem(RuntimeRenderingFn renderFn, menuid_t id, int btnNum, MenuItem* next)
+            : RuntimeMenuItem(MENUTYPE_DIALOG_BUTTON, id, renderFn, 0, 1, next), buttonNumber(btnNum) {
         setLocalOnly(true);
-        buttonNumber = btnNum;
     }
     int getButtonNumber() { return  buttonNumber; }
 };

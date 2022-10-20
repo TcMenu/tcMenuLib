@@ -28,6 +28,9 @@ class BaseDialog;
 #define TC_DISPLAY_UPDATES_PER_SECOND 4
 #endif // TC_DISPLAY_UPDATES_PER_SECOND
 
+// The updates per second value that indicates the display is not updating, and doesn't schedule rendering.
+#define UPDATES_SEC_DISPLAY_OFF 0xFFU
+
 /** The maximum number of screen ticks */
 #define MAX_TICKS 0xffff
 
@@ -302,8 +305,20 @@ public:
 	 * @param updatesSec the number of updates.
 	 */
 	void setUpdatesPerSecond(int updatesSec) {
+        bool needsReschedule = updatesPerSecond == UPDATES_SEC_DISPLAY_OFF;
 	    updatesPerSecond = updatesSec;
         resetValInTicks = 30 * updatesSec;
+        if(needsReschedule) {
+            taskManager.execute(this);
+        }
+    }
+
+    /**
+     * Turn off the display updates to allow for low power state transition, to re-enable call setUpdatesPerSecond
+     * @see setUpdatesPerSecond
+     */
+    void turnOffDisplayUpdates(bool updatesEnabled) {
+        updatesPerSecond = UPDATES_SEC_DISPLAY_OFF;
     }
 
     /** 
@@ -379,6 +394,14 @@ public:
      * @return the position 0 based.
      */
     virtual int findActiveItem(MenuItem* root);
+
+    /**
+     * Find an item's offset in a given root, safely returns 0.
+     * @param root the root item
+     * @param toFind the item within that root
+     * @return the index if found, otherwise 0.
+     */
+    virtual int findItemAtIndex(MenuItem *root, MenuItem *toFind);
 
     /**
      * Get the count of items in the current root

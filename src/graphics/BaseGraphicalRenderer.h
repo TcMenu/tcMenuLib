@@ -184,6 +184,15 @@ namespace tcgfx {
         int findActiveItem(MenuItem* root) override;
 
         /**
+         * Find an item's offset in a given root, safely returns 0.
+         * @param root the root item
+         * @param toFind the item within that root
+         * @return the index if found, otherwise 0.
+         */
+        int findItemAtIndex(MenuItem *root, MenuItem *toFind) override;
+
+
+        /**
          * @return the total number of items in the current menu
          */
         uint8_t itemCount(MenuItem* root, bool) override;

@@ -341,8 +341,8 @@ void MenuManager::changeMenu(MenuItem* possibleActive) {
         menuMgr.setItemsInCurrentMenu(listMenu->getNumberOfRows());
     } else {
         auto* toActivate = (possibleActive) ? possibleActive : navigator.getCurrentRoot();
-        toActivate->setActive(true);
-        setItemsInCurrentMenu(itemCount(navigator.getCurrentRoot(), false) - 1, offsetOfCurrentActive(navigator.getCurrentRoot()));
+        auto itemIdx = offsetOfItem(toActivate);
+        setItemsInCurrentMenu(itemCount(navigator.getCurrentRoot(), false) - 1, itemIdx);
     }
 
     // lastly force a redraw.
@@ -453,7 +453,7 @@ void MenuManager::resetMenu(bool completeReset) {
 }
 
 void MenuManager::navigateToMenu(MenuItem* theNewItem, MenuItem* possibleActive, bool customMenu) {
-    navigator.navigateTo(findCurrentActive(), theNewItem, customMenu);
+    navigator.navigateTo(possibleActive, theNewItem, customMenu);
     changeMenu(possibleActive);
 }
 

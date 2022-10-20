@@ -77,6 +77,13 @@ MenuItem* getItemAtPosition(MenuItem* root, uint8_t pos);
 int offsetOfCurrentActive(MenuItem* root);
 
 /**
+ * Get the offset in the menu of the given item, but safely returns 0 if not the item is not found
+ * @param itemToFind the item to be found
+ * @return the position, or 0 if not there
+ */
+int offsetOfItem(MenuItem* itemToFind);
+
+/**
  * returns the number of items in the current menu described by itemCount
  * @param item the root item of the menu to be counted.
  * @param includeNonVisble include menu items that are not marked visible

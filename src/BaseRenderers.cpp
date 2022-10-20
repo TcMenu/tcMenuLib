@@ -78,10 +78,15 @@ bool BaseMenuRenderer::tryTakeSelectIfNeeded(int currentReading, RenderPressMode
 }
 
 void BaseMenuRenderer::exec() {
-
+    // If a dialog is active, they take priority, either menu based or rendering based dialog, these are highest.
+    // Then we check if the display is taken over, if it is, that takes priority (either functional or OO takeover,
+    // finally we render the menu if none of the above are true.
 	if(dialog!=nullptr && dialog->isRenderNeeded()) {
 		dialog->dialogRendering(menuMgr.getCurrentRangeValue(), renderFnPressType);
-    } else if(displayTakenMode == NOT_TAKEN_OVER) {
+    } else if(dialog->isInUse()) {
+        displayTakenMode = NOT_TAKEN_OVER;
+        render();
+    }else if(displayTakenMode == NOT_TAKEN_OVER) {
         render();
     } else if(displayTakenMode == START_CUSTOM_DRAW) {
         customDrawing->started(this);
@@ -92,8 +97,12 @@ void BaseMenuRenderer::exec() {
 	    renderCallback(menuMgr.getCurrentRangeValue(), renderFnPressType);
 	}
 
-    int refreshInterval = 1000 / updatesPerSecond;
-    taskManager.scheduleOnce(refreshInterval, this);
+    // here we work out when we should be called again, this allows the number of updates per second to be changed
+    // during the run of the application.
+    if(updatesPerSecond != UPDATES_SEC_DISPLAY_OFF) {
+        int refreshInterval = 1000 / updatesPerSecond;
+        taskManager.scheduleOnce(refreshInterval, this);
+    }
 }
 
 void BaseMenuRenderer::resetToDefault() {
@@ -147,6 +156,19 @@ void BaseMenuRenderer::giveBackDisplay() {
 void BaseMenuRenderer::setFirstWidget(TitleWidget* widget) {
 	this->firstWidget = widget;
 	this->redrawMode = MENUDRAW_COMPLETE_REDRAW;
+}
+
+int BaseMenuRenderer::findItemAtIndex(MenuItem *root, MenuItem *toFind) {
+    uint8_t i = 0;
+    MenuItem *itm = root;
+    while (itm != nullptr) {
+        if(itm->isVisible()) {
+            i = i + 1;
+            if (itm == toFind) return i;
+        }
+        itm = itm->getNext();
+    }
+    return 0;
 }
 
 int BaseMenuRenderer::findActiveItem(MenuItem *root) {
