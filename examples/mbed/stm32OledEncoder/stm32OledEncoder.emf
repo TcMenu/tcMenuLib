@@ -365,17 +365,17 @@
       },
       {
         "name": "ENCODER_PIN_A",
-        "latestValue": "PE_2",
+        "latestValue": "PC_8",
         "subsystem": "INPUT"
       },
       {
         "name": "ENCODER_PIN_B",
-        "latestValue": "PE_5",
+        "latestValue": "PC_10",
         "subsystem": "INPUT"
       },
       {
         "name": "ENCODER_PIN_OK",
-        "latestValue": "PE_4",
+        "latestValue": "PC_9",
         "subsystem": "INPUT"
       },
       {

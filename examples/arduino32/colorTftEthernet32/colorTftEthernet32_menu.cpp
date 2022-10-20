@@ -52,9 +52,9 @@ const SubMenuInfo minfoConnectivity = { "Connectivity", 14, 0xffff, 0, NO_CALLBA
 BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuIpAddress);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, &menuRomValues);
 const FloatMenuInfo minfoVoltA1 = { "Volt A1", 9, 0xffff, 2, NO_CALLBACK };
-FloatMenuItem menuVoltA1(&minfoVoltA1, NULL);
+FloatMenuItem menuVoltA1(&minfoVoltA1, 0.0, NULL);
 const FloatMenuInfo minfoVoltA0 = { "Volt A0", 8, 0xffff, 2, NO_CALLBACK };
-FloatMenuItem menuVoltA0(&minfoVoltA0, &menuVoltA1);
+FloatMenuItem menuVoltA0(&minfoVoltA0, 0.0, &menuVoltA1);
 RENDERING_CALLBACK_NAME_INVOKE(fnStatusRtCall, backSubItemRenderFn, "Status", -1, NO_CALLBACK)
 const SubMenuInfo minfoStatus = { "Status", 7, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackStatus(fnStatusRtCall, &menuVoltA0);
@@ -62,7 +62,7 @@ SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuConnectivity);
 const BooleanMenuInfo minfoShowHidden = { "Show Hidden", 30, 0xffff, 1, onShowHidden, NAMING_YES_NO };
 BooleanMenuItem menuShowHidden(&minfoShowHidden, false, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnRGBRtCall, rgbAlphaItemRenderFn, "RGB", 16, onRgbChanged)
-Rgb32MenuItem menuRGB(26, fnRGBRtCall, false, &menuShowHidden);
+Rgb32MenuItem menuRGB(26, fnRGBRtCall, false, RgbColor32(0, 0, 0), &menuShowHidden);
 const BooleanMenuInfo minfoTempCheck = { "Temp Check", 13, 9, 1, NO_CALLBACK, NAMING_ON_OFF };
 BooleanMenuItem menuTempCheck(&minfoTempCheck, false, &menuRGB);
 const AnyMenuInfo minfoHiddenItem = { "Hidden item", 16, 0xffff, 0, NO_CALLBACK };

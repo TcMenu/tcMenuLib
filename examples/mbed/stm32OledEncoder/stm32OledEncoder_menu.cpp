@@ -9,7 +9,7 @@
  */
 
 #include <tcMenu.h>
-#include "stm32f4mbed_menu.h"
+#include "stm32OledEncoder_menu.h"
 #include "ThemeMonoInverse.h"
 
 // Global variable declarations
@@ -42,9 +42,9 @@ SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, &menuCom
 const AnyMenuInfo minfoSaveAll = { "Save All", 17, 0xffff, 0, onSaveAll };
 ActionMenuItem menuSaveAll(&minfoSaveAll, NULL);
 const FloatMenuInfo minfoAvgTemp = { "Avg Temp", 12, 0xffff, 1, NO_CALLBACK };
-FloatMenuItem menuAvgTemp(&minfoAvgTemp, &menuSaveAll);
+FloatMenuItem menuAvgTemp(&minfoAvgTemp, 0.0, &menuSaveAll);
 ListRuntimeMenuItem menuCountingList(11, 10, fnCountingListRtCall, &menuAvgTemp);
-extern const char* choicesItems;
+extern char choicesItems[];
 RENDERING_CALLBACK_NAME_INVOKE(fnChoicesRtCall, enumItemRenderFn, "Choices", 19, NO_CALLBACK)
 ScrollChoiceMenuItem menuChoices(10, fnChoicesRtCall, 0, choicesItems, 10, 4, &menuCountingList);
 RENDERING_CALLBACK_NAME_INVOKE(fnOtherRtCall, backSubItemRenderFn, "Other", -1, NO_CALLBACK)
@@ -52,9 +52,9 @@ const SubMenuInfo minfoOther = { "Other", 9, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackOther(fnOtherRtCall, &menuChoices);
 SubMenuItem menuOther(&minfoOther, &menuBackOther, &menuConnectivity);
 RENDERING_CALLBACK_NAME_INVOKE(fnRGBRtCall, rgbAlphaItemRenderFn, "RGB", 15, NO_CALLBACK)
-Rgb32MenuItem menuRGB(8, fnRGBRtCall, true, NULL);
+Rgb32MenuItem menuRGB(8, fnRGBRtCall, true, RgbColor32(0, 0, 0, 255), NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnFrequencyRtCall, largeNumItemRenderFn, "Frequency", 7, onFrequencyChanged)
-EditableLargeNumberMenuItem menuFrequency(fnFrequencyRtCall, 7, 8, 0, true, &menuRGB);
+EditableLargeNumberMenuItem menuFrequency(fnFrequencyRtCall, 7, 8, 0, true, LargeFixedNumber(0U, 0U, false), &menuRGB);
 const BooleanMenuInfo minfoPower = { "Power", 6, 6, 1, NO_CALLBACK, NAMING_ON_OFF };
 BooleanMenuItem menuPower(&minfoPower, false, &menuFrequency);
 const char enumStrFoods_0[] = "Salad";
@@ -93,8 +93,8 @@ void setupMenu() {
     gfx.setRotation(0);
     gfx.begin();
     renderer.setUpdatesPerSecond(5);
-    switches.initialise(internalDigitalIo(), true);
-    menuMgr.initForEncoder(&renderer, &menuRTCDate, PE_2, PE_5, PE_4);
+    switches.init(internalDigitalIo(), SWITCHES_POLL_EVERYTHING, true);
+    menuMgr.initForEncoder(&renderer, &menuRTCDate, PC_8, PC_10, PC_9);
     remoteServer.addConnection(&ethernetConnection);
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_ALWAYS);
     renderer.setUseSliderForAnalog(false);
@@ -102,5 +102,8 @@ void setupMenu() {
 
     // We have an IoT monitor, register the server
     menuIoTMonitor.setRemoteServer(remoteServer);
+
+    // We have an EEPROM authenticator, it needs initialising
+    menuAuthenticator.init();
 }
 

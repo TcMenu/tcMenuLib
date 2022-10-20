@@ -2,7 +2,7 @@
 #ifndef TCMENUEXAMPLE_SCREENSAVERCUSTOMDRAWING_H
 #define TCMENUEXAMPLE_SCREENSAVERCUSTOMDRAWING_H
 
-#include "stm32f4mbed_menu.h"
+#include "stm32OledEncoder_menu.h"
 #include <Fonts/FreeSans9pt7b.h>
 /**
  * Here we implement the custom drawing class so that we can register for drawing and reset events with it.
@@ -45,7 +45,7 @@ public:
      * @param userClick if the user has clicked on the button, one of: RPRESS_NONE, PRESS_PRESSED, RPRESS_HELD
      */
     void renderLoop(unsigned int currentValue, RenderPressMode userClick) override {
-        if(userClick != RPRESS_NONE || exitDisplayProc || renderer.getDialog()->isInUse()) {
+        if(userClick != RPRESS_NONE || exitDisplayProc) {
             renderer.giveBackDisplay();
             return;
         }

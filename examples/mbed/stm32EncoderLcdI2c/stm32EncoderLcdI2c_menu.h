@@ -11,46 +11,38 @@
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
 
-#include <Arduino.h>
+#include <mbed.h>
 #include <tcMenu.h>
-#include "tcMenuTfteSpi.h"
-#include <graphics/MenuTouchScreenEncoder.h>
+
+#include <LiquidCrystalIO.h>
+#include <IoAbstractionWire.h>
 #include <IoAbstraction.h>
+#include "tcMenuLiquidCrystal.h"
 
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
-extern TFT_eSPI gfx;
-extern TfteSpiDrawable gfxDrawable;
-extern GraphicsDeviceRenderer renderer;
+extern I2C i2cDisplay;
+extern LiquidCrystal lcd;
+extern LiquidCrystalRenderer renderer;
 
 // Any externals needed by IO expanders, EEPROMs etc
 
 
 // Global Menu Item exports
-extern ActionMenuItem menuDialogs;
-extern ActionMenuItem menuStatusRestart;
-extern FloatMenuItem menuStatusLineVoltage;
-extern BooleanMenuItem menuStatusAmpPower;
-extern EnumMenuItem menuStatusAmpStatus;
-extern BackMenuItem menuBackStatus;
-extern SubMenuItem menuStatus;
-extern BooleanMenuItem menuSettingsProtection;
-extern AnalogMenuItem menuSettingsMaxOnVolume;
+extern BooleanMenuItem menuSettingsFan;
+extern AnalogMenuItem menuSettingsTemp;
 extern BackMenuItem menuBackSettings;
 extern SubMenuItem menuSettings;
-extern BooleanMenuItem menuMute;
-extern EnumMenuItem menuInput;
-extern AnalogMenuItem menuVolume;
+extern AnalogMenuItem menuTempHtr;
+extern AnalogMenuItem menuTempRoom;
+extern EnumMenuItem menuStatus;
 
 // Provide a wrapper to get hold of the root menu item and export setupMenu
-inline MenuItem& rootMenuItem() { return menuVolume; }
+inline MenuItem& rootMenuItem() { return menuStatus; }
 void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
-void CALLBACK_FUNCTION onRestart(int id);
-void CALLBACK_FUNCTION onShowDialogs(int id);
-void CALLBACK_FUNCTION onVolumeChanged(int id);
 
 #endif // MENU_GENERATED_CODE_H

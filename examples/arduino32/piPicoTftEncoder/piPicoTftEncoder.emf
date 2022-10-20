@@ -1,6 +1,6 @@
 {
   "version": "1.00",
-  "projectName": "Project description",
+  "projectName": "RPiPico Tft Encoder",
   "author": "dave",
   "items": [
     {
@@ -212,7 +212,7 @@
     ],
     "lastThemeUuid": "850dc0a3-f534-47c2-94d8-1e64ff368a54",
     "applicationUUID": "0c6972c4-addb-4931-a910-e4b2a85d2b2a",
-    "applicationName": "officialPiPicoTftEncoder",
+    "applicationName": "RPiPico Tft Encoder",
     "lastProperties": [
       {
         "name": "DISPLAY_VARIABLE",

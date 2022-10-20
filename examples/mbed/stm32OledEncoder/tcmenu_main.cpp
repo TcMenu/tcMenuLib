@@ -7,13 +7,14 @@
  */
 
 #include <mbed.h>
-#include "stm32f4mbed_menu.h"
+#include "stm32OledEncoder_menu.h"
 #include "NTPTimeEvent.h"
 #include "ScreenSaverCustomDrawing.h"
 #include "mbed/HalStm32EepromAbstraction.h"
 #include <stockIcons/wifiAndConnectionIcons16x12.h>
 #include <RemoteMenuItem.h>
 #include <tcMenuVersion.h>
+#include <Adafruit_SSD1306.h>
 
 #ifdef BUILD_FOR_MBED_6
 BufferedSerial serPort(USBTX, USBRX);
