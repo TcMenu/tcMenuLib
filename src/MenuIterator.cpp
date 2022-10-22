@@ -195,7 +195,7 @@ MenuItem* getItemAtPosition(MenuItem* root, uint8_t pos) {
 int offsetOfItem(MenuItem* itemToFind) {
     if(MenuRenderer::getInstance() && MenuRenderer::getInstance()->getRendererType() == RENDER_TYPE_NOLOCAL) return 0;
     auto *confRenderer = reinterpret_cast<BaseMenuRenderer*>(MenuRenderer::getInstance());
-    return confRenderer->findItemAtIndex(menuMgr.getRoot(), itemToFind);
+    return confRenderer->findItemIndex(menuMgr.getRoot(), itemToFind);
 }
 
 int offsetOfCurrentActive(MenuItem* root) {

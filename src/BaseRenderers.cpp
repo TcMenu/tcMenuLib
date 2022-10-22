@@ -158,13 +158,13 @@ void BaseMenuRenderer::setFirstWidget(TitleWidget* widget) {
 	this->redrawMode = MENUDRAW_COMPLETE_REDRAW;
 }
 
-int BaseMenuRenderer::findItemAtIndex(MenuItem *root, MenuItem *toFind) {
+int BaseMenuRenderer::findItemIndex(MenuItem *root, MenuItem *toFind) {
     uint8_t i = 0;
     MenuItem *itm = root;
     while (itm != nullptr) {
         if(itm->isVisible()) {
-            i = i + 1;
             if (itm == toFind) return i;
+            i = i + 1;
         }
         itm = itm->getNext();
     }

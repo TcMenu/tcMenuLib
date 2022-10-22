@@ -401,7 +401,7 @@ public:
      * @param toFind the item within that root
      * @return the index if found, otherwise 0.
      */
-    virtual int findItemAtIndex(MenuItem *root, MenuItem *toFind);
+    virtual int findItemIndex(MenuItem *root, MenuItem *toFind);
 
     /**
      * Get the count of items in the current root

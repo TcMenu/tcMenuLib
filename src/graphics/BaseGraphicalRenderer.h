@@ -189,7 +189,7 @@ namespace tcgfx {
          * @param toFind the item within that root
          * @return the index if found, otherwise 0.
          */
-        int findItemAtIndex(MenuItem *root, MenuItem *toFind) override;
+        int findItemIndex(MenuItem *root, MenuItem *toFind) override;
 
 
         /**

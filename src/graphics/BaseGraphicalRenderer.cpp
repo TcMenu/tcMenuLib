@@ -388,11 +388,11 @@ uint8_t BaseGraphicalRenderer::itemCount(MenuItem*, bool ) {
     }
 }
 
-int BaseGraphicalRenderer::findItemAtIndex(MenuItem *root, MenuItem *toFind) {
+int BaseGraphicalRenderer::findItemIndex(MenuItem *root, MenuItem *toFind) {
     checkIfRootHasChanged();
     for(bsize_t i=0;i<itemOrderByRow.count();i++) {
         auto* possibleActive = itemOrderByRow.itemAtIndex(i);
-        if(possibleActive->getMenuItem() == toFind) return possibleActive->getPosition().getRow();
+        if(possibleActive->getMenuItem() == toFind) return i;
     }
     return 0;
 }
