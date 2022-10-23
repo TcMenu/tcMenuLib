@@ -367,8 +367,16 @@ TextMenuItem::TextMenuItem(RuntimeRenderingFn customRenderFn, menuid_t id, int s
 
 }
 
-void IpAddressMenuItem::setIpAddress(const char * ipData) {
-	memset(data, 0, sizeof(data));
+TextMenuItem::TextMenuItem(RuntimeRenderingFn customRenderFn, menuid_t id, int size, const char* initial, MenuItem *next)
+        : EditableMultiPartMenuItem(MENUTYPE_TEXT_VALUE, id, size, customRenderFn, next) {
+    data = new char[size];
+    memset(data, 0, size);
+    strncpy(data, initial, size);
+    passwordField = false;
+}
+
+IpAddressStorage::IpAddressStorage(const char *ipData) {
+    memset(data, 0, sizeof(data));
 	char part[4];
 	uint8_t currPart = 0;
 	while (*ipData && currPart < 4) {
@@ -378,24 +386,32 @@ void IpAddressMenuItem::setIpAddress(const char * ipData) {
 			ipData++;
 		}
 		serlogF3(SER_TCMENU_DEBUG, "IpPart", getId(), part);
-		setIpPart(currPart, atoi(part));
+		setPart(currPart, atoi(part));
 		currPart++;
 		if(*ipData) ipData++;
 	}
 }
 
-void IpAddressMenuItem::setIpAddress(uint8_t p1, uint8_t p2, uint8_t p3, uint8_t p4) {
-	data[0] = p1;
+IpAddressStorage::IpAddressStorage(uint8_t p1, uint8_t p2, uint8_t p3, uint8_t p4) {
+    data[0] = p1;
 	data[1] = p2;
 	data[2] = p3;
 	data[3] = p4;
-	setChanged(true);
-	setSendRemoteNeededAll();
 }
 
 void IpAddressMenuItem::setIpPart(uint8_t part, uint8_t newVal) {
     if (part > 3) return;
-    data[part] = newVal;
+    data.setPart(part, newVal);
+    changeOccurred(false);
+}
+
+void IpAddressMenuItem::setUnderlying(const IpAddressStorage& other) {
+    data = other;
+    changeOccurred(false);
+}
+
+void IpAddressMenuItem::setIpAddress(const char *source) {
+    data = IpAddressStorage(source);
     changeOccurred(false);
 }
 
@@ -426,6 +442,12 @@ void TimeFormattedMenuItem::setTimeFromString(const char* ptr) {
 TimeFormattedMenuItem::TimeFormattedMenuItem(RuntimeRenderingFn renderFn, menuid_t id, MultiEditWireType format, MenuItem *next)
         : EditableMultiPartMenuItem(MENUTYPE_TIME, id, format == EDITMODE_TIME_HUNDREDS_24H ? 4 : 3, renderFn, next) {
     setTime(TimeStorage(12, 0));
+    this->format = format;
+}
+
+TimeFormattedMenuItem::TimeFormattedMenuItem(RuntimeRenderingFn renderFn, menuid_t id, MultiEditWireType format, const TimeStorage& initial, MenuItem *next)
+        : EditableMultiPartMenuItem(MENUTYPE_TIME, id, format == EDITMODE_TIME_HUNDREDS_24H ? 4 : 3, renderFn, next) {
+    setTime(initial);
     this->format = format;
 }
 

@@ -239,6 +239,7 @@ private:
     bool passwordField;
 public:
     TextMenuItem(RuntimeRenderingFn customRenderFn, menuid_t id, int size, MenuItem* next = nullptr);
+    TextMenuItem(RuntimeRenderingFn customRenderFn, menuid_t id, int size, const char* initial, MenuItem* next = nullptr);
 
     void setPasswordField(bool pwd) {
         this->passwordField = pwd;
@@ -286,26 +287,59 @@ private:
  */
 int findPositionInEditorSet(char ch);
 
+class IpAddressStorage {
+private:
+    uint8_t data[4];
+public:
+    explicit IpAddressStorage(const char* address);
+    IpAddressStorage(uint8_t p1, uint8_t p2, uint8_t p3, uint8_t p4);
+    IpAddressStorage(const IpAddressStorage& other) = default;
+    IpAddressStorage& operator=(const IpAddressStorage& other) = default;
+
+    void setPart(int part, uint8_t newValue) { data[part] = newValue; }
+    uint8_t* underlyingArray() { return data; }
+};
+
 /**
  * This menu item represents an IP address that can be configured / or just displayed on the device,
  * if it is editable it is edited 
  */
 class IpAddressMenuItem : public EditableMultiPartMenuItem {
 private:
-    uint8_t data[4];
+    IpAddressStorage data;
 public:
+    /**
+     * Create an IP address that initially points to 127.0.0.1, with a given ID and rendering function
+     * @param renderFn the rendering function to use.
+     * @param id the ID of this item
+     * @param next optional pointer to next item
+     */
     IpAddressMenuItem(RuntimeRenderingFn renderFn, menuid_t id, MenuItem* next = nullptr)
-		: EditableMultiPartMenuItem(MENUTYPE_IPADDRESS, id, 4, renderFn, next) {
-		setIpAddress(127, 0, 0, 1);
-	}
+		: EditableMultiPartMenuItem(MENUTYPE_IPADDRESS, id, 4, renderFn, next), data(127, 0, 0, 1) {}
+
+    /**
+     * Create an IP address that has an initial value, with a given ID and rendering function
+     * @param renderFn the rendering function to use.
+     * @param id the ID of this item
+     * @param ipParts a 4 digit IP address as a constant array
+     * @param next optional pointer to next item
+     */
+    IpAddressMenuItem(RuntimeRenderingFn renderFn, menuid_t id, const IpAddressStorage& initialIp, MenuItem* next = nullptr)
+		: EditableMultiPartMenuItem(MENUTYPE_IPADDRESS, id, 4, renderFn, next), data(initialIp) {}
 
 	void setIpAddress(const char* source);
 
 	/** Sets the whole IP address as four parts */
-	void setIpAddress(uint8_t p1, uint8_t p2, uint8_t p3, uint8_t p4);
+	void setIpAddress(uint8_t p1, uint8_t p2, uint8_t p3, uint8_t p4) {
+        data = IpAddressStorage(p1, p2, p3, p4);
+    }
 
 	/** gets the IP address as four separate bytes */
-	uint8_t* getIpAddress() const { return (uint8_t*)data; }
+	uint8_t* getIpAddress() { return data.underlyingArray(); }
+
+    void setUnderlying(const IpAddressStorage& other);
+
+    IpAddressStorage& getUnderlying() { return data; }
 	
 	/** sets a single part in the address */
 	void setIpPart(uint8_t part, uint8_t newVal);
@@ -319,13 +353,14 @@ struct TimeStorage {
     TimeStorage() {
         this->hours = this->minutes = this->seconds = this->hundreds = 0;
     }
-    
     TimeStorage(uint8_t hours, uint8_t minutes, uint8_t seconds = 0, uint8_t hundreds = 0) {
         this->hours = hours;
         this->minutes = minutes;
         this->seconds = seconds;
         this->hundreds = hundreds;
     }
+    TimeStorage(const TimeStorage& other) = default;
+    TimeStorage& operator=(const TimeStorage& other) = default;
 
     uint8_t hours;
     uint8_t minutes;
@@ -350,6 +385,9 @@ struct DateStorage {
         this->month = month;
         this->year = year;
     }
+
+    DateStorage(const DateStorage& other) = default;
+    DateStorage& operator=(const DateStorage& other)=default;
 };
 
 /**
@@ -364,6 +402,7 @@ private:
     TimeStorage data;
 public:
     TimeFormattedMenuItem(RuntimeRenderingFn renderFn, menuid_t id, MultiEditWireType format, MenuItem* next = nullptr);
+    TimeFormattedMenuItem(RuntimeRenderingFn renderFn, menuid_t id, MultiEditWireType format, const TimeStorage& initial,  MenuItem* next = nullptr);
 
 
 	/** gets the time as four separate bytes */
@@ -395,9 +434,10 @@ private:
     static DateFormatOption dateFormatMode;
 public:
     DateFormattedMenuItem(RuntimeRenderingFn renderFn, menuid_t id, MenuItem* next = nullptr)
-    : EditableMultiPartMenuItem(MENUTYPE_DATE, id, 3, renderFn, next) {
-        setDate(DateStorage(1, 1, 2020));
-    }
+            : EditableMultiPartMenuItem(MENUTYPE_DATE, id, 3, renderFn, next), data(1, 1, 2020) {}
+
+    DateFormattedMenuItem(RuntimeRenderingFn renderFn, menuid_t id, const DateStorage& initial, MenuItem* next = nullptr)
+            : EditableMultiPartMenuItem(MENUTYPE_DATE, id, 3, renderFn, next), data(initial) {}
 
     /**
      * sets the global separator for date rendering.
@@ -476,4 +516,3 @@ int fnName(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, 
 }
 
 #endif //_RUNTIME_MENUITEM_H_
-
