@@ -6,6 +6,7 @@
     {
       "parentId": 0,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 5,
         "itemType": "GREGORIAN_DATE",
@@ -20,6 +21,7 @@
     {
       "parentId": 0,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 5,
         "itemType": "TIME_12H",
@@ -47,11 +49,13 @@
     {
       "parentId": 3,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 1000,
         "offset": 0,
         "divisor": 10,
         "unitName": "tn",
+        "step": 1,
         "name": "Tenths",
         "id": 4,
         "eepromAddress": 2,
@@ -64,6 +68,7 @@
     {
       "parentId": 3,
       "type": "enumItem",
+      "defaultValue": "0",
       "item": {
         "enumEntries": [
           "Salad",
@@ -84,6 +89,7 @@
     {
       "parentId": 3,
       "type": "boolItem",
+      "defaultValue": "false",
       "item": {
         "naming": "ON_OFF",
         "name": "Power",
@@ -97,6 +103,7 @@
     {
       "parentId": 3,
       "type": "largeNumItem",
+      "defaultValue": "0",
       "item": {
         "digitsAllowed": 8,
         "decimalPlaces": 0,
@@ -113,6 +120,7 @@
     {
       "parentId": 3,
       "type": "rgbItem",
+      "defaultValue": "#000000FF",
       "item": {
         "includeAlphaChannel": true,
         "name": "RGB",
@@ -140,6 +148,7 @@
     {
       "parentId": 9,
       "type": "scrollItem",
+      "defaultValue": "0-",
       "item": {
         "itemWidth": 10,
         "eepromOffset": 0,
@@ -171,6 +180,7 @@
     {
       "parentId": 9,
       "type": "floatItem",
+      "defaultValue": "0.0",
       "item": {
         "numDecimalPlaces": 1,
         "name": "Avg Temp",
@@ -211,6 +221,7 @@
     {
       "parentId": 13,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 5,
         "itemType": "IP_ADDRESS",
@@ -253,11 +264,13 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 32767,
         "offset": 0,
         "divisor": 0,
         "unitName": "",
+        "step": 1,
         "name": "Commits",
         "id": 15,
         "eepromAddress": -1,
@@ -269,6 +282,7 @@
     {
       "parentId": 0,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 16,
         "itemType": "PLAIN_TEXT",
@@ -349,13 +363,8 @@
         "subsystem": "DISPLAY"
       },
       {
-        "name": "PULLUP_LOGIC",
-        "latestValue": "true",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "INTERRUPT_SWITCHES",
-        "latestValue": "false",
+        "name": "SW_POLLING_MODE",
+        "latestValue": "SWITCHES_POLL_EVERYTHING",
         "subsystem": "INPUT"
       },
       {
@@ -386,6 +395,11 @@
       {
         "name": "ENCODER_NEXT_PIN",
         "latestValue": "-1",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "PULLUP_LOGIC",
+        "latestValue": "true",
         "subsystem": "INPUT"
       },
       {
@@ -446,6 +460,11 @@
     "authenticatorDefinition": "rom:100:6",
     "projectIoExpanders": [
       "deviceIO:"
-    ]
+    ],
+    "menuInMenuCollection": {
+      "menuDefinitions": []
+    },
+    "packageNamespace": "",
+    "appIsModular": false
   }
 }

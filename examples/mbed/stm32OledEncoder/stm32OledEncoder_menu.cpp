@@ -26,7 +26,7 @@ TagValueRemoteServerConnection ethernetConnection(ethernetTransport, mbedEthInit
 
 // Global Menu Item declarations
 RENDERING_CALLBACK_NAME_INVOKE(fnEditRtCall, textItemRenderFn, "Edit", -1, NO_CALLBACK)
-TextMenuItem menuEdit(fnEditRtCall, 16, 16, NULL);
+TextMenuItem menuEdit(fnEditRtCall, "", 16, 16, NULL);
 const AnalogMenuInfo minfoCommits = { "Commits", 15, 0xffff, 32767, NO_CALLBACK, 0, 1, "" };
 AnalogMenuItem menuCommits(&minfoCommits, 0, &menuEdit);
 const char pgmStrAuthenticatorText[] = { "Authenticator" };
@@ -34,7 +34,7 @@ EepromAuthenticationInfoMenuItem menuAuthenticator(pgmStrAuthenticatorText, NO_C
 const char pgmStrIoTMonitorText[] = { "IoT Monitor" };
 RemoteMenuItem menuIoTMonitor(pgmStrIoTMonitorText, 18, &menuAuthenticator);
 RENDERING_CALLBACK_NAME_INVOKE(fnIPRtCall, ipAddressRenderFn, "IP", -1, NO_CALLBACK)
-IpAddressMenuItem menuIP(fnIPRtCall, 14, &menuIoTMonitor);
+IpAddressMenuItem menuIP(fnIPRtCall, IpAddressStorage(127, 0, 0, 1), 14, &menuIoTMonitor);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NO_CALLBACK)
 const SubMenuInfo minfoConnectivity = { "Connectivity", 13, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuIP);
@@ -52,7 +52,7 @@ const SubMenuInfo minfoOther = { "Other", 9, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackOther(fnOtherRtCall, &menuChoices);
 SubMenuItem menuOther(&minfoOther, &menuBackOther, &menuConnectivity);
 RENDERING_CALLBACK_NAME_INVOKE(fnRGBRtCall, rgbAlphaItemRenderFn, "RGB", 15, NO_CALLBACK)
-Rgb32MenuItem menuRGB(8, fnRGBRtCall, true, RgbColor32(0, 0, 0, 255), NULL);
+Rgb32MenuItem menuRGB(fnRGBRtCall, RgbColor32(0, 0, 0, 255), 8, true, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnFrequencyRtCall, largeNumItemRenderFn, "Frequency", 7, onFrequencyChanged)
 EditableLargeNumberMenuItem menuFrequency(fnFrequencyRtCall, 7, 8, 0, true, LargeFixedNumber(0U, 0U, false), &menuRGB);
 const BooleanMenuInfo minfoPower = { "Power", 6, 6, 1, NO_CALLBACK, NAMING_ON_OFF };
@@ -72,9 +72,9 @@ const SubMenuInfo minfoEditing = { "Editing", 3, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackEditing(fnEditingRtCall, &menuTenths);
 SubMenuItem menuEditing(&minfoEditing, &menuBackEditing, &menuOther);
 RENDERING_CALLBACK_NAME_INVOKE(fnRTCTimeRtCall, timeItemRenderFn, "RTCTime", -1, NO_CALLBACK)
-TimeFormattedMenuItem menuRTCTime(fnRTCTimeRtCall, 2, (MultiEditWireType)3, &menuEditing);
+TimeFormattedMenuItem menuRTCTime(fnRTCTimeRtCall, TimeStorage(0, 0, 0, 0), 2, (MultiEditWireType)3, &menuEditing);
 RENDERING_CALLBACK_NAME_INVOKE(fnRTCDateRtCall, dateItemRenderFn, "RTCDate", -1, NO_CALLBACK)
-DateFormattedMenuItem menuRTCDate(fnRTCDateRtCall, 1, &menuRTCTime);
+DateFormattedMenuItem menuRTCDate(fnRTCDateRtCall, DateStorage(2020, 1, 1), 1, &menuRTCTime);
 
 void setupMenu() {
     // First we set up eeprom and authentication (if needed).

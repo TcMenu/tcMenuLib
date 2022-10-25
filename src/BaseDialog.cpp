@@ -275,7 +275,6 @@ void MenuBasedDialog::internalSetVisible(bool visible) {
     BaseDialog::internalSetVisible(visible);
 
     bitWrite(flags, DLG_FLAG_NEEDS_RENDERING, false);
-    resetDialogFields();
 
     if(visible) {
         auto* renderer =  reinterpret_cast<BaseGraphicalRenderer*>(MenuRenderer::getInstance());
@@ -293,6 +292,7 @@ void MenuBasedDialog::internalSetVisible(bool visible) {
         menuMgr.navigateToMenu(&backItem, toMakeActive, true);
     }
     else {
+        resetDialogFields();
         menuMgr.resetMenu(false);
     }
 }

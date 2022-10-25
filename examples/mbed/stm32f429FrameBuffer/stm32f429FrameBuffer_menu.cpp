@@ -27,11 +27,11 @@ ActionMenuItem menuDialogs(&minfoDialogs, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnSamplesLgePosRtCall, largeNumItemRenderFn, "LgePos", -1, NO_CALLBACK)
 EditableLargeNumberMenuItem menuSamplesLgePos(fnSamplesLgePosRtCall, 17, 7, 0, false, LargeFixedNumber(12456U, 0U, false), NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnSamplesRGBRtCall, rgbAlphaItemRenderFn, "RGB", -1, NO_CALLBACK)
-Rgb32MenuItem menuSamplesRGB(16, fnSamplesRGBRtCall, false, RgbColor32(255, 170, 187), &menuSamplesLgePos);
+Rgb32MenuItem menuSamplesRGB(fnSamplesRGBRtCall, RgbColor32(255, 170, 187), 16, false, &menuSamplesLgePos);
 RENDERING_CALLBACK_NAME_INVOKE(fnSamplesTimeRtCall, timeItemRenderFn, "Time", -1, NO_CALLBACK)
-TimeFormattedMenuItem menuSamplesTime(fnSamplesTimeRtCall, 15, (MultiEditWireType)2, &menuSamplesRGB);
+TimeFormattedMenuItem menuSamplesTime(fnSamplesTimeRtCall, TimeStorage(0, 0, 0, 0), 15, (MultiEditWireType)2, &menuSamplesRGB);
 RENDERING_CALLBACK_NAME_INVOKE(fnSamplesTextRtCall, textItemRenderFn, "Text", -1, NO_CALLBACK)
-TextMenuItem menuSamplesText(fnSamplesTextRtCall, 14, 10, &menuSamplesTime);
+TextMenuItem menuSamplesText(fnSamplesTextRtCall, "", 14, 10, &menuSamplesTime);
 const AnalogMenuInfo minfoBeltSpeed = { "Belt Speed", 13, 0xffff, 200, NO_CALLBACK, 0, 100, "mS" };
 AnalogMenuItem menuBeltSpeed(&minfoBeltSpeed, 200, &menuSamplesText);
 const char enumStrBeltStatus_0[] = "Running";
@@ -51,7 +51,7 @@ const SubMenuInfo minfoConnectivity = { "Connectivity", 9, 0xffff, 0, NO_CALLBAC
 BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuConnectivityEnableUSB);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, &menuSamples);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRunDurationRtCall, timeItemRenderFn, "Run duration", 4, NO_CALLBACK)
-TimeFormattedMenuItem menuSettingsRunDuration(fnSettingsRunDurationRtCall, 8, (MultiEditWireType)6, NULL);
+TimeFormattedMenuItem menuSettingsRunDuration(fnSettingsRunDurationRtCall, TimeStorage(0, 0, 0, 0), 8, (MultiEditWireType)6, NULL);
 const AnalogMenuInfo minfoSettingsTargetSpeed = { "Target speed", 7, 2, 200, onTargetChanged, 0, 100, "mS" };
 AnalogMenuItem menuSettingsTargetSpeed(&minfoSettingsTargetSpeed, 0, &menuSettingsRunDuration);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings", -1, NO_CALLBACK)

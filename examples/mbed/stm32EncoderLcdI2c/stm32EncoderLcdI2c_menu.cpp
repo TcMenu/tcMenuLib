@@ -54,6 +54,6 @@ void setupMenu() {
     lcd.configureBacklightPin(3);
     lcd.backlight();
     switches.init(internalDigitalIo(), SWITCHES_NO_POLLING, true);
-    menuMgr.initForEncoder(&renderer, &menuStatus, PE_2, PE_5, PE_4);
+    menuMgr.initForEncoder(&renderer, &menuStatus, PC_8, PC_10, PC_9);
 }
 
