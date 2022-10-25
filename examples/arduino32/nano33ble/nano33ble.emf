@@ -6,6 +6,7 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 2000,
         "offset": 0,
@@ -24,6 +25,7 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 1000,
         "offset": 0,
@@ -42,6 +44,7 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 32000,
         "offset": 0,
@@ -74,6 +77,7 @@
     {
       "parentId": 4,
       "type": "floatItem",
+      "defaultValue": "0.0",
       "item": {
         "numDecimalPlaces": 2,
         "name": "MagX",
@@ -87,6 +91,7 @@
     {
       "parentId": 4,
       "type": "floatItem",
+      "defaultValue": "0.0",
       "item": {
         "numDecimalPlaces": 2,
         "name": "MagY",
@@ -100,6 +105,7 @@
     {
       "parentId": 4,
       "type": "floatItem",
+      "defaultValue": "0.0",
       "item": {
         "numDecimalPlaces": 2,
         "name": "MagZ",
@@ -113,6 +119,7 @@
     {
       "parentId": 4,
       "type": "floatItem",
+      "defaultValue": "0.0",
       "item": {
         "numDecimalPlaces": 2,
         "name": "AccelX",
@@ -126,6 +133,7 @@
     {
       "parentId": 4,
       "type": "floatItem",
+      "defaultValue": "0.0",
       "item": {
         "numDecimalPlaces": 2,
         "name": "AccelY",
@@ -139,6 +147,7 @@
     {
       "parentId": 4,
       "type": "floatItem",
+      "defaultValue": "0.0",
       "item": {
         "numDecimalPlaces": 2,
         "name": "AccelZ",
@@ -166,6 +175,7 @@
     {
       "parentId": 11,
       "type": "floatItem",
+      "defaultValue": "0.0",
       "item": {
         "numDecimalPlaces": 2,
         "name": "In A0",
@@ -180,6 +190,7 @@
     {
       "parentId": 11,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 100,
         "offset": 0,
@@ -335,8 +346,8 @@
     "eepromDefinition": "",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
-      "deviceIO:",
-      "customIO:io23017"
+      "customIO:io23017",
+      "deviceIO:"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []
