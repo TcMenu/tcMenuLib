@@ -169,9 +169,9 @@ private:
 public:
     EditableLargeNumberMenuItem(RuntimeRenderingFn renderFn, uint16_t id, int maxDigits, int dps, bool allowNeg, const LargeFixedNumber& initial, MenuItem* next = nullptr)
             : EditableMultiPartMenuItem(MENUTYPE_LARGENUM_VALUE, id, maxDigits + (allowNeg ? 1 : 0), renderFn, next) {
+        data = initial;
         data.setPrecision(dps, maxDigits);
         negativeAllowed = allowNeg;
-        data = initial;
     }
 
     EditableLargeNumberMenuItem(RuntimeRenderingFn renderFn, uint16_t id, int maxDigits, int dps, bool allowNeg, MenuItem* next = nullptr)

@@ -123,28 +123,28 @@ int largeNumItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, 
 		bool editingMode = row > 0 && row < 0xf;
 		bool hadNonZero = false;
 		uint8_t editPosition = 0;
+        row = row - 1;
 
-		if (negativeAllowed && (editingMode ||  num->isNegative())) {
-            row = row - 1;
+        if (negativeAllowed && (editingMode ||  num->isNegative())) {
             wrapEditor(row == 0, row, num->isNegative() ? '-' : '+', buffer, bufferSize);
-		}
+            editPosition = 1;
+        }
 
-		row = row - 1;
-
-		for (int i = num->decimalPointIndex(); i < numParts; i++) {
+        for (int i = num->decimalPointIndex(); i < numParts; i++) {
 			char txtVal = num->getDigit(i) + '0';
 			hadNonZero |= txtVal != '0';
             bool lastDigit = i == (numParts - 1);
 			if (hadNonZero || editingMode || lastDigit) {
-				wrapEditor(row == editPosition, row + 1, txtVal, buffer, bufferSize);
+				wrapEditor(row == editPosition, row, txtVal, buffer, bufferSize);
 			}
 			editPosition++;
 		}
+
 		if(num->decimalPointIndex() != 0) appendChar(buffer, '.', bufferSize);
 
 		for (int i = 0; i < num->decimalPointIndex(); i++) {
 			char txtVal = num->getDigit(i) + '0';
-			wrapEditor(row == editPosition, row + 2, txtVal, buffer, bufferSize);
+			wrapEditor(row == editPosition, row + 1, txtVal, buffer, bufferSize);
 			editPosition++;
 		}
 		return true;

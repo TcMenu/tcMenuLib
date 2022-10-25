@@ -75,7 +75,7 @@ namespace tcgfx {
             setChanged(true);
         }
 
-        const char *getTitleHeaderPgm() {
+        const char *getTitleHeaderPgm() const {
             return (titleOverridePgm != nullptr) ? titleOverridePgm : titleHeaderPgm;
         }
 
@@ -83,7 +83,7 @@ namespace tcgfx {
             callback = titleCb;
         }
 
-        MenuCallbackFn getCallback() {
+        MenuCallbackFn getCallback() const {
             return callback;
         }
     };

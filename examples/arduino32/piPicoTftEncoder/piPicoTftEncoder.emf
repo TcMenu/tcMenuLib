@@ -107,6 +107,87 @@
       }
     },
     {
+      "parentId": 4,
+      "type": "textItem",
+      "defaultValue": "hello",
+      "item": {
+        "textLength": 10,
+        "itemType": "PLAIN_TEXT",
+        "name": "Text",
+        "variableName": "SettingsText",
+        "id": 13,
+        "eepromAddress": 9,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "textItem",
+      "defaultValue": "192.168.0.33",
+      "item": {
+        "textLength": 5,
+        "itemType": "IP_ADDRESS",
+        "name": "IP",
+        "variableName": "SettingsIP",
+        "id": 14,
+        "eepromAddress": 19,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "rgbItem",
+      "defaultValue": "#000000FF",
+      "item": {
+        "includeAlphaChannel": false,
+        "name": "RGB",
+        "variableName": "SettingsRGB",
+        "id": 15,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "largeNumItem",
+      "defaultValue": "100.500",
+      "item": {
+        "digitsAllowed": 8,
+        "decimalPlaces": 3,
+        "negativeAllowed": false,
+        "name": "LargeNum",
+        "variableName": "SettingsLargeNum",
+        "id": 16,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "largeNumItem",
+      "defaultValue": "0",
+      "item": {
+        "digitsAllowed": 8,
+        "decimalPlaces": 0,
+        "negativeAllowed": true,
+        "name": "NLge",
+        "variableName": "SettingsNlge",
+        "id": 18,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
       "parentId": 0,
       "type": "subMenu",
       "item": {
@@ -174,7 +255,6 @@
     {
       "parentId": 7,
       "type": "actionMenu",
-      "defaultValue": "false",
       "item": {
         "name": "Restart",
         "variableName": "StatusRestart",
@@ -189,13 +269,27 @@
     {
       "parentId": 0,
       "type": "actionMenu",
-      "defaultValue": "false",
       "item": {
         "name": "Dialogs",
         "variableName": "Dialogs",
         "id": 12,
         "eepromAddress": -1,
         "functionName": "onShowDialogs",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "runtimeList",
+      "item": {
+        "initialRows": 0,
+        "name": "Root List",
+        "variableName": "RootList",
+        "id": 17,
+        "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true
@@ -256,7 +350,7 @@
       },
       {
         "name": "ENCODER_PIN_OK",
-        "latestValue": "1",
+        "latestValue": "21",
         "subsystem": "INPUT"
       },
       {

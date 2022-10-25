@@ -17,7 +17,7 @@ menuid_t nextRandomId() {
 }
 
 RuntimeMenuItem::RuntimeMenuItem(MenuType menuType, menuid_t id, RuntimeRenderingFn renderFn,
-	uint8_t itemPosition, uint8_t numberOfRows, MenuItem* next)	: MenuItem(menuType, NULL, next, false) {
+	uint8_t itemPosition, uint8_t numberOfRows, MenuItem* next)	: MenuItem(menuType, nullptr, next, false) {
 	this->id = id;
 	this->noOfParts = numberOfRows;
 	this->renderFn = renderFn;
@@ -96,7 +96,7 @@ void wrapForEdit(int val, int idx, uint8_t row, char* buffer, int bufferSize, bo
 
 int ipAddressRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
 	if (item->getMenuType() != MENUTYPE_IPADDRESS) return 0;
-	IpAddressMenuItem* ipItem = reinterpret_cast<IpAddressMenuItem*>(item);
+	auto ipItem = reinterpret_cast<IpAddressMenuItem*>(item);
 
 	switch (mode) {
 	case RENDERFN_VALUE: {
@@ -172,16 +172,26 @@ int timeItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char
 		return true;
 	}
     case RENDERFN_GETRANGE: {
-		if(idx == 0) return 23;
-        else if(idx == 1 || idx == 2) return 59;
-        else if(idx == 3) return 99;
-        else return true;		
+		if(idx == 0) {
+            return 23;
+        } else if(idx == 1 || idx == 2) {
+            return 59;
+        } else if(idx == 3) {
+            return 99;
+        } else {
+            return true;
+        }
     }
     case RENDERFN_GETPART: {
-		if(idx == 0) return data.hours;
-        else if(idx==1) return data.minutes;
-        else if(idx==2) return data.seconds;
-        else return data.hundreds;
+		if(idx == 0) {
+            return data.hours;
+        } else if(idx==1) {
+            return data.minutes;
+        } else if(idx==2) {
+            return data.seconds;
+        } else {
+            return data.hundreds;
+        }
 	}
 
 	case RENDERFN_SET_VALUE: {
@@ -367,7 +377,7 @@ TextMenuItem::TextMenuItem(RuntimeRenderingFn customRenderFn, menuid_t id, int s
 
 }
 
-TextMenuItem::TextMenuItem(RuntimeRenderingFn customRenderFn, menuid_t id, int size, const char* initial, MenuItem *next)
+TextMenuItem::TextMenuItem(RuntimeRenderingFn customRenderFn, const char* initial, menuid_t id, int size, MenuItem *next)
         : EditableMultiPartMenuItem(MENUTYPE_TEXT_VALUE, id, size, customRenderFn, next) {
     data = new char[size];
     memset(data, 0, size);
@@ -385,7 +395,7 @@ IpAddressStorage::IpAddressStorage(const char *ipData) {
 			appendChar(part, *ipData, sizeof(part));
 			ipData++;
 		}
-		serlogF3(SER_TCMENU_DEBUG, "IpPart", getId(), part);
+		serlogF2(SER_TCMENU_DEBUG, "IpPart", part);
 		setPart(currPart, atoi(part));
 		currPart++;
 		if(*ipData) ipData++;
@@ -445,7 +455,7 @@ TimeFormattedMenuItem::TimeFormattedMenuItem(RuntimeRenderingFn renderFn, menuid
     this->format = format;
 }
 
-TimeFormattedMenuItem::TimeFormattedMenuItem(RuntimeRenderingFn renderFn, menuid_t id, MultiEditWireType format, const TimeStorage& initial, MenuItem *next)
+TimeFormattedMenuItem::TimeFormattedMenuItem(RuntimeRenderingFn renderFn, const TimeStorage& initial, menuid_t id, MultiEditWireType format, MenuItem *next)
         : EditableMultiPartMenuItem(MENUTYPE_TIME, id, format == EDITMODE_TIME_HUNDREDS_24H ? 4 : 3, renderFn, next) {
     setTime(initial);
     this->format = format;
@@ -468,7 +478,7 @@ int EditableMultiPartMenuItem::changeEditBy(int amt) {
     itemPosition += amt;
     setChanged(true);
     setSendRemoteNeededAll();
-    return renderFn(this, itemPosition, RENDERFN_GETRANGE, NULL, 0);
+    return renderFn(this, itemPosition, RENDERFN_GETRANGE, nullptr, 0);
 }
 
 int EditableMultiPartMenuItem::previousPart() {

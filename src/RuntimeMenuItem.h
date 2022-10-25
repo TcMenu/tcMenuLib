@@ -239,7 +239,7 @@ private:
     bool passwordField;
 public:
     TextMenuItem(RuntimeRenderingFn customRenderFn, menuid_t id, int size, MenuItem* next = nullptr);
-    TextMenuItem(RuntimeRenderingFn customRenderFn, menuid_t id, int size, const char* initial, MenuItem* next = nullptr);
+    TextMenuItem(RuntimeRenderingFn customRenderFn, const char* initial, menuid_t id, int size, MenuItem* next = nullptr);
 
     void setPasswordField(bool pwd) {
         this->passwordField = pwd;
@@ -324,7 +324,7 @@ public:
      * @param ipParts a 4 digit IP address as a constant array
      * @param next optional pointer to next item
      */
-    IpAddressMenuItem(RuntimeRenderingFn renderFn, menuid_t id, const IpAddressStorage& initialIp, MenuItem* next = nullptr)
+    IpAddressMenuItem(RuntimeRenderingFn renderFn, const IpAddressStorage& initialIp, menuid_t id, MenuItem* next = nullptr)
 		: EditableMultiPartMenuItem(MENUTYPE_IPADDRESS, id, 4, renderFn, next), data(initialIp) {}
 
 	void setIpAddress(const char* source);
@@ -402,7 +402,7 @@ private:
     TimeStorage data;
 public:
     TimeFormattedMenuItem(RuntimeRenderingFn renderFn, menuid_t id, MultiEditWireType format, MenuItem* next = nullptr);
-    TimeFormattedMenuItem(RuntimeRenderingFn renderFn, menuid_t id, MultiEditWireType format, const TimeStorage& initial,  MenuItem* next = nullptr);
+    TimeFormattedMenuItem(RuntimeRenderingFn renderFn, const TimeStorage& initial, menuid_t id, MultiEditWireType format, MenuItem* next = nullptr);
 
 
 	/** gets the time as four separate bytes */
@@ -436,7 +436,7 @@ public:
     DateFormattedMenuItem(RuntimeRenderingFn renderFn, menuid_t id, MenuItem* next = nullptr)
             : EditableMultiPartMenuItem(MENUTYPE_DATE, id, 3, renderFn, next), data(1, 1, 2020) {}
 
-    DateFormattedMenuItem(RuntimeRenderingFn renderFn, menuid_t id, const DateStorage& initial, MenuItem* next = nullptr)
+    DateFormattedMenuItem(RuntimeRenderingFn renderFn, const DateStorage& initial, menuid_t id, MenuItem* next = nullptr)
             : EditableMultiPartMenuItem(MENUTYPE_DATE, id, 3, renderFn, next), data(initial) {}
 
     /**

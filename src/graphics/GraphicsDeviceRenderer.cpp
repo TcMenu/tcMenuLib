@@ -100,7 +100,7 @@ namespace tcgfx {
         return (pItem->isEditing() || pItem->isActive()) && mt != MENUTYPE_TITLE_ITEM && mt != MENUTYPE_BACK_VALUE;
     }
 
-    int GraphicsDeviceRenderer::calculateSpaceBetween(const void* font, const char* buffer, int start, int end) {
+    int GraphicsDeviceRenderer::calculateSpaceBetween(const void* font, uint8_t mag, const char* buffer, int start, int end) {
         int bufferLen = (int)strlen(buffer);
         int pos = start;
         size_t idx = 0;
@@ -111,7 +111,7 @@ namespace tcgfx {
             idx++;
         }
         sz[idx] = 0;
-        auto extents = drawable->textExtents(font, 1, sz);
+        auto extents = drawable->textExtents(font, mag, sz);
         return int(extents.x);
     }
 
@@ -145,8 +145,8 @@ namespace tcgfx {
             if(weAreEditingWithCursor) {
                 drawable->setDrawColor(propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND, true));
                 auto& hints = menuMgr.getEditorHints();
-                int startX = calculateSpaceBetween(props->getFont(), buffer, 0, hints.getStartIndex() );
-                int lenX = max(MINIMUM_CURSOR_SIZE, calculateSpaceBetween(props->getFont(), buffer, hints.getStartIndex(), hints.getEndIndex()));
+                int startX = calculateSpaceBetween(props->getFont(), props->getFontMagnification(), buffer, 0, hints.getStartIndex() );
+                int lenX = max(MINIMUM_CURSOR_SIZE, calculateSpaceBetween(props->getFont(), props->getFontMagnification(), buffer, hints.getStartIndex(), hints.getEndIndex()));
                 int whereX = min(int(width) - MINIMUM_CURSOR_SIZE, int(wh.x + startX));
                 drawable->drawBox(Coord(whereX, where.y + size.y - 1), Coord(lenX, 1), true);
                 drawable->setDrawColor(fg);

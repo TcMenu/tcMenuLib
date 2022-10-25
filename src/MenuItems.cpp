@@ -6,6 +6,7 @@
 #include "tcMenu.h"
 #include "MenuItems.h"
 #include "RuntimeMenuItem.h"
+#include "graphics/RuntimeTitleMenuItem.h"
 
 MenuItem::MenuItem(MenuType menuType, const AnyMenuInfo* menuInfo, MenuItem* next, bool infoProgmem) {
 	this->flags = 0;
@@ -354,7 +355,9 @@ void copyMenuItemValue(const MenuItem* item, char* buffer, size_t bufferSize) {
         }
     }
     else if(item->getMenuType() == MENUTYPE_TITLE_ITEM) {
-        buffer[0] = 0;
+        if(reinterpret_cast<const tcgfx::RuntimeTitleMenuItem*>(item)->getCallback() && item->isActive()) {
+            strncpy(buffer, "...", bufferSize);
+        } else buffer[0] = 0;
     }
     else if(isMenuRuntime(item)) {
         auto* rtItem = reinterpret_cast<const RuntimeMenuItem*>(item);
