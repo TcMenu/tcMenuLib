@@ -36,7 +36,7 @@ TagValueRemoteServerConnection ethernetConnection2(ethernetTransport2, ethernetI
 const PROGMEM AnyMenuInfo minfoRomChoicesSave = { "Save", 23, 0xffff, 0, onSaveValue };
 ActionMenuItem menuRomChoicesSave(&minfoRomChoicesSave, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnRomChoicesValueRtCall, textItemRenderFn, "Value", -1, NO_CALLBACK)
-TextMenuItem menuRomChoicesValue(fnRomChoicesValueRtCall, 22, 10, &menuRomChoicesSave);
+TextMenuItem menuRomChoicesValue(fnRomChoicesValueRtCall, "", 22, 10, &menuRomChoicesSave);
 extern char romSpaceNames[];
 RENDERING_CALLBACK_NAME_INVOKE(fnRomChoicesItemNumRtCall, enumItemRenderFn, "Item Num", -1, onItemChange)
 ScrollChoiceMenuItem menuRomChoicesItemNum(21, fnRomChoicesItemNumRtCall, 0, romSpaceNames, 7, 10, &menuRomChoicesValue);
@@ -61,7 +61,7 @@ ScrollChoiceMenuItem menuAdditionalNumChoices(17, fnAdditionalNumChoicesRtCall, 
 RENDERING_CALLBACK_NAME_INVOKE(fnAdditionalRomChoiceRtCall, enumItemRenderFn, "Rom Choice", 30, NO_CALLBACK)
 ScrollChoiceMenuItem menuAdditionalRomChoice(19, fnAdditionalRomChoiceRtCall, 0, 500, 10, 9, &menuAdditionalNumChoices);
 RENDERING_CALLBACK_NAME_INVOKE(fnAdditionalRGBRtCall, rgbAlphaItemRenderFn, "RGB", 34, NO_CALLBACK)
-Rgb32MenuItem menuAdditionalRGB(15, fnAdditionalRGBRtCall, true, &menuAdditionalRomChoice);
+Rgb32MenuItem menuAdditionalRGB(fnAdditionalRGBRtCall, RgbColor32(0, 0, 0, 255), 15, true, &menuAdditionalRomChoice);
 RENDERING_CALLBACK_NAME_INVOKE(fnAdditionalRtCall, backSubItemRenderFn, "Additional", -1, NO_CALLBACK)
 const PROGMEM SubMenuInfo minfoAdditional = { "Additional", 14, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackAdditional(fnAdditionalRtCall, &menuAdditionalRGB);
@@ -73,11 +73,11 @@ RemoteMenuItem menuConnectivityIoTMonitor(pgmStrConnectivityIoTMonitorText, 29, 
 const PROGMEM AnyMenuInfo minfoConnectivitySaveToEEPROM = { "Save to EEPROM", 10, 0xffff, 0, onSaveToEeprom };
 ActionMenuItem menuConnectivitySaveToEEPROM(&minfoConnectivitySaveToEEPROM, &menuConnectivityIoTMonitor);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityTextRtCall, textItemRenderFn, "Text", 16, NO_CALLBACK)
-TextMenuItem menuConnectivityText(fnConnectivityTextRtCall, 9, 10, &menuConnectivitySaveToEEPROM);
+TextMenuItem menuConnectivityText(fnConnectivityTextRtCall, "", 9, 10, &menuConnectivitySaveToEEPROM);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityIpAddressRtCall, ipAddressRenderFn, "IpAddress", 12, NO_CALLBACK)
-IpAddressMenuItem menuConnectivityIpAddress(fnConnectivityIpAddressRtCall, 7, &menuConnectivityText);
+IpAddressMenuItem menuConnectivityIpAddress(fnConnectivityIpAddressRtCall, IpAddressStorage(127, 0, 0, 1), 7, &menuConnectivityText);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityChangePinRtCall, textItemRenderFn, "Change Pin", -1, onChangePin)
-TextMenuItem menuConnectivityChangePin(fnConnectivityChangePinRtCall, 11, 15, &menuConnectivityIpAddress);
+TextMenuItem menuConnectivityChangePin(fnConnectivityChangePinRtCall, "", 11, 15, &menuConnectivityIpAddress);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NO_CALLBACK)
 const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 6, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuConnectivityChangePin);
@@ -93,7 +93,7 @@ EnumMenuItem menuFruits(&minfoFruits, 0, &menuConnectivity);
 const PROGMEM AnalogMenuInfo minfoFiths = { "Fiths", 5, 6, 200, onFiths, 0, 5, "A" };
 AnalogMenuItem menuFiths(&minfoFiths, 0, &menuFruits);
 RENDERING_CALLBACK_NAME_INVOKE(fnLargeNumRtCall, largeNumItemRenderFn, "Large Num", -1, NO_CALLBACK)
-EditableLargeNumberMenuItem menuLargeNum(fnLargeNumRtCall, 12, 8, 4, true, &menuFiths);
+EditableLargeNumberMenuItem menuLargeNum(fnLargeNumRtCall, 12, 8, 4, true, LargeFixedNumber(0U, 0U, false), &menuFiths);
 const PROGMEM AnalogMenuInfo minfoDecimalTens = { "DecimalTens", 4, 28, 1000, NO_CALLBACK, 0, 10, "V" };
 AnalogMenuItem menuDecimalTens(&minfoDecimalTens, 0, &menuLargeNum);
 const PROGMEM AnalogMenuInfo minfoInteger = { "Integer", 3, 4, 1000, onInteger, 100, 1, "" };
@@ -103,7 +103,7 @@ BooleanMenuItem menuHiddenItem(&minfoHiddenItem, false, &menuInteger);
 const PROGMEM AnalogMenuInfo minfoAnalog1 = { "Analog1", 2, 2, 255, onAnalog1, -180, 2, "dB" };
 AnalogMenuItem menuAnalog1(&minfoAnalog1, 0, &menuHiddenItem);
 RENDERING_CALLBACK_NAME_INVOKE(fnTimeRtCall, timeItemRenderFn, "Time", 8, NO_CALLBACK)
-TimeFormattedMenuItem menuTime(fnTimeRtCall, 1, (MultiEditWireType)3, &menuAnalog1);
+TimeFormattedMenuItem menuTime(fnTimeRtCall, TimeStorage(0, 0, 0, 0), 1, (MultiEditWireType)3, &menuAnalog1);
 
 void setupMenu() {
     // First we set up eeprom and authentication (if needed).

@@ -6,6 +6,7 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 100,
         "offset": 0,
@@ -25,6 +26,7 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 100,
         "offset": 0,
@@ -44,6 +46,7 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 100,
         "offset": 0,
@@ -63,6 +66,7 @@
     {
       "parentId": 0,
       "type": "enumItem",
+      "defaultValue": "0",
       "item": {
         "enumEntries": [
           "All On",
@@ -94,6 +98,7 @@
     {
       "parentId": 5,
       "type": "boolItem",
+      "defaultValue": "false",
       "item": {
         "naming": "YES_NO",
         "name": "Pwr Delay",
@@ -108,6 +113,7 @@
     {
       "parentId": 5,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 10,
         "offset": 0,
@@ -140,10 +146,11 @@
     {
       "parentId": 5,
       "type": "rgbItem",
+      "defaultValue": "#887755FF",
       "item": {
         "includeAlphaChannel": true,
         "name": "RGB",
-        "variableName": "",
+        "variableName": "RGB",
         "id": 17,
         "eepromAddress": 17,
         "readOnly": false,
@@ -168,10 +175,11 @@
     {
       "parentId": 8,
       "type": "floatItem",
+      "defaultValue": "2.2",
       "item": {
         "numDecimalPlaces": 2,
         "name": "Volts in",
-        "variableName": "",
+        "variableName": "VoltsIn",
         "id": 9,
         "eepromAddress": -1,
         "readOnly": false,
@@ -182,6 +190,7 @@
     {
       "parentId": 8,
       "type": "floatItem",
+      "defaultValue": "0.0",
       "item": {
         "numDecimalPlaces": 2,
         "name": "Current",
@@ -196,6 +205,7 @@
     {
       "parentId": 8,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 6,
         "itemType": "PLAIN_TEXT",
@@ -225,6 +235,7 @@
     {
       "parentId": 15,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 20,
         "itemType": "IP_ADDRESS",

@@ -31,23 +31,23 @@ EepromAuthenticationInfoMenuItem menuAuthenticator(pgmStrAuthenticatorText, NO_C
 const PROGMEM char pgmStrIoTMonitorText[] = { "IoT Monitor" };
 RemoteMenuItem menuIoTMonitor(pgmStrIoTMonitorText, 18, &menuAuthenticator);
 RENDERING_CALLBACK_NAME_INVOKE(fnIPRtCall, ipAddressRenderFn, "IP", 13, NO_CALLBACK)
-IpAddressMenuItem menuIP(fnIPRtCall, 16, &menuIoTMonitor);
+IpAddressMenuItem menuIP(fnIPRtCall, IpAddressStorage(127, 0, 0, 1), 16, &menuIoTMonitor);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NO_CALLBACK)
 const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 15, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuIP);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnTxtRtCall, textItemRenderFn, "Txt", -1, NO_CALLBACK)
-TextMenuItem menuTxt(fnTxtRtCall, 14, 6, NULL);
+TextMenuItem menuTxt(fnTxtRtCall, "", 14, 6, NULL);
 const PROGMEM FloatMenuInfo minfoCurrent = { "Current", 10, 0xffff, 2, NO_CALLBACK };
-FloatMenuItem menuCurrent(&minfoCurrent, &menuTxt);
+FloatMenuItem menuCurrent(&minfoCurrent, 0.0, &menuTxt);
 const PROGMEM FloatMenuInfo minfoVoltsIn = { "Volts in", 9, 0xffff, 2, NO_CALLBACK };
-FloatMenuItem menuVoltsIn(&minfoVoltsIn, &menuCurrent);
+FloatMenuItem menuVoltsIn(&minfoVoltsIn, 2.2, &menuCurrent);
 RENDERING_CALLBACK_NAME_INVOKE(fnStatusRtCall, backSubItemRenderFn, "Status", -1, NO_CALLBACK)
 const PROGMEM SubMenuInfo minfoStatus = { "Status", 8, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackStatus(fnStatusRtCall, &menuVoltsIn);
 SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuConnectivity);
 RENDERING_CALLBACK_NAME_INVOKE(fnRGBRtCall, rgbAlphaItemRenderFn, "RGB", 17, NO_CALLBACK)
-Rgb32MenuItem menuRGB(17, fnRGBRtCall, true, NULL);
+Rgb32MenuItem menuRGB(fnRGBRtCall, RgbColor32(136, 119, 85, 255), 17, true, NULL);
 const PROGMEM AnyMenuInfo minfoShutdownNow = { "Shutdown now", 11, 0xffff, 0, onPowerDownDetected };
 ActionMenuItem menuShutdownNow(&minfoShutdownNow, &menuRGB);
 const PROGMEM AnalogMenuInfo minfoDelay = { "Delay", 7, 11, 10, NO_CALLBACK, 0, 1, "S" };

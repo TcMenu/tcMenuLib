@@ -22,9 +22,9 @@ const PROGMEM AnalogMenuInfo minfoCommits = { "Commits", 7, 0xffff, 65000, NO_CA
 AnalogMenuItem menuCommits(&minfoCommits, 0, NULL);
 ScrollChoiceMenuItem menuChooseItem(8, fnChooseItemRtCall, 0, 20, &menuCommits);
 RENDERING_CALLBACK_NAME_INVOKE(fnTextRtCall, textItemRenderFn, "Text", 4, NO_CALLBACK)
-TextMenuItem menuText(fnTextRtCall, 6, 6, &menuChooseItem);
+TextMenuItem menuText(fnTextRtCall, "", 6, 6, &menuChooseItem);
 RENDERING_CALLBACK_NAME_INVOKE(fnLgeNumRtCall, largeNumItemRenderFn, "LgeNum", 10, NO_CALLBACK)
-EditableLargeNumberMenuItem menuLgeNum(fnLgeNumRtCall, 5, 8, 4, true, &menuText);
+EditableLargeNumberMenuItem menuLgeNum(fnLgeNumRtCall, 5, 8, 4, true, LargeFixedNumber(0U, 0U, false), &menuText);
 const PROGMEM BooleanMenuInfo minfoL2 = { "L2", 4, 3, 1, onLed2, NAMING_ON_OFF };
 BooleanMenuItem menuL2(&minfoL2, false, NULL);
 const PROGMEM BooleanMenuInfo minfoL1 = { "L1", 3, 2, 1, onLed1, NAMING_ON_OFF };
