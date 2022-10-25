@@ -32,27 +32,27 @@ EepromAuthenticationInfoMenuItem menuConnectivityAuthenticator(pgmStrConnectivit
 const PROGMEM char pgmStrConnectivityIoTMonitorText[] = { "IoT Monitor" };
 RemoteMenuItem menuConnectivityIoTMonitor(pgmStrConnectivityIoTMonitorText, 19, &menuConnectivityAuthenticator);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityIPAddressRtCall, ipAddressRenderFn, "IPAddress", 7, NO_CALLBACK)
-IpAddressMenuItem menuConnectivityIPAddress(fnConnectivityIPAddressRtCall, 12, &menuConnectivityIoTMonitor);
+IpAddressMenuItem menuConnectivityIPAddress(fnConnectivityIPAddressRtCall, IpAddressStorage(127, 0, 0, 1), 12, &menuConnectivityIoTMonitor);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityChangePinRtCall, textItemRenderFn, "ChangePin", -1, onChangePin)
-TextMenuItem menuConnectivityChangePin(fnConnectivityChangePinRtCall, 14, 15, &menuConnectivityIPAddress);
+TextMenuItem menuConnectivityChangePin(fnConnectivityChangePinRtCall, "", 14, 15, &menuConnectivityIPAddress);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NO_CALLBACK)
 const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 11, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuConnectivityChangePin);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsDateRtCall, dateItemRenderFn, "Date", -1, NO_CALLBACK)
-DateFormattedMenuItem menuSettingsDate(fnSettingsDateRtCall, 18, NULL);
+DateFormattedMenuItem menuSettingsDate(fnSettingsDateRtCall, DateStorage(2020, 1, 1), 18, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsTimeRtCall, timeItemRenderFn, "Time", -1, NO_CALLBACK)
-TimeFormattedMenuItem menuSettingsTime(fnSettingsTimeRtCall, 17, (MultiEditWireType)3, &menuSettingsDate);
+TimeFormattedMenuItem menuSettingsTime(fnSettingsTimeRtCall, TimeStorage(0, 0, 0, 0), 17, (MultiEditWireType)3, &menuSettingsDate);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsNum6x4RtCall, largeNumItemRenderFn, "Num6x4", -1, NO_CALLBACK)
-EditableLargeNumberMenuItem menuSettingsNum6x4(fnSettingsNum6x4RtCall, 16, 10, 4, true, &menuSettingsTime);
+EditableLargeNumberMenuItem menuSettingsNum6x4(fnSettingsNum6x4RtCall, 16, 10, 4, true, LargeFixedNumber(0U, 0U, false), &menuSettingsTime);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsPositiveIntsRtCall, largeNumItemRenderFn, "PositiveInts", -1, NO_CALLBACK)
-EditableLargeNumberMenuItem menuSettingsPositiveInts(fnSettingsPositiveIntsRtCall, 15, 9, 0, false, &menuSettingsNum6x4);
+EditableLargeNumberMenuItem menuSettingsPositiveInts(fnSettingsPositiveIntsRtCall, 15, 9, 0, false, LargeFixedNumber(0U, 0U, false), &menuSettingsNum6x4);
 const PROGMEM AnyMenuInfo minfoSettingsSaveSettings = { "Save Settings", 6, 0xffff, 0, onSaveSettings };
 ActionMenuItem menuSettingsSaveSettings(&minfoSettingsSaveSettings, &menuSettingsPositiveInts);
 const PROGMEM AnalogMenuInfo minfoSettingsPower = { "Power", 5, 5, 250, NO_CALLBACK, 0, 10, "W" };
-AnalogMenuItem menuSettingsPower(&minfoSettingsPower, 0, &menuSettingsSaveSettings);
+AnalogMenuItem menuSettingsPower(&minfoSettingsPower, 22, &menuSettingsSaveSettings);
 const PROGMEM BooleanMenuInfo minfoSettingsEnabled = { "Enabled", 4, 2, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
-BooleanMenuItem menuSettingsEnabled(&minfoSettingsEnabled, false, &menuSettingsPower);
+BooleanMenuItem menuSettingsEnabled(&minfoSettingsEnabled, true, &menuSettingsPower);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings", -1, NO_CALLBACK)
 const PROGMEM SubMenuInfo minfoSettings = { "Settings", 3, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackSettings(fnSettingsRtCall, &menuSettingsEnabled);
@@ -62,7 +62,7 @@ ActionMenuItem menuQuestionDialog(&minfoQuestionDialog, &menuSettings);
 const PROGMEM AnyMenuInfo minfoInfoDialog = { "Info Dialog", 8, 0xffff, 0, onInfoDlg };
 ActionMenuItem menuInfoDialog(&minfoInfoDialog, &menuQuestionDialog);
 RENDERING_CALLBACK_NAME_INVOKE(fnTextRtCall, textItemRenderFn, "Text", -1, NO_CALLBACK)
-TextMenuItem menuText(fnTextRtCall, 7, 10, &menuInfoDialog);
+TextMenuItem menuText(fnTextRtCall, "boo", 7, 10, &menuInfoDialog);
 const char enumStrFood_0[] PROGMEM = "Pizza";
 const char enumStrFood_1[] PROGMEM = "Pasta";
 const char enumStrFood_2[] PROGMEM = "Salad";
@@ -72,7 +72,7 @@ EnumMenuItem menuFood(&minfoFood, 0, &menuText);
 const PROGMEM AnyMenuInfo minfoTakeDisplay = { "Take Display", 1, 0xffff, 0, onTakeOverDisplay };
 ActionMenuItem menuTakeDisplay(&minfoTakeDisplay, &menuFood);
 RENDERING_CALLBACK_NAME_INVOKE(fnTimeRtCall, timeItemRenderFn, "Time", -1, NO_CALLBACK)
-TimeFormattedMenuItem menuTime(fnTimeRtCall, 13, (MultiEditWireType)3, &menuTakeDisplay);
+TimeFormattedMenuItem menuTime(fnTimeRtCall, TimeStorage(0, 0, 0, 0), 13, (MultiEditWireType)3, &menuTakeDisplay);
 
 void setupMenu() {
     // First we set up eeprom and authentication (if needed).

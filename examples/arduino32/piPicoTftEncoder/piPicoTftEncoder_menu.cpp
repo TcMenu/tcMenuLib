@@ -46,7 +46,7 @@ EditableLargeNumberMenuItem menuSettingsNlge(fnSettingsNlgeRtCall, 18, 8, 0, tru
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsLargeNumRtCall, largeNumItemRenderFn, "LargeNum", -1, NO_CALLBACK)
 EditableLargeNumberMenuItem menuSettingsLargeNum(fnSettingsLargeNumRtCall, 16, 8, 3, false, LargeFixedNumber(100U, 500U, false), &menuSettingsNlge);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRGBRtCall, rgbAlphaItemRenderFn, "RGB", -1, NO_CALLBACK)
-Rgb32MenuItem menuSettingsRGB(fnSettingsRGBRtCall, 15, RgbColor32(0, 0, 0), false, &menuSettingsLargeNum);
+Rgb32MenuItem menuSettingsRGB(fnSettingsRGBRtCall, RgbColor32(0, 0, 0), 15, false, &menuSettingsLargeNum);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsIPRtCall, ipAddressRenderFn, "IP", 19, NO_CALLBACK)
 IpAddressMenuItem menuSettingsIP(fnSettingsIPRtCall, IpAddressStorage(192, 168, 0, 33), 14, &menuSettingsRGB);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsTextRtCall, textItemRenderFn, "Text", 9, NO_CALLBACK)

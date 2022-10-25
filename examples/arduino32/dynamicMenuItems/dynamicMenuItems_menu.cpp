@@ -25,9 +25,9 @@ MenuEditingKeyListener tcMenuKeyListener('*', '#', 'A', 'B');
 
 // Global Menu Item declarations
 RENDERING_CALLBACK_NAME_INVOKE(fnIpItemRtCall, ipAddressRenderFn, "IpItem", -1, NO_CALLBACK)
-IpAddressMenuItem menuIpItem(fnIpItemRtCall, 21, NULL);
+IpAddressMenuItem menuIpItem(fnIpItemRtCall, IpAddressStorage(127, 0, 0, 1), 21, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnTextItemRtCall, textItemRenderFn, "TextItem", -1, NO_CALLBACK)
-TextMenuItem menuTextItem(fnTextItemRtCall, 20, 5, &menuIpItem);
+TextMenuItem menuTextItem(fnTextItemRtCall, "", 20, 5, &menuIpItem);
 RENDERING_CALLBACK_NAME_INVOKE(fnRuntimesRtCall, backSubItemRenderFn, "Runtimes", -1, NO_CALLBACK)
 const SubMenuInfo minfoRuntimes = { "Runtimes", 19, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackRuntimes(fnRuntimesRtCall, &menuTextItem);

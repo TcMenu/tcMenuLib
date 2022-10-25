@@ -6,6 +6,7 @@
     {
       "parentId": 0,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 10,
         "itemType": "TIME_12H",
@@ -33,6 +34,7 @@
     {
       "parentId": 0,
       "type": "enumItem",
+      "defaultValue": "0",
       "item": {
         "enumEntries": [
           "Pizza",
@@ -51,10 +53,12 @@
     {
       "parentId": 0,
       "type": "textItem",
+      "defaultValue": "boo",
       "item": {
         "textLength": 10,
         "itemType": "PLAIN_TEXT",
         "name": "Text",
+        "variableName": "Text",
         "id": 7,
         "eepromAddress": -1,
         "readOnly": true,
@@ -104,9 +108,11 @@
     {
       "parentId": 3,
       "type": "boolItem",
+      "defaultValue": "true",
       "item": {
         "naming": "TRUE_FALSE",
         "name": "Enabled",
+        "variableName": "SettingsEnabled",
         "id": 4,
         "eepromAddress": 2,
         "readOnly": false,
@@ -117,6 +123,7 @@
     {
       "parentId": 3,
       "type": "analogItem",
+      "defaultValue": "22",
       "item": {
         "maxValue": 250,
         "offset": 0,
@@ -124,6 +131,7 @@
         "unitName": "W",
         "step": 1,
         "name": "Power",
+        "variableName": "SettingsPower",
         "id": 5,
         "eepromAddress": 5,
         "readOnly": false,
@@ -147,6 +155,7 @@
     {
       "parentId": 3,
       "type": "largeNumItem",
+      "defaultValue": "0",
       "item": {
         "digitsAllowed": 9,
         "decimalPlaces": 0,
@@ -162,6 +171,7 @@
     {
       "parentId": 3,
       "type": "largeNumItem",
+      "defaultValue": "0",
       "item": {
         "digitsAllowed": 10,
         "decimalPlaces": 4,
@@ -177,6 +187,7 @@
     {
       "parentId": 3,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 10,
         "itemType": "TIME_12H",
@@ -191,6 +202,7 @@
     {
       "parentId": 3,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 10,
         "itemType": "GREGORIAN_DATE",
@@ -218,6 +230,7 @@
     {
       "parentId": 11,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 15,
         "itemType": "PLAIN_TEXT",
@@ -233,6 +246,7 @@
     {
       "parentId": 11,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 20,
         "itemType": "IP_ADDRESS",

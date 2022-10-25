@@ -6,11 +6,13 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 255,
         "offset": -128,
         "divisor": 2,
         "unitName": "V",
+        "step": 1,
         "name": "Voltage",
         "variableName": "",
         "id": 1,
@@ -24,11 +26,13 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 255,
         "offset": 0,
         "divisor": 100,
         "unitName": "A",
+        "step": 1,
         "name": "Current",
         "variableName": "",
         "id": 2,
@@ -42,6 +46,7 @@
     {
       "parentId": 0,
       "type": "enumItem",
+      "defaultValue": "0",
       "item": {
         "enumEntries": [
           "Current",
@@ -74,6 +79,7 @@
     {
       "parentId": 4,
       "type": "boolItem",
+      "defaultValue": "false",
       "item": {
         "naming": "YES_NO",
         "name": "Pwr Delay",
@@ -116,6 +122,7 @@
     {
       "parentId": 11,
       "type": "boolItem",
+      "defaultValue": "false",
       "item": {
         "naming": "ON_OFF",
         "name": "S-Circuit Protect",
@@ -143,6 +150,7 @@
     {
       "parentId": 11,
       "type": "boolItem",
+      "defaultValue": "false",
       "item": {
         "naming": "ON_OFF",
         "name": "Temp Check",
@@ -157,6 +165,7 @@
     {
       "parentId": 11,
       "type": "rgbItem",
+      "defaultValue": "#000000FF",
       "item": {
         "includeAlphaChannel": false,
         "name": "RGB",
@@ -172,6 +181,7 @@
     {
       "parentId": 11,
       "type": "boolItem",
+      "defaultValue": "false",
       "item": {
         "naming": "YES_NO",
         "name": "Show Hidden",
@@ -201,6 +211,7 @@
     {
       "parentId": 7,
       "type": "floatItem",
+      "defaultValue": "0.0",
       "item": {
         "numDecimalPlaces": 2,
         "name": "Volt A0",
@@ -215,6 +226,7 @@
     {
       "parentId": 7,
       "type": "floatItem",
+      "defaultValue": "0.0",
       "item": {
         "numDecimalPlaces": 2,
         "name": "Volt A1",
@@ -243,6 +255,7 @@
     {
       "parentId": 14,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 20,
         "itemType": "IP_ADDRESS",
@@ -300,6 +313,7 @@
     {
       "parentId": 20,
       "type": "scrollItem",
+      "defaultValue": "0-",
       "item": {
         "itemWidth": 10,
         "eepromOffset": 1024,
@@ -317,6 +331,7 @@
     {
       "parentId": 20,
       "type": "scrollItem",
+      "defaultValue": "0-",
       "item": {
         "itemWidth": 10,
         "eepromOffset": 0,
@@ -335,6 +350,7 @@
     {
       "parentId": 20,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 10,
         "itemType": "PLAIN_TEXT",
@@ -555,12 +571,13 @@
     "eepromDefinition": "at24:80:PAGESIZE_AT24C128",
     "authenticatorDefinition": "rom:100:6",
     "projectIoExpanders": [
-      "pcf8574:io8574:32:0",
+      "pcf8574:io8574:32:0:false",
       "deviceIO:"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []
     },
-    "packageNamespace": ""
+    "packageNamespace": "",
+    "appIsModular": false
   }
 }

@@ -33,7 +33,7 @@ ActionMenuItem menuTakeDisplay(&minfoTakeDisplay, NULL);
 const AnyMenuInfo minfoSaveItem = { "Save item", 23, 0xffff, 0, onSaveItem };
 ActionMenuItem menuSaveItem(&minfoSaveItem, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnRomTextRtCall, textItemRenderFn, "Rom Text", -1, NO_CALLBACK)
-TextMenuItem menuRomText(fnRomTextRtCall, 21, 10, &menuSaveItem);
+TextMenuItem menuRomText(fnRomTextRtCall, "", 21, 10, &menuSaveItem);
 ScrollChoiceMenuItem menuRomLocation(24, fnRomLocationRtCall, 0, 10, &menuRomText);
 RENDERING_CALLBACK_NAME_INVOKE(fnRomChoiceRtCall, enumItemRenderFn, "Rom Choice", 14, NO_CALLBACK)
 ScrollChoiceMenuItem menuRomChoice(25, fnRomChoiceRtCall, 0, 1024, 10, 10, &menuRomLocation);
@@ -46,7 +46,7 @@ RemoteMenuItem menuIoTMonitor(pgmStrIoTMonitorText, 29, NULL);
 const char pgmStrAuthenticatorText[] = { "Authenticator" };
 EepromAuthenticationInfoMenuItem menuAuthenticator(pgmStrAuthenticatorText, NO_CALLBACK, 28, &menuIoTMonitor);
 RENDERING_CALLBACK_NAME_INVOKE(fnIpAddressRtCall, ipAddressRenderFn, "Ip Address", 10, NO_CALLBACK)
-IpAddressMenuItem menuIpAddress(fnIpAddressRtCall, 15, &menuAuthenticator);
+IpAddressMenuItem menuIpAddress(fnIpAddressRtCall, IpAddressStorage(127, 0, 0, 1), 15, &menuAuthenticator);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NO_CALLBACK)
 const SubMenuInfo minfoConnectivity = { "Connectivity", 14, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuIpAddress);
@@ -62,7 +62,7 @@ SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuConnectivity);
 const BooleanMenuInfo minfoShowHidden = { "Show Hidden", 30, 0xffff, 1, onShowHidden, NAMING_YES_NO };
 BooleanMenuItem menuShowHidden(&minfoShowHidden, false, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnRGBRtCall, rgbAlphaItemRenderFn, "RGB", 16, onRgbChanged)
-Rgb32MenuItem menuRGB(26, fnRGBRtCall, false, RgbColor32(0, 0, 0), &menuShowHidden);
+Rgb32MenuItem menuRGB(fnRGBRtCall, RgbColor32(0, 0, 0), 26, false, &menuShowHidden);
 const BooleanMenuInfo minfoTempCheck = { "Temp Check", 13, 9, 1, NO_CALLBACK, NAMING_ON_OFF };
 BooleanMenuItem menuTempCheck(&minfoTempCheck, false, &menuRGB);
 const AnyMenuInfo minfoHiddenItem = { "Hidden item", 16, 0xffff, 0, NO_CALLBACK };

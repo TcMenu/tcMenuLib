@@ -6,7 +6,6 @@
     {
       "parentId": 0,
       "type": "actionMenu",
-      "defaultValue": "false",
       "item": {
         "name": "Instructions",
         "variableName": "Instructions",
@@ -21,7 +20,6 @@
     {
       "parentId": 0,
       "type": "actionMenu",
-      "defaultValue": "false",
       "item": {
         "name": "Start Game",
         "variableName": "StartGame",
@@ -107,7 +105,6 @@
     {
       "parentId": 4,
       "type": "actionMenu",
-      "defaultValue": "false",
       "item": {
         "name": "Save All",
         "variableName": "SettingsSaveAll",
