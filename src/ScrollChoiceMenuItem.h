@@ -187,7 +187,7 @@ public:
      * @param initial the initial value
      * @param next optional pointer to the next menu item
      */
-    Rgb32MenuItem(RuntimeRenderingFn renderFn, uint16_t id, const RgbColor32& col, bool includeAlpha, MenuItem *next = nullptr);
+    Rgb32MenuItem(RuntimeRenderingFn renderFn, const RgbColor32& col, uint16_t id, bool includeAlpha, MenuItem *next = nullptr);
 
     /**
      * Creates a color data menu item that can be edited, optionally including an alpha channel

@@ -126,7 +126,7 @@ Rgb32MenuItem::Rgb32MenuItem(uint16_t id, RuntimeRenderingFn renderFn, bool incl
     if (!alphaChannel) data.alpha = 255;
 }
 
-Rgb32MenuItem::Rgb32MenuItem(RuntimeRenderingFn renderFn, uint16_t id, const RgbColor32& col, bool includeAlpha, MenuItem *next)
+Rgb32MenuItem::Rgb32MenuItem(RuntimeRenderingFn renderFn, const RgbColor32& col, uint16_t id, bool includeAlpha, MenuItem *next)
         : EditableMultiPartMenuItem(MENUTYPE_COLOR_VALUE, id, includeAlpha ? 4 : 3, renderFn, next) {
     alphaChannel = includeAlpha;
     data = col;
