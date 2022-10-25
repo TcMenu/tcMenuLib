@@ -135,7 +135,7 @@
       },
       {
         "name": "I2C_ADDRESS",
-        "latestValue": "0x27",
+        "latestValue": "0x47",
         "subsystem": "DISPLAY"
       },
       {

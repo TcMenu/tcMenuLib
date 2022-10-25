@@ -6,6 +6,7 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 1000,
         "offset": 0,
@@ -25,6 +26,7 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 255,
         "offset": 0,
@@ -43,6 +45,7 @@
     {
       "parentId": 0,
       "type": "largeNumItem",
+      "defaultValue": "0",
       "item": {
         "digitsAllowed": 9,
         "decimalPlaces": 3,
@@ -74,6 +77,7 @@
     {
       "parentId": 4,
       "type": "enumItem",
+      "defaultValue": "0",
       "item": {
         "enumEntries": [
           "Pizza",
@@ -92,6 +96,7 @@
     {
       "parentId": 4,
       "type": "boolItem",
+      "defaultValue": "false",
       "item": {
         "naming": "YES_NO",
         "name": "Toppings",
@@ -106,6 +111,7 @@
     {
       "parentId": 4,
       "type": "boolItem",
+      "defaultValue": "false",
       "item": {
         "naming": "ON_OFF",
         "name": "Power",
@@ -134,6 +140,7 @@
     {
       "parentId": 4,
       "type": "floatItem",
+      "defaultValue": "0.0",
       "item": {
         "numDecimalPlaces": 2,
         "name": "Number",
@@ -148,6 +155,7 @@
     {
       "parentId": 4,
       "type": "scrollItem",
+      "defaultValue": "0-",
       "item": {
         "itemWidth": 10,
         "eepromOffset": 0,
@@ -180,6 +188,7 @@
     {
       "parentId": 11,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 5,
         "itemType": "PLAIN_TEXT",
@@ -236,6 +245,7 @@
     {
       "parentId": 0,
       "type": "enumItem",
+      "defaultValue": "0",
       "item": {
         "enumEntries": [
           "1x",

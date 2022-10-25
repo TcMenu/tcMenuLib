@@ -38,7 +38,7 @@ const char pgmStrRuntimesIoTMonitorText[] = { "IoT Monitor" };
 RemoteMenuItem menuRuntimesIoTMonitor(pgmStrRuntimesIoTMonitorText, 14, &menuRuntimesAuthenticator);
 ListRuntimeMenuItem menuRuntimesCustomList(13, 0, fnRuntimesCustomListRtCall, &menuRuntimesIoTMonitor);
 RENDERING_CALLBACK_NAME_INVOKE(fnRuntimesTextRtCall, textItemRenderFn, "Text", 18, NO_CALLBACK)
-TextMenuItem menuRuntimesText(fnRuntimesTextRtCall, 12, 5, &menuRuntimesCustomList);
+TextMenuItem menuRuntimesText(fnRuntimesTextRtCall, "", 12, 5, &menuRuntimesCustomList);
 RENDERING_CALLBACK_NAME_INVOKE(fnRuntimesRtCall, backSubItemRenderFn, "Runtimes", -1, NO_CALLBACK)
 const SubMenuInfo minfoRuntimes = { "Runtimes", 11, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackRuntimes(fnRuntimesRtCall, &menuRuntimesText);
@@ -47,7 +47,7 @@ extern char ramDataSet[];
 RENDERING_CALLBACK_NAME_INVOKE(fnMoreItemsScrollRtCall, enumItemRenderFn, "Scroll", -1, NO_CALLBACK)
 ScrollChoiceMenuItem menuMoreItemsScroll(10, fnMoreItemsScrollRtCall, 0, ramDataSet, 10, 5, NULL);
 const FloatMenuInfo minfoMoreItemsNumber = { "Number", 9, 0xffff, 2, NO_CALLBACK };
-FloatMenuItem menuMoreItemsNumber(&minfoMoreItemsNumber, &menuMoreItemsScroll);
+FloatMenuItem menuMoreItemsNumber(&minfoMoreItemsNumber, 0.0, &menuMoreItemsScroll);
 const AnyMenuInfo minfoMoreItemsPressMe = { "Save", 8, 0xffff, 0, saveWasPressed };
 ActionMenuItem menuMoreItemsPressMe(&minfoMoreItemsPressMe, &menuMoreItemsNumber);
 const BooleanMenuInfo minfoMoreItemsPower = { "Power", 7, 17, 1, NO_CALLBACK, NAMING_ON_OFF };
@@ -65,7 +65,7 @@ const SubMenuInfo minfoMoreItems = { "More Items", 4, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackMoreItems(fnMoreItemsRtCall, &menuMoreItemsOptions);
 SubMenuItem menuMoreItems(&minfoMoreItems, &menuBackMoreItems, &menuRuntimes);
 RENDERING_CALLBACK_NAME_INVOKE(fnLgeNumRtCall, largeNumItemRenderFn, "Lge Num", 6, largeNumDidChange)
-EditableLargeNumberMenuItem menuLgeNum(fnLgeNumRtCall, 3, 9, 3, true, &menuMoreItems);
+EditableLargeNumberMenuItem menuLgeNum(fnLgeNumRtCall, 3, 9, 3, true, LargeFixedNumber(0U, 0U, false), &menuMoreItems);
 const AnalogMenuInfo minfoHalves = { "Halves", 2, 4, 255, NO_CALLBACK, 0, 2, "dB" };
 AnalogMenuItem menuHalves(&minfoHalves, 0, &menuLgeNum);
 const AnalogMenuInfo minfoDecimal = { "Decimal", 1, 2, 1000, decimalDidChange, 0, 10, "d" };

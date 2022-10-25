@@ -6,11 +6,13 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 10,
         "offset": 0,
         "divisor": 1,
         "unitName": "",
+        "step": 1,
         "name": "Toaster power",
         "variableName": "",
         "id": 1,
@@ -23,6 +25,7 @@
     {
       "parentId": 0,
       "type": "enumItem",
+      "defaultValue": "0",
       "item": {
         "enumEntries": [
           "Bread",
@@ -41,6 +44,7 @@
     {
       "parentId": 0,
       "type": "boolItem",
+      "defaultValue": "false",
       "item": {
         "naming": "YES_NO",
         "name": "Frozen",
@@ -83,6 +87,7 @@
     {
       "parentId": 5,
       "type": "boolItem",
+      "defaultValue": "false",
       "item": {
         "naming": "TRUE_FALSE",
         "name": "Safety lock",
@@ -97,6 +102,7 @@
     {
       "parentId": 5,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 5,
         "itemType": "PLAIN_TEXT",
@@ -113,6 +119,7 @@
     {
       "parentId": 5,
       "type": "largeNumItem",
+      "defaultValue": "0",
       "item": {
         "digitsAllowed": 8,
         "decimalPlaces": 0,
@@ -204,13 +211,8 @@
         "subsystem": "DISPLAY"
       },
       {
-        "name": "PULLUP_LOGIC",
-        "latestValue": "true",
-        "subsystem": "INPUT"
-      },
-      {
-        "name": "INTERRUPT_SWITCHES",
-        "latestValue": "false",
+        "name": "SW_POLLING_MODE",
+        "latestValue": "SWITCHES_POLL_EVERYTHING",
         "subsystem": "INPUT"
       },
       {
@@ -241,6 +243,11 @@
       {
         "name": "ENCODER_NEXT_PIN",
         "latestValue": "-1",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "PULLUP_LOGIC",
+        "latestValue": "true",
         "subsystem": "INPUT"
       },
       {
@@ -281,6 +288,11 @@
     "authenticatorDefinition": "",
     "projectIoExpanders": [
       "deviceIO:"
-    ]
+    ],
+    "menuInMenuCollection": {
+      "menuDefinitions": []
+    },
+    "packageNamespace": "",
+    "appIsModular": false
   }
 }

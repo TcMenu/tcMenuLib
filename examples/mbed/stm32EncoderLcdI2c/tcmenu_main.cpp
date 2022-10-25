@@ -4,16 +4,13 @@
 //
 // Set up the logging support in IoAbstraction. For mbed we rely on an MBedLogger being created.
 //
-#ifdef BUILD_FOR_MBED_6
 BufferedSerial serPort(USBTX, USBRX);
-#else
-Serial serPort(USBTX, USBRX);
-#endif
 MBedLogger LoggingPort(serPort);
 
-I2C i2cDisplay(PF_0, PF_1);
+I2C i2cDisplay(PB_9, PB_8);
 
 void setup() {
+    serPort.set_baud(115200);
     serdebugF("LCD mbed is starting");
     setupMenu();
 }
