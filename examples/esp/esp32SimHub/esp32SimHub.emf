@@ -6,11 +6,13 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 1000,
         "offset": 0,
         "divisor": 1,
         "unitName": "",
+        "step": 1,
         "name": "Speed",
         "variableName": "",
         "id": 1,
@@ -23,11 +25,13 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 32000,
         "offset": 0,
         "divisor": 1,
         "unitName": "",
+        "step": 1,
         "name": "RPM",
         "variableName": "",
         "id": 2,
@@ -40,6 +44,7 @@
     {
       "parentId": 0,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 2,
         "itemType": "PLAIN_TEXT",
@@ -56,11 +61,13 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 255,
         "offset": 0,
         "divisor": 0,
         "unitName": "C",
+        "step": 1,
         "name": "Tyre Temp",
         "variableName": "",
         "id": 7,
@@ -74,6 +81,7 @@
     {
       "parentId": 0,
       "type": "boolItem",
+      "defaultValue": "false",
       "item": {
         "naming": "ON_OFF",
         "name": "SimHub Link",
@@ -104,11 +112,13 @@
     {
       "parentId": 4,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 255,
         "offset": -180,
         "divisor": 2,
         "unitName": "dB",
+        "step": 1,
         "name": "Test Item 1",
         "variableName": "SettingsTestItem1",
         "id": 5,
@@ -135,6 +145,7 @@
     {
       "parentId": 4,
       "type": "boolItem",
+      "defaultValue": "false",
       "item": {
         "naming": "ON_OFF",
         "name": "Overboost",
@@ -149,6 +160,7 @@
     {
       "parentId": 4,
       "type": "largeNumItem",
+      "defaultValue": "0",
       "item": {
         "digitsAllowed": 12,
         "decimalPlaces": 4,
@@ -178,6 +190,7 @@
     {
       "parentId": 4,
       "type": "largeNumItem",
+      "defaultValue": "0",
       "item": {
         "digitsAllowed": 4,
         "decimalPlaces": 1,
@@ -194,6 +207,7 @@
     {
       "parentId": 0,
       "type": "enumItem",
+      "defaultValue": "0",
       "item": {
         "enumEntries": [
           "F1 Wheel",
@@ -213,11 +227,13 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 999,
         "offset": 0,
         "divisor": 0,
         "unitName": "",
+        "step": 1,
         "name": "Lap",
         "variableName": "",
         "id": 10,
@@ -362,6 +378,11 @@
       {
         "name": "SELECT_SENSOR",
         "latestValue": "6",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "TS_KEY_REPEAT",
+        "latestValue": "20",
         "subsystem": "INPUT"
       },
       {

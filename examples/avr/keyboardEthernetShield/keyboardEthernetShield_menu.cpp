@@ -93,7 +93,7 @@ EnumMenuItem menuFruits(&minfoFruits, 0, &menuConnectivity);
 const PROGMEM AnalogMenuInfo minfoFiths = { "Fiths", 5, 6, 200, onFiths, 0, 5, "A" };
 AnalogMenuItem menuFiths(&minfoFiths, 0, &menuFruits);
 RENDERING_CALLBACK_NAME_INVOKE(fnLargeNumRtCall, largeNumItemRenderFn, "Large Num", -1, NO_CALLBACK)
-EditableLargeNumberMenuItem menuLargeNum(fnLargeNumRtCall, 12, 8, 4, true, LargeFixedNumber(0U, 0U, false), &menuFiths);
+EditableLargeNumberMenuItem menuLargeNum(fnLargeNumRtCall, LargeFixedNumber(8, 4, 0U, 0U, false), 12, true, &menuFiths);
 const PROGMEM AnalogMenuInfo minfoDecimalTens = { "DecimalTens", 4, 28, 1000, NO_CALLBACK, 0, 10, "V" };
 AnalogMenuItem menuDecimalTens(&minfoDecimalTens, 0, &menuLargeNum);
 const PROGMEM AnalogMenuInfo minfoInteger = { "Integer", 3, 4, 1000, onInteger, 100, 1, "" };

@@ -21,11 +21,11 @@ GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 
 // Global Menu Item declarations
 RENDERING_CALLBACK_NAME_INVOKE(fnNewSubMenuDateRtCall, dateItemRenderFn, "Date", -1, NO_CALLBACK)
-DateFormattedMenuItem menuNewSubMenuDate(fnNewSubMenuDateRtCall, 9, NULL);
+DateFormattedMenuItem menuNewSubMenuDate(fnNewSubMenuDateRtCall, DateStorage(1, 1, 2020), 9, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnNewSubMenuTextRtCall, textItemRenderFn, "Text", -1, NO_CALLBACK)
-TextMenuItem menuNewSubMenuText(fnNewSubMenuTextRtCall, 8, 5, &menuNewSubMenuDate);
+TextMenuItem menuNewSubMenuText(fnNewSubMenuTextRtCall, "", 8, 5, &menuNewSubMenuDate);
 RENDERING_CALLBACK_NAME_INVOKE(fnNewSubMenuColorRtCall, rgbAlphaItemRenderFn, "Color", -1, NO_CALLBACK)
-Rgb32MenuItem menuNewSubMenuColor(7, fnNewSubMenuColorRtCall, false, &menuNewSubMenuText);
+Rgb32MenuItem menuNewSubMenuColor(fnNewSubMenuColorRtCall, RgbColor32(0, 0, 0), 7, false, &menuNewSubMenuText);
 RENDERING_CALLBACK_NAME_INVOKE(fnNewSubMenuRtCall, backSubItemRenderFn, "New SubMenu", -1, NO_CALLBACK)
 const SubMenuInfo minfoNewSubMenu = { "New SubMenu", 6, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackNewSubMenu(fnNewSubMenuRtCall, &menuNewSubMenuColor);
@@ -39,7 +39,7 @@ const char* const enumStrFoods[]  = { enumStrFoods_0, enumStrFoods_1, enumStrFoo
 const EnumMenuInfo minfoFoods = { "Foods", 4, 0xffff, 2, NO_CALLBACK, enumStrFoods };
 EnumMenuItem menuFoods(&minfoFoods, 0, &menuToGo);
 RENDERING_CALLBACK_NAME_INVOKE(fnLgeNumRtCall, largeNumItemRenderFn, "Lge Num", -1, NO_CALLBACK)
-EditableLargeNumberMenuItem menuLgeNum(fnLgeNumRtCall, 3, 6, 4, true, &menuFoods);
+EditableLargeNumberMenuItem menuLgeNum(fnLgeNumRtCall, LargeFixedNumber(6, 4, 0U, 0U, false), 3, true, &menuFoods);
 const AnalogMenuInfo minfoTenths = { "Tenths", 2, 0xffff, 1000, NO_CALLBACK, 0, 10, "" };
 AnalogMenuItem menuTenths(&minfoTenths, 0, &menuLgeNum);
 const AnalogMenuInfo minfoPercent = { "Percent", 1, 0xffff, 100, NO_CALLBACK, 0, 1, "%" };

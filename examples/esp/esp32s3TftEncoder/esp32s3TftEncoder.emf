@@ -6,6 +6,7 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 100,
         "offset": 0,
@@ -24,6 +25,7 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 1000,
         "offset": 0,
@@ -42,6 +44,7 @@
     {
       "parentId": 0,
       "type": "largeNumItem",
+      "defaultValue": "0",
       "item": {
         "digitsAllowed": 6,
         "decimalPlaces": 4,
@@ -58,6 +61,7 @@
     {
       "parentId": 0,
       "type": "enumItem",
+      "defaultValue": "0",
       "item": {
         "enumEntries": [
           "Pizza",
@@ -76,6 +80,7 @@
     {
       "parentId": 0,
       "type": "boolItem",
+      "defaultValue": "false",
       "item": {
         "naming": "YES_NO",
         "name": "To go",
@@ -103,6 +108,7 @@
     {
       "parentId": 6,
       "type": "rgbItem",
+      "defaultValue": "#000000FF",
       "item": {
         "includeAlphaChannel": false,
         "name": "Color",
@@ -117,6 +123,7 @@
     {
       "parentId": 6,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 5,
         "itemType": "PLAIN_TEXT",
@@ -132,6 +139,7 @@
     {
       "parentId": 6,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 5,
         "itemType": "GREGORIAN_DATE",

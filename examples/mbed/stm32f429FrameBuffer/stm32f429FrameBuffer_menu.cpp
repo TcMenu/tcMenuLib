@@ -25,7 +25,7 @@ MenuTouchScreenManager touchScreen(&touchInterrogator, &renderer, iotouch::Touch
 const AnyMenuInfo minfoDialogs = { "Dialogs", 18, 0xffff, 0, onPresentDialog };
 ActionMenuItem menuDialogs(&minfoDialogs, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnSamplesLgePosRtCall, largeNumItemRenderFn, "LgePos", -1, NO_CALLBACK)
-EditableLargeNumberMenuItem menuSamplesLgePos(fnSamplesLgePosRtCall, 17, 7, 0, false, LargeFixedNumber(12456U, 0U, false), NULL);
+EditableLargeNumberMenuItem menuSamplesLgePos(fnSamplesLgePosRtCall, LargeFixedNumber(7, 0, 12456U, 0U, false), 17, false, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnSamplesRGBRtCall, rgbAlphaItemRenderFn, "RGB", -1, NO_CALLBACK)
 Rgb32MenuItem menuSamplesRGB(fnSamplesRGBRtCall, RgbColor32(255, 170, 187), 16, false, &menuSamplesLgePos);
 RENDERING_CALLBACK_NAME_INVOKE(fnSamplesTimeRtCall, timeItemRenderFn, "Time", -1, NO_CALLBACK)

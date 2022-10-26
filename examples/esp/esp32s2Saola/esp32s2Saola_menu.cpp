@@ -31,25 +31,25 @@ EepromAuthenticationInfoMenuItem menuConnectivityAuthenticator(pgmStrConnectivit
 const PROGMEM char pgmStrConnectivityIoTMonitorText[] = { "IoT Monitor" };
 RemoteMenuItem menuConnectivityIoTMonitor(pgmStrConnectivityIoTMonitorText, 19, &menuConnectivityAuthenticator);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityIPAddressRtCall, ipAddressRenderFn, "IP Address", -1, NO_CALLBACK)
-IpAddressMenuItem menuConnectivityIPAddress(fnConnectivityIPAddressRtCall, 15, &menuConnectivityIoTMonitor);
+IpAddressMenuItem menuConnectivityIPAddress(fnConnectivityIPAddressRtCall, IpAddressStorage(127, 0, 0, 1), 15, &menuConnectivityIoTMonitor);
 const char enumStrConnectivityWiFiMode_0[] PROGMEM = "Station";
 const char enumStrConnectivityWiFiMode_1[] PROGMEM = "Soft AP";
 const char* const enumStrConnectivityWiFiMode[] PROGMEM  = { enumStrConnectivityWiFiMode_0, enumStrConnectivityWiFiMode_1 };
 const PROGMEM EnumMenuInfo minfoConnectivityWiFiMode = { "WiFi Mode", 18, 64, 1, NO_CALLBACK, enumStrConnectivityWiFiMode };
 EnumMenuItem menuConnectivityWiFiMode(&minfoConnectivityWiFiMode, 0, &menuConnectivityIPAddress);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityPasscodeRtCall, textItemRenderFn, "Passcode", 42, NO_CALLBACK)
-TextMenuItem menuConnectivityPasscode(fnConnectivityPasscodeRtCall, 17, 22, &menuConnectivityWiFiMode);
+TextMenuItem menuConnectivityPasscode(fnConnectivityPasscodeRtCall, "", 17, 22, &menuConnectivityWiFiMode);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivitySSIDRtCall, textItemRenderFn, "SSID", 20, NO_CALLBACK)
-TextMenuItem menuConnectivitySSID(fnConnectivitySSIDRtCall, 16, 22, &menuConnectivityPasscode);
+TextMenuItem menuConnectivitySSID(fnConnectivitySSIDRtCall, "", 16, 22, &menuConnectivityPasscode);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NO_CALLBACK)
 const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 14, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuConnectivitySSID);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL);
 ListRuntimeMenuItem menuExtrasMyList(13, 0, fnExtrasMyListRtCall, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnExtrasColorRtCall, rgbAlphaItemRenderFn, "Color", 16, NO_CALLBACK)
-Rgb32MenuItem menuExtrasColor(12, fnExtrasColorRtCall, false, &menuExtrasMyList);
+Rgb32MenuItem menuExtrasColor(fnExtrasColorRtCall, RgbColor32(0, 0, 0), 12, false, &menuExtrasMyList);
 RENDERING_CALLBACK_NAME_INVOKE(fnExtrasTextRtCall, textItemRenderFn, "Text", 11, NO_CALLBACK)
-TextMenuItem menuExtrasText(fnExtrasTextRtCall, 11, 5, &menuExtrasColor);
+TextMenuItem menuExtrasText(fnExtrasTextRtCall, "", 11, 5, &menuExtrasColor);
 RENDERING_CALLBACK_NAME_INVOKE(fnExtrasRtCall, backSubItemRenderFn, "Extras", -1, NO_CALLBACK)
 const PROGMEM SubMenuInfo minfoExtras = { "Extras", 10, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackExtras(fnExtrasRtCall, &menuExtrasText);
@@ -57,9 +57,9 @@ SubMenuItem menuExtras(&minfoExtras, &menuBackExtras, &menuConnectivity);
 const PROGMEM AnyMenuInfo minfoSelectMePressMe = { "Press Me", 9, 0xffff, 0, pressMeActionRun };
 ActionMenuItem menuSelectMePressMe(&minfoSelectMePressMe, NULL);
 const PROGMEM FloatMenuInfo minfoSelectMeFloat2 = { "Float 2", 8, 0xffff, 3, NO_CALLBACK };
-FloatMenuItem menuSelectMeFloat2(&minfoSelectMeFloat2, &menuSelectMePressMe);
+FloatMenuItem menuSelectMeFloat2(&minfoSelectMeFloat2, 0.0, &menuSelectMePressMe);
 const PROGMEM FloatMenuInfo minfoSelectMeFloat1 = { "Float 1", 7, 0xffff, 3, NO_CALLBACK };
-FloatMenuItem menuSelectMeFloat1(&minfoSelectMeFloat1, &menuSelectMeFloat2);
+FloatMenuItem menuSelectMeFloat1(&minfoSelectMeFloat1, 0.0, &menuSelectMeFloat2);
 RENDERING_CALLBACK_NAME_INVOKE(fnSelectMeRtCall, backSubItemRenderFn, "Select Me", -1, NO_CALLBACK)
 const PROGMEM SubMenuInfo minfoSelectMe = { "Select Me", 6, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackSelectMe(fnSelectMeRtCall, &menuSelectMeFloat1);

@@ -65,7 +65,7 @@ const SubMenuInfo minfoMoreItems = { "More Items", 4, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackMoreItems(fnMoreItemsRtCall, &menuMoreItemsOptions);
 SubMenuItem menuMoreItems(&minfoMoreItems, &menuBackMoreItems, &menuRuntimes);
 RENDERING_CALLBACK_NAME_INVOKE(fnLgeNumRtCall, largeNumItemRenderFn, "Lge Num", 6, largeNumDidChange)
-EditableLargeNumberMenuItem menuLgeNum(fnLgeNumRtCall, 3, 9, 3, true, LargeFixedNumber(0U, 0U, false), &menuMoreItems);
+EditableLargeNumberMenuItem menuLgeNum(fnLgeNumRtCall, LargeFixedNumber(9, 3, 0U, 0U, false), 3, true, &menuMoreItems);
 const AnalogMenuInfo minfoHalves = { "Halves", 2, 4, 255, NO_CALLBACK, 0, 2, "dB" };
 AnalogMenuItem menuHalves(&minfoHalves, 0, &menuLgeNum);
 const AnalogMenuInfo minfoDecimal = { "Decimal", 1, 2, 1000, decimalDidChange, 0, 10, "d" };

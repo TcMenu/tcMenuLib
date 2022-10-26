@@ -17,8 +17,8 @@
 #include <tcMenuKeyboard.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
-#include <IoAbstraction.h>
 #include <IoAbstractionWire.h>
+#include <IoAbstraction.h>
 
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;

@@ -6,6 +6,7 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 255,
         "offset": -180,
@@ -25,6 +26,7 @@
     {
       "parentId": 0,
       "type": "scrollItem",
+      "defaultValue": "0-",
       "item": {
         "itemWidth": 16,
         "eepromOffset": 150,
@@ -43,6 +45,7 @@
     {
       "parentId": 0,
       "type": "boolItem",
+      "defaultValue": "false",
       "item": {
         "naming": "TRUE_FALSE",
         "name": "Direct",
@@ -58,6 +61,7 @@
     {
       "parentId": 0,
       "type": "boolItem",
+      "defaultValue": "false",
       "item": {
         "naming": "TRUE_FALSE",
         "name": "Mute",
@@ -101,6 +105,7 @@
     {
       "parentId": 7,
       "type": "scrollItem",
+      "defaultValue": "0-",
       "item": {
         "itemWidth": 10,
         "eepromOffset": 0,
@@ -119,6 +124,7 @@
     {
       "parentId": 7,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 20,
         "offset": -10,
@@ -137,6 +143,7 @@
     {
       "parentId": 7,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 15,
         "itemType": "PLAIN_TEXT",
@@ -167,6 +174,7 @@
     {
       "parentId": 5,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 300,
         "offset": 0,
@@ -186,6 +194,7 @@
     {
       "parentId": 5,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 600,
         "offset": 0,
@@ -233,6 +242,7 @@
     {
       "parentId": 6,
       "type": "enumItem",
+      "defaultValue": "0",
       "item": {
         "enumEntries": [
           "Warm up",
@@ -254,6 +264,7 @@
     {
       "parentId": 6,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 30000,
         "offset": -20000,
@@ -272,6 +283,7 @@
     {
       "parentId": 6,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 30000,
         "offset": -20000,
@@ -319,6 +331,7 @@
     {
       "parentId": 6,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 65535,
         "offset": -5000,
@@ -351,6 +364,7 @@
     {
       "parentId": 12,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 5,
         "itemType": "IP_ADDRESS",
@@ -366,6 +380,7 @@
     {
       "parentId": 12,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 20,
         "itemType": "PLAIN_TEXT",
@@ -381,6 +396,7 @@
     {
       "parentId": 12,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 20,
         "itemType": "PLAIN_TEXT",

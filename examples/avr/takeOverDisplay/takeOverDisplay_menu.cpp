@@ -40,13 +40,13 @@ const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 11, 0xffff, 0, N
 BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuConnectivityChangePin);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsDateRtCall, dateItemRenderFn, "Date", -1, NO_CALLBACK)
-DateFormattedMenuItem menuSettingsDate(fnSettingsDateRtCall, DateStorage(2020, 1, 1), 18, NULL);
+DateFormattedMenuItem menuSettingsDate(fnSettingsDateRtCall, DateStorage(1, 1, 2020), 18, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsTimeRtCall, timeItemRenderFn, "Time", -1, NO_CALLBACK)
 TimeFormattedMenuItem menuSettingsTime(fnSettingsTimeRtCall, TimeStorage(0, 0, 0, 0), 17, (MultiEditWireType)3, &menuSettingsDate);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsNum6x4RtCall, largeNumItemRenderFn, "Num6x4", -1, NO_CALLBACK)
-EditableLargeNumberMenuItem menuSettingsNum6x4(fnSettingsNum6x4RtCall, 16, 10, 4, true, LargeFixedNumber(0U, 0U, false), &menuSettingsTime);
+EditableLargeNumberMenuItem menuSettingsNum6x4(fnSettingsNum6x4RtCall, LargeFixedNumber(10, 4, 0U, 0U, false), 16, true, &menuSettingsTime);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsPositiveIntsRtCall, largeNumItemRenderFn, "PositiveInts", -1, NO_CALLBACK)
-EditableLargeNumberMenuItem menuSettingsPositiveInts(fnSettingsPositiveIntsRtCall, 15, 9, 0, false, LargeFixedNumber(0U, 0U, false), &menuSettingsNum6x4);
+EditableLargeNumberMenuItem menuSettingsPositiveInts(fnSettingsPositiveIntsRtCall, LargeFixedNumber(9, 0, 0U, 0U, false), 15, false, &menuSettingsNum6x4);
 const PROGMEM AnyMenuInfo minfoSettingsSaveSettings = { "Save Settings", 6, 0xffff, 0, onSaveSettings };
 ActionMenuItem menuSettingsSaveSettings(&minfoSettingsSaveSettings, &menuSettingsPositiveInts);
 const PROGMEM AnalogMenuInfo minfoSettingsPower = { "Power", 5, 5, 250, NO_CALLBACK, 0, 10, "W" };

@@ -54,7 +54,7 @@ SubMenuItem menuOther(&minfoOther, &menuBackOther, &menuConnectivity);
 RENDERING_CALLBACK_NAME_INVOKE(fnRGBRtCall, rgbAlphaItemRenderFn, "RGB", 15, NO_CALLBACK)
 Rgb32MenuItem menuRGB(fnRGBRtCall, RgbColor32(0, 0, 0, 255), 8, true, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnFrequencyRtCall, largeNumItemRenderFn, "Frequency", 7, onFrequencyChanged)
-EditableLargeNumberMenuItem menuFrequency(fnFrequencyRtCall, 7, 8, 0, true, LargeFixedNumber(0U, 0U, false), &menuRGB);
+EditableLargeNumberMenuItem menuFrequency(fnFrequencyRtCall, LargeFixedNumber(8, 0, 0U, 0U, false), 7, true, &menuRGB);
 const BooleanMenuInfo minfoPower = { "Power", 6, 6, 1, NO_CALLBACK, NAMING_ON_OFF };
 BooleanMenuItem menuPower(&minfoPower, false, &menuFrequency);
 const char enumStrFoods_0[] = "Salad";
@@ -74,7 +74,7 @@ SubMenuItem menuEditing(&minfoEditing, &menuBackEditing, &menuOther);
 RENDERING_CALLBACK_NAME_INVOKE(fnRTCTimeRtCall, timeItemRenderFn, "RTCTime", -1, NO_CALLBACK)
 TimeFormattedMenuItem menuRTCTime(fnRTCTimeRtCall, TimeStorage(0, 0, 0, 0), 2, (MultiEditWireType)3, &menuEditing);
 RENDERING_CALLBACK_NAME_INVOKE(fnRTCDateRtCall, dateItemRenderFn, "RTCDate", -1, NO_CALLBACK)
-DateFormattedMenuItem menuRTCDate(fnRTCDateRtCall, DateStorage(2020, 1, 1), 1, &menuRTCTime);
+DateFormattedMenuItem menuRTCDate(fnRTCDateRtCall, DateStorage(1, 1, 2020), 1, &menuRTCTime);
 
 void setupMenu() {
     // First we set up eeprom and authentication (if needed).

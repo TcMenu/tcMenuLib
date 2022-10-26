@@ -6,6 +6,7 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 255,
         "offset": -20,
@@ -23,6 +24,7 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 255,
         "offset": -20,
@@ -40,6 +42,7 @@
     {
       "parentId": 0,
       "type": "boolItem",
+      "defaultValue": "false",
       "item": {
         "naming": "ON_OFF",
         "name": "Electric Heater",
@@ -54,6 +57,7 @@
     {
       "parentId": 0,
       "type": "boolItem",
+      "defaultValue": "false",
       "item": {
         "naming": "YES_NO",
         "name": "Lock Door",
@@ -81,6 +85,7 @@
     {
       "parentId": 5,
       "type": "enumItem",
+      "defaultValue": "0",
       "item": {
         "enumEntries": [
           "LOW",
@@ -99,6 +104,7 @@
     {
       "parentId": 5,
       "type": "enumItem",
+      "defaultValue": "0",
       "item": {
         "enumEntries": [
           "NARROW",
@@ -130,6 +136,7 @@
     {
       "parentId": 5,
       "type": "boolItem",
+      "defaultValue": "false",
       "item": {
         "naming": "TRUE_FALSE",
         "name": "Secret Entry",
@@ -143,6 +150,7 @@
     {
       "parentId": 5,
       "type": "scrollItem",
+      "defaultValue": "0-",
       "item": {
         "itemWidth": 10,
         "eepromOffset": 200,
@@ -187,6 +195,7 @@
     {
       "parentId": 9,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 15,
         "itemType": "PLAIN_TEXT",
@@ -201,6 +210,7 @@
     {
       "parentId": 9,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 15,
         "itemType": "PLAIN_TEXT",
@@ -215,6 +225,7 @@
     {
       "parentId": 9,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 20,
         "itemType": "IP_ADDRESS",
@@ -257,6 +268,7 @@
     {
       "parentId": 9,
       "type": "enumItem",
+      "defaultValue": "0",
       "item": {
         "enumEntries": [
           "Station",
@@ -436,8 +448,8 @@
     "eepromDefinition": "eeprom:",
     "authenticatorDefinition": "rom:100:6",
     "projectIoExpanders": [
-      "deviceIO:",
-      "pcf8574:io8574:32:12:false"
+      "pcf8574:io8574:32:12:false",
+      "deviceIO:"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []

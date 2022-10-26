@@ -42,9 +42,9 @@ const SubMenuInfo minfoStatus = { "Status", 7, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackStatus(fnStatusRtCall, &menuStatusAmpStatus);
 SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuDialogs);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsNlgeRtCall, largeNumItemRenderFn, "NLge", -1, NO_CALLBACK)
-EditableLargeNumberMenuItem menuSettingsNlge(fnSettingsNlgeRtCall, 18, 8, 0, true, LargeFixedNumber(0U, 0U, false), NULL);
+EditableLargeNumberMenuItem menuSettingsNlge(fnSettingsNlgeRtCall, LargeFixedNumber(8, 0, 0U, 0U, false), 18, true, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsLargeNumRtCall, largeNumItemRenderFn, "LargeNum", -1, NO_CALLBACK)
-EditableLargeNumberMenuItem menuSettingsLargeNum(fnSettingsLargeNumRtCall, 16, 8, 3, false, LargeFixedNumber(100U, 500U, false), &menuSettingsNlge);
+EditableLargeNumberMenuItem menuSettingsLargeNum(fnSettingsLargeNumRtCall, LargeFixedNumber(8, 3, 100U, 500U, false), 16, false, &menuSettingsNlge);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRGBRtCall, rgbAlphaItemRenderFn, "RGB", -1, NO_CALLBACK)
 Rgb32MenuItem menuSettingsRGB(fnSettingsRGBRtCall, RgbColor32(0, 0, 0), 15, false, &menuSettingsLargeNum);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsIPRtCall, ipAddressRenderFn, "IP", 19, NO_CALLBACK)

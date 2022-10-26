@@ -6,6 +6,7 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 100,
         "offset": 0,
@@ -24,6 +25,7 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 1000,
         "offset": 0,
@@ -42,6 +44,7 @@
     {
       "parentId": 0,
       "type": "analogItem",
+      "defaultValue": "0",
       "item": {
         "maxValue": 200,
         "offset": 0,
@@ -60,6 +63,7 @@
     {
       "parentId": 0,
       "type": "enumItem",
+      "defaultValue": "0",
       "item": {
         "enumEntries": [
           "Pizza",
@@ -79,6 +83,7 @@
     {
       "parentId": 0,
       "type": "boolItem",
+      "defaultValue": "false",
       "item": {
         "naming": "YES_NO",
         "name": "Door Open",
@@ -107,6 +112,7 @@
     {
       "parentId": 6,
       "type": "floatItem",
+      "defaultValue": "0.0",
       "item": {
         "numDecimalPlaces": 3,
         "name": "Float 1",
@@ -121,6 +127,7 @@
     {
       "parentId": 6,
       "type": "floatItem",
+      "defaultValue": "0.0",
       "item": {
         "numDecimalPlaces": 3,
         "name": "Float 2",
@@ -163,6 +170,7 @@
     {
       "parentId": 10,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 5,
         "itemType": "PLAIN_TEXT",
@@ -178,6 +186,7 @@
     {
       "parentId": 10,
       "type": "rgbItem",
+      "defaultValue": "#000000FF",
       "item": {
         "includeAlphaChannel": false,
         "name": "Color",
@@ -221,6 +230,7 @@
     {
       "parentId": 14,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 22,
         "itemType": "PLAIN_TEXT",
@@ -236,6 +246,7 @@
     {
       "parentId": 14,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 22,
         "itemType": "PLAIN_TEXT",
@@ -251,6 +262,7 @@
     {
       "parentId": 14,
       "type": "enumItem",
+      "defaultValue": "0",
       "item": {
         "enumEntries": [
           "Station",
@@ -268,6 +280,7 @@
     {
       "parentId": 14,
       "type": "textItem",
+      "defaultValue": "",
       "item": {
         "textLength": 5,
         "itemType": "IP_ADDRESS",
