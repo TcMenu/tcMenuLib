@@ -89,6 +89,12 @@ void LargeFixedNumber::setFromFloat(float value) {
     setValue(val, frc, neg);
 }
 
+LargeFixedNumber::LargeFixedNumber(int totalDigits, int decimalPointIndex, uint32_t whole, uint32_t fraction, bool negative) {
+    this->totalSize = totalDigits;
+    this->fractionDp = decimalPointIndex;
+    setValue(whole, fraction, negative);
+}
+
 void EditableLargeNumberMenuItem::setLargeNumberFromString(const char* val) {
 	int offset = 0;
 	bool negative = false;

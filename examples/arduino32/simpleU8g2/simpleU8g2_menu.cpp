@@ -20,10 +20,22 @@ U8g2Drawable gfxDrawable(&gfx, &Wire);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 
 // Global Menu Item declarations
+RENDERING_CALLBACK_NAME_INVOKE(fnExtrasDateRtCall, dateItemRenderFn, "Date", -1, NO_CALLBACK)
+DateFormattedMenuItem menuExtrasDate(fnExtrasDateRtCall, DateStorage(1, 1, 2022), 14, NULL);
+RENDERING_CALLBACK_NAME_INVOKE(fnExtrasTimeRtCall, timeItemRenderFn, "Time", -1, NO_CALLBACK)
+TimeFormattedMenuItem menuExtrasTime(fnExtrasTimeRtCall, TimeStorage(14, 00, 00, 0), 13, (MultiEditWireType)2, &menuExtrasDate);
+RENDERING_CALLBACK_NAME_INVOKE(fnExtrasIpRtCall, ipAddressRenderFn, "Ip", -1, NO_CALLBACK)
+IpAddressMenuItem menuExtrasIp(fnExtrasIpRtCall, IpAddressStorage(192, 168, 0, 0), 12, &menuExtrasTime);
+RENDERING_CALLBACK_NAME_INVOKE(fnExtrasRGBRtCall, rgbAlphaItemRenderFn, "RGB", -1, NO_CALLBACK)
+Rgb32MenuItem menuExtrasRGB(fnExtrasRGBRtCall, RgbColor32(221, 85, 238), 11, false, &menuExtrasIp);
+RENDERING_CALLBACK_NAME_INVOKE(fnExtrasRtCall, backSubItemRenderFn, "Extras", -1, NO_CALLBACK)
+const PROGMEM SubMenuInfo minfoExtras = { "Extras", 10, 0xffff, 0, NO_CALLBACK };
+BackMenuItem menuBackExtras(fnExtrasRtCall, &menuExtrasRGB);
+SubMenuItem menuExtras(&minfoExtras, &menuBackExtras, NULL);
 const PROGMEM AnyMenuInfo minfoSettingsSaveSettings = { "SaveSettings", 9, 0xffff, 0, onSaveSettings };
 ActionMenuItem menuSettingsSaveSettings(&minfoSettingsSaveSettings, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsSerialNumberRtCall, largeNumItemRenderFn, "Serial Number", 7, NO_CALLBACK)
-EditableLargeNumberMenuItem menuSettingsSerialNumber(fnSettingsSerialNumberRtCall, 8, 8, 0, true, LargeFixedNumber(0U, 0U, false), &menuSettingsSaveSettings);
+EditableLargeNumberMenuItem menuSettingsSerialNumber(fnSettingsSerialNumberRtCall, LargeFixedNumber(8, 0, 0U, 0U, false), 8, true, &menuSettingsSaveSettings);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsUserNameRtCall, textItemRenderFn, "User Name", 16, onNameChanged)
 TextMenuItem menuSettingsUserName(fnSettingsUserNameRtCall, "", 7, 5, &menuSettingsSerialNumber);
 const PROGMEM BooleanMenuInfo minfoSettingsSafetyLock = { "Safety lock", 6, 15, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
@@ -31,7 +43,7 @@ BooleanMenuItem menuSettingsSafetyLock(&minfoSettingsSafetyLock, false, &menuSet
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings", -1, NO_CALLBACK)
 const PROGMEM SubMenuInfo minfoSettings = { "Settings", 5, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackSettings(fnSettingsRtCall, &menuSettingsSafetyLock);
-SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, NULL);
+SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, &menuExtras);
 const PROGMEM AnyMenuInfo minfoStartToasting = { "Start toasting", 4, 0xffff, 0, onStartToasting };
 ActionMenuItem menuStartToasting(&minfoStartToasting, &menuSettings);
 const PROGMEM BooleanMenuInfo minfoFrozen = { "Frozen", 3, 6, 1, NO_CALLBACK, NAMING_YES_NO };

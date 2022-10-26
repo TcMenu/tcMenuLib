@@ -15,6 +15,7 @@
 #include <tcMenu.h>
 #include "tcMenuU8g2.h"
 #include <RuntimeMenuItem.h>
+#include <ScrollChoiceMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
 #include <IoAbstraction.h>
 #include <ArduinoEEPROMAbstraction.h>
@@ -28,6 +29,12 @@ extern GraphicsDeviceRenderer renderer;
 
 
 // Global Menu Item exports
+extern DateFormattedMenuItem menuExtrasDate;
+extern TimeFormattedMenuItem menuExtrasTime;
+extern IpAddressMenuItem menuExtrasIp;
+extern Rgb32MenuItem menuExtrasRGB;
+extern BackMenuItem menuBackExtras;
+extern SubMenuItem menuExtras;
 extern ActionMenuItem menuSettingsSaveSettings;
 extern EditableLargeNumberMenuItem menuSettingsSerialNumber;
 extern TextMenuItem menuSettingsUserName;

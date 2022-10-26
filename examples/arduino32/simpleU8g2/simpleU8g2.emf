@@ -146,6 +146,83 @@
         "localOnly": false,
         "visible": true
       }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "Extras",
+        "variableName": "Extras",
+        "id": 10,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 10,
+      "type": "rgbItem",
+      "defaultValue": "#DD55EEFF",
+      "item": {
+        "includeAlphaChannel": false,
+        "name": "RGB",
+        "variableName": "ExtrasRGB",
+        "id": 11,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 10,
+      "type": "textItem",
+      "defaultValue": "192.168.0.0",
+      "item": {
+        "textLength": 5,
+        "itemType": "IP_ADDRESS",
+        "name": "Ip",
+        "variableName": "ExtrasIp",
+        "id": 12,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 10,
+      "type": "textItem",
+      "defaultValue": "14:00:00",
+      "item": {
+        "textLength": 5,
+        "itemType": "TIME_24H",
+        "name": "Time",
+        "variableName": "ExtrasTime",
+        "id": 13,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 10,
+      "type": "textItem",
+      "defaultValue": "2022/1/1",
+      "item": {
+        "textLength": 5,
+        "itemType": "GREGORIAN_DATE",
+        "name": "Date",
+        "variableName": "ExtrasDate",
+        "id": 14,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
     }
   ],
   "codeOptions": {

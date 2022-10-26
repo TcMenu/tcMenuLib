@@ -8,6 +8,7 @@ color_t defaultItemPaletteMono[] = {1, 0, 1, 1};
 
 void installMonoBorderedTheme(GraphicsDeviceRenderer& bgr, const MenuFontDef& itemFont, const MenuFontDef& titleFont, bool needEditingIcons) {
     bgr.setDisplayDimensions(bgr.getDeviceDrawable()->getDisplayDimensions().x, bgr.getDeviceDrawable()->getDisplayDimensions().y);
+
     auto& factory = bgr.getGraphicsPropertiesFactory();
 
     factory.setSelectedColors(0, 1);

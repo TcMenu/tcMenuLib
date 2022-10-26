@@ -83,7 +83,7 @@ void BaseMenuRenderer::exec() {
     // finally we render the menu if none of the above are true.
 	if(dialog!=nullptr && dialog->isRenderNeeded()) {
 		dialog->dialogRendering(menuMgr.getCurrentRangeValue(), renderFnPressType);
-    } else if(dialog->isInUse()) {
+    } else if(dialog!=nullptr && dialog->isInUse()) {
         displayTakenMode = NOT_TAKEN_OVER;
         render();
     }else if(displayTakenMode == NOT_TAKEN_OVER) {

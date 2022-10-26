@@ -32,10 +32,21 @@ private:
     uint8_t fractionDp = 0;
 public:
     /**
-     * Create a default instance with decimal places set to 4 and total size 12.
+     * Create a default instance which needs to be configured before use
      */
     LargeFixedNumber() = default;
-    LargeFixedNumber(uint32_t whole, uint32_t fraction, bool negative) {setValue(whole, fraction, negative);}
+
+    /**
+     * Create a fully populated LargeFixedNumber giving the number of digits and the initial value
+     * @param totalDigits the maximum digits to use
+     * @param decimalPointIndex the number of decimal places
+     * @param whole the whole value expressed as an unsigned integer
+     * @param fraction the fractional part expressed as a unsigned integer
+     * @param negative if the value is positive or negative
+     */
+    LargeFixedNumber(int totalDigits, int decimalPointIndex, uint32_t whole, uint32_t fraction, bool negative);
+
+    LargeFixedNumber(const LargeFixedNumber& other) = default;
     LargeFixedNumber& operator=(const LargeFixedNumber& other) = default;
 
     /**
@@ -47,6 +58,11 @@ public:
 	 * @return the number of decimal places this represents.
 	 */
     int decimalPointIndex() const { return fractionDp; }
+
+    /**
+     * @return the total number of digits it can represent
+     */
+    int getTotalDigits() const { return totalSize; }
 
 	/**
 	 * Set the number of decimal places and optionally the total size then zero out any currently held value. When
@@ -167,10 +183,9 @@ private:
     LargeFixedNumber data;
     bool negativeAllowed;
 public:
-    EditableLargeNumberMenuItem(RuntimeRenderingFn renderFn, uint16_t id, int maxDigits, int dps, bool allowNeg, const LargeFixedNumber& initial, MenuItem* next = nullptr)
-            : EditableMultiPartMenuItem(MENUTYPE_LARGENUM_VALUE, id, maxDigits + (allowNeg ? 1 : 0), renderFn, next) {
+    EditableLargeNumberMenuItem(RuntimeRenderingFn renderFn, const LargeFixedNumber& initial, uint16_t id, bool allowNeg, MenuItem* next = nullptr)
+            : EditableMultiPartMenuItem(MENUTYPE_LARGENUM_VALUE, id, initial.getTotalDigits() + (allowNeg ? 1 : 0), renderFn, next) {
         data = initial;
-        data.setPrecision(dps, maxDigits);
         negativeAllowed = allowNeg;
     }
 
