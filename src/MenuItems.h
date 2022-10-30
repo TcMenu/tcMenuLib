@@ -31,7 +31,14 @@ typedef uint16_t menuid_t;
 #define INVALID_MENU_ID 0xffff
 
 /** the size of each name in program memory */
+#ifndef NAME_SIZE_T
 #define NAME_SIZE_T 20
+#endif // NAME_SIZE_T
+
+/** the size of each unit field in program memory */
+#ifndef UNIT_SIZE_T
+#define UNIT_SIZE_T 5
+#endif // NAME_SIZE_T
 
 /** the value that represents no call back */
 #define NO_CALLBACK NULL
@@ -90,7 +97,7 @@ struct AnalogMenuInfo {
 	/**
 	 * An optional unit name to be presented after the the value. For example V for volts, dB for decibel.
 	 */
-	char unitName[5];
+	char unitName[UNIT_SIZE_T];
 };
 
 /**
