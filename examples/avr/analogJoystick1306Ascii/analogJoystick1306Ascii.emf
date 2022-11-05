@@ -233,6 +233,21 @@
         "name": "JOYSTICK_X_CENTRE_VALUE",
         "latestValue": "0.5",
         "subsystem": "INPUT"
+      },
+      {
+        "name": "JOYSTICK_CUSTOM_ACCEL",
+        "latestValue": "true",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "JOYSTICK_ACCEL_INITIAL",
+        "latestValue": "550",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "JOYSTICK_ACCEL_DIVISOR",
+        "latestValue": "4",
+        "subsystem": "INPUT"
       }
     ],
     "namingRecursive": true,

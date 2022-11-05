@@ -65,8 +65,7 @@ void MenuEditingKeyListener::keyPressed(char key, bool held) {
             if (indexOfActive > numItems) return;
             MenuItem *newActive = getItemAtPosition(menuMgr.getCurrentMenu(), indexOfActive);
             if (newActive) {
-                currentActive->setActive(false);
-                newActive->setActive(true);
+                menuMgr.setItemActive(newActive);
                 serlogF2(SER_TCMENU_DEBUG, "activate item ", newActive->getId());
             }
         }

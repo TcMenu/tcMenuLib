@@ -54,6 +54,13 @@ public:
      * @param item the item that has finished editing.
      */
     virtual void menuEditEnded(MenuItem* item)=0;
+
+    /**
+     * Optionally,this method can be overridden to be told when a new item has been activated. This callback will
+     * be called after the active item is changed.
+     * @param newActive
+     */
+    virtual void activeItemHasChanged(MenuItem* newActive) {}
 };
 
 /**
@@ -356,6 +363,13 @@ public:
 	 * @param editor the new editor or NULL
 	 */
 	void setCurrentEditor(MenuItem* editor);
+
+    /**
+     * Set item to be the active item on the renderer. This also ensure any notifications are run too. It does
+     * clear any currently active item. This DOES NOT update the encoder, it is only to update the active status.
+     * @param item the item to active.
+     */
+    void setItemActive(MenuItem* item);
 
 	/**
 	 * Set the root item of either the first menu or any sub menu

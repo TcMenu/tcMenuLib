@@ -101,17 +101,26 @@ void MenuManager::valueChanged(int value) {
         reinterpret_cast<ListRuntimeMenuItem*>(menuMgr.getCurrentMenu())->setActiveIndex(value);
     }
 	else {
-        MenuItem* currentActive = menuMgr.findCurrentActive();
-        currentActive->setActive(false);
         if(renderer->getRendererType() != RENDER_TYPE_NOLOCAL) {
             serlogF2(SER_TCMENU_DEBUG, "activate item ", value);
-            currentActive = reinterpret_cast<BaseMenuRenderer*>(renderer)->getMenuItemAtIndex(getCurrentMenu(), value);
+            auto currentActive = reinterpret_cast<BaseMenuRenderer*>(renderer)->getMenuItemAtIndex(getCurrentMenu(), value);
             if(currentActive) {
-                currentActive->setActive(true);
+                setItemActive(currentActive);
                 serlogF3(SER_TCMENU_DEBUG, "Change active (V, ID) ", value, currentActive->getId());
             }
         }
 	}
+}
+
+void MenuManager::setItemActive(MenuItem* item) {
+    if(item) {
+        auto oldActive = findCurrentActive();
+        if(oldActive) oldActive->setActive(false);
+        item->setActive(true);
+        for(auto n : structureNotifier) {
+            if(n) n->activeItemHasChanged(item);
+        }
+    }
 }
 
 /**

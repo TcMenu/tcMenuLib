@@ -66,6 +66,7 @@ void setupMenu() {
             menuMgr.valueChanged(val);
         });
     reinterpret_cast<JoystickSwitchInput*>(switches.getEncoder())->setTolerance(0.5, 0.05);
+    reinterpret_cast<JoystickSwitchInput*>(switches.getEncoder())->setAccelerationParameters(550.0F, 4.0F);
     menuMgr.initWithoutInput(&renderer, &menuInstructions);
 }
 

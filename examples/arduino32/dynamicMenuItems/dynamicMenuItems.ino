@@ -21,7 +21,7 @@
 char pizzaToppings[] = {"Peperoni\0 Onions\0   Olives\0   Sweetcorn\0Mushrooms\0Peppers\0  "};
 
 //
-// We now create two menu items that we manually add to the oven menu during initialisation. We set the sub menu child
+// We now create some menu items that we manually add to the oven menu during initialisation. We set the sub menu child
 // to be the first of the two menu items, which are provided in a linked list.
 //
 BooleanMenuInfo minfoOvenFull = { "Start Oven", nextRandomId(), 0xffff, 1, NO_CALLBACK, NAMING_YES_NO};
@@ -73,6 +73,10 @@ public:
 
     void menuEditEnded(MenuItem *item) override {
         serdebugF2("Edit has completed for ID ", item->getId());
+    }
+
+    void activeItemHasChanged(MenuItem* newActive) override {
+        serdebugF2("The active item changed to ", newActive->getId())
     }
 } myMgrObserver;
 
