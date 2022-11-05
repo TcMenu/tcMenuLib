@@ -122,9 +122,13 @@ void onTitlePressed(int /*id*/) {
 void setup() {
     // If we use wire or serial, it's our responsibility to prepare it.
     Serial.begin(115200);
+    //while(!Serial);
     Wire.begin();
 
     serEnableLevel(SER_TCMENU_DEBUG, true);
+
+    // now we turn off the reset support
+    renderer.turnOffResetLogic();
 
     setupMenu();
 

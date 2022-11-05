@@ -10,6 +10,7 @@
 #include "BaseRenderers.h"
 #include "BaseDialog.h"
 #include "graphics/BaseGraphicalRenderer.h"
+#include <IoLogging.h>
 
 MenuRenderer* MenuRenderer::theInstance = nullptr;
 
@@ -38,12 +39,13 @@ BaseMenuRenderer::BaseMenuRenderer(int bufferSize, RendererType rType) : MenuRen
 	ticksToReset = 0;
     lastOffset = 0;
     resetValInTicks = 30 * TC_DISPLAY_UPDATES_PER_SECOND;
-	renderCallback = NULL;
-    resetCallback = NULL;
+	renderCallback = nullptr;
+    resetCallback = nullptr;
+    renderFnPressType = RPRESS_NONE;
 	redrawMode = MENUDRAW_COMPLETE_REDRAW;
 	this->lastOffset = 0;
-    this->firstWidget = NULL;
-    this->dialog = NULL;
+    this->firstWidget = nullptr;
+    this->dialog = nullptr;
     isCustomDrawing = false;
     displayTakenMode = NOT_TAKEN_OVER;
     updatesPerSecond = TC_DISPLAY_UPDATES_PER_SECOND;
@@ -52,11 +54,9 @@ BaseMenuRenderer::BaseMenuRenderer(int bufferSize, RendererType rType) : MenuRen
 
 void BaseMenuRenderer::initialise() {
 	ticksToReset = resetValInTicks;
-	renderCallback = NULL;
 	redrawMode = MENUDRAW_COMPLETE_REDRAW;
 
     menuMgr.changeMenu();
-
     if(updatesPerSecond == 0) updatesPerSecond = TC_DISPLAY_UPDATES_PER_SECOND;
 
     taskManager.scheduleOnce(250, this);
@@ -211,6 +211,17 @@ MenuItem *BaseMenuRenderer::getMenuItemAtIndex(MenuItem *root, uint8_t pos) {
     return root;
 }
 
+void BaseMenuRenderer::setUpdatesPerSecond(int updatesSec) {
+    bool needsReschedule = updatesPerSecond == UPDATES_SEC_DISPLAY_OFF;
+    updatesPerSecond = updatesSec;
+    if(resetValInTicks != MAX_TICKS) {
+        resetValInTicks = 30 * updatesSec;
+    }
+    if(needsReschedule) {
+        taskManager.execute(this);
+    }
+}
+
 TitleWidget::TitleWidget(const uint8_t * const* icons, uint8_t maxStateIcons, uint8_t width, uint8_t height, TitleWidget* next) {
 	this->iconData = icons;
 	this->maxStateIcons = maxStateIcons;
@@ -231,7 +242,7 @@ protected:
 };
 
 BaseDialog* NoRenderer::getDialog() {
-    if(dialog == NULL) {
+    if(dialog == nullptr) {
         dialog = new NoRenderDialog();
     }
     return dialog;
