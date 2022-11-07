@@ -378,13 +378,15 @@ public:
 	void changeMenu(MenuItem* possibleActive=nullptr);
 
 	/**
-	 * Navigate to the menu and ensure it is display, further, you can optionally provide an item in the menu to
-	 * activate, not doing so selects the first possible item.
-	 * @param theNewItem the root menu item to display
+	 * Make the menu item provided in `theNewItem` the current menu on display, this item should be either the item referred
+	 * to by `rootMenuItem()` or the first child item of a submenu, normally obtained by calling `menuSub.getChild()` on the
+	 * submenu. If `skipHistory` is false, this navigation will be put into the navigation history, and the back menu
+	 * will then cleanly go back through this item.
+	 * @param theNewItem the first child menu item of the submenu (or root item)
 	 * @param possibleActive the item to activate or null for default
-	 * @param customMenu set to true if this menu is custom and should not be stored in the history
+	 * @param skipHistory set to true if this menu is custom and should not be stored in the history
 	 */
-	void navigateToMenu(MenuItem* theNewItem, MenuItem* possibleActive = nullptr, bool customMenu = false);
+	void navigateToMenu(MenuItem* theNewItem, MenuItem* possibleActive = nullptr, bool skipHistory = false);
 
 	/**
 	 * Force a complete reset of the menu
