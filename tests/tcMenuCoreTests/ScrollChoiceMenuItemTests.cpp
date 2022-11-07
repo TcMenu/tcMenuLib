@@ -1,5 +1,5 @@
 
-#include <AUnit.h>
+#include <testing/SimpleTest.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 #include "fixtures_extern.h"
@@ -13,35 +13,35 @@ test(testValueAtPositionAndGetters) {
     // first check the three valid index positions
     char buffer[10];
     choice.valueAtPosition(buffer, sizeof buffer, 0);
-    assertStringCaseEqual("item1", buffer);
+    assertStringEquals("item1", buffer);
 
     choice.valueAtPosition(buffer, sizeof buffer, 1);
-    assertStringCaseEqual("item2", buffer);
+    assertStringEquals("item2", buffer);
 
     choice.valueAtPosition(buffer, sizeof buffer, 2);
-    assertStringCaseEqual("item3", buffer);
+    assertStringEquals("item3", buffer);
 
     // now the invalid case
 
     choice.valueAtPosition(buffer, sizeof buffer, 3);
-    assertStringCaseEqual("", buffer);
+    assertStringEquals("", buffer);
 
     // now check the positional stuff
 
-    assertEqual(0, choice.getCurrentValue());
-    assertEqual((uint8_t)3, choice.getNumberOfRows());
+    assertEquals(0, choice.getCurrentValue());
+    assertEquals((uint8_t)3, choice.getNumberOfRows());
     choice.copyValue(buffer, sizeof buffer);
-    assertStringCaseEqual("item1", buffer);
+    assertStringEquals("item1", buffer);
 
     choice.setCurrentValue(2);
-    assertEqual(2, choice.getCurrentValue());
+    assertEquals(2, choice.getCurrentValue());
     choice.copyValue(buffer, sizeof buffer);
-    assertStringCaseEqual("item3", buffer);
+    assertStringEquals("item3", buffer);
 
-    assertEqual((uint16_t)0xFFFFU, choice.getEepromPosition());
+    assertEquals((uint16_t)0xFFFFU, choice.getEepromPosition());
 
     choice.setCurrentValue(55);
-    assertEqual(2, choice.getCurrentValue());
+    assertEquals(2, choice.getCurrentValue());
 }
 
 test(testValueAtPositionEeeprom) {
@@ -59,18 +59,18 @@ test(testValueAtPositionEeeprom) {
     // test the two valid cases
 
     choice.valueAtPosition(buffer, sizeof buffer, 0);
-    assertStringCaseEqual("computer12", buffer);
+    assertStringEquals("computer12", buffer);
 
     choice.valueAtPosition(buffer, sizeof buffer, 1);
-    assertStringCaseEqual("turntable1", buffer);
+    assertStringEquals("turntable1", buffer);
 
     // and the invalid case too
 
     choice.valueAtPosition(buffer, sizeof buffer, 2);
-    assertStringCaseEqual("", buffer);
+    assertStringEquals("", buffer);
 
     choice.copyTransportText(buffer, sizeof buffer);
-    assertStringCaseEqual("0-computer12", buffer);
+    assertStringEquals("0-computer12", buffer);
 }
 
 bool renderingInvoked = false;
@@ -101,27 +101,27 @@ test(testValueAtPositionCustom) {
     char compBuf[15];
     for(int i = 0; i < 100; i++) {
         choice.setCurrentValue(i, true);
-        assertEqual(i, choice.getCurrentValue());
+        assertEquals(i, choice.getCurrentValue());
         choice.copyValue(buffer, sizeof(buffer));
         itoa(i, compBuf, 10);
-        assertStringCaseEqual(compBuf, buffer);
+        assertStringEquals(compBuf, buffer);
     }
 
     choice.valueAtPosition(buffer, sizeof(buffer), 2);
-    assertStringCaseEqual("2", buffer);
+    assertStringEquals("2", buffer);
 
     choice.copyNameToBuffer(buffer, sizeof buffer);
-    assertStringCaseEqual("CustomEnum", buffer);
+    assertStringEquals("CustomEnum", buffer);
 
-    assertEqual((uint16_t)99U, choice.getEepromPosition());
+    assertEquals((uint16_t)99U, choice.getEepromPosition());
 
     assertFalse(renderingInvoked);
     choice.setCurrentValue(1);
     assertTrue(renderingInvoked);
-    assertEqual(1, choice.getCurrentValue());
+    assertEquals(1, choice.getCurrentValue());
 
     choice.copyTransportText(buffer, sizeof buffer);
-    assertStringCaseEqual("1-1", buffer);
+    assertStringEquals("1-1", buffer);
 }
 
 int colorCbCount = 0;
@@ -136,38 +136,41 @@ Rgb32MenuItem colorItemNoAlpha(202, colorItemNoAlphaFn, false, nullptr);
 test(testColorMenuItemNoAlpha) {
     char sz[20];
     auto originalChangeCount = colorCbCount;
-    assertEqual((uint16_t)202, colorItemNoAlpha.getId());
-    assertEqual((uint16_t)233, colorItemNoAlpha.getEepromPosition());
+    assertEquals((uint16_t)202, colorItemNoAlpha.getId());
+    assertEquals((uint16_t)233, colorItemNoAlpha.getEepromPosition());
     colorItemNoAlpha.copyNameToBuffer(sz, sizeof(sz));
-    assertEqual("RGB NoAlpha", sz);
+    assertEquals("RGB NoAlpha", sz);
 
     colorItemNoAlpha.setColorData(RgbColor32(100, 50, 200));
 
     colorItemNoAlpha.copyValue(sz, sizeof sz);
-    assertEqual("R100 G50 B200", sz);
+    assertEquals("R100 G50 B200", sz);
 
-    assertEqual(3, colorItemNoAlpha.beginMultiEdit());
-    assertEqual(255, colorItemNoAlpha.nextPart());
+    assertEquals(3, colorItemNoAlpha.beginMultiEdit());
+    assertEquals(255, colorItemNoAlpha.nextPart());
     colorItemNoAlpha.copyValue(sz, sizeof sz);
-    assertEqual("R[100] G50 B200", sz);
+    assertEquals("R100 G50 B200", sz);
+    assertTrue(checkEditorHints(1, 4, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
     colorItemNoAlpha.valueChanged(145);
-    assertEqual(originalChangeCount + 2, colorCbCount);
+    assertEquals(originalChangeCount + 2, colorCbCount);
 
-    assertEqual(255, colorItemNoAlpha.nextPart());
+    assertEquals(255, colorItemNoAlpha.nextPart());
     colorItemNoAlpha.copyValue(sz, sizeof sz);
-    assertEqual("R145 G[50] B200", sz);
+    assertEquals("R145 G50 B200", sz);
+    assertTrue(checkEditorHints(6, 8, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
     colorItemNoAlpha.valueChanged(222);
-    assertEqual(originalChangeCount + 3, colorCbCount);
+    assertEquals(originalChangeCount + 3, colorCbCount);
 
-    assertEqual(255, colorItemNoAlpha.nextPart());
+    assertEquals(255, colorItemNoAlpha.nextPart());
     colorItemNoAlpha.copyValue(sz, sizeof sz);
-    assertEqual("R145 G222 B[200]", sz);
+    assertEquals("R145 G222 B200", sz);
+    assertTrue(checkEditorHints(11, 14, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
     colorItemNoAlpha.valueChanged(1);
-    assertEqual(originalChangeCount + 4, colorCbCount);
+    assertEquals(originalChangeCount + 4, colorCbCount);
 
-    assertEqual(0, colorItemNoAlpha.nextPart());
+    assertEquals(0, colorItemNoAlpha.nextPart());
     colorItemNoAlpha.copyValue(sz, sizeof sz);
-    assertEqual("R145 G222 B1", sz);
+    assertEquals("R145 G222 B1", sz);
 }
 
 RENDERING_CALLBACK_NAME_INVOKE(colorItemWithAlphaFn, rgbAlphaItemRenderFn, "RGB Alpha", 333, myCountingCallback);
@@ -177,38 +180,39 @@ test(testColorMenuItemWithAlphaAndFn) {
     auto originalChangeCount = colorCbCount;
 
     char sz[25];
-    assertEqual((uint16_t)202, colorItemWithAlpha.getId());
+    assertEquals((uint16_t)202, colorItemWithAlpha.getId());
     colorItemWithAlpha.copyNameToBuffer(sz, sizeof(sz));
-    assertEqual("RGB Alpha", sz);
+    assertEquals("RGB Alpha", sz);
 
     colorItemWithAlpha.setColorData(RgbColor32(100, 50, 200, 150));
 
     colorItemWithAlpha.copyValue(sz, sizeof sz);
-    assertEqual("R100 G50 B200 A150", sz);
+    assertEquals("R100 G50 B200 A150", sz);
 
-    assertEqual(4, colorItemWithAlpha.beginMultiEdit());
-    assertEqual(255, colorItemWithAlpha.nextPart());
-    assertEqual(255, colorItemWithAlpha.nextPart());
-    assertEqual(255, colorItemWithAlpha.nextPart());
-    assertEqual(255, colorItemWithAlpha.nextPart());
+    assertEquals(4, colorItemWithAlpha.beginMultiEdit());
+    assertEquals(255, colorItemWithAlpha.nextPart());
+    assertEquals(255, colorItemWithAlpha.nextPart());
+    assertEquals(255, colorItemWithAlpha.nextPart());
+    assertEquals(255, colorItemWithAlpha.nextPart());
     colorItemWithAlpha.copyValue(sz, sizeof sz);
-    assertEqual("R100 G50 B200 A[150]", sz);
+    assertEquals("R100 G50 B200 A150", sz);
+    assertTrue(checkEditorHints(15, 18, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
     colorItemWithAlpha.valueChanged(225);
-    assertEqual(originalChangeCount + 2, colorCbCount);
+    assertEquals(originalChangeCount + 2, colorCbCount);
 
-    assertEqual(0, colorItemWithAlpha.nextPart());
+    assertEquals(0, colorItemWithAlpha.nextPart());
     colorItemWithAlpha.copyValue(sz, sizeof sz);
-    assertEqual("R100 G50 B200 A225", sz);
+    assertEquals("R100 G50 B200 A225", sz);
 }
 
-class ColorTestFixing : public aunit::TestOnce {
+class ColorTestFixing : public SimpleTest::UnitTestExecutor {
 public:
     void assertColor(const char *name, const RgbColor32 &col, uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha) {
         serdebugF2("Color test: ", name);
-        assertEqual(red, col.red);
-        assertEqual(green, col.green);
-        assertEqual(blue, col.blue);
-        assertEqual(alpha, col.alpha);
+        assertEquals(red, col.red);
+        assertEquals(green, col.green);
+        assertEquals(blue, col.blue);
+        assertEquals(alpha, col.alpha);
     }
 };
 
@@ -228,11 +232,11 @@ testF(ColorTestFixing, testColor32Struct) {
     // ensure we can get as html for both alpha and non-alpha case
     char sz[10];
     forHtml.asHtmlString(sz, sizeof sz, true);
-    assertStringCaseEqual("#F4AA55BB", sz);
+    assertStringEquals("#F4AA55BB", sz);
     forHtml.asHtmlString(sz, sizeof sz, false);
-    assertStringCaseEqual("#F4AA55", sz);
+    assertStringEquals("#F4AA55", sz);
 
     // ensure string too short does not overflow.
     forHtml.asHtmlString(sz, 2, false);
-    assertStringCaseEqual("", sz);
+    assertStringEquals("", sz);
 }

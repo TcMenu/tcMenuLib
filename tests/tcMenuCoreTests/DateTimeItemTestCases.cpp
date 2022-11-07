@@ -1,5 +1,5 @@
 
-#include <AUnit.h>
+#include <testing/SimpleTest.h>
 #include <RuntimeMenuItem.h>
 #include <RemoteMenuItem.h>
 #include <RemoteAuthentication.h>
@@ -68,43 +68,45 @@ test(testTimeMenuItem24HrEditing) {
 
     char sz[20];
     timeItem24.copyNameToBuffer(sz, sizeof(sz));
-    assertStringCaseEqual("Time", sz);
+    assertStringEquals("Time", sz);
 
     timeItem24.setTime(TimeStorage(20, 39, 30, 93));
-    assertStringCaseEqual("Time", sz);
+    assertStringEquals("Time", sz);
     timeItem24.copyValue(sz, sizeof(sz));
-    assertStringCaseEqual("20:39:30.93", sz);
+    assertStringEquals("20:39:30.93", sz);
 
-    assertEqual(uint8_t(4), timeItem24.beginMultiEdit());
-    assertEqual(23, timeItem24.nextPart());
-    assertEqual(20, timeItem24.getPartValueAsInt());
+    assertEquals(uint8_t(4), timeItem24.beginMultiEdit());
+    assertEquals(23, timeItem24.nextPart());
+    assertEquals(20, timeItem24.getPartValueAsInt());
     timeItem24.valueChanged(18);
 
-    assertEqual(59, timeItem24.nextPart());
-    assertEqual(39, timeItem24.getPartValueAsInt());
+    assertEquals(59, timeItem24.nextPart());
+    assertEquals(39, timeItem24.getPartValueAsInt());
     timeItem24.valueChanged(30);
 
     timeItem24.copyValue(sz, sizeof(sz));
-    assertStringCaseEqual("18:[30]:30.93", sz);
+    assertStringEquals("18:30:30.93", sz);
+    assertTrue(checkEditorHints(3, 5, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
 
-    assertEqual(59, timeItem24.nextPart());
-    assertEqual(30, timeItem24.getPartValueAsInt());
+    assertEquals(59, timeItem24.nextPart());
+    assertEquals(30, timeItem24.getPartValueAsInt());
 
-    assertEqual(99, timeItem24.nextPart());
-    assertEqual(93, timeItem24.getPartValueAsInt());
+    assertEquals(99, timeItem24.nextPart());
+    assertEquals(93, timeItem24.getPartValueAsInt());
     timeItem24.valueChanged(10);
 
     timeItem24.copyValue(sz, sizeof(sz));
-    assertStringCaseEqual("18:30:30.[10]", sz);
+    assertStringEquals("18:30:30.10", sz);
+    assertTrue(checkEditorHints(9, 11, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
     timeItem24.stopMultiEdit();
 
     timeItem24.setTimeFromString("23:44:00.33");
     timeItem24.copyValue(sz, sizeof(sz));
-    assertStringCaseEqual("23:44:00.33", sz);
+    assertStringEquals("23:44:00.33", sz);
 
     timeItem24.setTimeFromString("8:32");
     timeItem24.copyValue(sz, sizeof(sz));
-    assertStringCaseEqual("08:32:00.00", sz);
+    assertStringEquals("08:32:00.00", sz);
 }
 
 test(dateFormattedMenuItem) {
@@ -113,33 +115,36 @@ test(dateFormattedMenuItem) {
     char sz[25];
     dateItem.setDateFromString("2020/08/11");
     dateItem.copyNameToBuffer(sz, sizeof(sz));
-    assertStringCaseEqual("Date", sz);
+    assertStringEquals("Date", sz);
     dateItem.copyValue(sz, sizeof(sz));
-    assertStringCaseEqual("11/08/2020", sz);
+    assertStringEquals("11/08/2020", sz);
 
-    assertEqual(uint8_t(3), dateItem.beginMultiEdit());
-    assertEqual(31, dateItem.nextPart());
-    assertEqual(11, dateItem.getPartValueAsInt());
+    assertEquals(uint8_t(3), dateItem.beginMultiEdit());
+    assertEquals(31, dateItem.nextPart());
+    assertEquals(11, dateItem.getPartValueAsInt());
     dateItem.valueChanged(10);
     dateItem.copyValue(sz, sizeof(sz));
-    assertStringCaseEqual("[10]/08/2020", sz);
+    assertStringEquals("10/08/2020", sz);
+    assertTrue(checkEditorHints(0, 2, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
 
-    assertEqual(12, dateItem.nextPart());
-    assertEqual(8, dateItem.getPartValueAsInt());
+    assertEquals(12, dateItem.nextPart());
+    assertEquals(8, dateItem.getPartValueAsInt());
     dateItem.valueChanged(2);
     dateItem.copyValue(sz, sizeof(sz));
-    assertStringCaseEqual("10/[02]/2020", sz);
+    assertStringEquals("10/02/2020", sz);
+    assertTrue(checkEditorHints(3, 5, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
 
-    assertEqual(9999, dateItem.nextPart());
-    assertEqual(2020, dateItem.getPartValueAsInt());
+    assertEquals(9999, dateItem.nextPart());
+    assertEquals(2020, dateItem.getPartValueAsInt());
     dateItem.valueChanged(2018);
 
     dateItem.copyValue(sz, sizeof(sz));
-    assertStringCaseEqual("10/02/[2018]", sz);
+    assertStringEquals("10/02/2018", sz);
+    assertTrue(checkEditorHints(6, 10, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
     dateItem.stopMultiEdit();
 
     dateItem.copyValue(sz, sizeof(sz));
-    assertStringCaseEqual("10/02/2018", sz);
+    assertStringEquals("10/02/2018", sz);
 
     DateFormattedMenuItem::setDateSeparator('-');
     DateFormattedMenuItem::setDateFormatStyle(DateFormattedMenuItem::MM_DD_YYYY);
@@ -147,27 +152,31 @@ test(dateFormattedMenuItem) {
     // now check MM-DD-YYYY
     dateItem.setDate(DateStorage(20, 11, 2019));
     dateItem.copyValue(sz, sizeof(sz));
-    assertStringCaseEqual("11-20-2019", sz);
+    assertStringEquals("11-20-2019", sz);
 
     dateItem.beginMultiEdit();
 
-    assertEqual(12, dateItem.nextPart());
-    assertEqual(11, dateItem.getPartValueAsInt());
+    assertEquals(12, dateItem.nextPart());
+    assertEquals(11, dateItem.getPartValueAsInt());
     dateItem.valueChanged(10);
     dateItem.copyValue(sz, sizeof(sz));
-    assertStringCaseEqual("[10]-20-2019", sz);
+    assertStringEquals("10-20-2019", sz);
+    assertTrue(checkEditorHints(0, 2, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
 
-    assertEqual(31, dateItem.nextPart());
-    assertEqual(20, dateItem.getPartValueAsInt());
+    assertEquals(31, dateItem.nextPart());
+    assertEquals(20, dateItem.getPartValueAsInt());
     dateItem.valueChanged(14);
     dateItem.copyValue(sz, sizeof(sz));
-    assertStringCaseEqual("10-[14]-2019", sz);
+    assertStringEquals("10-14-2019", sz);
+    assertTrue(checkEditorHints(3, 5, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
 
-    assertEqual(9999, dateItem.nextPart());
-    assertEqual(2019, dateItem.getPartValueAsInt());
+    assertEquals(9999, dateItem.nextPart());
+    assertEquals(2019, dateItem.getPartValueAsInt());
     dateItem.valueChanged(2018);
     dateItem.copyValue(sz, sizeof(sz));
-    assertStringCaseEqual("10-14-[2018]", sz);
+    assertStringEquals("10-14-2018", sz);
+    assertTrue(checkEditorHints(6, 10, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
+
     dateItem.stopMultiEdit();
 
     // lastly check YYYY-MM-DD
@@ -177,27 +186,30 @@ test(dateFormattedMenuItem) {
 
     dateItem.setDate(DateStorage(20, 11, 2019));
     dateItem.copyValue(sz, sizeof(sz));
-    assertStringCaseEqual("2019*11*20", sz);
+    assertStringEquals("2019*11*20", sz);
 
     dateItem.beginMultiEdit();
 
-    assertEqual(9999, dateItem.nextPart());
-    assertEqual(2019, dateItem.getPartValueAsInt());
+    assertEquals(9999, dateItem.nextPart());
+    assertEquals(2019, dateItem.getPartValueAsInt());
     dateItem.valueChanged(2018);
     dateItem.copyValue(sz, sizeof(sz));
-    assertStringCaseEqual("[2018]*11*20", sz);
+    assertStringEquals("2018*11*20", sz);
+    assertTrue(checkEditorHints(0, 4, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
 
-    assertEqual(12, dateItem.nextPart());
-    assertEqual(11, dateItem.getPartValueAsInt());
+    assertEquals(12, dateItem.nextPart());
+    assertEquals(11, dateItem.getPartValueAsInt());
     dateItem.valueChanged(3);
     dateItem.copyValue(sz, sizeof(sz));
-    assertStringCaseEqual("2018*[03]*20", sz);
+    assertStringEquals("2018*03*20", sz);
+    assertTrue(checkEditorHints(5, 7, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
 
-    assertEqual(31, dateItem.nextPart());
-    assertEqual(20, dateItem.getPartValueAsInt());
+    assertEquals(31, dateItem.nextPart());
+    assertEquals(20, dateItem.getPartValueAsInt());
     dateItem.valueChanged(2);
     dateItem.copyValue(sz, sizeof(sz));
-    assertStringCaseEqual("2018*03*[02]", sz);
+    assertStringEquals("2018*03*02", sz);
+    assertTrue(checkEditorHints(8, 10, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
     dateItem.stopMultiEdit();
 }
 
@@ -207,37 +219,37 @@ int daysForMonth(DateStorage& theDate);
 test(testDateLeapYearAndMonthSizes) {
 
     auto theDate = DateStorage(3, 1, 1929);
-    assertEqual(31, daysForMonth(theDate));
+    assertEquals(31, daysForMonth(theDate));
 
     // now do all the leap year test cases
     theDate.month = 2;
-    assertEqual(28, daysForMonth(theDate)); // 1929 not a leap year
+    assertEquals(28, daysForMonth(theDate)); // 1929 not a leap year
     theDate.year = 1900;
-    assertEqual(28, daysForMonth(theDate)); // 1900 not a leap year. !(YR % 100)
+    assertEquals(28, daysForMonth(theDate)); // 1900 not a leap year. !(YR % 100)
     theDate.year = 1904;
-    assertEqual(29, daysForMonth(theDate)); // 1904 is a leap year. YR % 4
+    assertEquals(29, daysForMonth(theDate)); // 1904 is a leap year. YR % 4
     theDate.year = 1600;
-    assertEqual(29, daysForMonth(theDate)); // 1600 is a leap year. YR % 400
+    assertEquals(29, daysForMonth(theDate)); // 1600 is a leap year. YR % 400
 
     theDate.month = 3;
-    assertEqual(31, daysForMonth(theDate));
+    assertEquals(31, daysForMonth(theDate));
     theDate.month = 4;
-    assertEqual(30, daysForMonth(theDate));
+    assertEquals(30, daysForMonth(theDate));
     theDate.month = 5;
-    assertEqual(31, daysForMonth(theDate));
+    assertEquals(31, daysForMonth(theDate));
     theDate.month = 6;
-    assertEqual(30, daysForMonth(theDate));
+    assertEquals(30, daysForMonth(theDate));
     theDate.month = 7;
-    assertEqual(31, daysForMonth(theDate));
+    assertEquals(31, daysForMonth(theDate));
     theDate.month = 8;
-    assertEqual(31, daysForMonth(theDate));
+    assertEquals(31, daysForMonth(theDate));
     theDate.month = 9;
-    assertEqual(30, daysForMonth(theDate));
+    assertEquals(30, daysForMonth(theDate));
     theDate.month = 10;
-    assertEqual(31, daysForMonth(theDate));
+    assertEquals(31, daysForMonth(theDate));
     theDate.month = 11;
-    assertEqual(30, daysForMonth(theDate));
+    assertEquals(30, daysForMonth(theDate));
     theDate.month = 12;
-    assertEqual(31, daysForMonth(theDate));
+    assertEquals(31, daysForMonth(theDate));
 
 }

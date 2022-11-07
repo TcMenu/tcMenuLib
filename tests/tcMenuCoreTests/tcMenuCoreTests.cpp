@@ -1,6 +1,4 @@
-#line 2 "tcMenuCoreTests.ino"
-
-#include <AUnit.h>
+#include <testing/SimpleTest.h>
 #include <tcMenu.h>
 #include "tcMenuFixtures.h"
 #include <BaseRenderers.h>
@@ -14,7 +12,7 @@ void myActionCb(int id);
 
 #include <tcm_test/testFixtures.h>
 
-using namespace aunit;
+using namespace SimpleTest;
 
 const char *uuid1 = "07cd8bc6-734d-43da-84e7-6084990becfc";
 const char *uuid2 = "07cd8bc6-734d-43da-84e7-6084990becfd";
@@ -31,14 +29,12 @@ const PROGMEM ConnectorLocalInfo applicationInfo = { "DfRobot", "2ba37227-a412-4
 void setup() {
     Serial.begin(115200);
     while(!Serial);
+    startTesting();
 
     menuMgr.initWithoutInput(&noRenderer, &menuVolume);
 }
 
-void loop() {
-    TestRunner::run();
-}
-
+DEFAULT_TEST_RUNLOOP
 
 test(testTcUtilIntegerConversions) {
     char szBuffer[20];
@@ -46,40 +42,41 @@ test(testTcUtilIntegerConversions) {
     // first check the basic cases for the version that always starts at pos 0
     strcpy(szBuffer, "abc");
     ltoaClrBuff(szBuffer, 1234, 4, ' ', sizeof(szBuffer));
-    assertEqual(szBuffer, "1234");
+    assertStringEquals(szBuffer, "1234");
     ltoaClrBuff(szBuffer, 907, 4, ' ', sizeof(szBuffer));
-    assertEqual(szBuffer, " 907");
+    assertStringEquals(szBuffer, " 907");
     ltoaClrBuff(szBuffer, 22, 4, '0', sizeof(szBuffer));
-    assertEqual(szBuffer, "0022");
+    assertStringEquals(szBuffer, "0022");
 	ltoaClrBuff(szBuffer, -22, 4, '0', sizeof(szBuffer));
-	assertEqual(szBuffer, "-0022");
+	assertStringEquals(szBuffer, "-0022");
 	ltoaClrBuff(szBuffer, -93, 2, NOT_PADDED, sizeof(szBuffer));
-	assertEqual(szBuffer, "-93");
+	assertStringEquals(szBuffer, "-93");
     ltoaClrBuff(szBuffer, 0, 4, NOT_PADDED, sizeof(szBuffer));
-    assertEqual(szBuffer, "0");
+    assertStringEquals(szBuffer, "0");
 
     // and now test the appending version with zero padding
     strcpy(szBuffer, "val = ");
     fastltoa(szBuffer, 22, 4, '0', sizeof(szBuffer));
-    assertEqual(szBuffer, "val = 0022");
+    assertStringEquals(szBuffer, "val = 0022");
 
     // and now test the appending version with an absolute divisor.
     strcpy(szBuffer, "val = ");
     fastltoa_mv(szBuffer, 22, 1000, '0', sizeof(szBuffer));
-    assertEqual(szBuffer, "val = 022");
+    assertStringEquals(szBuffer, "val = 022");
 
     // and lasty try the divisor version without 0.
     strcpy(szBuffer, "val = ");
     fastltoa_mv(szBuffer, 22, 10000, NOT_PADDED, sizeof(szBuffer));
+    assertStringEquals(szBuffer, "val = 22");
 
     // and now try something bigger than the divisor
     strcpy(szBuffer, "val = ");
     fastltoa_mv(szBuffer, 222222, 10000, NOT_PADDED, sizeof(szBuffer));
-    assertEqual(szBuffer, "val = 2222");
+    assertStringEquals(szBuffer, "val = 2222");
 }
 
 void printMenuItem(MenuItem* menuItem) {
-    if(menuItem == NULL) {
+    if(menuItem == nullptr) {
         Serial.print("NULL");
     }
     else {
@@ -89,7 +86,7 @@ void printMenuItem(MenuItem* menuItem) {
     }
 }
 
-class MenuItemIteratorFixture : public TestOnce {
+class MenuItemIteratorFixture : public UnitTestExecutor {
 public:
     bool checkMenuItem(MenuItem* actual, MenuItem* expected) {
         if(expected != actual) {
@@ -107,7 +104,7 @@ public:
 testF(MenuItemIteratorFixture, testTcUtilGetParentAndVisit) {
     menuMgr.initWithoutInput(&noRenderer, &menuVolume);
 
-    assertTrue(checkMenuItem(getParentRoot(NULL), &menuVolume));
+    assertTrue(checkMenuItem(getParentRoot(nullptr), &menuVolume));
     assertTrue(checkMenuItem(getParentRoot(&menuVolume), &menuVolume));
     assertTrue(checkMenuItem(getParentRoot(&menuStatus), &menuVolume));
     assertTrue(checkMenuItem(getParentRoot(&menuBackSettings), &menuVolume));
@@ -119,7 +116,7 @@ testF(MenuItemIteratorFixture, testTcUtilGetParentAndVisit) {
 		// below is for debugging
         //Serial.print("Visited");printMenuItem(item);Serial.println();
     }), &menuBackStatus));
-    assertEqual(counter, 15);
+    assertEquals(counter, 15);
 }
 
 testF(MenuItemIteratorFixture, testIteratorGetSubMenu) {
@@ -137,7 +134,7 @@ testF(MenuItemIteratorFixture, testIteratorGetSubMenu) {
 testF(MenuItemIteratorFixture, testGetItemById) {
     menuMgr.initWithoutInput(&noRenderer, &menuVolume);
 
-    assertTrue(getMenuItemById(0) == NULL);
+    assertTrue(getMenuItemById(0) == nullptr);
     assertTrue(checkMenuItem(getMenuItemById(1), &menuVolume));
     assertTrue(checkMenuItem(getMenuItemById(menuBackStatus.getId()), &menuBackStatus));
     assertTrue(checkMenuItem(getMenuItemById(5), &menuStatus));
@@ -174,7 +171,7 @@ testF(MenuItemIteratorFixture, testIterationWithPredicate) {
         assertTrue(checkMenuItem(iterator.nextItem(), &menuSettings));
         assertTrue(checkMenuItem(iterator.nextItem(), &menuStatus));
         assertTrue(checkMenuItem(iterator.nextItem(), &menuSecondLevel));
-        assertTrue(iterator.nextItem() == NULL);
+        assertTrue(iterator.nextItem() == nullptr);
     }
 
     RemoteNoMenuItemPredicate remotePredicate(0);
@@ -194,12 +191,12 @@ testF(MenuItemIteratorFixture, testIterationWithPredicate) {
 
     assertTrue(checkMenuItem(iterator.nextItem(), &menuSettings));
     assertTrue(checkMenuItem(iterator.nextItem(), &menu12VStandby));
-    assertTrue(iterator.nextItem() == NULL);
+    assertTrue(iterator.nextItem() == nullptr);
 
     clearAllChangeStatus();
 
     assertTrue(checkMenuItem(iterator.nextItem(), &menuSettings));
-    assertTrue(iterator.nextItem() == NULL);
+    assertTrue(iterator.nextItem() == nullptr);
 }
 
 
@@ -221,7 +218,7 @@ testF(MenuItemIteratorFixture, testIteratorTypePredicateLocalOnly) {
 
         assertTrue(checkMenuItem(iterator.nextItem(), &menuVolume));
         assertTrue(checkMenuItem(iterator.nextItem(), &menuSettings));
-        assertTrue(iterator.nextItem() == NULL);
+        assertTrue(iterator.nextItem() == nullptr);
     }
 
     menuVolume.setLocalOnly(true);
@@ -238,7 +235,7 @@ testF(MenuItemIteratorFixture, testIteratorTypePredicateLocalOnly) {
         assertTrue(checkMenuItem(iterator.nextItem(), &menuRHSTemp));
         assertTrue(checkMenuItem(iterator.nextItem(), &menuSecondLevel));
         assertTrue(checkMenuItem(iterator.nextItem(), &menuCaseTemp));
-        assertTrue(iterator.nextItem() == NULL);
+        assertTrue(iterator.nextItem() == nullptr);
     }
 }
 
@@ -260,7 +257,7 @@ testF(MenuItemIteratorFixture, testIteratorNothingMatchesPredicate) {
 
     // should be repeatedly null, nothing matches.
     for(int i=0;i<10;i++) {
-        assertTrue(iterator.nextItem() == NULL);
+        assertTrue(iterator.nextItem() == nullptr);
     }
 }
 
@@ -268,7 +265,7 @@ testF(MenuItemIteratorFixture, testIterationOverAllMenuItems) {
     menuMgr.initWithoutInput(&noRenderer, &menuVolume);
 
     MenuItemIterator iterator;
-    iterator.setPredicate(NULL);
+    iterator.setPredicate(nullptr);
     iterator.reset();
 
     // iterators should be completely repeatable
@@ -281,11 +278,11 @@ testF(MenuItemIteratorFixture, testIterationOverAllMenuItems) {
         // first we get the volume and channel
         assertTrue(checkMenuItem(iterator.nextItem(),&menuVolume));
         assertTrue(checkMenuItem(iterator.nextItem(), &menuChannel));
-        assertTrue(iterator.currentParent() == NULL);
+        assertTrue(iterator.currentParent() == nullptr);
 
         // then traverse into the settings menu (parent is volume)
         assertTrue(checkMenuItem(iterator.nextItem(), &menuSettings));
-        assertTrue(checkMenuItem(iterator.currentParent(), NULL));
+        assertTrue(checkMenuItem(iterator.currentParent(), nullptr));
         assertTrue(checkMenuItem(iterator.nextItem(), &menuBackSettings));
         assertTrue(checkMenuItem(iterator.currentParent(), &menuSettings));
         assertTrue(checkMenuItem(iterator.nextItem(), &menu12VStandby));
@@ -293,7 +290,7 @@ testF(MenuItemIteratorFixture, testIterationOverAllMenuItems) {
 
         // and then into the status menu, which has a nested submenu
         assertTrue(checkMenuItem(iterator.nextItem(), &menuStatus));
-        assertTrue(checkMenuItem(iterator.currentParent(), NULL));
+        assertTrue(checkMenuItem(iterator.currentParent(), nullptr));
         assertTrue(checkMenuItem(iterator.nextItem(), &menuBackStatus));
         assertTrue(checkMenuItem(iterator.currentParent(), &menuStatus));
         assertTrue(checkMenuItem(iterator.nextItem(), &menuLHSTemp));
@@ -310,7 +307,7 @@ testF(MenuItemIteratorFixture, testIterationOverAllMenuItems) {
         // exit of nested submenu here.
         assertTrue(checkMenuItem(iterator.nextItem(), &menuCaseTemp));
         assertTrue(checkMenuItem(iterator.currentParent(), &menuStatus));
-        assertTrue(iterator.nextItem() == NULL);
+        assertTrue(iterator.nextItem() == nullptr);
     }
 }
 
@@ -318,12 +315,12 @@ testF(MenuItemIteratorFixture, testIterationOnSimpleMenu) {
     menuMgr.initWithoutInput(&noRenderer, &menuSimple1);
 
     MenuItemIterator iterator;
-    iterator.setPredicate(NULL);
+    iterator.setPredicate(nullptr);
     iterator.reset();
 
     for(int i=0;i<3;i++) {
         assertTrue(checkMenuItem(iterator.nextItem(), &menuSimple1));
         assertTrue(checkMenuItem(iterator.nextItem(), &menuSimple2));
-        assertTrue(iterator.nextItem() == NULL);
+        assertTrue(iterator.nextItem() == nullptr);
     }
 }

@@ -1,5 +1,5 @@
 
-#include <AUnit.h>
+#include <testing/SimpleTest.h>
 #include <MenuHistoryNavigator.h>
 #include "fixtures_extern.h"
 
@@ -9,9 +9,9 @@ test(creatingAndInitialisation) {
     MenuNavigationStore nav;
     nav.setRootItem(&menuVolume);
 
-    assertEqual(&menuVolume, nav.getRoot());
-    assertEqual(&menuVolume, nav.getCurrentRoot());
-    assertEqual(nullptr, nav.getCurrentSubMenu());
+    assertEquals(&menuVolume, nav.getRoot());
+    assertEquals(&menuVolume, nav.getCurrentRoot());
+    assertEquals(nullptr, nav.getCurrentSubMenu());
 }
 
 test(navigationPushAndPop) {
@@ -26,28 +26,28 @@ test(navigationPushAndPop) {
     nav.navigateTo(&menuRHSTemp, &menuSub, false);
 
     auto* act = nav.popNavigationGetActive();
-    assertEqual(act, &menuRHSTemp);
-    assertEqual(menuSettings.getChild(), nav.getCurrentRoot());
-    assertEqual(&menuSettings, nav.getCurrentSubMenu());
+    assertEquals(act, &menuRHSTemp);
+    assertEquals(menuSettings.getChild(), nav.getCurrentRoot());
+    assertEquals(&menuSettings, nav.getCurrentSubMenu());
 
     act = nav.popNavigationGetActive();
-    assertEqual(act, &menu12VStandby);
-    assertEqual(menuSecondLevel.getChild(), nav.getCurrentRoot());
-    assertEqual(&menuSecondLevel, nav.getCurrentSubMenu());
+    assertEquals(act, &menu12VStandby);
+    assertEquals(menuSecondLevel.getChild(), nav.getCurrentRoot());
+    assertEquals(&menuSecondLevel, nav.getCurrentSubMenu());
 
     act = nav.popNavigationGetActive();
-    assertEqual(act, &menuLHSTemp);
-    assertEqual(menuStatus.getChild(), nav.getCurrentRoot());
-    assertEqual(&menuStatus, nav.getCurrentSubMenu());
+    assertEquals(act, &menuLHSTemp);
+    assertEquals(menuStatus.getChild(), nav.getCurrentRoot());
+    assertEquals(&menuStatus, nav.getCurrentSubMenu());
 
     act = nav.popNavigationGetActive();
-    assertEqual(act, &menuChannel);
-    assertEqual(&menuVolume, nav.getCurrentRoot());
-    assertEqual(nullptr, nav.getCurrentSubMenu());
+    assertEquals(act, &menuChannel);
+    assertEquals(&menuVolume, nav.getCurrentRoot());
+    assertEquals(nullptr, nav.getCurrentSubMenu());
 
     // try and over pop from array.
     act = nav.popNavigationGetActive();
-    assertEqual(act, &menuVolume);
-    assertEqual(&menuVolume, nav.getCurrentRoot());
-    assertEqual(nullptr, nav.getCurrentSubMenu());
+    assertEquals(act, &menuVolume);
+    assertEquals(&menuVolume, nav.getCurrentRoot());
+    assertEquals(nullptr, nav.getCurrentSubMenu());
 }

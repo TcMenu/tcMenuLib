@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <AUnit.h>
+#include <testing/SimpleTest.h>
 #include <graphics/GfxMenuConfig.h>
 #include <graphics/BaseGraphicalRenderer.h>
 #include "fixtures_extern.h"
@@ -66,10 +66,10 @@ bool checkPropertiesBasics(ItemDisplayProperties* props, const char* name, const
 }
 
 test(testEmptyItemPropertiesFactory) {
-    assertEqual(4, (int)sizeof(GridPosition));
-    assertEqual(4, (int)sizeof(Coord));
-    assertEqual(2, (int)sizeof(MenuPadding));
-    assertEqual(1, (int)sizeof(MenuBorder));
+    assertEquals(4, (int)sizeof(GridPosition));
+    assertEquals(4, (int)sizeof(Coord));
+    assertEquals(2, (int)sizeof(MenuPadding));
+    assertEquals(1, (int)sizeof(MenuBorder));
 
     ConfigurableItemDisplayPropertiesFactory factory;
     auto *config = factory.configFor(nullptr, ItemDisplayProperties::COMPTYPE_TITLE);
@@ -141,23 +141,23 @@ test(testIconStorageAndRetrival) {
 
     auto* icon = factory.iconForMenuItem(menuVolume.getId());
     assertTrue(icon != nullptr);
-    assertEqual(icon->getIconType(), DrawableIcon::ICON_XBITMAP);
+    assertEquals(icon->getIconType(), DrawableIcon::ICON_XBITMAP);
     int iconX = (int)(icon->getDimensions().x);
     int iconY = (int)(icon->getDimensions().y);
-    assertEqual(1, iconX);
-    assertEqual(3, iconY);
-    assertEqual(pointer1, icon->getIcon(false));
-    assertEqual(pointer2, icon->getIcon(true));
+    assertEquals(1, iconX);
+    assertEquals(3, iconY);
+    assertEquals(pointer1, icon->getIcon(false));
+    assertEquals(pointer2, icon->getIcon(true));
 
     icon = factory.iconForMenuItem(menuSub.getId());
     assertTrue(icon != nullptr);
-    assertEqual(icon->getIconType(), DrawableIcon::ICON_NATIVE);
+    assertEquals(icon->getIconType(), DrawableIcon::ICON_NATIVE);
     iconX = (int)(icon->getDimensions().x);
     iconY = (int)(icon->getDimensions().y);
-    assertEqual(2, iconX);
-    assertEqual(1, iconY);
-    assertEqual(pointer3, icon->getIcon(false));
-    assertEqual(pointer3, icon->getIcon(true));
+    assertEquals(2, iconX);
+    assertEquals(1, iconY);
+    assertEquals(pointer3, icon->getIcon(false));
+    assertEquals(pointer3, icon->getIcon(true));
 }
 
 test(testGridPositionStorageAndRetrival) {
@@ -168,20 +168,20 @@ test(testGridPositionStorageAndRetrival) {
     assertTrue(nullptr == factory.gridPositionForItem(&menuSub));
 
     auto* grid = factory.gridPositionForItem(&menuVolume);
-    assertEqual(grid->getPosition().getDrawingMode(), GridPosition::DRAW_INTEGER_AS_UP_DOWN);
-    assertEqual(grid->getPosition().getRow(), 2);
-    assertEqual(grid->getPosition().getGridPosition(), 1);
-    assertEqual(grid->getPosition().getGridSize(), 1);
-    assertEqual(grid->getPosition().getGridHeight(), 10);
-    assertEqual(grid->getPosition().getJustification(), GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT);
+    assertEquals(grid->getPosition().getDrawingMode(), GridPosition::DRAW_INTEGER_AS_UP_DOWN);
+    assertEquals(grid->getPosition().getRow(), 2);
+    assertEquals(grid->getPosition().getGridPosition(), 1);
+    assertEquals(grid->getPosition().getGridSize(), 1);
+    assertEquals(grid->getPosition().getGridHeight(), 10);
+    assertEquals(grid->getPosition().getJustification(), GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT);
 
     grid = factory.gridPositionForItem(&menuStatus);
-    assertEqual(grid->getPosition().getDrawingMode(), GridPosition::DRAW_AS_ICON_ONLY);
-    assertEqual(grid->getPosition().getRow(), 4);
-    assertEqual(grid->getPosition().getGridPosition(), 2);
-    assertEqual(grid->getPosition().getGridSize(), 3);
-    assertEqual(grid->getPosition().getGridHeight(), 0);
-    assertEqual(grid->getPosition().getJustification(), GridPosition::JUSTIFY_CENTER_NO_VALUE);
+    assertEquals(grid->getPosition().getDrawingMode(), GridPosition::DRAW_AS_ICON_ONLY);
+    assertEquals(grid->getPosition().getRow(), 4);
+    assertEquals(grid->getPosition().getGridPosition(), 2);
+    assertEquals(grid->getPosition().getGridSize(), 3);
+    assertEquals(grid->getPosition().getGridHeight(), 0);
+    assertEquals(grid->getPosition().getJustification(), GridPosition::JUSTIFY_CENTER_NO_VALUE);
 }
 
 const uint8_t* const icons1[] PROGMEM {pointer1, pointer2};
@@ -192,27 +192,27 @@ TitleWidget widget1 = TitleWidget(icons1, 2, 8, 3, &widget2);
 const char pgmName[] PROGMEM = "Test";
 
 test(testWidgetFunctionality) {
-    assertEqual((uint8_t)8, widget1.getWidth());
-    assertEqual((uint8_t)3, widget1.getHeight());
-    assertEqual((uint8_t)2, widget1.getMaxValue());
-    assertEqual((uint8_t)8, widget2.getWidth());
-    assertEqual((uint8_t)4, widget2.getHeight());
-    assertEqual((uint8_t)3, widget2.getMaxValue());
+    assertEquals((uint8_t)8, widget1.getWidth());
+    assertEquals((uint8_t)3, widget1.getHeight());
+    assertEquals((uint8_t)2, widget1.getMaxValue());
+    assertEquals((uint8_t)8, widget2.getWidth());
+    assertEquals((uint8_t)4, widget2.getHeight());
+    assertEquals((uint8_t)3, widget2.getMaxValue());
 
     widget1.setCurrentState(0);
-    assertEqual((uint8_t)0, widget1.getCurrentState());
-    assertEqual(pointer1, widget1.getCurrentIcon());
+    assertEquals((uint8_t)0, widget1.getCurrentState());
+    assertEquals(pointer1, widget1.getCurrentIcon());
     widget1.setCurrentState(19);
-    assertEqual((uint8_t)0, widget1.getCurrentState());
+    assertEquals((uint8_t)0, widget1.getCurrentState());
     widget1.setCurrentState(1);
-    assertEqual((uint8_t)1, widget1.getCurrentState());
-    assertEqual(pointer2, widget1.getCurrentIcon());
+    assertEquals((uint8_t)1, widget1.getCurrentState());
+    assertEquals(pointer2, widget1.getCurrentIcon());
 
     widget2.setCurrentState(2);
-    assertEqual((uint8_t)2, widget2.getCurrentState());
-    assertEqual(pointer3, widget2.getCurrentIcon());
-    assertEqual(pointer3, widget2.getIcon(2));
-    assertEqual(pointer1, widget2.getIcon(20));
+    assertEquals((uint8_t)2, widget2.getCurrentState());
+    assertEquals(pointer3, widget2.getCurrentIcon());
+    assertEquals(pointer3, widget2.getIcon(2));
+    assertEquals(pointer1, widget2.getIcon(20));
 }
 
 bool checkWidget(int widNum, WidgetDrawingRecord* item, Coord where, color_t* palette, int updatesExpected) {
@@ -285,11 +285,11 @@ test(testBaseRendererWithDefaults) {
 
     assertTrue(renderer.checkCommands(true, true, true));
 
-    assertEqual((bsize_t)2, renderer.getWidgetRecordings().count());
+    assertEquals((bsize_t)2, renderer.getWidgetRecordings().count());
     assertTrue(checkWidget(1, renderer.getWidgetRecordings().getByKey((unsigned long)&widget1), Coord(320 - 8 - 4, 4), palette1, 0));
     assertTrue(checkWidget(2, renderer.getWidgetRecordings().getByKey((unsigned long)&widget2), Coord(320 - 16 - 8, 4), palette1, 0));
 
-    assertEqual((bsize_t)2, renderer.getWidgetRecordings().count());
+    assertEquals((bsize_t)2, renderer.getWidgetRecordings().count());
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(0), Coord(0, 0), Coord(320, 30), pointer2, GridPosition::DRAW_TITLE_ITEM, GridPosition::JUSTIFY_CENTER_NO_VALUE, 0));
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(1), Coord(0, 40), Coord(320, 20), pointer1, GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 0, &textMenuItem1));
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(2), Coord(0, 65), Coord(320, 25), pointer1, GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_LEFT_NO_VALUE, 0, &boolItem1));
@@ -352,8 +352,8 @@ test(testScrollingWithMoreThanOneItemOnRow) {
     renderer.resetCommandStates();
     renderer.exec();
     assertTrue(renderer.checkCommands(true, true, true));
-    assertEqual((bsize_t)0, renderer.getWidgetRecordings().count());
-    assertEqual((bsize_t)5, renderer.getMenuItemRecordings().count());
+    assertEquals((bsize_t)0, renderer.getWidgetRecordings().count());
+    assertEquals((bsize_t)5, renderer.getMenuItemRecordings().count());
 
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(0), Coord(0, 0), Coord(320, 20), pointer1, GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 0, &textMenuItem1));
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(1), Coord(0, 25), Coord(159, 35), pointer1, GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_WITH_VALUE, 0, &boolItem1));
@@ -368,8 +368,8 @@ test(testScrollingWithMoreThanOneItemOnRow) {
     renderer.getMenuItemRecordings().clear();
     renderer.exec();
     assertTrue(renderer.checkCommands(false, true, true));
-    assertEqual((bsize_t)0, renderer.getWidgetRecordings().count());
-    assertEqual((bsize_t)4, renderer.getMenuItemRecordings().count());
+    assertEquals((bsize_t)0, renderer.getWidgetRecordings().count());
+    assertEquals((bsize_t)4, renderer.getMenuItemRecordings().count());
 
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(1), Coord(0, 0), Coord(160, 35), pointer1, GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_WITH_VALUE, 0, &boolItem1));
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(101), Coord(160, 0), Coord(160, 35), pointer1, GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 0, &menuSub));
@@ -408,6 +408,7 @@ public:
 
 test(testTakeOverDisplay) {
     TestCapturingRenderer renderer(320, 100, false, pgmName);
+    menuMgr.initWithoutInput(&renderer, &textMenuItem1);
     DisplayDrawing drawingTest;
     renderer.setCustomDrawingHandler(&drawingTest);
     for(int i=0; i<400 ;i++) {
@@ -419,17 +420,17 @@ test(testTakeOverDisplay) {
     renderer.takeOverDisplay();
     renderer.exec();
     assertTrue(drawingTest.didStart());
-    assertEqual(0, drawingTest.getTicks());
+    assertEquals(0, drawingTest.getTicks());
     drawingTest.clearFlags();
     for(int i=0;i<500;i++) renderer.exec();
-    assertEqual(500, drawingTest.getTicks());
+    assertEquals(500, drawingTest.getTicks());
     assertFalse(drawingTest.didReset());
 
     renderer.giveBackDisplay();
     for(int i=0;i<500;i++) renderer.exec();
     assertTrue(drawingTest.didReset());
 
-    assertEqual(500, drawingTest.getTicks());
+    assertEquals(500, drawingTest.getTicks());
 }
 
 extern int testBasicRuntimeFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
@@ -446,7 +447,7 @@ test(testListRendering) {
 
     renderer.resetCommandStates();
     renderer.exec();
-    assertEqual((bsize_t)5, renderer.getMenuItemRecordings().count());
+    assertEquals((bsize_t)5, renderer.getMenuItemRecordings().count());
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(0), Coord(0, 0), Coord(320, 30), pointer2, GridPosition::DRAW_TITLE_ITEM, GridPosition::JUSTIFY_CENTER_NO_VALUE, 0, &runtimeItem));
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(1), Coord(0, 40), Coord(320, 20), pointer1, GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 0, &runtimeItem));
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(2), Coord(0, 65), Coord(320, 20), pointer1, GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 0, &runtimeItem));

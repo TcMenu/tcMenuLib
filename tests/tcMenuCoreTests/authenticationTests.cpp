@@ -1,11 +1,12 @@
 #ifndef _BASE_REMOTE_TESTS_H
 #define _BASE_REMOTE_TESTS_H
 
-#include <AUnit.h>
+#include <testing/SimpleTest.h>
 #include <MockEepromAbstraction.h>
 #include "RemoteAuthentication.h"
 #include "fixtures_extern.h"
-using namespace aunit;
+
+using namespace SimpleTest;
 
 void printAllAuthenticatorEntries(EepromAuthenticatorManager& authenticator, const char* why) {
 	Serial.print(why);
@@ -27,7 +28,7 @@ test(authenticationTest) {
 	EepromAuthenticatorManager authenticator;
 	authenticator.initialise(&eeprom, 10);
 
-    assertEqual(eeprom.read16(10), uint16_t(0x9B32));
+    assertEquals(eeprom.read16(10), uint16_t(0x9B32));
 
     // we should be in an out the box state, nothing should authenticate.
     assertFalse(authenticator.isAuthenticated("uuid1", uuid1));
