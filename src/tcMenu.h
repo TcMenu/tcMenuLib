@@ -448,6 +448,8 @@ public:
 
     void setEditorHintsLocked(bool locked);
 
+    void resetObservers();
+
 protected:
 	void setupForEditing(MenuItem* item);
 	void actionOnCurrentItem(MenuItem * toEdit);

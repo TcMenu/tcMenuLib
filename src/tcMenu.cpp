@@ -390,6 +390,12 @@ void MenuManager::addChangeNotification(MenuManagerObserver *observer) {
     }
 }
 
+void MenuManager::resetObservers() {
+    for(auto& i : structureNotifier) {
+        i= nullptr;
+    }
+}
+
 void MenuManager::load(uint16_t magicKey, TimerFn onEepromEmpty) {
     if(!loadMenuStructure(eepromRef, magicKey) && onEepromEmpty != nullptr) {
         serlogF(SER_TCMENU_INFO, "Run EEPROM empty cb");
