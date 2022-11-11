@@ -18,8 +18,7 @@ bool setTimeAndCompareResult(TimeFormattedMenuItem& item, int hr, int min, int s
     item.copyValue(sz, sizeof sz);
     bool success = strncmp(expected, sz, sizeof sz) == 0;
     if(!success) {
-        Serial.print("Failed exp="); Serial.print(expected);
-        Serial.print(", act="); Serial.println(sz);
+        serdebugF4("Failed exp=", expected, ", act=", sz);
     }
     return success;
 }

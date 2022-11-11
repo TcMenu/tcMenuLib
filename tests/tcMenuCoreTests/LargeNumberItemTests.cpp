@@ -8,15 +8,11 @@
 #include <tcMenu.h>
 
 void dumpBuffer(LargeFixedNumber* buffer) {
-	Serial.print("Largenumber buffer: ");
+	serdebugF("Largenumber buffer: ");
 	const uint8_t* underlyingBuffer = buffer->getNumberBuffer();
 	for (int i = 0; i < 6; i++) {
-		Serial.print((unsigned int)(underlyingBuffer[i] & 0x0f));
-        Serial.print(" ");
-		Serial.print((unsigned int)(underlyingBuffer[i] >>4));
-		Serial.print(" ");
+		serdebug3(i, (unsigned int)(underlyingBuffer[i] & 0x0f), underlyingBuffer[i] >>4);
 	}
-	Serial.println();
 }
 
 test(testGettingAndSettingDigits) {
@@ -330,6 +326,7 @@ test(LargeNumberWithOneDecimalPlace) {
     editable.getLargeNumber()->setValue(13, 5, false);
     assertTrue(checkMatches(editable.getLargeNumber(), 13, 5, 13.5F, false));
 
+#ifdef IOA_USE_ARDUINO
     // conversion from a string object with too many decimal places -eg 3.100
     auto str = String(3.1F, 3);
     editable.setLargeNumberFromString(str.c_str());
@@ -339,6 +336,7 @@ test(LargeNumberWithOneDecimalPlace) {
     str = String(3.999F, 3);
     editable.setLargeNumberFromString(str.c_str());
     assertTrue(checkMatches(editable.getLargeNumber(), 3, 9, 3.9F, false));
+#endif // Arduino only test
 
     editable.getLargeNumber()->setFromFloat(14.9999F);
     assertTrue(checkMatches(editable.getLargeNumber(), 14, 9, 14.9F, false));

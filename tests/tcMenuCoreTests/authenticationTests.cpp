@@ -9,19 +9,14 @@
 using namespace SimpleTest;
 
 void printAllAuthenticatorEntries(EepromAuthenticatorManager& authenticator, const char* why) {
-	Serial.print(why);
-	Serial.print(". entries : ");
+	serdebug2(why, ". entries : ");
 	for (int i = 0; i < authenticator.getNumberOfEntries(); i++) {
 		char sz[16];
 		authenticator.copyKeyNameToBuffer(i, sz, sizeof(sz));
 		if (sz[0] != 0) {
-			Serial.print(sz);
-			Serial.print('(');
-			Serial.print(i);
-			Serial.print(") ");
+			serdebug3(sz, ' ', i);
 		}
 	}
-	Serial.println();
 }
 
 test(authenticationTest) {

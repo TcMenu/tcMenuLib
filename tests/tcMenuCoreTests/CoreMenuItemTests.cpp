@@ -10,7 +10,8 @@
 
 RENDERING_CALLBACK_NAME_INVOKE(ipMenuItemTestCb, ipAddressRenderFn, "HelloWorld", 102, NULL)
 
-test(testIpAddressItem) {
+
+testF(TaskManagerResettingTest, testIpAddressItem) {
 	IpAddressMenuItem ipItem(ipMenuItemTestCb, 2039, NULL);
 	ipItem.setIpAddress(192U, 168U, 0U, 96U);
 
@@ -53,7 +54,7 @@ test(testIpAddressItem) {
 	assertTrue(isMenuRuntimeMultiEdit(&ipItem));
 }
 
-test(testSettingIpItemDirectly) {
+testF(TaskManagerResettingTest, testSettingIpItemDirectly) {
 	IpAddressMenuItem ipItem(ipMenuItemTestCb, 2039, NULL);
 	char sz[20];
 
@@ -75,7 +76,7 @@ test(testSettingIpItemDirectly) {
 
 }
 
-test(testFloatType) {
+testF(TaskManagerResettingTest, testFloatType) {
 	menuFloatItem.clearSendRemoteNeededAll();
 	menuFloatItem.setChanged(false);
 	menuFloatItem.setFloatValue(1.001);
@@ -114,7 +115,7 @@ test(testFloatType) {
 	assertFalse(isMenuRuntimeMultiEdit(&menuFloatItem));
 }
 
-test(testAuthMenuItem) {
+testF(TaskManagerResettingTest, testAuthMenuItem) {
 	EepromAuthenticatorManager auth;
 	auth.initialise(&eeprom, 20);
 	auth.addAdditionalUUIDKey("uuid1", uuid1);

@@ -26,9 +26,11 @@ const char PROGMEM pgmMyName[]  = "UnitTest";
 int counter = 0;
 const PROGMEM ConnectorLocalInfo applicationInfo = { "DfRobot", "2ba37227-a412-40b7-94e7-42caf9bb0ff4" };
 
+IOLOG_MBED_PORT_IF_NEEDED(USBTX, USBRX)
+
 void setup() {
-    Serial.begin(115200);
-    while(!Serial);
+    IOLOG_START_SERIAL
+    serEnableLevel(SER_IOA_DEBUG, true);
     startTesting();
 
     menuMgr.initWithoutInput(&noRenderer, &menuVolume);
@@ -36,53 +38,14 @@ void setup() {
 
 DEFAULT_TEST_RUNLOOP
 
-test(testTcUtilIntegerConversions) {
-    char szBuffer[20];
-    
-    // first check the basic cases for the version that always starts at pos 0
-    strcpy(szBuffer, "abc");
-    ltoaClrBuff(szBuffer, 1234, 4, ' ', sizeof(szBuffer));
-    assertStringEquals(szBuffer, "1234");
-    ltoaClrBuff(szBuffer, 907, 4, ' ', sizeof(szBuffer));
-    assertStringEquals(szBuffer, " 907");
-    ltoaClrBuff(szBuffer, 22, 4, '0', sizeof(szBuffer));
-    assertStringEquals(szBuffer, "0022");
-	ltoaClrBuff(szBuffer, -22, 4, '0', sizeof(szBuffer));
-	assertStringEquals(szBuffer, "-0022");
-	ltoaClrBuff(szBuffer, -93, 2, NOT_PADDED, sizeof(szBuffer));
-	assertStringEquals(szBuffer, "-93");
-    ltoaClrBuff(szBuffer, 0, 4, NOT_PADDED, sizeof(szBuffer));
-    assertStringEquals(szBuffer, "0");
-
-    // and now test the appending version with zero padding
-    strcpy(szBuffer, "val = ");
-    fastltoa(szBuffer, 22, 4, '0', sizeof(szBuffer));
-    assertStringEquals(szBuffer, "val = 0022");
-
-    // and now test the appending version with an absolute divisor.
-    strcpy(szBuffer, "val = ");
-    fastltoa_mv(szBuffer, 22, 1000, '0', sizeof(szBuffer));
-    assertStringEquals(szBuffer, "val = 022");
-
-    // and lasty try the divisor version without 0.
-    strcpy(szBuffer, "val = ");
-    fastltoa_mv(szBuffer, 22, 10000, NOT_PADDED, sizeof(szBuffer));
-    assertStringEquals(szBuffer, "val = 22");
-
-    // and now try something bigger than the divisor
-    strcpy(szBuffer, "val = ");
-    fastltoa_mv(szBuffer, 222222, 10000, NOT_PADDED, sizeof(szBuffer));
-    assertStringEquals(szBuffer, "val = 2222");
-}
-
 void printMenuItem(MenuItem* menuItem) {
     if(menuItem == nullptr) {
-        Serial.print("NULL");
+        serdebugF("NULL");
     }
     else {
         char buffer[20];
         menuItem->copyNameToBuffer(buffer, sizeof buffer);
-        Serial.print(menuItem->getId());Serial.print(',');Serial.print(menuItem->getMenuType());Serial.print(',');Serial.print(buffer);
+        serdebug3(menuItem->getId(), menuItem->getMenuType(),buffer);
     }
 }
 
@@ -90,16 +53,14 @@ class MenuItemIteratorFixture : public UnitTestExecutor {
 public:
     bool checkMenuItem(MenuItem* actual, MenuItem* expected) {
         if(expected != actual) {
-            Serial.print("Menu items are not equal: expected=");
+            serdebugF("Menu items are not equal: expected=");
             printMenuItem(expected);
-            Serial.print(". Actual=");
+            serdebugF(". Actual=");
             printMenuItem(actual);
-            Serial.println();
         }
         return (actual == expected);
     }
 };
-
 
 testF(MenuItemIteratorFixture, testTcUtilGetParentAndVisit) {
     menuMgr.initWithoutInput(&noRenderer, &menuVolume);
@@ -166,7 +127,7 @@ testF(MenuItemIteratorFixture, testIterationWithPredicate) {
     iterator.setPredicate(&subPredicate);
 
     for(int i=0;i<3;i++) {
-        Serial.print("Type Predicate item iteration ");Serial.println(i);
+        serdebugF2("Type Predicate item iteration ", i);
 
         assertTrue(checkMenuItem(iterator.nextItem(), &menuSettings));
         assertTrue(checkMenuItem(iterator.nextItem(), &menuStatus));
@@ -214,7 +175,7 @@ testF(MenuItemIteratorFixture, testIteratorTypePredicateLocalOnly) {
     menuStatus.setLocalOnly(true);
 
     for(int i=0;i<3;i++) {
-        Serial.print("Local Int Predicate item iteration ");Serial.println(i);
+        serdebugF2("Local Int Predicate item iteration ", i);
 
         assertTrue(checkMenuItem(iterator.nextItem(), &menuVolume));
         assertTrue(checkMenuItem(iterator.nextItem(), &menuSettings));
@@ -226,7 +187,7 @@ testF(MenuItemIteratorFixture, testIteratorTypePredicateLocalOnly) {
     menuStatus.setLocalOnly(false);
 
     for(int i=0;i<3;i++) {
-        Serial.print("Local Int Predicate (secondLevel local only)");Serial.println(i);
+        serdebugF2("Local Int Predicate (secondLevel local only)", i);
 
         assertTrue(checkMenuItem(iterator.nextItem(), &menuSettings));
         assertTrue(checkMenuItem(iterator.nextItem(), &menuContrast));
@@ -240,7 +201,7 @@ testF(MenuItemIteratorFixture, testIteratorTypePredicateLocalOnly) {
 }
 
 class NothingMatchingMenuPredicate : public MenuItemPredicate {
-    bool matches(MenuItem* /*ignored*/) override {
+    bool matches(MenuItem* ) override {
         return false;
     }
 };
@@ -270,7 +231,7 @@ testF(MenuItemIteratorFixture, testIterationOverAllMenuItems) {
 
     // iterators should be completely repeatable
     for(int i=0;i<3;i++) {
-        Serial.print("All item iteration ");Serial.println(i);
+        serdebugF2("All item iteration ", i);
 
         // this should be the list of items in the text fixture exactly as they
         // are laid out in the file, IE depth first ordering.

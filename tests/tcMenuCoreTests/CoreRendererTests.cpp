@@ -1,4 +1,3 @@
-#include <Arduino.h>
 #include <testing/SimpleTest.h>
 #include <graphics/GfxMenuConfig.h>
 #include <graphics/BaseGraphicalRenderer.h>
@@ -65,7 +64,7 @@ bool checkPropertiesBasics(ItemDisplayProperties* props, const char* name, const
     return true;
 }
 
-test(testEmptyItemPropertiesFactory) {
+testF(TaskManagerResettingTest, testEmptyItemPropertiesFactory) {
     assertEquals(4, (int)sizeof(GridPosition));
     assertEquals(4, (int)sizeof(Coord));
     assertEquals(2, (int)sizeof(MenuPadding));
@@ -89,7 +88,7 @@ void populatePropsWithDefaults(ConfigurableItemDisplayPropertiesFactory& factory
     taskManager.reset();
 }
 
-test(testDefaultItemPropertiesFactory) {
+testF(TaskManagerResettingTest, testDefaultItemPropertiesFactory) {
     ConfigurableItemDisplayPropertiesFactory factory;
     populatePropsWithDefaults(factory);
 
@@ -115,7 +114,7 @@ test(testDefaultItemPropertiesFactory) {
     assertTrue(checkPadding(config->getPadding(), 2,3,4,5));
 }
 
-test(testSubAndItemSelectionPropertiesFactory) {
+testF(TaskManagerResettingTest, testSubAndItemSelectionPropertiesFactory) {
     ConfigurableItemDisplayPropertiesFactory factory;
     populatePropsWithDefaults(factory);
 
@@ -132,7 +131,7 @@ test(testSubAndItemSelectionPropertiesFactory) {
     assertTrue(checkPadding(config->getPadding(), 6,6,6,6));
 }
 
-test(testIconStorageAndRetrival) {
+testF(TaskManagerResettingTest, testIconStorageAndRetrival) {
     ConfigurableItemDisplayPropertiesFactory factory;
     factory.addImageToCache(DrawableIcon(menuVolume.getId(), Coord(1, 3), DrawableIcon::ICON_XBITMAP, pointer1, pointer2));
     factory.addImageToCache(DrawableIcon(menuSub.getId(), Coord(2, 1), DrawableIcon::ICON_NATIVE, pointer3));
@@ -160,7 +159,7 @@ test(testIconStorageAndRetrival) {
     assertEquals(pointer3, icon->getIcon(true));
 }
 
-test(testGridPositionStorageAndRetrival) {
+testF(TaskManagerResettingTest, testGridPositionStorageAndRetrival) {
     ConfigurableItemDisplayPropertiesFactory factory;
     factory.addGridPosition(&menuVolume, GridPosition(GridPosition::DRAW_INTEGER_AS_UP_DOWN, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 2, 10));
     factory.addGridPosition(&menuStatus, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 2, 4, 0));
@@ -191,7 +190,7 @@ TitleWidget widget2 = TitleWidget(icons2, 3, 8, 4, nullptr);
 TitleWidget widget1 = TitleWidget(icons1, 2, 8, 3, &widget2);
 const char pgmName[] PROGMEM = "Test";
 
-test(testWidgetFunctionality) {
+testF(TaskManagerResettingTest, testWidgetFunctionality) {
     assertEquals((uint8_t)8, widget1.getWidth());
     assertEquals((uint8_t)3, widget1.getHeight());
     assertEquals((uint8_t)2, widget1.getMaxValue());
@@ -265,7 +264,7 @@ bool checkItem(MenuDrawingRecord* record, Coord where, Coord size, const void* f
     return true;
 }
 
-test(testBaseRendererWithDefaults) {
+testF(TaskManagerResettingTest, testBaseRendererWithDefaults) {
 
     TestCapturingRenderer renderer(320, 120, false, pgmName);
 
@@ -333,7 +332,7 @@ void selectItem(MenuItem* root, MenuItem* toSelect) {
     }
 }
 
-test(testScrollingWithMoreThanOneItemOnRow) {
+testF(TaskManagerResettingTest, testScrollingWithMoreThanOneItemOnRow) {
     TestCapturingRenderer renderer(320, 100, false, pgmName);
     renderer.setTitleMode(BaseGraphicalRenderer::NO_TITLE);
 
@@ -406,7 +405,7 @@ public:
     }
 };
 
-test(testTakeOverDisplay) {
+testF(TaskManagerResettingTest, testTakeOverDisplay) {
     TestCapturingRenderer renderer(320, 100, false, pgmName);
     menuMgr.initWithoutInput(&renderer, &textMenuItem1);
     DisplayDrawing drawingTest;
@@ -435,7 +434,7 @@ test(testTakeOverDisplay) {
 
 extern int testBasicRuntimeFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
 
-test(testListRendering) {
+testF(TaskManagerResettingTest, testListRendering) {
     ListRuntimeMenuItem runtimeItem(101, 20, testBasicRuntimeFn, nullptr);
     TestCapturingRenderer renderer(320, 100, false, pgmName);
     DisplayDrawing drawingTest;
