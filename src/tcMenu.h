@@ -378,7 +378,7 @@ public:
 	void changeMenu(MenuItem* possibleActive=nullptr);
 
 	/**
-	 * Make the menu item provided in `theNewItem` the current menu on display, this item should be either the item referred
+	 * Make the menu item `theNewItem` the ROOT of the current menu on display, this item should be either the item referred
 	 * to by `rootMenuItem()` or the first child item of a submenu, normally obtained by calling `menuSub.getChild()` on the
 	 * submenu. If `skipHistory` is false, this navigation will be put into the navigation history, and the back menu
 	 * will then cleanly go back through this item.
