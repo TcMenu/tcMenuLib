@@ -17,6 +17,8 @@
  * Shows how to use adafruit graphics with a TFT panel and an ethernet module.
  * This is a 32 bit example, which by default targets 32 bit devices.
  * Assumed board for this is a SAMD based MKR board.
+ *
+ * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
  * 
  * For more details see the README.md file in this directory.
  */

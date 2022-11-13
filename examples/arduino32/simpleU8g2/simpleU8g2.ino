@@ -5,7 +5,8 @@
  * trying to get started with either adafruit graphics or u8g2. It is missing title widgets,
  * remote capabilities,  and many other things but makes for the simplest possible starting 
  * point for a graphical build.
- * 
+ *
+ * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
  */
 
 #include "simpleU8g2_menu.h"

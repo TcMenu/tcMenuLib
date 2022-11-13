@@ -1,7 +1,8 @@
 /**
- * This example assumes you've got an Uno / MEGA with the DF robot board. It uses a the switches that are connected to
- * analog 0 and tries to keep as much in line with the DF robot spec as possible.
- * See the readme file for more info.
+ * This example assumes you've got an Uno / MEGA with the DF robot board. It uses the switches that are connected to
+ * A0 to control the menu, including the next and back support.
+ *
+ * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
  */
 #include "analogDfRobot_menu.h"
 #include "AnalogDeviceAbstraction.h"

@@ -6,6 +6,8 @@
  *
  * Although it's set up to run on SAMD there is no reason it could not be easily reconfigured for any
  * other board.
+ *
+ * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
  */
 
 #include "dynamicMenuItems_menu.h"

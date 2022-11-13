@@ -5,6 +5,8 @@
  * can load the example's emf file into TcMenu Designer and take a look around or re-build it.
  *
  * You can get or adjust the pin configurations by loading the emf file into the designer
+ *
+ * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
  */
 
 #include "nano33ble_menu.h"

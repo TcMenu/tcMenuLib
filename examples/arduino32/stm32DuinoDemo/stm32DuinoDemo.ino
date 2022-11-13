@@ -2,6 +2,8 @@
  * This is a simple demo application for Stm32Duino based boards. It just showcases many of the types of editor that
  * are available. By default it is setup for an OLED screen and a rotary encoder, although it could be moved to use
  * many other different display and input technologies.
+ *
+ * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
  */
 
 #include "stm32DuinoDemo_menu.h"

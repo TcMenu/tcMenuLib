@@ -1,3 +1,9 @@
+/**
+ * An example that we test regularly on a Raspberry PI Pico (should work on either core), it has a screen based on
+ * the TFT_eSPI library and also a rotary encoder. It demonstrates quite a few features of the library.
+ *
+ * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
+ */
 #include "piPicoTftEncoder_menu.h"
 #include <PlatformDetermination.h>
 #include <IoLogging.h>
