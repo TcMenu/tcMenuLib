@@ -380,8 +380,12 @@ public:
 	/**
 	 * Make the menu item `theNewItem` the ROOT of the current menu on display, this item should be either the item referred
 	 * to by `rootMenuItem()` or the first child item of a submenu, normally obtained by calling `menuSub.getChild()` on the
-	 * submenu. If `skipHistory` is false, this navigation will be put into the navigation history, and the back menu
-	 * will then cleanly go back through this item.
+	 * submenu. When we navigate to a new item, by default menu manager keeps breadcrumbs to be able to go back nicely
+	 * afterwards. If you are navigiating to a dynamic menu that should not go into this history, set skipHistory to true.
+	 *
+	 * There is more information about this online see:
+	 * https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menumanager-and-iteration/#navigation-around-menus
+	 *
 	 * @param theNewItem the first child menu item of the submenu (or root item)
 	 * @param possibleActive the item to activate or null for default
 	 * @param skipHistory set to true if this menu is custom and should not be stored in the history
