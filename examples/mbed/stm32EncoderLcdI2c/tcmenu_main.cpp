@@ -1,6 +1,8 @@
 #include <mbed.h>
 #include "stm32EncoderLcdI2c_menu.h"
 
+// Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
+
 //
 // Set up the logging support in IoAbstraction. For mbed we rely on an MBedLogger being created.
 //

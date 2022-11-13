@@ -10,6 +10,8 @@
  * 
  * The circuit uses a PCF8574 with both the input via rotary encoder and the outputs for the heater
  * and window opener driven by it too.
+ *
+ * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
  */
 
 #include <U8g2lib.h>

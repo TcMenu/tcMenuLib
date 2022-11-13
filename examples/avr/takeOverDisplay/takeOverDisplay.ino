@@ -20,6 +20,7 @@
  * This example also shows how to use an i2c AT24 EEPROM instead of the AVR one, comment in/out the one you want in the
  * sketch.
  *
+ * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
  */
 
 #include "takeOverDisplay_menu.h"

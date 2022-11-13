@@ -26,6 +26,8 @@
  * Connections by default:
  * Encoder A=36, B=37, Sel=21
  * Touch Up=5, Down=7, Sel=6
+ *
+ * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
  */
 
 #include <Adafruit_ILI9341.h>

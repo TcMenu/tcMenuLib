@@ -1,11 +1,10 @@
-/**
- * BETA early access, the frame buffer is not yet fully working. Only for evaluation.
- */
+// An example showing how to setup and use the BSP framebuffer support for STM32 devices on mbed. Tested and working
+// with STM32F4x9 DISC1
+//
+// Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
 
 #include <mbed.h>
 #include "stm32f429FrameBuffer_menu.h"
-
-
 
 BufferedSerial console(USBTX, USBRX);
 MBedLogger LoggingPort(console);

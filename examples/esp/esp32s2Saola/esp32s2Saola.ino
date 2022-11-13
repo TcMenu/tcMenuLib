@@ -2,6 +2,7 @@
 // ESP32 S2 example based on Saola board
 // I2C on standard pin, 8 and 9 with an SH1106 display
 // encoder on 5, 6 with button on 7
+// Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
 //
 
 #include "esp32s2Saola_menu.h"

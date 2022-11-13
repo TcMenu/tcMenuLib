@@ -4,6 +4,8 @@
  * the menu, we defaulted to SPI, but you could change easily to i2c.
  *
  * Compilation works for both mbed 5 and 6. Add build flag -DBUILD_FOR_MBED_6 to build for V6. This is an RTOS example.
+ *
+ * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
  */
 
 #include <mbed.h>

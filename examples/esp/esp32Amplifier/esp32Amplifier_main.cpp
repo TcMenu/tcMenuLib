@@ -8,6 +8,8 @@
  * YNEG_PIN 0
  *
  * Screen setup for 320x240 LANDSCAPE.
+ *
+ * https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
  */
 
 #include <Arduino.h>

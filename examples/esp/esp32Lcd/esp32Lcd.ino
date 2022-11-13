@@ -1,3 +1,7 @@
+// An example showing how to draw in columns and rows onto an LCD screen using an ESP32 device
+//
+// See getting started guide: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
+
 #include "esp32Lcd_menu.h"
 
 //                   0         1         2         3

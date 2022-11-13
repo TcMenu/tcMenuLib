@@ -4,6 +4,8 @@
  * This game shows the use of the SSD1306ASCII library written by greiman, it combines that with the analog joystick
  * support built into tcMenu.
  *
+ * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
+ *
  * Hardware:
  * * I2C OLED display that is suitable for use with SSD1306ASCII
  * * Analog Joystick with X and Y axis (A0-Y axis, A1-X axis, A2-button).

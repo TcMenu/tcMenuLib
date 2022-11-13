@@ -6,7 +6,8 @@
  *
  * More information about matrix keyboard support:
  * https://www.thecoderscorner.com/products/arduino-libraries/io-abstraction/matrix-keyboard-keypad-manager/
-
+ *
+ * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
  */
 #include "keyboardEthernetShield_menu.h"
 #include <IoAbstractionWire.h>
