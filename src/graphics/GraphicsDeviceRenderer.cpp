@@ -128,6 +128,7 @@ namespace tcgfx {
             fg = props->getColor(ItemDisplayProperties::TEXT);
         }
 
+        copyMenuItemValue(pEntry->getMenuItem(), buffer, bufferSize);
         bool weAreEditingWithCursor = pEntry->getMenuItem()->isEditing() && menuMgr.getCurrentEditor() != nullptr
                                       && editorHintNeedsCursor(menuMgr.getEditorHints().getEditorRenderingType());
 
