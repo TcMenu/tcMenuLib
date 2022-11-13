@@ -42,6 +42,14 @@ bool loadMenuStructure(EepromAbstraction* eeprom, uint16_t magicKey = 0xfade);
 bool loadMenuItem(EepromAbstraction* eeprom, MenuItem* theItem, uint16_t magicKey = 0xfade);
 
 /**
+ * Saves a single item back to the EEPROM, it will NOT write the magic key, it is assumed that a full save has already
+ * been done at some point in the past.
+ * @param eeprom the EEPROM storage to save to
+ * @param theItem the item to save
+ */
+void saveMenuItem(EepromAbstraction* eeprom, MenuItem* theItem);
+
+/**
  * This will trigger callbacks in a controlled manner, for only items that would be loaded from EEPROM, and only if
  * the item is marked as changed. This is much safer than the previous option, which was to run all callbacks as
  * part of the load call, when most of the system may not have started yet.
