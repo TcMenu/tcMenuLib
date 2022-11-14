@@ -385,6 +385,11 @@
         "subsystem": "DISPLAY"
       },
       {
+        "name": "USE_UTF8_SUPPORT",
+        "latestValue": "true",
+        "subsystem": "DISPLAY"
+      },
+      {
         "name": "SW_POLLING_MODE",
         "latestValue": "SWITCHES_POLL_EVERYTHING",
         "subsystem": "INPUT"
