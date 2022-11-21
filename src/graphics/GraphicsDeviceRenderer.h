@@ -148,6 +148,14 @@ namespace tcgfx {
         virtual Coord textExtents(const void* font, int mag, const char* text, int* baseline)=0;
 
         /**
+         * Draw a pixel in the current draw color at the location provided. This should be implemented in the most
+         * optimal way possible for the platform
+         * @param x the x location
+         * @param y the y location
+         */
+        virtual void drawPixel(uint16_t x, uint16_t y)=0;
+
+        /**
          * Gets the width and height of the text in the font provided, returned in a Coord.
          * @param font the font to measure
          * @param mag the magnification if supported
