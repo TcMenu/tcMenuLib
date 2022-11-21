@@ -50,20 +50,20 @@ namespace tcgfx {
      * Each glyph in the font is represented by this struct. This describes how to render each character.
      */
     typedef struct {
-        /** offset into the bitmap array */
-        uint32_t relativeBmpOffset:17;
         /** The character number in the array */
         uint32_t relativeChar: 15;
+        /** offset into the bitmap array */
+        uint32_t relativeBmpOffset:17;
         /** width of the bitmap in pixels */
         uint8_t width;
         /** height of the bitmap in pixels */
         uint8_t height;
+        /** how far to advance in the x dimension */
+        uint8_t xAdvance;
         /** the x offset from the UL corner */
         int8_t xOffset;
         /** the y offset from the UL corner, usually negative */
         int8_t yOffset;
-        /** how far to advance in the x dimension */
-        uint8_t xAdvance;
     } UnicodeFontGlyph;
 
     /**
@@ -76,7 +76,7 @@ namespace tcgfx {
         /** the array of bitmaps for each letter */
         const uint8_t *bitmap;
         /** The glyphs within this block */
-        UnicodeFontGlyph *glyphs;
+        const UnicodeFontGlyph *glyphs;
         /** The number of points in this block */
         uint16_t numberOfPoints;
     } UnicodeFontBlock;
@@ -87,7 +87,7 @@ namespace tcgfx {
      */
     typedef struct {
         /** the array of unicode glyphs */
-        UnicodeFontBlock *unicodeBlocks;
+        const UnicodeFontBlock *unicodeBlocks;
         /** the number of items */
         uint16_t numberOfBlocks;
         /** the height of each line */
@@ -108,7 +108,7 @@ namespace tcgfx {
     class GlyphWithBitmap {
     private:
         const uint8_t* bitmapData = nullptr;
-        UnicodeFontGlyph* glyph = nullptr;
+        const UnicodeFontGlyph* glyph = nullptr;
     public:
         /**
          * @return the actual bitmap data with offset already applied
@@ -120,7 +120,7 @@ namespace tcgfx {
         /**
          * @return the glyph instructions for rendering.
          */
-        UnicodeFontGlyph* getGlyph() const {
+        const UnicodeFontGlyph* getGlyph() const {
             return glyph;
         }
 
@@ -128,7 +128,7 @@ namespace tcgfx {
             GlyphWithBitmap::bitmapData = bm;
         }
 
-        void setGlyph(UnicodeFontGlyph* g) {
+        void setGlyph(const UnicodeFontGlyph* g) {
             GlyphWithBitmap::glyph = g;
         }
     };
@@ -194,9 +194,9 @@ namespace tcgfx {
         void setFont(const GFXfont *font) { adaFont = font; fontAdafruit = true; }
 
         /**
-         * Sets the font based on the magnification, -1 value means the font is a unicode font,
-         * any other value is adafruit. The usual way is to set magnification to -1 for unicode,
-         * otherwise set it to 0 or 1 for adafruit.
+         * Sets the font based on the magnification, 0 value means the font is a unicode font,
+         * any other value is adafruit. The usual way is to set magnification to 0 for unicode,
+         * otherwise set it to 1 or more for adafruit.
          * @param font a void font pointer to be decided using mag
          * @param mag when -1=Unicode, otherwise Adafruit
          */

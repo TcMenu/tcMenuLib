@@ -160,7 +160,7 @@ tcgfx::Coord tcgfx::UnicodeFontHandler::textExtent(uint32_t theChar) {
     return Coord(gb.getGlyph()->xAdvance, getYAdvance());
 }
 
-UnicodeFontGlyph *findWithinGlyphs(UnicodeFontBlock* block, uint32_t ch) {
+const UnicodeFontGlyph *findWithinGlyphs(const UnicodeFontBlock* block, uint32_t ch) {
     size_t start = 0;
     size_t end = block->numberOfPoints - 1;
     bool failed = false;
@@ -171,12 +171,12 @@ UnicodeFontGlyph *findWithinGlyphs(UnicodeFontBlock* block, uint32_t ch) {
         size_t middle = ((end - start) / 2) + start;
         uint32_t charNumMiddle = block->glyphs[middle].relativeChar;
         if (charNumMiddle == ch) return &block->glyphs[middle];
-        if (charNumMiddle < ch) {
+        if (ch < charNumMiddle) {
             end = middle;
         } else {
             start = middle;
         }
-        if (start == end) failed = true;
+        if ((end - start) < 2) failed = true;
     }
     return nullptr;
 }
@@ -202,7 +202,7 @@ bool UnicodeFontHandler::findCharInFont(uint32_t code, GlyphWithBitmap& glyphBit
         for (uint16_t i = 0; i < unicodeFont->numberOfBlocks; i++) {
             uint32_t startingNum = unicodeFont->unicodeBlocks[i].startingNum;
             if (code >= startingNum) {
-                UnicodeFontGlyph *glyph = findWithinGlyphs(&unicodeFont->unicodeBlocks[i], code - startingNum);
+                const UnicodeFontGlyph *glyph = findWithinGlyphs(&unicodeFont->unicodeBlocks[i], code - startingNum);
                 if (glyph != nullptr) {
                     glyphBitmap.setGlyph(glyph);
                     glyphBitmap.setBitmapData(&unicodeFont->unicodeBlocks[i].bitmap[glyph->relativeBmpOffset]);
@@ -252,7 +252,7 @@ int UnicodeFontHandler::getBaseline() {
 }
 
 void UnicodeFontHandler::setFontFromMag(const void *font, int mag) {
-    if(mag == -1) {
+    if(mag == 0) {
         setFont((tcgfx::UnicodeFont*)font);
     } else {
         setFont((GFXfont*) font);
