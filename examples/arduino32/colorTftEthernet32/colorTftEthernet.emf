@@ -571,8 +571,8 @@
     "eepromDefinition": "at24:80:PAGESIZE_AT24C128",
     "authenticatorDefinition": "rom:100:6",
     "projectIoExpanders": [
-      "pcf8574:io8574:32:0:false",
-      "deviceIO:"
+      "deviceIO:",
+      "pcf8574:io8574:32:0:false"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []

@@ -30,7 +30,7 @@ DeviceDrawable *TfteSpiDrawable::getSubDeviceFor(const Coord &where, const Coord
     else return nullptr;
 }
 
-void TfteSpiDrawable::drawText(const Coord &where, const void *font, int mag, const char *text) {
+void TfteSpiDrawable::internalDrawText(const Coord &where, const void *font, int mag, const char *text) {
     fontPtrToNum(font, mag);
     tft->setTextColor(drawColor, drawColor); // transparent background
     tft->drawString(text, where.x, where.y);
@@ -92,6 +92,10 @@ Coord TfteSpiDrawable::textExtents(const void *font, int mag, const char *text, 
     if(baseline) *baseline = 0;
     fontPtrToNum(font, mag);
     return Coord(tft->textWidth(text), tft->fontHeight());
+}
+
+void TfteSpiDrawable::drawPixel(uint16_t x, uint16_t y) {
+    tft->drawPixel(x, y, drawColor);
 }
 
 void TfteSpiDrawable::fontPtrToNum(const void* font, int mag) {

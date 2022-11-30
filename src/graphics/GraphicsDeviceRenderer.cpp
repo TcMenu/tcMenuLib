@@ -4,6 +4,7 @@
  */
 
 #include "GraphicsDeviceRenderer.h"
+#include <tcUnicodeHelper.h>
 
 namespace tcgfx {
 
@@ -388,4 +389,28 @@ namespace tcgfx {
         drawable->drawBox(Coord(0, endPoint), Coord(width, height-endPoint), true);
     }
 
+    UnicodeFontHandler *DeviceDrawable::getUnicodeHandler(bool enableIfNeeded) {
+        if(enableIfNeeded) textTcUnicode = true;
+
+        if(textTcUnicode && fontHandler == nullptr) {
+            fontHandler = new UnicodeFontHandler(this, ENCMODE_UTF8);
+        }
+        return fontHandler;
+    }
+
+    void DeviceDrawable::drawText(const Coord& where, const void* font, int mag, const char* text) {
+        auto handler = getUnicodeHandler(false);
+        if(textTcUnicode && handler) {
+            handler->setCursor(where);
+            handler->setDrawColor(drawColor);
+            if(mag == 0) {
+                handler->setFont((UnicodeFont*) font);
+            } else {
+                handler->setFont((GFXfont*) font);
+            }
+            handler->print(text);
+        } else {
+            internalDrawText(where, font, mag, text);
+        }
+    }
 } // namespace tcgfx

@@ -34,7 +34,7 @@ public:
 
     DeviceDrawable *getSubDeviceFor(const Coord &where, const Coord& size, const color_t *palette, int paletteSize) override;
 
-    void drawText(const Coord &where, const void *font, int mag, const char *text) override;
+    void internalDrawText(const Coord &where, const void *font, int mag, const char *text) override;
 
     void drawBitmap(const Coord &where, const DrawableIcon *icon, bool selected) override;
 
@@ -45,6 +45,8 @@ public:
     void drawCircle(const Coord &where, int radius, bool filled) override;
 
     void drawPolygon(const Coord *points, int numPoints, bool filled) override;
+
+    void drawPixel(uint16_t x, uint16_t y) override;
 
     void transaction(bool isStarting, bool redrawNeeded) override;
 

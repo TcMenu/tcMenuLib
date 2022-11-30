@@ -17,8 +17,9 @@
 
 #define MINIMUM_CURSOR_SIZE 6
 
-namespace tcgfx {
+class UnicodeFontHandler;
 
+namespace tcgfx {
     /**
      * This is the interface that all graphical rendering devices extend from when using GraphicsDeviceRenderer. Instances
      * of this map all the graphics primitives for each display type. You can use it yourself in code to present moderately
@@ -42,8 +43,11 @@ namespace tcgfx {
      * supporting new graphical displays will be far easier, and less maintenance going forwards.
      */
     class DeviceDrawable {
+    private:
+        UnicodeFontHandler* fontHandler = nullptr;
     protected:
         color_t backgroundColor = 0, drawColor = 0;
+        bool textTcUnicode = false;
     public:
         virtual ~DeviceDrawable() = default;
         /**
@@ -64,13 +68,17 @@ namespace tcgfx {
         virtual DeviceDrawable* getSubDeviceFor(const Coord& where, const Coord& size, const color_t *palette, int paletteSize)=0;
 
         /**
-         * Draw text at the location requested using the font and color information provided.
+         * Draw text at the location requested using the font and color information provided. If the TcUnicode flag is
+         * enabled then all drawing will take place using TcUnicode, otherwise the native font support will be called,
+         * as implemented by `internalDrawText`.
          * @param where the position on the screen
          * @param font the font to use
          * @param mag the magnification of the font - if supported
          * @param text the string to print
          */
-        virtual void drawText(const Coord& where, const void* font, int mag, const char* text)=0;
+        void drawText(const Coord& where, const void* font, int mag, const char* text);
+
+        virtual void internalDrawText(const Coord& where, const void* font, int mag, const char* text)=0;
 
         /**
          * Draw an icon bitmap at the specified location using the provided color, you can choose either the regular or
@@ -198,6 +206,26 @@ namespace tcgfx {
          * @param fg foreground / drawing color.
          */
         void setDrawColor(color_t fg) { drawColor = getUnderlyingColor(fg); }
+
+        /**
+         * Enables the use of tcUnicode characters, and at this point the drawable assumes all fonts are tcUnicode or
+         * Adafruit GFX. This only prevents creation of the handler if called before getting the font handler.
+         * @param enabled true if TcUnicode support is to be enabled, otherwise false.
+         */
+        void setTcUnicodeEnabled(bool enabled) { textTcUnicode = enabled; }
+        /**
+         * Check if TcUnicode is enabled. Useful before calling `getFontHandler` to ensure the support is on.
+         * @return true if on, otherwise false
+         */
+        bool isTcUnicodeEnabled() { return textTcUnicode; }
+
+        /**
+         * Gets hold of the TcUnicode font handler that can render text onto the display. It has features similar to
+         * print and Adafruit GFX that make rendering unicode character with UTF-8 easier.
+         * @param enableIfNeeded if true, the TcUnicode enable flag will be enabled if needed.
+         * @return the font handler if unicode is enabled, otherwise nullptr.
+         */
+        UnicodeFontHandler* getUnicodeHandler(bool enableIfNeeded = true);
     };
 
     /**

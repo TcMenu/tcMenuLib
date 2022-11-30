@@ -80,6 +80,6 @@ void setupMenu() {
     menuMgr.initWithoutInput(&renderer, &menuPower);
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
     renderer.setUseSliderForAnalog(true);
-    installCoolBlueModernTheme(renderer, MenuFontDef(&OSArialArial16, 0), MenuFontDef(&FreeSans12pt7b, 1), false);
+    installCoolBlueModernTheme(renderer, MenuFontDef(&AudiowideRegular24, 0), MenuFontDef(&FreeSans12pt7b, 1), false);
 }
 

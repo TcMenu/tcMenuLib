@@ -132,16 +132,8 @@ namespace tcgfx {
             this->y = y;
         }
 
-        Coord(const Coord &other) {
-            this->x = other.x;
-            this->y = other.y;
-        }
-
-        Coord& operator = (const Coord& other) {
-            this->x = other.x;
-            this->y = other.y;
-            return *this;
-        }
+        Coord(const Coord &other) = default;
+        Coord& operator = (const Coord& other) = default;
 
         int32_t x: 16;
         int32_t y: 16;

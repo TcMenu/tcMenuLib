@@ -20,9 +20,13 @@
       {
         "name": "IoAbstraction",
         "authors": "DaveTCC"
+      },
+      {
+        "name": "tcUnicodeHelper",
+        "authors": "DaveTCC"
       }
     ],
-    "version": "2.5.1",
+    "version": "3.0.0",
     "license": "Apache-2.0",
     "frameworks": "arduino, mbed",
     "platforms": "*"
