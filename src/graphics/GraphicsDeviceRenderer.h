@@ -332,6 +332,8 @@ namespace tcgfx {
         void drawBorderAndAdjustSize(Coord &where, Coord &size, MenuBorder &border);
     };
 
+    void setTcFontAccordingToMag(UnicodeFontHandler* handler, const void* font, int mag);
+
 } // namespace tcgfx
 
 #endif //TCLIBRARYDEV_GRAPHICSDEVICERENDERER_H

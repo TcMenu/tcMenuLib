@@ -393,11 +393,7 @@ namespace tcgfx {
         auto handler = getUnicodeHandler(false);
         if(handler) {
             handler->setDrawColor(drawColor);
-            if(mag == 0) {
-                handler->setFont((UnicodeFont*) font);
-            } else {
-                handler->setFont((GFXfont*) font);
-            }
+            setTcFontAccordingToMag(handler, font, mag);
             handler->setCursor((int)where.x, (int)where.y + handler->getYAdvance());
             handler->print(text);
         } else {
@@ -419,14 +415,18 @@ namespace tcgfx {
     Coord DeviceDrawable::textExtents(const void *font, int mag, const char *text, int *baseline) {
         auto handler = getUnicodeHandler(false);
         if(handler) {
-            if(mag == 0) {
-                handler->setFont((UnicodeFont*) font);
-            } else {
-                handler->setFont((GFXfont*) font);
-            }
+            setTcFontAccordingToMag(handler, font, mag);
             return handler->textExtents(text, baseline, false);
         } else {
             return internalTextExtents(font, mag, text, baseline);
+        }
+    }
+
+    void setTcFontAccordingToMag(UnicodeFontHandler* handler, const void* font, int mag) {
+        if(mag == 0) {
+            handler->setFont((UnicodeFont*) font);
+        } else {
+            handler->setFont((GFXfont*) font);
         }
     }
 } // namespace tcgfx

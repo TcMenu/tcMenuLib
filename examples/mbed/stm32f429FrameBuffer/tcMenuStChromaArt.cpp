@@ -13,22 +13,28 @@
  * This library requires the u8g2 library available for download from your IDE library manager.
  */
 
+#include <tcUnicodeHelper.h>
 #include "tcMenuStChromaArt.h"
 #include "BspUserSettings.h"
 
-StChromaArtDrawable::StChromaArtDrawable(): textHandler(this, ENCMODE_UTF8) {
+StChromaArtDrawable::StChromaArtDrawable() {
     BSP_LCD_Init();
     BSP_LCD_LayerDefaultInit(0, SDRAM_DEVICE_ADDR);
 }
 
-void StChromaArtDrawable::drawText(const Coord &where, const void *font, int mag, const char *text) {
+Coord StChromaArtDrawable::internalTextExtents(const void *maybeFont, int mag, const char *text, int *baseline) {
+    auto fontHandler = getUnicodeHandler(true);
+    setTcFontAccordingToMag(fontHandler, maybeFont, mag);
+    return fontHandler->textExtents(text, baseline, false);
+}
+
+void StChromaArtDrawable::internalDrawText(const Coord &where, const void *font, int mag, const char *text) {
     if(font == nullptr) return; // font must be defined
 
-    textHandler.setFontFromMag(font, mag);
-    int bl = 0;
-    auto extents = textHandler.textExtents(text, &bl);
-    textHandler.setCursor(Coord(where.x, where.y + (extents.y - bl)));
-    textHandler.printUtf8(text);
+    auto handler = getUnicodeHandler(true);
+    setTcFontAccordingToMag(handler, font, mag);
+    handler->setCursor(where.x, where.y + handler->getYAdvance());
+    handler->print(text);
 }
 
 Coord StChromaArtDrawable::getDisplayDimensions() {
@@ -97,15 +103,6 @@ void StChromaArtDrawable::drawPolygon(const Coord *points, int numPoints, bool f
 }
 
 void StChromaArtDrawable::transaction(bool isStarting, bool redrawNeeded) {
-}
-
-Coord StChromaArtDrawable::textExtents(const void *maybeFont, int mag, const char *text, int *baseline) {
-    textHandler.setFontFromMag((UnicodeFont *) maybeFont, mag);
-    return textHandler.textExtents(text, baseline);
-}
-
-void StChromaArtDrawable::drawPixel(uint16_t x, uint16_t y) {
-    BSP_LCD_DrawPixel(x, y, drawColor);
 }
 
 #if TC_BSP_TOUCH_DEVICE_PRESENT == true

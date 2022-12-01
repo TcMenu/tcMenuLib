@@ -14,6 +14,7 @@
 #include <mbed.h>
 #include <tcMenu.h>
 
+#include <tcUnicodeHelper.h>
 #include "BspUserSettings.h"
 #include "tcMenuStChromaArt.h"
 #include <graphics/MenuTouchScreenEncoder.h>
@@ -29,12 +30,17 @@ extern StChromaArtDrawable Drawable;
 extern GraphicsDeviceRenderer renderer;
 extern StBspTouchInterrogator touchInterrogator;
 extern MenuTouchScreenManager touchScreen;
-extern const GFXfont FreeSans12pt7b;
+extern const UnicodeFont OpenSans18[];
+extern const GFXfont RobotoMedium24;
 
 // Any externals needed by IO expanders, EEPROMs etc
 
 
 // Global Menu Item exports
+extern AnalogMenuItem menuUnicodeLevel;
+extern EnumMenuItem menuUnicodeChoice;
+extern BackMenuItem menuBackUnicode;
+extern SubMenuItem menuUnicode;
 extern ActionMenuItem menuDialogs;
 extern EditableLargeNumberMenuItem menuSamplesLgePos;
 extern Rgb32MenuItem menuSamplesRGB;

@@ -264,6 +264,58 @@
         "localOnly": false,
         "visible": true
       }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "Unicode",
+        "variableName": "Unicode",
+        "id": 19,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 19,
+      "type": "enumItem",
+      "defaultValue": "0",
+      "item": {
+        "enumEntries": [
+          "Салат",
+          "піца",
+          "борщ"
+        ],
+        "name": "Вибір",
+        "variableName": "UnicodeChoice",
+        "id": 20,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 19,
+      "type": "analogItem",
+      "defaultValue": "0",
+      "item": {
+        "maxValue": 1000,
+        "offset": 0,
+        "divisor": 10,
+        "unitName": "П",
+        "step": 1,
+        "name": "Рівень",
+        "variableName": "UnicodeLevel",
+        "id": 21,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
     }
   ],
   "codeOptions": {
@@ -305,12 +357,12 @@
       },
       {
         "name": "ITEM_FONT",
-        "latestValue": "adl:FreeSans12pt7b,1",
+        "latestValue": "adl:OpenSans18,0",
         "subsystem": "THEME"
       },
       {
         "name": "TITLE_FONT",
-        "latestValue": "adl:FreeSans12pt7b,1",
+        "latestValue": "adl:RobotoMedium24,1",
         "subsystem": "THEME"
       },
       {
@@ -321,6 +373,11 @@
       {
         "name": "TITLE_SHOW_MODE",
         "latestValue": "TITLE_FIRST_ROW",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "USE_TC_UNICODE",
+        "latestValue": "true",
         "subsystem": "THEME"
       },
       {

@@ -21,7 +21,6 @@
 #include <tcUtil.h>
 #include <graphics/BaseGraphicalRenderer.h>
 #include <graphics/GraphicsDeviceRenderer.h>
-#include <graphics/UnicodeFontHandler.h>
 #include <BaseDialog.h>
 #include <tcUtil.h>
 #include <ResistiveTouchScreen.h>
@@ -45,26 +44,23 @@ using namespace tcgfx;
  * by providing font capabilities from the Adafruit Graphics libraries.
  */
 class StChromaArtDrawable : public DeviceDrawable {
-private:
-    UnicodeFontHandler textHandler;
 public:
     explicit StChromaArtDrawable();
     ~StChromaArtDrawable() override = default;
 
     DeviceDrawable* getSubDeviceFor(const Coord &where, const Coord &size, const color_t *palette, int paletteSize) override {return nullptr; }
 
-    void drawText(const Coord &where, const void *font, int mag, const char *text) override;
+    void internalDrawText(const Coord &where, const void *font, int mag, const char *text) override;
     void drawBitmap(const Coord &where, const DrawableIcon *icon, bool selected) override;
     void drawXBitmap(const Coord &where, const Coord &size, const uint8_t *data) override;
     void drawBox(const Coord &where, const Coord &size, bool filled) override;
     void drawCircle(const Coord &where, int radius, bool filled) override;
     void drawPolygon(const Coord *points, int numPoints, bool filled) override;
 
-    Coord getDisplayDimensions();
+    Coord getDisplayDimensions() override;
     void transaction(bool isStarting, bool redrawNeeded) override;
-    Coord textExtents(const void *font, int mag, const char *text, int *baseline) override;
-
-    void drawPixel(uint16_t x, uint16_t y) override;
+    Coord internalTextExtents(const void *font, int mag, const char *text, int *baseline) override;
+    void drawPixel(uint16_t x, uint16_t y) override { BSP_LCD_DrawPixel(x, y, drawColor); }
 };
 
 #if TC_BSP_TOUCH_DEVICE_PRESENT == true

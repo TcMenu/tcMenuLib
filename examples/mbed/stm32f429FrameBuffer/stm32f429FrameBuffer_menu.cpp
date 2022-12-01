@@ -11,8 +11,8 @@
 #include <tcMenu.h>
 #include "stm32f429FrameBuffer_menu.h"
 #include "ThemeCoolBlueModern.h"
-#include "Fonts/FreeSans12pt7b.h"
-#include "Fonts/OSArialArial12.h"
+#include "Fonts/OpenSans18.h"
+#include "Fonts/RobotoMedium24.h"
 
 // Global variable declarations
 const  ConnectorLocalInfo applicationInfo = { "Factory", "4df3d784-674a-4a3d-bcee-54a49693788e" };
@@ -23,8 +23,20 @@ StBspTouchInterrogator touchInterrogator(240, 320);
 MenuTouchScreenManager touchScreen(&touchInterrogator, &renderer, iotouch::TouchInterrogator::PORTRAIT);
 
 // Global Menu Item declarations
+const AnalogMenuInfo minfoUnicodeLevel = { "Рівень", 21, 0xffff, 1000, NO_CALLBACK, 0, 10, "П" };
+AnalogMenuItem menuUnicodeLevel(&minfoUnicodeLevel, 0, NULL);
+const char enumStrUnicodeChoice_0[] = "Салат";
+const char enumStrUnicodeChoice_1[] = "піца";
+const char enumStrUnicodeChoice_2[] = "борщ";
+const char* const enumStrUnicodeChoice[]  = { enumStrUnicodeChoice_0, enumStrUnicodeChoice_1, enumStrUnicodeChoice_2 };
+const EnumMenuInfo minfoUnicodeChoice = { "Вибір", 20, 0xffff, 2, NO_CALLBACK, enumStrUnicodeChoice };
+EnumMenuItem menuUnicodeChoice(&minfoUnicodeChoice, 0, &menuUnicodeLevel);
+RENDERING_CALLBACK_NAME_INVOKE(fnUnicodeRtCall, backSubItemRenderFn, "Unicode", -1, NO_CALLBACK)
+const SubMenuInfo minfoUnicode = { "Unicode", 19, 0xffff, 0, NO_CALLBACK };
+BackMenuItem menuBackUnicode(fnUnicodeRtCall, &menuUnicodeChoice);
+SubMenuItem menuUnicode(&minfoUnicode, &menuBackUnicode, NULL);
 const AnyMenuInfo minfoDialogs = { "Dialogs", 18, 0xffff, 0, onPresentDialog };
-ActionMenuItem menuDialogs(&minfoDialogs, NULL);
+ActionMenuItem menuDialogs(&minfoDialogs, &menuUnicode);
 RENDERING_CALLBACK_NAME_INVOKE(fnSamplesLgePosRtCall, largeNumItemRenderFn, "LgePos", -1, NO_CALLBACK)
 EditableLargeNumberMenuItem menuSamplesLgePos(fnSamplesLgePosRtCall, LargeFixedNumber(7, 0, 12456U, 0U, false), 17, false, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnSamplesRGBRtCall, rgbAlphaItemRenderFn, "RGB", -1, NO_CALLBACK)
@@ -80,6 +92,7 @@ void setupMenu() {
     menuMgr.initWithoutInput(&renderer, &menuPower);
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
     renderer.setUseSliderForAnalog(true);
-    installCoolBlueModernTheme(renderer, MenuFontDef(&AudiowideRegular24, 0), MenuFontDef(&FreeSans12pt7b, 1), false);
+    renderer.enableTcUnicode();
+    installCoolBlueModernTheme(renderer, MenuFontDef(&OpenSans18, 0), MenuFontDef(&RobotoMedium24, 1), false);
 }
 
