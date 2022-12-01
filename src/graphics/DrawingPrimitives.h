@@ -114,7 +114,8 @@ namespace tcgfx {
         }
     };
 
-
+#ifndef TC_COORD_DEFINED
+#define TC_COORD_DEFINED
     /** A structure that holds both X and Y direction in a single 32 bit integer. Both x and y are public */
     struct Coord {
         /** default construction sets values to 0 */
@@ -138,6 +139,8 @@ namespace tcgfx {
         int32_t x: 16;
         int32_t y: 16;
     };
+
+#endif // TC_COORD_DEFINED
 
     /**
      * Structure that represent a palette based color image. For palette based images the data pointer will be to an

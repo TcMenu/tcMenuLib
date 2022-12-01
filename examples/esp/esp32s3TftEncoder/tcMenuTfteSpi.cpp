@@ -115,6 +115,8 @@ bool TftSpriteAndConfig::initSprite(const Coord &spriteWhere, const Coord &sprit
     // if the area is too big, or the sprite is in use, don't proceed.
     if(spriteSize.x > size.x || spriteSize.y > size.y) return false;
 
+    this->fontHandler = root->getUnicodeHandler(false);
+
     // create the sprite if needed
     if(!sprite.created()) {
         sprite.createSprite(size.x, size.y);
