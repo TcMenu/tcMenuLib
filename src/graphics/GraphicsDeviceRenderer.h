@@ -43,11 +43,9 @@ namespace tcgfx {
      * supporting new graphical displays will be far easier, and less maintenance going forwards.
      */
     class DeviceDrawable {
-    private:
-        UnicodeFontHandler* fontHandler = nullptr;
     protected:
+        UnicodeFontHandler* fontHandler = nullptr;
         color_t backgroundColor = 0, drawColor = 0;
-        bool textTcUnicode = false;
     public:
         virtual ~DeviceDrawable() = default;
         /**
@@ -145,6 +143,17 @@ namespace tcgfx {
         virtual void transaction(bool isStarting, bool redrawNeeded)=0;
 
         /**
+         * This is the internal implementation of textExtents for when TcUnicode is not in use, always prefer the use
+         * of textExtents unless you actually need to directly access the library functions.
+         * @param font the font to get sizing for
+         * @param mag the magnification of the font if supported
+         * @param text the text to get the size of
+         * @param baseline optionally, the base line will be populated if this is provided.
+         * @return the X and Y dimensions
+         */
+        virtual Coord internalTextExtents(const void* font, int mag, const char* text, int* baseline)=0;
+
+        /**
          * gets the extents of the text, and optionally the baseline for the given font and text. The X axis of the returned
          * Coord is the text width, the Y axis has the height, finally the base line is the descent.
          * @param font the font to get sizing for
@@ -153,7 +162,7 @@ namespace tcgfx {
          * @param baseline optionally, the base line will be populated if this is provided.
          * @return the X and Y dimensions
          */
-        virtual Coord textExtents(const void* font, int mag, const char* text, int* baseline)=0;
+        Coord textExtents(const void* font, int mag, const char* text, int* baseline);
 
         /**
          * Draw a pixel in the current draw color at the location provided. This should be implemented in the most
@@ -212,12 +221,12 @@ namespace tcgfx {
          * Adafruit GFX. This only prevents creation of the handler if called before getting the font handler.
          * @param enabled true if TcUnicode support is to be enabled, otherwise false.
          */
-        void setTcUnicodeEnabled(bool enabled) { textTcUnicode = enabled; }
+        void enableTcUnicode() { if(fontHandler == nullptr) fontHandler = createFontHandler(); }
         /**
          * Check if TcUnicode is enabled. Useful before calling `getFontHandler` to ensure the support is on.
          * @return true if on, otherwise false
          */
-        bool isTcUnicodeEnabled() { return textTcUnicode; }
+        bool isTcUnicodeEnabled() { return fontHandler != nullptr; }
 
         /**
          * Gets hold of the TcUnicode font handler that can render text onto the display. It has features similar to
@@ -226,6 +235,14 @@ namespace tcgfx {
          * @return the font handler if unicode is enabled, otherwise nullptr.
          */
         UnicodeFontHandler* getUnicodeHandler(bool enableIfNeeded = true);
+
+    protected:
+        /**
+         * It is best that all device drawables override this with an optimal implementation rather than rely on the
+         * default one which indirects through draw pixel here adding a layer of latency
+         * @return a font handler
+         */
+        virtual UnicodeFontHandler* createFontHandler();
     };
 
     /**
@@ -298,6 +315,12 @@ namespace tcgfx {
          * @return the underlying device drawable.
          */
         DeviceDrawable* getDeviceDrawable() { return rootDrawable; }
+
+        /**
+         * Enables TcUnicode as the default font processor for all operations, and ensures that the unicode helper can
+         * be accessed too.
+         */
+        void enableTcUnicode() { rootDrawable->enableTcUnicode(); }
     private:
         int calculateSpaceBetween(const void* font, uint8_t mag, const char* buffer, int start, int end);
         void internalDrawText(GridPositionRowCacheEntry* pEntry, const Coord& where, const Coord& size);

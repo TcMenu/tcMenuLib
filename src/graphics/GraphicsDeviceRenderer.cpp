@@ -389,28 +389,44 @@ namespace tcgfx {
         drawable->drawBox(Coord(0, endPoint), Coord(width, height-endPoint), true);
     }
 
-    UnicodeFontHandler *DeviceDrawable::getUnicodeHandler(bool enableIfNeeded) {
-        if(enableIfNeeded) textTcUnicode = true;
-
-        if(textTcUnicode && fontHandler == nullptr) {
-            fontHandler = new UnicodeFontHandler(this, ENCMODE_UTF8);
-        }
-        return fontHandler;
-    }
-
     void DeviceDrawable::drawText(const Coord& where, const void* font, int mag, const char* text) {
         auto handler = getUnicodeHandler(false);
-        if(textTcUnicode && handler) {
-            handler->setCursor(where);
+        if(handler) {
             handler->setDrawColor(drawColor);
             if(mag == 0) {
                 handler->setFont((UnicodeFont*) font);
             } else {
                 handler->setFont((GFXfont*) font);
             }
+            handler->setCursor((int)where.x, (int)where.y + handler->getYAdvance());
             handler->print(text);
         } else {
             internalDrawText(where, font, mag, text);
+        }
+    }
+
+    UnicodeFontHandler *DeviceDrawable::getUnicodeHandler(bool enableIfNeeded) {
+        if(fontHandler == nullptr && enableIfNeeded) {
+            fontHandler = createFontHandler();
+        }
+        return fontHandler; // if null, there is no font handler.
+    }
+
+    UnicodeFontHandler *DeviceDrawable::createFontHandler() {
+        return fontHandler = new UnicodeFontHandler(this, ENCMODE_UTF8);
+    }
+
+    Coord DeviceDrawable::textExtents(const void *font, int mag, const char *text, int *baseline) {
+        auto handler = getUnicodeHandler(false);
+        if(handler) {
+            if(mag == 0) {
+                handler->setFont((UnicodeFont*) font);
+            } else {
+                handler->setFont((GFXfont*) font);
+            }
+            return handler->textExtents(text, baseline, false);
+        } else {
+            return internalTextExtents(font, mag, text, baseline);
         }
     }
 } // namespace tcgfx

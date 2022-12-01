@@ -50,9 +50,11 @@ public:
 
     void transaction(bool isStarting, bool redrawNeeded) override;
 
-    Coord textExtents(const void *font, int mag, const char *text, int *baseline) override;
+    Coord internalTextExtents(const void *font, int mag, const char *text, int *baseline) override;
     Coord getDisplayDimensions() override { return Coord(tft->width(), tft->height());}
     TFT_eSPI* getTFT() { return tft; }
+protected:
+    UnicodeFontHandler* createFontHandler() override;
 private:
     void fontPtrToNum(const void* font, int mag);
 };

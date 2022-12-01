@@ -11,6 +11,8 @@
 #include <tcMenu.h>
 #include "piPicoTftEncoder_menu.h"
 #include "ThemeCoolBlueModern.h"
+#include "Fonts/OpenSans18.h"
+#include "Fonts/RobotoMedium24.h"
 
 // Global variable declarations
 const  ConnectorLocalInfo applicationInfo = { "RPiPico Tft Encoder", "0c6972c4-addb-4931-a910-e4b2a85d2b2a" };
@@ -82,6 +84,7 @@ void setupMenu() {
     menuMgr.initForEncoder(&renderer, &menuVolume, 16, 17, 21);
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
     renderer.setUseSliderForAnalog(true);
-    installCoolBlueModernTheme(renderer, MenuFontDef(nullptr, 2), MenuFontDef(nullptr, 2), false);
+    renderer.enableTcUnicode();
+    installCoolBlueModernTheme(renderer, MenuFontDef(&OpenSans18, 0), MenuFontDef(&RobotoMedium24, 1), false);
 }
 

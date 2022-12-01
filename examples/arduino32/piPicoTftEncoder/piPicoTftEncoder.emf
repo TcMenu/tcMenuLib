@@ -375,12 +375,12 @@
       },
       {
         "name": "ITEM_FONT",
-        "latestValue": "num:,2",
+        "latestValue": "adl:OpenSans18,0",
         "subsystem": "THEME"
       },
       {
         "name": "TITLE_FONT",
-        "latestValue": "num:,2",
+        "latestValue": "adl:RobotoMedium24,1",
         "subsystem": "THEME"
       },
       {
@@ -391,6 +391,11 @@
       {
         "name": "TITLE_SHOW_MODE",
         "latestValue": "TITLE_FIRST_ROW",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "USE_TC_UNICODE",
+        "latestValue": "true",
         "subsystem": "THEME"
       },
       {
