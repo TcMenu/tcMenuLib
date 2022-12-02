@@ -11,8 +11,8 @@
 #include <tcMenu.h>
 #include "piPicoTftEncoder_menu.h"
 #include "ThemeCoolBlueModern.h"
-#include "Fonts/OpenSans18.h"
-#include "Fonts/RobotoMedium24.h"
+#include <Fonts/OpenSans18.h>
+#include <Fonts/RobotoMedium24.h>
 
 // Global variable declarations
 const  ConnectorLocalInfo applicationInfo = { "RPiPico Tft Encoder", "0c6972c4-addb-4931-a910-e4b2a85d2b2a" };

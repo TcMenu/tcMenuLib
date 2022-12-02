@@ -11,8 +11,8 @@
 #include <tcMenu.h>
 #include "stm32f429FrameBuffer_menu.h"
 #include "ThemeCoolBlueModern.h"
-#include "Fonts/OpenSans18.h"
-#include "Fonts/RobotoMedium24.h"
+#include <Fonts/OpenSans18.h>
+#include <Fonts/RobotoMedium24.h>
 
 // Global variable declarations
 const  ConnectorLocalInfo applicationInfo = { "Factory", "4df3d784-674a-4a3d-bcee-54a49693788e" };

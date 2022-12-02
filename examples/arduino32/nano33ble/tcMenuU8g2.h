@@ -20,6 +20,7 @@
 #include <tcMenu.h>
 #include <tcUtil.h>
 #include <Wire.h>
+#include <tcUnicodeHelper.h>
 #include <U8g2lib.h>
 #include <graphics/BaseGraphicalRenderer.h>
 #include <graphics/GraphicsDeviceRenderer.h>
@@ -80,7 +81,7 @@ public:
 
     DeviceDrawable* getSubDeviceFor(const Coord &where, const Coord &size, const color_t *palette, int paletteSize) override {return nullptr; }
 
-    void drawText(const Coord &where, const void *font, int mag, const char *text) override;
+    void internalDrawText(const Coord &where, const void *font, int mag, const char *text) override;
     void drawBitmap(const Coord &where, const DrawableIcon *icon, bool selected) override;
     void drawXBitmap(const Coord &where, const Coord &size, const uint8_t *data) override;
     void drawBox(const Coord &where, const Coord &size, bool filled) override;
@@ -89,9 +90,13 @@ public:
 
     Coord getDisplayDimensions() override {  return Coord(u8g2->getWidth(), u8g2->getHeight()); }
     void transaction(bool isStarting, bool redrawNeeded) override;
-    Coord textExtents(const void *font, int mag, const char *text, int *baseline) override;
-    color_t getUnderlyingColor(color_t col) { return (col<4) ? col : 1; }
+    Coord internalTextExtents(const void *font, int mag, const char *text, int *baseline) override;
+    color_t getUnderlyingColor(color_t col) override { return (col<4) ? col : 1; }
 
+    void drawPixel(uint16_t x, uint16_t y) override { u8g2->drawPixel(x, y); }
+
+protected:
+    UnicodeFontHandler *createFontHandler() override;
 };
 
 #endif // _TCMENU_U8G2_H_

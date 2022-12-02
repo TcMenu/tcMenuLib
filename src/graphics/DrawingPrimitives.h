@@ -136,8 +136,8 @@ namespace tcgfx {
         Coord(const Coord &other) = default;
         Coord& operator = (const Coord& other) = default;
 
-        int32_t x: 16;
-        int32_t y: 16;
+        int16_t x;
+        int16_t y;
     };
 
 #endif // TC_COORD_DEFINED

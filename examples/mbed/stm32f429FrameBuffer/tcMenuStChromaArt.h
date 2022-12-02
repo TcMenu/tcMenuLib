@@ -61,6 +61,9 @@ public:
     void transaction(bool isStarting, bool redrawNeeded) override;
     Coord internalTextExtents(const void *font, int mag, const char *text, int *baseline) override;
     void drawPixel(uint16_t x, uint16_t y) override { BSP_LCD_DrawPixel(x, y, drawColor); }
+
+protected:
+    UnicodeFontHandler *createFontHandler() override;
 };
 
 #if TC_BSP_TOUCH_DEVICE_PRESENT == true

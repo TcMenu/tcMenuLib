@@ -105,6 +105,35 @@ void StChromaArtDrawable::drawPolygon(const Coord *points, int numPoints, bool f
 void StChromaArtDrawable::transaction(bool isStarting, bool redrawNeeded) {
 }
 
+/**
+ * The lightest weight plotter possible for the BSP driver, implements the needed functions direct to BSP calls.
+ */
+class BspTextPlotPipeline : public TextPlotPipeline {
+private:
+    Coord cursorPos {};
+public:
+    void drawPixel(uint16_t x, uint16_t y, uint32_t color) override {
+        BSP_LCD_DrawPixel(x, y, color);
+    }
+
+    void setCursor(const Coord &where) override {
+        cursorPos = where;
+    }
+
+    Coord getCursor() override {
+        return cursorPos;
+    }
+
+    Coord getDimensions() override {
+        return Coord(BSP_LCD_GetXSize(), BSP_LCD_GetYSize());
+    }
+};
+
+UnicodeFontHandler *StChromaArtDrawable::createFontHandler() {
+    auto fontPlotter = new BspTextPlotPipeline();
+    return new UnicodeFontHandler(fontPlotter, ENCMODE_UTF8);
+}
+
 #if TC_BSP_TOUCH_DEVICE_PRESENT == true
 
 iotouch::TouchState StBspTouchInterrogator::internalProcessTouch(float *ptrX, float *ptrY, iotouch::TouchInterrogator::TouchRotation rotation,

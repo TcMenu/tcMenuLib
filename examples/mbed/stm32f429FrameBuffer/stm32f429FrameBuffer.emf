@@ -357,12 +357,12 @@
       },
       {
         "name": "ITEM_FONT",
-        "latestValue": "adl:OpenSans18,0",
+        "latestValue": "ada:OpenSans18,0",
         "subsystem": "THEME"
       },
       {
         "name": "TITLE_FONT",
-        "latestValue": "adl:RobotoMedium24,1",
+        "latestValue": "ada:RobotoMedium24,1",
         "subsystem": "THEME"
       },
       {
