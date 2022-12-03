@@ -48,7 +48,6 @@ float ledAdjustment = 0.01;
 const int lcdBacklightPin = 5;
 
 // we need access to the analog device of the ESP32
-ArduinoAnalogDevice analogDevice;
 DashCustomDrawing* dashCustomDrawing;
 void setupDashboard();
 bool currentLedStatus = false;
@@ -82,12 +81,12 @@ void setup() {
     //menuSettingsNewLargeNumber.setLargeNumberFromString("12.1");
     menuSettingsTestItem1.setFromFloatingPointValue(21.5F);
 
-    analogDevice.initPin(dacPin, DIR_OUT);
+    internalAnalogDevice().initPin(dacPin, DIR_OUT);
     taskManager.scheduleFixedRate(10, [] {
         ledLevel += ledAdjustment;
         if(ledLevel > 0.98) ledAdjustment = -0.01;
         if(ledLevel < 0.01) ledAdjustment = 0.01;
-        analogDevice.setCurrentFloat(dacPin, ledLevel);
+        internalAnalogDevice().setCurrentFloat(dacPin, ledLevel);
     });
 
     setTitlePressedCallback([](int id) {

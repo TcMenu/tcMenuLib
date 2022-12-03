@@ -80,6 +80,7 @@ void setupMenu() {
     remoteServer.addConnection(&simhubConnection);
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
     renderer.setUseSliderForAnalog(true);
+    renderer.enableTcUnicode();
     installCoolBlueTraditionalTheme(renderer, MenuFontDef(&FreeSans9pt7b, 1), MenuFontDef(&FreeSans12pt7b, 1), true);
 
     // We have an IoT monitor, register the server

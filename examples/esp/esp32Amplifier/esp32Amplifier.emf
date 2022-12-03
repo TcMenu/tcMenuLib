@@ -553,7 +553,7 @@
     ],
     "namingRecursive": true,
     "saveToSrc": false,
-    "useCppMain": true,
+    "useCppMain": false,
     "eepromDefinition": "eeprom:",
     "authenticatorDefinition": "rom:200:6",
     "projectIoExpanders": [

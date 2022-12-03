@@ -16,13 +16,26 @@ public:
         TITLE_RIGHT_VALUE_LEFT, TITLE_RIGHT_VALUE_RIGHT };
 protected:
     DashAlign alignment;
-    const GFXfont* font;
+    union {
+        const GFXfont *adaFont;
+        const UnicodeFont *uniFont;
+    };
     uint16_t fgColor;
     uint16_t bgColor;
+    bool isAdaFont = true;
 public:
     DashDrawParameters(uint16_t fgColor_, uint16_t bgColor_, const GFXfont* font_, DashAlign align = TITLE_RIGHT_VALUE_RIGHT) {
         alignment = align;
-        font = font_;
+        adaFont = font_;
+        isAdaFont = true;
+        fgColor = fgColor_;
+        bgColor = bgColor_;
+    }
+
+    DashDrawParameters(uint16_t fgColor_, uint16_t bgColor_, const UnicodeFont* font_, DashAlign align = TITLE_RIGHT_VALUE_RIGHT) {
+        alignment = align;
+        uniFont = font_;
+        isAdaFont = false;
         fgColor = fgColor_;
         bgColor = bgColor_;
     }
@@ -37,10 +50,16 @@ public:
     bool isValueLeftAlign() {
         return alignment == TITLE_RIGHT_VALUE_LEFT || alignment == TITLE_LEFT_VALUE_LEFT || alignment == NO_TITLE_VALUE_LEFT;
     }
-    const GFXfont* getFont() {
-        return font;
+    
+    bool isAdafruitFont() {
+        return adaFont;
     }
-
+    const GFXfont* getAsAdaFont() {
+        return adaFont;
+    }
+    const UnicodeFont* getAsUnicodeFont() {
+        return uniFont;
+    }
     virtual uint16_t getBgColor(MenuItem *item, bool updated)  {
         return bgColor;
     }
@@ -238,11 +257,20 @@ public:
         return item->isChanged() || updateCountDown != 0;
     }
 
-    void paintTitle(Adafruit_GFX *myGfx) {
-        myGfx->setFont(parameters->getFont());
+    void setFont(DashDrawParameters* params, UnicodeFontHandler* unicodeHandler) {
+        if(parameters->isAdafruitFont()) {
+            unicodeHandler->setFont(parameters->getAsAdaFont());
+        } else {
+            unicodeHandler->setFont(parameters->getAsUnicodeFont());
+        }
+    }
+    
+    void paintTitle() {
         int baseline;
-        titleExtents = gfxDrawable.textExtents(parameters->getFont(), 1, titleText, &baseline);
-        valueWidth = gfxDrawable.textExtents(parameters->getFont(), 1,"0", &baseline).x * numChars;
+        UnicodeFontHandler* unicodeHandler = gfxDrawable.getUnicodeHandler(true);
+
+        titleExtents = unicodeHandler->textExtents(titleText, &baseline);
+        valueWidth = unicodeHandler->textExtents("0", &baseline).x * numChars;
         valueWidth = int(valueWidth * 1.20);
 
         if(!parameters->isTitleDrawn()) return;
@@ -250,28 +278,34 @@ public:
         auto startX = (parameters->isTitleLeftAlign()) ? screenLoc.x : screenLoc.x + valueWidth + 1;
 
         if(parameters->getTitleBgColor(item, false) != ILI9341_BLACK) {
-            gfx.fillRect(startX, screenLoc.y, titleExtents.x, titleExtents.y, parameters->getTitleBgColor(item, false));
+            gfxDrawable.setDrawColor(parameters->getTitleBgColor(item, false));
+            gfxDrawable.drawBox(Coord(startX, screenLoc.y), Coord(titleExtents.x, titleExtents.y), true);
         }
-        myGfx->setTextColor(parameters->getTitleFgColor(item, false));
-        myGfx->setCursor(startX, screenLoc.y + titleExtents.y);
-        myGfx->print(titleText);
+        unicodeHandler->setDrawColor(parameters->getTitleFgColor(item, false));
+        unicodeHandler->setCursor(Coord(startX, screenLoc.y + titleExtents.y));
+        unicodeHandler->print(titleText);
 
     }
 
-    void paintItem(Adafruit_GFX *myGfx, GFXcanvas1* canvas, BaseMenuRenderer *renderer) {
+    void paintItem(Adafruit_GFX *myGfx, DeviceDrawable* canvasDrawable, GFXcanvas1* canvas) {
         item->setChanged(false);
         char sz[20];
         copyMenuItemValue(item, sz, sizeof(sz));
-        canvas->fillScreen(0);
-        canvas->setFont(parameters->getFont());
+        const Coord &dims = canvasDrawable->getDisplayDimensions();
+        canvasDrawable->setDrawColor(0);
+        canvasDrawable->drawBox(Coord(0, 0), Coord(dims.x, dims.y), true);
+
+        UnicodeFontHandler* unicodeHandler = canvasDrawable->getUnicodeHandler(true);
+        setFont(parameters, unicodeHandler);
         auto padding = 0;
         if(!parameters->isValueLeftAlign()) {
             int baseline;
-            Coord valueLen = gfxDrawable.textExtents(parameters->getFont(), 1, sz, &baseline);
+            Coord valueLen = unicodeHandler->textExtents(sz, &baseline);
             padding = valueWidth - (valueLen.x + 4);
         }
-        canvas->setCursor(padding, titleExtents.y - 1);
-        canvas->print(sz);
+        unicodeHandler->setDrawColor(1);
+        unicodeHandler->setCursor(padding, unicodeHandler->getYAdvance());
+        unicodeHandler->print(sz);
         auto startX = (parameters->isTitleLeftAlign()) ? screenLoc.x + titleExtents.x + 5 : screenLoc.x;
         drawCookieCutBitmap(myGfx, startX, screenLoc.y, canvas->getBuffer(), valueWidth, titleExtents.y,
                 canvas->width(), 0, 0,parameters->getFgColor(item, updateCountDown > 1),
@@ -295,6 +329,7 @@ private:
     bool wantLeds;
     BtreeList<uint16_t, DashMenuItem> drawingItems;
     GFXcanvas1 *canvas;
+    AdafruitDrawable *canvasDrawable;
 public:
     DashCustomDrawing(Adafruit_GFX *gfx, bool drawLeds = true) : drawingItems() {
         serdebugF("construct drawing")
@@ -303,6 +338,8 @@ public:
         renderer = nullptr;
         wantLeds = drawLeds;
         canvas = new GFXcanvas1(gfx->width() / 2, gfx->height());
+        canvasDrawable = new AdafruitDrawable(canvas);
+        canvasDrawable->enableTcUnicode();
         for (uint16_t &ledState : ledColors) ledState = 0;
     }
 
@@ -343,7 +380,7 @@ public:
             auto drawing = drawingItems.itemAtIndex(i);
             serdebugF("drawing title")
 
-            drawing->paintTitle(myGfx);
+            drawing->paintTitle();
         }
         serdebugF("started2")
 
@@ -365,7 +402,7 @@ public:
         for(int i = 0; i < drawingItems.count(); i++) {
             auto drawing = drawingItems.itemAtIndex(i);
             if(drawing->needsPainting()) {
-                drawing->paintItem(myGfx, canvas, renderer);
+                drawing->paintItem(myGfx, canvasDrawable, canvas);
             }
         }
     }
