@@ -14,10 +14,15 @@
 #include <EepromAbstraction.h>
 #include "tcUtil.h"
 
+#ifndef MAX_PIN_LENGTH
 #define MAX_PIN_LENGTH 16
+#endif
+
+#ifndef CLIENT_DESC_SIZE
+#define CLIENT_DESC_SIZE 16
+#endif
 
 #define UUID_KEY_SIZE 40
-#define CLIENT_DESC_SIZE 16
 #define TOTAL_KEY_SIZE (UUID_KEY_SIZE + CLIENT_DESC_SIZE)
 
 enum AuthenticationManagerType: uint8_t {

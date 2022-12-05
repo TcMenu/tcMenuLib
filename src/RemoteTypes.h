@@ -15,7 +15,11 @@
  * This defines the maximum size of any field value that can be received by this library.
  * If you need longer fields, change this value to a higher one.
  */
+#ifndef MAX_VALUE_LEN
 #define MAX_VALUE_LEN 40
+#elif MAX_VALUE_LEN < 40
+#error "MAX_VALUE_LEN must be > 40"
+#endif
 
 enum AckResponseStatus {
     // warnings

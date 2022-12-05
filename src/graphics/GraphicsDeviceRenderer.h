@@ -15,7 +15,9 @@
 #include "BaseGraphicalRenderer.h"
 #include "GfxMenuConfig.h"
 
+#ifndef MINIMUM_CURSOR_SIZE
 #define MINIMUM_CURSOR_SIZE 6
+#endif
 
 class UnicodeFontHandler;
 
@@ -43,9 +45,12 @@ namespace tcgfx {
      * supporting new graphical displays will be far easier, and less maintenance going forwards.
      */
     class DeviceDrawable {
+    public:
+        enum SubDeviceType { NO_SUB_DEVICE, SUB_DEVICE_4BPP, SUB_DEVICE_2BPP };
     protected:
         UnicodeFontHandler* fontHandler = nullptr;
         color_t backgroundColor = 0, drawColor = 0;
+        SubDeviceType subDeviceType = NO_SUB_DEVICE;
     public:
         virtual ~DeviceDrawable() = default;
         /**
@@ -237,6 +242,11 @@ namespace tcgfx {
          */
         UnicodeFontHandler* getUnicodeHandler(bool enableIfNeeded = true);
 
+        /**
+         * @return the type of sub-device that is supported by this display drawable.
+         */
+        SubDeviceType getSubDeviceType() { return subDeviceType; }
+
     protected:
         /**
          * It is best that all device drawables override this with an optimal implementation rather than rely on the
@@ -244,6 +254,13 @@ namespace tcgfx {
          * @return a font handler
          */
         virtual UnicodeFontHandler* createFontHandler();
+
+        /**
+         * Normally used internally by extension classes to set the type of subdevice they can support. Defaults to
+         * none.
+         * @param s the type of sub-device supported.
+         */
+        void setSubDeviceType(SubDeviceType s) { subDeviceType = s; }
     };
 
     /**

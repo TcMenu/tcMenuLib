@@ -68,13 +68,25 @@ namespace tcgfx {
             return;
         }
 
+        DeviceDrawable* subDevice = nullptr;
+        if(rootDrawable->getSubDeviceType() == DeviceDrawable::SUB_DEVICE_4BPP) {
+            subDevice = rootDrawable->getSubDeviceFor(where, areaSize, entry->getDisplayProperties()->getPalette(), 6);
+        } else if(rootDrawable->getSubDeviceType() == DeviceDrawable::SUB_DEVICE_2BPP) {
+            color_t palette[4];
+            bool selected = entry->getMenuItem()->isActive() || entry->getMenuItem()->isEditing();
+            palette[ItemDisplayProperties::TEXT] = (selected) ? propertiesFactory.getSelectedColor(ItemDisplayProperties::TEXT) : entry->getDisplayProperties()->getPalette()[ItemDisplayProperties::TEXT];
+            palette[ItemDisplayProperties::BACKGROUND] = (selected) ? propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND) : entry->getDisplayProperties()->getPalette()[ItemDisplayProperties::BACKGROUND];
+            palette[ItemDisplayProperties::HIGHLIGHT1] = entry->getDisplayProperties()->getPalette()[ItemDisplayProperties::HIGHLIGHT1];
+            palette[ItemDisplayProperties::HIGHLIGHT2] = entry->getDisplayProperties()->getPalette()[ItemDisplayProperties::HIGHLIGHT2];
+            subDevice = rootDrawable->getSubDeviceFor(where, areaSize, palette, 4);
+        }
 
-        auto* subDevice = rootDrawable->getSubDeviceFor(where, areaSize, entry->getDisplayProperties()->getPalette(), 6);
         if(subDevice) {
             subDevice->startDraw();
         }
         drawable = subDevice ? subDevice : rootDrawable;
         Coord wh = subDevice ? Coord(0,0) : where;
+
         switch(drawingMode) {
             case GridPosition::DRAW_TEXTUAL_ITEM:
             case GridPosition::DRAW_TITLE_ITEM:
