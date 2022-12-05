@@ -35,8 +35,8 @@
 #include <Wire.h>
 #include <IoLogging.h>
 #include <AnalogDeviceAbstraction.h>
-#include "DashCustomDrawing.h"
-#include "RobotoMonoBold60pt.h"
+#include "../../../src/extras/DrawableDashboard.h"
+#include "Fonts/RobotoMonoBold60pt.h"
 #include <Fonts/FreeSans18pt7b.h>
 #include <tcMenuVersion.h>
 
