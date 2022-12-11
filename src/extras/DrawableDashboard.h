@@ -177,6 +177,42 @@ public:
 };
 
 /**
+ * Allows for easy extension of the below drawable dashboard by providing callbacks when important events occur, mainly
+ * before and after a dashboard is opened or drawn to. It also tells you when a dashboard was closed, and if the display
+ * has reset due to a timeout. This provides an easy way to customize further the dashboard support in nearly all cases.
+ * The two "draw" functions are called in the rendering loop, one before any drawing, the other afterwards.
+ */
+class DrawableDashboardDelegate {
+public:
+    /**
+     * Indicates that the dashboard has closed and no longer displayed
+     */
+    virtual void dashboardDidClose() {}
+    /**
+     * Indicates that the dashboard will open, called before any other work is done by the dashboard.
+     */
+    virtual void dashboardWillOpen(BaseMenuRenderer* /*where*/) {}
+    /**
+     * Indicates that the dashboard has already opened, called after any other work is done by the dashboard.
+     */
+    virtual void dashboardDidOpen(BaseMenuRenderer* /*where*/) {}
+    /**
+     * Indicates that the dashboard will start drawing, called before any other work is done by the dashboard. The
+     * current value of the rotary encoder and state of the button are provided.
+     */
+    virtual void dashboardWillDraw(unsigned int /*currentValue*/, RenderPressMode /*mode*/) {}
+    /**
+     * Indicates that the dashboard drawing is completed, called after any other work is done by the dashboard. The
+     * current value of the rotary encoder and state of the button are provided.
+     */
+    virtual void dashboardDidDraw(unsigned int /*currentValue*/, RenderPressMode /*mode*/) {}
+    /**
+     * Indicates that the display reset has been received from the renderer.
+     */
+    virtual void displayDidReset() {}
+};
+
+/**
  * Drawable Dashboard is a configurable dashboard that can be used to draw a series of menu items in a more configurable
  * dashboard style way. It is possible to further customise the class purely by extending it yourself and handling any
  * drawing in renderLoop() before calling the super implementation in this class.
@@ -189,6 +225,7 @@ public:
     /** Allows you to define how the dashboard will be displayed, and dismissed. */
     enum DashboardMode: uint8_t { DASH_ON_RESET_CLICK_EXIT, DASH_ON_RESET_MANUAL_EXIT, DASH_FULLY_MANUAL, DASH_MANUAL_START_CLICK_EXIT };
 private:
+    DrawableDashboardDelegate *delegate = nullptr;
     TitleWidget* firstWidget;
     BaseMenuRenderer *renderer;
     DeviceDrawable *drawable;
@@ -205,6 +242,7 @@ public:
         screenBg = screenBgCol;
         coreItemFg = coreFgCol;
     }
+    void setDelegate(DrawableDashboardDelegate* dashDelegate) { this->delegate = dashDelegate; }
 
     void clearItems() { drawingItems.clear(); }
     void addDrawingItem(MenuItem *theItem, Coord topLeft, DashDrawParameters* params, int numCharsInValue,

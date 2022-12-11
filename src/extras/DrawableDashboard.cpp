@@ -11,15 +11,19 @@ void DrawableDashboard::addDrawingItem(MenuItem *theItem, Coord topLeft, DashDra
 void DrawableDashboard::stop() {
     running = false;
     renderer->giveBackDisplay();
+    if(delegate != nullptr) delegate->dashboardDidClose();
 }
 
 void DrawableDashboard::reset() {
+    if(delegate != nullptr) delegate->displayDidReset();
     if (drawingMode == DASH_ON_RESET_CLICK_EXIT || drawingMode == DASH_ON_RESET_MANUAL_EXIT) {
         if (!running) renderer->takeOverDisplay();
     }
 }
 
 void DrawableDashboard::started(BaseMenuRenderer *currentRenderer) {
+    if(delegate != nullptr) delegate->dashboardWillOpen(renderer);
+
     renderer = currentRenderer;
     drawable->setDrawColor(screenBg);
     drawable->drawBox(Coord(0, 0), drawable->getDisplayDimensions(), true);
@@ -31,9 +35,13 @@ void DrawableDashboard::started(BaseMenuRenderer *currentRenderer) {
     }
 
     drawWidgets(true);
+
+    if(delegate != nullptr) delegate->dashboardDidOpen(renderer);
 }
 
 void DrawableDashboard::renderLoop(unsigned int currentValue, RenderPressMode userClick) {
+    if(delegate != nullptr) delegate->dashboardWillDraw(currentValue, userClick);
+
     if (userClick != RPRESS_NONE && (drawingMode == DASH_ON_RESET_CLICK_EXIT || drawingMode == DASH_MANUAL_START_CLICK_EXIT)) {
         serlogF(SER_TCMENU_INFO, "Dashboard exit, clicked");
         stop();
@@ -48,6 +56,8 @@ void DrawableDashboard::renderLoop(unsigned int currentValue, RenderPressMode us
     }
 
     drawWidgets(false);
+
+    if(delegate != nullptr) delegate->dashboardDidDraw(currentValue, userClick);
 }
 
 void DrawableDashboard::drawWidgets(bool force) {
@@ -199,11 +209,14 @@ public:
     }
 
     DeviceDrawable* getDrawable() { return drawable; }
-    color_t getPaletteColor(size_t idx) { return isSubDevice ? idx : palette[idx]; }
     Coord offsetLocation(const Coord& source) const { return isSubDevice ? Coord(source.x - startPos.x, source.y - startPos.y) : source; }
     Coord offsetLocation(const Coord& source, int xOffs, int yOffs) const {
         return isSubDevice ? Coord((source.x + xOffs) - startPos.x, (source.y + yOffs) - startPos.y) : Coord(source.x + xOffs, source.y + yOffs);
     }
+
+    color_t fgCol() { return palette[1];}
+    color_t fgColUnderlying() { return drawable->getUnderlyingColor(palette[1]);}
+    color_t bgCol() { return palette[0];}
 
     void endDraw() { if(isSubDevice) drawable->endDraw(true); }
 };
@@ -222,10 +235,10 @@ void DashMenuItem::paintTitle(DeviceDrawable* drawableRoot) {
     if(!parameters->isTitleDrawn()) return;
 
     auto startX = (parameters->isTitleLeftAlign()) ? 0 : valueWidth + 1;
-    wrapper.getDrawable()->setDrawColor(wrapper.getPaletteColor(0));
+    wrapper.getDrawable()->setDrawColor(wrapper.bgCol());
     wrapper.getDrawable()->drawBox(wrapper.offsetLocation(screenLoc), Coord(titleExtents.x + valueWidth, titleExtents.y), true);
 
-    unicodeHandler->setDrawColor(wrapper.getPaletteColor(1));
+    unicodeHandler->setDrawColor(wrapper.fgColUnderlying());
     unicodeHandler->setCursor(wrapper.offsetLocation(screenLoc, startX, titleExtents.y));
     unicodeHandler->print(titleText);
 
@@ -238,11 +251,11 @@ void DashMenuItem::paintItem(DeviceDrawable* drawableRoot) {
     DrawableWrapper wrapper(drawableRoot, parameters, item, screenLoc, Coord(valueWidth, titleExtents.y));
 
     copyMenuItemValue(item, sz, sizeof(sz));
-    wrapper.getDrawable()->setDrawColor(wrapper.getPaletteColor(0));
+    wrapper.getDrawable()->setDrawColor(wrapper.bgCol());
     wrapper.getDrawable()->drawBox(wrapper.offsetLocation(screenLoc), Coord(valueWidth, titleExtents.y), true);
 
     UnicodeFontHandler* unicodeHandler = wrapper.getDrawable()->getUnicodeHandler(true);
-    unicodeHandler->setDrawColor(wrapper.getPaletteColor(1));
+    unicodeHandler->setDrawColor(wrapper.fgColUnderlying());
     setFont(parameters, unicodeHandler);
     auto padding = 0;
     if(!parameters->isValueLeftAlign()) {
