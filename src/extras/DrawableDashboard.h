@@ -4,13 +4,19 @@
 
 #include "BaseRenderers.h"
 #include <tcUnicodeHelper.h>
+#include <graphics/GraphicsDeviceRenderer.h>
 
+/**
+ * Draw parameters for static items that do not change, the alignment of text, the font and colors are stored in this
+ * item. Fonts can be either Adafruit or TcUnicode.
+ */
 class DashDrawParameters {
 public:
     enum DashAlign {
         TITLE_LEFT_VALUE_LEFT, TITLE_LEFT_VALUE_RIGHT,
         NO_TITLE_VALUE_LEFT, NO_TITLE_VALUE_RIGHT,
-        TITLE_RIGHT_VALUE_LEFT, TITLE_RIGHT_VALUE_RIGHT };
+        TITLE_RIGHT_VALUE_LEFT, TITLE_RIGHT_VALUE_RIGHT,
+        CUSTOM_DRAWN_ITEM };
 protected:
     DashAlign alignment;
     union {
@@ -28,9 +34,9 @@ public:
     bool isTitleLeftAlign() { return alignment == TITLE_LEFT_VALUE_LEFT || alignment == TITLE_LEFT_VALUE_RIGHT; }
     bool isValueLeftAlign() { return alignment == TITLE_RIGHT_VALUE_LEFT || alignment == TITLE_LEFT_VALUE_LEFT || alignment == NO_TITLE_VALUE_LEFT; }
     
-    bool isAdafruitFont() { return adaFont; }
-    const GFXfont* getAsAdaFont() { return adaFont; }
-    const UnicodeFont* getAsUnicodeFont() { return uniFont; }
+    bool isAdafruitFont() const { return isAdaFont; }
+    const GFXfont* getAsAdaFont() const { return adaFont; }
+    const UnicodeFont* getAsUnicodeFont() const { return uniFont; }
 
     virtual color_t getBgColor(MenuItem *item, bool updated)  { return bgColor; }
     virtual color_t getFgColor(MenuItem *item, bool updated)  { return fgColor; }
@@ -38,6 +44,9 @@ public:
     virtual color_t getTitleFgColor(MenuItem *item, bool updated)  { return fgColor; }
 };
 
+/**
+ * In addition to regular dash draw parameters this class adds support to store colors for items that have updated
+ */
 class DashDrawParametersUpdate : public DashDrawParameters {
 private:
     color_t fgUpdateColor;
@@ -60,7 +69,9 @@ public:
 /**
  * A drawing parameter that updates the color based on ranges of integer values. For example one color could define
  * the integer values between 0..10 and another 11..20, in addition it can have a change in color for when the item
- * updates
+ * updates.
+ *
+ * Supported types are AnalogMenuItem, EnumMenuItem, BooleanMenuItem (values 0 and 1), and ScrollChoiceMenuItem.
  */
 class DashDrawParametersIntUpdateRange : public DashDrawParametersUpdate {
 public:
@@ -79,13 +90,13 @@ public:
                                      const GFXfont *font_, const IntColorRange colorRanges_[], int numberRanges,
                                      DashAlign align = TITLE_RIGHT_VALUE_RIGHT) :
             DashDrawParametersUpdate(fgColor_, bgColor_, fgUpdateColor_, bgUpdateColor_, font_, align),
-            colorRanges(colorRanges_), numOfRanges(numberRanges) useUpdateColor(fgColor_ != fgUpdateColor_ || bgColor_ != bgUpdateColor_) { }
+            colorRanges(colorRanges_), numOfRanges(numberRanges), useUpdateColor(fgColor_ != fgUpdateColor_ || bgColor_ != bgUpdateColor_) { }
 
     DashDrawParametersIntUpdateRange(color_t fgColor_, color_t bgColor_, color_t fgUpdateColor_, color_t bgUpdateColor_,
                                      const UnicodeFont *font_, const IntColorRange colorRanges_[], int numberRanges,
                                      DashAlign align = TITLE_RIGHT_VALUE_RIGHT) :
             DashDrawParametersUpdate(fgColor_, bgColor_, fgUpdateColor_, bgUpdateColor_, font_, align),
-            colorRanges(colorRanges_), numOfRanges(numberRanges) useUpdateColor(fgColor_ != fgUpdateColor_ || bgColor_ != bgUpdateColor_) { }
+            colorRanges(colorRanges_), numOfRanges(numberRanges), useUpdateColor(fgColor_ != fgUpdateColor_ || bgColor_ != bgUpdateColor_) { }
 
 private:
     int findIndexForChoice(MenuItem* item);
@@ -97,6 +108,8 @@ private:
  * A drawing parameter that updates the color based on the text of a menu item. You can define various string values for
  * matching, the string value should be in program memory. In addition it can have a set of colors to handle change
  * on update.
+ *
+ * It works with any runtime menu item such as TextMenuItem and others.
  */
 class DashDrawParametersTextUpdateRange : public DashDrawParametersUpdate {
 public:
@@ -117,7 +130,7 @@ public:
             numOfRanges(numberRanges), useUpdateColor(fgColor_ != fgUpdateColor_ || bgColor_ != bgUpdateColor_) {}
 
     DashDrawParametersTextUpdateRange(color_t fgColor_, color_t bgColor_, color_t fgUpdateColor_, color_t bgUpdateColor_,
-                                     const Unicodeont *font_, const TextColorOverride colorOverrides_[], int numberRanges,
+                                     const UnicodeFont *font_, const TextColorOverride colorOverrides_[], int numberRanges,
                                      DashAlign align = TITLE_RIGHT_VALUE_RIGHT) :
             DashDrawParametersUpdate(fgColor_, bgColor_, fgUpdateColor_, bgUpdateColor_, font_, align), colorOverrides(colorOverrides_),
             numOfRanges(numberRanges), useUpdateColor(fgColor_ != fgUpdateColor_ || bgColor_ != bgUpdateColor_) {}
@@ -128,12 +141,15 @@ private:
     color_t getFgColor(MenuItem *item, bool updated) override;
 };
 
+typedef void (*DashPaintFunction)(DashDrawParameters* params, color_t bg, color_t fg, DeviceDrawable* drawable);
+
 /**
  * Each item that is to appear in the dashboard can be attached to a menu item, this is the drawing class that will
  * present a given item in the dashboard.
  */
 class DashMenuItem {
 private:
+    static color_t staticPalette[4];
     MenuItem *item;
     Coord screenLoc;
     DashDrawParameters *parameters;
@@ -144,8 +160,8 @@ private:
     int countDownTicks;
     char titleText[20];
 public:
-    DashMenuItem() : item(nullptr), screenLoc(0, 0), parameters(nullptr), updateCountDown(0), numChars(0), valueWidth(0),
-                     titleText(), titleExtents(0, 0) {}
+    DashMenuItem() : item(nullptr), screenLoc(0, 0), parameters(nullptr), updateCountDown(0), titleExtents(0, 0),
+                     numChars(0), valueWidth(0), countDownTicks(0), titleText() {}
     DashMenuItem(MenuItem *theItem, Coord topLeft, DashDrawParameters* params, int numCharsInValue, const char* titleOverride, int countDownTicks);
     DashMenuItem(const DashMenuItem &other) = default;
     DashMenuItem& operator= (const DashMenuItem& other) = default;
@@ -156,8 +172,8 @@ public:
 
     bool needsPainting();
     void setFont(DashDrawParameters* params, UnicodeFontHandler* unicodeHandler);
-    void paintTitle();
-    void paintItem(Adafruit_GFX *myGfx, DeviceDrawable* canvasDrawable, GFXcanvas1* canvas);
+    void paintTitle(DeviceDrawable* canvasDrawable);
+    void paintItem(DeviceDrawable* canvasDrawable);
 };
 
 /**
@@ -175,17 +191,24 @@ public:
 private:
     TitleWidget* firstWidget;
     BaseMenuRenderer *renderer;
-    AdafruitDrawable *canvasDrawable;
+    DeviceDrawable *drawable;
     BtreeList<uint16_t, DashMenuItem> drawingItems;
-    DrawingMode drawingMode;
+    color_t screenBg = 0;
+    color_t coreItemFg = 0;
+    DashboardMode drawingMode;
     bool running;
 public:
     DrawableDashboard(DeviceDrawable *device, BaseMenuRenderer* renderer, TitleWidget* widgets, DashboardMode drawingMode)
-            : firstWidget(widgets),renderer(renderer), drawingItems() { }
+            : firstWidget(widgets), renderer(renderer), drawable(device), drawingItems(), drawingMode(drawingMode), running(false) { }
     ~DrawableDashboard() override = default;
+    void setBaseColors(color_t screenBgCol, color_t coreFgCol) {
+        screenBg = screenBgCol;
+        coreItemFg = coreFgCol;
+    }
 
     void clearItems() { drawingItems.clear(); }
-    void addDrawingItem(MenuItem *theItem, Coord topLeft, DashDrawParameters* params, int numCharsInValue, const char* titleOverrideText = nullptr);
+    void addDrawingItem(MenuItem *theItem, Coord topLeft, DashDrawParameters* params, int numCharsInValue,
+                        const char* titleOverrideText = nullptr, int updateTicks = 5);
     void stop();
     void reset() override;
     void started(BaseMenuRenderer *currentRenderer) override;
@@ -197,6 +220,8 @@ public:
      * @param userClicked this represents the status of the select button, see RenderPressMode for more details
      */
     void renderLoop(unsigned int currentValue, RenderPressMode userClick) override;
+
+    void drawWidgets(bool force);
 };
 
 #endif //TCMENU_DRAWABLE_DASHBOARD_H

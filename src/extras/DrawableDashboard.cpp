@@ -1,10 +1,10 @@
 #include <BaseRenderers.h>
 #include "DrawableDashboard.h"
+#include "ScrollChoiceMenuItem.h"
 
-void
-DrawableDashboard::addDrawingItem(MenuItem *theItem, Coord topLeft, DashDrawParameters *params, int numCharsInValue,
-                                  const char *titleOverrideText = nullptr) {
-    drawingItems.add(DashMenuItem(theItem, topLeft, params, numCharsInValue, titleOverrideText));
+void DrawableDashboard::addDrawingItem(MenuItem *theItem, Coord topLeft, DashDrawParameters *params, int numCharsInValue,
+                                  const char *titleOverrideText, int updateTicks) {
+    drawingItems.add(DashMenuItem(theItem, topLeft, params, numCharsInValue, titleOverrideText, updateTicks));
     serdebugF2("added item to list #", drawingItems.count());
 }
 
@@ -21,21 +21,21 @@ void DrawableDashboard::reset() {
 
 void DrawableDashboard::started(BaseMenuRenderer *currentRenderer) {
     renderer = currentRenderer;
-    myGfx->setTextSize(1);
-    myGfx->fillScreen(0);
-    serdebugF2("drawing titles #", drawingItems.count())
+    drawable->setDrawColor(screenBg);
+    drawable->drawBox(Coord(0, 0), drawable->getDisplayDimensions(), true);
+    serdebugF2("drawing titles #", drawingItems.count());
 
     for (int i = 0; i < drawingItems.count(); i++) {
         auto drawing = drawingItems.itemAtIndex(i);
-        serdebugF("drawing title")
-
-        drawing->paintTitle();
+        drawing->paintTitle(drawable);
     }
-    serdebugF("started2")
+
+    drawWidgets(true);
 }
 
 void DrawableDashboard::renderLoop(unsigned int currentValue, RenderPressMode userClick) {
     if (userClick != RPRESS_NONE && (drawingMode == DASH_ON_RESET_CLICK_EXIT || drawingMode == DASH_MANUAL_START_CLICK_EXIT)) {
+        serlogF(SER_TCMENU_INFO, "Dashboard exit, clicked");
         stop();
         return;
     }
@@ -43,13 +43,28 @@ void DrawableDashboard::renderLoop(unsigned int currentValue, RenderPressMode us
     for (int i = 0; i < drawingItems.count(); i++) {
         auto drawing = drawingItems.itemAtIndex(i);
         if (drawing->needsPainting()) {
-            drawing->paintItem(myGfx, canvasDrawable, canvas);
+            drawing->paintItem(drawable);
         }
+    }
+
+    drawWidgets(false);
+}
+
+void DrawableDashboard::drawWidgets(bool force) {
+    auto widget = firstWidget;
+    int xPos = drawable->getDisplayDimensions().x;
+    while(widget) {
+        if(force || widget->isChanged()) {
+            xPos -= (widget->getWidth() + 3);
+            drawable->setColors(coreItemFg, screenBg);
+            drawable->drawXBitmap(Coord(xPos, 3), Coord(widget->getWidth(), widget->getHeight()), widget->getCurrentIcon());
+            widget->setChanged(false);
+        }
+        widget = widget->getNext();
     }
 }
 
-DashDrawParameters::DashDrawParameters(color_t fgColor_, color_t bgColor_, const GFXfont *font_,
-                                       DashAlign align = TITLE_RIGHT_VALUE_RIGHT) {
+DashDrawParameters::DashDrawParameters(color_t fgColor_, color_t bgColor_, const GFXfont *font_, DashAlign align) {
     alignment = align;
     adaFont = font_;
     isAdaFont = true;
@@ -57,8 +72,7 @@ DashDrawParameters::DashDrawParameters(color_t fgColor_, color_t bgColor_, const
     bgColor = bgColor_;
 }
 
-DashDrawParameters::DashDrawParameters(color_t fgColor_, color_t bgColor_, const UnicodeFont *font_,
-                                       DashAlign align = TITLE_RIGHT_VALUE_RIGHT) {
+DashDrawParameters::DashDrawParameters(color_t fgColor_, color_t bgColor_, const UnicodeFont *font_, DashAlign align) {
     alignment = align;
     uniFont = font_;
     isAdaFont = false;
@@ -67,14 +81,21 @@ DashDrawParameters::DashDrawParameters(color_t fgColor_, color_t bgColor_, const
 }
 
 int DashDrawParametersIntUpdateRange::findIndexForChoice(MenuItem* item) {
+    int val;
     if(isMenuBasedOnValueItem(item)) {
-        auto val = reinterpret_cast<ValueMenuItem*>(item)->getCurrentValue();
-        for(int i=0;i<numOfRanges;i++) {
-            if(val >= colorRanges[i].minValue && val <= colorRanges[i].maxValue) {
-                return i;
-            }
+        val = reinterpret_cast<ValueMenuItem *>(item)->getCurrentValue();
+    } else if(item->getMenuType() == MENUTYPE_SCROLLER_VALUE) {
+        val = reinterpret_cast<ScrollChoiceMenuItem*>(item)->getCurrentValue();
+    } else {
+        return -1;
+    }
+
+    for(int i=0;i<numOfRanges;i++) {
+        if(val >= colorRanges[i].minValue && val <= colorRanges[i].maxValue) {
+            return i;
         }
     }
+
     return -1;
 }
 
@@ -116,10 +137,14 @@ color_t DashDrawParametersTextUpdateRange::getFgColor(MenuItem *item, bool updat
     return (idx != -1) ? colorOverrides[idx].fgColor : fgColor;
 }
 
-DashMenuItem::DashMenuItem(MenuItem *theItem, Coord topLeft, DashDrawParameters* params, int numCharsInValue, const char* titleOverride, int countDownTicks)
-        : item(theItem) screenLoc(topLeft), updateCountDown(countDownTicks), numChars(numCharsInValue), valueWidth(0), titleExtents(0, 0), countDownTicks(countDownTicks) {
+color_t DashMenuItem::staticPalette[4] = {};
 
-    if(titleOverride) {
+DashMenuItem::DashMenuItem(MenuItem *theItem, Coord topLeft, DashDrawParameters* params, int numCharsInValue,
+                           const char* titleOverride, int countDownTicks) : item(theItem), screenLoc(topLeft),
+                               parameters(params), updateCountDown(countDownTicks), numChars(numCharsInValue),
+                               valueWidth(0), titleExtents(0, 0), countDownTicks(countDownTicks) {
+
+    if(titleOverride != nullptr) {
         strncpy(titleText, titleOverride, sizeof(titleText));
     }
     else {
@@ -145,36 +170,79 @@ void DashMenuItem::setFont(DashDrawParameters* params, UnicodeFontHandler* unico
     }
 }
 
-void DashMenuItem::paintTitle() {
-    int baseline;
-    UnicodeFontHandler* unicodeHandler = gfxDrawable.getUnicodeHandler(true);
+/**
+ * Wraps a drawable regardless of if we are on a sub device or root device, this class handles all the differences
+ * between the two with helper functions for dealing with palette colors and offset differences.
+ */
+class DrawableWrapper {
+private:
+    color_t palette[2] = {};
+    DeviceDrawable* drawable = nullptr;
+    Coord startPos = {};
+    bool isSubDevice = false;
+public:
+    DrawableWrapper(DeviceDrawable* root, DashDrawParameters* parameters, MenuItem* item, const Coord& startPosition, const Coord& size) {
+        palette[0] = parameters->getBgColor(item, item->isChanged());
+        palette[1] = parameters->getFgColor(item, item->isChanged());
 
+        isSubDevice = false;
+        drawable = root;
+        if (root->getSubDeviceType() != tcgfx::DeviceDrawable::NO_SUB_DEVICE) {
+            auto subDrawable = root->getSubDeviceFor(startPosition, size, palette, 4);
+            if (subDrawable) {
+                isSubDevice = true;
+                drawable = subDrawable;
+                drawable->startDraw();
+                startPos = startPosition;
+            }
+        }
+    }
+
+    DeviceDrawable* getDrawable() { return drawable; }
+    color_t getPaletteColor(size_t idx) { return isSubDevice ? idx : palette[idx]; }
+    Coord offsetLocation(const Coord& source) const { return isSubDevice ? Coord(source.x - startPos.x, source.y - startPos.y) : source; }
+    Coord offsetLocation(const Coord& source, int xOffs, int yOffs) const {
+        return isSubDevice ? Coord((source.x + xOffs) - startPos.x, (source.y + yOffs) - startPos.y) : Coord(source.x + xOffs, source.y + yOffs);
+    }
+
+    void endDraw() { if(isSubDevice) drawable->endDraw(true); }
+};
+
+void DashMenuItem::paintTitle(DeviceDrawable* drawableRoot) {
+    int baseline;
+    UnicodeFontHandler* unicodeHandler = drawableRoot->getUnicodeHandler(true);
+    setFont(parameters, unicodeHandler);
     titleExtents = unicodeHandler->textExtents(titleText, &baseline);
     valueWidth = unicodeHandler->textExtents("0", &baseline).x * numChars;
     valueWidth = int(valueWidth * 1.20);
 
+    DrawableWrapper wrapper(drawableRoot, parameters, item, screenLoc, Coord(titleExtents.x + valueWidth, titleExtents.y));
+    unicodeHandler = wrapper.getDrawable()->getUnicodeHandler(true);
+
     if(!parameters->isTitleDrawn()) return;
 
-    auto startX = (parameters->isTitleLeftAlign()) ? screenLoc.x : screenLoc.x + valueWidth + 1;
+    auto startX = (parameters->isTitleLeftAlign()) ? 0 : valueWidth + 1;
+    wrapper.getDrawable()->setDrawColor(wrapper.getPaletteColor(0));
+    wrapper.getDrawable()->drawBox(wrapper.offsetLocation(screenLoc), Coord(titleExtents.x + valueWidth, titleExtents.y), true);
 
-    if(parameters->getTitleBgColor(item, false) != ILI9341_BLACK) {
-        gfxDrawable.setDrawColor(parameters->getTitleBgColor(item, false));
-        gfxDrawable.drawBox(Coord(startX, screenLoc.y), Coord(titleExtents.x, titleExtents.y), true);
-    }
-    unicodeHandler->setDrawColor(parameters->getTitleFgColor(item, false));
-    unicodeHandler->setCursor(Coord(startX, screenLoc.y + titleExtents.y));
+    unicodeHandler->setDrawColor(wrapper.getPaletteColor(1));
+    unicodeHandler->setCursor(wrapper.offsetLocation(screenLoc, startX, titleExtents.y));
     unicodeHandler->print(titleText);
+
+    wrapper.endDraw();
 }
 
-void DashMenuItem::paintItem(Adafruit_GFX *myGfx, DeviceDrawable* canvasDrawable, GFXcanvas1* canvas) {
+void DashMenuItem::paintItem(DeviceDrawable* drawableRoot) {
     item->setChanged(false);
     char sz[20];
-    copyMenuItemValue(item, sz, sizeof(sz));
-    const Coord &dims = canvasDrawable->getDisplayDimensions();
-    canvasDrawable->setDrawColor(0);
-    canvasDrawable->drawBox(Coord(0, 0), Coord(dims.x, dims.y), true);
+    DrawableWrapper wrapper(drawableRoot, parameters, item, screenLoc, Coord(valueWidth, titleExtents.y));
 
-    UnicodeFontHandler* unicodeHandler = canvasDrawable->getUnicodeHandler(true);
+    copyMenuItemValue(item, sz, sizeof(sz));
+    wrapper.getDrawable()->setDrawColor(wrapper.getPaletteColor(0));
+    wrapper.getDrawable()->drawBox(wrapper.offsetLocation(screenLoc), Coord(valueWidth, titleExtents.y), true);
+
+    UnicodeFontHandler* unicodeHandler = wrapper.getDrawable()->getUnicodeHandler(true);
+    unicodeHandler->setDrawColor(wrapper.getPaletteColor(1));
     setFont(parameters, unicodeHandler);
     auto padding = 0;
     if(!parameters->isValueLeftAlign()) {
@@ -182,11 +250,8 @@ void DashMenuItem::paintItem(Adafruit_GFX *myGfx, DeviceDrawable* canvasDrawable
         Coord valueLen = unicodeHandler->textExtents(sz, &baseline);
         padding = valueWidth - (valueLen.x + 4);
     }
-    unicodeHandler->setDrawColor(1);
-    unicodeHandler->setCursor(padding, unicodeHandler->getYAdvance());
+    unicodeHandler->setCursor(wrapper.offsetLocation(screenLoc, padding, unicodeHandler->getYAdvance()));
     unicodeHandler->print(sz);
-    auto startX = (parameters->isTitleLeftAlign()) ? screenLoc.x + titleExtents.x + 5 : screenLoc.x;
-    drawCookieCutBitmap(myGfx, startX, screenLoc.y, canvas->getBuffer(), valueWidth, titleExtents.y,
-                        canvas->width(), 0, 0,parameters->getFgColor(item, updateCountDown > 1),
-                        parameters->getBgColor(item, updateCountDown > 1));
+
+    wrapper.endDraw();
 }
