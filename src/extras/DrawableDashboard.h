@@ -16,7 +16,7 @@ public:
         TITLE_LEFT_VALUE_LEFT, TITLE_LEFT_VALUE_RIGHT,
         NO_TITLE_VALUE_LEFT, NO_TITLE_VALUE_RIGHT,
         TITLE_RIGHT_VALUE_LEFT, TITLE_RIGHT_VALUE_RIGHT,
-        CUSTOM_DRAWN_ITEM };
+    };
 protected:
     DashAlign alignment;
     union {

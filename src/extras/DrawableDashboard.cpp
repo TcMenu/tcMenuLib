@@ -240,6 +240,7 @@ void DashMenuItem::paintTitle(DeviceDrawable* drawableRoot) {
 
     unicodeHandler->setDrawColor(wrapper.fgColUnderlying());
     unicodeHandler->setCursor(wrapper.offsetLocation(screenLoc, startX, titleExtents.y));
+    setFont(parameters, unicodeHandler);
     unicodeHandler->print(titleText);
 
     wrapper.endDraw();
