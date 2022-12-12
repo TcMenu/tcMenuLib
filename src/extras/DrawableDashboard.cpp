@@ -32,6 +32,7 @@ void DrawableDashboard::started(BaseMenuRenderer *currentRenderer) {
     for (int i = 0; i < drawingItems.count(); i++) {
         auto drawing = drawingItems.itemAtIndex(i);
         drawing->paintTitle(drawable);
+        drawing->paintItem(drawable);
     }
 
     drawWidgets(true);
@@ -179,47 +180,6 @@ void DashMenuItem::setFont(DashDrawParameters* params, UnicodeFontHandler* unico
         unicodeHandler->setFont(parameters->getAsUnicodeFont());
     }
 }
-
-/**
- * Wraps a drawable regardless of if we are on a sub device or root device, this class handles all the differences
- * between the two with helper functions for dealing with palette colors and offset differences.
- */
-class DrawableWrapper {
-private:
-    color_t palette[2] = {};
-    DeviceDrawable* drawable = nullptr;
-    Coord startPos = {};
-    bool isSubDevice = false;
-public:
-    DrawableWrapper(DeviceDrawable* root, DashDrawParameters* parameters, MenuItem* item, const Coord& startPosition, const Coord& size) {
-        palette[0] = parameters->getBgColor(item, item->isChanged());
-        palette[1] = parameters->getFgColor(item, item->isChanged());
-
-        isSubDevice = false;
-        drawable = root;
-        if (root->getSubDeviceType() != tcgfx::DeviceDrawable::NO_SUB_DEVICE) {
-            auto subDrawable = root->getSubDeviceFor(startPosition, size, palette, 4);
-            if (subDrawable) {
-                isSubDevice = true;
-                drawable = subDrawable;
-                drawable->startDraw();
-                startPos = startPosition;
-            }
-        }
-    }
-
-    DeviceDrawable* getDrawable() { return drawable; }
-    Coord offsetLocation(const Coord& source) const { return isSubDevice ? Coord(source.x - startPos.x, source.y - startPos.y) : source; }
-    Coord offsetLocation(const Coord& source, int xOffs, int yOffs) const {
-        return isSubDevice ? Coord((source.x + xOffs) - startPos.x, (source.y + yOffs) - startPos.y) : Coord(source.x + xOffs, source.y + yOffs);
-    }
-
-    color_t fgCol() { return palette[1];}
-    color_t fgColUnderlying() { return drawable->getUnderlyingColor(palette[1]);}
-    color_t bgCol() { return palette[0];}
-
-    void endDraw() { if(isSubDevice) drawable->endDraw(true); }
-};
 
 void DashMenuItem::paintTitle(DeviceDrawable* drawableRoot) {
     int baseline;
