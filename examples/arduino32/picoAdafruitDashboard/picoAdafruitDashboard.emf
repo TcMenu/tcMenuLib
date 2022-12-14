@@ -1,0 +1,289 @@
+{
+  "version": "1.00",
+  "projectName": "Project description",
+  "author": "dave",
+  "items": [
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "defaultValue": "222",
+      "item": {
+        "maxValue": 1000,
+        "offset": 0,
+        "divisor": 10,
+        "unitName": "V",
+        "step": 1,
+        "name": "Analog",
+        "variableName": "Analog",
+        "id": 1,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "floatItem",
+      "defaultValue": "33.123",
+      "item": {
+        "numDecimalPlaces": 3,
+        "name": "Float",
+        "variableName": "Float",
+        "id": 2,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "enumItem",
+      "defaultValue": "0",
+      "item": {
+        "enumEntries": [
+          "Item1",
+          "Item2"
+        ],
+        "name": "Enum",
+        "variableName": "Enum",
+        "id": 3,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "boolItem",
+      "defaultValue": "false",
+      "item": {
+        "naming": "ON_OFF",
+        "name": "Power",
+        "variableName": "Power",
+        "id": 4,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "Settings",
+        "variableName": "Settings",
+        "id": 5,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 5,
+      "type": "actionMenu",
+      "item": {
+        "name": "Action",
+        "variableName": "SettingsAction",
+        "id": 6,
+        "eepromAddress": -1,
+        "functionName": "onSettingsAction",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 5,
+      "type": "rgbItem",
+      "defaultValue": "#000000FF",
+      "item": {
+        "includeAlphaChannel": false,
+        "name": "RGB",
+        "variableName": "SettingsRGB",
+        "id": 7,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    }
+  ],
+  "codeOptions": {
+    "embeddedPlatform": "ARDUINO_ESP32",
+    "lastDisplayUuid": "4dcb12ec-13d8-4466-b8b6-bd575eae4612",
+    "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
+    "lastRemoteUuid": "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb",
+    "lastRemoteUuids": [
+      "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
+    ],
+    "lastThemeUuid": "850dc0a3-f534-47c2-94d8-1e64ff368a54",
+    "applicationUUID": "0ad4bdde-34a4-4507-912e-b495b0eac2c1",
+    "applicationName": "adafruitDrawableTest",
+    "lastProperties": [
+      {
+        "name": "DISPLAY_VARIABLE",
+        "latestValue": "gfx",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_TYPE",
+        "latestValue": "Adafruit_ILI9341",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_WIDTH",
+        "latestValue": "320",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_HEIGHT",
+        "latestValue": "240",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_RESET_PIN",
+        "latestValue": "19",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CS_PIN",
+        "latestValue": "20",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_RS_PIN",
+        "latestValue": "18",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_DATA_PIN",
+        "latestValue": "-1",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CLOCK_PIN",
+        "latestValue": "-1",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "ST7735_TAB_TYPE",
+        "latestValue": "INITR_BLACKTAB",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_ROTATION",
+        "latestValue": "1",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "UPDATES_PER_SEC",
+        "latestValue": "5",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_BUFFER_SIZE",
+        "latestValue": "40",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "SW_POLLING_MODE",
+        "latestValue": "SWITCHES_POLL_EVERYTHING",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SWITCH_IODEVICE",
+        "latestValue": "devicePins",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_A",
+        "latestValue": "16",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_B",
+        "latestValue": "17",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_OK",
+        "latestValue": "21",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_BACK_PIN",
+        "latestValue": "-1",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_NEXT_PIN",
+        "latestValue": "-1",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "PULLUP_LOGIC",
+        "latestValue": "true",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_IS_QUARTER_CYCLE",
+        "latestValue": "false",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ITEM_FONT",
+        "latestValue": "ada:OpenSansCyrillicLatin18,0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_FONT",
+        "latestValue": "ada:RobotoMedium24,1",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "BORDER_FOR_ACTIONS",
+        "latestValue": "0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_SHOW_MODE",
+        "latestValue": "TITLE_FIRST_ROW",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "USE_TC_UNICODE",
+        "latestValue": "true",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "USE_SLIDER_ANALOG",
+        "latestValue": "true",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "NEED_EDITING_ICONS",
+        "latestValue": "false",
+        "subsystem": "THEME"
+      }
+    ],
+    "namingRecursive": true,
+    "saveToSrc": false,
+    "useCppMain": false,
+    "eepromDefinition": "",
+    "authenticatorDefinition": "",
+    "projectIoExpanders": [
+      "deviceIO:"
+    ],
+    "menuInMenuCollection": {
+      "menuDefinitions": []
+    },
+    "packageNamespace": "",
+    "appIsModular": false
+  }
+}
