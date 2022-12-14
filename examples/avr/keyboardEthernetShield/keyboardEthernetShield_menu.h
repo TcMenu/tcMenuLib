@@ -21,8 +21,8 @@
 #include <ScrollChoiceMenuItem.h>
 #include <RemoteMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
-#include <IoAbstractionWire.h>
 #include <IoAbstraction.h>
+#include <IoAbstractionWire.h>
 #include <EepromAbstraction.h>
 #include <RemoteAuthentication.h>
 #include "tcMenuLiquidCrystal.h"
@@ -68,6 +68,7 @@ extern IpAddressMenuItem menuConnectivityIpAddress;
 extern TextMenuItem menuConnectivityChangePin;
 extern BackMenuItem menuBackConnectivity;
 extern SubMenuItem menuConnectivity;
+extern ActionMenuItem menuTakeDisplay;
 extern EnumMenuItem menuFruits;
 extern AnalogMenuItem menuFiths;
 extern EditableLargeNumberMenuItem menuLargeNum;
@@ -93,5 +94,6 @@ void CALLBACK_FUNCTION onInteger(int id);
 void CALLBACK_FUNCTION onItemChange(int id);
 void CALLBACK_FUNCTION onSaveToEeprom(int id);
 void CALLBACK_FUNCTION onSaveValue(int id);
+void CALLBACK_FUNCTION onTakeOverDisplay(int id);
 
 #endif // MENU_GENERATED_CODE_H

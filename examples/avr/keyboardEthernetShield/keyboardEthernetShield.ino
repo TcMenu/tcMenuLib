@@ -18,6 +18,7 @@
 #include <EepromAbstraction.h>
 #include <Ethernet.h>
 #include <IoLogging.h>
+#include <stockIcons/wifiAndConnectionIconsLCD.h>
 
 using namespace tcremote;
 
@@ -32,6 +33,15 @@ byte mac[] = {
 const char pgmListPressed[] PROGMEM = "List Item Pressed";
 const char pgmHeaderSavedItem[] PROGMEM = "Saved Item";
 const char * romSpaceNames = "item 01item 02item 03item 04item 05item 06item 07item 08item 09item 10 ";
+
+// We add a title widget that shows when a user is connected to the device. Connection icons
+// are in the standard icon set we included at the top.
+// Yes even on LCD we now support title widgets, but they eat up a few of your custom chars.
+// The width must always be 1, and the height is the first custom character that is used.
+TitleWidget connectedWidget(iconsConnection, 2, 1, 0);
+
+// used by the take over display logic.
+int counter = 0;
 
 //
 // Creating a grid layout just for a specific menu item. The flags menu under additional is laid out in a grid format,
@@ -51,6 +61,15 @@ void prepareLayout() {
                             GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_RIGHT_WITH_VALUE, 2, 2, 2, 1));
 }
 
+// when there's a change in communication status (client connects for example) this gets called.
+void onCommsChange(CommunicationInfo info) {
+    if(info.remoteNo == 0) {
+        connectedWidget.setCurrentState(info.connected ? 1 : 0);
+    }
+    // this relies on logging in IoAbstraction's ioLogging.h, to turn it on visit the file for instructions.
+    serdebugF4("Comms notify (rNo, con, enum)", info.remoteNo, info.connected, info.errorMode);
+}
+
 void setup() {
 	//
 	// If you are using serial (connectivity or logging) and wire they must be initialised 
@@ -63,9 +82,9 @@ void setup() {
 
     serEnableLevel(SER_TCMENU_DEBUG, true);
 
-    // now we turn off the title and change the editor characters
-    renderer.setTitleRequired(false);
-    
+    // you can turn off the title line (but also removes title widget).
+    //renderer.setTitleRequired(false);
+
     // Here we set the character to be used for back, next and editing for the "cursor".
     renderer.setEditorChars(0b01111111, 0b01111110, '=');
 
@@ -99,9 +118,21 @@ void setup() {
     menuConnectivityChangePin.setTextValue(sz);
     menuConnectivityChangePin.setPasswordField(true);
 
+    // here's an example of setting an item to a value manually before the loop starts.
     menuLargeNum.getLargeNumber()->setFromFloat(1234.567);
 
+    // here we customize the LCD layout for one menu, to have two items per line.
     prepareLayout();
+
+    // and lastly we register a communication listener, it updates the title widget
+    // that shows connectivity state on the right corner.
+    menuConnectivityIoTMonitor.registerCommsNotification(onCommsChange);
+    renderer.setFirstWidget(&connectedWidget);
+
+    // and finally, when the display times out, take over and draw a custom screen
+    renderer.setResetCallback([] {
+        onTakeOverDisplay(-1);
+    });
 }
 
 void loop() {
@@ -226,4 +257,51 @@ int CALLBACK_FUNCTION fnAdditionalCountListRtCall(RuntimeMenuItem * item, uint8_
         case RENDERFN_EEPROM_POS: return 0xFFFF; // lists are generally not saved to EEPROM
         default: return false;
     }
+}
+
+//
+// this is the function called by the renderer every 1/5 second once the display is
+// taken over, we pass this function to takeOverDisplay below.
+//
+void myDisplayFunction(unsigned int encoderValue, RenderPressMode clicked) {
+    // we initialise the display on the first call.
+    if(counter == 0) {
+        switches.changeEncoderPrecision(999, 50);
+        lcd.clear();
+        lcd.print("We have the display!");
+        lcd.setCursor(0, 1);
+        lcd.print("OK button for menu..");
+    }
+
+    // We are told when the button is pressed in by the boolean parameter.
+    // When the button is clicked, we give back to the menu..
+    if(clicked) {
+        renderer.giveBackDisplay();
+        counter = 0;
+    }
+    else {
+        char buffer[5];
+        // otherwise update the counter.
+        lcd.setCursor(0, 2);
+        ltoaClrBuff(buffer, ++counter, 4, ' ', sizeof(buffer));
+        lcd.print(buffer);
+        lcd.setCursor(12, 2);
+        ltoaClrBuff(buffer, encoderValue, 4, '0', sizeof(buffer));
+        lcd.print(buffer);
+    }
+}
+
+//
+// We have an option on the menu to take over the display, this function is called when that
+// option is chosen.
+//
+void CALLBACK_FUNCTION onTakeOverDisplay(int /*id*/) {
+    // in order to take over rendering onto the display we just request the display
+    // at which point tcMenu will stop rendering until the display is "given back".
+    // Don't forget that LiquidCrystalIO uses task manager and things can be happening
+    // in the background. Always ensure all operations with the LCD occur on the rendering
+    // call back.
+
+    counter = 0;
+    renderer.takeOverDisplay(myDisplayFunction);
 }

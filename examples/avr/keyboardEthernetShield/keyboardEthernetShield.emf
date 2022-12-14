@@ -145,6 +145,20 @@
     },
     {
       "parentId": 0,
+      "type": "actionMenu",
+      "item": {
+        "name": "Take display",
+        "variableName": "TakeDisplay",
+        "id": 31,
+        "eepromAddress": -1,
+        "functionName": "onTakeOverDisplay",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
+      "parentId": 0,
       "type": "subMenu",
       "item": {
         "secured": true,
@@ -477,13 +491,18 @@
         "subsystem": "DISPLAY"
       },
       {
-        "name": "LCD_EN",
-        "latestValue": "9",
+        "name": "LCD_RS",
+        "latestValue": "8",
         "subsystem": "DISPLAY"
       },
       {
-        "name": "LCD_RS",
-        "latestValue": "8",
+        "name": "LCD_RW",
+        "latestValue": "-1",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "LCD_EN",
+        "latestValue": "9",
         "subsystem": "DISPLAY"
       },
       {
@@ -707,6 +726,11 @@
         "subsystem": "THEME"
       },
       {
+        "name": "USE_TC_UNICODE",
+        "latestValue": "false",
+        "subsystem": "THEME"
+      },
+      {
         "name": "USE_SLIDER_ANALOG",
         "latestValue": "true",
         "subsystem": "THEME"
@@ -723,8 +747,8 @@
     "eepromDefinition": "avr:",
     "authenticatorDefinition": "rom:100:6",
     "projectIoExpanders": [
-      "mcp23017:io23017:32:2",
-      "deviceIO:"
+      "deviceIO:",
+      "mcp23017:io23017:32:2"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []

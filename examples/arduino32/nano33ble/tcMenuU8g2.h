@@ -20,7 +20,6 @@
 #include <tcMenu.h>
 #include <tcUtil.h>
 #include <Wire.h>
-#include <tcUnicodeHelper.h>
 #include <U8g2lib.h>
 #include <graphics/BaseGraphicalRenderer.h>
 #include <graphics/GraphicsDeviceRenderer.h>
@@ -91,11 +90,9 @@ public:
     Coord getDisplayDimensions() override {  return Coord(u8g2->getWidth(), u8g2->getHeight()); }
     void transaction(bool isStarting, bool redrawNeeded) override;
     Coord internalTextExtents(const void *font, int mag, const char *text, int *baseline) override;
-    color_t getUnderlyingColor(color_t col) override { return (col<4) ? col : 1; }
-
-    void drawPixel(uint16_t x, uint16_t y) override { u8g2->drawPixel(x, y); }
-
+    color_t getUnderlyingColor(color_t col) { return (col<4) ? col : 1; }
 protected:
+    void drawPixel(uint16_t x, uint16_t y) override;
     UnicodeFontHandler *createFontHandler() override;
 };
 

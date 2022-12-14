@@ -13,6 +13,7 @@
 
 #include <Arduino.h>
 #include <tcMenu.h>
+#include <tcUnicodeHelper.h>
 #include "tcMenuU8g2.h"
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
@@ -31,6 +32,8 @@ extern U8G2_SH1106_128X64_NONAME_F_HW_I2C gfx;
 extern GraphicsDeviceRenderer renderer;
 extern WiFiServer server;
 extern EthernetInitialisation ethernetInitialisation;
+extern const UnicodeFont OpenSans10[];
+extern const GFXfont RobotoBlack12;
 
 // Any externals needed by IO expanders, EEPROMs etc
 extern IoAbstractionRef ioexp_io8574;

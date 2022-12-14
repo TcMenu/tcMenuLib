@@ -17,7 +17,7 @@ TcMenuRemoteServer remoteServer(applicationInfo);
 IoAbstractionRef ioexp_io23017 = ioFrom23017(0x20, ACTIVE_LOW_OPEN, 2);
 AvrEeprom glAvrRom;
 EepromAuthenticatorManager authManager(6);
-LiquidCrystal lcd(8, 9, 10, 11, 12, 13);
+LiquidCrystal lcd(8, -1, 9, 10, 11, 12, 13);
 LiquidCrystalRenderer renderer(lcd, 20, 4);
 MatrixKeyboardManager keyboard;
 const char keyboardKeys[] PROGMEM  = "123456789*0#";
@@ -82,6 +82,8 @@ RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Conne
 const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 6, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuConnectivityChangePin);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, &menuAdditional);
+const PROGMEM AnyMenuInfo minfoTakeDisplay = { "Take display", 31, 0xffff, 0, onTakeOverDisplay };
+ActionMenuItem menuTakeDisplay(&minfoTakeDisplay, &menuConnectivity);
 const char enumStrFruits_0[] PROGMEM = "Apples";
 const char enumStrFruits_1[] PROGMEM = "Oranges";
 const char enumStrFruits_2[] PROGMEM = "Pears";
@@ -89,7 +91,7 @@ const char enumStrFruits_3[] PROGMEM = "Plums";
 const char enumStrFruits_4[] PROGMEM = "Grapes";
 const char* const enumStrFruits[] PROGMEM  = { enumStrFruits_0, enumStrFruits_1, enumStrFruits_2, enumStrFruits_3, enumStrFruits_4 };
 const PROGMEM EnumMenuInfo minfoFruits = { "Fruits", 8, 26, 4, NO_CALLBACK, enumStrFruits };
-EnumMenuItem menuFruits(&minfoFruits, 0, &menuConnectivity);
+EnumMenuItem menuFruits(&minfoFruits, 0, &menuTakeDisplay);
 const PROGMEM AnalogMenuInfo minfoFiths = { "Fiths", 5, 6, 200, onFiths, 0, 5, "A" };
 AnalogMenuItem menuFiths(&minfoFiths, 0, &menuFruits);
 RENDERING_CALLBACK_NAME_INVOKE(fnLargeNumRtCall, largeNumItemRenderFn, "Large Num", -1, NO_CALLBACK)
@@ -111,8 +113,8 @@ void setupMenu() {
     authManager.initialise(menuMgr.getEepromAbstraction(), 100);
     menuMgr.setAuthenticator(&authManager);
     // Now add any readonly, non-remote and visible flags.
-    menuConnectivityAuthenticator.setLocalOnly(true);
     menuConnectivityIoTMonitor.setLocalOnly(true);
+    menuConnectivityAuthenticator.setLocalOnly(true);
     menuConnectivity.setLocalOnly(true);
     menuConnectivity.setSecured(true);
     menuHiddenItem.setVisible(false);

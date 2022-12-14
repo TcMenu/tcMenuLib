@@ -347,6 +347,11 @@
         "subsystem": "DISPLAY"
       },
       {
+        "name": "USE_UTF8_SUPPORT",
+        "latestValue": "false",
+        "subsystem": "DISPLAY"
+      },
+      {
         "name": "SW_POLLING_MODE",
         "latestValue": "SWITCHES_POLL_KEYS_ONLY",
         "subsystem": "INPUT"
@@ -418,27 +423,32 @@
       },
       {
         "name": "ITEM_FONT",
-        "latestValue": "def:,1",
+        "latestValue": "adl:OpenSans10,0",
         "subsystem": "THEME"
       },
       {
         "name": "TITLE_FONT",
-        "latestValue": "avl:u8g2_font_sirclivethebold_tr,1",
+        "latestValue": "adl:RobotoBlack12,1",
         "subsystem": "THEME"
       },
       {
         "name": "TITLE_HEADER_PADDING",
-        "latestValue": "2",
+        "latestValue": "1",
         "subsystem": "THEME"
       },
       {
         "name": "TITLE_TO_ITEM_SPACING",
-        "latestValue": "2",
+        "latestValue": "0",
         "subsystem": "THEME"
       },
       {
         "name": "TITLE_SHOW_MODE",
         "latestValue": "TITLE_FIRST_ROW",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "USE_TC_UNICODE",
+        "latestValue": "true",
         "subsystem": "THEME"
       }
     ],

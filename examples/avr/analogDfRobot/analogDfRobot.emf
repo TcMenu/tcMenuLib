@@ -180,6 +180,11 @@
         "subsystem": "THEME"
       },
       {
+        "name": "USE_TC_UNICODE",
+        "latestValue": "false",
+        "subsystem": "THEME"
+      },
+      {
         "name": "USE_SLIDER_ANALOG",
         "latestValue": "true",
         "subsystem": "THEME"
