@@ -189,7 +189,7 @@ void DashMenuItem::paintTitle(DeviceDrawable* drawableRoot) {
     valueWidth = unicodeHandler->textExtents("0", &baseline).x * numChars;
     valueWidth = int(valueWidth * 1.20);
 
-    DrawableWrapper wrapper(drawableRoot, parameters, item, screenLoc, Coord(titleExtents.x + valueWidth, titleExtents.y));
+    DrawableWrapper wrapper(drawableRoot, parameters, item, screenLoc, Coord(titleExtents.x + valueWidth, titleExtents.y), true);
     unicodeHandler = wrapper.getDrawable()->getUnicodeHandler(true);
 
     if(!parameters->isTitleDrawn()) return;

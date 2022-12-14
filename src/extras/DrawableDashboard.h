@@ -273,9 +273,14 @@ private:
     Coord startPos = {};
     bool isSubDevice = false;
 public:
-    DrawableWrapper(DeviceDrawable* root, DashDrawParameters* parameters, MenuItem* item, const Coord& startPosition, const Coord& size) {
-        palette[0] = parameters->getBgColor(item, item->isChanged());
-        palette[1] = parameters->getFgColor(item, item->isChanged());
+    DrawableWrapper(DeviceDrawable* root, DashDrawParameters* parameters, MenuItem* item, const Coord& startPosition, const Coord& size, bool titleMode = false) {
+        if(titleMode) {
+            palette[0] = parameters->getTitleBgColor(item, item->isChanged());
+            palette[1] = parameters->getTitleFgColor(item, item->isChanged());
+        } else {
+            palette[0] = parameters->getBgColor(item, item->isChanged());
+            palette[1] = parameters->getFgColor(item, item->isChanged());
+        }
 
         isSubDevice = false;
         drawable = root;
