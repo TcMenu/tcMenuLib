@@ -15,7 +15,7 @@
 #include <tcMenu.h>
 
 #include "Adafruit_SSD1306.h"
-#include "tcMenuAdaFruitGfx.h"
+#include "tcMenuAdaFruitGfxMono.h"
 #include "MBedEthernetTransport.h"
 #include <RemoteConnector.h>
 #include <RuntimeMenuItem.h>

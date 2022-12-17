@@ -16,7 +16,7 @@
 const  ConnectorLocalInfo applicationInfo = { "Dynamic Menus", "5f22995e-8da2-49c4-9ec8-d055901003af" };
 IoAbstractionRef ioexp_io23017 = ioFrom23017(0x20, ACTIVE_LOW_OPEN, 10);
 Adafruit_ST7735 gfx(1, 0, -1);
-AdafruitDrawable gfxDrawable(&gfx);
+AdafruitDrawable gfxDrawable(&gfx, 0);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 MatrixKeyboardManager keyboard;
 const char keyboardKeys[]  = "123A456B789C*0#D";

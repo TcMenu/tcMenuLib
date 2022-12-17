@@ -13,19 +13,15 @@
  */
 
 #include <ScrollChoiceMenuItem.h>
-#include "tcMenuAdaFruitGfx.h"
-
-#if DISPLAY_HAS_MEMBUFFER == true
-#define refreshDisplayIfNeeded(gr, needUpd) {if(needUpd) reinterpret_cast<Adafruit_SSD1306_Spi*>(gr)->display();}
-#else
-#define refreshDisplayIfNeeded(g, n)
-#endif
+#include "tcMenuAdaFruitGfxMono.h"
 
 void AdafruitDrawable::transaction(bool isStarting, bool redrawNeeded) {
-    if(!isStarting) refreshDisplayIfNeeded(graphics, redrawNeeded);
+    if(!isStarting && redrawNeeded) {
+        reinterpret_cast<Adafruit_SSD1306_Spi*>(graphics)->display();
+    }
 }
 
-void AdafruitDrawable::drawText(const Coord &where, const void *font, int mag, const char *sz) {
+void AdafruitDrawable::internalDrawText(const Coord &where, const void *font, int mag, const char *sz) {
     graphics->setTextWrap(false);
     int baseline=0;
     Coord exts = textExtents(font, mag, "(;y", &baseline);
@@ -86,7 +82,7 @@ void AdafruitDrawable::drawPolygon(const Coord points[], int numPoints, bool fil
 }
 
 
-Coord AdafruitDrawable::textExtents(const void *f, int mag, const char *text, int *baseline) {
+Coord AdafruitDrawable::internalTextExtents(const void *f, int mag, const char *text, int *baseline) {
     graphics->setFont(static_cast<const GFXfont *>(f));
     graphics->setTextSize(mag);
     auto* font = (GFXfont *) f;
@@ -105,45 +101,33 @@ Coord AdafruitDrawable::textExtents(const void *f, int mag, const char *text, in
         int height = 0;
         int bl = 0;
         const char* current = sz;
-        while(*current && (*current < font->last)) {
-            int glIdx = *current - font->first;
-            auto &g = font->glyph[glIdx];
-            if (g.height > height) height = g.height;
-            bl = g.height + g.yOffset;
+        auto fontLast = pgm_read_word(&font->last);
+        auto fontFirst = pgm_read_word(&font->first);
+        while(*current && (*current < fontLast)) {
+            size_t glIdx = *current - fontFirst;
+            auto allGlyphs = (GFXglyph*)pgm_read_ptr(&font->glyph);
+            unsigned char glyphHeight = pgm_read_byte(&allGlyphs[glIdx].height);
+            if (glyphHeight > height) height = glyphHeight;
+            bl = glyphHeight + pgm_read_byte(&allGlyphs[glIdx].yOffset);
             current++;
         }
         if(baseline) *baseline = bl;
-        return Coord(w, height);
+        return Coord((int)w, height);
     }
+}
+
+void AdafruitDrawable::drawPixel(uint16_t x, uint16_t y) {
+    graphics->writePixel(x, y, drawColor);
+}
+
+UnicodeFontHandler *AdafruitDrawable::createFontHandler() {
+    return new UnicodeFontHandler(graphics, ENCMODE_UTF8);
 }
 
 //
 // helper functions
 //
 
-/** A couple of helper functions that we'll submit for inclusion once a bit more testing is done */
-
-/**************************************************************************/
-/*!
-   @brief      Draw a RAM-resident 1-bit image at the specified (x,y) position,
-   from image data that may be wider or taller than the desired width and height.
-   Imagine a cookie dough rolled out, where you can cut a rectangle out of it.
-   It uses the specified foreground (for set bits) and background (unset bits) colors.
-   This is particularly useful for GFXCanvas1 operations, where you can allocate the
-   largest canvas needed and then use it for all drawing operations.
-
-    @param    x   Top left corner x coordinate
-    @param    y   Top left corner y coordinate
-    @param    bitmap  byte array with monochrome bitmap
-    @param    w   width of the portion you want to draw
-    @param    h   Height of the portion you want to draw
-    @param    totalWidth actual width of the bitmap
-    @param    xStart X position of the image in the data
-    @param    yStart Y position of the image in the data
-    @param    color 16-bit 5-6-5 Color to draw pixels with
-    @param    bg 16-bit 5-6-5 Color to draw background with
-*/
-/**************************************************************************/
 void drawCookieCutBitmap(Adafruit_GFX* gfx, int16_t x, int16_t y, const uint8_t *bitmap, int16_t w,
                          int16_t h, int16_t totalWidth, int16_t xStart, int16_t yStart,
                          uint16_t fgColor, uint16_t bgColor) {

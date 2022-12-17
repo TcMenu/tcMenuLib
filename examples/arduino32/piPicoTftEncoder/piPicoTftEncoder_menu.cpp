@@ -11,7 +11,7 @@
 #include <tcMenu.h>
 #include "piPicoTftEncoder_menu.h"
 #include "ThemeCoolBlueModern.h"
-#include <Fonts/OpenSans18.h>
+#include <Fonts/OpenSansCyrillicLatin18.h>
 #include <Fonts/RobotoMedium24.h>
 
 // Global variable declarations
@@ -85,6 +85,6 @@ void setupMenu() {
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
     renderer.setUseSliderForAnalog(true);
     renderer.enableTcUnicode();
-    installCoolBlueModernTheme(renderer, MenuFontDef(&OpenSans18, 0), MenuFontDef(&RobotoMedium24, 1), false);
+    installCoolBlueModernTheme(renderer, MenuFontDef(&OpenSansCyrillicLatin18, 0), MenuFontDef(&RobotoMedium24, 1), false);
 }
 

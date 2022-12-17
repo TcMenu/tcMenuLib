@@ -451,6 +451,11 @@
         "name": "TITLE_SHOW_MODE",
         "latestValue": "TITLE_ALWAYS",
         "subsystem": "THEME"
+      },
+      {
+        "name": "USE_TC_UNICODE",
+        "latestValue": "false",
+        "subsystem": "THEME"
       }
     ],
     "namingRecursive": false,

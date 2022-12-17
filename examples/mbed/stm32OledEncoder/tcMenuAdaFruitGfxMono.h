@@ -21,6 +21,7 @@
 #include <tcMenu.h>
 #include <tcUtil.h>
 #include <BaseRenderers.h>
+#include <tcUnicodeHelper.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306_Spi.h>
 #include <gfxfont.h>
@@ -29,8 +30,6 @@
 #include <graphics/BaseGraphicalRenderer.h>
 #include <graphics/GraphicsDeviceRenderer.h>
 #include <AnalogDeviceAbstraction.h>
-
-#define DISPLAY_HAS_MEMBUFFER true
 
 using namespace tcgfx;
 
@@ -47,14 +46,34 @@ using namespace tcgfx;
 extern const ConnectorLocalInfo applicationInfo;
 
 /**
+   @brief      Draw a RAM-resident 1-bit image at the specified (x,y) position,
+   from image data that may be wider or taller than the desired width and height.
+   Imagine a cookie dough rolled out, where you can cut a rectangle out of it.
+   It uses the specified foreground (for set bits) and background (unset bits) colors.
+   This is particularly useful for GFXCanvas1 operations, where you can allocate the
+   largest canvas needed and then use it for all drawing operations.
+
+    @param    gfx The actual graphics object to draw onto
+    @param    x   Top left corner x coordinate
+    @param    y   Top left corner y coordinate
+    @param    bitmap  byte array with monochrome bitmap
+    @param    w   width of the portion you want to draw
+    @param    h   Height of the portion you want to draw
+    @param    totalWidth actual width of the bitmap
+    @param    xStart X position of the image in the data
+    @param    yStart Y position of the image in the data
+    @param    fgColor 16-bit 5-6-5 Color to draw pixels with
+    @param    bgColor 16-bit 5-6-5 Color to draw background with
+*/
+void drawCookieCutBitmap(Adafruit_GFX* gfx, int16_t x, int16_t y, const uint8_t *bitmap, int16_t w,
+                         int16_t h, int16_t totalWidth, int16_t xStart, int16_t yStart,
+                         uint16_t fgColor, uint16_t bgColor);
+
+/**
  * A standard menu render configuration that describes how to renderer each item and the title.
  * Specialised for Adafruit_GFX fonts.
  */
 typedef struct ColorGfxMenuConfig<const GFXfont*> AdaColorGfxMenuConfig;
-
-void drawCookieCutBitmap(Adafruit_GFX* gfx, int16_t x, int16_t y, const uint8_t *bitmap, int16_t w,
-                         int16_t h, int16_t totalWidth, int16_t xStart, int16_t yStart,
-                         uint16_t fgColor, uint16_t bgColor);
 
 /**
  * A basic renderer that can use the AdaFruit_GFX library to render information onto a suitable
@@ -71,7 +90,8 @@ class AdafruitDrawable : public DeviceDrawable {
 private:
     Adafruit_GFX* graphics;
 public:
-    explicit AdafruitDrawable(Adafruit_GFX* graphics) : graphics(graphics) {
+    explicit AdafruitDrawable(Adafruit_GFX* graphics, int spriteHeight = 0) : graphics(graphics) {
+        setSubDeviceType(NO_SUB_DEVICE);
     }
     ~AdafruitDrawable() override = default;
 
@@ -79,21 +99,21 @@ public:
         return Coord(graphics->width(), graphics->height());
     }
 
-    DeviceDrawable *getSubDeviceFor(const Coord& where, const Coord& size, const color_t *palette, int paletteSize) override {
-        // not yet supported on this library, too slow when tested with GfxCanvas (on an ESP32!)
-        return nullptr;
-    }
-
+    DeviceDrawable *getSubDeviceFor(const Coord& w, const Coord& s, const color_t *pal, int palSize) override { return nullptr; }
     void transaction(bool isStarting, bool redrawNeeded) override;
-
-    void drawText(const Coord &where, const void *font, int mag, const char *text) override;
+    void internalDrawText(const Coord &where, const void *font, int mag, const char *text) override;
     void drawBitmap(const Coord &where, const DrawableIcon *icon, bool selected) override;
     void drawXBitmap(const Coord &where, const Coord &size, const uint8_t *data) override;
     void drawBox(const Coord &where, const Coord &size, bool filled) override;
     void drawCircle(const Coord& where, int radius, bool filled) override;
     void drawPolygon(const Coord points[], int numPoints, bool filled) override;
+    Coord internalTextExtents(const void *font, int mag, const char *text, int *baseline) override;
+    void drawPixel(uint16_t x, uint16_t y) override;
+    Adafruit_GFX* getGfx() { return graphics; }
+protected:
+    void setGraphics(Adafruit_GFX* gfx) { graphics = gfx; }
 
-    Coord textExtents(const void *font, int mag, const char *text, int *baseline) override;
+    UnicodeFontHandler *createFontHandler() override;
 };
 
 #endif /* _TCMENU_TCMENUADAFRUITGFX_H_ */

@@ -26,7 +26,7 @@ extern const PROGMEM ConnectorLocalInfo applicationInfo;
 extern TFT_eSPI gfx;
 extern TfteSpiDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
-extern const UnicodeFont OpenSans18[];
+extern const UnicodeFont OpenSansCyrillicLatin18[];
 extern const GFXfont RobotoMedium24;
 
 // Any externals needed by IO expanders, EEPROMs etc

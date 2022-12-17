@@ -385,6 +385,11 @@
         "subsystem": "DISPLAY"
       },
       {
+        "name": "DISPLAY_BUFFER_SIZE",
+        "latestValue": "0",
+        "subsystem": "DISPLAY"
+      },
+      {
         "name": "MK_KEYBOARD_NEXT",
         "latestValue": "B",
         "subsystem": "INPUT"
@@ -535,6 +540,11 @@
         "subsystem": "THEME"
       },
       {
+        "name": "USE_TC_UNICODE",
+        "latestValue": "false",
+        "subsystem": "THEME"
+      },
+      {
         "name": "USE_SLIDER_ANALOG",
         "latestValue": "true",
         "subsystem": "THEME"
@@ -551,8 +561,8 @@
     "eepromDefinition": "",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
-      "deviceIO:",
-      "mcp23017:io23017:32:10"
+      "mcp23017:io23017:32:10",
+      "deviceIO:"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []

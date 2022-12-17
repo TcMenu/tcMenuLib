@@ -29,7 +29,7 @@ void DrawableDashboard::started(BaseMenuRenderer *currentRenderer) {
     drawable->drawBox(Coord(0, 0), drawable->getDisplayDimensions(), true);
     serdebugF2("drawing titles #", drawingItems.count());
 
-    for (int i = 0; i < drawingItems.count(); i++) {
+    for (size_t i = 0; i < drawingItems.count(); i++) {
         auto drawing = drawingItems.itemAtIndex(i);
         drawing->paintTitle(drawable);
         drawing->paintItem(drawable);
@@ -49,7 +49,7 @@ void DrawableDashboard::renderLoop(unsigned int currentValue, RenderPressMode us
         return;
     }
 
-    for (int i = 0; i < drawingItems.count(); i++) {
+    for (size_t i = 0; i < drawingItems.count(); i++) {
         auto drawing = drawingItems.itemAtIndex(i);
         if (drawing->needsPainting()) {
             drawing->paintItem(drawable);
