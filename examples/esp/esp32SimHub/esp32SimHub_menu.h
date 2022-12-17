@@ -13,6 +13,7 @@
 
 #include <Arduino.h>
 #include <tcMenu.h>
+#include <tcUnicodeHelper.h>
 #include "tcMenuAdaFruitGfx.h"
 #include "ESP32TouchKeysAbstraction.h"
 #include "SimhubConnector.h"

@@ -331,6 +331,11 @@
         "subsystem": "DISPLAY"
       },
       {
+        "name": "DISPLAY_BUFFER_SIZE",
+        "latestValue": "0",
+        "subsystem": "DISPLAY"
+      },
+      {
         "name": "SWITCH_THRESHOLD",
         "latestValue": "800",
         "subsystem": "INPUT"
@@ -413,6 +418,11 @@
       {
         "name": "TITLE_SHOW_MODE",
         "latestValue": "TITLE_FIRST_ROW",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "USE_TC_UNICODE",
+        "latestValue": "true",
         "subsystem": "THEME"
       },
       {

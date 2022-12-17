@@ -81,7 +81,7 @@ void setup() {
                                                     GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 3, 4, 49));
 
     // here is how we completely redefine the drawing of a specific item, you can also define for submenu or default
-    color_t specialPalette[] { ILI9341_WHITE, ILI9341_RED, ILI9341_BLACK, ILI9341_BLUE};
+    color_t specialPalette[] { RGB(255, 255, 255), RGB(255, 0, 0), RGB(0, 0, 0), RGB(0, 0, 255) };
     factory.setDrawingPropertiesAllInSub(ItemDisplayProperties::COMPTYPE_TITLE, menuStatus.getId(), specialPalette,
                                         MenuPadding(4), nullptr, 4, 10, 36,
                                         GridPosition::JUSTIFY_CENTER_WITH_VALUE , MenuBorder(2));
