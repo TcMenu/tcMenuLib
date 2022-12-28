@@ -11,9 +11,8 @@
 #include "../RuntimeMenuItem.h"
 
 /**
- * @file testFixtures.h 
- * 
- * A full complete menu tree structure suitable for basic unit testing. Contains most types.
+ * @file testFixtures.h
+ * @brief A full complete menu tree structure suitable for basic unit testing. Contains most types.
  * Also contains a simpler menu for testing too.
  */
 

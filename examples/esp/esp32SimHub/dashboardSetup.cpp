@@ -21,11 +21,12 @@ void CustomDashboardDelegate::dashboardDidDraw(unsigned int encVal, RenderPressM
     if(!ledsChanged) return;
     ledsChanged = false;
     int widthOfOneLed = renderer.getDeviceDrawable()->getDisplayDimensions().x / LED_STATES;
+    int startX = widthOfOneLed / 2;
 
-    int offsetX = widthOfOneLed / 2;
     for (uint16_t ledState : ledColors) {
-        renderer.getDeviceDrawable()->drawCircle(Coord(offsetX, offsetX), offsetX - 1, ledState);
-        offsetX += widthOfOneLed;
+        renderer.getDeviceDrawable()->setDrawColor(ledState);
+        renderer.getDeviceDrawable()->drawCircle(Coord(startX, 12), 11, true);
+        startX += widthOfOneLed;
     }
 }
 
@@ -68,12 +69,12 @@ void setupDashboard() {
     serdebugF("Starting dashboard setup");
     dashCustomDrawing = new DrawableDashboard(renderer.getDeviceDrawable(), &renderer, nullptr, DrawableDashboard::DASH_ON_RESET_CLICK_EXIT);
     dashCustomDrawing->clearItems();
-    dashCustomDrawing->addDrawingItem(&menuGear, Coord(15, 60), &gearDrawParams, 1);
-    dashCustomDrawing->addDrawingItem(&menuTyreTemp, Coord(145, 125), &white18ptUpdateRightParam, 5, "TMP");
-    dashCustomDrawing->addDrawingItem(&menuRPM, Coord(145, 45), &rpmDrawParams, 5);
-    dashCustomDrawing->addDrawingItem(&menuSpeed, Coord(145, 85), &white18ptNoUpdate, 5, "MPH");
-    dashCustomDrawing->addDrawingItem(&menuDashboard, Coord(5, 220), &yellow9PtUpdateLeft, 10);
-    dashCustomDrawing->addDrawingItem(&menuLap, Coord(200, 220), &yellow9PtUpdateRight, 5);
+    dashCustomDrawing->addDrawingItem(&menuGear, Coord(15, 50), &gearDrawParams, 1);
+    dashCustomDrawing->addDrawingItem(&menuTyreTemp, Coord(125, 125), &white18ptUpdateRightParam, 5, "TMP");
+    dashCustomDrawing->addDrawingItem(&menuRPM, Coord(125, 45), &rpmDrawParams, 5);
+    dashCustomDrawing->addDrawingItem(&menuSpeed, Coord(125, 85), &white18ptNoUpdate, 5, "MPH");
+    dashCustomDrawing->addDrawingItem(&menuDashboard, Coord(5, 215), &yellow9PtUpdateLeft, 10);
+    dashCustomDrawing->addDrawingItem(&menuLap, Coord(200, 215), &yellow9PtUpdateRight, 5);
     dashCustomDrawing->setDelegate(&dashboardDelegate);
     serdebugF("Finished dash setup");
 

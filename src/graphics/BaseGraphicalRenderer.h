@@ -5,7 +5,7 @@
 
 /**
  * @file BaseGraphicalRenderer.h
- * Contains the base functionality for all graphical renderers.
+ * @brief Contains the base functionality for all graphical renderers.
  */
 
 #ifndef TCMENU_BASEGRAPHICALRENDERER_H

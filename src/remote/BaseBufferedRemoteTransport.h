@@ -3,6 +3,11 @@
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
+/**
+ * @file BaseBufferedRemoteTransport.h
+ * @brief helper classes for dealing with buffering remote transports
+ */
+
 #ifndef TCMENU_BASEBUFFEREDREMOTETRANSPORT_H
 #define TCMENU_BASEBUFFEREDREMOTETRANSPORT_H
 

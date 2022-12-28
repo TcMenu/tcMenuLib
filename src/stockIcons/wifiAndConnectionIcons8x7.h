@@ -9,9 +9,8 @@
 #include <PlatformDetermination.h>
 
 /**
- * @file wifiAndConnectionIcons8x8.h
- * 
- * Contains definitions for standard icons including the connection active icon and the wifi signal strength icon.
+ * @file wifiAndConnectionIcons8x7.h
+ * @brief Contains definitions for standard icons including the connection active icon and the wifi signal strength icon.
  * Icons in this file are all 8 x 8 pixels for low res displays.
  */
 

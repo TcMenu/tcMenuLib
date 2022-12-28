@@ -9,9 +9,8 @@
 #include <PlatformDetermination.h>
 
 /**
- * @file wifiAndConnectionIconLCD.h
- * 
- * Contains definitions for standard icons including the connection active icon and the wifi signal strength icon.
+ * @file wifiAndConnectionIconsLCD.h
+ * @brief Contains definitions for standard icons including the connection active icon and the wifi signal strength icon.
  * Icons in this file are for use on LCD display and are arranged to show as custom characters.
  */
 

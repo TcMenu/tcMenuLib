@@ -4,7 +4,8 @@
  */
 
 /**
- * @file MenuHistoryNavigator.h contains the functionality to do with menu item navigation, including a stack of
+ * @file MenuHistoryNavigator.h
+ * @brief contains the functionality to do with menu item navigation, including a stack of
  * previous navigations
  */
 

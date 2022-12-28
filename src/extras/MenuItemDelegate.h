@@ -7,7 +7,8 @@
 #define TCMENU_MENUITEMDELEGATE_H
 
 /**
- * @file MenuItemDelegate.h contains a delegate class that allows some menu item operations on more than one item at once
+ * @file
+ * @brief MenuItemDelegate.h contains a delegate class that allows some menu item operations on more than one item at once
  */
 
 #include <MenuItems.h>

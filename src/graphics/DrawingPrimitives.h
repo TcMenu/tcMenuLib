@@ -3,7 +3,10 @@
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
-/** @file DrawingPrimitives.h contains a series of core components needed by all graphical renderers */
+/**
+ * @file DrawingPrimitives.h
+ * @brief contains a series of core components needed by all graphical renderers
+ */
 
 #ifndef TCMENU_DRAWING_PRIMITIVES_H
 #define TCMENU_DRAWING_PRIMITIVES_H

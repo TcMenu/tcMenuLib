@@ -4,7 +4,8 @@
  */
 
 /**
- * @file MenuTouchScreenEncoder.h contains the interface between the touch screen and tcMenu.
+ * @file MenuTouchScreenEncoder.h
+ * @brief contains the interface between the touch screen and tcMenu.
  */
 
 #ifndef TCMENU_MENUTOUCHSCREENENCODER_H
