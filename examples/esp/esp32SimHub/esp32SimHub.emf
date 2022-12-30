@@ -332,7 +332,7 @@
       },
       {
         "name": "DISPLAY_BUFFER_SIZE",
-        "latestValue": "0",
+        "latestValue": "20",
         "subsystem": "DISPLAY"
       },
       {
@@ -387,7 +387,7 @@
       },
       {
         "name": "TS_KEY_REPEAT",
-        "latestValue": "20",
+        "latestValue": "35",
         "subsystem": "INPUT"
       },
       {
