@@ -12,6 +12,11 @@ namespace tcgfx {
     static unsigned char rendererUpArrowXbm[] = { 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0x3f, 0x1f, 0x0f, 0x07, 0x03 };
     static unsigned char rendererDownArrowXbm[] = { 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0 };
 
+    inline bool isActiveOrEditing(MenuItem* pItem) {
+        auto mt = pItem->getMenuType();
+        return (pItem->isEditing() || pItem->isActive()) && mt != MENUTYPE_TITLE_ITEM && mt != MENUTYPE_BACK_VALUE;
+    }
+
     GraphicsDeviceRenderer::GraphicsDeviceRenderer(int bufferSize, const char *appTitle, DeviceDrawable *drawable)
             : BaseGraphicalRenderer(bufferSize, 1, 1, false, appTitle), rootDrawable(drawable), drawable(drawable) {
         const Coord &coord = rootDrawable->getDisplayDimensions();
@@ -73,7 +78,7 @@ namespace tcgfx {
             subDevice = rootDrawable->getSubDeviceFor(where, areaSize, entry->getDisplayProperties()->getPalette(), 6);
         } else if(rootDrawable->getSubDeviceType() == DeviceDrawable::SUB_DEVICE_2BPP) {
             color_t palette[4];
-            bool selected = entry->getMenuItem()->isActive() || entry->getMenuItem()->isEditing();
+            bool selected = isActiveOrEditing(entry->getMenuItem());
             palette[ItemDisplayProperties::TEXT] = (selected) ? propertiesFactory.getSelectedColor(ItemDisplayProperties::TEXT) : entry->getDisplayProperties()->getPalette()[ItemDisplayProperties::TEXT];
             palette[ItemDisplayProperties::BACKGROUND] = (selected) ? propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND) : entry->getDisplayProperties()->getPalette()[ItemDisplayProperties::BACKGROUND];
             palette[ItemDisplayProperties::HIGHLIGHT1] = entry->getDisplayProperties()->getPalette()[ItemDisplayProperties::HIGHLIGHT1];
@@ -106,11 +111,6 @@ namespace tcgfx {
             drawable = rootDrawable;
             subDevice->endDraw();
         }
-    }
-
-    inline bool isActiveOrEditing(MenuItem* pItem) {
-        auto mt = pItem->getMenuType();
-        return (pItem->isEditing() || pItem->isActive()) && mt != MENUTYPE_TITLE_ITEM && mt != MENUTYPE_BACK_VALUE;
     }
 
     int GraphicsDeviceRenderer::calculateSpaceBetween(const void* font, uint8_t mag, const char* buffer, int start, int end) {

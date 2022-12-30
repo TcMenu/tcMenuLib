@@ -19,7 +19,7 @@ const PROGMEM  ConnectorLocalInfo applicationInfo = { "SimHub Link", "4db9fbfe-9
 TcMenuRemoteServer remoteServer(applicationInfo);
 
 Adafruit_ILI9341 gfx(22, 17, 16);
-AdafruitDrawable gfxDrawable(&gfx, 20);
+AdafruitDrawable gfxDrawable(&gfx, 40);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 ESP32TouchKeysAbstraction esp32Touch(800, TOUCH_HVOLT_2V7, TOUCH_LVOLT_0V5, TOUCH_HVOLT_ATTEN_1V);
 SimHubRemoteConnection simhubConnection(&Serial, 3);
