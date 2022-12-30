@@ -12,7 +12,7 @@
 
 /**
  * @file DialogRuntimeEditor.h
- * Contains the functionality to handle editing runtime multipart items
+ * @brief Contains the functionality to handle editing runtime multipart items
  */
 
 

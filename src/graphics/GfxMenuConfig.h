@@ -6,9 +6,8 @@
 /**
  * @file GfxMenuConfig.h
  *
- * This file contains the base drawing configuration structures and helper methods for
- * drawing onto graphical screens, be it mono or colour. Also there's some additional
- * structures for describing colours, coordinates and padding.
+ * @brief This file contains the base drawing structures and helper methods for drawing onto graphical
+ * screens, be it mono or colour.
  */
 
 #ifndef _GFX_MENU_CONFIG_H_

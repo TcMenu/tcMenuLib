@@ -182,7 +182,6 @@ void DashMenuItem::setFont(DashDrawParameters* params, UnicodeFontHandler* unico
 }
 
 void DashMenuItem::paintTitle(DeviceDrawable* drawableRoot) {
-    int baseline;
     UnicodeFontHandler* unicodeHandler = drawableRoot->getUnicodeHandler(true);
     setFont(parameters, unicodeHandler);
     titleExtents = unicodeHandler->textExtents(titleText, &baseline);
@@ -199,7 +198,7 @@ void DashMenuItem::paintTitle(DeviceDrawable* drawableRoot) {
     wrapper.getDrawable()->drawBox(wrapper.offsetLocation(screenLoc), Coord(titleExtents.x + valueWidth, titleExtents.y), true);
 
     unicodeHandler->setDrawColor(wrapper.fgColUnderlying());
-    unicodeHandler->setCursor(wrapper.offsetLocation(screenLoc, startX, titleExtents.y));
+    unicodeHandler->setCursor(wrapper.offsetLocation(screenLoc, startX, titleExtents.y - baseline));
     setFont(parameters, unicodeHandler);
     unicodeHandler->print(titleText);
 
@@ -224,7 +223,7 @@ void DashMenuItem::paintItem(DeviceDrawable* drawableRoot) {
         Coord valueLen = unicodeHandler->textExtents(sz, &baseline);
         padding = valueWidth - (valueLen.x + 4);
     }
-    unicodeHandler->setCursor(wrapper.offsetLocation(screenLoc, padding, unicodeHandler->getYAdvance()));
+    unicodeHandler->setCursor(wrapper.offsetLocation(screenLoc, padding, unicodeHandler->getYAdvance() - baseline));
     unicodeHandler->print(sz);
 
     wrapper.endDraw();

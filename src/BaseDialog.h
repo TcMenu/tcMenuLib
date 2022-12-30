@@ -8,11 +8,8 @@
 
 /**
  * @file BaseDialog.h
- * 
- * The definition of the base dialog object, that can be used with any display type. These are designed
+ * @brief The definition of the base dialog object, that can be used with any display type. These are designed
  * to handle simple user informational pages and questions.
- * 
- * Dialogs are a core function of tcMenu, and must be supported on all available platforms.
  */
 
 #define FIRST_DEFAULT_BUTTON 0

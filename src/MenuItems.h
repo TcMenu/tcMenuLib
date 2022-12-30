@@ -5,13 +5,10 @@
 
 /**
  * @file MenuItems.h
- * 
- * In TcMenu, MenuItem storage is shared between program memory and RAM. Usually each MenuItem has associated Info block and
+ * @brief In TcMenu, MenuItem storage is shared between program memory and RAM. Usually each MenuItem has associated Info block and
  * within the InfoBlock, the first fields must be in the same order as AnyMenuInfo. The most commonly used menu items are
  * defined within this file. Each menu item also has a menu item type that is used during rendering and remote communication
  * to determine what it actually is.
- * 
- * Most of the editable menu items can stored to EEPROM, including AnalogMenuItem, EnumMenuItem, BooleanMenuItem and TextMenuItem
  */
 
 #ifndef _MENUITEMS_h

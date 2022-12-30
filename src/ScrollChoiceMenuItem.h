@@ -4,7 +4,8 @@
  */
 
 /**
- * @file ScrollChoiceMenuItem.h contains the menu item definition for scrolling choice types, and also for RGB items
+ * @file ScrollChoiceMenuItem.h
+ * @brief contains the menu item definition for scrolling choice types, and also for RGB items
  */
 
 #ifndef SCROLL_CHOICE_ENUM_MENU_ITEM_H

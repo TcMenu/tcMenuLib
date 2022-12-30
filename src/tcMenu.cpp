@@ -54,7 +54,7 @@ void MenuManager::performDirectionMove(bool dirIsBack) {
         int editorRange = dirIsBack ? editableItem->previousPart() : editableItem->nextPart();
 		if (editorRange != 0) {
 			switches.changeEncoderPrecision(0, editorRange, editableItem->getPartValueAsInt(),
-                                            isWrapAroundEncoder(editableItem));
+                                            isWrapAroundEncoder(editableItem), 1);
 		}
         else {
             stopEditingCurrentItem(false);
@@ -212,7 +212,7 @@ void MenuManager::stopEditingCurrentItem(bool doMultiPartNext) {
 		int editorRange = editableItem->nextPart();
 		if (editorRange != 0) {
 			switches.changeEncoderPrecision(0, editorRange, editableItem->getPartValueAsInt(),
-                                            isWrapAroundEncoder(editableItem));
+                                            isWrapAroundEncoder(editableItem), 1);
 			return;
 		}
 	}
@@ -308,14 +308,14 @@ void MenuManager::setupForEditing(MenuItem* item) {
 	else if (ty == MENUTYPE_SCROLLER_VALUE) {
         setCurrentEditor(item);
 	    switches.changeEncoderPrecision(0, item->getMaximumValue(), reinterpret_cast<ScrollChoiceMenuItem*>(item)->getCurrentValue(),
-                                        isWrapAroundEncoder(currentEditor));
+                                        isWrapAroundEncoder(currentEditor), 1);
 	}
 	else if (isMenuRuntimeMultiEdit(item)) {
         setCurrentEditor(item);
         auto* editableItem = reinterpret_cast<EditableMultiPartMenuItem*>(item);
         editableItem->beginMultiEdit();
         int range = editableItem->nextPart();
-        switches.changeEncoderPrecision(0, range, editableItem->getPartValueAsInt(), editableItem->getId());
+        switches.changeEncoderPrecision(0, range, editableItem->getPartValueAsInt(), editableItem->getId(), 1);
         switches.getEncoder()->setUserIntention(CHANGE_VALUE);
     }
 }

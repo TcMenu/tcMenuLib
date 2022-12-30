@@ -11,7 +11,7 @@
 
 /**
  * @file EditableLargeNumberMenuItem.h
- * This file contains the classes needed to edit very large number values that could not be edited with a rotary encoder.
+ * @brief This file contains the classes needed to edit very large number values that could not be edited with a rotary encoder.
  * These numeric values have 12 digits, and as many decimal places as required.
  */
 

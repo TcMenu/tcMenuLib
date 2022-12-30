@@ -5,7 +5,7 @@
 
 /**
  * @file RemoteAuthentication.h
- * Contains the base functionality for communication between the menu library and remote APIs.
+ * @brief Contains the base functionality for communication between the menu library and remote APIs.
  */
 
 #ifndef _REMOTE_AUTHENTICATION_H_

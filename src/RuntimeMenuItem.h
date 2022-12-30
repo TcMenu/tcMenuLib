@@ -5,7 +5,7 @@
 
 /**
  * @file RuntimeMenuItem.h
- * Contains definitions of menu items that can be fully defined at runtime with no need for prog mem structures.
+ * @brief Contains definitions of menu items that can be fully defined at runtime with no need for prog mem structures.
  */
 
 #ifndef _RUNTIME_MENUITEM_H_

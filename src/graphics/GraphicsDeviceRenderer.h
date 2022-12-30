@@ -4,7 +4,8 @@
  */
 
 /**
- * @file GraphicsDeviceRenderer.h the interface that all graphics devices should implement to do the actual graphics rendering.
+ * @file GraphicsDeviceRenderer.h
+ * @brief the interface that all graphics devices should implement to do the actual graphics rendering.
  */
 
 #ifndef TCLIBRARYDEV_GRAPHICSDEVICERENDERER_H

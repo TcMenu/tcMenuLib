@@ -17,8 +17,7 @@ class MenuItem;
 
 /**
  * @file tcUtil.h
- * 
- * A series of utilities that used thoughout tcMenu
+ * @brief A series of utilities that used throughout tcMenu
  */
 
 /**

@@ -8,8 +8,7 @@
 
 /**
  * @file RemoteMenuItem.h
- *
- * This file contains the extra types needed for remote menu items, they are not in the main MenuItems.h header because
+ * @brief This file contains the extra types needed for remote menu items, they are not in the main MenuItems.h header because
  * they require all the remote headers be included.
  */
 

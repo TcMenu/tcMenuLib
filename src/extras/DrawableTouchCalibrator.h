@@ -3,6 +3,11 @@
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
+/**
+ * @file DrawableTouchCalibrator.h
+ * @brief A simple helper for touch calibration implemented as a TcMenu CustomDrawing instance
+ */
+
 #ifndef TCMENU_DRAWABLETOUCHCALIBRATOR_H
 #define TCMENU_DRAWABLETOUCHCALIBRATOR_H
 
