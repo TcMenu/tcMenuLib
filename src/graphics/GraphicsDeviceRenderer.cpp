@@ -406,7 +406,7 @@ namespace tcgfx {
         if(handler) {
             handler->setDrawColor(drawColor);
             setTcFontAccordingToMag(handler, font, mag);
-            handler->setCursor((int)where.x, (int)where.y + handler->getYAdvance());
+            handler->setCursor((int)where.x, (int)where.y + (handler->getYAdvance() - handler->getBaseline()));
             handler->print(text);
         } else {
             internalDrawText(where, font, mag, text);
