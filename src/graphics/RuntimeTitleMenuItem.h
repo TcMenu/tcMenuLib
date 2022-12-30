@@ -4,8 +4,7 @@
  */
 
 /**
- * @file RuntimeTitleMenuItem.h
- * @brief the menu item that is presented for the title
+ * @file RuntimeTitleMenuItem.h the menu item that is presented for the title
  */
 
 #ifndef TCMENU_RUNTIMETITLEMENUITEM_H

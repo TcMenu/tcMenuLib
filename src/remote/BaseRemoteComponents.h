@@ -4,8 +4,7 @@
  */
 
 /**
- * @file BaseRemoteComponents.h
- * @brief contains remote components that are shared across all remote devices.
+ * @file BaseRemoteComponents.h contains remote components that are shared across all remote devices.
  */
 
 #ifndef TCMENU_BASEREMOTECOMPONENTS_H

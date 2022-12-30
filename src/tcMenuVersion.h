@@ -4,8 +4,7 @@
  */
 
 /**
- * @file TcMenuVersion.h
- * @brief contains the version information and accessor functions.
+ * @file TcMenuVersion.h contains the version information and accessor functions.
  */
 
 #ifndef TCMENU_VERSION_H

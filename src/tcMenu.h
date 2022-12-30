@@ -20,7 +20,8 @@ class MenuRenderer;
 
 /**
  * @file tcMenu.h
- * @brief The menu manager is responsible for managing a set of menu items, and is configured with a renderer and input
+ * 
+ * The menu manager is responsible for managing a set of menu items, and is configured with a renderer and input
  * capability in order to present the menu. Remotes generally also the the menu manager to find out about the
  * overall structure
  */

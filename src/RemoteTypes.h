@@ -4,7 +4,8 @@
  */
 /**
  * @file RemoteTypes.h
- * @brief contains the definitions of each message and field.
+ * 
+ * contains the definitions of each message and field.
  */
 
 #ifndef _TCMENU_REMOTETYPES_H_

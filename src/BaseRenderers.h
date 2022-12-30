@@ -3,11 +3,6 @@
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
-/**
- * @file BaseRenderers.h
- * @brief The base definitions and classes shared by all TcMenu renderers.
- */
-
 #ifndef _BASE_RENDERERS_H_
 #define _BASE_RENDERERS_H_
 

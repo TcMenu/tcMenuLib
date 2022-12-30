@@ -2,11 +2,6 @@
 #ifndef TCMENU_DRAWABLE_DASHBOARD_H
 #define TCMENU_DRAWABLE_DASHBOARD_H
 
-/**
- * @file
- * @brief DrawableDashboard.h a series of helper classes for building dashboards out of menu items.
- */
-
 #include "BaseRenderers.h"
 #include <tcUnicodeHelper.h>
 #include <graphics/GraphicsDeviceRenderer.h>
@@ -163,7 +158,6 @@ private:
     int numChars;
     int valueWidth;
     int countDownTicks;
-    int baseline;
     char titleText[20];
 public:
     DashMenuItem() : item(nullptr), screenLoc(0, 0), parameters(nullptr), updateCountDown(0), titleExtents(0, 0),

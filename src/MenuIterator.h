@@ -7,7 +7,8 @@
 
 /**
  * @file MenuIterator.h
- * @brief Provides a number of utility functions for the processing of menu item structures.
+ * 
+ * Provides a number of utility functions for the processing of menu item structures.
  */
 
 #ifndef _MENUITERATOR_H

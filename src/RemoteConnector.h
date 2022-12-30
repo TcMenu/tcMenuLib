@@ -5,7 +5,7 @@
 
 /**
  * @file RemoteConnector.h
- * @brief Contains the base functionality for communication between the menu library and remote APIs.
+ * Contains the base functionality for communication between the menu library and remote APIs.
  */
 
 #ifndef _TCMENU_REMOTECONNECTOR_H_

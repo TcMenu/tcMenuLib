@@ -9,8 +9,7 @@
 #include <KeyboardManager.h>
 
 /**
- * @file tcMenuKeyboard.h
- * @brief contains a keyboard listener for use with MatrixKeyboardManager that can
+ * @file tcMenuKeyboard.h contains a keyboard listener for use with MatrixKeyboardManager that can
  * control a menu system
  */
 

@@ -14,7 +14,8 @@
 
 /**
  * @file MessageProcessors.h
- * @brief This file contains the default processors that can deal with incoming messages turning
+ * 
+ * This file contains the default processors that can deal with incoming messages turning
  * them into events on tcMenu.
  */
 

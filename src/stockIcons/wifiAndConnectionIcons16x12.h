@@ -10,7 +10,8 @@
 
 /**
  * @file wifiAndConnectionIcons16x12.h
- * @brief Contains definitions for standard icons including the connection active icon and the wifi signal strength icon.
+ * 
+ * Contains definitions for standard icons including the connection active icon and the wifi signal strength icon.
  * Icons in this file are all 16 x 12 pixels for medium to high res displays.
  */
 

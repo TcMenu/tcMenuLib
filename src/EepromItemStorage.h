@@ -8,7 +8,7 @@
 
 /**
  * @file EepromItemStorage.h
- * @brief this file contains a series of helper methods for loading and saving menu item to eeprom.
+ * this file contains a series of helper methods for loading and saving menu item to eeprom.
  */
 
 #include "EepromAbstraction.h"
