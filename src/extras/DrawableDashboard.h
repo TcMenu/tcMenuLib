@@ -12,11 +12,15 @@
 #include <graphics/GraphicsDeviceRenderer.h>
 
 /**
- * Draw parameters for static items that do not change, the alignment of text, the font and colors are stored in this
+ * Base class for draw parameters, used for static items that do not change.
+ * This class stores the alignment of text, the font and colors are stored in this
  * item. Fonts can be either Adafruit or TcUnicode.
  */
 class DashDrawParameters {
 public:
+    /**
+     * Controls the alignment of an item in the dashboard. Options are fairly self-explanatory.
+     */
     enum DashAlign {
         TITLE_LEFT_VALUE_LEFT, TITLE_LEFT_VALUE_RIGHT,
         NO_TITLE_VALUE_LEFT, NO_TITLE_VALUE_RIGHT,
@@ -32,20 +36,70 @@ protected:
     color_t bgColor;
     bool isAdaFont = true;
 public:
+    /**
+     * @brief Creates a dash parameter that has a background, foreground, font, and alignment. In this case the font is an
+     * Adafruit graphics font.
+     * @param fgColor_ the foreground color
+     * @param bgColor_ the background color
+     * @param font_ the font to draw with
+     * @param align the alignment
+     */
     DashDrawParameters(color_t fgColor_, color_t bgColor_, const GFXfont* font_, DashAlign align = TITLE_RIGHT_VALUE_RIGHT);
+    /**
+     * @brief Creates a dash parameter that has a background, foreground, font, and alignment. In this case the font is a
+     * tcUnicode font.
+     * @param fgColor_ the foreground color
+     * @param bgColor_ the background color
+     * @param font_ the font to draw with
+     * @param align the alignment
+     */
     DashDrawParameters(color_t fgColor_, color_t bgColor_, const UnicodeFont* font_, DashAlign align = TITLE_RIGHT_VALUE_RIGHT);
 
+    /**
+     * @return true if the title is drawn, otherwise it returns false
+     */
     bool isTitleDrawn() { return alignment != NO_TITLE_VALUE_LEFT && alignment != NO_TITLE_VALUE_RIGHT; }
+    /**
+     * @return true if the title is aligned to the left of the value
+     */
     bool isTitleLeftAlign() { return alignment == TITLE_LEFT_VALUE_LEFT || alignment == TITLE_LEFT_VALUE_RIGHT; }
+    /**
+     * @return true if the title is aligned to the right of the value
+     */
     bool isValueLeftAlign() { return alignment == TITLE_RIGHT_VALUE_LEFT || alignment == TITLE_LEFT_VALUE_LEFT || alignment == NO_TITLE_VALUE_LEFT; }
-    
+
+    /**
+     * @return true if the font is adafruit, otherwise false if the font is tcUnicode
+     */
     bool isAdafruitFont() const { return isAdaFont; }
+    /**
+     * @return the font as an Adafruit font, only call when isAdafruitFont returns true
+     */
     const GFXfont* getAsAdaFont() const { return adaFont; }
+    /**
+     * @return the font as a tcUnicode font, only call when isAdafruitFont returns false
+     */
     const UnicodeFont* getAsUnicodeFont() const { return uniFont; }
 
+    /**
+     * the background color method is overloaded, each implementation has a different way of handling it.
+     * @return the background color, in this class it is fixed
+     */
     virtual color_t getBgColor(MenuItem *item, bool updated)  { return bgColor; }
+    /**
+     * the foreground color method is overloaded, each implementation has a different way of handling it.
+     * @return the background color, in this class it is fixed
+     */
     virtual color_t getFgColor(MenuItem *item, bool updated)  { return fgColor; }
+    /**
+     * the background title color method is overloaded, each implementation has a different way of handling it.
+     * @return the background color for the title, in this class it is fixed
+     */
     virtual color_t getTitleBgColor(MenuItem *item, bool updated)  { return bgColor; }
+    /**
+     * the foreground title color method is overloaded, each implementation has a different way of handling it.
+     * @return the foreground color for the title, in this class it is fixed
+     */
     virtual color_t getTitleFgColor(MenuItem *item, bool updated)  { return fgColor; }
 };
 

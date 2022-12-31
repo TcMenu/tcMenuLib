@@ -315,7 +315,8 @@ void MenuManager::setupForEditing(MenuItem* item) {
         auto* editableItem = reinterpret_cast<EditableMultiPartMenuItem*>(item);
         editableItem->beginMultiEdit();
         int range = editableItem->nextPart();
-        switches.changeEncoderPrecision(0, range, editableItem->getPartValueAsInt(), editableItem->getId(), 1);
+        switches.changeEncoderPrecision(0, range, editableItem->getPartValueAsInt(),
+                                        isWrapAroundEncoder(editableItem), 1);
         switches.getEncoder()->setUserIntention(CHANGE_VALUE);
     }
 }
