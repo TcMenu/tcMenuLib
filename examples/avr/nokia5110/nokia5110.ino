@@ -6,7 +6,7 @@
  * home projects. TcMenu has an Apache license but UIP does not. Prefer
  * Ethernet2 for production boards as it is LGPL.
  * 
- * For more details see the README.md file in this directory.
+ * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
  */
 
 #include "nokia5110_menu.h"
