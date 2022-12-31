@@ -177,7 +177,7 @@
       },
       {
         "name": "DOUBLE_BUFFER_ROWS",
-        "latestValue": "2",
+        "latestValue": "20",
         "subsystem": "DISPLAY"
       },
       {
@@ -232,12 +232,12 @@
       },
       {
         "name": "ITEM_FONT",
-        "latestValue": "num:,2",
+        "latestValue": "ada:OpenSansCyrillicLatin12,0",
         "subsystem": "THEME"
       },
       {
         "name": "TITLE_FONT",
-        "latestValue": "num:,2",
+        "latestValue": "ada:OpenSansCyrillicLatin12,0",
         "subsystem": "THEME"
       },
       {
@@ -248,6 +248,11 @@
       {
         "name": "TITLE_SHOW_MODE",
         "latestValue": "TITLE_FIRST_ROW",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "USE_TC_UNICODE",
+        "latestValue": "true",
         "subsystem": "THEME"
       },
       {

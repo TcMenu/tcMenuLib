@@ -13,6 +13,7 @@
 
 #include <Arduino.h>
 #include <tcMenu.h>
+#include <tcUnicodeHelper.h>
 #include "tcMenuTfteSpi.h"
 #include <graphics/MenuTouchScreenEncoder.h>
 #include <RuntimeMenuItem.h>
@@ -25,6 +26,7 @@ extern const PROGMEM ConnectorLocalInfo applicationInfo;
 extern TFT_eSPI gfx;
 extern TfteSpiDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
+extern const UnicodeFont OpenSansCyrillicLatin12[];
 
 // Any externals needed by IO expanders, EEPROMs etc
 

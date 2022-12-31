@@ -11,12 +11,13 @@
 #include <tcMenu.h>
 #include "esp32s3TftEncoder_menu.h"
 #include "ThemeCoolBlueTraditional.h"
+#include <Fonts/OpenSansCyrillicLatin12.h>
 
 // Global variable declarations
 const  ConnectorLocalInfo applicationInfo = { "ESP32 S3 Tiny", "c035e186-32cc-45e4-ac28-773f57e108ee" };
 
 TFT_eSPI gfx;
-TfteSpiDrawable gfxDrawable(&gfx, 2);
+TfteSpiDrawable gfxDrawable(&gfx, 20);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 
 // Global Menu Item declarations
@@ -56,6 +57,7 @@ void setupMenu() {
     menuMgr.initForEncoder(&renderer, &menuPercent, 3, 4, 5);
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
     renderer.setUseSliderForAnalog(true);
-    installCoolBlueTraditionalTheme(renderer, MenuFontDef(nullptr, 2), MenuFontDef(nullptr, 2), true);
+    renderer.enableTcUnicode();
+    installCoolBlueTraditionalTheme(renderer, MenuFontDef(&OpenSansCyrillicLatin12, 0), MenuFontDef(&OpenSansCyrillicLatin12, 0), true);
 }
 
