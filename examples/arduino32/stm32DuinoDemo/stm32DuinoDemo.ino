@@ -13,7 +13,9 @@
 #include <TaskManagerIO.h>
 #include <IoLogging.h>
 
+// We added a RAM based scroll choice item, and this references a fixed width array variable.
 // This variable is the RAM data for scroll choice item Scroll
+// https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/scrollchoice-menu-item/
 char ramDataSet[] = "1\0        2\0        3\0        4\0        5\0        ~";
 
 const uint8_t myManualIp[] = { 192, 168, 0, 202 };
@@ -22,6 +24,10 @@ const uint8_t standardNetMask[] = { 255, 255, 255, 0 };
 
 using namespace tcremote;
 
+// Here we implement the custom drawing capability of the renderer, it allows us to receive reset and custom drawing
+// requests. More info in the link below:
+//  https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/renderer-take-over-display/
+//
 class MyCustomDrawing : public CustomDrawing {
 private:
     GraphicsDeviceRenderer& dev;
@@ -69,10 +75,12 @@ public:
 } myCustomDrawing(renderer);
 
 void setup() {
+    // This example logs using IoLogging, see the following guide to enable
+    // https://www.thecoderscorner.com/products/arduino-libraries/io-abstraction/arduino-logging-with-io-logging/
+    IOLOG_START_SERIAL
     serEnableLevel(SER_NETWORK_DEBUG, true);
 
     // Start up serial and prepare the correct SPI
-    Serial.begin(115200);
     SPI.setMISO(PB4);
     SPI.setMOSI(PB5);
     SPI.setSCLK(PB3);
@@ -93,6 +101,8 @@ void setup() {
     });
 
     myCustomDrawing.registerWithRenderer();
+
+    // We can set a callback for when the title item is pressed on the main menu, here we just take over the display
     setTitlePressedCallback([](int) {
         renderer.takeOverDisplay();
     });
@@ -102,8 +112,9 @@ void loop() {
     taskManager.runLoop();
 }
 
-
 // see tcMenu list documentation on thecoderscorner.com
+// https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
+//
 int CALLBACK_FUNCTION fnRuntimesCustomListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
    switch(mode) {
     case RENDERFN_INVOKE:
@@ -142,6 +153,11 @@ void CALLBACK_FUNCTION largeNumDidChange(int id) {
 
 
 void CALLBACK_FUNCTION onDecimalStepChange(int id) {
+    //
+    // Analog menu items support the concept of step, that is the number of ticks forward that one detent of the
+    // encoder represents, here we read the step enum item to get the current value, and then call setStep on the
+    // analog item to set how much one tick moves the current value.
+    //
     int stepChoice = menuDecimalStep.getCurrentValue();
     int stepVal;
     switch (stepChoice) {
