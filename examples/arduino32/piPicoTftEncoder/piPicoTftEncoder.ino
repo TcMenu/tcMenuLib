@@ -27,10 +27,9 @@ const char* fileNames[] = {
 void onTitlePressed(int);
 
 void setup() {
-    // Initialise serial for logging
-    // If you're using a pico probe, set build flag LoggingPort=Serial1 and initialise serial port 1.
-    //Serial.begin(115200);
-    Serial1.begin(115200);
+    // This example logs using IoLogging, see the following guide to enable
+    // https://www.thecoderscorner.com/products/arduino-libraries/io-abstraction/arduino-logging-with-io-logging/
+    IOLOG_START_SERIAL
 
     // This is added by the code generator, it initialises the menu
     setupMenu();

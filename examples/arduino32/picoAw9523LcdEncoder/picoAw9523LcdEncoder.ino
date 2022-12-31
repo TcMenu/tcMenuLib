@@ -16,6 +16,7 @@
 const int backlightPin = 15;
 
 // We create an analog device for the LED controller in the AW9523, we can then use the device analog output functions.
+// as the actual abstraction was created in the designer, we just use the reference to it from
 AW9523AnalogAbstraction aw9523Analog(iodev_aw9523);
 
 void setup() {
@@ -29,6 +30,9 @@ void setup() {
     lcd.configureAnalogBacklight(&aw9523Analog, backlightPin);
     lcd.setBacklight(menuBacklight.getCurrentValue());
 
+    // You can provide a callback function to be called when the title is clicked. We call withMenuDialogIfAvailable
+    // which in turn calls the function provided if the menu dialog is available. You can then show a dialog, here
+    // we show a version dialog.
     setTitlePressedCallback([](int) {
         withMenuDialogIfAvailable([](MenuBasedDialog *dlg) {
             dlg->setButtons(BTNTYPE_CLOSE, BTNTYPE_NONE);

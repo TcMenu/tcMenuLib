@@ -11,12 +11,13 @@
 #include <tcMenu.h>
 #include "dynamicMenuItems_menu.h"
 #include "ThemeCoolBlueTraditional.h"
+#include <Fonts/OpenSansCyrillicLatin12.h>
 
 // Global variable declarations
 const  ConnectorLocalInfo applicationInfo = { "Dynamic Menus", "5f22995e-8da2-49c4-9ec8-d055901003af" };
 IoAbstractionRef ioexp_io23017 = ioFrom23017(0x20, ACTIVE_LOW_OPEN, 10);
 Adafruit_ST7735 gfx(1, 0, -1);
-AdafruitDrawable gfxDrawable(&gfx, 0);
+AdafruitDrawable gfxDrawable(&gfx, 20);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 MatrixKeyboardManager keyboard;
 const char keyboardKeys[]  = "123A456B789C*0#D";
@@ -98,6 +99,7 @@ void setupMenu() {
     keyboard.setRepeatKeyMillis(850, 350);
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
     renderer.setUseSliderForAnalog(true);
-    installCoolBlueTraditionalTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(nullptr, 1), true);
+    renderer.enableTcUnicode();
+    installCoolBlueTraditionalTheme(renderer, MenuFontDef(&OpenSansCyrillicLatin12, 0), MenuFontDef(&OpenSansCyrillicLatin12, 0), true);
 }
 

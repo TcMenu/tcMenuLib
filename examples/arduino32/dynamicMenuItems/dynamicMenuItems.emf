@@ -386,7 +386,7 @@
       },
       {
         "name": "DISPLAY_BUFFER_SIZE",
-        "latestValue": "0",
+        "latestValue": "20",
         "subsystem": "DISPLAY"
       },
       {
@@ -521,12 +521,12 @@
       },
       {
         "name": "ITEM_FONT",
-        "latestValue": "def:,1",
+        "latestValue": "ada:OpenSansCyrillicLatin12,0",
         "subsystem": "THEME"
       },
       {
         "name": "TITLE_FONT",
-        "latestValue": "def:,1",
+        "latestValue": "ada:OpenSansCyrillicLatin12,0",
         "subsystem": "THEME"
       },
       {
@@ -541,7 +541,7 @@
       },
       {
         "name": "USE_TC_UNICODE",
-        "latestValue": "false",
+        "latestValue": "true",
         "subsystem": "THEME"
       },
       {

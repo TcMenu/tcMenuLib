@@ -2,12 +2,14 @@
  * This example shows how to create scroll choices, lists, and dynamically add items to both dialogs and existing menus
  * at runtime.
  *
- * Test environment: Seeed MG126 - Adafruit 128x128 display, encoder on device pins.
+ * Test environment: Seeed MG126 - Matrix Keyboard, Adafruit 128x128 display, rotary encoder
  *
  * Although it's set up to run on SAMD there is no reason it could not be easily reconfigured for any
- * other board.
+ * other board. This is one of the biggest advantages of this framework, moving boards is easier.
  *
  * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
+ * Dialogs: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/rendering-with-tcmenu-lcd-tft-oled/
+ * MenuManager: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menumanager-and-iteration/
  */
 
 #include "dynamicMenuItems_menu.h"
@@ -17,14 +19,17 @@
 #include <tcMenuVersion.h>
 #include <IoLogging.h>
 
-// Pizza toppings that we forward referenced in the scroll choice item, when in RAM or EEPROM then they are declared in
-// a flat array based on the item size.
-//                            0123456789 0123456789 0123456789 0123456789 0123456789 0123456789
+//
+// ScrollChoice menu items when using data in RAM mode reference a fixed width array in your code, these will be
+// created by the code generator if needed. Genreally they are an array of char large enough to hold all items.
+// In this case they are pizza toppings, each zero terminated.
+//                       0123456789 0123456789 0123456789 0123456789 0123456789 0123456789
 char pizzaToppings[] = {"Peperoni\0 Onions\0   Olives\0   Sweetcorn\0Mushrooms\0Peppers\0  "};
 
 //
 // We now create some menu items that we manually add to the oven menu during initialisation. We set the sub menu child
-// to be the first of the two menu items, which are provided in a linked list.
+// to be the first of the two menu items, which are provided in a linked list. Notice that these are completely created
+// RAM, and not program memory.
 //
 BooleanMenuInfo minfoOvenFull = { "Start Oven", nextRandomId(), 0xffff, 1, NO_CALLBACK, NAMING_YES_NO};
 BooleanMenuItem menuOvenFull(&minfoOvenFull, false, nullptr, false);
@@ -48,10 +53,13 @@ public:
         allowDialogBack = allow;
     }
 
+    // called when the structure of the menu has completely changed, IE menu items added or removed from the tree
     void structureHasChanged() override {
         serdebugF("Structure of menu tree has changed, IE item added or removed!");
     }
 
+    // editing is about to start on an item, or a submenu is about to be shown, return true to show the menu, false
+    // to prevent the item from being edited or submenu shown
     bool menuEditStarting(MenuItem *item) override {
         serdebugF2("Item about to be actioned/editing", item->getId());
 
@@ -73,10 +81,14 @@ public:
         return true; // otherwise, default to allowing all actions.
     }
 
+    // called when the menu has finished editing or a menu is coming off the display. Note that in the special case
+    // of a submenu being shown, this will be after the new `menuEditStarted` because that could be prevented by
+    // returning false.
     void menuEditEnded(MenuItem *item) override {
         serdebugF2("Edit has completed for ID ", item->getId());
     }
 
+    // called whenever the active item changes
     void activeItemHasChanged(MenuItem* newActive) override {
         serdebugF2("The active item changed to ", newActive->getId())
     }
@@ -122,12 +134,13 @@ void onTitlePressed(int /*id*/) {
 }
 
 void setup() {
-    // If we use wire or serial, it's our responsibility to prepare it.
-    Serial.begin(115200);
-    //while(!Serial);
-    Wire.begin();
-
+    // This example logs using IoLogging, see the following guide to enable
+    // https://www.thecoderscorner.com/products/arduino-libraries/io-abstraction/arduino-logging-with-io-logging/
+    IOLOG_START_SERIAL
     serEnableLevel(SER_TCMENU_DEBUG, true);
+
+    // start wire if using I2C
+    Wire.begin();
 
     // now we turn off the reset support
     renderer.turnOffResetLogic();
@@ -149,12 +162,17 @@ void loop() {
     taskManager.runLoop();
 }
 
+//
+// Helper function to print a menu items name and value
+//
 void serialPrintMenuItem(MenuItem* item) {
     char sz[32];
     copyMenuItemNameAndValue(item, sz, sizeof sz);
     Serial.println(sz);
 }
 
+//
+// Called when the start cooking menu item is clicked. It prints all the associated menu items out
 void CALLBACK_FUNCTION onStartCooking(int id) {
     Serial.println("We are making pizza!");
     serialPrintMenuItem(&menuPizzaMakerOvenTemp);
@@ -172,6 +190,8 @@ RENDERING_CALLBACK_NAME_INVOKE(fnExtraDialogLine, textItemRenderFn, "Detail: ", 
 TextMenuItem secondItem(fnExtraDialogLine, nextRandomId(), 12, nullptr);
 
 void CALLBACK_FUNCTION onDialogInfo(int id) {
+    // withMenuDialogIfAvailable checks if the dialog can be presented now, and if so will call the function
+    // provided with the dialog as the parameter. you then just prepare the dialog to be shown.
     withMenuDialogIfAvailable([](MenuBasedDialog* dlg) {
         // we set it to have only one button, named close.
         dlg->setButtons(BTNTYPE_NONE, BTNTYPE_CLOSE);
@@ -198,20 +218,28 @@ const char pgmQuestionHeader[] PROGMEM = {"Override the title?"};
 const char pgmTitleOverride[] PROGMEM = {"Title Overridden"};
 taskid_t questionTask = TASKMGR_INVALIDID;
 void CALLBACK_FUNCTION onDialogQuestion(int id) {
+    // withMenuDialogIfAvailable checks if the dialog can be presented now, and if so will call the function
+    // provided with the dialog as the parameter. you then just prepare the dialog to be shown.
     withMenuDialogIfAvailable([] (MenuBasedDialog* dlg) {
+        // present a dialog with OK and CANCEL buttons with the question message, it has a completion handler.
         dlg->setButtons(BTNTYPE_OK, BTNTYPE_CANCEL);
         dlg->show(pgmQuestionHeader, true, [](ButtonType btn, void* data) {
             // this is the completion task that runs when the dialog is dismissed.
             Serial.print("Question result was "); Serial.println(btn);
             if(btn == BTNTYPE_OK) {
+                // here we override the main menu title to a new value
                 appTitleMenuItem.setTitleOverridePgm(pgmTitleOverride);
             }
             else {
+                // here we clear the title override, and put it back to default.
                 appTitleMenuItem.clearTitleOverride();
             }
+
+            // we must cancel the task that we started when the dialog was created
             taskManager.cancelTask(questionTask);
         });
 
+        // we create a task that keeps updating the value in the dialog buffer item.
         dlg->copyIntoBuffer("...");
         questionTask = taskManager.scheduleFixedRate(250, [] {
             char sz[10];
@@ -283,6 +311,8 @@ public:
 MyDialogController dialogController;
 
 void CALLBACK_FUNCTION onDialogController(int id) {
+    // withMenuDialogIfAvailable checks if the dialog can be presented now, and if so will call the function
+    // provided with the dialog as the parameter. you then just prepare the dialog to be shown.
     withMenuDialogIfAvailable([](MenuBasedDialog* dlg) {
         dlg->setButtons(BTNTYPE_OK, BTNTYPE_CUSTOM0);
         dlg->showController(true, &dialogController);
