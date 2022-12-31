@@ -19,10 +19,6 @@
 const int analogInputPin = A0;
 const int pwmOutputPin = 2;
 
-// We work with analog input and output here, so we use an analog device to make it easier. It provides the ability
-// to treat analog values as floats between 0..1 on any supported platform.
-ArduinoAnalogDevice analogDevice;
-
 // We create a class extending Executable for the temprature, humidity, and pressure sensors that are built in
 SensorManager sensorManager;
 
@@ -35,8 +31,8 @@ void setup() {
     Wire.setClock(400000);
 
     // First we set up the analog pins
-    analogDevice.initPin(pwmOutputPin, DIR_OUT);
-    analogDevice.initPin(analogInputPin, DIR_IN);
+    internalAnalogDevice().initPin(pwmOutputPin, DIR_OUT);
+    internalAnalogDevice().initPin(analogInputPin, DIR_IN);
 
     // Here we tell the encoder not to wrap (we don't technically need to do this as false is the default.
     // Wrap means go from maxValue back to 0, or from 0 back to maxValue. On is true, Off (default) is false.
@@ -50,9 +46,14 @@ void setup() {
     // then we initialise our sensor and motion detection and register with task manager.
     sensorManager.initialise();
     motionDetection.initialise();
+
+    // see the task manager documentation: https://www.thecoderscorner.com/products/arduino-libraries/taskmanager-io/
     taskManager.registerEvent(&motionDetection);
     taskManager.scheduleFixedRate(1, &sensorManager, TIME_SECONDS);
 
+    // we can register call back that is called when the main menu title is pressed, in this case we just show
+    // the tcMenu version number in a dialog.
+    // https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/rendering-with-tcmenu-lcd-tft-oled/#presenting-a-dialog-to-the-user
     setTitlePressedCallback([](int id) {
         withMenuDialogIfAvailable([](MenuBasedDialog* dlg) {
             dlg->setButtons(BTNTYPE_CLOSE, BTNTYPE_NONE);
@@ -65,7 +66,7 @@ void setup() {
 
     // lastly we set up something simple to read from analog in
     taskManager.scheduleFixedRate(100, [] {
-       menuAnalogReadingsInA0.setFloatValue(analogDevice.getCurrentFloat(analogInputPin));
+       menuAnalogReadingsInA0.setFloatValue(internalAnalogDevice().getCurrentFloat(analogInputPin));
     });
 }
 
@@ -74,8 +75,9 @@ void loop() {
     taskManager.runLoop();
 }
 
-// And something to change the PWM output when the PWM menu item changes
 void CALLBACK_FUNCTION onPWMChanged(int id) {
+    // here we are notified of changes in the PWM menu item and we convert that change to a value between 0 and 1.
     auto newPwm = menuAnalogReadingsOutputPWM.getCurrentValue() / 100.0F;
-    analogDevice.setCurrentFloat(pwmOutputPin, newPwm);
+    // then we can apply that to the output pin, analogDevice does all the conversion work for us.
+    internalAnalogDevice().setCurrentFloat(pwmOutputPin, newPwm);
 }
