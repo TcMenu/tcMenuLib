@@ -1,3 +1,13 @@
+/*
+ * Shows how to use adafruit graphics with a TFT panel and an ethernet module.
+ * This is a 32 bit example, which by default targets 32 bit devices.
+ * Assumed board for this is a SAMD based MKR board.
+ *
+ * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
+ *
+ * For more details see the README.md file in this directory.
+ */
+
 #include "colorTftEthernet32_menu.h"
 #include <IoAbstractionWire.h>
 #include <EepromAbstractionWire.h>
@@ -10,18 +20,8 @@
 #include "ColorEtherenetCustomDraw.h"
 #include <tcMenuVersion.h>
 
-// contains the graphical widget title components.
+// contains the tcMenu library included graphical widget title components.
 #include "stockIcons/wifiAndConnectionIcons16x12.h"
-
-/*
- * Shows how to use adafruit graphics with a TFT panel and an ethernet module.
- * This is a 32 bit example, which by default targets 32 bit devices.
- * Assumed board for this is a SAMD based MKR board.
- *
- * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
- * 
- * For more details see the README.md file in this directory.
- */
 
 // we are going to allow control of the menu over local area network
 // so therefore must configure ethernet..
@@ -29,8 +29,8 @@ byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
 };
 
-// and we create an analog device with enhanced range because we are using a 32bit board.
-ArduinoAnalogDevice analogDevice(12, 10);
+// and we create an analog device with enhanced range because on M.
+ArduinoAnalogDevice& analogDevice = internalAnalogDevice();
 
 // We add a title widget that shows when a user is connected to the device. Connection icons
 // are in the standard icon set we included at the top.
@@ -66,9 +66,12 @@ void onCommsChange(CommunicationInfo info) {
 }
 
 void setup() {
+    // This example logs using IoLogging, see the following guide to enable
+    // https://www.thecoderscorner.com/products/arduino-libraries/io-abstraction/arduino-logging-with-io-logging/
+    IOLOG_START_SERIAL
+
     // we used an i2c device (io8574) so must initialise wire too
     Wire.begin();
-    Serial.begin(115200);
 
     // here we make all menu items except menu voltage wrap around. Wrap means that when the value hits maximum it
     // goes back to 0, and when it hits 0 it goes back to maximum. Default is all wrapping off.
@@ -120,9 +123,14 @@ void setup() {
     // register the custom drawing handler
     renderer.setCustomDrawingHandler(&myCustomDraw);
 
-    ioDevicePinMode(switches.getIoAbstraction(), ledPin, OUTPUT);
+    // set the LED pin that we control as output
+    switches.getIoAbstraction()->pinMode(ledPin, OUTPUT);
 
+    // we can register call back that is called when the main menu title is pressed, in this case we just show
+    // the tcMenu version number in a dialog.
     setTitlePressedCallback([](int id) {
+        // withMenuDialogIfAvailable checks if the dialog can be presented now, and if so will call the function
+        // provided with the dialog as the parameter. you then just prepare the dialog to be shown.
         withMenuDialogIfAvailable([](MenuBasedDialog* dlg) {
             dlg->setButtons(BTNTYPE_CLOSE, BTNTYPE_NONE);
             dlg->showRam("ARM Example", false);
@@ -132,7 +140,6 @@ void setup() {
         });
     });
 
-    // Start 2nd encoder
     Serial.println("Setting up second encoder now");
 
     // here we want the encoder set to the range of values that menuCurrent takes, this is just for example,
@@ -147,7 +154,7 @@ void setup() {
     // it will repeat at 25 * 20 millis before acceleration kicks in.
     switches.addSwitch(encoder2Click, [](pinid_t pin, bool held) {
         menuPwrDelay.setBoolean(!menuPwrDelay.getBoolean());
-        ioDeviceDigitalWriteS(switches.getIoAbstraction(), ledPin, menuPwrDelay.getBoolean());
+        switches.getIoAbstraction()->digitalWriteS(ledPin, menuPwrDelay.getBoolean());
     }, 25);
     // End 2nd encoder
 }
@@ -157,9 +164,11 @@ void loop() {
 }
 
 void writeToDac() {
+    // here we show how to convert analog menu items into floating point values
     float volts = menuVoltage.getAsFloatingPointValue();
     float curr = menuCurrent.getAsFloatingPointValue();
-    
+
+    // and now we set the output voltage of A0 using a float between 0..1
     float total = (volts / 64.0F) * (curr / 2.0F);
     analogDevice.setCurrentFloat(A0, total);
     menuVoltA0.setFloatValue(total);
