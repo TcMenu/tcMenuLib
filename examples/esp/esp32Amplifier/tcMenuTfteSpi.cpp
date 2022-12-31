@@ -12,8 +12,8 @@
  * This library requires the AdaGfx library along with a suitable driver.
  */
 
-
 #include "tcMenuTfteSpi.h"
+#include "tcUnicodeHelper.h"
 #include <TFT_eSPI.h>
 
 TfteSpiDrawable::TfteSpiDrawable(TFT_eSPI *tft, int spriteHeight) : tft(tft), spriteWithConfig(nullptr), spriteHeight(spriteHeight) {}
@@ -30,7 +30,7 @@ DeviceDrawable *TfteSpiDrawable::getSubDeviceFor(const Coord &where, const Coord
     else return nullptr;
 }
 
-void TfteSpiDrawable::drawText(const Coord &where, const void *font, int mag, const char *text) {
+void TfteSpiDrawable::internalDrawText(const Coord &where, const void *font, int mag, const char *text) {
     fontPtrToNum(font, mag);
     tft->setTextColor(drawColor, drawColor); // transparent background
     tft->drawString(text, where.x, where.y);
@@ -88,10 +88,14 @@ void TfteSpiDrawable::transaction(bool isStarting, bool redrawNeeded) {
     if(isStarting) tft->setTextDatum(TL_DATUM);
 }
 
-Coord TfteSpiDrawable::textExtents(const void *font, int mag, const char *text, int *baseline) {
+Coord TfteSpiDrawable::internalTextExtents(const void *font, int mag, const char *text, int *baseline) {
     if(baseline) *baseline = 0;
     fontPtrToNum(font, mag);
     return Coord(tft->textWidth(text), tft->fontHeight());
+}
+
+void TfteSpiDrawable::drawPixel(uint16_t x, uint16_t y) {
+    tft->drawPixel(x, y, drawColor);
 }
 
 void TfteSpiDrawable::fontPtrToNum(const void* font, int mag) {
@@ -101,6 +105,10 @@ void TfteSpiDrawable::fontPtrToNum(const void* font, int mag) {
     else {
         tft->setFreeFont(static_cast<const GFXfont *>(font));
     }
+}
+
+UnicodeFontHandler *TfteSpiDrawable::createFontHandler() {
+    return fontHandler = new UnicodeFontHandler(tft, tccore::ENCMODE_UTF8);
 }
 
 //
@@ -114,6 +122,10 @@ TftSpriteAndConfig::TftSpriteAndConfig(TfteSpiDrawable *root, int width, int hei
 bool TftSpriteAndConfig::initSprite(const Coord &spriteWhere, const Coord &spriteSize, const color_t* palette, int palEntries) {
     // if the area is too big, or the sprite is in use, don't proceed.
     if(spriteSize.x > size.x || spriteSize.y > size.y) return false;
+
+    if(root->isTcUnicodeEnabled() && fontHandler == nullptr) {
+        fontHandler = new UnicodeFontHandler(&sprite, tccore::ENCMODE_UTF8);
+    }
 
     // create the sprite if needed
     if(!sprite.created()) {
