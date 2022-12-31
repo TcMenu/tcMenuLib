@@ -20,7 +20,7 @@ IoAbstractionRef ioexp_io8574 = ioFrom8574(0x20, 0);
 I2cAt24Eeprom glI2cRom(0x50, PAGESIZE_AT24C128);
 EepromAuthenticatorManager authManager(6);
 Adafruit_ST7735 gfx(6, 7, 3);
-AdafruitDrawable gfxDrawable(&gfx);
+AdafruitDrawable gfxDrawable(&gfx, 0);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 EthernetServer server(3333);
 EthernetInitialisation ethernetInitialisation(&server);

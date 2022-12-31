@@ -19,8 +19,8 @@
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 #include <RemoteMenuItem.h>
-#include <IoAbstraction.h>
 #include <IoAbstractionWire.h>
+#include <IoAbstraction.h>
 #include <EepromAbstractionWire.h>
 #include <RemoteAuthentication.h>
 
@@ -32,7 +32,6 @@ extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
 extern EthernetServer server;
 extern EthernetInitialisation ethernetInitialisation;
-extern const GFXfont FreeSansBold9pt7b;
 
 // Any externals needed by IO expanders, EEPROMs etc
 extern IoAbstractionRef ioexp_io8574;
