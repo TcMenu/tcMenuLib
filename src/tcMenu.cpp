@@ -484,9 +484,14 @@ bool MenuManager::isWrapAroundEncoder(MenuItem* menuItem) {
     return useWrapAroundByDefault;
 }
 
-void MenuManager::majorOrderChangeApplied(int newMax) {
-    if(renderer->getRendererType() == RENDER_TYPE_CONFIGURABLE && getCurrentMenu()->getMenuType() != MENUTYPE_RUNTIME_LIST) {
-        setItemsInCurrentMenu(newMax);
+void MenuManager::recalculateListIfOnDisplay(RuntimeMenuItem* runtimeItem) {
+    auto enc = switches.getEncoder();
+    // if there is an encoder, and the current menu is the list..
+    if(enc && navigator.getCurrentRoot() == runtimeItem) {
+        auto newRows = runtimeItem->getNumberOfRows();
+        auto encVal = enc->getCurrentReading();
+        uint8_t newPos = encVal < newRows ? encVal : (newRows - 1);
+        setItemsInCurrentMenu(newRows, newPos);
     }
 }
 

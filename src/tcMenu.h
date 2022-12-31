@@ -446,7 +446,12 @@ public:
      */
     void addChangeNotification(MenuManagerObserver* observer);
 
-    void majorOrderChangeApplied(int newMax);
+    /**
+     * This provides support for when lists are on the display, to allow the encoder to be updated so it can present
+     * the new items. If the list is not on display, nothing is done.
+     * @param runtimeItem
+     */
+    void recalculateListIfOnDisplay(RuntimeMenuItem* runtimeItem);
 
     void setEditorHints(CurrentEditorRenderingHints::EditorRenderingType hint, size_t start=0, size_t end=0);
     const CurrentEditorRenderingHints& getEditorHints() { return renderingHints; }
