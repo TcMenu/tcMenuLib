@@ -152,8 +152,9 @@ color_t DashMenuItem::staticPalette[4] = {};
 
 DashMenuItem::DashMenuItem(MenuItem *theItem, Coord topLeft, DashDrawParameters* params, int numCharsInValue,
                            const char* titleOverride, int countDownTicks) : item(theItem), screenLoc(topLeft),
-                               parameters(params), updateCountDown(countDownTicks), numChars(numCharsInValue),
-                               valueWidth(0), titleExtents(0, 0), countDownTicks(countDownTicks) {
+                               parameters(params), updateCountDown(countDownTicks), titleExtents(0, 0),
+                               numChars(numCharsInValue), valueWidth(0), countDownTicks(countDownTicks), baseline(0),
+                               titleText{} {
 
     if(titleOverride != nullptr) {
         strncpy(titleText, titleOverride, sizeof(titleText));
@@ -173,7 +174,7 @@ bool DashMenuItem::needsPainting() {
     return item->isChanged() || updateCountDown != 0;
 }
 
-void DashMenuItem::setFont(DashDrawParameters* params, UnicodeFontHandler* unicodeHandler) {
+void DashMenuItem::setFont(UnicodeFontHandler* unicodeHandler) {
     if(parameters->isAdafruitFont()) {
         unicodeHandler->setFont(parameters->getAsAdaFont());
     } else {
@@ -183,7 +184,7 @@ void DashMenuItem::setFont(DashDrawParameters* params, UnicodeFontHandler* unico
 
 void DashMenuItem::paintTitle(DeviceDrawable* drawableRoot) {
     UnicodeFontHandler* unicodeHandler = drawableRoot->getUnicodeHandler(true);
-    setFont(parameters, unicodeHandler);
+    setFont(unicodeHandler);
     titleExtents = unicodeHandler->textExtents(titleText, &baseline);
     valueWidth = unicodeHandler->textExtents("0", &baseline).x * numChars;
     valueWidth = int(valueWidth * 1.20);
@@ -199,7 +200,7 @@ void DashMenuItem::paintTitle(DeviceDrawable* drawableRoot) {
 
     unicodeHandler->setDrawColor(wrapper.fgColUnderlying());
     unicodeHandler->setCursor(wrapper.offsetLocation(screenLoc, startX, titleExtents.y - baseline));
-    setFont(parameters, unicodeHandler);
+    setFont(unicodeHandler);
     unicodeHandler->print(titleText);
 
     wrapper.endDraw();
@@ -216,10 +217,9 @@ void DashMenuItem::paintItem(DeviceDrawable* drawableRoot) {
 
     UnicodeFontHandler* unicodeHandler = wrapper.getDrawable()->getUnicodeHandler(true);
     unicodeHandler->setDrawColor(wrapper.fgColUnderlying());
-    setFont(parameters, unicodeHandler);
+    setFont(unicodeHandler);
     auto padding = 0;
     if(!parameters->isValueLeftAlign()) {
-        int baseline;
         Coord valueLen = unicodeHandler->textExtents(sz, &baseline);
         padding = valueWidth - (valueLen.x + 4);
     }

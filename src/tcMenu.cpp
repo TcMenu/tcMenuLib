@@ -155,7 +155,7 @@ void MenuManager::actionOnSubMenu(MenuItem* nextSub) {
 		navigateToMenu(popup->getRootItem(), popup->getItemToActivate(), true);
 	}
 	else {
-		navigateToMenu(subMenu->getChild());
+		navigateToMenu(subMenu->getChild(), findCurrentActive());
 	}
 }
 

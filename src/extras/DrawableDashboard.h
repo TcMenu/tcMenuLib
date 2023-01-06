@@ -221,7 +221,7 @@ private:
     char titleText[20];
 public:
     DashMenuItem() : item(nullptr), screenLoc(0, 0), parameters(nullptr), updateCountDown(0), titleExtents(0, 0),
-                     numChars(0), valueWidth(0), countDownTicks(0), titleText() {}
+                     numChars(0), valueWidth(0), countDownTicks(0), baseline(0), titleText() {}
     DashMenuItem(MenuItem *theItem, Coord topLeft, DashDrawParameters* params, int numCharsInValue, const char* titleOverride, int countDownTicks);
     DashMenuItem(const DashMenuItem &other) = default;
     DashMenuItem& operator= (const DashMenuItem& other) = default;
@@ -231,7 +231,7 @@ public:
     }
 
     bool needsPainting();
-    void setFont(DashDrawParameters* params, UnicodeFontHandler* unicodeHandler);
+    void setFont(UnicodeFontHandler* unicodeHandler);
     void paintTitle(DeviceDrawable* canvasDrawable);
     void paintItem(DeviceDrawable* canvasDrawable);
 };
