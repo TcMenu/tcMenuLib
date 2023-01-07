@@ -32,7 +32,10 @@ ListRuntimeMenuItem::ListRuntimeMenuItem(menuid_t id, int numberOfRows, RuntimeR
 RuntimeMenuItem *ListRuntimeMenuItem::getChildItem(int pos) {
     menuType = MENUTYPE_RUNTIME_LIST;
     itemPosition = pos;
-    setActive((activeItem - 1) == pos);
+    if((activeItem - 1) == pos) {
+        setActive(true);
+        renderFn(this, activeItem, RENDERFN_ACTIVATE, nullptr, 0);
+    } else setActive(false);
     return this;
 }
 
@@ -43,7 +46,11 @@ RuntimeMenuItem *ListRuntimeMenuItem::asParent() {
 }
 
 RuntimeMenuItem *ListRuntimeMenuItem::asBackMenu() {
-    setActive(activeItem == 0);
+    if(activeItem == 0) {
+        // the title is active.
+        setActive(true);
+        renderFn(this, 0, RENDERFN_ACTIVATE, nullptr, 0);
+    } else setActive(false);
     menuType = MENUTYPE_BACK_VALUE;
     itemPosition = LIST_PARENT_ITEM_POS;
     return this;

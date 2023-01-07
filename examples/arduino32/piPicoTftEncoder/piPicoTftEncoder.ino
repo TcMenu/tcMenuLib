@@ -9,7 +9,7 @@
 #include <IoLogging.h>
 #include <TaskManagerIO.h>
 #include <BaseDialog.h>
-#include <tcMenuVersion.h>
+#include <tcUtil.h>
 
 // TFT_eSPI setup is "Setup60_RP2040_ILI9341.h".
 
@@ -24,8 +24,6 @@ const char* fileNames[] = {
 
 #define FILE_NAME_SIZE 5
 
-void onTitlePressed(int);
-
 void setup() {
     // This example logs using IoLogging, see the following guide to enable
     // https://www.thecoderscorner.com/products/arduino-libraries/io-abstraction/arduino-logging-with-io-logging/
@@ -35,7 +33,10 @@ void setup() {
     setupMenu();
 
     // Add a callback to show the build version when the title is pressed
-    setTitlePressedCallback(onTitlePressed);
+    // this uses the standard function to show a version dialog from tcUtil.h
+    setTitlePressedCallback([](int) {
+        showVersionDialog(&applicationInfo);
+    });
 
     // Add another button that directly controls the mute menu item
     switches.addSwitch(22, [] (pinid_t key, bool held) {
@@ -154,6 +155,9 @@ void CALLBACK_FUNCTION onShowDialogs(int) {
  */
 int CALLBACK_FUNCTION fnRootListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
    switch(mode) {
+    case RENDERFN_ACTIVATE:
+        serlogF2(SER_DEBUG, "List activate ", row);
+        return false;
     case RENDERFN_INVOKE:
         // we have a list of files and a refresh option at the end.
         if(row < FILE_NAME_SIZE) {
@@ -186,14 +190,4 @@ int CALLBACK_FUNCTION fnRootListRtCall(RuntimeMenuItem* item, uint8_t row, Rende
     case RENDERFN_EEPROM_POS: return 0xffff; // lists are generally not saved to EEPROM
     default: return false;
     }
-}
-
-void onTitlePressed(int) {
-    withMenuDialogIfAvailable([](MenuBasedDialog *dlg) {
-        dlg->setButtons(BTNTYPE_NONE, BTNTYPE_CLOSE);
-        dlg->show("TcMenu PI Pico example", false);
-        char sz[20];
-        tccore::copyTcMenuVersion(sz, sizeof sz);
-        dlg->copyIntoBuffer(sz);
-    });
 }

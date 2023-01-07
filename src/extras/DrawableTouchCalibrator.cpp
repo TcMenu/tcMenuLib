@@ -138,4 +138,5 @@ bool IoaTouchScreenCalibrator::loadCalibration() {
     if(rom->hasErrorOccurred()) return false;
 
     serlogF(SER_TCMENU_INFO, "Loaded calibration OK");
+    return true;
 }

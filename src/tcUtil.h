@@ -29,6 +29,8 @@ struct ConnectorLocalInfo {
     char uuid[38];
 };
 
+void showVersionDialog(const ConnectorLocalInfo* localInfo);
+
 // There now follows pretty much internal code, boolean negative for dealing with program memory
 // never use direct program memory commands, always prefer these, it allows us
 // to compile it out much easier.
