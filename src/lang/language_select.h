@@ -27,6 +27,18 @@
 #else
 # include "language_fr.h"
 #endif // use ASCII
+#elif defined(TC_LOCALE_SK)
+#if defined(TC_LOCAL_ASCII)
+# include "language_sk_ascii.h"
+#else
+# include "language_sk.h"
+#endif // use ASCII
+#elif defined(TC_LOCALE_CS)
+#if defined(TC_LOCAL_ASCII)
+# include "language_cs_ascii.h"
+#else
+# include "language_cs.h"
+#endif // use ASCII
 #else
 # include "language_en.h"
 #endif
