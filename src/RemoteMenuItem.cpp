@@ -9,8 +9,12 @@
 #include "RemoteConnector.h"
 #include "tcUtil.h"
 #include "BaseDialog.h"
+#include "lang/language_select.h"
 
-const char REMOVE_CONN_HDR_PGM[] PROGMEM = "Close Connection";
+const char REMOVE_CONN_HDR_PGM[] PROGMEM = TXT_CLOSE_CONNECTION;
+const char AUTH_REMOVE_KEY[] PROGMEM = TXT_AUTH_REMOVE;
+const char AUTH_REMOVE_ALL_KEYS[] PROGMEM = TXT_AUTH_REMOVE_ALL_KEYS;
+const char AUTH_EMPTY_KEY[] PROGMEM = TXT_AUTH_EMPTY_KEY;
 
 // called when the close connection dialog completes.
 void onRemoteInfoDialogComplete(ButtonType btn, void* data) {
@@ -111,10 +115,6 @@ EepromAuthenticatorManager *EepromAuthenticationInfoMenuItem::getAuthManager() {
     }
     return nullptr;
 }
-
-const char AUTH_REMOVE_KEY[] PROGMEM = "Remove";
-const char AUTH_REMOVE_ALL_KEYS[] PROGMEM = "Remove ALL keys?";
-const char AUTH_EMPTY_KEY[] PROGMEM = "EmptyKey";
 
 void onAuthenticateRemoveKeysDlgComplete(ButtonType btn, void* data) {
     if (btn == BTNTYPE_OK) {

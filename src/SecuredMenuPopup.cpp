@@ -6,10 +6,11 @@
 #include "SecuredMenuPopup.h"
 #include "tcMenu.h"
 #include "BaseDialog.h"
+#include "lang/language_select.h"
 
-const char pgmProceedText[] PROGMEM = "Proceed";
-const char pgmCancelText[] PROGMEM = "Cancel";
-const char pgmHeaderNotAuth[] PROGMEM = "Pin incorrect";
+const char pgmProceedText[] PROGMEM = TXT_SECURE_MENU_PROCEED;
+const char pgmCancelText[] PROGMEM = TXT_SECURE_MENU_CANCEL;
+const char pgmHeaderNotAuth[] PROGMEM = TXT_SECURE_PIN_WRONG;
 
 RENDERING_CALLBACK_NAME_INVOKE(fnpopupPasswordRtCall, textItemRenderFn, "Password", -1, NULL)
 RENDERING_CALLBACK_NAME_INVOKE(fnpopupSubmenuSecured, backSubItemRenderFn, "Enter PIN", -1, NULL)

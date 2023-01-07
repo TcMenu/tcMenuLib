@@ -10,13 +10,14 @@
 #include <RemoteConnector.h>
 #include <BaseDialog.h>
 #include <SwitchInput.h>
+#include "lang/language_select.h"
 
 using namespace tcgfx;
 
-const char buttonOK[] PROGMEM = "ok";
-const char buttonCancel[] PROGMEM = "cancel";
-const char buttonClose[] PROGMEM = "close";
-const char buttonAccept[] PROGMEM = "accept";
+const char buttonOK[] PROGMEM = TXT_DIALOG_OK;
+const char buttonCancel[] PROGMEM = TXT_DIALOG_CANCEL;
+const char buttonClose[] PROGMEM = TXT_DIALOG_CLOSE;
+const char buttonAccept[] PROGMEM = TXT_DIALOG_ACCEPT;
 const char* standardDialogButton[] = { buttonOK, buttonAccept, buttonCancel, buttonClose };
 
 BaseDialog::BaseDialog() : header{0}, headerPgm(nullptr) {

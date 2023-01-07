@@ -100,6 +100,19 @@ public:
 typedef void (*ResetCallbackFn)();
 
 /**
+ * This class provides the reset callback in a functional way without the need for custom drawing class.
+ * It simply calls the provided reset function on reset.
+ */
+class ResetCallbackFunctionCustomDraw : public CustomDrawing {
+    ResetCallbackFn resetFn;
+public:
+    ResetCallbackFunctionCustomDraw(ResetCallbackFn fn): resetFn(fn) {}
+    void started(BaseMenuRenderer *currentRenderer) override { }
+    void reset() override {resetFn();}
+    void renderLoop(unsigned int currentValue, RenderPressMode userClick) override {}
+};
+
+/**
  * Title widgets allow for drawing small graphics in the title area, for example connectivity status
  * of the wifi network, if a remote connection to the menu is active. They are in a linked list so
  * as to make storage as efficient as possible. Chain them together using the constructor or setNext().
@@ -276,11 +289,7 @@ protected:
     uint16_t resetValInTicks;
 	MenuRedrawState redrawMode;
 	TitleWidget* firstWidget;
-	union {
-        ResetCallbackFn resetCallback;
-        CustomDrawing *customDrawing;
-    };
-    bool isCustomDrawing;
+    CustomDrawing *customDrawing;
 	DisplayTakeoverMode displayTakenMode;
     BaseDialog* dialog;
 
@@ -342,8 +351,7 @@ public:
      * and that will be notified of both reset events and take over display events.
      */
     void setResetCallback(ResetCallbackFn resetFn) {
-        isCustomDrawing = false;
-        resetCallback = resetFn;
+        customDrawing = new ResetCallbackFunctionCustomDraw(resetFn);
     }
 
     /**
@@ -353,8 +361,14 @@ public:
      * display is first taken over, followed by renderLoop until it's given back.
      */
     void setCustomDrawingHandler(CustomDrawing* customDrawingParam) {
-        isCustomDrawing= true;
         customDrawing = customDrawingParam;
+    }
+
+    /**
+     * @return the current custom drawing set on this renderer, it could be nullptr if never set.
+     */
+    CustomDrawing* getCurrentCustomDrawing() {
+        return customDrawing;
     }
 
     /**

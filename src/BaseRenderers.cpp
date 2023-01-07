@@ -40,13 +40,11 @@ BaseMenuRenderer::BaseMenuRenderer(int bufferSize, RendererType rType) : MenuRen
     lastOffset = 0;
     resetValInTicks = 30 * TC_DISPLAY_UPDATES_PER_SECOND;
 	renderCallback = nullptr;
-    resetCallback = nullptr;
     renderFnPressType = RPRESS_NONE;
 	redrawMode = MENUDRAW_COMPLETE_REDRAW;
 	this->lastOffset = 0;
     this->firstWidget = nullptr;
     this->dialog = nullptr;
-    isCustomDrawing = false;
     displayTakenMode = NOT_TAKEN_OVER;
     updatesPerSecond = TC_DISPLAY_UPDATES_PER_SECOND;
     MenuRenderer::theInstance = this;
@@ -112,14 +110,9 @@ void BaseMenuRenderer::resetToDefault() {
 
     // once the menu has been reset, if the reset callback is present
     // then we call it.
-    if(resetCallback) {
-        if(isCustomDrawing) {
-            customDrawing->reset();
-        }
-        else {
-            resetCallback();
-        }
-    };
+    if(customDrawing) {
+        customDrawing->reset();
+    }
 }
 
 void BaseMenuRenderer::countdownToDefaulting() {
@@ -137,7 +130,7 @@ void BaseMenuRenderer::countdownToDefaulting() {
 }
 
 void BaseMenuRenderer::takeOverDisplay(RendererCallbackFn displayFn) {
-    if(displayFn == nullptr && isCustomDrawing == false) return;
+    if(displayFn == nullptr && customDrawing != nullptr) return;
 	// when we set this, we are stopping tcMenu rendering and letting this take over
 	renderFnPressType = RPRESS_NONE;
     displayTakenMode = displayFn ? TAKEN_OVER_FN : START_CUSTOM_DRAW;

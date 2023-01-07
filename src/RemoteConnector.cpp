@@ -8,6 +8,7 @@
 
 #include <PlatformDetermination.h>
 #include "tcMenuVersion.h"
+#include "lang/language_select.h"
 #ifdef IOA_USE_MBED
 #include "tcUtil.h"
 #endif
@@ -101,8 +102,7 @@ void TagValueRemoteConnector::provideAuthentication(const char* auth) {
     }
 }
 
-const char headerPairingText[] PROGMEM = "Pairing waiting";
-const char headerPairingDone[] PROGMEM = "Pairing complete";
+const char headerPairingText[] PROGMEM = TXT_PAIRING_TEXT;
 const char* lastUuid;
 
 void onPairingFinished(ButtonType ty, void* voidConnector) {
