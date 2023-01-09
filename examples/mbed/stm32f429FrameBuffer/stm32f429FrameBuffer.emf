@@ -252,6 +252,21 @@
       }
     },
     {
+      "parentId": 11,
+      "type": "boolItem",
+      "defaultValue": "false",
+      "item": {
+        "naming": "CHECKBOX",
+        "name": "Bool Check",
+        "variableName": "SamplesBoolCheck",
+        "id": 22,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
       "parentId": 0,
       "type": "actionMenu",
       "item": {
@@ -357,7 +372,7 @@
       },
       {
         "name": "ITEM_FONT",
-        "latestValue": "ada:OpenSans18,0",
+        "latestValue": "ada:OpenSansCyrillicLatin18,0",
         "subsystem": "THEME"
       },
       {

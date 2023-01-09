@@ -345,6 +345,7 @@ namespace tcgfx {
         void internalDrawText(GridPositionRowCacheEntry* pEntry, const Coord& where, const Coord& size);
         void drawCoreLineItem(GridPositionRowCacheEntry* entry, DrawableIcon* icon, Coord &where, Coord &size, bool drawBg);
         void drawTextualItem(GridPositionRowCacheEntry* entry, Coord& where, Coord& size);
+        void drawCheckbox(GridPositionRowCacheEntry *entry, Coord& where, Coord& size);
         void drawSlider(GridPositionRowCacheEntry* entry, AnalogMenuItem* pItem, Coord& where, Coord& size);
         void drawUpDownItem(GridPositionRowCacheEntry* entry, Coord& where, Coord& size);
         void drawIconItem(GridPositionRowCacheEntry *pEntry, Coord& where, Coord& size);

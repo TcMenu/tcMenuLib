@@ -145,6 +145,13 @@ namespace tcgfx {
         bool weAreEditingWithCursor = pEntry->getMenuItem()->isEditing() && menuMgr.getCurrentEditor() != nullptr
                                       && editorHintNeedsCursor(menuMgr.getEditorHints().getEditorRenderingType());
 
+        bool valueNeeded = true;
+        if(pEntry->getMenuItem()->getMenuType() == MENUTYPE_BOOLEAN_VALUE) {
+            if (reinterpret_cast<BooleanMenuItem *>(pEntry->getMenuItem())->getBooleanNaming() == NAMING_CHECKBOX) {
+                valueNeeded = false;
+            }
+        }
+
         if(just == GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT || weAreEditingWithCursor) {
             // special case, title left, value right.
             Coord wh = Coord(where.x + padding.left, where.y + padding.top);
@@ -153,7 +160,9 @@ namespace tcgfx {
             drawable->setDrawColor(fg);
             drawable->drawText(wh, props->getFont(), props->getFontMagnification(), buffer);
 
-            copyMenuItemValue(pEntry->getMenuItem(), buffer, bufferSize);
+            if(valueNeeded) {
+                copyMenuItemValue(pEntry->getMenuItem(), buffer, bufferSize);
+            } else buffer[0] = 0;
             int16_t right = where.x + size.x - (drawable->textExtents(props->getFont(), props->getFontMagnification(), buffer).x + padding.right);
             wh.x = right;
             if(weAreEditingWithCursor) {
@@ -174,7 +183,6 @@ namespace tcgfx {
         else {
             char sz[32];
             bool nameNeeded = itemNeedsName(just);
-            bool valueNeeded = itemNeedsValue(just);
             if(valueNeeded && nameNeeded) {
                 copyMenuItemNameAndValue(pEntry->getMenuItem(), sz, sizeof sz, 0);
             } else if(valueNeeded) {
@@ -285,6 +293,29 @@ namespace tcgfx {
         }
     }
 
+    void GraphicsDeviceRenderer::drawCheckbox(GridPositionRowCacheEntry *entry, Coord& where, Coord& size) {
+        auto padding = entry->getDisplayProperties()->getPadding();
+        auto* icon = propertiesFactory.iconForMenuItem(entry->getMenuItem()->isEditing() ? SPECIAL_ID_EDIT_ICON :SPECIAL_ID_ACTIVE_ICON);
+
+        drawCoreLineItem(entry, icon, where, size, true);
+        auto hei = size.y - (padding.top + padding.top);
+        auto startingX = where.x + size.x - (padding.left + padding.right + hei);
+        auto boolItem = reinterpret_cast<BooleanMenuItem*>(entry->getMenuItem());
+        auto hl = entry->getDisplayProperties()->getColor(ItemDisplayProperties::HIGHLIGHT1);
+        auto txtCol = entry->getDisplayProperties()->getColor(ItemDisplayProperties::TEXT);
+
+        drawable->setDrawColor(txtCol);
+        drawable->drawBox(Coord(startingX, where.y + padding.top), Coord(hei, hei), false);
+        if(hl != txtCol) {
+            drawable->drawBox(Coord(startingX + 1, where.y + padding.top + 1), Coord(hei - 2, hei - 2), false);
+        }
+        if(boolItem->getBoolean()) {
+            drawable->setDrawColor(hl);
+            drawable->drawBox(Coord(startingX + 2, where.y + padding.top + 2), Coord(hei - 4, hei - 4), true);
+        }
+        internalDrawText(entry, where, Coord(size.x - (hei + padding.left), size.y));
+    }
+
     void GraphicsDeviceRenderer::drawUpDownItem(GridPositionRowCacheEntry *entry, Coord& where, Coord& size) {
         auto padding = entry->getDisplayProperties()->getPadding();
         auto* icon = propertiesFactory.iconForMenuItem(entry->getMenuItem()->isEditing() ? SPECIAL_ID_EDIT_ICON :SPECIAL_ID_ACTIVE_ICON);
@@ -315,6 +346,13 @@ namespace tcgfx {
     }
 
     void GraphicsDeviceRenderer::drawTextualItem(GridPositionRowCacheEntry* pEntry, Coord& where, Coord& size) {
+        if(pEntry->getMenuItem()->getMenuType() == MENUTYPE_BOOLEAN_VALUE) {
+            auto boolItem = reinterpret_cast<BooleanMenuItem*>(pEntry->getMenuItem());
+            if(boolItem->getBooleanNaming() == NAMING_CHECKBOX) {
+                drawCheckbox(pEntry, where, size);
+                return;
+            }
+        }
         auto* icon = propertiesFactory.iconForMenuItem(pEntry->getMenuItem()->isEditing() ? SPECIAL_ID_EDIT_ICON :SPECIAL_ID_ACTIVE_ICON);
         drawCoreLineItem(pEntry, icon, where, size, true);
         internalDrawText(pEntry, Coord(where.x, where.y), Coord(size.x, size.y));

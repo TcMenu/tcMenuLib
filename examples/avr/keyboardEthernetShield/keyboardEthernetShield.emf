@@ -382,7 +382,7 @@
       "type": "boolItem",
       "defaultValue": "false",
       "item": {
-        "naming": "YES_NO",
+        "naming": "CHECKBOX",
         "name": "Flag3",
         "variableName": "AdditionalBoolFlagFlag3",
         "id": 27,
@@ -397,7 +397,7 @@
       "type": "boolItem",
       "defaultValue": "false",
       "item": {
-        "naming": "YES_NO",
+        "naming": "CHECKBOX",
         "name": "Flag4",
         "variableName": "AdditionalBoolFlagFlag4",
         "id": 28,
@@ -747,8 +747,8 @@
     "eepromDefinition": "avr:",
     "authenticatorDefinition": "rom:100:6",
     "projectIoExpanders": [
-      "deviceIO:",
-      "mcp23017:io23017:32:2"
+      "mcp23017:io23017:32:2",
+      "deviceIO:"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []

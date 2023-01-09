@@ -54,8 +54,10 @@ RENDERING_CALLBACK_NAME_INVOKE(fnExtrasRtCall, backSubItemRenderFn, "Extras", -1
 const PROGMEM SubMenuInfo minfoExtras = { "Extras", 10, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackExtras(fnExtrasRtCall, &menuExtrasText);
 SubMenuItem menuExtras(&minfoExtras, &menuBackExtras, &menuConnectivity);
+const PROGMEM BooleanMenuInfo minfoSelectMeNewBoolItem = { "New BoolItem", 21, 0xffff, 1, NO_CALLBACK, NAMING_CHECKBOX };
+BooleanMenuItem menuSelectMeNewBoolItem(&minfoSelectMeNewBoolItem, true, NULL);
 const PROGMEM AnyMenuInfo minfoSelectMePressMe = { "Press Me", 9, 0xffff, 0, pressMeActionRun };
-ActionMenuItem menuSelectMePressMe(&minfoSelectMePressMe, NULL);
+ActionMenuItem menuSelectMePressMe(&minfoSelectMePressMe, &menuSelectMeNewBoolItem);
 const PROGMEM FloatMenuInfo minfoSelectMeFloat2 = { "Float 2", 8, 0xffff, 3, NO_CALLBACK };
 FloatMenuItem menuSelectMeFloat2(&minfoSelectMeFloat2, 0.0, &menuSelectMePressMe);
 const PROGMEM FloatMenuInfo minfoSelectMeFloat1 = { "Float 1", 7, 0xffff, 3, NO_CALLBACK };

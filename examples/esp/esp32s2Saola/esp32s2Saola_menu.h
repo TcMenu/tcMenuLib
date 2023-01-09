@@ -48,6 +48,7 @@ extern Rgb32MenuItem menuExtrasColor;
 extern TextMenuItem menuExtrasText;
 extern BackMenuItem menuBackExtras;
 extern SubMenuItem menuExtras;
+extern BooleanMenuItem menuSelectMeNewBoolItem;
 extern ActionMenuItem menuSelectMePressMe;
 extern FloatMenuItem menuSelectMeFloat2;
 extern FloatMenuItem menuSelectMeFloat1;

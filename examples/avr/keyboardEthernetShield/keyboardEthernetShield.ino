@@ -88,6 +88,11 @@ void setup() {
     // Here we set the character to be used for back, next and editing for the "cursor".
     renderer.setEditorChars(0b01111111, 0b01111110, '=');
 
+    // You can also have title widgets on LCDs, maximum of 7 states. They use up the custom chars 0..7. How it works
+    // is that you define a custom character for each icon, and treat them just as you would a regular icon. The height
+    // of the widget is fixed, and the height field instead indicates the first custom character for the first icon.
+    renderer.setFirstWidget(&connectedWidget);
+
 	setupMenu();
 
 	auto* authenticator = reinterpret_cast<EepromAuthenticatorManager*>(menuMgr.getAuthenticator());
@@ -127,7 +132,6 @@ void setup() {
     // and lastly we register a communication listener, it updates the title widget
     // that shows connectivity state on the right corner.
     menuConnectivityIoTMonitor.registerCommsNotification(onCommsChange);
-    renderer.setFirstWidget(&connectedWidget);
 
     // and finally, when the display times out, take over and draw a custom screen
     renderer.setResetCallback([] {

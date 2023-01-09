@@ -154,6 +154,21 @@
       }
     },
     {
+      "parentId": 6,
+      "type": "boolItem",
+      "defaultValue": "true",
+      "item": {
+        "naming": "CHECKBOX",
+        "name": "New BoolItem",
+        "variableName": "SelectMeNewBoolItem",
+        "id": 21,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true
+      }
+    },
+    {
       "parentId": 0,
       "type": "subMenu",
       "item": {

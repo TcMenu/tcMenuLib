@@ -37,8 +37,10 @@ BackMenuItem menuBackUnicode(fnUnicodeRtCall, &menuUnicodeChoice);
 SubMenuItem menuUnicode(&minfoUnicode, &menuBackUnicode, NULL);
 const AnyMenuInfo minfoDialogs = { "Dialogs", 18, 0xffff, 0, onPresentDialog };
 ActionMenuItem menuDialogs(&minfoDialogs, &menuUnicode);
+const BooleanMenuInfo minfoSamplesBoolCheck = { "Bool Check", 22, 0xffff, 1, NO_CALLBACK, NAMING_CHECKBOX };
+BooleanMenuItem menuSamplesBoolCheck(&minfoSamplesBoolCheck, false, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnSamplesLgePosRtCall, largeNumItemRenderFn, "LgePos", -1, NO_CALLBACK)
-EditableLargeNumberMenuItem menuSamplesLgePos(fnSamplesLgePosRtCall, LargeFixedNumber(7, 0, 12456U, 0U, false), 17, false, NULL);
+EditableLargeNumberMenuItem menuSamplesLgePos(fnSamplesLgePosRtCall, LargeFixedNumber(7, 0, 12456U, 0U, false), 17, false, &menuSamplesBoolCheck);
 RENDERING_CALLBACK_NAME_INVOKE(fnSamplesRGBRtCall, rgbAlphaItemRenderFn, "RGB", -1, NO_CALLBACK)
 Rgb32MenuItem menuSamplesRGB(fnSamplesRGBRtCall, RgbColor32(255, 170, 187), 16, false, &menuSamplesLgePos);
 RENDERING_CALLBACK_NAME_INVOKE(fnSamplesTimeRtCall, timeItemRenderFn, "Time", -1, NO_CALLBACK)
@@ -93,6 +95,6 @@ void setupMenu() {
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
     renderer.setUseSliderForAnalog(true);
     renderer.enableTcUnicode();
-    installCoolBlueModernTheme(renderer, MenuFontDef(OpenSansCyrillicLatin18, 0), MenuFontDef(&RobotoMedium24, 1), false);
+    installCoolBlueModernTheme(renderer, MenuFontDef(&OpenSansCyrillicLatin18, 0), MenuFontDef(&RobotoMedium24, 1), false);
 }
 

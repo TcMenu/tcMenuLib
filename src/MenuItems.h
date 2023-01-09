@@ -136,7 +136,9 @@ enum BooleanNaming : uint8_t {
 	/** prefer the use of On / Off */
 	NAMING_ON_OFF,
 	/** prefer the user of Yes and No */
-	NAMING_YES_NO
+	NAMING_YES_NO,
+    /** prefer that the user see a checkbox */
+    NAMING_CHECKBOX
 };
 
 /**

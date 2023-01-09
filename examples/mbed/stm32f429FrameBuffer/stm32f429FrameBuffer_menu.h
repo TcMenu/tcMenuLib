@@ -42,6 +42,7 @@ extern EnumMenuItem menuUnicodeChoice;
 extern BackMenuItem menuBackUnicode;
 extern SubMenuItem menuUnicode;
 extern ActionMenuItem menuDialogs;
+extern BooleanMenuItem menuSamplesBoolCheck;
 extern EditableLargeNumberMenuItem menuSamplesLgePos;
 extern Rgb32MenuItem menuSamplesRGB;
 extern TimeFormattedMenuItem menuSamplesTime;

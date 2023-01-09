@@ -314,6 +314,9 @@ void copyMenuItemNameAndValue(const MenuItem* item, char* buffer, size_t bufferS
     copyMenuItemValue(item, buffer + pos, bufferSize - pos);
 }
 
+const char CHECKED_STR[] PROGMEM = "[X]";
+const char UNCHECKED_STR[] PROGMEM = "[ ]";
+
 void copyMenuItemValue(const MenuItem* item, char* buffer, size_t bufferSize) {
     buffer[0] = 0;
     if(item->getMenuType() == MENUTYPE_ENUM_VALUE) {
@@ -330,6 +333,9 @@ void copyMenuItemValue(const MenuItem* item, char* buffer, size_t bufferSize) {
                 break;
             case NAMING_YES_NO:
                 val = boolItem->getBoolean() ? YES_STR : NO_STR;
+                break;
+            case NAMING_CHECKBOX:
+                val = boolItem->getBoolean() ? CHECKED_STR : UNCHECKED_STR;
                 break;
             default:
                 val = boolItem->getBoolean() ? TRUE_STR : FALSE_STR;

@@ -430,8 +430,7 @@ ItemDisplayProperties::ComponentType BaseGraphicalRenderer::toComponentType(Grid
         case GridPosition::DRAW_AS_ICON_ONLY:
         case GridPosition::DRAW_AS_ICON_TEXT:
         default:
-            return isItemActionable(pMenuItem) || pMenuItem->getMenuType() == MENUTYPE_BOOLEAN_VALUE
-                   ? ItemDisplayProperties::COMPTYPE_ACTION : ItemDisplayProperties::COMPTYPE_ITEM;
+            return isItemActionable(pMenuItem) ? ItemDisplayProperties::COMPTYPE_ACTION : ItemDisplayProperties::COMPTYPE_ITEM;
     }
 }
 

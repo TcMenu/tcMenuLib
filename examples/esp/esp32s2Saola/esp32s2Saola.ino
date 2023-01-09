@@ -13,7 +13,7 @@
 #include <tcMenuVersion.h>
 #include <WiFi.h>
 #include <stockIcons/wifiAndConnectionIcons16x12.h>
-
+#include <tcUtil.h>
 
 #define MENU_WIFIMODE_STATION 0
 const char pgmsListHeader[] PROGMEM = "List items";
@@ -45,19 +45,9 @@ void setup() {
     startWiFiAndListener();
     renderer.setFirstWidget(&wifiWidget);
 
-    // lastly when the title is pressed present a dialog.
+    // lastly we capture when the root title is pressed present a standard version dialog.
     setTitlePressedCallback([](int titleCb) {
-        auto dlg = renderer.getDialog();
-        if(!dlg->isInUse()) {
-            dlg->setButtons(BTNTYPE_NONE, BTNTYPE_CLOSE);
-            dlg->show(applicationInfo.name, false);
-            char sz[25];
-            char ver[10];
-            tccore::copyTcMenuVersion(ver, sizeof ver);
-            strcpy(sz, "TcMenu lib ");
-            strcat(sz, ver);
-            dlg->copyIntoBuffer(sz);
-        }
+        showVersionDialog(&applicationInfo);
     });
 }
 

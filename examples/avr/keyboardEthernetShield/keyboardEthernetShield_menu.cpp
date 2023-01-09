@@ -44,9 +44,9 @@ RENDERING_CALLBACK_NAME_INVOKE(fnRomChoicesRtCall, backSubItemRenderFn, "Rom Cho
 const PROGMEM SubMenuInfo minfoRomChoices = { "Rom Choices", 20, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackRomChoices(fnRomChoicesRtCall, &menuRomChoicesItemNum);
 SubMenuItem menuRomChoices(&minfoRomChoices, &menuBackRomChoices, NULL);
-const PROGMEM BooleanMenuInfo minfoAdditionalBoolFlagFlag4 = { "Flag4", 28, 41, 1, NO_CALLBACK, NAMING_YES_NO };
+const PROGMEM BooleanMenuInfo minfoAdditionalBoolFlagFlag4 = { "Flag4", 28, 41, 1, NO_CALLBACK, NAMING_CHECKBOX };
 BooleanMenuItem menuAdditionalBoolFlagFlag4(&minfoAdditionalBoolFlagFlag4, false, NULL);
-const PROGMEM BooleanMenuInfo minfoAdditionalBoolFlagFlag3 = { "Flag3", 27, 40, 1, NO_CALLBACK, NAMING_YES_NO };
+const PROGMEM BooleanMenuInfo minfoAdditionalBoolFlagFlag3 = { "Flag3", 27, 40, 1, NO_CALLBACK, NAMING_CHECKBOX };
 BooleanMenuItem menuAdditionalBoolFlagFlag3(&minfoAdditionalBoolFlagFlag3, false, &menuAdditionalBoolFlagFlag4);
 const PROGMEM BooleanMenuInfo minfoAdditionalBoolFlagFlag2 = { "Flag2", 26, 39, 1, NO_CALLBACK, NAMING_ON_OFF };
 BooleanMenuItem menuAdditionalBoolFlagFlag2(&minfoAdditionalBoolFlagFlag2, false, &menuAdditionalBoolFlagFlag3);
@@ -113,8 +113,8 @@ void setupMenu() {
     authManager.initialise(menuMgr.getEepromAbstraction(), 100);
     menuMgr.setAuthenticator(&authManager);
     // Now add any readonly, non-remote and visible flags.
-    menuConnectivityIoTMonitor.setLocalOnly(true);
     menuConnectivityAuthenticator.setLocalOnly(true);
+    menuConnectivityIoTMonitor.setLocalOnly(true);
     menuConnectivity.setLocalOnly(true);
     menuConnectivity.setSecured(true);
     menuHiddenItem.setVisible(false);
