@@ -14,14 +14,14 @@
 // If you're using original Arduino IDE you can force a definition of TC_LOCALE here. Commented out example below.
 // For example if we wanted french with only ASCII (32..126)
 //
-// #define TC_LOCALE_FRENCH
+// #define TC_LOCALE_FR
 // #define TC_LOCAL_ASCII
 //
 
 
 #if __has_include(<project_locale.h>)
 # include <project_locale.h>
-#elif defined(TC_LOCALE_FRENCH)
+#elif defined(TC_LOCALE_FR)
 #if defined(TC_LOCAL_ASCII)
 # include "language_fr_ascii.h"
 #else
