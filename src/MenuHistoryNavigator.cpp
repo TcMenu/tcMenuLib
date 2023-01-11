@@ -51,3 +51,7 @@ MenuItem *tcnav::MenuNavigationStore::popNavigationGetActive() {
 bool tcnav::MenuNavigationStore::isShowingRoot() {
     return currentRoot == root;
 }
+
+void tcnav::MenuNavigationStore::resetStack() {
+    setRootItem(root);
+}

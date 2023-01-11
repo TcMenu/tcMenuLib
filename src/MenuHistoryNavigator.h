@@ -67,6 +67,28 @@ namespace tcnav {
         MenuItem* popNavigationGetActive();
 
         bool isShowingRoot();
+
+        /**
+         * @return the depth of the navigation stack that is being managed.
+         */
+        int getNavigationDepth() const { return navIdx; }
+
+        /**
+         * The active item at a given zero based position in the stack or nullptr if out of range
+         * @param i the index
+         * @return the item or nullptr
+         */
+        MenuItem* getActiveAt(uint8_t i) { return i < navIdx ? activeItems[i] : nullptr; }
+
+        /**
+         * Get the root menu item for the given zero based position in the stack or nullptr if out of range.
+         * @param i the index
+         * @return the item or nullptr
+         */
+        MenuItem* getRootAt(uint8_t i) { return i < navIdx ? navItems[i] : nullptr; }
+
+        /** Completely reset the navigation back to the initial state where root is on display */
+        void resetStack();
     };
 }
 

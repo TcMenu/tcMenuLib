@@ -23,7 +23,7 @@ BackMenuItem menuBackSub(backSubFixturesFn, &menuSubAnalog);
 const PGM_TCM SubMenuInfo minfoSub = { "Settings", 7, 0xffff, 0, NO_CALLBACK };
 SubMenuItem menuSub(&minfoSub, &menuBackSub, NULL);
 
-const PGM_TCM AnalogMenuInfo minfoAnalog = { "Analog", 1, 2, 255, NO_CALLBACK, 0, 1, "AB" };
+const PGM_TCM AnalogMenuInfo minfoAnalog = { "Analog", 1, 34, 255, NO_CALLBACK, 0, 1, "AB" };
 AnalogMenuItem menuAnalog(&minfoAnalog, 0, &menuSub);
 
 const PGM_TCM AnalogMenuInfo minfoAnalog2 = { "Analog2", 2, 4, 100, NO_CALLBACK, -10, 10, "" };

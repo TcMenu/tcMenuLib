@@ -50,6 +50,7 @@ void dialogTestCallback(ButtonType buttonPressed, void* yourData) {
 }
 
 test(testBaseDialogInfo) {
+    switches.resetAllSwitches();
 	NoRenderer noRenderer;
 	DialogTestImpl dialog(true);
 	dialog.setButtons(BTNTYPE_NONE, BTNTYPE_CLOSE);

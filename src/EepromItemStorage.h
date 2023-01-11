@@ -56,4 +56,10 @@ void saveMenuItem(EepromAbstraction* eeprom, MenuItem* theItem);
  */
 void triggerAllChangedCallbacks();
 
+/**
+ * This enables the sized EEPROM support. When this is on, new items that are beyond the last saved EEPROM position
+ * will not attempt to be loaded. This allows new items to initialise properly as long as they are at the end.
+ */
+void setSizeBasedEEPROMStorageEnabled(bool ena);
+
 #endif //_EEPROM_ITEM_STORAGE_H_

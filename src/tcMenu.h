@@ -397,19 +397,27 @@ public:
 	void resetMenu(bool completeReset);
 
 	/**
-	 * Get the first menu item in the linked list that is being rendered
+	 * @return the first menu item in the linked list that is being rendered
 	 */
 	MenuItem* getCurrentMenu() { return navigator.getCurrentRoot(); }
 
+    /**
+     * @return the submenu for the currently on display menu. If root is on display it will be nullptr.
+     */
 	MenuItem* getCurrentSubMenu() { return navigator.getCurrentSubMenu(); }
 
+    /**
+     * @return the underlying navigation store that manages navigation activity for this menu manager.
+     */
+    tcnav::MenuNavigationStore& getNavigationStore() { return navigator; }
+
 	/**
-	 * Get the parent of the current menu clearing all active flags too
+	 * @return the parent of the current menu clearing all active flags too
 	 */
 	MenuItem* getParentAndReset();
 
 	/**
-	 * returns the range of the encoder or other device that is providing the
+	 * @return the range of the encoder or other device that is providing the
 	 * equivalent function as the encoder.
 	 */
 	int getCurrentRangeValue() {
@@ -423,7 +431,12 @@ public:
 	 */
 	SecuredMenuPopup* secureMenuInstance();
 
-	void stopEditingCurrentItem(bool checkMultiPart);
+    /**
+     * Stop editing the current item, if doMultiPartNext is true and we are editing a multi part field , then this will
+     * instead move editing to the next part. Otherwise, editing will end.
+     * @param checkMultiPart true to move to the next on multipart instead of ending completely
+     */
+	void stopEditingCurrentItem(bool doMultiPartNext);
 
 	/**
 	 * Adds a menu item into the tree directly after the existing item provided. Never add an item that's already in
@@ -453,11 +466,26 @@ public:
      */
     void recalculateListIfOnDisplay(RuntimeMenuItem* runtimeItem);
 
+    /**
+     * This sets rendering hints, so that the renderer knows that something is being edited. When the rendering hints
+     * are set, they refer to the item that is currently being edited.
+     * @param hint the type of edit taking place
+     * @param start the starting point within the text
+     * @param end the ending point within the text
+     */
     void setEditorHints(CurrentEditorRenderingHints::EditorRenderingType hint, size_t start=0, size_t end=0);
     const CurrentEditorRenderingHints& getEditorHints() { return renderingHints; }
 
+    /**
+     * Lock the editor hints such that nobody can change them, useful for complex editing where more than one field is
+     * being edited at once.
+     * @param locked true to lock, otherwise false.
+     */
     void setEditorHintsLocked(bool locked);
 
+    /**
+     * Use this with caution. Resets the entire list of observers that have previously been registered.
+     */
     void resetObservers();
 
 protected:

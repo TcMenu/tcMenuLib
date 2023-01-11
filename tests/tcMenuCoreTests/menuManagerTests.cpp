@@ -12,14 +12,53 @@ extern MockEepromAbstraction eeprom;
 
 const char szCompareData[] = "123456789";
 
-test(saveAndLoadFromMenu) {
+test(saveAndLoadFromMenuSized) {
+    switches.initialise(&mockIo, true);
+    setSizeBasedEEPROMStorageEnabled(true);
+    menuMgr.initForUpDownOk(&noRenderer, &textMenuItem1, 0, 1, 2);
+
+    eeprom.write16(0, 0xfade);
+    eeprom.write16(2, 8); // limit is location 8, shouldn't load past there.
+    eeprom.write16(4, 8);
+    eeprom.write16(6, 2);
+    eeprom.write8(8, 1);
+    eeprom.write16(20, 99);
+    eeprom.write16(34, 99);
+    menuMgr.load(eeprom);
+
+    // now check the values we've loaded back from eeprom.
+    assertEquals((int)menuAnalog2.getCurrentValue(), 8);
+    assertEquals((int)menuEnum1.getCurrentValue(), 2);
+    assertTrue(boolItem1.getBoolean());
+    // these items exceed position 8 in the rom and wont load
+    assertEquals((int)menuAnalog.getCurrentValue(), 0);
+    assertEquals((int)menuSubAnalog.getCurrentValue(), 0);
+    assertEquals((int)menuSubAnalog.getCurrentValue(), 0);
+
+    menuSubAnalog.setCurrentValue(42);
+
+    // save and then make sure the header is right
+    menuMgr.save(eeprom);
+    assertEquals(uint16_t(0xfade), eeprom.read16(0));
+    assertEquals(uint16_t(34), eeprom.read16(2));
+
+    // and now the values
+    assertEquals(eeprom.read16(20), (uint16_t)42);
+    assertEquals(eeprom.read16(4), (uint16_t)8);
+    assertEquals(eeprom.read16(6), (uint16_t)2);
+    assertEquals(eeprom.read8(8), (uint8_t)1);
+    switches.resetAllSwitches();
+}
+
+test(saveAndLoadFromMenuUnsized) {
     // initialise the menu manager and switches with basic configuration
     switches.initialise(&mockIo, true);
+    setSizeBasedEEPROMStorageEnabled(false);
     menuMgr.initForUpDownOk(&noRenderer, &textMenuItem1, 0, 1, 2);
 
     // now set up the eeprom ready to load.
     eeprom.write16(0, 0xfade);
-    eeprom.write16(2, 100);
+    eeprom.write16(34, 100);
     eeprom.write16(4, 8);
     eeprom.write16(6, 2);
     eeprom.write8(8, 1);
@@ -51,7 +90,7 @@ test(saveAndLoadFromMenu) {
 
     // now compare back from eeprom what we saved.
     assertEquals(eeprom.read16(0), (uint16_t)0xfade);
-    assertEquals(eeprom.read16(2), (uint16_t)100);
+    assertEquals(eeprom.read16(34), (uint16_t)100);
     assertEquals(eeprom.read16(20), (uint16_t)50);
     assertEquals(eeprom.read16(4), (uint16_t)8);
     assertEquals(eeprom.read16(6), (uint16_t)2);
@@ -68,6 +107,7 @@ test(saveAndLoadFromMenu) {
 
     // lastly make sure there were no errors in eeprom.
     assertFalse(eeprom.hasErrorOccurred());
+    switches.resetAllSwitches();
 }
 
 class TestMenuMgrObserver : public MenuManagerObserver {
