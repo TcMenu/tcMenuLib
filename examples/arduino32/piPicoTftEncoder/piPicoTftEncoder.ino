@@ -54,12 +54,9 @@ void loop() {
     taskManager.runLoop();
 }
 
-
-void CALLBACK_FUNCTION onRestart(int /*id*/) {
-    serdebugF("Restart selected");
-}
-
-
+/**
+ * An example callback that was registered in the designer UI and generated for us here.
+ */
 void CALLBACK_FUNCTION onVolumeChanged(int /*id*/) {
     serdebugF2("Volume changed ", menuVolume.getCurrentValue());
 }
@@ -190,4 +187,43 @@ int CALLBACK_FUNCTION fnRootListRtCall(RuntimeMenuItem* item, uint8_t row, Rende
     case RENDERFN_EEPROM_POS: return 0xffff; // lists are generally not saved to EEPROM
     default: return false;
     }
+}
+
+//
+// For Item: menuStatusInfo
+//
+// Here we present how to customize a runtime menu item such as a text item, RGB or Large number. You can take full
+// control of the callback, or just override a few of the features to customize it.
+//
+// In this case we just want to override the name at runtime so we can change the name to be a counter of the number of
+// times it is drawn.
+//
+// Steps
+// 1. In the Designer of a text item, select "edit" next to the function callback text field
+// 2. Select the "Runtime RenderFn override implementation" option
+// 3. Once code generation the function is generated (exactly as below)
+//
+int CALLBACK_FUNCTION infoRenderingRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
+    static int staticCounter = 0;
+    // See https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/based-on-runtimemenuitem/
+
+    switch(mode) {
+    case RENDERFN_NAME:
+        strncpy(buffer, "Count ", bufferSize);
+        fastltoa(buffer, staticCounter++, 7, NOT_PADDED, bufferSize);
+        return true; // override title by returning true
+    }
+    return textItemRenderFn(item, row, mode, buffer, bufferSize);
+}
+
+/**
+ * How to change an item based on an Info block, such as Analog, Enum, Boolean, Float, Action and SubMenu.
+ *
+ * This is a standard callback function, it is attached in designer to the restart menu item. Here we show how to
+ * rename a menu item that is based on a menu info block.
+ */
+void CALLBACK_FUNCTION onRestart(int /*id*/) {
+    serdebugF("Restart selected");
+    strncpy(minfoStatusRestart.name, "Restarting", NAME_SIZE_T);
+    menuStatusRestart.setChanged(true);
 }

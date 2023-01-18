@@ -23,6 +23,7 @@
 #include <EditableLargeNumberMenuItem.h>
 #include <IoAbstractionWire.h>
 #include <IoAbstraction.h>
+#include <EepromItemStorage.h>
 #include <EepromAbstraction.h>
 #include <RemoteAuthentication.h>
 #include "tcMenuLiquidCrystal.h"
@@ -48,6 +49,7 @@ extern TextMenuItem menuRomChoicesValue;
 extern ScrollChoiceMenuItem menuRomChoicesItemNum;
 extern BackMenuItem menuBackRomChoices;
 extern SubMenuItem menuRomChoices;
+extern TextMenuItem menuAdditionalCustomHex;
 extern BooleanMenuItem menuAdditionalBoolFlagFlag4;
 extern BooleanMenuItem menuAdditionalBoolFlagFlag3;
 extern BooleanMenuItem menuAdditionalBoolFlagFlag2;
@@ -85,6 +87,7 @@ void setupMenu();
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
+int customHexEditorRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
 int fnAdditionalCountListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
 int fnAdditionalNumChoicesRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
 void CALLBACK_FUNCTION onAnalog1(int id);

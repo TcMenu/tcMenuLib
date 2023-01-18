@@ -306,7 +306,9 @@ enum RenderFnMode : uint8_t {
 	/** Gets the range zero based, for this part - used only in editable mode, buffer not needed */
 	RENDERFN_GETRANGE,
 	/** Gets the integer value of the current part that is being edited, buffer not needed */
-	RENDERFN_GETPART
+	RENDERFN_GETPART,
+    /** Sets the value at a given position based on a keyboard press, only currently used by text controls */
+    RENDERFN_SET_TEXT_VALUE
 };
 
 // forward reference

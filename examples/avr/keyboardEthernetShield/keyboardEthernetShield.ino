@@ -309,3 +309,51 @@ void CALLBACK_FUNCTION onTakeOverDisplay(int /*id*/) {
     counter = 0;
     renderer.takeOverDisplay(myDisplayFunction);
 }
+
+//
+// For Item: menuAdditionalCustomHex
+//
+// Here we present how to customize a runtime menu item such as a text item, RGB or Large number. You can take full
+// control of the callback, or just override a few of the features to customize it.
+//
+// In this case we start with the regular text item and then we restrict the values that can be put into each char down
+// to only 0-9 and A-F. This shows how to quickly provide a simple custom text editor.
+//
+// Steps
+// 1. In the Designer of a text item, select "edit" next to the function callback text field
+// 2. Select the "Runtime RenderFn override implementation" option
+// 3. Once code generation the function is generated (exactly as below)
+//
+int CALLBACK_FUNCTION customHexEditorRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
+    auto textItem = reinterpret_cast<TextMenuItem*>(item);
+    // See https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/based-on-runtimemenuitem/
+    switch(mode) {
+        case RENDERFN_NAME:
+            return false; // use default
+        case RENDERFN_GETRANGE:
+            return 15; // range is 0..15 - IE '0'-'F'.
+        case RENDERFN_GETPART: {
+            int partVal = textItem->getTextValue()[row - 1];
+            return (partVal >= 65) ? partVal - 55 : partVal - 48;
+        }
+        case RENDERFN_SET_VALUE: {
+            // value is from a rotary encoder or other linear range based input that emulates an encoder. Here we need
+            // to just set the character value that represents the current value.
+            char val = buffer[0];
+            textItem->setCharValue(row - 1, val > 10 ? char(val + 55) : char(val + 48));
+            return true;
+        }
+        case RENDERFN_SET_TEXT_VALUE: {
+            // value is from a keyboard and in this case the actual character to store is passed in, we validate it
+            // against our allowed "hex" characters, returning false prevents the keyboard input being accepted.
+            char val = buffer[0];
+            if ((val >= '0' && val <= '9') || (val >= 'A' && val <= 'F')) {
+                textItem->setCharValue(row - 1, val);
+            } else {
+                return false;
+            }
+            return true;
+        }
+    }
+    return textItemRenderFn(item, row, mode, buffer, bufferSize);
+}

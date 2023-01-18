@@ -290,15 +290,24 @@ int dateItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char
 
 int backSubItemRenderFn(RuntimeMenuItem* item, uint8_t /*row*/, RenderFnMode mode, char* buffer, int bufferSize) {
 	switch (mode) {
-	    case RENDERFN_NAME:
-	        if(item->getMenuType() == MENUTYPE_SUB_VALUE && ((SubMenuItem*)item)->getNamePGMUnsafe()) {
-	            const char* name = ((SubMenuItem*)item)->getNamePGMUnsafe();
+	    case RENDERFN_NAME: {
+            buffer[0] = 0;
+            const char *name = nullptr;
+            if (item->getMenuType() == MENUTYPE_SUB_VALUE) {
+                name = reinterpret_cast<SubMenuItem*>(item)->getNameUnsafe();
+            } else if (item->getMenuType() == MENUTYPE_BACK_VALUE) {
+                name = reinterpret_cast<BackMenuItem*>(item)->getNameUnsafe();
+            }
+
+            if (name == nullptr) return true;
+
+            if (item->isInfoProgMem()) {
                 safeProgCpy(buffer, name, bufferSize);
-	        }
-	        else {
-	            buffer[0] = 0;
-	        }
-	        return true;
+            } else {
+                strncpy(buffer, name, bufferSize);
+            }
+            return true;
+        }
 	    case RENDERFN_EEPROM_POS:
 	        return -1;
 	    case RENDERFN_VALUE:
@@ -356,9 +365,18 @@ int textItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char
 		int idx = row - 1;
 		return (idx > 1 && txtItem->getTextValue()[idx - 1] == 0) ? 0 : ALLOWABLE_CHARS_ENCODER_SIZE;
 	}
+    case RENDERFN_SET_TEXT_VALUE: {
+        int idx = row - 1;
+        char ch = buffer[0];
+        if (ch == 0) {
+            txtItem->setCharValue(idx, 0);
+            return true;
+        }
+        return txtItem->setCharValue(idx, ch);
+    }
 	case RENDERFN_SET_VALUE: {
 		int idx = row - 1;
-		int offset = buffer[0];
+		char offset = buffer[0];
 		if (offset == 0) {
 			txtItem->setCharValue(idx, 0);
 			return true;
@@ -522,4 +540,21 @@ bool EditableMultiPartMenuItem::valueChanged(int newVal) {
     // we only redraw if either the value has changed, or we are in edit mode, when we always need to draw it on change.
     if(valueUpdated) changeOccurred(false);
     return valueUpdated;
+}
+
+bool TextMenuItem::valueChangedFromKeyboard(char keyPress) {
+    uint8_t sz[2];
+    sz[0] = lowByte(keyPress);
+    sz[1] = 0;
+    bool valueUpdated = renderFn(this, itemPosition, RENDERFN_SET_TEXT_VALUE, reinterpret_cast<char*>(sz), sizeof(sz));
+
+    // we only redraw if either the value has changed, or we are in edit mode, when we always need to draw it on change.
+    if(valueUpdated) changeOccurred(false);
+    return valueUpdated;
+}
+
+BackMenuItem::BackMenuItem(const SubMenuInfo *info, MenuItem *next, boolean infoInPgm)
+        : RuntimeMenuItem(MENUTYPE_BACK_VALUE, nextRandomId(), backSubItemRenderFn, 0, 1, next) {
+    namePtr = info->name;
+    bitWrite(flags, MENUITEM_INFO_STRUCT_PGM, infoInPgm);
 }

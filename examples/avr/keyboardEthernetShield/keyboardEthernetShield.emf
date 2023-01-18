@@ -15,7 +15,8 @@
         "eepromAddress": 8,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -34,7 +35,8 @@
         "functionName": "onAnalog1",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -48,7 +50,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": false
+        "visible": false,
+        "staticDataInRAM": false
       }
     },
     {
@@ -67,7 +70,8 @@
         "functionName": "onInteger",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -85,7 +89,8 @@
         "eepromAddress": 28,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -101,7 +106,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -120,7 +126,8 @@
         "functionName": "onFiths",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -140,7 +147,8 @@
         "eepromAddress": 26,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -154,7 +162,8 @@
         "functionName": "onTakeOverDisplay",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -167,7 +176,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": true,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -183,7 +193,8 @@
         "functionName": "onChangePin",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -198,7 +209,8 @@
         "eepromAddress": 12,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -213,7 +225,8 @@
         "eepromAddress": 16,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -226,7 +239,8 @@
         "functionName": "onSaveToEeprom",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -240,7 +254,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": true,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -254,7 +269,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": true,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -267,7 +283,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -281,7 +298,8 @@
         "eepromAddress": 34,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -299,7 +317,8 @@
         "eepromAddress": 30,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -316,7 +335,8 @@
         "eepromAddress": 32,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -330,7 +350,8 @@
         "functionName": "",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -344,7 +365,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -359,7 +381,8 @@
         "eepromAddress": 38,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -374,7 +397,8 @@
         "eepromAddress": 39,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -389,7 +413,8 @@
         "eepromAddress": 40,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -404,7 +429,26 @@
         "eepromAddress": 41,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 14,
+      "type": "textItem",
+      "defaultValue": "",
+      "item": {
+        "textLength": 4,
+        "itemType": "PLAIN_TEXT",
+        "name": "Custom Hex",
+        "variableName": "AdditionalCustomHex",
+        "id": 32,
+        "eepromAddress": -1,
+        "functionName": "customHexEditorRtCall",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -417,7 +461,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -436,7 +481,8 @@
         "functionName": "onItemChange",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -451,7 +497,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -464,7 +511,8 @@
         "functionName": "onSaveValue",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     }
   ],
@@ -744,6 +792,7 @@
     "namingRecursive": true,
     "saveToSrc": false,
     "useCppMain": false,
+    "usingSizedEEPROMStorage": false,
     "eepromDefinition": "avr:",
     "authenticatorDefinition": "rom:100:6",
     "projectIoExpanders": [

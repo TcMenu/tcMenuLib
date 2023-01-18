@@ -34,56 +34,54 @@ TagValueRemoteServerConnection ethernetConnection2(ethernetTransport2, ethernetI
 
 // Global Menu Item declarations
 const PROGMEM AnyMenuInfo minfoRomChoicesSave = { "Save", 23, 0xffff, 0, onSaveValue };
-ActionMenuItem menuRomChoicesSave(&minfoRomChoicesSave, NULL);
+ActionMenuItem menuRomChoicesSave(&minfoRomChoicesSave, NULL, INFO_LOCATION_PGM);
 RENDERING_CALLBACK_NAME_INVOKE(fnRomChoicesValueRtCall, textItemRenderFn, "Value", -1, NO_CALLBACK)
 TextMenuItem menuRomChoicesValue(fnRomChoicesValueRtCall, "", 22, 10, &menuRomChoicesSave);
 extern char romSpaceNames[];
 RENDERING_CALLBACK_NAME_INVOKE(fnRomChoicesItemNumRtCall, enumItemRenderFn, "Item Num", -1, onItemChange)
 ScrollChoiceMenuItem menuRomChoicesItemNum(21, fnRomChoicesItemNumRtCall, 0, romSpaceNames, 7, 10, &menuRomChoicesValue);
-RENDERING_CALLBACK_NAME_INVOKE(fnRomChoicesRtCall, backSubItemRenderFn, "Rom Choices", -1, NO_CALLBACK)
 const PROGMEM SubMenuInfo minfoRomChoices = { "Rom Choices", 20, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackRomChoices(fnRomChoicesRtCall, &menuRomChoicesItemNum);
-SubMenuItem menuRomChoices(&minfoRomChoices, &menuBackRomChoices, NULL);
+BackMenuItem menuBackRomChoices(&minfoRomChoices, &menuRomChoicesItemNum, INFO_LOCATION_PGM);
+SubMenuItem menuRomChoices(&minfoRomChoices, &menuBackRomChoices, NULL, INFO_LOCATION_PGM);
+RENDERING_CALLBACK_NAME_OVERRIDDEN(fnAdditionalCustomHexRtCall, customHexEditorRtCall, "Custom Hex", -1)
+TextMenuItem menuAdditionalCustomHex(fnAdditionalCustomHexRtCall, "", 32, 4, NULL);
 const PROGMEM BooleanMenuInfo minfoAdditionalBoolFlagFlag4 = { "Flag4", 28, 41, 1, NO_CALLBACK, NAMING_CHECKBOX };
-BooleanMenuItem menuAdditionalBoolFlagFlag4(&minfoAdditionalBoolFlagFlag4, false, NULL);
+BooleanMenuItem menuAdditionalBoolFlagFlag4(&minfoAdditionalBoolFlagFlag4, false, NULL, INFO_LOCATION_PGM);
 const PROGMEM BooleanMenuInfo minfoAdditionalBoolFlagFlag3 = { "Flag3", 27, 40, 1, NO_CALLBACK, NAMING_CHECKBOX };
-BooleanMenuItem menuAdditionalBoolFlagFlag3(&minfoAdditionalBoolFlagFlag3, false, &menuAdditionalBoolFlagFlag4);
+BooleanMenuItem menuAdditionalBoolFlagFlag3(&minfoAdditionalBoolFlagFlag3, false, &menuAdditionalBoolFlagFlag4, INFO_LOCATION_PGM);
 const PROGMEM BooleanMenuInfo minfoAdditionalBoolFlagFlag2 = { "Flag2", 26, 39, 1, NO_CALLBACK, NAMING_ON_OFF };
-BooleanMenuItem menuAdditionalBoolFlagFlag2(&minfoAdditionalBoolFlagFlag2, false, &menuAdditionalBoolFlagFlag3);
+BooleanMenuItem menuAdditionalBoolFlagFlag2(&minfoAdditionalBoolFlagFlag2, false, &menuAdditionalBoolFlagFlag3, INFO_LOCATION_PGM);
 const PROGMEM BooleanMenuInfo minfoAdditionalBoolFlagFlag1 = { "Flag1", 25, 38, 1, NO_CALLBACK, NAMING_ON_OFF };
-BooleanMenuItem menuAdditionalBoolFlagFlag1(&minfoAdditionalBoolFlagFlag1, false, &menuAdditionalBoolFlagFlag2);
-RENDERING_CALLBACK_NAME_INVOKE(fnAdditionalBoolFlagRtCall, backSubItemRenderFn, "Bool Flag", -1, NO_CALLBACK)
+BooleanMenuItem menuAdditionalBoolFlagFlag1(&minfoAdditionalBoolFlagFlag1, false, &menuAdditionalBoolFlagFlag2, INFO_LOCATION_PGM);
 const PROGMEM SubMenuInfo minfoAdditionalBoolFlag = { "Bool Flag", 24, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackAdditionalBoolFlag(fnAdditionalBoolFlagRtCall, &menuAdditionalBoolFlagFlag1);
-SubMenuItem menuAdditionalBoolFlag(&minfoAdditionalBoolFlag, &menuBackAdditionalBoolFlag, NULL);
+BackMenuItem menuBackAdditionalBoolFlag(&minfoAdditionalBoolFlag, &menuAdditionalBoolFlagFlag1, INFO_LOCATION_PGM);
+SubMenuItem menuAdditionalBoolFlag(&minfoAdditionalBoolFlag, &menuBackAdditionalBoolFlag, &menuAdditionalCustomHex, INFO_LOCATION_PGM);
 ListRuntimeMenuItem menuAdditionalCountList(18, 20, fnAdditionalCountListRtCall, &menuAdditionalBoolFlag);
 ScrollChoiceMenuItem menuAdditionalNumChoices(17, fnAdditionalNumChoicesRtCall, 0, 30, &menuAdditionalCountList);
 RENDERING_CALLBACK_NAME_INVOKE(fnAdditionalRomChoiceRtCall, enumItemRenderFn, "Rom Choice", 30, NO_CALLBACK)
 ScrollChoiceMenuItem menuAdditionalRomChoice(19, fnAdditionalRomChoiceRtCall, 0, 500, 10, 9, &menuAdditionalNumChoices);
 RENDERING_CALLBACK_NAME_INVOKE(fnAdditionalRGBRtCall, rgbAlphaItemRenderFn, "RGB", 34, NO_CALLBACK)
 Rgb32MenuItem menuAdditionalRGB(fnAdditionalRGBRtCall, RgbColor32(0, 0, 0, 255), 15, true, &menuAdditionalRomChoice);
-RENDERING_CALLBACK_NAME_INVOKE(fnAdditionalRtCall, backSubItemRenderFn, "Additional", -1, NO_CALLBACK)
 const PROGMEM SubMenuInfo minfoAdditional = { "Additional", 14, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackAdditional(fnAdditionalRtCall, &menuAdditionalRGB);
-SubMenuItem menuAdditional(&minfoAdditional, &menuBackAdditional, &menuRomChoices);
+BackMenuItem menuBackAdditional(&minfoAdditional, &menuAdditionalRGB, INFO_LOCATION_PGM);
+SubMenuItem menuAdditional(&minfoAdditional, &menuBackAdditional, &menuRomChoices, INFO_LOCATION_PGM);
 const PROGMEM char pgmStrConnectivityAuthenticatorText[] = { "Authenticator" };
 EepromAuthenticationInfoMenuItem menuConnectivityAuthenticator(pgmStrConnectivityAuthenticatorText, NO_CALLBACK, 30, NULL);
 const PROGMEM char pgmStrConnectivityIoTMonitorText[] = { "IoT Monitor" };
 RemoteMenuItem menuConnectivityIoTMonitor(pgmStrConnectivityIoTMonitorText, 29, &menuConnectivityAuthenticator);
 const PROGMEM AnyMenuInfo minfoConnectivitySaveToEEPROM = { "Save to EEPROM", 10, 0xffff, 0, onSaveToEeprom };
-ActionMenuItem menuConnectivitySaveToEEPROM(&minfoConnectivitySaveToEEPROM, &menuConnectivityIoTMonitor);
+ActionMenuItem menuConnectivitySaveToEEPROM(&minfoConnectivitySaveToEEPROM, &menuConnectivityIoTMonitor, INFO_LOCATION_PGM);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityTextRtCall, textItemRenderFn, "Text", 16, NO_CALLBACK)
 TextMenuItem menuConnectivityText(fnConnectivityTextRtCall, "", 9, 10, &menuConnectivitySaveToEEPROM);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityIpAddressRtCall, ipAddressRenderFn, "IpAddress", 12, NO_CALLBACK)
 IpAddressMenuItem menuConnectivityIpAddress(fnConnectivityIpAddressRtCall, IpAddressStorage(127, 0, 0, 1), 7, &menuConnectivityText);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityChangePinRtCall, textItemRenderFn, "Change Pin", -1, onChangePin)
 TextMenuItem menuConnectivityChangePin(fnConnectivityChangePinRtCall, "", 11, 15, &menuConnectivityIpAddress);
-RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NO_CALLBACK)
 const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 6, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuConnectivityChangePin);
-SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, &menuAdditional);
+BackMenuItem menuBackConnectivity(&minfoConnectivity, &menuConnectivityChangePin, INFO_LOCATION_PGM);
+SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, &menuAdditional, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoTakeDisplay = { "Take display", 31, 0xffff, 0, onTakeOverDisplay };
-ActionMenuItem menuTakeDisplay(&minfoTakeDisplay, &menuConnectivity);
+ActionMenuItem menuTakeDisplay(&minfoTakeDisplay, &menuConnectivity, INFO_LOCATION_PGM);
 const char enumStrFruits_0[] PROGMEM = "Apples";
 const char enumStrFruits_1[] PROGMEM = "Oranges";
 const char enumStrFruits_2[] PROGMEM = "Pears";
@@ -91,31 +89,32 @@ const char enumStrFruits_3[] PROGMEM = "Plums";
 const char enumStrFruits_4[] PROGMEM = "Grapes";
 const char* const enumStrFruits[] PROGMEM  = { enumStrFruits_0, enumStrFruits_1, enumStrFruits_2, enumStrFruits_3, enumStrFruits_4 };
 const PROGMEM EnumMenuInfo minfoFruits = { "Fruits", 8, 26, 4, NO_CALLBACK, enumStrFruits };
-EnumMenuItem menuFruits(&minfoFruits, 0, &menuTakeDisplay);
+EnumMenuItem menuFruits(&minfoFruits, 0, &menuTakeDisplay, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoFiths = { "Fiths", 5, 6, 200, onFiths, 0, 5, "A" };
-AnalogMenuItem menuFiths(&minfoFiths, 0, &menuFruits);
+AnalogMenuItem menuFiths(&minfoFiths, 0, &menuFruits, INFO_LOCATION_PGM);
 RENDERING_CALLBACK_NAME_INVOKE(fnLargeNumRtCall, largeNumItemRenderFn, "Large Num", -1, NO_CALLBACK)
 EditableLargeNumberMenuItem menuLargeNum(fnLargeNumRtCall, LargeFixedNumber(8, 4, 0U, 0U, false), 12, true, &menuFiths);
 const PROGMEM AnalogMenuInfo minfoDecimalTens = { "DecimalTens", 4, 28, 1000, NO_CALLBACK, 0, 10, "V" };
-AnalogMenuItem menuDecimalTens(&minfoDecimalTens, 0, &menuLargeNum);
+AnalogMenuItem menuDecimalTens(&minfoDecimalTens, 0, &menuLargeNum, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoInteger = { "Integer", 3, 4, 1000, onInteger, 100, 1, "" };
-AnalogMenuItem menuInteger(&minfoInteger, 0, &menuDecimalTens);
+AnalogMenuItem menuInteger(&minfoInteger, 0, &menuDecimalTens, INFO_LOCATION_PGM);
 const PROGMEM BooleanMenuInfo minfoHiddenItem = { "Hidden item", 13, 0xffff, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
-BooleanMenuItem menuHiddenItem(&minfoHiddenItem, false, &menuInteger);
+BooleanMenuItem menuHiddenItem(&minfoHiddenItem, false, &menuInteger, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoAnalog1 = { "Analog1", 2, 2, 255, onAnalog1, -180, 2, "dB" };
-AnalogMenuItem menuAnalog1(&minfoAnalog1, 0, &menuHiddenItem);
+AnalogMenuItem menuAnalog1(&minfoAnalog1, 0, &menuHiddenItem, INFO_LOCATION_PGM);
 RENDERING_CALLBACK_NAME_INVOKE(fnTimeRtCall, timeItemRenderFn, "Time", 8, NO_CALLBACK)
 TimeFormattedMenuItem menuTime(fnTimeRtCall, TimeStorage(0, 0, 0, 0), 1, (MultiEditWireType)3, &menuAnalog1);
 
 void setupMenu() {
     // First we set up eeprom and authentication (if needed).
+    setSizeBasedEEPROMStorageEnabled(false);
     menuMgr.setEepromRef(&glAvrRom);
     authManager.initialise(menuMgr.getEepromAbstraction(), 100);
     menuMgr.setAuthenticator(&authManager);
     // Now add any readonly, non-remote and visible flags.
     menuConnectivityAuthenticator.setLocalOnly(true);
-    menuConnectivityIoTMonitor.setLocalOnly(true);
     menuConnectivity.setLocalOnly(true);
+    menuConnectivityIoTMonitor.setLocalOnly(true);
     menuConnectivity.setSecured(true);
     menuHiddenItem.setVisible(false);
 
