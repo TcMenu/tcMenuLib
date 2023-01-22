@@ -40,7 +40,7 @@ You can use the embedCONTROL UI (coming soon), Java Example UI and TcMenu Java A
 If you are manually using tcMenu, without the designer, this page fully documents the types used, along with how to create them. Once you've created a menu structure, at this point you will need to include the right plugins. The plugins are hosted in the main repository and each one is documented to some extent in the second link below:
 
 * [Describing the TcMenu type system](https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-menu-item-types-tutorial/)
-* [The core plugins that you can use](https://github.com/davetcc/tcMenu/tree/master/CoreXmlPlugins)
+* The core plugins that you could base your display, input, and remote facilities on are in the main tcMenu repo.
 
 ## Asking questions
 
