@@ -98,6 +98,7 @@ void IoaTouchScreenCalibrator::renderLoop(unsigned int currentValue, RenderPress
 void IoaTouchScreenCalibrator::giveItBack() {
     renderer->giveBackDisplay();
     renderer->setCustomDrawingHandler(lastDrawing);
+    touchScreen->enableCalibration(true);
     lastDrawing = nullptr;
     if(screenPrep != nullptr) screenPrep(true);
 }
@@ -105,6 +106,7 @@ void IoaTouchScreenCalibrator::giveItBack() {
 void IoaTouchScreenCalibrator::reCalibrateNow() {
     if(screenPrep != nullptr) screenPrep(true);
     lastDrawing = renderer->getCurrentCustomDrawing();
+    touchScreen->enableCalibration(false);
     renderer->setCustomDrawingHandler(this);
     renderer->takeOverDisplay();
 }
