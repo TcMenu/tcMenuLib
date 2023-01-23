@@ -130,7 +130,7 @@ void BaseMenuRenderer::countdownToDefaulting() {
 }
 
 void BaseMenuRenderer::takeOverDisplay(RendererCallbackFn displayFn) {
-    if(displayFn == nullptr && customDrawing != nullptr) return;
+    if(displayFn == nullptr && customDrawing == nullptr) return;
 	// when we set this, we are stopping tcMenu rendering and letting this take over
 	renderFnPressType = RPRESS_NONE;
     displayTakenMode = displayFn ? TAKEN_OVER_FN : START_CUSTOM_DRAW;

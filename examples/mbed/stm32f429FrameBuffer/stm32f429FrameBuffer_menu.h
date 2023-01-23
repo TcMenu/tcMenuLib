@@ -18,10 +18,12 @@
 #include "BspUserSettings.h"
 #include "tcMenuStChromaArt.h"
 #include <graphics/MenuTouchScreenEncoder.h>
+#include <extras/DrawableTouchCalibrator.h>
 #include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 #include <IoAbstraction.h>
+#include <EepromItemStorage.h>
 #include <mbed/HalStm32EepromAbstraction.h>
 
 // variables we declare that you may need to access
@@ -30,6 +32,7 @@ extern StChromaArtDrawable Drawable;
 extern GraphicsDeviceRenderer renderer;
 extern StBspTouchInterrogator touchInterrogator;
 extern MenuTouchScreenManager touchScreen;
+extern tcextras::IoaTouchScreenCalibrator touchCalibrator;
 extern const UnicodeFont OpenSansCyrillicLatin18[];
 extern const GFXfont RobotoMedium24;
 

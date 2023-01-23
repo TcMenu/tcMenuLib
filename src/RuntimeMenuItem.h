@@ -129,7 +129,7 @@ public:
      * @param next the next item in the linked list
      * @param infoInPgm if the info block is const/PROGMEM: true, RAM: false
      */
-    BackMenuItem(const SubMenuInfo* info, MenuItem* next, boolean infoInPgm);
+    BackMenuItem(const SubMenuInfo* info, MenuItem* next, bool infoInPgm);
 
     /**
      * @return the name pointer or null if not set, could be in progmem.

@@ -12,6 +12,7 @@ using namespace tcgfx;
 using namespace iotouch;
 
 #define TOUCH_BLACK RGB(0,0,0)
+#define TOUCH_WHITE RGB(255, 255, 255)
 #define TOUCH_ORANGE RGB(255, 69, 0)
 #define TOUCH_YELLOW RGB(255, 255, 0)
 
@@ -29,7 +30,6 @@ void IoaTouchScreenCalibrator::started(BaseMenuRenderer *currentRenderer) {
 void IoaTouchScreenCalibrator::renderLoop(unsigned int currentValue, RenderPressMode userClick) {
 
     iotouch::TouchState touchState = touchScreen->getLastTouchState();
-    if(touchState != iotouch::TOUCHED && touchState != iotouch::HELD) return;
 
     drawable->startDraw();
     drawable->setDrawColor(TOUCH_BLACK);
@@ -55,11 +55,12 @@ void IoaTouchScreenCalibrator::renderLoop(unsigned int currentValue, RenderPress
 
     drawable->setDrawColor(TOUCH_YELLOW);
     drawable->drawBox(Coord(0, 0), Coord(buttonSize, buttonSize), true);
-    drawable->drawBox(Coord(dims.x - buttonSize, 0), Coord(buttonSize, buttonSize), true);
-    drawable->drawBox(Coord(dims.x - buttonSize, rightCorner), Coord(buttonSize, buttonSize), true);
+    drawable->drawBox(Coord(rightCorner, 0), Coord(buttonSize, buttonSize), true);
+    drawable->drawBox(Coord(rightCorner, dims.y - buttonSize), Coord(buttonSize, buttonSize), true);
     drawable->setDrawColor(TOUCH_ORANGE);
-    drawable->drawBox(Coord(0, rightCorner), Coord(buttonSize, buttonSize), true);
-    drawable->drawText(Coord(0, dims.y - 5), titleConfig->getFont(), titleConfig->getFontMagnification(), "[X]");
+    drawable->drawBox(Coord(0, dims.y - buttonSize), Coord(buttonSize, buttonSize), true);
+    drawable->setDrawColor(TOUCH_WHITE);
+    drawable->drawText(Coord(0, dims.y - (buttonSize - 6)), titleConfig->getFont(), titleConfig->getFontMagnification(), "[X]");
 
     drawable->setColors(TOUCH_YELLOW, TOUCH_BLACK);
     drawable->drawText(Coord(0, 22), nullptr, 0, sz);

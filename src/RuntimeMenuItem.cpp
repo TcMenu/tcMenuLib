@@ -553,7 +553,7 @@ bool TextMenuItem::valueChangedFromKeyboard(char keyPress) {
     return valueUpdated;
 }
 
-BackMenuItem::BackMenuItem(const SubMenuInfo *info, MenuItem *next, boolean infoInPgm)
+BackMenuItem::BackMenuItem(const SubMenuInfo *info, MenuItem *next, bool infoInPgm)
         : RuntimeMenuItem(MENUTYPE_BACK_VALUE, nextRandomId(), backSubItemRenderFn, 0, 1, next) {
     namePtr = info->name;
     bitWrite(flags, MENUITEM_INFO_STRUCT_PGM, infoInPgm);

@@ -70,7 +70,6 @@ namespace tcextras {
             if(!loadCalibration() && presentUiUninitialised) {
                 reCalibrateNow();
             }
-            touchScreen->enableCalibration(true);
         }
 
         /**
