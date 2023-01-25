@@ -13,17 +13,16 @@
 
 #include <Arduino.h>
 #include <tcMenu.h>
-#include <tcUnicodeHelper.h>
 #include "tcMenuAdaFruitGfx.h"
 #include <ScrollChoiceMenuItem.h>
 #include <IoAbstraction.h>
+#include <EepromItemStorage.h>
 
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
 extern Adafruit_ILI9341 gfx;
 extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
-extern const UnicodeFont OpenSansCyrillicLatin18[];
 extern const GFXfont RobotoMedium24;
 
 // Any externals needed by IO expanders, EEPROMs etc

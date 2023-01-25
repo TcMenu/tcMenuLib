@@ -19,7 +19,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -34,7 +35,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -52,7 +54,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -67,7 +70,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -81,7 +85,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -95,7 +100,8 @@
         "functionName": "onSettingsAction",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -110,7 +116,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     }
   ],
@@ -238,7 +245,7 @@
       },
       {
         "name": "ITEM_FONT",
-        "latestValue": "ada:OpenSansCyrillicLatin18,0",
+        "latestValue": "ada:RobotoMedium24,1",
         "subsystem": "THEME"
       },
       {
@@ -258,7 +265,7 @@
       },
       {
         "name": "USE_TC_UNICODE",
-        "latestValue": "true",
+        "latestValue": "false",
         "subsystem": "THEME"
       },
       {
@@ -275,6 +282,7 @@
     "namingRecursive": true,
     "saveToSrc": false,
     "useCppMain": false,
+    "usingSizedEEPROMStorage": false,
     "eepromDefinition": "",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
