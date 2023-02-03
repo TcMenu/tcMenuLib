@@ -57,6 +57,8 @@ extern SubMenuItem menuSamples;
 extern BooleanMenuItem menuConnectivityEnableUSB;
 extern BackMenuItem menuBackConnectivity;
 extern SubMenuItem menuConnectivity;
+extern ActionMenuItem menuSettingsCalibrateNow;
+extern BooleanMenuItem menuSettingsTSCalibration;
 extern TimeFormattedMenuItem menuSettingsRunDuration;
 extern AnalogMenuItem menuSettingsTargetSpeed;
 extern BackMenuItem menuBackSettings;
@@ -72,7 +74,9 @@ void setupMenu();
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
+void CALLBACK_FUNCTION onCalibrateScreen(int id);
 void CALLBACK_FUNCTION onPresentDialog(int id);
 void CALLBACK_FUNCTION onTargetChanged(int id);
+void CALLBACK_FUNCTION onTouchCalibration(int id);
 
 #endif // MENU_GENERATED_CODE_H

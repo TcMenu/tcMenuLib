@@ -23,10 +23,11 @@ void setup() {
      * at their defaults. The UI will then present in the native format, and record the ranges, then once dismissed the
      * function is called again, here you should reapply any required settings and if need be to a commit on the EEPROM.
      */
-    touchCalibrator.initCalibration([](bool finished) {
+    touchCalibrator.initCalibration([](bool starting) {
         serlogF2(SER_DEBUG, "Calibration FN done=", finished);
-        if(finished) {
+        if(!starting) {
             reinterpret_cast<HalStm32EepromAbstraction*>(menuMgr.getEepromAbstraction())->commit();
+            menuSettingsTSCalibration.setBoolean(true);
         }
     }, true);
 
@@ -66,4 +67,15 @@ void CALLBACK_FUNCTION onPresentDialog(int id) {
         dlg->show("More dialogs?", true, onFirstDialogCompleted);
         dlg->copyIntoBuffer("Accept for more");
     });
+}
+
+
+void CALLBACK_FUNCTION onCalibrateScreen(int id) {
+    touchCalibrator.reCalibrateNow();
+}
+
+
+
+void CALLBACK_FUNCTION onTouchCalibration(int id) {
+    touchScreen.enableCalibration(menuSettingsTSCalibration.getBoolean());
 }

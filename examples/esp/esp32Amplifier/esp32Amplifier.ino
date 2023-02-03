@@ -24,7 +24,10 @@
 #include "TestingDialogController.h"
 #include <extras/DrawableTouchCalibrator.h>
 
+#define MENU_USING_CALIBRATION_MGR false
+
 using namespace tcremote;
+using namespace iotouch;
 
 const char pgmVersionHeader[] PROGMEM = "tcMenu Version";
 
@@ -59,10 +62,26 @@ void setup() {
     prepareWifiForUse();
 
     controller.initialise();
+
+#if MENU_USING_CALIBRATION_MGR == true
+    touchCalibrator.initCalibration([](bool isStarting) {
+        static TouchInterrogator::TouchRotation lastRotation = TouchInterrogator::PORTRAIT;
+        if(isStarting) {
+            tft.setRotation(0);
+            lastRotation = touchScreen.getRotation();
+            touchScreen.changeRotation(TouchInterrogator::PORTRAIT);
+        } else {
+            tft.setRotation(1);
+            touchScreen.changeRotation(lastRotation);
+            EEPROM.commit();
+        }
+    }, true);
+
+    // force a recalibration now if uncommented
+    //touchCalibrator.reCalibrateNow();
+#else
     touchScreen.calibrateMinMaxValues(0.250F, 0.890F, 0.09F, 0.88F);
-
-    renderer.setCustomDrawingHandler(new tcextras::TouchScreenCalibrator(&touchScreen, &renderer));
-
+#endif // TC_TFT_ESPI_NEEDS_TOUCH
     // first we get the graphics factory
     auto & factory = renderer.getGraphicsPropertiesFactory();
 

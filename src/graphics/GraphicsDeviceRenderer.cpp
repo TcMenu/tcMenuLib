@@ -366,10 +366,10 @@ namespace tcgfx {
         int maximumSliderArea = size.x - pad.right;
         int filledAreaX = analogRangeToScreen(pItem, maximumSliderArea);
         int outsideAreaX = maximumSliderArea - filledAreaX;
-        auto mainBg = (pItem->isActive() || pItem->isEditing()) ? propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND) : props->getColor(ItemDisplayProperties::HIGHLIGHT1);
-        drawable->setDrawColor(mainBg);
+        drawable->setDrawColor(props->getColor(ItemDisplayProperties::HIGHLIGHT1));
         drawable->drawBox(Coord(where.x, where.y), Coord(filledAreaX, size.y), true);
-        drawable->setDrawColor(props->getColor(ItemDisplayProperties::HIGHLIGHT2));
+        auto mainBg = (pItem->isActive() || pItem->isEditing()) ? propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND) : props->getColor(ItemDisplayProperties::BACKGROUND);
+        drawable->setDrawColor(mainBg);
         drawable->drawBox(Coord(where.x + filledAreaX, where.y), Coord(outsideAreaX, size.y), true);
         internalDrawText(entry, Coord(where.x, where.y), Coord(size.x, size.y));
     }

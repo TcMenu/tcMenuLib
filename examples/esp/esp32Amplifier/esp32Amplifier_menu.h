@@ -15,12 +15,14 @@
 #include <tcMenu.h>
 #include "tcMenuTfteSpi.h"
 #include <graphics/MenuTouchScreenEncoder.h>
+#include <extras/DrawableTouchCalibrator.h>
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
 #include <RemoteMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 #include <IoAbstraction.h>
+#include <EepromItemStorage.h>
 #include <ArduinoEEPROMAbstraction.h>
 #include <RemoteAuthentication.h>
 
@@ -32,6 +34,7 @@ extern TfteSpiDrawable tftDrawable;
 extern GraphicsDeviceRenderer renderer;
 extern iotouch::ResistiveTouchInterrogator touchInterrogator;
 extern MenuTouchScreenManager touchScreen;
+extern tcextras::IoaTouchScreenCalibrator touchCalibrator;
 extern WiFiServer server;
 extern EthernetInitialisation ethernetInitialisation;
 

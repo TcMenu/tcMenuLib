@@ -63,8 +63,12 @@ BooleanMenuItem menuConnectivityEnableUSB(&minfoConnectivityEnableUSB, false, NU
 const SubMenuInfo minfoConnectivity = { "Connectivity", 9, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackConnectivity(&minfoConnectivity, &menuConnectivityEnableUSB, INFO_LOCATION_PGM);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, &menuSamples, INFO_LOCATION_PGM);
+const AnyMenuInfo minfoSettingsCalibrateNow = { "Calibrate Now", 24, 0xffff, 0, onCalibrateScreen };
+ActionMenuItem menuSettingsCalibrateNow(&minfoSettingsCalibrateNow, NULL, INFO_LOCATION_PGM);
+const BooleanMenuInfo minfoSettingsTSCalibration = { "TS Calibration", 23, 0xffff, 1, onTouchCalibration, NAMING_CHECKBOX };
+BooleanMenuItem menuSettingsTSCalibration(&minfoSettingsTSCalibration, false, &menuSettingsCalibrateNow, INFO_LOCATION_PGM);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRunDurationRtCall, timeItemRenderFn, "Run duration", 4, NO_CALLBACK)
-TimeFormattedMenuItem menuSettingsRunDuration(fnSettingsRunDurationRtCall, TimeStorage(0, 0, 0, 0), 8, (MultiEditWireType)6, NULL);
+TimeFormattedMenuItem menuSettingsRunDuration(fnSettingsRunDurationRtCall, TimeStorage(0, 0, 0, 0), 8, (MultiEditWireType)6, &menuSettingsTSCalibration);
 const AnalogMenuInfo minfoSettingsTargetSpeed = { "Target speed", 7, 2, 200, onTargetChanged, 0, 100, "mS" };
 AnalogMenuItem menuSettingsTargetSpeed(&minfoSettingsTargetSpeed, 0, &menuSettingsRunDuration, INFO_LOCATION_PGM);
 const SubMenuInfo minfoSettings = { "Settings", 5, 0xffff, 0, NO_CALLBACK };

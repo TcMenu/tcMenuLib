@@ -52,6 +52,7 @@ namespace tcextras {
         int oldX = 0, oldY = 0;
         iotouch::CalibrationHandler calibrationHandler {};
         IoaCalibrationScreenPrep screenPrep = nullptr;
+        bool needsRedrawing = false;
 
     public:
         explicit IoaTouchScreenCalibrator(tcgfx::MenuTouchScreenManager *touchScreen, tcgfx::GraphicsDeviceRenderer* renderer, uint16_t romPos)

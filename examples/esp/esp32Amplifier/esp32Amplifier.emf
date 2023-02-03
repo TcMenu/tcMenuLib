@@ -20,7 +20,8 @@
         "functionName": "onVolumeChanged",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -39,7 +40,8 @@
         "functionName": "onChannelChanged",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -55,7 +57,8 @@
         "functionName": "onAudioDirect",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -71,7 +74,8 @@
         "functionName": "onMuteSound",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -85,7 +89,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -99,7 +104,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -118,7 +124,8 @@
         "functionName": "",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -137,7 +144,8 @@
         "eepromAddress": 9,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -154,7 +162,8 @@
         "functionName": "",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -168,7 +177,8 @@
         "functionName": "onChannelSetttingsUpdate",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -188,7 +198,8 @@
         "functionName": "@warmUpChanged",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -208,7 +219,8 @@
         "functionName": "@valveHeatingChanged",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -222,7 +234,8 @@
         "functionName": "onSaveSettings",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -236,7 +249,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -258,7 +272,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -277,7 +292,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -296,7 +312,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -310,7 +327,8 @@
         "functionName": "onShowDialogs",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -325,7 +343,8 @@
         "functionName": "",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -344,7 +363,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -358,7 +378,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -374,7 +395,8 @@
         "eepromAddress": -1,
         "readOnly": true,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -390,7 +412,8 @@
         "eepromAddress": 17,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -406,7 +429,8 @@
         "eepromAddress": 37,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -420,7 +444,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": true,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -434,7 +459,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": true,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     }
   ],
@@ -471,6 +497,46 @@
         "subsystem": "DISPLAY"
       },
       {
+        "name": "TOUCH_SEPARATOR",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TFT_TOUCH_SCREEN_REQUIRED",
+        "latestValue": "false",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TFT_TOUCH_SCREEN_CALIBRATE",
+        "latestValue": "true",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TOUCH_USE_RAW_TFT_FUNCTION",
+        "latestValue": "true",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TFT_TOUCH_CALIBRATION_STORAGE_LOC",
+        "latestValue": "400",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TFT_TOUCH_ROTATION",
+        "latestValue": "PORTRAIT",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TOUCH_CALIB_WIDTH",
+        "latestValue": "240",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TOUCH_CALIB_HEIGHT",
+        "latestValue": "320",
+        "subsystem": "DISPLAY"
+      },
+      {
         "name": "XPLUS_PIN",
         "latestValue": "2",
         "subsystem": "INPUT"
@@ -493,6 +559,16 @@
       {
         "name": "TOUCH_ROTATION",
         "latestValue": "LANDSCAPE",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "TOUCH_SCREEN_CALIBRATE",
+        "latestValue": "true",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "TOUCH_CALIBRATION_STORAGE_LOC",
+        "latestValue": "400",
         "subsystem": "INPUT"
       },
       {
@@ -559,6 +635,7 @@
     "namingRecursive": true,
     "saveToSrc": false,
     "useCppMain": false,
+    "usingSizedEEPROMStorage": false,
     "eepromDefinition": "eeprom:",
     "authenticatorDefinition": "rom:200:6",
     "projectIoExpanders": [

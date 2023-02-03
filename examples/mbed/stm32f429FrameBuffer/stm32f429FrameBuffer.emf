@@ -113,6 +113,38 @@
       }
     },
     {
+      "parentId": 5,
+      "type": "boolItem",
+      "defaultValue": "false",
+      "item": {
+        "naming": "CHECKBOX",
+        "name": "TS Calibration",
+        "variableName": "SettingsTSCalibration",
+        "id": 23,
+        "eepromAddress": -1,
+        "functionName": "onTouchCalibration",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 5,
+      "type": "actionMenu",
+      "item": {
+        "name": "Calibrate Now",
+        "variableName": "SettingsCalibrateNow",
+        "id": 24,
+        "eepromAddress": -1,
+        "functionName": "onCalibrateScreen",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
       "parentId": 0,
       "type": "subMenu",
       "item": {
@@ -391,13 +423,13 @@
         "subsystem": "DISPLAY"
       },
       {
-        "name": "TOUCH_ROTATION",
-        "latestValue": "PORTRAIT",
+        "name": "TOUCH_SCREEN_CALIBRATE",
+        "latestValue": "true",
         "subsystem": "DISPLAY"
       },
       {
-        "name": "TOUCH_SCREEN_CALIBRATE",
-        "latestValue": "true",
+        "name": "TOUCH_ROTATION",
+        "latestValue": "PORTRAIT",
         "subsystem": "DISPLAY"
       },
       {
