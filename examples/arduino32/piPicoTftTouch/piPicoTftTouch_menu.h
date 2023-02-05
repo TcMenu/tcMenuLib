@@ -16,6 +16,7 @@
 #include <tcUnicodeHelper.h>
 #include "tcMenuTfteSpi.h"
 #include <graphics/MenuTouchScreenEncoder.h>
+#include <extras/DrawableTouchCalibrator.h>
 #include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
@@ -27,6 +28,9 @@ extern const PROGMEM ConnectorLocalInfo applicationInfo;
 extern TFT_eSPI gfx;
 extern TfteSpiDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
+extern iotouch::TftSpiTouchInterrogator touchInterrogator;
+extern MenuTouchScreenManager touchScreen;
+extern tcextras::IoaTouchScreenCalibrator touchCalibrator;
 extern const UnicodeFont OpenSansCyrillicLatin18[];
 extern const GFXfont RobotoMedium24;
 

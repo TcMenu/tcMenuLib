@@ -9,7 +9,7 @@
  */
 
 #include <tcMenu.h>
-#include "piPicoTftEncoder_menu.h"
+#include "piPicoTftTouch_menu.h"
 #include "ThemeCoolBlueModern.h"
 #include <Fonts/OpenSansCyrillicLatin18.h>
 #include <Fonts/RobotoMedium24.h>
@@ -20,6 +20,10 @@ const  ConnectorLocalInfo applicationInfo = { "RPiPico Tft Encoder", "0c6972c4-a
 TFT_eSPI gfx;
 TfteSpiDrawable gfxDrawable(&gfx, 45);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
+iotouch::TftSpiTouchInterrogator touchInterrogator(&gfx, 4096, 4096, true);
+iotouch::TouchOrientationSettings touchOrientation(true, false, false);
+MenuTouchScreenManager touchScreen(&touchInterrogator, &renderer, touchOrientation);
+tcextras::IoaTouchScreenCalibrator touchCalibrator(&touchScreen, &renderer, 400);
 
 // Global Menu Item declarations
 ListRuntimeMenuItem menuRootList(17, 0, fnRootListRtCall, NULL);
@@ -80,8 +84,8 @@ void setupMenu() {
     gfx.begin();
     gfx.setRotation(1);
     renderer.setUpdatesPerSecond(15);
-    switches.init(internalDigitalIo(), SWITCHES_POLL_EVERYTHING, true);
-    menuMgr.initForEncoder(&renderer, &menuVolume, 16, 17, 21);
+    touchScreen.start();
+    menuMgr.initWithoutInput(&renderer, &menuVolume);
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
     renderer.setUseSliderForAnalog(true);
     renderer.enableTcUnicode();

@@ -16,6 +16,8 @@
 #include "tcUnicodeHelper.h"
 #include <TFT_eSPI.h>
 
+using namespace iotouch;
+
 TfteSpiDrawable::TfteSpiDrawable(TFT_eSPI *tft, int spriteHeight) : tft(tft), spriteWithConfig(nullptr), spriteHeight(spriteHeight) {}
 
 DeviceDrawable *TfteSpiDrawable::getSubDeviceFor(const Coord &where, const Coord& size, const color_t *palette, int paletteSize) {
@@ -163,3 +165,27 @@ void TftSpriteAndConfig::transaction(bool isStarting, bool redrawNeeded) {
         sprite.pushSprite(where.x, where.y, 0, 0, currentSize.x, currentSize.y);
     }
 }
+
+#if TC_TFT_ESPI_NEEDS_TOUCH == true
+
+TouchState TftSpiTouchInterrogator::internalProcessTouch(float *ptrX, float *ptrY, const TouchOrientationSettings& rotation, const iotouch::CalibrationHandler& calib) {
+
+    uint16_t touchX=0, touchY=0;
+    bool pressed;
+    if(usingRawTouch) {
+        tft->getTouchRaw(&touchX, &touchY);
+        pressed = tft->getTouchRawZ() > 600;
+        *ptrX = calib.calibrateX(float(touchX) / XPT_2046_MAX, rotation.isXInverted());
+        *ptrY = calib.calibrateY(float(touchY) / XPT_2046_MAX, rotation.isYInverted());
+    } else {
+        pressed = tft->getTouch(&touchX, &touchY);
+        *ptrX = calib.calibrateX(float(touchX) / maxWidthDim, rotation.isXInverted());
+        *ptrY = calib.calibrateY(float(touchY) / maxHeightDim, rotation.isYInverted());
+    }
+
+    if(!pressed) return iotouch::NOT_TOUCHED;
+    //serdebugF3("point at ", touchX, touchY);
+
+    return iotouch::TOUCHED;
+}
+#endif // TC_TFT_ESPI_NEEDS_TOUCH == true

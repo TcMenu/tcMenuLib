@@ -105,7 +105,7 @@ namespace tcgfx {
          * @param rotation the rotation of the touch interface
          */
         MenuTouchScreenManager(iotouch::TouchInterrogator* interrogator, BaseGraphicalRenderer* renderer,
-                               iotouch::TouchInterrogator::TouchRotation rotation);
+                               const iotouch::TouchOrientationSettings& rotation);
 
         void sendEvent(float locationX, float locationY, float touchPressure, iotouch::TouchState touched) override;
 

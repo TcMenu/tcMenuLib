@@ -4,7 +4,7 @@
  *
  * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
  */
-#include "piPicoTftEncoder_menu.h"
+#include "piPicoTftTouch_menu.h"
 #include <PlatformDetermination.h>
 #include <IoLogging.h>
 #include <TaskManagerIO.h>

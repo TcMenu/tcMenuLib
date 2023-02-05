@@ -13,7 +13,7 @@ namespace tcgfx {
 
 DialogMultiPartEditor dialogMultiPartEditor;
 
-MenuTouchScreenManager::MenuTouchScreenManager(TouchInterrogator* interrogator, BaseGraphicalRenderer* renderer, iotouch::TouchInterrogator::TouchRotation rotation)
+MenuTouchScreenManager::MenuTouchScreenManager(TouchInterrogator* interrogator, BaseGraphicalRenderer* renderer, const TouchOrientationSettings& rotation)
         : TouchScreenManager(interrogator, rotation),
           currentlySelected(nullptr), localStart(0,0), localSize(0,0), encoder(renderer), renderer(renderer),
           observer(&encoder), lastX(0.0F), lastY(0.0F), currentState(NOT_TOUCHED) {
