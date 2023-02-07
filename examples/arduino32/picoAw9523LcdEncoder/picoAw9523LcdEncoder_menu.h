@@ -18,6 +18,7 @@
 #include <EditableLargeNumberMenuItem.h>
 #include <IoAbstractionWire.h>
 #include <IoAbstraction.h>
+#include <EepromItemStorage.h>
 #include "tcMenuLiquidCrystal.h"
 
 // variables we declare that you may need to access
