@@ -21,6 +21,7 @@
 #include <ScrollChoiceMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
 #include <IoAbstraction.h>
+#include <EepromItemStorage.h>
 #include <mbed/HalStm32EepromAbstraction.h>
 #include <RemoteAuthentication.h>
 

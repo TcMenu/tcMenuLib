@@ -18,6 +18,7 @@
 #include "ssd1306asciiRenderer.h"
 #include <JoystickSwitchInput.h>
 #include <IoAbstraction.h>
+#include <EepromItemStorage.h>
 #include <EepromAbstraction.h>
 
 // variables we declare that you may need to access

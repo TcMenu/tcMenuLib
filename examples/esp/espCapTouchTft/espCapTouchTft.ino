@@ -21,6 +21,8 @@
 
 #define START_CALIBRATION_FOR_TOUCH true
 
+using namespace iotouch;
+
 void setup() {
     // This example uses both serial and wire, we must start them ob
     Serial.begin(115200);
@@ -39,13 +41,12 @@ void setup() {
 
 #ifdef START_CALIBRATION_FOR_TOUCH
     touchCalibrator.initCalibration([](bool starting) {
-        static iotouch::TouchInterrogator::TouchRotation storedRotation = iotouch::TouchInterrogator::PORTRAIT;
+        static TouchOrientationSettings oldTouchSettings(false, false, false);
         if(starting) {
-            storedRotation = touchScreen.getRotation();
-            touchScreen.changeRotation(iotouch::TouchInterrogator::PORTRAIT_INVERTED);
+            oldTouchSettings = touchScreen.changeOrientation(TouchOrientationSettings(false, true, true));
             gfx.setRotation(0);
         } else {
-            touchScreen.changeRotation(storedRotation);
+            touchScreen.changeOrientation(oldTouchSettings);
             gfx.setRotation(1);
         }
 

@@ -218,6 +218,11 @@ const char pgmQuestionHeader[] PROGMEM = {"Override the title?"};
 const char pgmTitleOverride[] PROGMEM = {"Title Overridden"};
 taskid_t questionTask = TASKMGR_INVALIDID;
 void CALLBACK_FUNCTION onDialogQuestion(int id) {
+    // the question action item is set to have static data in RAM, therefore we can change it at will. Here we show
+    // how to adjust the menu info block at runtime. Be aware that the menu must be marked structurally changed after.
+    strncpy(minfoDialogsQuestion.name, "Questioned", sizeof minfoDialogsQuestion.name);
+    menuMgr.notifyStructureChanged();
+
     // withMenuDialogIfAvailable checks if the dialog can be presented now, and if so will call the function
     // provided with the dialog as the parameter. you then just prepare the dialog to be shown.
     withMenuDialogIfAvailable([] (MenuBasedDialog* dlg) {
@@ -358,4 +363,38 @@ int CALLBACK_FUNCTION fnListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnM
 
 void CALLBACK_FUNCTION onDialogBack(int id) {
     myMgrObserver.setAllowDialogBackAction(menuDialogsDialogBack.getBoolean());
+}
+
+
+// Here we show how to implement a custom text control, in this case we implement it so that it can be used both by
+// rotary encoder and by keyboards, it will allow the user to only enter values between 0 and 7, and hence is an
+// octal text filter.
+int CALLBACK_FUNCTION octalOnlyRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
+    // See https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/based-on-runtimemenuitem/
+    auto textItem = reinterpret_cast<TextMenuItem*>(item);
+    switch(mode) {
+        case RENDERFN_NAME:
+            strncpy(buffer, "Oct", bufferSize);
+            return true; // to override name return true, to use default return false
+        case RENDERFN_GETPART:
+            // this is called to get the current value at a given position, in a way that is suitable for a rotary
+            // encoder to edit. IE a zero based value between 0 and 7.
+            if (row < 1) return 0;
+            return textItem->getTextValue()[row - 1] - '0';
+        case RENDERFN_SET_VALUE:
+            // this is called when a rotary encoder or similar changes value, these are zero based so the value
+            // will be between 0 and 7 and we then simply add '0'.
+            if (row < 1) return false;
+            textItem->setCharValue(row - 1, '0' + *buffer);
+            return true;
+        case RENDERFN_SET_TEXT_VALUE:
+            // this is called by keyboards when a key is pressed in edit mode, the character entered on the
+            // keyboard is provided in the buffer, and it is up to you to validate it, return true if successful
+            // otherwise false
+            if (row < 1 || *buffer < '0' || *buffer > '7') return false;
+            textItem->setCharValue(row - 1, *buffer);
+            return true;
+    }
+    // when we are not handling something, we need to call through to the parent callback
+    return textItemRenderFn(item, row, mode, buffer, bufferSize);
 }

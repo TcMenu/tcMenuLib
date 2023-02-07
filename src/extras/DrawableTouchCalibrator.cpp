@@ -121,6 +121,7 @@ void IoaTouchScreenCalibrator::reCalibrateNow() {
     lastDrawing = renderer->getCurrentCustomDrawing();
     touchScreen->enableCalibration(false);
     renderer->setCustomDrawingHandler(this);
+    calibrationHandler.setCalibrationValues(0.0F, 1.0F, 0.0F, 1.0F);
     renderer->takeOverDisplay();
     serlogF(SER_TCMENU_INFO, "Calibrator UI starting");
 

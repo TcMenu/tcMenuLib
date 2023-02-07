@@ -19,7 +19,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -38,7 +39,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -55,7 +57,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -74,7 +77,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -89,7 +93,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -102,7 +107,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -117,7 +123,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -133,7 +140,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -149,7 +157,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     }
   ],
@@ -183,6 +192,66 @@
       {
         "name": "UPDATES_PER_SEC",
         "latestValue": "15",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TOUCH_SEPARATOR",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TFT_TOUCH_SCREEN_REQUIRED",
+        "latestValue": "false",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TOUCH_CALIB_WIDTH",
+        "latestValue": "240",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TOUCH_CALIB_HEIGHT",
+        "latestValue": "320",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TOUCH_USE_RAW_TFT_FUNCTION",
+        "latestValue": "true",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "ORIENTATION_SEPARATOR",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TFT_TOUCH_SWAP_XY",
+        "latestValue": "false",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TFT_TOUCH_X_INVERTED",
+        "latestValue": "false",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TFT_TOUCH_Y_INVERTED",
+        "latestValue": "false",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "CALIB_SEPARATOR",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TFT_TOUCH_SCREEN_CALIBRATE",
+        "latestValue": "true",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TFT_TOUCH_CALIBRATION_STORAGE_LOC",
+        "latestValue": "400",
         "subsystem": "DISPLAY"
       },
       {
@@ -269,6 +338,7 @@
     "namingRecursive": true,
     "saveToSrc": false,
     "useCppMain": false,
+    "usingSizedEEPROMStorage": false,
     "eepromDefinition": "",
     "authenticatorDefinition": "",
     "projectIoExpanders": [

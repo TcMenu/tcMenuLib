@@ -11,8 +11,6 @@
 #include <tcMenu.h>
 #include "esp8266WifiOled_menu.h"
 #include "ThemeMonoInverse.h"
-#include "Fonts/OpenSans10.h"
-#include "Fonts/RobotoBlack12.h"
 
 // Global variable declarations
 const PROGMEM  ConnectorLocalInfo applicationInfo = { "ESP8266 Greenhouse", "01b9cb76-c108-4be3-a133-6159f8f1c9c1" };
@@ -33,7 +31,7 @@ const char enumStrWiFiMode_0[] PROGMEM = "Station";
 const char enumStrWiFiMode_1[] PROGMEM = "Access Point";
 const char* const enumStrWiFiMode[] PROGMEM  = { enumStrWiFiMode_0, enumStrWiFiMode_1 };
 const PROGMEM EnumMenuInfo minfoWiFiMode = { "WiFi Mode", 19, 0xffff, 1, NO_CALLBACK, enumStrWiFiMode };
-EnumMenuItem menuWiFiMode(&minfoWiFiMode, 0, NULL);
+EnumMenuItem menuWiFiMode(&minfoWiFiMode, 0, NULL, INFO_LOCATION_PGM);
 const PROGMEM char pgmStrAuthenticatorText[] = { "Authenticator" };
 EepromAuthenticationInfoMenuItem menuAuthenticator(pgmStrAuthenticatorText, NO_CALLBACK, 18, &menuWiFiMode);
 const PROGMEM char pgmStrIoTMonitorText[] = { "IoT Monitor" };
@@ -44,46 +42,45 @@ RENDERING_CALLBACK_NAME_INVOKE(fnPwdRtCall, textItemRenderFn, "Pwd", 23, NO_CALL
 TextMenuItem menuPwd(fnPwdRtCall, "", 12, 15, &menuIpAddress);
 RENDERING_CALLBACK_NAME_INVOKE(fnSSIDRtCall, textItemRenderFn, "SSID", 8, NO_CALLBACK)
 TextMenuItem menuSSID(fnSSIDRtCall, "", 11, 15, &menuPwd);
-RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NO_CALLBACK)
 const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 9, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuSSID);
-SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL);
+BackMenuItem menuBackConnectivity(&minfoConnectivity, &menuSSID, INFO_LOCATION_PGM);
+SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoLoadFiles = { "Load Files", 15, 0xffff, 0, onLoadFiles };
-ActionMenuItem menuLoadFiles(&minfoLoadFiles, &menuConnectivity);
+ActionMenuItem menuLoadFiles(&minfoLoadFiles, &menuConnectivity, INFO_LOCATION_PGM);
 extern char fileChoicesArray[];
 RENDERING_CALLBACK_NAME_INVOKE(fnFileRtCall, enumItemRenderFn, "File", -1, onFileChoice)
 ScrollChoiceMenuItem menuFile(14, fnFileRtCall, 0, fileChoicesArray, 10, 1, &menuLoadFiles);
 const PROGMEM BooleanMenuInfo minfoSecretEntry = { "Secret Entry", 13, 0xffff, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
-BooleanMenuItem menuSecretEntry(&minfoSecretEntry, false, &menuFile);
+BooleanMenuItem menuSecretEntry(&minfoSecretEntry, false, &menuFile, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoSaveAll = { "Save All", 8, 0xffff, 0, onSaveAll };
-ActionMenuItem menuSaveAll(&minfoSaveAll, &menuSecretEntry);
+ActionMenuItem menuSaveAll(&minfoSaveAll, &menuSecretEntry, INFO_LOCATION_PGM);
 const char enumStrWinOpening_0[] PROGMEM = "NARROW";
 const char enumStrWinOpening_1[] PROGMEM = "WIDE";
 const char enumStrWinOpening_2[] PROGMEM = "CLOSED";
 const char* const enumStrWinOpening[] PROGMEM  = { enumStrWinOpening_0, enumStrWinOpening_1, enumStrWinOpening_2 };
 const PROGMEM EnumMenuInfo minfoWinOpening = { "Win Opening", 7, 6, 2, onWindowOpening, enumStrWinOpening };
-EnumMenuItem menuWinOpening(&minfoWinOpening, 0, &menuSaveAll);
+EnumMenuItem menuWinOpening(&minfoWinOpening, 0, &menuSaveAll, INFO_LOCATION_PGM);
 const char enumStrHeaterPower_0[] PROGMEM = "LOW";
 const char enumStrHeaterPower_1[] PROGMEM = "MEDIUM";
 const char enumStrHeaterPower_2[] PROGMEM = "HIGH";
 const char* const enumStrHeaterPower[] PROGMEM  = { enumStrHeaterPower_0, enumStrHeaterPower_1, enumStrHeaterPower_2 };
 const PROGMEM EnumMenuInfo minfoHeaterPower = { "Heater Power", 6, 4, 2, onHeaterPower, enumStrHeaterPower };
-EnumMenuItem menuHeaterPower(&minfoHeaterPower, 0, &menuWinOpening);
-RENDERING_CALLBACK_NAME_INVOKE(fnSetupRtCall, backSubItemRenderFn, "Setup", -1, NO_CALLBACK)
+EnumMenuItem menuHeaterPower(&minfoHeaterPower, 0, &menuWinOpening, INFO_LOCATION_PGM);
 const PROGMEM SubMenuInfo minfoSetup = { "Setup", 5, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackSetup(fnSetupRtCall, &menuHeaterPower);
-SubMenuItem menuSetup(&minfoSetup, &menuBackSetup, NULL);
+BackMenuItem menuBackSetup(&minfoSetup, &menuHeaterPower, INFO_LOCATION_PGM);
+SubMenuItem menuSetup(&minfoSetup, &menuBackSetup, NULL, INFO_LOCATION_PGM);
 const PROGMEM BooleanMenuInfo minfoLockDoor = { "Lock Door", 16, 38, 1, onLockDoor, NAMING_YES_NO };
-BooleanMenuItem menuLockDoor(&minfoLockDoor, false, &menuSetup);
+BooleanMenuItem menuLockDoor(&minfoLockDoor, false, &menuSetup, INFO_LOCATION_PGM);
 const PROGMEM BooleanMenuInfo minfoElectricHeater = { "Electric Heater", 4, 3, 1, onElectricHeater, NAMING_ON_OFF };
-BooleanMenuItem menuElectricHeater(&minfoElectricHeater, false, &menuLockDoor);
+BooleanMenuItem menuElectricHeater(&minfoElectricHeater, false, &menuLockDoor, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoCucumberTemp = { "Cucumber Temp", 2, 0xffff, 255, NO_CALLBACK, -20, 4, "C" };
-AnalogMenuItem menuCucumberTemp(&minfoCucumberTemp, 0, &menuElectricHeater);
+AnalogMenuItem menuCucumberTemp(&minfoCucumberTemp, 0, &menuElectricHeater, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoTomatoTemp = { "Tomato Temp", 1, 0xffff, 255, NO_CALLBACK, -20, 4, "C" };
-AnalogMenuItem menuTomatoTemp(&minfoTomatoTemp, 0, &menuCucumberTemp);
+AnalogMenuItem menuTomatoTemp(&minfoTomatoTemp, 0, &menuCucumberTemp, INFO_LOCATION_PGM);
 
 void setupMenu() {
     // First we set up eeprom and authentication (if needed).
+    setSizeBasedEEPROMStorageEnabled(false);
     menuMgr.setEepromRef(&glArduinoEeprom);
     authManager.initialise(menuMgr.getEepromAbstraction(), 100);
     menuMgr.setAuthenticator(&authManager);
@@ -92,8 +89,8 @@ void setupMenu() {
     menuTomatoTemp.setReadOnly(true);
     menuIpAddress.setReadOnly(true);
     menuAuthenticator.setLocalOnly(true);
-    menuSSID.setLocalOnly(true);
     menuPwd.setLocalOnly(true);
+    menuSSID.setLocalOnly(true);
     menuIoTMonitor.setLocalOnly(true);
     menuSecretEntry.setVisible(false);
 
@@ -105,8 +102,7 @@ void setupMenu() {
     remoteServer.addConnection(&ethernetConnection);
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
     renderer.setUseSliderForAnalog(false);
-    renderer.enableTcUnicode();
-    installMonoInverseTitleTheme(renderer, MenuFontDef(&OpenSans10, 0), MenuFontDef(&RobotoBlack12, 1), true);
+    installMonoInverseTitleTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(nullptr, 1), true);
 
     // We have an IoT monitor, register the server
     menuIoTMonitor.setRemoteServer(remoteServer);

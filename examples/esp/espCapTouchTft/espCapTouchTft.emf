@@ -198,26 +198,6 @@
         "subsystem": "DISPLAY"
       },
       {
-        "name": "TFT_TOUCH_SCREEN_CALIBRATE",
-        "latestValue": "true",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "TOUCH_USE_RAW_TFT_FUNCTION",
-        "latestValue": "true",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "TFT_TOUCH_CALIBRATION_STORAGE_LOC",
-        "latestValue": "400",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "TFT_TOUCH_ROTATION",
-        "latestValue": "PORTRAIT",
-        "subsystem": "DISPLAY"
-      },
-      {
         "name": "TOUCH_CALIB_WIDTH",
         "latestValue": "240",
         "subsystem": "DISPLAY"
@@ -228,9 +208,44 @@
         "subsystem": "DISPLAY"
       },
       {
-        "name": "TOUCH_ROTATION",
-        "latestValue": "LANDSCAPE",
-        "subsystem": "INPUT"
+        "name": "TOUCH_USE_RAW_TFT_FUNCTION",
+        "latestValue": "true",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "ORIENTATION_SEPARATOR",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TFT_TOUCH_SWAP_XY",
+        "latestValue": "false",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TFT_TOUCH_X_INVERTED",
+        "latestValue": "false",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TFT_TOUCH_Y_INVERTED",
+        "latestValue": "false",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "CALIB_SEPARATOR",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TFT_TOUCH_SCREEN_CALIBRATE",
+        "latestValue": "true",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TFT_TOUCH_CALIBRATION_STORAGE_LOC",
+        "latestValue": "400",
+        "subsystem": "DISPLAY"
       },
       {
         "name": "TOUCH_LIBRARY",
@@ -245,6 +260,36 @@
       {
         "name": "TOUCH_CS_PIN",
         "latestValue": "9",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "HARDWARE_TOUCH_ROTATION",
+        "latestValue": "0",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ORIENTATION_SEPARATOR",
+        "latestValue": "",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "LIB_TOUCH_SWAP_XY",
+        "latestValue": "true",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "LIB_TOUCH_X_INVERTED",
+        "latestValue": "false",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "LIB_TOUCH_Y_INVERTED",
+        "latestValue": "true",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "CALIB_SEPARATOR",
+        "latestValue": "",
         "subsystem": "INPUT"
       },
       {

@@ -16,6 +16,7 @@
 #include <graphics/GraphicsDeviceRenderer.h>
 #include <TFT_eSPI.h>
 #include <SPI.h>
+#include <ResistiveTouchScreen.h>
 
 #define TFT_SPRITE_BITS 4
 #define SPRITE_PALETTE_SIZE (1 << TFT_SPRITE_BITS)
@@ -75,5 +76,35 @@ public:
     void transaction(bool isStarting, bool redrawNeeded) override;
     color_t getUnderlyingColor(color_t col) override;
 };
+
+#define TC_TFT_ESPI_NEEDS_TOUCH false
+#if TC_TFT_ESPI_NEEDS_TOUCH == true
+
+#define XPT_2046_MAX 4096
+
+namespace iotouch {
+
+    /**
+     * Implements the touch interrogator class, this purely gets the current reading from the device when requested. This
+     * implementation works with the TFT_eSPI touch functions providing tcMenu support for it. It is your responsibility
+     * to have run whatever calibration is needed before calling this function.  The X and Y values to the constructor
+     * are the maximum values that can be returned by calling getTouch.
+     */
+    class TftSpiTouchInterrogator : public iotouch::TouchInterrogator {
+    private:
+        TFT_eSPI* tft;
+        float maxWidthDim;
+        float maxHeightDim;
+        bool usingRawTouch;
+    public:
+        TftSpiTouchInterrogator(TFT_eSPI* tft, uint16_t xMax, uint16_t yMax, bool rawTouch)
+                : tft(tft), maxWidthDim(xMax), maxHeightDim(yMax), usingRawTouch(rawTouch) { }
+
+        iotouch::TouchState internalProcessTouch(float *ptrX, float *ptrY, const TouchOrientationSettings& touchOrientationSettings,
+                                                 const iotouch::CalibrationHandler& calib) override;
+    };
+
+}
+#endif // TC_TFT_ESPI_NEEDS_TOUCH == true
 
 #endif //TCMENU_PLUGIN_TCMENUTFTESPI_H

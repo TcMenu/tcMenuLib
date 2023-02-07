@@ -16,6 +16,11 @@ test(saveAndLoadFromMenuSized) {
     switches.initialise(&mockIo, true);
     setSizeBasedEEPROMStorageEnabled(true);
     menuMgr.initForUpDownOk(&noRenderer, &textMenuItem1, 0, 1, 2);
+    menuAnalog.setCurrentValue(0);
+    menuAnalog2.setCurrentValue(0);
+    menuEnum1.setCurrentValue(0);
+    menuSubAnalog.setCurrentValue(0);
+    menuSubAnalog.setCurrentValue(0);
 
     eeprom.write16(0, 0xfade);
     eeprom.write16(2, 8); // limit is location 8, shouldn't load past there.
@@ -32,7 +37,6 @@ test(saveAndLoadFromMenuSized) {
     assertTrue(boolItem1.getBoolean());
     // these items exceed position 8 in the rom and wont load
     assertEquals((int)menuAnalog.getCurrentValue(), 0);
-    assertEquals((int)menuSubAnalog.getCurrentValue(), 0);
     assertEquals((int)menuSubAnalog.getCurrentValue(), 0);
 
     menuSubAnalog.setCurrentValue(42);

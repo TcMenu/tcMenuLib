@@ -18,6 +18,7 @@
 #include <ScrollChoiceMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
 #include <IoAbstraction.h>
+#include <EepromItemStorage.h>
 #include <ArduinoEEPROMAbstraction.h>
 
 // variables we declare that you may need to access

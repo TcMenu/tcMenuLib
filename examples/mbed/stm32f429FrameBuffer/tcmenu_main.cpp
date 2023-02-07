@@ -24,7 +24,7 @@ void setup() {
      * function is called again, here you should reapply any required settings and if need be to a commit on the EEPROM.
      */
     touchCalibrator.initCalibration([](bool starting) {
-        serlogF2(SER_DEBUG, "Calibration FN done=", finished);
+        serlogF2(SER_DEBUG, "Calibration FN done=", starting);
         if(!starting) {
             reinterpret_cast<HalStm32EepromAbstraction*>(menuMgr.getEepromAbstraction())->commit();
             menuSettingsTSCalibration.setBoolean(true);

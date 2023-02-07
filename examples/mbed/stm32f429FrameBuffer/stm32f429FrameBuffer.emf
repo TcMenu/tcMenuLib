@@ -423,13 +423,33 @@
         "subsystem": "DISPLAY"
       },
       {
-        "name": "TOUCH_SCREEN_CALIBRATE",
-        "latestValue": "true",
+        "name": "ORIENTATION_SEPARATOR",
+        "latestValue": "",
         "subsystem": "DISPLAY"
       },
       {
-        "name": "TOUCH_ROTATION",
-        "latestValue": "PORTRAIT",
+        "name": "TFT_TOUCH_SWAP_XY",
+        "latestValue": "false",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TFT_TOUCH_X_INVERTED",
+        "latestValue": "false",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TFT_TOUCH_Y_INVERTED",
+        "latestValue": "false",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "CALIB_SEPARATOR",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TOUCH_SCREEN_CALIBRATE",
+        "latestValue": "true",
         "subsystem": "DISPLAY"
       },
       {

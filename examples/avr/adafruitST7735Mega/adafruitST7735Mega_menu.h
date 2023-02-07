@@ -13,43 +13,39 @@
 
 #include <Arduino.h>
 #include <tcMenu.h>
-#include <LiquidCrystalIO.h>
-#include "tcMenuLiquidCrystal.h"
-#include <DfRobotInputAbstraction.h>
-#include <ScrollChoiceMenuItem.h>
+#include <tcUnicodeHelper.h>
+#include "tcMenuAdaFruitGfx.h"
 #include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
 #include <IoAbstraction.h>
+#include <IoAbstractionWire.h>
 #include <EepromItemStorage.h>
 
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
-extern LiquidCrystal lcd;
-extern LiquidCrystalRenderer renderer;
+extern Adafruit_ST7735 gfx;
+extern AdafruitDrawable gfxDrawable;
+extern GraphicsDeviceRenderer renderer;
+extern const UnicodeFont OpenSansCyrillicLatin12[];
 
 // Any externals needed by IO expanders, EEPROMs etc
-
+extern IoAbstractionRef ioexp_mcp23017;
 
 // Global Menu Item exports
-extern AnalogMenuItem menuCommits;
-extern ScrollChoiceMenuItem menuChooseItem;
-extern TextMenuItem menuText;
-extern EditableLargeNumberMenuItem menuLgeNum;
-extern BooleanMenuItem menuL2;
-extern BooleanMenuItem menuL1;
-extern BackMenuItem menuBackLEDStates;
-extern SubMenuItem menuLEDStates;
-extern AnalogMenuItem menuValueA0;
+extern FloatMenuItem menuFlt;
+extern ActionMenuItem menuSubPressMe;
+extern BackMenuItem menuBackSub;
+extern SubMenuItem menuSub;
+extern EditableLargeNumberMenuItem menuLge;
+extern BooleanMenuItem menuBool;
+extern AnalogMenuItem menuAnalog;
 
 // Provide a wrapper to get hold of the root menu item and export setupMenu
-inline MenuItem& rootMenuItem() { return menuValueA0; }
+inline MenuItem& rootMenuItem() { return menuAnalog; }
 void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
-int fnChooseItemRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
-void CALLBACK_FUNCTION onLed1(int id);
-void CALLBACK_FUNCTION onLed2(int id);
 
 #endif // MENU_GENERATED_CODE_H

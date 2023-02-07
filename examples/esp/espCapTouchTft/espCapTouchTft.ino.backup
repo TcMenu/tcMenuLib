@@ -19,6 +19,10 @@
 #include <ArduinoEEPROMAbstraction.h>
 #include <tcMenuVersion.h>
 
+#define START_CALIBRATION_FOR_TOUCH true
+
+using namespace iotouch;
+
 void setup() {
     // This example uses both serial and wire, we must start them ob
     Serial.begin(115200);
@@ -34,6 +38,21 @@ void setup() {
     setTitlePressedCallback([](int) {
         showVersionDialog(&applicationInfo);
     });
+
+#ifdef START_CALIBRATION_FOR_TOUCH
+    touchCalibrator.initCalibration([](bool starting) {
+        static TouchOrientationSettings oldTouchSettings(false, false, false);
+        if(starting) {
+            oldTouchSettings = touchScreen.changeOrientation(TouchOrientationSettings(false, true, true));
+            gfx.setRotation(0);
+        } else {
+            touchScreen.changeOrientation(oldTouchSettings);
+            gfx.setRotation(1);
+        }
+
+    }, true);
+#endif
+
 }
 
 void loop() {
@@ -45,11 +64,11 @@ void loop() {
 int CALLBACK_FUNCTION fnNewRuntimeListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
    switch(mode) {
        case RENDERFN_ACTIVATE:
-           // called whenever item is activated.
+           // called whenever an item is activated.
            serlogF2(SER_DEBUG, "List Activate ", row);
            return true;
     case RENDERFN_INVOKE:
-        // called whenever the list is invoked.
+        // called whenever a list item is invoked.
         serlogF2(SER_DEBUG, "List Invoke ", row);
         return true;
     case RENDERFN_NAME:
@@ -74,13 +93,24 @@ int CALLBACK_FUNCTION CustomTextCallbackRtCall(RuntimeMenuItem* item, uint8_t ro
     auto text = static_cast<TextMenuItem *>(item);
     switch(mode) {
     case RENDERFN_NAME:
+        // Here we override the name, when we do so, we return true to indicate that we have overridden the name.
+        // Returning false here indicates that the default name will be used.
         strcpy(buffer, "HexData");
         return true; // override the name
     case RENDERFN_GETRANGE:
-        // we can only edit from 0-9 and A-F, 15 in range
+        // this provides the range of values for the current "row" or index. We can only ever edit from 0-9 and A-F
         return 15;
+    case RENDERFN_GETPART: {
+        // this gets the value for the current character being edited in raw format, suitable for rotary encoders and
+        // other index based editors
+        if(row == 0) return 0;
+        int partVal = text->getTextValue()[row - 1];
+        return (partVal >= 65) ? partVal - 55 : partVal - 48;
+    }
     case RENDERFN_SET_VALUE:
-        // we now work out what character represents the current value from 0..15
+        // This allows us to set a particular char from a rotary encoder, it is zero based between 0 and the value
+        // returned by get range. For keyboards there is a special version that sets the character value as input on
+        // a keyboard. You can decide when implementing if you need to support keyboards.
         if(row == 0) return false;
         if(buffer[0] < 10) text->setCharValue(row - 1, buffer[0] + '0');
         else text->setCharValue(row - 1, buffer[0] + 55);

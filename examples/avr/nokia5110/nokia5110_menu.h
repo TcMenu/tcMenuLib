@@ -13,13 +13,14 @@
 
 #include <Arduino.h>
 #include <tcMenu.h>
-#include "tcMenuAdaFruitGfx.h"
+#include "tcMenuAdaFruitGfxMono.h"
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
 #include <RemoteMenuItem.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 #include <IoAbstraction.h>
+#include <EepromItemStorage.h>
 #include <EepromAbstraction.h>
 #include <RemoteAuthentication.h>
 

@@ -113,8 +113,8 @@ void setupMenu() {
     menuMgr.setAuthenticator(&authManager);
     // Now add any readonly, non-remote and visible flags.
     menuConnectivityAuthenticator.setLocalOnly(true);
-    menuConnectivity.setLocalOnly(true);
     menuConnectivityIoTMonitor.setLocalOnly(true);
+    menuConnectivity.setLocalOnly(true);
     menuConnectivity.setSecured(true);
     menuHiddenItem.setVisible(false);
 

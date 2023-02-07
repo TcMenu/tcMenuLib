@@ -19,26 +19,25 @@ LiquidCrystalRenderer renderer(lcd, 16, 2);
 
 // Global Menu Item declarations
 const PROGMEM AnalogMenuInfo minfoCommits = { "Commits", 7, 0xffff, 65000, NO_CALLBACK, 0, 1, "" };
-AnalogMenuItem menuCommits(&minfoCommits, 0, NULL);
+AnalogMenuItem menuCommits(&minfoCommits, 0, NULL, INFO_LOCATION_PGM);
 ScrollChoiceMenuItem menuChooseItem(8, fnChooseItemRtCall, 0, 20, &menuCommits);
 RENDERING_CALLBACK_NAME_INVOKE(fnTextRtCall, textItemRenderFn, "Text", 4, NO_CALLBACK)
 TextMenuItem menuText(fnTextRtCall, "", 6, 6, &menuChooseItem);
 RENDERING_CALLBACK_NAME_INVOKE(fnLgeNumRtCall, largeNumItemRenderFn, "LgeNum", 10, NO_CALLBACK)
 EditableLargeNumberMenuItem menuLgeNum(fnLgeNumRtCall, LargeFixedNumber(8, 4, 0U, 0U, false), 5, true, &menuText);
 const PROGMEM BooleanMenuInfo minfoL2 = { "L2", 4, 3, 1, onLed2, NAMING_ON_OFF };
-BooleanMenuItem menuL2(&minfoL2, false, NULL);
+BooleanMenuItem menuL2(&minfoL2, false, NULL, INFO_LOCATION_PGM);
 const PROGMEM BooleanMenuInfo minfoL1 = { "L1", 3, 2, 1, onLed1, NAMING_ON_OFF };
-BooleanMenuItem menuL1(&minfoL1, false, &menuL2);
-RENDERING_CALLBACK_NAME_INVOKE(fnLEDStatesRtCall, backSubItemRenderFn, "LED States", -1, NO_CALLBACK)
+BooleanMenuItem menuL1(&minfoL1, false, &menuL2, INFO_LOCATION_PGM);
 const PROGMEM SubMenuInfo minfoLEDStates = { "LED States", 2, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackLEDStates(fnLEDStatesRtCall, &menuL1);
-SubMenuItem menuLEDStates(&minfoLEDStates, &menuBackLEDStates, &menuLgeNum);
+BackMenuItem menuBackLEDStates(&minfoLEDStates, &menuL1, INFO_LOCATION_PGM);
+SubMenuItem menuLEDStates(&minfoLEDStates, &menuBackLEDStates, &menuLgeNum, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoValueA0 = { "Value A0", 1, 0xffff, 1024, NO_CALLBACK, 0, 1, "" };
-AnalogMenuItem menuValueA0(&minfoValueA0, 0, &menuLEDStates);
+AnalogMenuItem menuValueA0(&minfoValueA0, 0, &menuLEDStates, INFO_LOCATION_PGM);
 
 void setupMenu() {
     // First we set up eeprom and authentication (if needed).
-
+    setSizeBasedEEPROMStorageEnabled(false);
     // Now add any readonly, non-remote and visible flags.
     menuValueA0.setReadOnly(true);
     menuCommits.setReadOnly(true);

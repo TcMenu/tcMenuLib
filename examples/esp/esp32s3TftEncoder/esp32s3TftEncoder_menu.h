@@ -15,11 +15,11 @@
 #include <tcMenu.h>
 #include <tcUnicodeHelper.h>
 #include "tcMenuTfteSpi.h"
-#include <graphics/MenuTouchScreenEncoder.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
 #include <IoAbstraction.h>
+#include <EepromItemStorage.h>
 
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;

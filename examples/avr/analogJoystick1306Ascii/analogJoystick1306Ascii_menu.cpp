@@ -21,28 +21,28 @@ AnalogJoystickToButtons joystickIoXAxis(internalAnalogIo(), A1, 0.5);
 
 // Global Menu Item declarations
 const PROGMEM AnyMenuInfo minfoSettingsSaveAll = { "Save All", 7, 0xffff, 0, onSave };
-ActionMenuItem menuSettingsSaveAll(&minfoSettingsSaveAll, NULL);
+ActionMenuItem menuSettingsSaveAll(&minfoSettingsSaveAll, NULL, INFO_LOCATION_PGM);
 const char enumStrSettingsDifficulty_0[] PROGMEM = "Easy";
 const char enumStrSettingsDifficulty_1[] PROGMEM = "Medium";
 const char enumStrSettingsDifficulty_2[] PROGMEM = "Hard";
 const char* const enumStrSettingsDifficulty[] PROGMEM  = { enumStrSettingsDifficulty_0, enumStrSettingsDifficulty_1, enumStrSettingsDifficulty_2 };
 const PROGMEM EnumMenuInfo minfoSettingsDifficulty = { "Difficulty", 6, 6, 2, NO_CALLBACK, enumStrSettingsDifficulty };
-EnumMenuItem menuSettingsDifficulty(&minfoSettingsDifficulty, 0, &menuSettingsSaveAll);
+EnumMenuItem menuSettingsDifficulty(&minfoSettingsDifficulty, 0, &menuSettingsSaveAll, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoSettingsFrameRate = { "Frame Rate", 5, 4, 10, NO_CALLBACK, 0, 1, "fps" };
-AnalogMenuItem menuSettingsFrameRate(&minfoSettingsFrameRate, 5, &menuSettingsDifficulty);
-RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings", -1, NO_CALLBACK)
+AnalogMenuItem menuSettingsFrameRate(&minfoSettingsFrameRate, 5, &menuSettingsDifficulty, INFO_LOCATION_PGM);
 const PROGMEM SubMenuInfo minfoSettings = { "Settings", 4, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackSettings(fnSettingsRtCall, &menuSettingsFrameRate);
-SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, NULL);
+BackMenuItem menuBackSettings(&minfoSettings, &menuSettingsFrameRate, INFO_LOCATION_PGM);
+SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, NULL, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoHighScore = { "High Score", 3, 2, 10000, NO_CALLBACK, 0, 1, "" };
-AnalogMenuItem menuHighScore(&minfoHighScore, 0, &menuSettings);
+AnalogMenuItem menuHighScore(&minfoHighScore, 0, &menuSettings, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoStartGame = { "Start Game", 2, 0xffff, 0, onStartGame };
-ActionMenuItem menuStartGame(&minfoStartGame, &menuHighScore);
+ActionMenuItem menuStartGame(&minfoStartGame, &menuHighScore, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoInstructions = { "Instructions", 1, 0xffff, 0, onInstructions };
-ActionMenuItem menuInstructions(&minfoInstructions, &menuStartGame);
+ActionMenuItem menuInstructions(&minfoInstructions, &menuStartGame, INFO_LOCATION_PGM);
 
 void setupMenu() {
     // First we set up eeprom and authentication (if needed).
+    setSizeBasedEEPROMStorageEnabled(false);
     menuMgr.setEepromRef(&glAvrRom);
     // Now add any readonly, non-remote and visible flags.
     menuHighScore.setReadOnly(true);

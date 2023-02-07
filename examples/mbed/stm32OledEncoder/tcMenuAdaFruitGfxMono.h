@@ -111,6 +111,7 @@ public:
     void drawPixel(uint16_t x, uint16_t y) override;
     Adafruit_GFX* getGfx() { return graphics; }
 protected:
+    explicit AdafruitDrawable() : graphics(nullptr) {}
     void setGraphics(Adafruit_GFX* gfx) { graphics = gfx; }
 
     UnicodeFontHandler *createFontHandler() override;

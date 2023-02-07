@@ -36,60 +36,58 @@ const char enumStrConnectivityWiFiMode_0[] PROGMEM = "Station";
 const char enumStrConnectivityWiFiMode_1[] PROGMEM = "Soft AP";
 const char* const enumStrConnectivityWiFiMode[] PROGMEM  = { enumStrConnectivityWiFiMode_0, enumStrConnectivityWiFiMode_1 };
 const PROGMEM EnumMenuInfo minfoConnectivityWiFiMode = { "WiFi Mode", 18, 64, 1, NO_CALLBACK, enumStrConnectivityWiFiMode };
-EnumMenuItem menuConnectivityWiFiMode(&minfoConnectivityWiFiMode, 0, &menuConnectivityIPAddress);
+EnumMenuItem menuConnectivityWiFiMode(&minfoConnectivityWiFiMode, 0, &menuConnectivityIPAddress, INFO_LOCATION_PGM);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityPasscodeRtCall, textItemRenderFn, "Passcode", 42, NO_CALLBACK)
 TextMenuItem menuConnectivityPasscode(fnConnectivityPasscodeRtCall, "", 17, 22, &menuConnectivityWiFiMode);
 RENDERING_CALLBACK_NAME_INVOKE(fnConnectivitySSIDRtCall, textItemRenderFn, "SSID", 20, NO_CALLBACK)
 TextMenuItem menuConnectivitySSID(fnConnectivitySSIDRtCall, "", 16, 22, &menuConnectivityPasscode);
-RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NO_CALLBACK)
 const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 14, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuConnectivitySSID);
-SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL);
+BackMenuItem menuBackConnectivity(&minfoConnectivity, &menuConnectivitySSID, INFO_LOCATION_PGM);
+SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL, INFO_LOCATION_PGM);
 ListRuntimeMenuItem menuExtrasMyList(13, 0, fnExtrasMyListRtCall, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnExtrasColorRtCall, rgbAlphaItemRenderFn, "Color", 16, NO_CALLBACK)
 Rgb32MenuItem menuExtrasColor(fnExtrasColorRtCall, RgbColor32(0, 0, 0), 12, false, &menuExtrasMyList);
 RENDERING_CALLBACK_NAME_INVOKE(fnExtrasTextRtCall, textItemRenderFn, "Text", 11, NO_CALLBACK)
 TextMenuItem menuExtrasText(fnExtrasTextRtCall, "", 11, 5, &menuExtrasColor);
-RENDERING_CALLBACK_NAME_INVOKE(fnExtrasRtCall, backSubItemRenderFn, "Extras", -1, NO_CALLBACK)
 const PROGMEM SubMenuInfo minfoExtras = { "Extras", 10, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackExtras(fnExtrasRtCall, &menuExtrasText);
-SubMenuItem menuExtras(&minfoExtras, &menuBackExtras, &menuConnectivity);
+BackMenuItem menuBackExtras(&minfoExtras, &menuExtrasText, INFO_LOCATION_PGM);
+SubMenuItem menuExtras(&minfoExtras, &menuBackExtras, &menuConnectivity, INFO_LOCATION_PGM);
 const PROGMEM BooleanMenuInfo minfoSelectMeNewBoolItem = { "New BoolItem", 21, 0xffff, 1, NO_CALLBACK, NAMING_CHECKBOX };
-BooleanMenuItem menuSelectMeNewBoolItem(&minfoSelectMeNewBoolItem, true, NULL);
+BooleanMenuItem menuSelectMeNewBoolItem(&minfoSelectMeNewBoolItem, true, NULL, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoSelectMePressMe = { "Press Me", 9, 0xffff, 0, pressMeActionRun };
-ActionMenuItem menuSelectMePressMe(&minfoSelectMePressMe, &menuSelectMeNewBoolItem);
+ActionMenuItem menuSelectMePressMe(&minfoSelectMePressMe, &menuSelectMeNewBoolItem, INFO_LOCATION_PGM);
 const PROGMEM FloatMenuInfo minfoSelectMeFloat2 = { "Float 2", 8, 0xffff, 3, NO_CALLBACK };
-FloatMenuItem menuSelectMeFloat2(&minfoSelectMeFloat2, 0.0, &menuSelectMePressMe);
+FloatMenuItem menuSelectMeFloat2(&minfoSelectMeFloat2, 0.0, &menuSelectMePressMe, INFO_LOCATION_PGM);
 const PROGMEM FloatMenuInfo minfoSelectMeFloat1 = { "Float 1", 7, 0xffff, 3, NO_CALLBACK };
-FloatMenuItem menuSelectMeFloat1(&minfoSelectMeFloat1, 0.0, &menuSelectMeFloat2);
-RENDERING_CALLBACK_NAME_INVOKE(fnSelectMeRtCall, backSubItemRenderFn, "Select Me", -1, NO_CALLBACK)
+FloatMenuItem menuSelectMeFloat1(&minfoSelectMeFloat1, 0.0, &menuSelectMeFloat2, INFO_LOCATION_PGM);
 const PROGMEM SubMenuInfo minfoSelectMe = { "Select Me", 6, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackSelectMe(fnSelectMeRtCall, &menuSelectMeFloat1);
-SubMenuItem menuSelectMe(&minfoSelectMe, &menuBackSelectMe, &menuExtras);
+BackMenuItem menuBackSelectMe(&minfoSelectMe, &menuSelectMeFloat1, INFO_LOCATION_PGM);
+SubMenuItem menuSelectMe(&minfoSelectMe, &menuBackSelectMe, &menuExtras, INFO_LOCATION_PGM);
 const PROGMEM BooleanMenuInfo minfoDoorOpen = { "Door Open", 5, 10, 1, NO_CALLBACK, NAMING_YES_NO };
-BooleanMenuItem menuDoorOpen(&minfoDoorOpen, false, &menuSelectMe);
+BooleanMenuItem menuDoorOpen(&minfoDoorOpen, false, &menuSelectMe, INFO_LOCATION_PGM);
 const char enumStrFoods_0[] PROGMEM = "Pizza";
 const char enumStrFoods_1[] PROGMEM = "Pasta";
 const char enumStrFoods_2[] PROGMEM = "Salad";
 const char enumStrFoods_3[] PROGMEM = "Pie";
 const char* const enumStrFoods[] PROGMEM  = { enumStrFoods_0, enumStrFoods_1, enumStrFoods_2, enumStrFoods_3 };
 const PROGMEM EnumMenuInfo minfoFoods = { "Foods", 4, 8, 3, NO_CALLBACK, enumStrFoods };
-EnumMenuItem menuFoods(&minfoFoods, 0, &menuDoorOpen);
+EnumMenuItem menuFoods(&minfoFoods, 0, &menuDoorOpen, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoHalves = { "Halves", 3, 6, 200, NO_CALLBACK, 0, 2, "" };
-AnalogMenuItem menuHalves(&minfoHalves, 0, &menuFoods);
+AnalogMenuItem menuHalves(&minfoHalves, 0, &menuFoods, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoDecEdit = { "Dec Edit", 2, 4, 1000, NO_CALLBACK, 0, 10, "oC" };
-AnalogMenuItem menuDecEdit(&minfoDecEdit, 0, &menuHalves);
+AnalogMenuItem menuDecEdit(&minfoDecEdit, 0, &menuHalves, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoIntEdit = { "Int Edit", 1, 2, 100, NO_CALLBACK, 0, 1, "%" };
-AnalogMenuItem menuIntEdit(&minfoIntEdit, 0, &menuDecEdit);
+AnalogMenuItem menuIntEdit(&minfoIntEdit, 0, &menuDecEdit, INFO_LOCATION_PGM);
 
 void setupMenu() {
     // First we set up eeprom and authentication (if needed).
+    setSizeBasedEEPROMStorageEnabled(false);
     menuMgr.setEepromRef(&glArduinoEeprom);
     authManager.initialise(menuMgr.getEepromAbstraction(), 200);
     menuMgr.setAuthenticator(&authManager);
     // Now add any readonly, non-remote and visible flags.
-    menuConnectivityAuthenticator.setLocalOnly(true);
     menuConnectivityIoTMonitor.setLocalOnly(true);
+    menuConnectivityAuthenticator.setLocalOnly(true);
 
     // Code generated by plugins.
     gfx.begin();

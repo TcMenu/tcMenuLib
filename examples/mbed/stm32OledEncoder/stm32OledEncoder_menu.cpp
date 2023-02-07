@@ -28,35 +28,33 @@ TagValueRemoteServerConnection ethernetConnection(ethernetTransport, mbedEthInit
 RENDERING_CALLBACK_NAME_INVOKE(fnEditRtCall, textItemRenderFn, "Edit", -1, NO_CALLBACK)
 TextMenuItem menuEdit(fnEditRtCall, "", 16, 16, NULL);
 const AnalogMenuInfo minfoCommits = { "Commits", 15, 0xffff, 32767, NO_CALLBACK, 0, 1, "" };
-AnalogMenuItem menuCommits(&minfoCommits, 0, &menuEdit);
+AnalogMenuItem menuCommits(&minfoCommits, 0, &menuEdit, INFO_LOCATION_PGM);
 const char pgmStrAuthenticatorText[] = { "Authenticator" };
 EepromAuthenticationInfoMenuItem menuAuthenticator(pgmStrAuthenticatorText, NO_CALLBACK, 19, NULL);
 const char pgmStrIoTMonitorText[] = { "IoT Monitor" };
 RemoteMenuItem menuIoTMonitor(pgmStrIoTMonitorText, 18, &menuAuthenticator);
 RENDERING_CALLBACK_NAME_INVOKE(fnIPRtCall, ipAddressRenderFn, "IP", -1, NO_CALLBACK)
 IpAddressMenuItem menuIP(fnIPRtCall, IpAddressStorage(127, 0, 0, 1), 14, &menuIoTMonitor);
-RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NO_CALLBACK)
 const SubMenuInfo minfoConnectivity = { "Connectivity", 13, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuIP);
-SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, &menuCommits);
+BackMenuItem menuBackConnectivity(&minfoConnectivity, &menuIP, INFO_LOCATION_PGM);
+SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, &menuCommits, INFO_LOCATION_PGM);
 const AnyMenuInfo minfoSaveAll = { "Save All", 17, 0xffff, 0, onSaveAll };
-ActionMenuItem menuSaveAll(&minfoSaveAll, NULL);
+ActionMenuItem menuSaveAll(&minfoSaveAll, NULL, INFO_LOCATION_PGM);
 const FloatMenuInfo minfoAvgTemp = { "Avg Temp", 12, 0xffff, 1, NO_CALLBACK };
-FloatMenuItem menuAvgTemp(&minfoAvgTemp, 0.0, &menuSaveAll);
+FloatMenuItem menuAvgTemp(&minfoAvgTemp, 0.0, &menuSaveAll, INFO_LOCATION_PGM);
 ListRuntimeMenuItem menuCountingList(11, 10, fnCountingListRtCall, &menuAvgTemp);
 extern char choicesItems[];
 RENDERING_CALLBACK_NAME_INVOKE(fnChoicesRtCall, enumItemRenderFn, "Choices", 19, NO_CALLBACK)
 ScrollChoiceMenuItem menuChoices(10, fnChoicesRtCall, 0, choicesItems, 10, 4, &menuCountingList);
-RENDERING_CALLBACK_NAME_INVOKE(fnOtherRtCall, backSubItemRenderFn, "Other", -1, NO_CALLBACK)
 const SubMenuInfo minfoOther = { "Other", 9, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackOther(fnOtherRtCall, &menuChoices);
-SubMenuItem menuOther(&minfoOther, &menuBackOther, &menuConnectivity);
+BackMenuItem menuBackOther(&minfoOther, &menuChoices, INFO_LOCATION_PGM);
+SubMenuItem menuOther(&minfoOther, &menuBackOther, &menuConnectivity, INFO_LOCATION_PGM);
 RENDERING_CALLBACK_NAME_INVOKE(fnRGBRtCall, rgbAlphaItemRenderFn, "RGB", 15, NO_CALLBACK)
 Rgb32MenuItem menuRGB(fnRGBRtCall, RgbColor32(0, 0, 0, 255), 8, true, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnFrequencyRtCall, largeNumItemRenderFn, "Frequency", 7, onFrequencyChanged)
 EditableLargeNumberMenuItem menuFrequency(fnFrequencyRtCall, LargeFixedNumber(8, 0, 0U, 0U, false), 7, true, &menuRGB);
 const BooleanMenuInfo minfoPower = { "Power", 6, 6, 1, NO_CALLBACK, NAMING_ON_OFF };
-BooleanMenuItem menuPower(&minfoPower, false, &menuFrequency);
+BooleanMenuItem menuPower(&minfoPower, false, &menuFrequency, INFO_LOCATION_PGM);
 const char enumStrFoods_0[] = "Salad";
 const char enumStrFoods_1[] = "Pasta";
 const char enumStrFoods_2[] = "Pizza";
@@ -64,13 +62,12 @@ const char enumStrFoods_3[] = "Casserole";
 const char enumStrFoods_4[] = "Soup";
 const char* const enumStrFoods[]  = { enumStrFoods_0, enumStrFoods_1, enumStrFoods_2, enumStrFoods_3, enumStrFoods_4 };
 const EnumMenuInfo minfoFoods = { "Foods", 5, 4, 4, onFoodChange, enumStrFoods };
-EnumMenuItem menuFoods(&minfoFoods, 0, &menuPower);
+EnumMenuItem menuFoods(&minfoFoods, 0, &menuPower, INFO_LOCATION_PGM);
 const AnalogMenuInfo minfoTenths = { "Tenths", 4, 2, 1000, onTenthsChaned, 0, 10, "tn" };
-AnalogMenuItem menuTenths(&minfoTenths, 0, &menuFoods);
-RENDERING_CALLBACK_NAME_INVOKE(fnEditingRtCall, backSubItemRenderFn, "Editing", -1, NO_CALLBACK)
+AnalogMenuItem menuTenths(&minfoTenths, 0, &menuFoods, INFO_LOCATION_PGM);
 const SubMenuInfo minfoEditing = { "Editing", 3, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackEditing(fnEditingRtCall, &menuTenths);
-SubMenuItem menuEditing(&minfoEditing, &menuBackEditing, &menuOther);
+BackMenuItem menuBackEditing(&minfoEditing, &menuTenths, INFO_LOCATION_PGM);
+SubMenuItem menuEditing(&minfoEditing, &menuBackEditing, &menuOther, INFO_LOCATION_PGM);
 RENDERING_CALLBACK_NAME_INVOKE(fnRTCTimeRtCall, timeItemRenderFn, "RTCTime", -1, NO_CALLBACK)
 TimeFormattedMenuItem menuRTCTime(fnRTCTimeRtCall, TimeStorage(0, 0, 0, 0), 2, (MultiEditWireType)3, &menuEditing);
 RENDERING_CALLBACK_NAME_INVOKE(fnRTCDateRtCall, dateItemRenderFn, "RTCDate", -1, NO_CALLBACK)
@@ -78,16 +75,17 @@ DateFormattedMenuItem menuRTCDate(fnRTCDateRtCall, DateStorage(1, 1, 2020), 1, &
 
 void setupMenu() {
     // First we set up eeprom and authentication (if needed).
+    setSizeBasedEEPROMStorageEnabled(false);
     glBspRom.initialise(0);
     menuMgr.setEepromRef(&glBspRom);
     authManager.initialise(menuMgr.getEepromAbstraction(), 100);
     menuMgr.setAuthenticator(&authManager);
     // Now add any readonly, non-remote and visible flags.
+    menuEdit.setReadOnly(true);
     menuCommits.setReadOnly(true);
     menuIP.setReadOnly(true);
-    menuEdit.setReadOnly(true);
-    menuAuthenticator.setLocalOnly(true);
     menuIoTMonitor.setLocalOnly(true);
+    menuAuthenticator.setLocalOnly(true);
 
     // Code generated by plugins.
     gfx.setRotation(0);

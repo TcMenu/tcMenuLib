@@ -18,8 +18,9 @@
 #include <tcMenuKeyboard.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
-#include <IoAbstractionWire.h>
 #include <IoAbstraction.h>
+#include <IoAbstractionWire.h>
+#include <EepromItemStorage.h>
 
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
@@ -34,6 +35,7 @@ extern const UnicodeFont OpenSansCyrillicLatin12[];
 extern IoAbstractionRef ioexp_io23017;
 
 // Global Menu Item exports
+extern TextMenuItem menuRuntimesOctal;
 extern IpAddressMenuItem menuIpItem;
 extern TextMenuItem menuTextItem;
 extern BackMenuItem menuBackRuntimes;
@@ -46,6 +48,7 @@ extern SubMenuItem menuDialogsBlockedSub;
 extern BooleanMenuItem menuDialogsDialogBack;
 extern ActionMenuItem menuDialogsController;
 extern ActionMenuItem menuDialogsInformation;
+extern AnyMenuInfo minfoDialogsQuestion;
 extern ActionMenuItem menuDialogsQuestion;
 extern BackMenuItem menuBackDialogs;
 extern SubMenuItem menuDialogs;
@@ -68,6 +71,7 @@ void setupMenu();
 #define CALLBACK_FUNCTION
 
 int fnListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
+int octalOnlyRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
 void CALLBACK_FUNCTION onDialogBack(int id);
 void CALLBACK_FUNCTION onDialogController(int id);
 void CALLBACK_FUNCTION onDialogInfo(int id);

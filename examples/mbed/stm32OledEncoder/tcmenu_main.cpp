@@ -88,14 +88,7 @@ void setup() {
     // When the main title is pressed or touched, we can register a callback to be executed.
     // Here we just present a simple dialog.
     setTitlePressedCallback([](int id) {
-        auto* dlg = renderer.getDialog();
-        if(dlg && !dlg->isInUse()) {
-            dlg->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
-            dlg->show("Mbed demo", false);
-            char szVer[10];
-            tccore::copyTcMenuVersion(szVer, sizeof szVer);
-            dlg->copyIntoBuffer(szVer);
-        }
+        showVersionDialog(&applicationInfo);
     });
 
     // We set the number of items in our runtime list

@@ -20,6 +20,7 @@
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 #include <IoAbstraction.h>
+#include <EepromItemStorage.h>
 #include <ArduinoEEPROMAbstraction.h>
 #include <RemoteAuthentication.h>
 

@@ -18,7 +18,8 @@
         "eepromAddress": -1,
         "readOnly": true,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -36,7 +37,8 @@
         "eepromAddress": -1,
         "readOnly": true,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -51,7 +53,8 @@
         "functionName": "onElectricHeater",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -66,7 +69,8 @@
         "functionName": "onLockDoor",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -79,7 +83,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -98,7 +103,8 @@
         "functionName": "onHeaterPower",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -117,7 +123,8 @@
         "functionName": "onWindowOpening",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -130,7 +137,8 @@
         "functionName": "onSaveAll",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -144,7 +152,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": false
+        "visible": false,
+        "staticDataInRAM": false
       }
     },
     {
@@ -163,7 +172,8 @@
         "functionName": "onFileChoice",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -176,7 +186,8 @@
         "functionName": "onLoadFiles",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -189,7 +200,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -204,7 +216,8 @@
         "eepromAddress": 8,
         "readOnly": false,
         "localOnly": true,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -219,7 +232,8 @@
         "eepromAddress": 23,
         "readOnly": false,
         "localOnly": true,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -234,7 +248,8 @@
         "eepromAddress": -1,
         "readOnly": true,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -248,7 +263,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": true,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -262,7 +278,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": true,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -280,7 +297,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     }
   ],
@@ -423,12 +441,12 @@
       },
       {
         "name": "ITEM_FONT",
-        "latestValue": "adl:OpenSans10,0",
+        "latestValue": "def:,1",
         "subsystem": "THEME"
       },
       {
         "name": "TITLE_FONT",
-        "latestValue": "adl:RobotoBlack12,1",
+        "latestValue": "def:,1",
         "subsystem": "THEME"
       },
       {
@@ -448,18 +466,19 @@
       },
       {
         "name": "USE_TC_UNICODE",
-        "latestValue": "true",
+        "latestValue": "false",
         "subsystem": "THEME"
       }
     ],
     "namingRecursive": false,
     "saveToSrc": false,
     "useCppMain": false,
+    "usingSizedEEPROMStorage": false,
     "eepromDefinition": "eeprom:",
     "authenticatorDefinition": "rom:100:6",
     "projectIoExpanders": [
-      "pcf8574:io8574:32:12:false",
-      "deviceIO:"
+      "deviceIO:",
+      "pcf8574:io8574:32:12:false"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []

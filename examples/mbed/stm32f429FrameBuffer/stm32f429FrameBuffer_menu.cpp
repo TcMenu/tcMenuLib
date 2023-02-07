@@ -20,7 +20,8 @@ HalStm32EepromAbstraction glBspRom;
 StChromaArtDrawable Drawable;
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &Drawable);
 StBspTouchInterrogator touchInterrogator(240, 320);
-MenuTouchScreenManager touchScreen(&touchInterrogator, &renderer, iotouch::TouchInterrogator::PORTRAIT);
+iotouch::TouchOrientationSettings touchOrientation(false, false, false);
+MenuTouchScreenManager touchScreen(&touchInterrogator, &renderer, touchOrientation);
 tcextras::IoaTouchScreenCalibrator touchCalibrator(&touchScreen, &renderer, 400);
 
 // Global Menu Item declarations

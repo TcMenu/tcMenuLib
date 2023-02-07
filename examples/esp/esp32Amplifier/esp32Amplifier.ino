@@ -24,7 +24,7 @@
 #include "TestingDialogController.h"
 #include <extras/DrawableTouchCalibrator.h>
 
-#define MENU_USING_CALIBRATION_MGR false
+#define MENU_USING_CALIBRATION_MGR true
 
 using namespace tcremote;
 using namespace iotouch;
@@ -65,20 +65,19 @@ void setup() {
 
 #if MENU_USING_CALIBRATION_MGR == true
     touchCalibrator.initCalibration([](bool isStarting) {
-        static TouchInterrogator::TouchRotation lastRotation = TouchInterrogator::PORTRAIT;
+        static TouchOrientationSettings oldTouchSettings(false, false, false);
         if(isStarting) {
             tft.setRotation(0);
-            lastRotation = touchScreen.getRotation();
-            touchScreen.changeRotation(TouchInterrogator::PORTRAIT);
+            oldTouchSettings = touchScreen.changeOrientation(TouchOrientationSettings(false, true, true));
         } else {
             tft.setRotation(1);
-            touchScreen.changeRotation(lastRotation);
+            touchScreen.changeOrientation(oldTouchSettings);
             EEPROM.commit();
         }
     }, true);
 
     // force a recalibration now if uncommented
-    //touchCalibrator.reCalibrateNow();
+    touchCalibrator.reCalibrateNow();
 #else
     touchScreen.calibrateMinMaxValues(0.250F, 0.890F, 0.09F, 0.88F);
 #endif // TC_TFT_ESPI_NEEDS_TOUCH

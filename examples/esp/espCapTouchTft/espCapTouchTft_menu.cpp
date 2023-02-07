@@ -20,7 +20,8 @@ TfteSpiDrawable gfxDrawable(&gfx, 45);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 Adafruit_FT6206 touchDevice;
 iotouch::AdaLibTouchInterrogator touchInterrogator(touchDevice);
-MenuTouchScreenManager touchScreen(&touchInterrogator, &renderer, iotouch::TouchInterrogator::LANDSCAPE);
+iotouch::TouchOrientationSettings touchOrientation(true, false, true);
+MenuTouchScreenManager touchScreen(&touchInterrogator, &renderer, touchOrientation);
 tcextras::IoaTouchScreenCalibrator touchCalibrator(&touchScreen, &renderer, 400);
 
 // Global Menu Item declarations

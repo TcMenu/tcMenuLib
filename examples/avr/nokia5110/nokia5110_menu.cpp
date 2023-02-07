@@ -32,46 +32,44 @@ const PROGMEM char pgmStrIoTMonitorText[] = { "IoT Monitor" };
 RemoteMenuItem menuIoTMonitor(pgmStrIoTMonitorText, 18, &menuAuthenticator);
 RENDERING_CALLBACK_NAME_INVOKE(fnIPRtCall, ipAddressRenderFn, "IP", 13, NO_CALLBACK)
 IpAddressMenuItem menuIP(fnIPRtCall, IpAddressStorage(127, 0, 0, 1), 16, &menuIoTMonitor);
-RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NO_CALLBACK)
 const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 15, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuIP);
-SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL);
+BackMenuItem menuBackConnectivity(&minfoConnectivity, &menuIP, INFO_LOCATION_PGM);
+SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL, INFO_LOCATION_PGM);
 RENDERING_CALLBACK_NAME_INVOKE(fnTxtRtCall, textItemRenderFn, "Txt", -1, NO_CALLBACK)
 TextMenuItem menuTxt(fnTxtRtCall, "", 14, 6, NULL);
 const PROGMEM FloatMenuInfo minfoCurrent = { "Current", 10, 0xffff, 2, NO_CALLBACK };
-FloatMenuItem menuCurrent(&minfoCurrent, 0.0, &menuTxt);
+FloatMenuItem menuCurrent(&minfoCurrent, 0.0, &menuTxt, INFO_LOCATION_PGM);
 const PROGMEM FloatMenuInfo minfoVoltsIn = { "Volts in", 9, 0xffff, 2, NO_CALLBACK };
-FloatMenuItem menuVoltsIn(&minfoVoltsIn, 2.2, &menuCurrent);
-RENDERING_CALLBACK_NAME_INVOKE(fnStatusRtCall, backSubItemRenderFn, "Status", -1, NO_CALLBACK)
+FloatMenuItem menuVoltsIn(&minfoVoltsIn, 2.2, &menuCurrent, INFO_LOCATION_PGM);
 const PROGMEM SubMenuInfo minfoStatus = { "Status", 8, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackStatus(fnStatusRtCall, &menuVoltsIn);
-SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuConnectivity);
+BackMenuItem menuBackStatus(&minfoStatus, &menuVoltsIn, INFO_LOCATION_PGM);
+SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuConnectivity, INFO_LOCATION_PGM);
 RENDERING_CALLBACK_NAME_INVOKE(fnRGBRtCall, rgbAlphaItemRenderFn, "RGB", 17, NO_CALLBACK)
 Rgb32MenuItem menuRGB(fnRGBRtCall, RgbColor32(136, 119, 85, 255), 17, true, NULL);
 const PROGMEM AnyMenuInfo minfoShutdownNow = { "Shutdown now", 11, 0xffff, 0, onPowerDownDetected };
-ActionMenuItem menuShutdownNow(&minfoShutdownNow, &menuRGB);
+ActionMenuItem menuShutdownNow(&minfoShutdownNow, &menuRGB, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoDelay = { "Delay", 7, 11, 10, NO_CALLBACK, 0, 1, "S" };
-AnalogMenuItem menuDelay(&minfoDelay, 0, &menuShutdownNow);
+AnalogMenuItem menuDelay(&minfoDelay, 0, &menuShutdownNow, INFO_LOCATION_PGM);
 const PROGMEM BooleanMenuInfo minfoPwrDelay = { "Pwr Delay", 6, 10, 1, NO_CALLBACK, NAMING_YES_NO };
-BooleanMenuItem menuPwrDelay(&minfoPwrDelay, false, &menuDelay);
-RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings", -1, NO_CALLBACK)
+BooleanMenuItem menuPwrDelay(&minfoPwrDelay, false, &menuDelay, INFO_LOCATION_PGM);
 const PROGMEM SubMenuInfo minfoSettings = { "Settings", 5, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackSettings(fnSettingsRtCall, &menuPwrDelay);
-SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, &menuStatus);
+BackMenuItem menuBackSettings(&minfoSettings, &menuPwrDelay, INFO_LOCATION_PGM);
+SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, &menuStatus, INFO_LOCATION_PGM);
 const char enumStrOnAlm_0[] PROGMEM = "All On";
 const char enumStrOnAlm_1[] PROGMEM = "Silient";
 const char* const enumStrOnAlm[] PROGMEM  = { enumStrOnAlm_0, enumStrOnAlm_1 };
 const PROGMEM EnumMenuInfo minfoOnAlm = { "On Alm", 4, 8, 1, NO_CALLBACK, enumStrOnAlm };
-EnumMenuItem menuOnAlm(&minfoOnAlm, 0, &menuSettings);
+EnumMenuItem menuOnAlm(&minfoOnAlm, 0, &menuSettings, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoKitchen = { "Kitchen", 3, 6, 100, onKitchenLight, 0, 1, "%" };
-AnalogMenuItem menuKitchen(&minfoKitchen, 0, &menuOnAlm);
+AnalogMenuItem menuKitchen(&minfoKitchen, 0, &menuOnAlm, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoLiving = { "Living", 2, 4, 100, onLivingRoomLight, 0, 1, "%" };
-AnalogMenuItem menuLiving(&minfoLiving, 0, &menuKitchen);
+AnalogMenuItem menuLiving(&minfoLiving, 0, &menuKitchen, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoHall = { "Hall", 1, 2, 100, onHallLight, 0, 1, "%" };
-AnalogMenuItem menuHall(&minfoHall, 0, &menuLiving);
+AnalogMenuItem menuHall(&minfoHall, 0, &menuLiving, INFO_LOCATION_PGM);
 
 void setupMenu() {
     // First we set up eeprom and authentication (if needed).
+    setSizeBasedEEPROMStorageEnabled(false);
     menuMgr.setEepromRef(&glAvrRom);
     authManager.initialise(menuMgr.getEepromAbstraction(), 100);
     menuMgr.setAuthenticator(&authManager);

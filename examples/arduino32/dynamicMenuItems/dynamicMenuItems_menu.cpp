@@ -25,37 +25,36 @@ KeyboardLayout keyboardLayout(4, 4, keyboardKeys);
 MenuEditingKeyListener tcMenuKeyListener('*', '#', 'A', 'B');
 
 // Global Menu Item declarations
+RENDERING_CALLBACK_NAME_OVERRIDDEN(fnRuntimesOctalRtCall, octalOnlyRtCall, "Octal", -1)
+TextMenuItem menuRuntimesOctal(fnRuntimesOctalRtCall, "", 22, 5, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnIpItemRtCall, ipAddressRenderFn, "IpItem", -1, NO_CALLBACK)
-IpAddressMenuItem menuIpItem(fnIpItemRtCall, IpAddressStorage(127, 0, 0, 1), 21, NULL);
+IpAddressMenuItem menuIpItem(fnIpItemRtCall, IpAddressStorage(127, 0, 0, 1), 21, &menuRuntimesOctal);
 RENDERING_CALLBACK_NAME_INVOKE(fnTextItemRtCall, textItemRenderFn, "TextItem", -1, NO_CALLBACK)
 TextMenuItem menuTextItem(fnTextItemRtCall, "", 20, 5, &menuIpItem);
-RENDERING_CALLBACK_NAME_INVOKE(fnRuntimesRtCall, backSubItemRenderFn, "Runtimes", -1, NO_CALLBACK)
 const SubMenuInfo minfoRuntimes = { "Runtimes", 19, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackRuntimes(fnRuntimesRtCall, &menuTextItem);
-SubMenuItem menuRuntimes(&minfoRuntimes, &menuBackRuntimes, NULL);
+BackMenuItem menuBackRuntimes(&minfoRuntimes, &menuTextItem, INFO_LOCATION_PGM);
+SubMenuItem menuRuntimes(&minfoRuntimes, &menuBackRuntimes, NULL, INFO_LOCATION_PGM);
 ListRuntimeMenuItem menuList(13, 0, fnListRtCall, &menuRuntimes);
 const BooleanMenuInfo minfoDialogsBlockedBool = { "Blocked Bool", 18, 0xffff, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
-BooleanMenuItem menuDialogsBlockedBool(&minfoDialogsBlockedBool, false, NULL);
+BooleanMenuItem menuDialogsBlockedBool(&minfoDialogsBlockedBool, false, NULL, INFO_LOCATION_PGM);
 const AnyMenuInfo minfoDialogsBlockedAction = { "Blocked Action", 17, 0xffff, 0, NO_CALLBACK };
-ActionMenuItem menuDialogsBlockedAction(&minfoDialogsBlockedAction, &menuDialogsBlockedBool);
-RENDERING_CALLBACK_NAME_INVOKE(fnDialogsBlockedSubRtCall, backSubItemRenderFn, "Blocked Sub", -1, NO_CALLBACK)
+ActionMenuItem menuDialogsBlockedAction(&minfoDialogsBlockedAction, &menuDialogsBlockedBool, INFO_LOCATION_PGM);
 const SubMenuInfo minfoDialogsBlockedSub = { "Blocked Sub", 15, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackDialogsBlockedSub(fnDialogsBlockedSubRtCall, NULL);
-SubMenuItem menuDialogsBlockedSub(&minfoDialogsBlockedSub, &menuBackDialogsBlockedSub, &menuDialogsBlockedAction);
+BackMenuItem menuBackDialogsBlockedSub(&minfoDialogsBlockedSub, NULL, INFO_LOCATION_PGM);
+SubMenuItem menuDialogsBlockedSub(&minfoDialogsBlockedSub, &menuBackDialogsBlockedSub, &menuDialogsBlockedAction, INFO_LOCATION_PGM);
 const BooleanMenuInfo minfoDialogsDialogBack = { "Allow Observer", 14, 0xffff, 1, onDialogBack, NAMING_ON_OFF };
-BooleanMenuItem menuDialogsDialogBack(&minfoDialogsDialogBack, false, &menuDialogsBlockedSub);
+BooleanMenuItem menuDialogsDialogBack(&minfoDialogsDialogBack, false, &menuDialogsBlockedSub, INFO_LOCATION_PGM);
 const AnyMenuInfo minfoDialogsController = { "Controller", 12, 0xffff, 0, onDialogController };
-ActionMenuItem menuDialogsController(&minfoDialogsController, &menuDialogsDialogBack);
+ActionMenuItem menuDialogsController(&minfoDialogsController, &menuDialogsDialogBack, INFO_LOCATION_PGM);
 const AnyMenuInfo minfoDialogsInformation = { "Information", 11, 0xffff, 0, onDialogInfo };
-ActionMenuItem menuDialogsInformation(&minfoDialogsInformation, &menuDialogsController);
-const AnyMenuInfo minfoDialogsQuestion = { "Question", 10, 0xffff, 0, onDialogQuestion };
-ActionMenuItem menuDialogsQuestion(&minfoDialogsQuestion, &menuDialogsInformation);
-RENDERING_CALLBACK_NAME_INVOKE(fnDialogsRtCall, backSubItemRenderFn, "Dialogs", -1, NO_CALLBACK)
+ActionMenuItem menuDialogsInformation(&minfoDialogsInformation, &menuDialogsController, INFO_LOCATION_PGM);
+AnyMenuInfo minfoDialogsQuestion = { "Question", 10, 0xffff, 0, onDialogQuestion };
+ActionMenuItem menuDialogsQuestion(&minfoDialogsQuestion, &menuDialogsInformation, INFO_LOCATION_RAM);
 const SubMenuInfo minfoDialogs = { "Dialogs", 9, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackDialogs(fnDialogsRtCall, &menuDialogsQuestion);
-SubMenuItem menuDialogs(&minfoDialogs, &menuBackDialogs, &menuList);
+BackMenuItem menuBackDialogs(&minfoDialogs, &menuDialogsQuestion, INFO_LOCATION_PGM);
+SubMenuItem menuDialogs(&minfoDialogs, &menuBackDialogs, &menuList, INFO_LOCATION_PGM);
 const AnyMenuInfo minfoPizzaMakerStartCooking = { "Start Cooking", 8, 0xffff, 0, onStartCooking };
-ActionMenuItem menuPizzaMakerStartCooking(&minfoPizzaMakerStartCooking, NULL);
+ActionMenuItem menuPizzaMakerStartCooking(&minfoPizzaMakerStartCooking, NULL, INFO_LOCATION_PGM);
 extern char pizzaToppings[];
 RENDERING_CALLBACK_NAME_INVOKE(fnPizzaMakerTopping3RtCall, enumItemRenderFn, "Topping 3", -1, NO_CALLBACK)
 ScrollChoiceMenuItem menuPizzaMakerTopping3(7, fnPizzaMakerTopping3RtCall, 0, pizzaToppings, 10, 6, &menuPizzaMakerStartCooking);
@@ -66,21 +65,19 @@ extern char pizzaToppings[];
 RENDERING_CALLBACK_NAME_INVOKE(fnPizzaMakerTopping1RtCall, enumItemRenderFn, "Topping 1", -1, NO_CALLBACK)
 ScrollChoiceMenuItem menuPizzaMakerTopping1(5, fnPizzaMakerTopping1RtCall, 0, pizzaToppings, 10, 6, &menuPizzaMakerTopping2);
 const AnalogMenuInfo minfoPizzaMakerOvenTemp = { "Oven Temp", 4, 0xffff, 300, NO_CALLBACK, 0, 1, "C" };
-AnalogMenuItem menuPizzaMakerOvenTemp(&minfoPizzaMakerOvenTemp, 0, &menuPizzaMakerTopping1);
-RENDERING_CALLBACK_NAME_INVOKE(fnPizzaMakerRtCall, backSubItemRenderFn, "Pizza Maker", -1, NO_CALLBACK)
+AnalogMenuItem menuPizzaMakerOvenTemp(&minfoPizzaMakerOvenTemp, 0, &menuPizzaMakerTopping1, INFO_LOCATION_PGM);
 const SubMenuInfo minfoPizzaMaker = { "Pizza Maker", 3, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackPizzaMaker(fnPizzaMakerRtCall, &menuPizzaMakerOvenTemp);
-SubMenuItem menuPizzaMaker(&minfoPizzaMaker, &menuBackPizzaMaker, &menuDialogs);
-RENDERING_CALLBACK_NAME_INVOKE(fnOvenRtCall, backSubItemRenderFn, "Oven", -1, NO_CALLBACK)
+BackMenuItem menuBackPizzaMaker(&minfoPizzaMaker, &menuPizzaMakerOvenTemp, INFO_LOCATION_PGM);
+SubMenuItem menuPizzaMaker(&minfoPizzaMaker, &menuBackPizzaMaker, &menuDialogs, INFO_LOCATION_PGM);
 const SubMenuInfo minfoOven = { "Oven", 2, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackOven(fnOvenRtCall, NULL);
-SubMenuItem menuOven(&minfoOven, &menuBackOven, &menuPizzaMaker);
+BackMenuItem menuBackOven(&minfoOven, NULL, INFO_LOCATION_PGM);
+SubMenuItem menuOven(&minfoOven, &menuBackOven, &menuPizzaMaker, INFO_LOCATION_PGM);
 const BooleanMenuInfo minfoMainPower = { "Main Power", 1, 0xffff, 1, NO_CALLBACK, NAMING_ON_OFF };
-BooleanMenuItem menuMainPower(&minfoMainPower, false, &menuOven);
+BooleanMenuItem menuMainPower(&minfoMainPower, false, &menuOven, INFO_LOCATION_PGM);
 
 void setupMenu() {
     // First we set up eeprom and authentication (if needed).
-
+    setSizeBasedEEPROMStorageEnabled(false);
     // Code generated by plugins.
     gfx.initR(INITR_BLACKTAB);
     gfx.setRotation(1);

@@ -29,70 +29,66 @@ TagValueRemoteServerConnection ethernetConnection(ethernetTransport, ethernetIni
 
 // Global Menu Item declarations
 const AnyMenuInfo minfoTakeDisplay = { "Take display", 17, 0xffff, 0, onTakeDisplay };
-ActionMenuItem menuTakeDisplay(&minfoTakeDisplay, NULL);
+ActionMenuItem menuTakeDisplay(&minfoTakeDisplay, NULL, INFO_LOCATION_PGM);
 const AnyMenuInfo minfoSaveItem = { "Save item", 23, 0xffff, 0, onSaveItem };
-ActionMenuItem menuSaveItem(&minfoSaveItem, NULL);
+ActionMenuItem menuSaveItem(&minfoSaveItem, NULL, INFO_LOCATION_PGM);
 RENDERING_CALLBACK_NAME_INVOKE(fnRomTextRtCall, textItemRenderFn, "Rom Text", -1, NO_CALLBACK)
 TextMenuItem menuRomText(fnRomTextRtCall, "", 21, 10, &menuSaveItem);
 ScrollChoiceMenuItem menuRomLocation(24, fnRomLocationRtCall, 0, 10, &menuRomText);
 RENDERING_CALLBACK_NAME_INVOKE(fnRomChoiceRtCall, enumItemRenderFn, "Rom Choice", 14, NO_CALLBACK)
 ScrollChoiceMenuItem menuRomChoice(25, fnRomChoiceRtCall, 0, 1024, 10, 10, &menuRomLocation);
-RENDERING_CALLBACK_NAME_INVOKE(fnRomValuesRtCall, backSubItemRenderFn, "Rom Values", -1, NO_CALLBACK)
 const SubMenuInfo minfoRomValues = { "Rom Values", 20, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackRomValues(fnRomValuesRtCall, &menuRomChoice);
-SubMenuItem menuRomValues(&minfoRomValues, &menuBackRomValues, &menuTakeDisplay);
+BackMenuItem menuBackRomValues(&minfoRomValues, &menuRomChoice, INFO_LOCATION_PGM);
+SubMenuItem menuRomValues(&minfoRomValues, &menuBackRomValues, &menuTakeDisplay, INFO_LOCATION_PGM);
 const char pgmStrIoTMonitorText[] = { "IoT Monitor" };
 RemoteMenuItem menuIoTMonitor(pgmStrIoTMonitorText, 29, NULL);
 const char pgmStrAuthenticatorText[] = { "Authenticator" };
 EepromAuthenticationInfoMenuItem menuAuthenticator(pgmStrAuthenticatorText, NO_CALLBACK, 28, &menuIoTMonitor);
 RENDERING_CALLBACK_NAME_INVOKE(fnIpAddressRtCall, ipAddressRenderFn, "Ip Address", 10, NO_CALLBACK)
 IpAddressMenuItem menuIpAddress(fnIpAddressRtCall, IpAddressStorage(127, 0, 0, 1), 15, &menuAuthenticator);
-RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityRtCall, backSubItemRenderFn, "Connectivity", -1, NO_CALLBACK)
 const SubMenuInfo minfoConnectivity = { "Connectivity", 14, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackConnectivity(fnConnectivityRtCall, &menuIpAddress);
-SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, &menuRomValues);
+BackMenuItem menuBackConnectivity(&minfoConnectivity, &menuIpAddress, INFO_LOCATION_PGM);
+SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, &menuRomValues, INFO_LOCATION_PGM);
 const FloatMenuInfo minfoVoltA1 = { "Volt A1", 9, 0xffff, 2, NO_CALLBACK };
-FloatMenuItem menuVoltA1(&minfoVoltA1, 0.0, NULL);
+FloatMenuItem menuVoltA1(&minfoVoltA1, 0.0, NULL, INFO_LOCATION_PGM);
 const FloatMenuInfo minfoVoltA0 = { "Volt A0", 8, 0xffff, 2, NO_CALLBACK };
-FloatMenuItem menuVoltA0(&minfoVoltA0, 0.0, &menuVoltA1);
-RENDERING_CALLBACK_NAME_INVOKE(fnStatusRtCall, backSubItemRenderFn, "Status", -1, NO_CALLBACK)
+FloatMenuItem menuVoltA0(&minfoVoltA0, 0.0, &menuVoltA1, INFO_LOCATION_PGM);
 const SubMenuInfo minfoStatus = { "Status", 7, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackStatus(fnStatusRtCall, &menuVoltA0);
-SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuConnectivity);
+BackMenuItem menuBackStatus(&minfoStatus, &menuVoltA0, INFO_LOCATION_PGM);
+SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuConnectivity, INFO_LOCATION_PGM);
 const BooleanMenuInfo minfoShowHidden = { "Show Hidden", 30, 0xffff, 1, onShowHidden, NAMING_YES_NO };
-BooleanMenuItem menuShowHidden(&minfoShowHidden, false, NULL);
+BooleanMenuItem menuShowHidden(&minfoShowHidden, false, NULL, INFO_LOCATION_PGM);
 RENDERING_CALLBACK_NAME_INVOKE(fnRGBRtCall, rgbAlphaItemRenderFn, "RGB", 16, onRgbChanged)
 Rgb32MenuItem menuRGB(fnRGBRtCall, RgbColor32(0, 0, 0), 26, false, &menuShowHidden);
 const BooleanMenuInfo minfoTempCheck = { "Temp Check", 13, 9, 1, NO_CALLBACK, NAMING_ON_OFF };
-BooleanMenuItem menuTempCheck(&minfoTempCheck, false, &menuRGB);
+BooleanMenuItem menuTempCheck(&minfoTempCheck, false, &menuRGB, INFO_LOCATION_PGM);
 const AnyMenuInfo minfoHiddenItem = { "Hidden item", 16, 0xffff, 0, NO_CALLBACK };
-ActionMenuItem menuHiddenItem(&minfoHiddenItem, &menuTempCheck);
+ActionMenuItem menuHiddenItem(&minfoHiddenItem, &menuTempCheck, INFO_LOCATION_PGM);
 const BooleanMenuInfo minfoSCircuitProtect = { "S-Circuit Protect", 12, 8, 1, NO_CALLBACK, NAMING_ON_OFF };
-BooleanMenuItem menuSCircuitProtect(&minfoSCircuitProtect, false, &menuHiddenItem);
-RENDERING_CALLBACK_NAME_INVOKE(fnAdvancedRtCall, backSubItemRenderFn, "Advanced", -1, NO_CALLBACK)
+BooleanMenuItem menuSCircuitProtect(&minfoSCircuitProtect, false, &menuHiddenItem, INFO_LOCATION_PGM);
 const SubMenuInfo minfoAdvanced = { "Advanced", 11, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackAdvanced(fnAdvancedRtCall, &menuSCircuitProtect);
-SubMenuItem menuAdvanced(&minfoAdvanced, &menuBackAdvanced, NULL);
+BackMenuItem menuBackAdvanced(&minfoAdvanced, &menuSCircuitProtect, INFO_LOCATION_PGM);
+SubMenuItem menuAdvanced(&minfoAdvanced, &menuBackAdvanced, NULL, INFO_LOCATION_PGM);
 const AnyMenuInfo minfoSaveAll = { "Save all", 10, 0xffff, 0, onSaveRom };
-ActionMenuItem menuSaveAll(&minfoSaveAll, &menuAdvanced);
+ActionMenuItem menuSaveAll(&minfoSaveAll, &menuAdvanced, INFO_LOCATION_PGM);
 const BooleanMenuInfo minfoPwrDelay = { "Pwr Delay", 5, 0xffff, 1, NO_CALLBACK, NAMING_YES_NO };
-BooleanMenuItem menuPwrDelay(&minfoPwrDelay, false, &menuSaveAll);
-RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings", -1, NO_CALLBACK)
+BooleanMenuItem menuPwrDelay(&minfoPwrDelay, false, &menuSaveAll, INFO_LOCATION_PGM);
 const SubMenuInfo minfoSettings = { "Settings", 4, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackSettings(fnSettingsRtCall, &menuPwrDelay);
-SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, &menuStatus);
+BackMenuItem menuBackSettings(&minfoSettings, &menuPwrDelay, INFO_LOCATION_PGM);
+SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, &menuStatus, INFO_LOCATION_PGM);
 const char enumStrLimit_0[] = "Current";
 const char enumStrLimit_1[] = "Voltage";
 const char* const enumStrLimit[]  = { enumStrLimit_0, enumStrLimit_1 };
 const EnumMenuInfo minfoLimit = { "Limit", 3, 6, 1, onLimitMode, enumStrLimit };
-EnumMenuItem menuLimit(&minfoLimit, 0, &menuSettings);
+EnumMenuItem menuLimit(&minfoLimit, 0, &menuSettings, INFO_LOCATION_PGM);
 const AnalogMenuInfo minfoCurrent = { "Current", 2, 4, 255, onCurrentChange, 0, 100, "A" };
-AnalogMenuItem menuCurrent(&minfoCurrent, 0, &menuLimit);
+AnalogMenuItem menuCurrent(&minfoCurrent, 0, &menuLimit, INFO_LOCATION_PGM);
 const AnalogMenuInfo minfoVoltage = { "Voltage", 1, 2, 255, onVoltageChange, -128, 2, "V" };
-AnalogMenuItem menuVoltage(&minfoVoltage, 0, &menuCurrent);
+AnalogMenuItem menuVoltage(&minfoVoltage, 0, &menuCurrent, INFO_LOCATION_PGM);
 
 void setupMenu() {
     // First we set up eeprom and authentication (if needed).
+    setSizeBasedEEPROMStorageEnabled(false);
     menuMgr.setEepromRef(&glI2cRom);
     authManager.initialise(menuMgr.getEepromAbstraction(), 100);
     menuMgr.setAuthenticator(&authManager);
