@@ -136,8 +136,12 @@ uint32_t fltToU32(float val) {
 }
 
 void IoaTouchScreenCalibrator::saveCalibration() {
-    serlogF2(SER_TCMENU_INFO, "Saving IOA touch calibration at ", romPos);
     EepromAbstraction *rom = menuMgr.getEepromAbstraction();
+    if(!rom) {
+        serlogF(SER_ERROR, "Calibration - No ROM defined");
+    }
+
+    serlogF2(SER_TCMENU_INFO, "Saving IOA touch calibration at ", romPos);
     rom->write16(romPos, calibrationMagicIoa);
     rom->write32(romPos + 2, fltToU32(calibrationHandler.getMinX()));
     rom->write32(romPos + 6, fltToU32(calibrationHandler.getMaxX()));
@@ -151,7 +155,7 @@ void IoaTouchScreenCalibrator::saveCalibration() {
 bool IoaTouchScreenCalibrator::loadCalibration() {
     serlogF2(SER_TCMENU_INFO, "Loading IOA touch calibration at ", romPos);
     EepromAbstraction *rom = menuMgr.getEepromAbstraction();
-    if(rom->read16(romPos) != calibrationMagicIoa) {
+    if(!rom || rom->read16(romPos) != calibrationMagicIoa) {
         serlogF(SER_TCMENU_INFO, "Calibrator ROM mismatch");
         return false;
     }

@@ -32,6 +32,20 @@ void setup() {
     // This is added by the code generator, it initialises the menu
     setupMenu();
 
+    // check if the touch screen needs to be initialised, we provide a callback that will be called before and
+    // after the calibration UI is shown, it should reset the screen and touch to native orientation on start, and
+    // put it back to "menu" mode on finishing.
+    touchCalibrator.initCalibration([](bool starting) {
+        static iotouch::TouchOrientationSettings oldSettings = iotouch::TouchOrientationSettings(false, false, false);
+        if(starting) {
+            gfx.setRotation(0);
+            oldSettings = touchScreen.changeOrientation(iotouch::TouchOrientationSettings(false, true, true));
+        } else {
+            gfx.setRotation(1);
+            touchScreen.changeOrientation(oldSettings);
+        }
+    }, true);
+
     // Add a callback to show the build version when the title is pressed
     // this uses the standard function to show a version dialog from tcUtil.h
     setTitlePressedCallback([](int) {
