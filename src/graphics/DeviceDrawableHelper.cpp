@@ -6,6 +6,7 @@ using namespace tcgfx;
 DeviceDrawableHelper::DeviceDrawableHelper(DeviceDrawable* root, color_t* palette, uint8_t paletteSize, const Coord& startPosition, const Coord& size) {
     isSubDevice = false;
     rootDrawable = root;
+    drawable = root;
     reConfigure(palette, paletteSize, startPosition, size);
 }
 
@@ -57,7 +58,7 @@ void DeviceDrawableHelper::drawText(const Coord& where, color_t drawColor, const
         }
         fontMode.setFontTcUnicode(unicodeHandler);
         unicodeHandler->setDrawColor(drawable->getUnderlyingColor(drawColor));
-        unicodeHandler->setCursor(where);
+        unicodeHandler->setCursor(Coord(where.x, where.y + (unicodeHandler->getYAdvance() - unicodeHandler->getBaseline())));
         unicodeHandler->print(what);
     } else {
         drawable->setDrawColor(drawColor);
@@ -72,4 +73,16 @@ DeviceDrawableHelper::DeviceDrawableHelper(DeviceDrawable *root) {
     drawable = root;
     isSubDevice = false;
     startPos = { 0 , 0 };
+}
+
+void DeviceDrawableHelper::setFontFromParameters(const void* font, uint8_t mag) {
+    if(getDrawable()->isTcUnicodeEnabled()) {
+        if(mag == 0) {
+            setFont(DeviceFontDrawingMode((const UnicodeFont*) font));
+        } else {
+            setFont(DeviceFontDrawingMode((const GFXfont*) font));
+        }
+    } else {
+        setFont(DeviceFontDrawingMode(NativeFontDesc(font, mag)));
+    }
 }

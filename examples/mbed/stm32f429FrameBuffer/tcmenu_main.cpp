@@ -5,6 +5,7 @@
 
 #include <mbed.h>
 #include "stm32f429FrameBuffer_menu.h"
+#include "dashboardConfig.h"
 
 BufferedSerial console(USBTX, USBRX);
 MBedLogger LoggingPort(console);
@@ -31,9 +32,14 @@ void setup() {
         }
     }, true);
 
+    renderer.setFirstWidget(&connectedWidget);
+
+    setupDashboard();
+
     taskManager.scheduleFixedRate(100, [] {
         menuACLine.setCurrentValue(2350 + (rand() % 100));
         menuConsumption.setCurrentValue(1900 + (rand() % 200));
+        connectedWidget.setCurrentState(rand() % 2);
     });
 }
 

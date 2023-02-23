@@ -196,6 +196,12 @@ namespace tcgfx {
          * @return the size of the text.
          */
         Coord textExtents(const char* text, int* bl);
+
+        /**
+         * Set the font from the theme font pointer and magnification values, by determining if tcUnicode is enabled
+         * and then choosing either native or TcUnicode based operation.
+         */
+        void setFontFromParameters(const void* font, uint8_t mag);
     };
 
 }

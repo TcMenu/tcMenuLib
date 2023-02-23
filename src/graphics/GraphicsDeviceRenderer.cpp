@@ -142,7 +142,7 @@ namespace tcgfx {
             }
         }
 
-        helper.setFont(DeviceFontDrawingMode(NativeFontDesc(props->getFont(), props->getFontMagnification())));
+        helper.setFontFromParameters(props->getFont(), props->getFontMagnification());
 
         if(just == GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT || weAreEditingWithCursor) {
             // special case, title left, value right.
@@ -399,7 +399,7 @@ namespace tcgfx {
 
     int GraphicsDeviceRenderer::heightForFontPadding(const void *font, int mag, MenuPadding &padding) {
         int baseline=0;
-        helper.setFont(DeviceFontDrawingMode(NativeFontDesc(font, mag)));
+        helper.setFontFromParameters(font, mag);
         Coord sizeInfo = helper.textExtents("();yg1", &baseline);
         int hei = sizeInfo.y + padding.top + padding.bottom;
         padding.bottom += baseline; // add the baseline to padding.
