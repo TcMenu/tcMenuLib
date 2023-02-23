@@ -17,8 +17,8 @@ void setup() {
 
     // prepare the SPI device on the right pins, configure as needed!
     SPI.setRX(4);
-    SPI.setTX(3);
-    SPI.setSCK(2);
+    SPI.setTX(7);
+    SPI.setSCK(6);
     SPI.begin();
 
     setupMenu();

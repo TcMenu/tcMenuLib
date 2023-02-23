@@ -10,6 +10,7 @@
 #include "BaseRenderers.h"
 #include <tcUnicodeHelper.h>
 #include <graphics/GraphicsDeviceRenderer.h>
+#include <graphics/DeviceDrawableHelper.h>
 
 /**
  * Base class for draw parameters, used for static items that do not change.
@@ -28,17 +29,13 @@ public:
     };
 protected:
     DashAlign alignment;
-    union {
-        const GFXfont *adaFont;
-        const UnicodeFont *uniFont;
-    };
     color_t fgColor;
     color_t bgColor;
-    bool isAdaFont = true;
+    DeviceFontDrawingMode fontMode;
 public:
     /**
      * @brief Creates a dash parameter that has a background, foreground, font, and alignment. In this case the font is an
-     * Adafruit graphics font.
+     * Adafruit graphics font via tcUnicodeHelper.
      * @param fgColor_ the foreground color
      * @param bgColor_ the background color
      * @param font_ the font to draw with
@@ -54,6 +51,15 @@ public:
      * @param align the alignment
      */
     DashDrawParameters(color_t fgColor_, color_t bgColor_, const UnicodeFont* font_, DashAlign align = TITLE_RIGHT_VALUE_RIGHT);
+    /**
+     * @brief Creates a dash parameter that has a background, foreground, font, and alignment. In this case the font is a
+     * native font that works with the library directly.
+     * @param fgColor_ the foreground color
+     * @param bgColor_ the background color
+     * @param font_ the font to draw with
+     * @param align the alignment
+     */
+    DashDrawParameters(color_t fgColor_, color_t bgColor_, const NativeFontDesc& font_, DashAlign align = TITLE_RIGHT_VALUE_RIGHT);
 
     /**
      * @return true if the title is drawn, otherwise it returns false
@@ -69,17 +75,9 @@ public:
     bool isValueLeftAlign() { return alignment == TITLE_RIGHT_VALUE_LEFT || alignment == TITLE_LEFT_VALUE_LEFT || alignment == NO_TITLE_VALUE_LEFT; }
 
     /**
-     * @return true if the font is adafruit, otherwise false if the font is tcUnicode
+     * @return the font mode that is being used. See the enum for details
      */
-    bool isAdafruitFont() const { return isAdaFont; }
-    /**
-     * @return the font as an Adafruit font, only call when isAdafruitFont returns true
-     */
-    const GFXfont* getAsAdaFont() const { return adaFont; }
-    /**
-     * @return the font as a tcUnicode font, only call when isAdafruitFont returns false
-     */
-    const UnicodeFont* getAsUnicodeFont() const { return uniFont; }
+    const DeviceFontDrawingMode& getFontMode() const { return fontMode; }
 
     /**
      * the background color method is overloaded, each implementation has a different way of handling it.
@@ -91,6 +89,7 @@ public:
      * @return the background color, in this class it is fixed
      */
     virtual color_t getFgColor(MenuItem *item, bool updated)  { return fgColor; }
+
     /**
      * the background title color method is overloaded, each implementation has a different way of handling it.
      * @return the background color for the title, in this class it is fixed
@@ -117,6 +116,10 @@ public:
                                  bgUpdateColor(bgUpdateColor_) {}
     DashDrawParametersUpdate(color_t fgColor_, color_t bgColor_, color_t fgUpdateColor_, color_t bgUpdateColor_,
                                  const UnicodeFont* font_, DashAlign align = TITLE_RIGHT_VALUE_RIGHT) :
+                                 DashDrawParameters(fgColor_, bgColor_, font_, align), fgUpdateColor(fgUpdateColor_),
+                                 bgUpdateColor(bgUpdateColor_) {}
+    DashDrawParametersUpdate(color_t fgColor_, color_t bgColor_, color_t fgUpdateColor_, color_t bgUpdateColor_,
+                                 const NativeFontDesc& font_, DashAlign align = TITLE_RIGHT_VALUE_RIGHT) :
                                  DashDrawParameters(fgColor_, bgColor_, font_, align), fgUpdateColor(fgUpdateColor_),
                                  bgUpdateColor(bgUpdateColor_) {}
 
@@ -157,6 +160,11 @@ public:
             DashDrawParametersUpdate(fgColor_, bgColor_, fgUpdateColor_, bgUpdateColor_, font_, align),
             colorRanges(colorRanges_), numOfRanges(numberRanges), useUpdateColor(fgColor_ != fgUpdateColor_ || bgColor_ != bgUpdateColor_) { }
 
+    DashDrawParametersIntUpdateRange(color_t fgColor_, color_t bgColor_, color_t fgUpdateColor_, color_t bgUpdateColor_,
+                                     const NativeFontDesc& font_, const IntColorRange colorRanges_[], int numberRanges,
+                                     DashAlign align = TITLE_RIGHT_VALUE_RIGHT) :
+            DashDrawParametersUpdate(fgColor_, bgColor_, fgUpdateColor_, bgUpdateColor_, font_, align),
+            colorRanges(colorRanges_), numOfRanges(numberRanges), useUpdateColor(fgColor_ != fgUpdateColor_ || bgColor_ != bgUpdateColor_) { }
 private:
     int findIndexForChoice(MenuItem* item);
     color_t getBgColor(MenuItem *item, bool updated) override;
@@ -194,13 +202,16 @@ public:
             DashDrawParametersUpdate(fgColor_, bgColor_, fgUpdateColor_, bgUpdateColor_, font_, align), colorOverrides(colorOverrides_),
             numOfRanges(numberRanges), useUpdateColor(fgColor_ != fgUpdateColor_ || bgColor_ != bgUpdateColor_) {}
 
+    DashDrawParametersTextUpdateRange(color_t fgColor_, color_t bgColor_, color_t fgUpdateColor_, color_t bgUpdateColor_,
+                                      const NativeFontDesc &font_, const TextColorOverride colorOverrides_[], int numberRanges,
+                                      DashAlign align = TITLE_RIGHT_VALUE_RIGHT) :
+            DashDrawParametersUpdate(fgColor_, bgColor_, fgUpdateColor_, bgUpdateColor_, font_, align), colorOverrides(colorOverrides_),
+            numOfRanges(numberRanges), useUpdateColor(fgColor_ != fgUpdateColor_ || bgColor_ != bgUpdateColor_) {}
 private:
     int findIndexForChoice(MenuItem* item);
     color_t getBgColor(MenuItem *item, bool updated) override;
     color_t getFgColor(MenuItem *item, bool updated) override;
 };
-
-typedef void (*DashPaintFunction)(DashDrawParameters* params, color_t bg, color_t fg, DeviceDrawable* drawable);
 
 /**
  * Each item that is to appear in the dashboard can be attached to a menu item, this is the drawing class that will
@@ -208,7 +219,6 @@ typedef void (*DashPaintFunction)(DashDrawParameters* params, color_t bg, color_
  */
 class DashMenuItem {
 private:
-    static color_t staticPalette[4];
     MenuItem *item;
     Coord screenLoc;
     DashDrawParameters *parameters;
@@ -231,7 +241,6 @@ public:
     }
 
     bool needsPainting();
-    void setFont(UnicodeFontHandler* unicodeHandler);
     void paintTitle(DeviceDrawable* canvasDrawable);
     void paintItem(DeviceDrawable* canvasDrawable);
 };
@@ -250,8 +259,9 @@ public:
     virtual void dashboardDidClose() {}
     /**
      * Indicates that the dashboard will open, called before any other work is done by the dashboard.
+     * @return true if you have already cleared the screen, otherwise false to have the core code do it.
      */
-    virtual void dashboardWillOpen(BaseMenuRenderer* /*where*/) {}
+    virtual bool dashboardWillOpen(BaseMenuRenderer* /*where*/) { return false; }
     /**
      * Indicates that the dashboard has already opened, called after any other work is done by the dashboard.
      */
@@ -321,52 +331,5 @@ public:
 
     void drawWidgets(bool force);
 };
-
-/**
- * Wraps a drawable regardless of if we are on a sub device or root device, this class handles all the differences
- * between the two with helper functions for dealing with palette colors and offset differences.
- */
-class DrawableWrapper {
-private:
-    color_t palette[2] = {};
-    DeviceDrawable* drawable = nullptr;
-    Coord startPos = {};
-    bool isSubDevice = false;
-public:
-    DrawableWrapper(DeviceDrawable* root, DashDrawParameters* parameters, MenuItem* item, const Coord& startPosition, const Coord& size, bool titleMode = false) {
-        if(titleMode) {
-            palette[0] = parameters->getTitleBgColor(item, item->isChanged());
-            palette[1] = parameters->getTitleFgColor(item, item->isChanged());
-        } else {
-            palette[0] = parameters->getBgColor(item, item->isChanged());
-            palette[1] = parameters->getFgColor(item, item->isChanged());
-        }
-
-        isSubDevice = false;
-        drawable = root;
-        if (root->getSubDeviceType() != tcgfx::DeviceDrawable::NO_SUB_DEVICE) {
-            auto subDrawable = root->getSubDeviceFor(startPosition, size, palette, 4);
-            if (subDrawable) {
-                isSubDevice = true;
-                drawable = subDrawable;
-                drawable->startDraw();
-                startPos = startPosition;
-            }
-        }
-    }
-
-    DeviceDrawable* getDrawable() { return drawable; }
-    Coord offsetLocation(const Coord& source) const { return isSubDevice ? Coord(source.x - startPos.x, source.y - startPos.y) : source; }
-    Coord offsetLocation(const Coord& source, int xOffs, int yOffs) const {
-        return isSubDevice ? Coord((source.x + xOffs) - startPos.x, (source.y + yOffs) - startPos.y) : Coord(source.x + xOffs, source.y + yOffs);
-    }
-
-    color_t fgCol() { return palette[1];}
-    color_t fgColUnderlying() { return drawable->getUnderlyingColor(palette[1]);}
-    color_t bgCol() { return palette[0];}
-
-    void endDraw() { if(isSubDevice) drawable->endDraw(true); }
-};
-
 
 #endif //TCMENU_DRAWABLE_DASHBOARD_H

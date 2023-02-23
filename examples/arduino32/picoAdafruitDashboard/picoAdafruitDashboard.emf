@@ -119,6 +119,38 @@
         "visible": true,
         "staticDataInRAM": false
       }
+    },
+    {
+      "parentId": 5,
+      "type": "boolItem",
+      "defaultValue": "false",
+      "item": {
+        "naming": "YES_NO",
+        "name": "YesNo",
+        "variableName": "SettingsYesNo",
+        "id": 8,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 5,
+      "type": "boolItem",
+      "defaultValue": "false",
+      "item": {
+        "naming": "CHECKBOX",
+        "name": "CheckBox",
+        "variableName": "SettingsCheckBox",
+        "id": 9,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
     }
   ],
   "codeOptions": {

@@ -21,8 +21,12 @@ AdafruitDrawable gfxDrawable(&gfx, 40);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 
 // Global Menu Item declarations
+const PROGMEM BooleanMenuInfo minfoSettingsCheckBox = { "CheckBox", 9, 0xffff, 1, NO_CALLBACK, NAMING_CHECKBOX };
+BooleanMenuItem menuSettingsCheckBox(&minfoSettingsCheckBox, false, NULL, INFO_LOCATION_PGM);
+const PROGMEM BooleanMenuInfo minfoSettingsYesNo = { "YesNo", 8, 0xffff, 1, NO_CALLBACK, NAMING_YES_NO };
+BooleanMenuItem menuSettingsYesNo(&minfoSettingsYesNo, false, &menuSettingsCheckBox, INFO_LOCATION_PGM);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRGBRtCall, rgbAlphaItemRenderFn, "RGB", -1, NO_CALLBACK)
-Rgb32MenuItem menuSettingsRGB(fnSettingsRGBRtCall, RgbColor32(0, 0, 0), 7, false, NULL);
+Rgb32MenuItem menuSettingsRGB(fnSettingsRGBRtCall, RgbColor32(0, 0, 0), 7, false, &menuSettingsYesNo);
 const PROGMEM AnyMenuInfo minfoSettingsAction = { "Action", 6, 0xffff, 0, onSettingsAction };
 ActionMenuItem menuSettingsAction(&minfoSettingsAction, &menuSettingsRGB, INFO_LOCATION_PGM);
 const PROGMEM SubMenuInfo minfoSettings = { "Settings", 5, 0xffff, 0, NO_CALLBACK };

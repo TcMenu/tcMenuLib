@@ -4,6 +4,7 @@
  */
 
 #include "GraphicsDeviceRenderer.h"
+#include "DeviceDrawableHelper.h"
 #include <tcUnicodeHelper.h>
 
 namespace tcgfx {
@@ -18,7 +19,7 @@ namespace tcgfx {
     }
 
     GraphicsDeviceRenderer::GraphicsDeviceRenderer(int bufferSize, const char *appTitle, DeviceDrawable *drawable)
-            : BaseGraphicalRenderer(bufferSize, 1, 1, false, appTitle), rootDrawable(drawable), drawable(drawable) {
+            : BaseGraphicalRenderer(bufferSize, 1, 1, false, appTitle), rootDrawable(drawable), helper(drawable) {
         const Coord &coord = rootDrawable->getDisplayDimensions();
         width = coord.x;
         height = coord.y;
@@ -28,13 +29,13 @@ namespace tcgfx {
         switch(command) {
             case DRAW_COMMAND_CLEAR: {
                 auto* cfg = propertiesFactory.configFor(nullptr, ItemDisplayProperties::COMPTYPE_ITEM);
-                drawable->setDrawColor(cfg->getColor(ItemDisplayProperties::BACKGROUND));
-                drawable->drawBox(Coord(0, 0), Coord(width, height), true);
+                helper.getDrawable()->setDrawColor(cfg->getColor(ItemDisplayProperties::BACKGROUND));
+                helper.getDrawable()->drawBox(Coord(0, 0), Coord(width, height), true);
                 break;
             }
             case DRAW_COMMAND_START:
             case DRAW_COMMAND_ENDED:
-                drawable->transaction(command == DRAW_COMMAND_START, redrawNeeded);
+                helper.getDrawable()->transaction(command == DRAW_COMMAND_START, redrawNeeded);
                 redrawNeeded = false;
                 break;
         }
@@ -42,8 +43,8 @@ namespace tcgfx {
 
     void GraphicsDeviceRenderer::drawWidget(Coord where, TitleWidget *widget, color_t colorFg, color_t colorBg) {
         redrawNeeded = true;
-        drawable->setColors(colorFg, colorBg);
-        drawable->drawXBitmap(where, Coord(widget->getWidth(), widget->getHeight()), widget->getCurrentIcon());
+        helper.getDrawable()->setColors(colorFg, colorBg);
+        helper.getDrawable()->drawXBitmap(where, Coord(widget->getWidth(), widget->getHeight()), widget->getCurrentIcon());
     }
 
     void GraphicsDeviceRenderer::drawMenuItem(GridPositionRowCacheEntry *entry, Coord where, Coord areaSize, bool drawAll) {
@@ -53,8 +54,8 @@ namespace tcgfx {
         // if it's in a multi grid layout, put a small gap at the start of each one.
         if(entry->getPosition().getGridSize() > 1) {
             auto space = entry->getDisplayProperties()->getSpaceAfter();
-            drawable->setDrawColor(entry->getDisplayProperties()->getColor(ItemDisplayProperties::BACKGROUND));
-            drawable->drawBox(where, Coord(space, areaSize.y), true);
+            helper.getDrawable()->setDrawColor(entry->getDisplayProperties()->getColor(ItemDisplayProperties::BACKGROUND));
+            helper.getDrawable()->drawBox(where, Coord(space, areaSize.y), true);
             areaSize.x -= space;
             where.x += space;
         }
@@ -62,8 +63,8 @@ namespace tcgfx {
         // if we are drawing everything, then we need to clear out the areas in between items.
         if(drawAll && entry->getDisplayProperties()->getSpaceAfter() > 0) {
             auto* bgConfig = propertiesFactory.configFor(menuMgr.getCurrentSubMenu(), ItemDisplayProperties::COMPTYPE_ITEM);
-            drawable->setDrawColor(bgConfig->getColor(ItemDisplayProperties::BACKGROUND));
-            drawable->drawBox(Coord(where.x, where.y + areaSize.y), Coord(areaSize.x, entry->getDisplayProperties()->getSpaceAfter()), true);
+            helper.getDrawable()->setDrawColor(bgConfig->getColor(ItemDisplayProperties::BACKGROUND));
+            helper.getDrawable()->drawBox(Coord(where.x, where.y + areaSize.y), Coord(areaSize.x, entry->getDisplayProperties()->getSpaceAfter()), true);
         }
 
         // icons never use double buffer drawing because they may use a lot of BPP and don't change often in the main
@@ -73,24 +74,16 @@ namespace tcgfx {
             return;
         }
 
-        DeviceDrawable* subDevice = nullptr;
-        if(rootDrawable->getSubDeviceType() == DeviceDrawable::SUB_DEVICE_4BPP) {
-            subDevice = rootDrawable->getSubDeviceFor(where, areaSize, entry->getDisplayProperties()->getPalette(), 6);
-        } else if(rootDrawable->getSubDeviceType() == DeviceDrawable::SUB_DEVICE_2BPP) {
-            color_t palette[4];
-            bool selected = isActiveOrEditing(entry->getMenuItem());
-            palette[ItemDisplayProperties::TEXT] = (selected) ? propertiesFactory.getSelectedColor(ItemDisplayProperties::TEXT) : entry->getDisplayProperties()->getPalette()[ItemDisplayProperties::TEXT];
-            palette[ItemDisplayProperties::BACKGROUND] = (selected) ? propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND) : entry->getDisplayProperties()->getPalette()[ItemDisplayProperties::BACKGROUND];
-            palette[ItemDisplayProperties::HIGHLIGHT1] = entry->getDisplayProperties()->getPalette()[ItemDisplayProperties::HIGHLIGHT1];
-            palette[ItemDisplayProperties::HIGHLIGHT2] = entry->getDisplayProperties()->getPalette()[ItemDisplayProperties::HIGHLIGHT2];
-            subDevice = rootDrawable->getSubDeviceFor(where, areaSize, palette, 4);
-        }
+        color_t palette[4];
+        bool selected = isActiveOrEditing(entry->getMenuItem());
+        palette[ItemDisplayProperties::TEXT] = (selected) ? propertiesFactory.getSelectedColor(ItemDisplayProperties::TEXT) : entry->getDisplayProperties()->getPalette()[ItemDisplayProperties::TEXT];
+        palette[ItemDisplayProperties::BACKGROUND] = (selected) ? propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND) : entry->getDisplayProperties()->getPalette()[ItemDisplayProperties::BACKGROUND];
+        palette[ItemDisplayProperties::HIGHLIGHT1] = entry->getDisplayProperties()->getPalette()[ItemDisplayProperties::HIGHLIGHT1];
+        palette[ItemDisplayProperties::HIGHLIGHT2] = entry->getDisplayProperties()->getPalette()[ItemDisplayProperties::HIGHLIGHT2];
+        helper.reConfigure(palette, 4, where, areaSize);
 
-        if(subDevice) {
-            subDevice->startDraw();
-        }
-        drawable = subDevice ? subDevice : rootDrawable;
-        Coord wh = subDevice ? Coord(0,0) : where;
+        Coord wh = helper.offsetLocation(where);
+
 
         switch(drawingMode) {
             case GridPosition::DRAW_TEXTUAL_ITEM:
@@ -107,10 +100,7 @@ namespace tcgfx {
                 break;
         }
 
-        if(subDevice) {
-            drawable = rootDrawable;
-            subDevice->endDraw();
-        }
+        helper.endDraw();
     }
 
     int GraphicsDeviceRenderer::calculateSpaceBetween(const void* font, uint8_t mag, const char* buffer, int start, int end) {
@@ -124,7 +114,7 @@ namespace tcgfx {
             idx++;
         }
         sz[idx] = 0;
-        auto extents = drawable->textExtents(font, mag, sz);
+        auto extents = helper.getDrawable()->textExtents(font, mag, sz);
         return int(extents.x);
     }
 
@@ -152,32 +142,34 @@ namespace tcgfx {
             }
         }
 
+        helper.setFont(DeviceFontDrawingMode(NativeFontDesc(props->getFont(), props->getFontMagnification())));
+
         if(just == GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT || weAreEditingWithCursor) {
             // special case, title left, value right.
             Coord wh = Coord(where.x + padding.left, where.y + padding.top);
             pEntry->getMenuItem()->copyNameToBuffer(buffer, bufferSize);
             serlogF4(SER_TCMENU_DEBUG, "item: ", buffer, size.y, where.y);
-            drawable->setDrawColor(fg);
-            drawable->drawText(wh, props->getFont(), props->getFontMagnification(), buffer);
+            helper.getDrawable()->setDrawColor(fg);
+            helper.drawText(wh, fg, buffer);
 
             if(valueNeeded) {
                 copyMenuItemValue(pEntry->getMenuItem(), buffer, bufferSize);
             } else buffer[0] = 0;
-            int16_t right = where.x + size.x - (drawable->textExtents(props->getFont(), props->getFontMagnification(), buffer).x + padding.right);
+            int bl;
+            int16_t right = where.x + size.x - (helper.textExtents(buffer, &bl).x + padding.right);
             wh.x = right;
             if(weAreEditingWithCursor) {
-                drawable->setDrawColor(propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND, true));
+                helper.getDrawable()->setDrawColor(propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND, true));
                 auto& hints = menuMgr.getEditorHints();
                 int startX = calculateSpaceBetween(props->getFont(), props->getFontMagnification(), buffer, 0, hints.getStartIndex() );
                 int lenX = max(MINIMUM_CURSOR_SIZE, calculateSpaceBetween(props->getFont(), props->getFontMagnification(), buffer, hints.getStartIndex(), hints.getEndIndex()));
                 int whereX = min(int(width) - MINIMUM_CURSOR_SIZE, int(wh.x + startX));
-                drawable->drawBox(Coord(whereX, where.y + size.y - 1), Coord(lenX, 1), true);
-                drawable->setDrawColor(fg);
+                helper.getDrawable()->drawBox(Coord(whereX, where.y + size.y - 1), Coord(lenX, 1), true);
                 if(hints.getEndIndex() > strlen(buffer)) wh.x = wh.x - (unsigned int)MINIMUM_CURSOR_SIZE;
-                drawable->drawText(wh, props->getFont(), props->getFontMagnification(), buffer);
+                helper.drawText(wh, fg, buffer);
             }
             else {
-                drawable->drawText(wh, props->getFont(), props->getFontMagnification(), buffer);
+                helper.drawText(wh, fg, buffer);
             }
         }
         else {
@@ -192,14 +184,14 @@ namespace tcgfx {
             }
 
             int startPosition = padding.left;
+            int bl;
             if(coreJustification(just) == GridPosition::CORE_JUSTIFY_RIGHT) {
-                startPosition = size.x - (drawable->textExtents(props->getFont(), props->getFontMagnification(), sz).x + padding.right);
+                startPosition = size.x - (helper.textExtents(sz, &bl).x + padding.right);
             }
             else if(coreJustification(just) == GridPosition::CORE_JUSTIFY_CENTER) {
-                startPosition = ((size.x - drawable->textExtents(props->getFont(), props->getFontMagnification(), sz).x) / 2) + padding.right;
+                startPosition = ((size.x - helper.textExtents(sz, &bl).x) / 2) + padding.right;
             }
-            drawable->setDrawColor(fg);
-            drawable->drawText(Coord(startPosition + where.x, where.y + padding.top), props->getFont(), props->getFontMagnification(), sz);
+            helper.drawText(Coord(startPosition + where.x, where.y + padding.top), fg, sz);
             serlogF4(SER_TCMENU_DEBUG, "intTx ", sz, startPosition + where.x, (where.y + size.y) - padding.bottom);
         }
     }
@@ -226,21 +218,21 @@ namespace tcgfx {
 
         // draw any active arrow or blank space that's needed first
         if((entry->getMenuItem()->isEditing() || entry->getMenuItem()->isActive())) {
-            drawable->setDrawColor(bgColor);
+            helper.getDrawable()->setDrawColor(bgColor);
             // drawing too much as a real impact on some displays, when we don't need to render the background, we do not
             Coord adjustedSize = drawBg ? size : Coord(xoffset + pad.left, size.y);
-            drawable->drawBox(where, adjustedSize, true);
-            drawable->setColors(textColor, bgColor);
+            helper.getDrawable()->drawBox(where, adjustedSize, true);
+            helper.getDrawable()->setColors(textColor, bgColor);
             if(icon) {
                 int imgMiddleY = where.y + ((size.y - icon->getDimensions().y) / 2);
-                drawable->drawXBitmap(Coord(where.x + pad.left, imgMiddleY), icon->getDimensions(),
+                helper.getDrawable()->drawXBitmap(Coord(where.x + pad.left, imgMiddleY), icon->getDimensions(),
                                       icon->getIcon(false));
             }
         }
         else {
             Coord adjustedSize = drawBg ? size : Coord(xoffset + pad.left, size.y);
-            drawable->setDrawColor(bgColor);
-            drawable->drawBox(where, adjustedSize, true);
+            helper.getDrawable()->setDrawColor(bgColor);
+            helper.getDrawable()->drawBox(where, adjustedSize, true);
         }
 
         if(icon) {
@@ -253,7 +245,7 @@ namespace tcgfx {
         MenuBorder border = entry->getDisplayProperties()->getBorder();
         if(!border.isBorderOff() || forceBorder) {
             if(forceBorder) border = MenuBorder(1);
-            drawable->setDrawColor(textColor);
+            helper.getDrawable()->setDrawColor(textColor);
             drawBorderAndAdjustSize(where, size, border);
         }
 
@@ -262,7 +254,7 @@ namespace tcgfx {
     void GraphicsDeviceRenderer::drawBorderAndAdjustSize(Coord &where, Coord &size, MenuBorder &border) {
         if(border.areAllBordersEqual()) {
             for(int i=0; i<border.left;++i) {
-                drawable->drawBox(where, size, false);
+                helper.getDrawable()->drawBox(where, size, false);
                 where.x++;
                 where.y++;
                 size.x -= 2;
@@ -271,22 +263,22 @@ namespace tcgfx {
         }
         else {
             if(border.left) {
-                drawable->drawBox(Coord(where.x, where.y), Coord(border.left, size.y), true);
+                helper.getDrawable()->drawBox(Coord(where.x, where.y), Coord(border.left, size.y), true);
                 where.x -= border.left;
                 size.x -= border.left;
             }
             if(border.right) {
-                drawable->drawBox(Coord(where.x + size.x - border.right, where.y), Coord(border.right, size.y), true);
+                helper.getDrawable()->drawBox(Coord(where.x + size.x - border.right, where.y), Coord(border.right, size.y), true);
                 where.x -= border.right;
                 size.x -= border.right;
             }
             if(border.bottom) {
-                drawable->drawBox(Coord(where.x, where.y + size.y - border.bottom), Coord(size.x, border.bottom), true);
+                helper.getDrawable()->drawBox(Coord(where.x, where.y + size.y - border.bottom), Coord(size.x, border.bottom), true);
                 where.y -= border.bottom;
                 size.y -= border.bottom;
             }
             if(border.top) {
-                drawable->drawBox(Coord(where.x, where.y), Coord(size.x, border.top), true);
+                helper.getDrawable()->drawBox(Coord(where.x, where.y), Coord(size.x, border.top), true);
                 where.y -= border.bottom;
                 size.y -= border.bottom;
             }
@@ -304,14 +296,14 @@ namespace tcgfx {
         auto hl = entry->getDisplayProperties()->getColor(ItemDisplayProperties::HIGHLIGHT1);
         auto txtCol = entry->getDisplayProperties()->getColor(ItemDisplayProperties::TEXT);
 
-        drawable->setDrawColor(txtCol);
-        drawable->drawBox(Coord(startingX, where.y + padding.top), Coord(hei, hei), false);
+        helper.getDrawable()->setDrawColor(txtCol);
+        helper.getDrawable()->drawBox(Coord(startingX, where.y + padding.top), Coord(hei, hei), false);
         if(hl != txtCol) {
-            drawable->drawBox(Coord(startingX + 1, where.y + padding.top + 1), Coord(hei - 2, hei - 2), false);
+            helper.getDrawable()->drawBox(Coord(startingX + 1, where.y + padding.top + 1), Coord(hei - 2, hei - 2), false);
         }
         if(boolItem->getBoolean()) {
-            drawable->setDrawColor(hl);
-            drawable->drawBox(Coord(startingX + 2, where.y + padding.top + 2), Coord(hei - 4, hei - 4), true);
+            helper.getDrawable()->setDrawColor(hl);
+            helper.getDrawable()->drawBox(Coord(startingX + 2, where.y + padding.top + 2), Coord(hei - 4, hei - 4), true);
         }
         internalDrawText(entry, where, Coord(size.x - (hei + padding.left), size.y));
     }
@@ -330,12 +322,12 @@ namespace tcgfx {
             int textStartX = size.y + padding.left;
             auto hl = entry->getDisplayProperties()->getColor(ItemDisplayProperties::HIGHLIGHT1);
             auto txtCol = entry->getDisplayProperties()->getColor(ItemDisplayProperties::TEXT);
-            drawable->setDrawColor(hl);
-            drawable->drawBox(Coord(downButtonLocation, where.y), Coord(size.y, size.y), true);
-            drawable->drawBox(Coord(upButtonLocation, where.y), Coord(size.y, size.y), true);
-            drawable->setColors(txtCol, hl);
-            drawable->drawXBitmap(Coord(downButtonLocation + offset, where.y + offset), rendererXbmArrowSize, rendererDownArrowXbm);
-            drawable->drawXBitmap(Coord(upButtonLocation + offset, where.y + offset), rendererXbmArrowSize, rendererUpArrowXbm);
+            helper.getDrawable()->setDrawColor(hl);
+            helper.getDrawable()->drawBox(Coord(downButtonLocation, where.y), Coord(size.y, size.y), true);
+            helper.getDrawable()->drawBox(Coord(upButtonLocation, where.y), Coord(size.y, size.y), true);
+            helper.getDrawable()->setColors(txtCol, hl);
+            helper.getDrawable()->drawXBitmap(Coord(downButtonLocation + offset, where.y + offset), rendererXbmArrowSize, rendererDownArrowXbm);
+            helper.getDrawable()->drawXBitmap(Coord(upButtonLocation + offset, where.y + offset), rendererXbmArrowSize, rendererUpArrowXbm);
 
             internalDrawText(entry, Coord(where.x + textStartX, where.y),
                              Coord(size.x - (((buttonSize + padding.right) * 2)), size.y));
@@ -366,11 +358,11 @@ namespace tcgfx {
         int maximumSliderArea = size.x - pad.right;
         int filledAreaX = analogRangeToScreen(pItem, maximumSliderArea);
         int outsideAreaX = maximumSliderArea - filledAreaX;
-        drawable->setDrawColor(props->getColor(ItemDisplayProperties::HIGHLIGHT1));
-        drawable->drawBox(Coord(where.x, where.y), Coord(filledAreaX, size.y), true);
+        helper.getDrawable()->setDrawColor(props->getColor(ItemDisplayProperties::HIGHLIGHT1));
+        helper.getDrawable()->drawBox(Coord(where.x, where.y), Coord(filledAreaX, size.y), true);
         auto mainBg = (pItem->isActive() || pItem->isEditing()) ? propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND) : props->getColor(ItemDisplayProperties::BACKGROUND);
-        drawable->setDrawColor(mainBg);
-        drawable->drawBox(Coord(where.x + filledAreaX, where.y), Coord(outsideAreaX, size.y), true);
+        helper.getDrawable()->setDrawColor(mainBg);
+        helper.getDrawable()->drawBox(Coord(where.x + filledAreaX, where.y), Coord(outsideAreaX, size.y), true);
         internalDrawText(entry, Coord(where.x, where.y), Coord(size.x, size.y));
     }
 
@@ -392,12 +384,12 @@ namespace tcgfx {
         }
 
         if(isActiveOrEditing(pEntry->getMenuItem())) {
-            drawable->setColors(propertiesFactory.getSelectedColor(ItemDisplayProperties::TEXT), propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND));
+            helper.getDrawable()->setColors(propertiesFactory.getSelectedColor(ItemDisplayProperties::TEXT), propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND));
         }
         else {
-            drawable->setColors(pEntry->getDisplayProperties()->getColor(ItemDisplayProperties::HIGHLIGHT2), pEntry->getDisplayProperties()->getColor(ItemDisplayProperties::BACKGROUND));
+            helper.getDrawable()->setColors(pEntry->getDisplayProperties()->getColor(ItemDisplayProperties::HIGHLIGHT2), pEntry->getDisplayProperties()->getColor(ItemDisplayProperties::BACKGROUND));
         }
-        drawable->drawBitmap(iconWhere, pIcon, sel);
+        helper.getDrawable()->drawBitmap(iconWhere, pIcon, sel);
 
         if(pEntry->getPosition().getDrawingMode() == GridPosition::DRAW_AS_ICON_TEXT) {
             effectiveTop += pIcon->getDimensions().y;
@@ -407,7 +399,8 @@ namespace tcgfx {
 
     int GraphicsDeviceRenderer::heightForFontPadding(const void *font, int mag, MenuPadding &padding) {
         int baseline=0;
-        Coord sizeInfo = drawable->textExtents(font, mag, "();yg1", &baseline);
+        helper.setFont(DeviceFontDrawingMode(NativeFontDesc(font, mag)));
+        Coord sizeInfo = helper.textExtents("();yg1", &baseline);
         int hei = sizeInfo.y + padding.top + padding.bottom;
         padding.bottom += baseline; // add the baseline to padding.
         return hei;
@@ -435,48 +428,7 @@ namespace tcgfx {
     void GraphicsDeviceRenderer::fillWithBackgroundTo(int endPoint) {
         if(endPoint >= height) return; // nothing to do when the display is already full.
         auto* bgConfig = propertiesFactory.configFor(menuMgr.getCurrentMenu(), ItemDisplayProperties::COMPTYPE_ITEM);
-        drawable->setDrawColor(bgConfig->getColor(ItemDisplayProperties::BACKGROUND));
-        drawable->drawBox(Coord(0, endPoint), Coord(width, height-endPoint), true);
-    }
-
-    void DeviceDrawable::drawText(const Coord& where, const void* font, int mag, const char* text) {
-        auto handler = getUnicodeHandler(false);
-        if(handler) {
-            handler->setDrawColor(drawColor);
-            setTcFontAccordingToMag(handler, font, mag);
-            handler->setCursor((int)where.x, (int)where.y + (handler->getYAdvance() - handler->getBaseline()));
-            handler->print(text);
-        } else {
-            internalDrawText(where, font, mag, text);
-        }
-    }
-
-    UnicodeFontHandler *DeviceDrawable::getUnicodeHandler(bool enableIfNeeded) {
-        if(fontHandler == nullptr && enableIfNeeded) {
-            fontHandler = createFontHandler();
-        }
-        return fontHandler; // if null, there is no font handler.
-    }
-
-    UnicodeFontHandler *DeviceDrawable::createFontHandler() {
-        return fontHandler = new UnicodeFontHandler(this, ENCMODE_UTF8);
-    }
-
-    Coord DeviceDrawable::textExtents(const void *font, int mag, const char *text, int *baseline) {
-        auto handler = getUnicodeHandler(false);
-        if(handler) {
-            setTcFontAccordingToMag(handler, font, mag);
-            return handler->textExtents(text, baseline, false);
-        } else {
-            return internalTextExtents(font, mag, text, baseline);
-        }
-    }
-
-    void setTcFontAccordingToMag(UnicodeFontHandler* handler, const void* font, int mag) {
-        if(mag == 0) {
-            handler->setFont((UnicodeFont*) font);
-        } else {
-            handler->setFont((GFXfont*) font);
-        }
+        helper.getDrawable()->setDrawColor(bgConfig->getColor(ItemDisplayProperties::BACKGROUND));
+        helper.getDrawable()->drawBox(Coord(0, endPoint), Coord(width, height-endPoint), true);
     }
 } // namespace tcgfx

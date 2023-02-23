@@ -29,6 +29,8 @@ extern const GFXfont RobotoMedium24;
 
 
 // Global Menu Item exports
+extern BooleanMenuItem menuSettingsCheckBox;
+extern BooleanMenuItem menuSettingsYesNo;
 extern Rgb32MenuItem menuSettingsRGB;
 extern ActionMenuItem menuSettingsAction;
 extern BackMenuItem menuBackSettings;

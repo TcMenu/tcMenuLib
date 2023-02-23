@@ -193,7 +193,7 @@ namespace tcgfx {
             STORED_IN_ROM,
             /** This image is in RAM, if it can be supported by the display. EG board with progmem, driver support */
             STORED_IN_RAM,
-            /** Not yet supported, will provide for loading images from external storage in the next version */
+            /** Not yet supported, will provide for loading images from external storage in a future version */
             LOAD_FROM_STORAGE
         };
     private:
