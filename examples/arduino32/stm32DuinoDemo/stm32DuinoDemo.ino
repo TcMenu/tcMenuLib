@@ -12,6 +12,7 @@
 #include <SPI.h>
 #include <TaskManagerIO.h>
 #include <IoLogging.h>
+#include <stockIcons/directionalIcons.h>
 
 // We added a RAM based scroll choice item, and this references a fixed width array variable.
 // This variable is the RAM data for scroll choice item Scroll
@@ -21,6 +22,9 @@ char ramDataSet[] = "1\0        2\0        3\0        4\0        5\0        ~";
 const uint8_t myManualIp[] = { 192, 168, 0, 202 };
 const uint8_t myManualMac[] = { 0xde, 0xed, 0xbe, 0xef, 0xfe, 0xed };
 const uint8_t standardNetMask[] = { 255, 255, 255, 0 };
+
+DrawableIcon iconLeft(-1, Coord(11, 22), tcgfx::DrawableIcon::ICON_XBITMAP, ArrowHoriz11x22BitmapLeft, nullptr);
+DrawableIcon iconRight(-1, Coord(11, 22), tcgfx::DrawableIcon::ICON_XBITMAP, ArrowHoriz11x22BitmapRight, nullptr);
 
 using namespace tcremote;
 
@@ -100,12 +104,17 @@ void setup() {
         menuHalves.setCurrentValue(6);
     });
 
+    // here we register the custom drawing we created earlier with the renderer
     myCustomDrawing.registerWithRenderer();
 
     // We can set a callback for when the title item is pressed on the main menu, here we just take over the display
     setTitlePressedCallback([](int) {
         renderer.takeOverDisplay();
     });
+
+    // lastly, we set the card layout for the main "root" menu. The last parameter is an optional touch screen interface
+    // that the card layout will interact with, to "flip" between cards. Set to null when no touch screen available.
+    renderer.enableCardLayout(iconLeft, iconRight, nullptr);
 }
 
 void loop() {

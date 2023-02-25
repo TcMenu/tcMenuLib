@@ -61,7 +61,7 @@ namespace tcgfx {
 
         void setTouchManager(MenuTouchScreenManager *manager);
 
-        void forMenu(ItemDisplayProperties *titleProps, DeviceDrawable *rootDrawable);
+        void forMenu(ItemDisplayProperties *titleProps, DeviceDrawable *rootDrawable, bool titleNeeded);
 
         void notInUse();
 

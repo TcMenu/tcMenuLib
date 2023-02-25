@@ -435,28 +435,27 @@ namespace tcgfx {
 
     void GraphicsDeviceRenderer::subMenuRender(MenuItem* rootItem, uint8_t& locRedrawMode, bool& forceDrawWidgets) {
         if(cardLayoutPane != nullptr && cardLayoutPane->isSubMenuCardLayout(menuMgr.getCurrentSubMenu())) {
-            GridPositionRowCacheEntry* titleEntry = itemOrderByRow.itemAtIndex(0);
+            GridPositionRowCacheEntry *titleEntry = itemOrderByRow.itemAtIndex(0);
             int activeIndex = offsetOfCurrentActive(rootItem);
-            GridPositionRowCacheEntry* entry = itemOrderByRow.itemAtIndex(activeIndex);
-            if(locRedrawMode == MENUDRAW_COMPLETE_REDRAW) {
-                cardLayoutPane->forMenu(titleEntry->getDisplayProperties(), getDeviceDrawable());
+            GridPositionRowCacheEntry *entry = itemOrderByRow.itemAtIndex(activeIndex);
+            bool titleNeeded = titleMode == TITLE_ALWAYS || titleMode == TITLE_FIRST_ROW;
+            if (locRedrawMode == MENUDRAW_COMPLETE_REDRAW) {
+                cardLayoutPane->forMenu(entry->getDisplayProperties(), getDeviceDrawable(), titleNeeded);
             }
-            int startY = 0;
-            const MenuPadding &padding = entry->getDisplayProperties()->getPadding();
-            if(titleMode == TITLE_ALWAYS || titleMode == TITLE_FIRST_ROW) {
-                startY = heightOfRow(0, true);
-                startY += padding.top;
-                forceDrawWidgets = false;
-                drawMenuItem(titleEntry, { 0, 0 }, { startY - 1, rootDrawable->getDisplayDimensions().y }, true);
+            if (titleNeeded && (locRedrawMode == MENUDRAW_COMPLETE_REDRAW || titleEntry->getMenuItem()->isChanged())) {
+                drawMenuItem(titleEntry, Coord(0, 0), cardLayoutPane->getTitleSize(), true);
             }
-            int buttonSize = 16;
-            Coord startLocation = {padding.left + buttonSize, startY };
-            Coord mainItemSize = { rootDrawable->getDisplayDimensions().x - ((buttonSize * 2) + padding.left + padding.right),
-                                   rootDrawable->getDisplayDimensions().y - startY };
-            drawMenuItem(entry, startLocation, mainItemSize, true);
+            if (entry->getMenuItem()->isChanged() || locRedrawMode == MENUDRAW_COMPLETE_REDRAW) {
+                getDeviceDrawable()->setDrawColor(entry->getDisplayProperties()->getColor(ItemDisplayProperties::BACKGROUND));
+                getDeviceDrawable()->drawBox(cardLayoutPane->getMenuLocation(), cardLayoutPane->getMenuSize(), true);
+                int offsetY = (cardLayoutPane->getMenuSize().y - entry->getHeight()) / 2;
+                Coord menuStart(cardLayoutPane->getMenuLocation().x, cardLayoutPane->getMenuLocation().y + offsetY);
+                Coord menuSize(cardLayoutPane->getMenuSize().x, entry->getHeight());
+                drawMenuItem(entry, menuStart, menuSize, false);
+            }
             cardLayoutPane->prepareAndPaintButtons(this, activeIndex, itemOrderByRow.count());
         } else {
-            if(cardLayoutPane) {
+            if(locRedrawMode == MENUDRAW_COMPLETE_REDRAW && cardLayoutPane != nullptr) {
                 cardLayoutPane->notInUse();
             }
             BaseGraphicalRenderer::subMenuRender(rootItem, locRedrawMode, forceDrawWidgets);

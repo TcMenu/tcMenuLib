@@ -27,7 +27,7 @@ void CardLayoutPane::setSubMenuState(MenuItem *item, bool onOrOff) {
     }
 }
 
-void CardLayoutPane::forMenu(ItemDisplayProperties* titleProps, DeviceDrawable* rootDrawable) {
+void CardLayoutPane::forMenu(ItemDisplayProperties* titleProps, DeviceDrawable* rootDrawable, bool titleNeeded) {
     inUse = true;
     if(touchScreenManager) {
         touchScreenManager->setSecondaryObserver(this);
@@ -35,8 +35,12 @@ void CardLayoutPane::forMenu(ItemDisplayProperties* titleProps, DeviceDrawable* 
 
     leftButton.setColors(titleProps->getColor(ItemDisplayProperties::BACKGROUND), titleProps->getColor(ItemDisplayProperties::TEXT), titleProps->getColor(ItemDisplayProperties::HIGHLIGHT2));
     rightButton.setColors(titleProps->getColor(ItemDisplayProperties::BACKGROUND), titleProps->getColor(ItemDisplayProperties::TEXT), titleProps->getColor(ItemDisplayProperties::HIGHLIGHT2));
-    int titleEndY = titleProps->getRequiredHeight();
-    int remainingHeight = rootDrawable->getDisplayDimensions().y - titleEndY;
+    int titleEndY = 0;
+    int remainingHeight = rootDrawable->getDisplayDimensions().y;
+    if(titleNeeded) {
+        titleEndY = titleProps->getRequiredHeight();
+        remainingHeight -= titleEndY;
+    }
 
     Coord buttonSize(iconLeft->getDimensions().x + (titleProps->getPadding().left * 2), remainingHeight);
     leftButton.setPositionAndSize(Coord(0, titleEndY), buttonSize);
@@ -52,7 +56,7 @@ void CardLayoutPane::setTouchManager(MenuTouchScreenManager *manager) {
 }
 
 void CardLayoutPane::notInUse() {
-    if(inUse) {
+    if(inUse && touchScreenManager != nullptr) {
         touchScreenManager->clearSecondaryObserver();
     }
     inUse = false;
