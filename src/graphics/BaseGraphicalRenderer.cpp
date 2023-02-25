@@ -30,55 +30,59 @@ void BaseGraphicalRenderer::render() {
 
     // if the root menu rootItem has changed then it's a complete re-draw and we need to calculate the orders again.
     MenuItem* rootItem = menuMgr.getCurrentMenu();
+
     if (menuMgr.getCurrentMenu()->getMenuType() == MENUTYPE_RUNTIME_LIST ) {
         if (rootItem->isChanged() || locRedrawMode != MENUDRAW_NO_CHANGE) {
             renderList();
             forceDrawWidgets = true;
         }
-        titleOnDisplay = (titleMode != NO_TITLE);
-    }
-    else if(itemOrderByRow.count()) {
-        // first we find the first currently active rootItem in our single linked list
-        int activeIndex = findActiveItem(rootItem);
-        uint16_t totalHeight = calculateHeightTo(activeIndex, rootItem);
-        int startRow = 0;
-        uint16_t adjustedHeight = height + (lastRowExactFit ? 0 : 1);
-        bool drawCompleteScreen = locRedrawMode != MENUDRAW_NO_CHANGE;
-        uint16_t startY = 0;
-
-        if(titleMode == TITLE_ALWAYS) {
-            startRow++;
-            startY = heightOfRow(0, true);
-            adjustedHeight -= startY;
-            totalHeight -= startY;
-        }
-
-        while (totalHeight > adjustedHeight) {
-            totalHeight -= heightOfRow(startRow, true);
-            startRow++;
-        }
-
-        // the screen has moved, we must completely redraw the area, and we need a clear first.
-        if(locRedrawMode != MENUDRAW_COMPLETE_REDRAW && lastOffset != startRow) {
-            locRedrawMode = MENUDRAW_COMPLETE_REDRAW;
-            serlogF3(SER_TCMENU_DEBUG, "Screen Row moved ", lastOffset, startRow);
-            drawCompleteScreen = true;
-        }
-        lastOffset = startRow;
-
-        if(titleMode == TITLE_ALWAYS && (drawCompleteScreen  || itemOrderByRow.itemAtIndex(0)->getMenuItem()->isChanged())) {
-            auto* pEntry = itemOrderByRow.itemAtIndex(0);
-            drawMenuItem(pEntry, Coord(0,0), Coord(width, startY), drawCompleteScreen);
-            forceDrawWidgets = true;
-        }
-
-        // and then we start drawing items until we run out of screen or items
-        if(drawTheMenuItems(startRow, startY, drawCompleteScreen)) forceDrawWidgets = true;
-        titleOnDisplay = (titleMode == TITLE_FIRST_ROW && startRow == 0) || titleMode == TITLE_ALWAYS;
+        setTitleOnDisplay(titleMode != NO_TITLE);
+    } else if(itemOrderByRow.count()) {
+        subMenuRender(rootItem, locRedrawMode, forceDrawWidgets);
     }
 
     redrawAllWidgets(locRedrawMode != MENUDRAW_NO_CHANGE || forceDrawWidgets);
     drawingCommand(DRAW_COMMAND_ENDED);
+}
+
+void BaseGraphicalRenderer::subMenuRender(MenuItem* rootItem, uint8_t& locRedrawMode, bool& forceDrawWidgets) {
+    // first we find the first currently active rootItem in our single linked list
+    int activeIndex = findActiveItem(rootItem);
+    uint16_t totalHeight = calculateHeightTo(activeIndex, rootItem);
+    int startRow = 0;
+    uint16_t adjustedHeight = height + (isLastRowExactFit() ? 0 : 1);
+    bool drawCompleteScreen = locRedrawMode != MENUDRAW_NO_CHANGE;
+    uint16_t startY = 0;
+
+    if(titleMode == TITLE_ALWAYS) {
+        startRow++;
+        startY = heightOfRow(0, true);
+        adjustedHeight -= startY;
+        totalHeight -= startY;
+    }
+
+    while (totalHeight > adjustedHeight) {
+        totalHeight -= heightOfRow(startRow, true);
+        startRow++;
+    }
+
+    // the screen has moved, we must completely redraw the area, and we need a clear first.
+    if(locRedrawMode != MENUDRAW_COMPLETE_REDRAW && lastOffset != startRow) {
+        locRedrawMode = MENUDRAW_COMPLETE_REDRAW;
+        serlogF3(SER_TCMENU_DEBUG, "Screen Row moved ", lastOffset, startRow);
+        drawCompleteScreen = true;
+    }
+    lastOffset = startRow;
+
+    if(titleMode == TITLE_ALWAYS && (drawCompleteScreen  || itemOrderByRow.itemAtIndex(0)->getMenuItem()->isChanged())) {
+        auto* pEntry = itemOrderByRow.itemAtIndex(0);
+        drawMenuItem(pEntry, Coord(0,0), Coord(width, startY), drawCompleteScreen);
+        forceDrawWidgets = true;
+    }
+
+    // and then we start drawing items until we run out of screen or items
+    if(drawTheMenuItems(startRow, startY, drawCompleteScreen)) forceDrawWidgets = true;
+    setTitleOnDisplay((titleMode == TITLE_FIRST_ROW && startRow == 0) || titleMode == TITLE_ALWAYS);
 }
 
 GridPositionRowCacheEntry* BaseGraphicalRenderer::findMenuEntryAndDimensions(const Coord& screenPos, Coord& localStart, Coord& localSize) {
@@ -101,6 +105,10 @@ GridPositionRowCacheEntry* BaseGraphicalRenderer::findMenuEntryAndDimensions(con
             cachedEntryItem = GridPositionRowCacheEntry(runList, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, rowNum + 1, titleHeight), titleProps);
             return &cachedEntryItem;
         }
+    }
+
+    if((isRawTouchMode())) {
+        return nullptr;
     }
 
     // if we are in title always mode, then the title must always be calculated
@@ -169,7 +177,7 @@ bool BaseGraphicalRenderer::drawTheMenuItems(int startRow, int startY, bool draw
         {
             if(lastRow != itemCfg->getPosition().getRow()) ypos += addAmount;
             totalHeight = ypos + itemCfg->getHeight();
-            auto extentsY = (lastRowExactFit) ? totalHeight : ypos;
+            auto extentsY = isLastRowExactFit() ? totalHeight : ypos;
             if(extentsY > height) break;
 
             if (drawEveryLine || item->isChanged()) {
@@ -240,7 +248,7 @@ void BaseGraphicalRenderer::renderList() {
     // reset the list item to a normal list again.
     runList->asParent();
     runList->setChanged(false);
-    titleOnDisplay = true;
+    setTitleOnDisplay(true);
 }
 
 GridPosition::GridDrawingMode modeFromItem(MenuItem* item, bool useSlider) {
@@ -301,7 +309,7 @@ void BaseGraphicalRenderer::recalculateDisplayOrder(MenuItem *root, bool safeMod
                 int row = 0;
                 while(itemOrderByRow.getByKey(rowCol(row, 1)) != nullptr) row++;
                 serlogF3(SER_TCMENU_DEBUG, "Add manual id at row", item->getId(), row);
-                auto mode = modeFromItem(item, useSliderForAnalog);
+                auto mode = modeFromItem(item, isUseSliderForAnalog());
                 auto* itemProps = getDisplayPropertiesFactory().configFor(item, toComponentType(mode, item));
                 itemOrderByRow.add(GridPositionRowCacheEntry(item, GridPosition(mode, itemProps->getDefaultJustification(), 1, 1, row, 0), itemProps));
             }
@@ -331,7 +339,7 @@ bool BaseGraphicalRenderer::areRowsOutOfOrder() {
 }
 
 void BaseGraphicalRenderer::redrawAllWidgets(bool forceRedraw) {
-    if(!titleOnDisplay || itemOrderByRow.count() == 0) return;
+    if(!isTitleOnDisplay() || itemOrderByRow.count() == 0) return;
     if(itemOrderByRow.itemAtIndex(0)->getPosition().getDrawingMode() != GridPosition::DRAW_TITLE_ITEM) return;
 
     auto* displayProps = itemOrderByRow.itemAtIndex(0)->getDisplayProperties();

@@ -6,6 +6,7 @@
 #include "GraphicsDeviceRenderer.h"
 #include "DeviceDrawableHelper.h"
 #include <tcUnicodeHelper.h>
+#include "CardLayoutPanel.h"
 
 namespace tcgfx {
 
@@ -165,7 +166,7 @@ namespace tcgfx {
                 int lenX = max(MINIMUM_CURSOR_SIZE, calculateSpaceBetween(props->getFont(), props->getFontMagnification(), buffer, hints.getStartIndex(), hints.getEndIndex()));
                 int whereX = min(int(width) - MINIMUM_CURSOR_SIZE, int(wh.x + startX));
                 helper.getDrawable()->drawBox(Coord(whereX, where.y + size.y - 1), Coord(lenX, 1), true);
-                if(hints.getEndIndex() > strlen(buffer)) wh.x = wh.x - (unsigned int)MINIMUM_CURSOR_SIZE;
+                if(size_t(hints.getEndIndex()) > strlen(buffer)) wh.x = wh.x - (unsigned int)MINIMUM_CURSOR_SIZE;
                 helper.drawText(wh, fg, buffer);
             }
             else {
@@ -314,7 +315,7 @@ namespace tcgfx {
 
         drawCoreLineItem(entry, icon, where, size, true);
 
-        if(hasTouchScreen && (entry->getMenuItem()->isActive() || entry->getMenuItem()->isEditing())) {
+        if(isHasTouchInterface() && (entry->getMenuItem()->isActive() || entry->getMenuItem()->isEditing())) {
             int buttonSize = size.y - 1;
             int offset = (buttonSize - rendererXbmArrowSize.y) / 2;
             int downButtonLocation = where.x;
@@ -430,5 +431,41 @@ namespace tcgfx {
         auto* bgConfig = propertiesFactory.configFor(menuMgr.getCurrentMenu(), ItemDisplayProperties::COMPTYPE_ITEM);
         helper.getDrawable()->setDrawColor(bgConfig->getColor(ItemDisplayProperties::BACKGROUND));
         helper.getDrawable()->drawBox(Coord(0, endPoint), Coord(width, height-endPoint), true);
+    }
+
+    void GraphicsDeviceRenderer::subMenuRender(MenuItem* rootItem, uint8_t& locRedrawMode, bool& forceDrawWidgets) {
+        if(cardLayoutPane != nullptr && cardLayoutPane->isSubMenuCardLayout(menuMgr.getCurrentSubMenu())) {
+            GridPositionRowCacheEntry* titleEntry = itemOrderByRow.itemAtIndex(0);
+            int activeIndex = offsetOfCurrentActive(rootItem);
+            GridPositionRowCacheEntry* entry = itemOrderByRow.itemAtIndex(activeIndex);
+            if(locRedrawMode == MENUDRAW_COMPLETE_REDRAW) {
+                cardLayoutPane->forMenu(titleEntry->getDisplayProperties(), getDeviceDrawable());
+            }
+            int startY = 0;
+            const MenuPadding &padding = entry->getDisplayProperties()->getPadding();
+            if(titleMode == TITLE_ALWAYS || titleMode == TITLE_FIRST_ROW) {
+                startY = heightOfRow(0, true);
+                startY += padding.top;
+                forceDrawWidgets = false;
+                drawMenuItem(titleEntry, { 0, 0 }, { startY - 1, rootDrawable->getDisplayDimensions().y }, true);
+            }
+            int buttonSize = 16;
+            Coord startLocation = {padding.left + buttonSize, startY };
+            Coord mainItemSize = { rootDrawable->getDisplayDimensions().x - ((buttonSize * 2) + padding.left + padding.right),
+                                   rootDrawable->getDisplayDimensions().y - startY };
+            drawMenuItem(entry, startLocation, mainItemSize, true);
+            cardLayoutPane->prepareAndPaintButtons(this, activeIndex, itemOrderByRow.count());
+        } else {
+            if(cardLayoutPane) {
+                cardLayoutPane->notInUse();
+            }
+            BaseGraphicalRenderer::subMenuRender(rootItem, locRedrawMode, forceDrawWidgets);
+        }
+    }
+    
+    void GraphicsDeviceRenderer::enableCardLayout(const DrawableIcon& left, const DrawableIcon& right, MenuTouchScreenManager* touchScreenManager) {
+        if(cardLayoutPane == nullptr) {
+            cardLayoutPane = new CardLayoutPane(&left, &right, touchScreenManager);
+        }
     }
 } // namespace tcgfx

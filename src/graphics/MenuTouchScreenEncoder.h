@@ -89,6 +89,7 @@ namespace tcgfx {
         MenuTouchScreenEncoder encoder;
         BaseGraphicalRenderer* renderer;
         TouchObserver* observer;
+        TouchObserver* secondaryObserver;
         float lastX, lastY;
         Coord lastCoord;
         iotouch::TouchState currentState;
@@ -109,11 +110,25 @@ namespace tcgfx {
                                const iotouch::TouchOrientationSettings& rotation);
 
         void sendEvent(float locationX, float locationY, float touchPressure, iotouch::TouchState touched) override;
-
         iotouch::TouchState getLastTouchState() const { return currentState; }
         float getLastX() const { return lastX; }
         float getLastY() const { return lastY; }
         Coord getLastScreenCoord() { return lastCoord; }
+
+        /**
+         * You can register a second temporary observer to receive touch updates, the card layout does this, and any
+         * other takeOverDisplay or other situation that needs such a temporary notification of touch can do so.
+         * @param secondaryObs the secondary listener
+         */
+        void setSecondaryObserver(TouchObserver* secondaryObs) { secondaryObserver = secondaryObs; }
+
+        /**
+         * Clear the secondary lister added by setSecondaryLister, note that if you are going to deallocate an object
+         * that is a listener you must call this first.
+         */
+        void clearSecondaryObserver() { secondaryObserver = nullptr; }
+
+        void sendToObservers(TouchNotification notification);
     };
 
 } // namespace tcgfx

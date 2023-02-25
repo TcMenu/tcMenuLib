@@ -66,14 +66,27 @@ namespace tcgfx {
          * @param text the text to be presented or nullptr if there is no text.
          */
         TcDrawableButton(const Coord &where, const Coord &size, color_t bgCol, color_t fgCol, color_t selCol,
-                         tcgfx::DrawableIcon *icon);
+                         const tcgfx::DrawableIcon *icon);
+
+        /**
+         * Create an icon based button where it is more convenient to set the color and positioning later
+         * @param icon the icon to draw with
+         */
+        explicit TcDrawableButton(const tcgfx::DrawableIcon *icon);
+
+        /**
+         * Create a text based b1utton where it is more convenient to set the color and positioning later
+         * @param text the text to draw
+         * @param font the font to draw with
+         */
+        TcDrawableButton(const char *text, const DeviceFontDrawingMode& font);
 
         /**
          * Returns true if the touch coordinates provided are within the bounds of this button, it also sets the pressed flag
          * @param location the touch location
          * @return true if within the buttons bounds
          */
-        bool touchInBounds(const Coord &location);
+        bool touchInBounds(const Coord &location) const;
 
         /**
          * Set the button mode
@@ -92,7 +105,17 @@ namespace tcgfx {
             bitWrite(flags, DRAW_BUTTON_FLAG_IS_DIRTY, d);
         }
 
+        /**
+         * If the button needs painting
+         * @return true if needs painting, otherwise false
+         */
         bool isDirty() const { return bitRead(flags, DRAW_BUTTON_FLAG_IS_DIRTY); }
+
+        /**
+         * If the button is an icon button
+         * @return true if icon, false if text
+         */
+        bool isIconDrawn() const { return bitRead(flags, DRAW_BUTTON_FLAG_ICON_BOOL); }
 
         /**
          * @return the current drawing mode of the button
@@ -104,6 +127,29 @@ namespace tcgfx {
          * @param drawable the drawable to draw onto
          */
         void paintButton(DeviceDrawable *drawable);
+
+        /**
+         * Set a new position for the button, note you will need to clear from the old location
+         * @param position the new screen position
+         */
+        void setPosition(const Coord& position);
+
+        /**
+         * Set both the position and size of the button at the same time
+         * @param position the screen position
+         * @param newSize the new size
+         */
+        void setPositionAndSize(const Coord& position, const Coord& newSize);
+
+        /**
+         * Change the colors associated with the button
+         * @param bgCol the background
+         * @param fgCol the foreground
+         * @param selCol the selected background
+         */
+        void setColors(color_t bgCol, color_t fgCol, color_t selCol);
+
+        void setText(const char* newText);
     };
 
 }

@@ -15,6 +15,12 @@
 #include "GfxMenuConfig.h"
 #include "RuntimeTitleMenuItem.h"
 
+#define GFX_LAST_ROW_FIT_FLAG 0
+#define GFX_USING_RAW_TOUCH 1
+#define GFX_USING_TOUCH_INTERFACE 2
+#define GFX_SLIDER_FOR_ANALOG 3
+#define GFX_TITLE_ON_DISPLAY 4
+
 namespace tcgfx {
 
     /**
@@ -89,28 +95,25 @@ namespace tcgfx {
             DRAW_COMMAND_ENDED
         };
     private:
-        BtreeList<uint16_t, GridPositionRowCacheEntry> itemOrderByRow;
         MenuItem *currentRootMenu;
         const char *pgmTitle;
-        bool lastRowExactFit;
-        bool useSliderForAnalog;
         GridPositionRowCacheEntry cachedEntryItem;
     protected:
+        BtreeList<uint16_t, GridPositionRowCacheEntry> itemOrderByRow;
         TitleMode titleMode = TITLE_FIRST_ROW;
-        bool titleOnDisplay = false;
-        bool hasTouchScreen;
+        uint8_t flags;
         uint16_t width, height;
     public:
         BaseGraphicalRenderer(int bufferSize, int wid, int hei, bool lastRowExact, const char *appTitle)
                 : BaseMenuRenderer(bufferSize, RENDER_TYPE_CONFIGURABLE) {
             width = wid;
             height = hei;
-            titleOnDisplay = true;
+            flags = 0;
+            setTitleOnDisplay(true);
+            setLastRowExactFit(lastRowExact);
+            setUseSliderForAnalog(true);
             currentRootMenu = nullptr;
-            lastRowExactFit = lastRowExact;
             pgmTitle = appTitle;
-            useSliderForAnalog = true;
-            hasTouchScreen = false;
         }
 
         void setTitleMode(TitleMode mode) {
@@ -118,11 +121,16 @@ namespace tcgfx {
             displayPropertiesHaveChanged();
         }
 
-        void setUseSliderForAnalog(bool useSlider) {
-            useSliderForAnalog = useSlider;
-        }
-
-        void setHasTouchInterface(bool hasTouch) { hasTouchScreen = hasTouch; }
+        void setUseSliderForAnalog(bool useSlider) { bitWrite(flags, GFX_SLIDER_FOR_ANALOG, useSlider); }
+        void setHasTouchInterface(bool hasTouch) { bitWrite(flags, GFX_USING_TOUCH_INTERFACE, hasTouch); }
+        void setTitleOnDisplay(bool titleOn) { bitWrite(flags, GFX_TITLE_ON_DISPLAY, titleOn); }
+        void setLastRowExactFit(bool exact) { bitWrite(flags, GFX_LAST_ROW_FIT_FLAG, exact); }
+        void setRawTouchMode(bool rawTouch) { bitWrite(flags, GFX_USING_RAW_TOUCH, rawTouch); }
+        bool isUseSliderForAnalog() { return bitRead(flags, GFX_SLIDER_FOR_ANALOG); }
+        bool isHasTouchInterface() { return bitRead(flags, GFX_USING_TOUCH_INTERFACE); }
+        bool isTitleOnDisplay() { return bitRead(flags, GFX_TITLE_ON_DISPLAY); }
+        bool isLastRowExactFit() { return bitRead(flags, GFX_LAST_ROW_FIT_FLAG); }
+        bool isRawTouchMode() { return bitRead(flags, GFX_USING_RAW_TOUCH); }
 
         void render() override;
 
@@ -175,7 +183,6 @@ namespace tcgfx {
          * @return the display properties factory.
          */
         virtual ItemDisplayPropertiesFactory &getDisplayPropertiesFactory() = 0;
-
 
         /**
          * Find the active item in the current list that is being presented, defaults to item 0.
@@ -234,6 +241,17 @@ namespace tcgfx {
          */
         void displayPropertiesHaveChanged() { currentRootMenu = nullptr; }
 
+    protected:
+        /**
+         * This is responsible for redrawing a series of menu items onto the screen, it can be overridden as needed
+         * in extension classes, such that different rendering can be achieved. The default rendering is vertical,
+         * with the items scrolling downward if needed. It is virtual to allow for such extensions.
+         * @param rootItem the first item in the linked list of children
+         * @param locRedrawMode the drawing mdoe, a reference, will be updated.
+         * @param forceDrawWidgets reference to widgets force update flag, will be updated.
+         */
+        virtual void subMenuRender(MenuItem* rootItem, uint8_t& locRedrawMode, bool& forceDrawWidgets);
+        int heightOfRow(int row, bool includeSpace=false);
     private:
         void checkIfRootHasChanged();
 
@@ -244,8 +262,6 @@ namespace tcgfx {
         void recalculateDisplayOrder(MenuItem *pItem, bool safeMode);
 
         void redrawAllWidgets(bool forceRedraw);
-
-        int heightOfRow(int row, bool includeSpace=false);
 
         bool areRowsOutOfOrder();
 

@@ -41,14 +41,19 @@ void MenuTouchScreenManager::sendEvent(float locationX, float locationY, float t
         // find the local size and ensure it does not drop below 0 in either dimension!
         int locX = max(0, (int)(lastCoord.x - localStart.x));
         int locY = max(0, (int)(lastCoord.y - localStart.y));
-        observer->touched(TouchNotification(currentlySelected, Coord(locX, locY), localStart, localSize, touched));
+        sendToObservers(TouchNotification(currentlySelected, Coord(locX, locY), localStart, localSize, touched));
     }
     else {
-        observer->touched(TouchNotification(lastCoord, touched));
+        sendToObservers(TouchNotification(lastCoord, touched));
     }
 }
 
-bool isTouchActionable(MenuItem* pItem) {
+    void MenuTouchScreenManager::sendToObservers(TouchNotification notification) {
+        observer->touched(notification);
+        if(secondaryObserver) secondaryObserver->touched(notification);
+    }
+
+    bool isTouchActionable(MenuItem* pItem) {
     return isItemActionable(pItem) || pItem->getMenuType() == MENUTYPE_BACK_VALUE || pItem->getMenuType() == MENUTYPE_BOOLEAN_VALUE;
 }
 

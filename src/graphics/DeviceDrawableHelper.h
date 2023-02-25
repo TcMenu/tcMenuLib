@@ -1,4 +1,12 @@
+/*
+ * Copyright (c) 2018 https://www.thecoderscorner.com (Dave Cherry).
+ * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
+ */
 
+/**
+ * @file DeviceDrawableHelper.h
+ * @brief A few helper classes that provides useful functions on top of a tcMenu device drawable.
+ */
 
 #ifndef TCLIBRARYDEV_DEVICEDRAWABLEHELPER_H
 #define TCLIBRARYDEV_DEVICEDRAWABLEHELPER_H

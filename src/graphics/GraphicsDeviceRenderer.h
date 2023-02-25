@@ -16,21 +16,16 @@
 #include "BaseGraphicalRenderer.h"
 #include "GfxMenuConfig.h"
 #include "DeviceDrawableHelper.h"
+#include "TcDrawableButton.h"
+#include "MenuTouchScreenEncoder.h"
 
 #ifndef MINIMUM_CURSOR_SIZE
 #define MINIMUM_CURSOR_SIZE 6
 #endif // MINIMUM_CURSOR_SIZE
 
 namespace tcgfx {
-    /**
-     * The layout modes that are supported by the graphical renderer, you can set this per sub menu.
-     */
-    enum MenuLayoutMode {
-        /** The regular vertical scrolling layout, items are presented vertically, and scroll as needed */
-        LAYOUT_REGULAR_VERTICAL,
-        /** Horizontal card layout, one item is shown at once, with button indicators for moving between items */
-        LAYOUT_CARD_HORIZONTAL
-    };
+
+    class CardLayoutPane;
 
     /**
      * This class contains all the drawing code that is used for most graphical displays, it relies on an instance of
@@ -46,6 +41,7 @@ namespace tcgfx {
         DeviceDrawable* rootDrawable;
         DeviceDrawableHelper helper;
         ConfigurableItemDisplayPropertiesFactory propertiesFactory;
+        CardLayoutPane* cardLayoutPane = nullptr;
         bool redrawNeeded = false;
     public:
         GraphicsDeviceRenderer(int bufferSize, const char *appTitle, DeviceDrawable *drawable);
@@ -110,11 +106,31 @@ namespace tcgfx {
         void enableTcUnicode() { rootDrawable->enableTcUnicode(); }
 
         /**
-         * Sets the mode in which to render the submenu, see the enumeration for the possible options.
-         * @param item the sub menu to set the mode for
-         * @param layout the layout mode, see the enumeration
+         * Enables the card layout system for the items provided, a card layout shows a single item at once, with left
+         * and right images present that work somewhat like buttons. Rotating the encoder (or up/down buttons) will result
+         * in switching between the menu items. This works particularly well when combined with using drawable icons
+         * for each of the menu items. Note that when enabled, this layout is always enabled for root.
+         * @param left the icon to use for left, (takes its colors from the title)
+         * @param right the icon to use for right, (takes its colors from the title)
+         * @param touchManager optionally provide the touch manager to make the buttons work with a touch screen
          */
-        void setRenderModeForSubMenu(SubMenuItem* item, MenuLayoutMode layout);
+        void enableCardLayout(const DrawableIcon& left, const DrawableIcon& right, MenuTouchScreenManager* touchManager);
+
+        /**
+         * Allows the card layout mode to be enabled by submenu.
+         * @param sub the submenu to change status of (nullptr for root)
+         * @param onOrOff true if on, otherwise false.
+         */
+        void setCardLayoutStatusForSub(MenuItem* sub, bool onOrOff);
+    protected:
+        /**
+         * Overrides the default implementation to allow for card based layouts, if this is not enabled for the submenu
+         * then regular rendering is used instead.
+         * @param rootItem the first item in the linked list for this submenu
+         * @param locRedrawMode reference to the local redraw mode. May be updated
+         * @param forceDrawWidgets reference to if the widgets are to be force drawn, may be updated
+         */
+        virtual void subMenuRender(MenuItem* rootItem, uint8_t& locRedrawMode, bool& forceDrawWidgets);
     private:
         int calculateSpaceBetween(const void* font, uint8_t mag, const char* buffer, int start, int end);
         void internalDrawText(GridPositionRowCacheEntry* pEntry, const Coord& where, const Coord& size);
