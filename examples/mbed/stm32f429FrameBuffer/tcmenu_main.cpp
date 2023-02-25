@@ -19,6 +19,14 @@ void setup() {
     setupMenu();
 
     /**
+     * We must set up the dashboard BEFORE we run the touch calibrator. See dashboardConfig.cpp/h for the function.
+     */
+    setupDashboard();
+
+
+    /**
+     * Here we are going to initialise touch calibration, it can present a calibration UI if needed.
+     *
      * The function you provide is called when the touch calibration starts and ends. The parameter is false at start
      * and true at the end. At the start you should remove any rotations so that the screen and touch are in alignment
      * at their defaults. The UI will then present in the native format, and record the ranges, then once dismissed the
@@ -32,10 +40,16 @@ void setup() {
         }
     }, true);
 
+    //
+    // Along with the dashboard, we set up a single widget, we set that widget as the first widget and it will be then
+    // show on top right in the title area.
+    //
     renderer.setFirstWidget(&connectedWidget);
 
-    setupDashboard();
-
+    //
+    // Here we just simulate a few things changing in our factory using a task manager task that runs frequently.
+    // In a real system we'd read the sensors in this loop and change the menu items based on those readings.
+    //
     taskManager.scheduleFixedRate(100, [] {
         menuACLine.setCurrentValue(2350 + (rand() % 100));
         menuConsumption.setCurrentValue(1900 + (rand() % 200));
@@ -84,4 +98,12 @@ void CALLBACK_FUNCTION onCalibrateScreen(int id) {
 
 void CALLBACK_FUNCTION onTouchCalibration(int id) {
     touchScreen.enableCalibration(menuSettingsTSCalibration.getBoolean());
+}
+
+
+
+void CALLBACK_FUNCTION onShowDash(int id) {
+    // the dashboard is registered as the default custom drawing facilities, just take over the display with no
+    // parameters to draw the dashboard that we set up earlier.
+    renderer.takeOverDisplay();
 }

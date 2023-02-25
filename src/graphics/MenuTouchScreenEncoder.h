@@ -90,6 +90,7 @@ namespace tcgfx {
         BaseGraphicalRenderer* renderer;
         TouchObserver* observer;
         float lastX, lastY;
+        Coord lastCoord;
         iotouch::TouchState currentState;
     public:
         /**
@@ -112,6 +113,7 @@ namespace tcgfx {
         iotouch::TouchState getLastTouchState() const { return currentState; }
         float getLastX() const { return lastX; }
         float getLastY() const { return lastY; }
+        Coord getLastScreenCoord() { return lastCoord; }
     };
 
 } // namespace tcgfx

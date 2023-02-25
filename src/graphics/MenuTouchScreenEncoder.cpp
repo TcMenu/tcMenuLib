@@ -32,19 +32,19 @@ void MenuTouchScreenManager::sendEvent(float locationX, float locationY, float t
         return;
     }
 
-    Coord raw = Coord((int)(float(renderer->getWidth()) * locationX), (int)(float(renderer->getHeight()) * locationY));
+    lastCoord = Coord((int)(float(renderer->getWidth()) * locationX), (int)(float(renderer->getHeight()) * locationY));
     if(touched == TOUCHED) {
-        currentlySelected = renderer->findMenuEntryAndDimensions(raw, localStart, localSize);
+        currentlySelected = renderer->findMenuEntryAndDimensions(lastCoord, localStart, localSize);
         setUsedForScrolling(currentlySelected == nullptr || currentlySelected->getPosition().getDrawingMode() == GridPosition::DRAW_INTEGER_AS_SCROLL);
     }
     if(currentlySelected) {
         // find the local size and ensure it does not drop below 0 in either dimension!
-        int locX = max(0, (int)(raw.x - localStart.x));
-        int locY = max(0, (int)(raw.y - localStart.y));
+        int locX = max(0, (int)(lastCoord.x - localStart.x));
+        int locY = max(0, (int)(lastCoord.y - localStart.y));
         observer->touched(TouchNotification(currentlySelected, Coord(locX, locY), localStart, localSize, touched));
     }
     else {
-        observer->touched(TouchNotification(raw, touched));
+        observer->touched(TouchNotification(lastCoord, touched));
     }
 }
 

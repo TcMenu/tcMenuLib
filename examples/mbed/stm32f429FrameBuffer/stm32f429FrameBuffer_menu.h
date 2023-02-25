@@ -57,6 +57,8 @@ extern SubMenuItem menuSamples;
 extern BooleanMenuItem menuConnectivityEnableUSB;
 extern BackMenuItem menuBackConnectivity;
 extern SubMenuItem menuConnectivity;
+extern AnyMenuInfo minfoSettingsDashboard;
+extern ActionMenuItem menuSettingsDashboard;
 extern ActionMenuItem menuSettingsCalibrateNow;
 extern BooleanMenuItem menuSettingsTSCalibration;
 extern TimeFormattedMenuItem menuSettingsRunDuration;
@@ -76,6 +78,7 @@ void setupMenu();
 
 void CALLBACK_FUNCTION onCalibrateScreen(int id);
 void CALLBACK_FUNCTION onPresentDialog(int id);
+void CALLBACK_FUNCTION onShowDash(int id);
 void CALLBACK_FUNCTION onTargetChanged(int id);
 void CALLBACK_FUNCTION onTouchCalibration(int id);
 

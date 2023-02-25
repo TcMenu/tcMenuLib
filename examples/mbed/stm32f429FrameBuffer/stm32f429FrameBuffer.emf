@@ -9,7 +9,7 @@
       "defaultValue": "true",
       "item": {
         "naming": "ON_OFF",
-        "name": "Power",
+        "name": "Mains",
         "variableName": "Power",
         "id": 6,
         "eepromAddress": -1,
@@ -49,7 +49,7 @@
         "divisor": 1,
         "unitName": "W",
         "step": 1,
-        "name": "Consumption",
+        "name": "Power",
         "variableName": "Consumption",
         "id": 4,
         "eepromAddress": -1,
@@ -142,6 +142,21 @@
         "localOnly": false,
         "visible": true,
         "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 5,
+      "type": "actionMenu",
+      "item": {
+        "name": "Dashboard",
+        "variableName": "SettingsDashboard",
+        "id": 25,
+        "eepromAddress": -1,
+        "functionName": "onShowDash",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": true
       }
     },
     {

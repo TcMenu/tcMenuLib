@@ -64,8 +64,10 @@ BooleanMenuItem menuConnectivityEnableUSB(&minfoConnectivityEnableUSB, false, NU
 const SubMenuInfo minfoConnectivity = { "Connectivity", 9, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackConnectivity(&minfoConnectivity, &menuConnectivityEnableUSB, INFO_LOCATION_PGM);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, &menuSamples, INFO_LOCATION_PGM);
+AnyMenuInfo minfoSettingsDashboard = { "Dashboard", 25, 0xffff, 0, onShowDash };
+ActionMenuItem menuSettingsDashboard(&minfoSettingsDashboard, NULL, INFO_LOCATION_RAM);
 const AnyMenuInfo minfoSettingsCalibrateNow = { "Calibrate Now", 24, 0xffff, 0, onCalibrateScreen };
-ActionMenuItem menuSettingsCalibrateNow(&minfoSettingsCalibrateNow, NULL, INFO_LOCATION_PGM);
+ActionMenuItem menuSettingsCalibrateNow(&minfoSettingsCalibrateNow, &menuSettingsDashboard, INFO_LOCATION_PGM);
 const BooleanMenuInfo minfoSettingsTSCalibration = { "TS Calibration", 23, 0xffff, 1, onTouchCalibration, NAMING_CHECKBOX };
 BooleanMenuItem menuSettingsTSCalibration(&minfoSettingsTSCalibration, false, &menuSettingsCalibrateNow, INFO_LOCATION_PGM);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRunDurationRtCall, timeItemRenderFn, "Run duration", 4, NO_CALLBACK)
@@ -75,11 +77,11 @@ AnalogMenuItem menuSettingsTargetSpeed(&minfoSettingsTargetSpeed, 0, &menuSettin
 const SubMenuInfo minfoSettings = { "Settings", 5, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackSettings(&minfoSettings, &menuSettingsTargetSpeed, INFO_LOCATION_PGM);
 SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, &menuConnectivity, INFO_LOCATION_PGM);
-const AnalogMenuInfo minfoConsumption = { "Consumption", 4, 0xffff, 4000, NO_CALLBACK, 0, 1, "W" };
+const AnalogMenuInfo minfoConsumption = { "Power", 4, 0xffff, 4000, NO_CALLBACK, 0, 1, "W" };
 AnalogMenuItem menuConsumption(&minfoConsumption, 200, &menuSettings, INFO_LOCATION_PGM);
 const AnalogMenuInfo minfoACLine = { "AC Line", 3, 0xffff, 2600, NO_CALLBACK, 0, 10, "V" };
 AnalogMenuItem menuACLine(&minfoACLine, 2450, &menuConsumption, INFO_LOCATION_PGM);
-const BooleanMenuInfo minfoPower = { "Power", 6, 0xffff, 1, NO_CALLBACK, NAMING_ON_OFF };
+const BooleanMenuInfo minfoPower = { "Mains", 6, 0xffff, 1, NO_CALLBACK, NAMING_ON_OFF };
 BooleanMenuItem menuPower(&minfoPower, true, &menuACLine, INFO_LOCATION_PGM);
 
 void setupMenu() {

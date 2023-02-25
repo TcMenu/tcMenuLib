@@ -20,7 +20,7 @@
 #define LCD_WHITE RGB(255, 255, 255)
 
 // Widget Generator yesNo
-TitleWidget connectedWidget(iconsConnection, 2, 17, 12, nullptr);
+TitleWidget connectedWidget(iconsConnection, 2, 16, 12, nullptr);
 
 // we define a global pointer to the dashboard, it will be created during the dash setup.
 DrawableDashboard* mainDashboard;
@@ -34,24 +34,24 @@ DashDrawParametersIntUpdateRange::IntColorRange drawVoltageColorRanges[] {
         {LCD_WHITE, LCD_BLUE, 2440, 3000}
 };
 DashDrawParametersIntUpdateRange drawVoltageWithIntRange(LCD_BLACK, LCD_LIGHT_BLUE, LCD_BLACK, LCD_YELLOW,
-                                                       NativeFontDesc(&RobotoMedium24, 1), drawVoltageColorRanges, 2);
+                                                       &RobotoMedium24, drawVoltageColorRanges, 2);
 
 // As above we create another one for the analog item, it has two ranges.
 // Note that this is a parameter, not the actual dashboard item, they are defined below
 DashDrawParametersIntUpdateRange::IntColorRange drawPowerColorRanges[] {
-        {LCD_LIGHTGREY, LCD_BLUE, 2100, 2180},
-        {LCD_YELLOW, LCD_RED, 2180, 3000}
+        {LCD_LIGHTGREY, LCD_BLUE, 2000, 2100},
+        {LCD_YELLOW, LCD_RED, 2100, 3000}
 };
 DashDrawParametersIntUpdateRange drawPowerValueWithIntRange(LCD_BLACK, LCD_LIGHT_BLUE, LCD_BLACK, LCD_YELLOW,
-                                                             NativeFontDesc(&RobotoMedium24, 1), drawPowerColorRanges, 2);
+                                                             &RobotoMedium24, drawPowerColorRanges, 2);
 
 //
-// Although the dashboard support provides a wide range of menu drawing capabilities, it does not cover every case
+// Although the dashboard support provides a wide range of menu drawing capabilities, it does not cover every case,
 // so you can create a delegate that can do the extra drawing and other functions that are needed. Here is a simple
 // example that draws something that resembles a tab with menu items within it, and three buttons that select according
 // to the encoder state.
 //
-// For drawing onto device drawble see:
+// For drawing onto device drawable see:
 //  https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/rendering-with-tcmenu-lcd-tft-oled/#drawing-direct-to-the-display-with-devicedrawabl
 // For more on the delegate class and all the points where you can extend
 //  https://www.thecoderscorner.com/ref-docs/tcmenu/html/class_drawable_dashboard_delegate.html
@@ -62,10 +62,10 @@ private:
     TcDrawableButton button2;
     int lastEncoderTurn = 0;
 public:
-    MyDrawableDashboardDelegate() : button1(Coord(10, 270), Coord(105, 40), LCD_LIGHT_BLUE, LCD_BLACK, LCD_SEL_BLUE, "AC",
-                                            DeviceFontDrawingMode(NativeFontDesc(&RobotoMedium24, 1))),
-                                    button2(Coord(125, 270), Coord(105, 40), LCD_LIGHT_BLUE, LCD_BLACK, LCD_SEL_BLUE, "Batt",
-                                            DeviceFontDrawingMode(NativeFontDesc(&RobotoMedium24, 1))) { }
+    MyDrawableDashboardDelegate() : button1(Coord(10, 240), Coord(105, 60), LCD_LIGHT_BLUE, LCD_BLACK, LCD_SEL_BLUE, "AC",
+                                            DeviceFontDrawingMode(&RobotoMedium24)),
+                                    button2(Coord(125, 240), Coord(105, 60), LCD_LIGHT_BLUE, LCD_BLACK, LCD_SEL_BLUE, "Batt",
+                                            DeviceFontDrawingMode(&RobotoMedium24)) { }
 
     // this is called before the dashboard titles are drawn when first presented.
     // you return true to tell the core code that you've already cleared the screen, otherwise false.
@@ -105,11 +105,17 @@ public:
     void dashboardWillDraw(unsigned int encVal, RenderPressMode mode) override {
         // here we store the last encoder position, and if it has changed from last time, we update all the buttons
         // with which one is now selected. Doing so will make the button repaint.
-//        if(lastEncoderTurn != encVal) {
-//            lastEncoderTurn = encVal;
-//            button1.setButtonDrawingMode(encVal == 0 ? TcDrawableButton::SELECTED : TcDrawableButton::NORMAL);
-//            button2.setButtonDrawingMode(encVal == 1 ? TcDrawableButton::SELECTED : TcDrawableButton::NORMAL);
-//        }
+        if(touchScreen.getLastTouchState() == iotouch::TOUCHED || touchScreen.getLastTouchState() == iotouch::HELD) {
+            // check if either button has been selected.
+            Coord touchLocation = touchScreen.getLastScreenCoord();
+            button1.setButtonDrawingMode(button1.touchInBounds(touchLocation) ? TcDrawableButton::SELECTED : TcDrawableButton::NORMAL);
+            button2.setButtonDrawingMode(button2.touchInBounds(touchLocation) ? TcDrawableButton::SELECTED : TcDrawableButton::NORMAL);
+
+            // if the touch is outside the button area, give back the display
+            if(touchLocation.y < 200) {
+                mainDashboard->stop();
+            }
+        }
 
         // Here we tell each button we have to repaint itself, it is lazy and will only repaint when needed
         button1.paintButton(renderer.getDeviceDrawable());
@@ -122,6 +128,7 @@ public:
         // get the drawing device from the renderer and its dimensions
         DeviceDrawable *pDrawable = renderer.getDeviceDrawable();
         const Coord &totalSize = Coord(pDrawable->getDisplayDimensions().x, 20);
+        serlogF3(SER_DEBUG, "totalSize=", totalSize.x, totalSize.y);
     }
 } myDrawableDashboardDelegate;
 
@@ -129,7 +136,8 @@ void setupDashboard() {
     // Reference docs https://www.thecoderscorner.com/ref-docs/tcmenu/html/_drawable_dashboard_8h.html
 
     // create a dashboard instance, giving it the renderer and drawable, any widgets to display in the top corner,
-    // and the mode in which it is to operate
+    // and the mode in which it is to operate. I personally don't mind using "new" during on-off configuration, and
+    // it makes the example read better, but could equally be created globally.
     mainDashboard = new DrawableDashboard(renderer.getDeviceDrawable(), &renderer, &connectedWidget,
                                           DrawableDashboard::DASH_ON_RESET_CLICK_EXIT);
 
@@ -145,7 +153,7 @@ void setupDashboard() {
     mainDashboard->addDrawingItem(&menuACLine, Coord(20, 40), &drawVoltageWithIntRange, 5, nullptr, 10);
     mainDashboard->addDrawingItem(&menuConsumption, Coord(20, 68), &drawPowerValueWithIntRange, 5, nullptr, 10);
 
-    // lastly, add the dashboard to the renderer, this is important, the dashboard implements CustomDrawing so it
+    // lastly, add the dashboard to the renderer, this is important, the dashboard implements CustomDrawing, so it
     // handles taking over the display and reset notification.
     renderer.setCustomDrawingHandler(mainDashboard);
 }
