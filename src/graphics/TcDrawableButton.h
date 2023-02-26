@@ -105,8 +105,8 @@ namespace tcgfx {
          * @param pressed
          */
         void setButtonDrawingMode(ButtonDrawingMode mode) {
+            if(drawingMode != mode) setDirty(true);
             drawingMode = mode;
-            setDirty(true);
         }
 
         /**

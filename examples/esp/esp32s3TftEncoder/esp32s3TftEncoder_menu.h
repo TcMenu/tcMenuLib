@@ -16,8 +16,8 @@
 #include <tcUnicodeHelper.h>
 #include "tcMenuTfteSpi.h"
 #include <RuntimeMenuItem.h>
-#include <ScrollChoiceMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
+#include <ScrollChoiceMenuItem.h>
 #include <IoAbstraction.h>
 #include <EepromItemStorage.h>
 
@@ -32,19 +32,24 @@ extern const UnicodeFont OpenSansCyrillicLatin12[];
 
 
 // Global Menu Item exports
+extern BooleanMenuItem menuToGo;
+extern EnumMenuItem menuFoods;
+extern EnumMenuItem menuBatteryCondition;
+extern AnalogMenuItem menuBatteryCharge;
+extern BackMenuItem menuBackBattery;
+extern SubMenuItem menuBattery;
+extern BooleanMenuItem menuMute;
+extern EditableLargeNumberMenuItem menuSettingsLgeNum1;
+extern AnalogMenuItem menuSettingsTenths1;
+extern AnalogMenuItem menuSettingsPercent1;
 extern DateFormattedMenuItem menuNewSubMenuDate;
 extern TextMenuItem menuNewSubMenuText;
 extern Rgb32MenuItem menuNewSubMenuColor;
-extern BackMenuItem menuBackNewSubMenu;
-extern SubMenuItem menuNewSubMenu;
-extern BooleanMenuItem menuToGo;
-extern EnumMenuItem menuFoods;
-extern EditableLargeNumberMenuItem menuLgeNum;
-extern AnalogMenuItem menuTenths;
-extern AnalogMenuItem menuPercent;
+extern BackMenuItem menuBackSettings;
+extern SubMenuItem menuSettings;
 
 // Provide a wrapper to get hold of the root menu item and export setupMenu
-inline MenuItem& rootMenuItem() { return menuPercent; }
+inline MenuItem& rootMenuItem() { return menuSettings; }
 void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type

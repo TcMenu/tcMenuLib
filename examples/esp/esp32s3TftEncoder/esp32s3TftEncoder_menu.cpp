@@ -17,43 +17,60 @@
 const  ConnectorLocalInfo applicationInfo = { "ESP32 S3 Tiny", "c035e186-32cc-45e4-ac28-773f57e108ee" };
 
 TFT_eSPI gfx;
-TfteSpiDrawable gfxDrawable(&gfx, 20);
+TfteSpiDrawable gfxDrawable(&gfx, 64);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 
 // Global Menu Item declarations
-RENDERING_CALLBACK_NAME_INVOKE(fnNewSubMenuDateRtCall, dateItemRenderFn, "Date", -1, NO_CALLBACK)
-DateFormattedMenuItem menuNewSubMenuDate(fnNewSubMenuDateRtCall, DateStorage(1, 1, 2020), 9, NULL);
-RENDERING_CALLBACK_NAME_INVOKE(fnNewSubMenuTextRtCall, textItemRenderFn, "Text", -1, NO_CALLBACK)
-TextMenuItem menuNewSubMenuText(fnNewSubMenuTextRtCall, "", 8, 5, &menuNewSubMenuDate);
-RENDERING_CALLBACK_NAME_INVOKE(fnNewSubMenuColorRtCall, rgbAlphaItemRenderFn, "Color", -1, NO_CALLBACK)
-Rgb32MenuItem menuNewSubMenuColor(fnNewSubMenuColorRtCall, RgbColor32(0, 0, 0), 7, false, &menuNewSubMenuText);
-const SubMenuInfo minfoNewSubMenu = { "New SubMenu", 6, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackNewSubMenu(&minfoNewSubMenu, &menuNewSubMenuColor, INFO_LOCATION_PGM);
-SubMenuItem menuNewSubMenu(&minfoNewSubMenu, &menuBackNewSubMenu, NULL, INFO_LOCATION_PGM);
 const BooleanMenuInfo minfoToGo = { "To go", 5, 0xffff, 1, NO_CALLBACK, NAMING_YES_NO };
-BooleanMenuItem menuToGo(&minfoToGo, false, &menuNewSubMenu, INFO_LOCATION_PGM);
+BooleanMenuItem menuToGo(&minfoToGo, false, NULL, INFO_LOCATION_PGM);
 const char enumStrFoods_0[] = "Pizza";
 const char enumStrFoods_1[] = "Pasta";
 const char enumStrFoods_2[] = "Salad";
 const char* const enumStrFoods[]  = { enumStrFoods_0, enumStrFoods_1, enumStrFoods_2 };
 const EnumMenuInfo minfoFoods = { "Foods", 4, 0xffff, 2, NO_CALLBACK, enumStrFoods };
 EnumMenuItem menuFoods(&minfoFoods, 0, &menuToGo, INFO_LOCATION_PGM);
-RENDERING_CALLBACK_NAME_INVOKE(fnLgeNumRtCall, largeNumItemRenderFn, "Lge Num", -1, NO_CALLBACK)
-EditableLargeNumberMenuItem menuLgeNum(fnLgeNumRtCall, LargeFixedNumber(6, 4, 0U, 0U, false), 3, true, &menuFoods);
-const AnalogMenuInfo minfoTenths = { "Tenths", 2, 0xffff, 1000, NO_CALLBACK, 0, 10, "" };
-AnalogMenuItem menuTenths(&minfoTenths, 0, &menuLgeNum, INFO_LOCATION_PGM);
-const AnalogMenuInfo minfoPercent = { "Percent", 1, 0xffff, 100, NO_CALLBACK, 0, 1, "%" };
-AnalogMenuItem menuPercent(&minfoPercent, 0, &menuTenths, INFO_LOCATION_PGM);
+const char enumStrBatteryCondition_0[] = "Bad";
+const char enumStrBatteryCondition_1[] = "Normal";
+const char enumStrBatteryCondition_2[] = "Good";
+const char* const enumStrBatteryCondition[]  = { enumStrBatteryCondition_0, enumStrBatteryCondition_1, enumStrBatteryCondition_2 };
+const EnumMenuInfo minfoBatteryCondition = { "Condition", 16, 0xffff, 2, NO_CALLBACK, enumStrBatteryCondition };
+EnumMenuItem menuBatteryCondition(&minfoBatteryCondition, 0, NULL, INFO_LOCATION_PGM);
+const AnalogMenuInfo minfoBatteryCharge = { "Charge", 15, 0xffff, 100, NO_CALLBACK, 0, 1, "%" };
+AnalogMenuItem menuBatteryCharge(&minfoBatteryCharge, 0, &menuBatteryCondition, INFO_LOCATION_PGM);
+const SubMenuInfo minfoBattery = { "Battery", 14, 0xffff, 0, NO_CALLBACK };
+BackMenuItem menuBackBattery(&minfoBattery, &menuBatteryCharge, INFO_LOCATION_PGM);
+SubMenuItem menuBattery(&minfoBattery, &menuBackBattery, &menuFoods, INFO_LOCATION_PGM);
+const BooleanMenuInfo minfoMute = { "Mute", 13, 0xffff, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
+BooleanMenuItem menuMute(&minfoMute, false, &menuBattery, INFO_LOCATION_PGM);
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsLgeNum1RtCall, largeNumItemRenderFn, "Lge Num1", -1, NO_CALLBACK)
+EditableLargeNumberMenuItem menuSettingsLgeNum1(fnSettingsLgeNum1RtCall, LargeFixedNumber(6, 4, 0U, 0U, false), 12, true, NULL);
+const AnalogMenuInfo minfoSettingsTenths1 = { "Tenths1", 11, 0xffff, 1000, NO_CALLBACK, 0, 10, "" };
+AnalogMenuItem menuSettingsTenths1(&minfoSettingsTenths1, 0, &menuSettingsLgeNum1, INFO_LOCATION_PGM);
+const AnalogMenuInfo minfoSettingsPercent1 = { "Percent1", 10, 0xffff, 100, NO_CALLBACK, 0, 1, "%" };
+AnalogMenuItem menuSettingsPercent1(&minfoSettingsPercent1, 0, &menuSettingsTenths1, INFO_LOCATION_PGM);
+RENDERING_CALLBACK_NAME_INVOKE(fnNewSubMenuDateRtCall, dateItemRenderFn, "Date", -1, NO_CALLBACK)
+DateFormattedMenuItem menuNewSubMenuDate(fnNewSubMenuDateRtCall, DateStorage(1, 1, 2020), 9, &menuSettingsPercent1);
+RENDERING_CALLBACK_NAME_INVOKE(fnNewSubMenuTextRtCall, textItemRenderFn, "Text", -1, NO_CALLBACK)
+TextMenuItem menuNewSubMenuText(fnNewSubMenuTextRtCall, "", 8, 5, &menuNewSubMenuDate);
+RENDERING_CALLBACK_NAME_INVOKE(fnNewSubMenuColorRtCall, rgbAlphaItemRenderFn, "Color", -1, NO_CALLBACK)
+Rgb32MenuItem menuNewSubMenuColor(fnNewSubMenuColorRtCall, RgbColor32(0, 0, 0), 7, false, &menuNewSubMenuText);
+const SubMenuInfo minfoSettings = { "Settings", 6, 0xffff, 0, NO_CALLBACK };
+BackMenuItem menuBackSettings(&minfoSettings, &menuNewSubMenuColor, INFO_LOCATION_PGM);
+SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, &menuMute, INFO_LOCATION_PGM);
 
 void setupMenu() {
     // First we set up eeprom and authentication (if needed).
     setSizeBasedEEPROMStorageEnabled(false);
+    // Now add any readonly, non-remote and visible flags.
+    menuBatteryCondition.setReadOnly(true);
+    menuBatteryCharge.setReadOnly(true);
+
     // Code generated by plugins.
     gfx.begin();
     gfx.setRotation(1);
     renderer.setUpdatesPerSecond(15);
     switches.init(internalDigitalIo(), SWITCHES_NO_POLLING, true);
-    menuMgr.initForEncoder(&renderer, &menuPercent, 3, 4, 5);
+    menuMgr.initForEncoder(&renderer, &menuSettings, 3, 4, 5);
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
     renderer.setUseSliderForAnalog(true);
     renderer.enableTcUnicode();
