@@ -34,4 +34,4 @@ const uint8_t ArrowHoriz11x22BitmapRight[] PROGMEM = {
         0x03,0x00,0x01,0x00
 };
 
-#endif TCMENU_DIRECTIONAL_ICONS_H
+#endif //TCMENU_DIRECTIONAL_ICONS_H
