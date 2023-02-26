@@ -6,9 +6,13 @@
 #include "CardLayoutPanel.h"
 
 
-CardLayoutPane::CardLayoutPane(const DrawableIcon *left, const DrawableIcon *right, MenuTouchScreenManager* optionalTouch)
+CardLayoutPane::CardLayoutPane(const DrawableIcon *left, const DrawableIcon *right, MenuTouchScreenManager* optionalTouch, bool mono)
         : leftButton(left), rightButton(right), iconLeft(left), touchScreenManager(optionalTouch) {
     usingCardLayout.add(SubMenuUsingCardLayout(0, true));
+    if(mono) {
+        leftButton.setHideOnUnselectable(true);
+        rightButton.setHideOnUnselectable(true);
+    }
 }
 
 bool CardLayoutPane::isSubMenuCardLayout(MenuItem *item) {
@@ -27,14 +31,17 @@ void CardLayoutPane::setSubMenuState(MenuItem *item, bool onOrOff) {
     }
 }
 
-void CardLayoutPane::forMenu(ItemDisplayProperties* titleProps, DeviceDrawable* rootDrawable, bool titleNeeded) {
+void CardLayoutPane::forMenu(ItemDisplayProperties* titleProps, ItemDisplayProperties* buttonProps, GraphicsDeviceRenderer* gfxRenderer, bool titleNeeded) {
+    theRenderer = gfxRenderer;
     inUse = true;
     if(touchScreenManager) {
         touchScreenManager->setSecondaryObserver(this);
     }
 
-    leftButton.setColors(titleProps->getColor(ItemDisplayProperties::BACKGROUND), titleProps->getColor(ItemDisplayProperties::TEXT), titleProps->getColor(ItemDisplayProperties::HIGHLIGHT2));
-    rightButton.setColors(titleProps->getColor(ItemDisplayProperties::BACKGROUND), titleProps->getColor(ItemDisplayProperties::TEXT), titleProps->getColor(ItemDisplayProperties::HIGHLIGHT2));
+    auto rootDrawable = gfxRenderer->getDeviceDrawable();
+
+    leftButton.setColors(buttonProps->getColor(ItemDisplayProperties::BACKGROUND), buttonProps->getColor(ItemDisplayProperties::TEXT), buttonProps->getColor(ItemDisplayProperties::HIGHLIGHT2));
+    rightButton.setColors(buttonProps->getColor(ItemDisplayProperties::BACKGROUND), buttonProps->getColor(ItemDisplayProperties::TEXT), buttonProps->getColor(ItemDisplayProperties::HIGHLIGHT2));
     int titleEndY = 0;
     int remainingHeight = rootDrawable->getDisplayDimensions().y;
     if(titleNeeded) {
@@ -42,29 +49,34 @@ void CardLayoutPane::forMenu(ItemDisplayProperties* titleProps, DeviceDrawable* 
         remainingHeight -= titleEndY;
     }
 
-    Coord buttonSize(iconLeft->getDimensions().x + (titleProps->getPadding().left * 2), remainingHeight);
-    leftButton.setPositionAndSize(Coord(0, titleEndY), buttonSize);
-    rightButton.setPositionAndSize(Coord(rootDrawable->getDisplayDimensions().x - buttonSize.x, titleEndY), buttonSize);
+    Coord buttonSize(iconLeft->getDimensions().x + (buttonProps->getPadding().left * 2), remainingHeight);
+    leftButton.setPositionAndSize(Coord(0, titleEndY + buttonProps->getSpaceAfter()), buttonSize);
+    rightButton.setPositionAndSize(Coord(rootDrawable->getDisplayDimensions().x - buttonSize.x, titleEndY + buttonProps->getSpaceAfter()), buttonSize);
 
     menuItemLocation = Coord(buttonSize.x, titleEndY + titleProps->getSpaceAfter());
     menuItemSize = Coord(rootDrawable->getDisplayDimensions().x - (buttonSize.x * 2), remainingHeight);
     titleSize = Coord(rootDrawable->getDisplayDimensions().x, titleEndY);
-}
-
-void CardLayoutPane::setTouchManager(MenuTouchScreenManager *manager) {
-    touchScreenManager = manager;
+    theRenderer->setEditStatusIconsEnabled(false);
 }
 
 void CardLayoutPane::notInUse() {
-    if(inUse && touchScreenManager != nullptr) {
+    if(!inUse) return;
+
+    if(touchScreenManager != nullptr) {
         touchScreenManager->clearSecondaryObserver();
     }
+    theRenderer->setEditStatusIconsEnabled(true);
+
     inUse = false;
 }
 
-CardLayoutPane::CardLayoutDir CardLayoutPane::prepareAndPaintButtons(GraphicsDeviceRenderer* renderer, int active, int countOfItems) {
+CardLayoutPane::CardLayoutDir CardLayoutPane::prepareAndPaintButtons(GraphicsDeviceRenderer* renderer, int active, int countOfItems, bool titleActive) {
     CardLayoutDir tempStatus = dirStatus;
     dirStatus = DOING_NOTHING;
+
+    // work out if we are at the bounds for this menu - IE first or last item and grey out buttons as needed.
+    leftButton.setButtonDrawingMode(((titleActive && active <= 1) || (!titleActive && active == 0)) ? TcDrawableButton::NOT_SELECTABLE : TcDrawableButton::NORMAL);
+    rightButton.setButtonDrawingMode(active >= (countOfItems - 1) ? TcDrawableButton::NOT_SELECTABLE : TcDrawableButton::NORMAL);
 
     leftButton.paintButton(renderer->getDeviceDrawable());
     rightButton.paintButton(renderer->getDeviceDrawable());

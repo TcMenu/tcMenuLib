@@ -13,7 +13,7 @@
 #include "ThemeMonoInverse.h"
 
 // Global variable declarations
-const  ConnectorLocalInfo applicationInfo = { "stm32DuinoDemo", "ecd5607f-55eb-4252-a512-aab769452dd3" };
+const  ConnectorLocalInfo applicationInfo = { "TcTT PSU", "ecd5607f-55eb-4252-a512-aab769452dd3" };
 TcMenuRemoteServer remoteServer(applicationInfo);
 HalStm32EepromAbstraction glBspRom;
 EepromAuthenticatorManager authManager(4);
@@ -32,8 +32,14 @@ const char enumStrDecimalStep_2[] = "4x";
 const char* const enumStrDecimalStep[]  = { enumStrDecimalStep_0, enumStrDecimalStep_1, enumStrDecimalStep_2 };
 const EnumMenuInfo minfoDecimalStep = { "Decimal Step", 16, 23, 2, onDecimalStepChange, enumStrDecimalStep };
 EnumMenuItem menuDecimalStep(&minfoDecimalStep, 0, NULL, INFO_LOCATION_PGM);
+const AnalogMenuInfo minfoDecimal = { "Decimal", 1, 2, 1000, decimalDidChange, 0, 10, "d" };
+AnalogMenuItem menuDecimal(&minfoDecimal, 0, &menuDecimalStep, INFO_LOCATION_PGM);
+RENDERING_CALLBACK_NAME_INVOKE(fnRuntimesLgeNum1RtCall, largeNumItemRenderFn, "Lge Num1", -1, largeNumDidChange)
+EditableLargeNumberMenuItem menuRuntimesLgeNum1(fnRuntimesLgeNum1RtCall, LargeFixedNumber(9, 3, 0U, 0U, false), 18, true, NULL);
+const AnalogMenuInfo minfoRuntimesHalves1 = { "Halves1", 17, 0xffff, 255, NO_CALLBACK, 0, 2, "dB" };
+AnalogMenuItem menuRuntimesHalves1(&minfoRuntimesHalves1, 0, &menuRuntimesLgeNum1, INFO_LOCATION_PGM);
 const char pgmStrRuntimesAuthenticatorText[] = { "Authenticator" };
-EepromAuthenticationInfoMenuItem menuRuntimesAuthenticator(pgmStrRuntimesAuthenticatorText, NO_CALLBACK, 15, NULL);
+EepromAuthenticationInfoMenuItem menuRuntimesAuthenticator(pgmStrRuntimesAuthenticatorText, NO_CALLBACK, 15, &menuRuntimesHalves1);
 const char pgmStrRuntimesIoTMonitorText[] = { "IoT Monitor" };
 RemoteMenuItem menuRuntimesIoTMonitor(pgmStrRuntimesIoTMonitorText, 14, &menuRuntimesAuthenticator);
 ListRuntimeMenuItem menuRuntimesCustomList(13, 0, fnRuntimesCustomListRtCall, &menuRuntimesIoTMonitor);
@@ -41,7 +47,7 @@ RENDERING_CALLBACK_NAME_INVOKE(fnRuntimesTextRtCall, textItemRenderFn, "Text", 1
 TextMenuItem menuRuntimesText(fnRuntimesTextRtCall, "", 12, 5, &menuRuntimesCustomList);
 const SubMenuInfo minfoRuntimes = { "Runtimes", 11, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackRuntimes(&minfoRuntimes, &menuRuntimesText, INFO_LOCATION_PGM);
-SubMenuItem menuRuntimes(&minfoRuntimes, &menuBackRuntimes, &menuDecimalStep, INFO_LOCATION_PGM);
+SubMenuItem menuRuntimes(&minfoRuntimes, &menuBackRuntimes, &menuDecimal, INFO_LOCATION_PGM);
 extern char ramDataSet[];
 RENDERING_CALLBACK_NAME_INVOKE(fnMoreItemsScrollRtCall, enumItemRenderFn, "Scroll", -1, NO_CALLBACK)
 ScrollChoiceMenuItem menuMoreItemsScroll(10, fnMoreItemsScrollRtCall, 0, ramDataSet, 10, 5, NULL);
@@ -62,12 +68,38 @@ EnumMenuItem menuMoreItemsOptions(&minfoMoreItemsOptions, 0, &menuMoreItemsToppi
 const SubMenuInfo minfoMoreItems = { "More Items", 4, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackMoreItems(&minfoMoreItems, &menuMoreItemsOptions, INFO_LOCATION_PGM);
 SubMenuItem menuMoreItems(&minfoMoreItems, &menuBackMoreItems, &menuRuntimes, INFO_LOCATION_PGM);
-RENDERING_CALLBACK_NAME_INVOKE(fnLgeNumRtCall, largeNumItemRenderFn, "Lge Num", 6, largeNumDidChange)
-EditableLargeNumberMenuItem menuLgeNum(fnLgeNumRtCall, LargeFixedNumber(9, 3, 0U, 0U, false), 3, true, &menuMoreItems);
-const AnalogMenuInfo minfoHalves = { "Halves", 2, 4, 255, NO_CALLBACK, 0, 2, "dB" };
-AnalogMenuItem menuHalves(&minfoHalves, 0, &menuLgeNum, INFO_LOCATION_PGM);
-const AnalogMenuInfo minfoDecimal = { "Decimal", 1, 2, 1000, decimalDidChange, 0, 10, "d" };
-AnalogMenuItem menuDecimal(&minfoDecimal, 0, &menuHalves, INFO_LOCATION_PGM);
+const AnyMenuInfo minfoSettingsSaveNow = { "Save Now", 31, 0xffff, 0, NO_CALLBACK };
+ActionMenuItem menuSettingsSaveNow(&minfoSettingsSaveNow, NULL, INFO_LOCATION_PGM);
+const char enumStrSettingsDefault_0[] = "33";
+const char enumStrSettingsDefault_1[] = "45";
+const char enumStrSettingsDefault_2[] = "78";
+const char* const enumStrSettingsDefault[]  = { enumStrSettingsDefault_0, enumStrSettingsDefault_1, enumStrSettingsDefault_2 };
+const EnumMenuInfo minfoSettingsDefault = { "Default", 30, 0xffff, 2, NO_CALLBACK, enumStrSettingsDefault };
+EnumMenuItem menuSettingsDefault(&minfoSettingsDefault, 0, &menuSettingsSaveNow, INFO_LOCATION_PGM);
+const AnalogMenuInfo minfoSettingsOfst78 = { "Ofst78", 29, 29, 10000, NO_CALLBACK, -5000, 1000, "%" };
+AnalogMenuItem menuSettingsOfst78(&minfoSettingsOfst78, 5000, &menuSettingsDefault, INFO_LOCATION_PGM);
+const AnalogMenuInfo minfoSettingsOfst45 = { "Ofst45", 28, 27, 10000, NO_CALLBACK, -5000, 1000, "%" };
+AnalogMenuItem menuSettingsOfst45(&minfoSettingsOfst45, 5000, &menuSettingsOfst78, INFO_LOCATION_PGM);
+const AnalogMenuInfo minfoSettingsOfst33 = { "Ofst33", 27, 25, 10000, NO_CALLBACK, -5000, 1000, "%" };
+AnalogMenuItem menuSettingsOfst33(&minfoSettingsOfst33, 5000, &menuSettingsOfst45, INFO_LOCATION_PGM);
+const SubMenuInfo minfoSettings = { "Settings", 26, 0xffff, 0, NO_CALLBACK };
+BackMenuItem menuBackSettings(&minfoSettings, &menuSettingsOfst33, INFO_LOCATION_PGM);
+SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, &menuMoreItems, INFO_LOCATION_PGM);
+const AnalogMenuInfo minfoStatusWoW = { "WoW", 25, 0xffff, 30000, NO_CALLBACK, -15000, 5000, "%" };
+AnalogMenuItem menuStatusWoW(&minfoStatusWoW, 15000, NULL, INFO_LOCATION_PGM);
+const AnalogMenuInfo minfoStatusMotor = { "Motor", 24, 0xffff, 300, NO_CALLBACK, 0, 10, "V" };
+AnalogMenuItem menuStatusMotor(&minfoStatusMotor, 0, &menuStatusWoW, INFO_LOCATION_PGM);
+const AnalogMenuInfo minfoStatusCurrent = { "Actual", 23, 0xffff, 7800, NO_CALLBACK, 0, 1, "RPM" };
+AnalogMenuItem menuStatusCurrent(&minfoStatusCurrent, 0, &menuStatusMotor, INFO_LOCATION_PGM);
+const SubMenuInfo minfoStatus = { "Status", 22, 0xffff, 0, NO_CALLBACK };
+BackMenuItem menuBackStatus(&minfoStatus, &menuStatusCurrent, INFO_LOCATION_PGM);
+SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuSettings, INFO_LOCATION_PGM);
+const AnyMenuInfo minfo78 = { "78", 21, 0xffff, 0, NO_CALLBACK };
+ActionMenuItem menu78(&minfo78, &menuStatus, INFO_LOCATION_PGM);
+const AnyMenuInfo minfo45 = { "45", 20, 0xffff, 0, NO_CALLBACK };
+ActionMenuItem menu45(&minfo45, &menu78, INFO_LOCATION_PGM);
+const AnyMenuInfo minfo33 = { "33", 19, 0xffff, 0, NO_CALLBACK };
+ActionMenuItem menu33(&minfo33, &menu45, INFO_LOCATION_PGM);
 
 void setupMenu() {
     // First we set up eeprom and authentication (if needed).
@@ -76,11 +108,16 @@ void setupMenu() {
     menuMgr.setEepromRef(&glBspRom);
     authManager.initialise(menuMgr.getEepromAbstraction(), 150);
     menuMgr.setAuthenticator(&authManager);
+    // Now add any readonly, non-remote and visible flags.
+    menuStatusWoW.setReadOnly(true);
+    menuStatusCurrent.setReadOnly(true);
+    menuStatusMotor.setReadOnly(true);
+
     // Code generated by plugins.
     gfx.begin();
     renderer.setUpdatesPerSecond(5);
     switches.init(internalDigitalIo(), SWITCHES_POLL_EVERYTHING, true);
-    menuMgr.initForEncoder(&renderer, &menuDecimal, PC8, PC10, PC9);
+    menuMgr.initForEncoder(&renderer, &menu33, PC8, PC10, PC9);
     remoteServer.addConnection(&ethernetConnection);
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_ALWAYS);
     renderer.setUseSliderForAnalog(false);

@@ -20,6 +20,7 @@
 #define GFX_USING_TOUCH_INTERFACE 2
 #define GFX_SLIDER_FOR_ANALOG 3
 #define GFX_TITLE_ON_DISPLAY 4
+#define GFX_EDIT_STATUS_ICONS_ENABLED 5
 
 namespace tcgfx {
 
@@ -121,16 +122,62 @@ namespace tcgfx {
             displayPropertiesHaveChanged();
         }
 
+        /**
+         * set the use of sliders by default for all integer items
+         * @param useSlider true to use sliders
+         */
         void setUseSliderForAnalog(bool useSlider) { bitWrite(flags, GFX_SLIDER_FOR_ANALOG, useSlider); }
+        /**
+         * Enable touch support within the renderer
+         * @param hasTouch true to enable touch
+         */
         void setHasTouchInterface(bool hasTouch) { bitWrite(flags, GFX_USING_TOUCH_INTERFACE, hasTouch); }
+        /**
+         * Set the title as on, so it appears on the display, somewhat internal to the library, control from the theme
+         * @param titleOn true to turn on
+         */
         void setTitleOnDisplay(bool titleOn) { bitWrite(flags, GFX_TITLE_ON_DISPLAY, titleOn); }
+        /**
+         * Set that the last row has to fit exactly, this is for LCD cases and where a gap at the bottom is deemed as
+         * better than half rendering.
+         * @param exact true for LCD and cases where a gap is better, otherwise false.
+         */
         void setLastRowExactFit(bool exact) { bitWrite(flags, GFX_LAST_ROW_FIT_FLAG, exact); }
+        /**
+         * When this is on, the touch will not look up items, helpful for where you need complete control of the touch
+         * interface for a short time.
+         */
         void setRawTouchMode(bool rawTouch) { bitWrite(flags, GFX_USING_RAW_TOUCH, rawTouch); }
-        bool isUseSliderForAnalog() { return bitRead(flags, GFX_SLIDER_FOR_ANALOG); }
-        bool isHasTouchInterface() { return bitRead(flags, GFX_USING_TOUCH_INTERFACE); }
-        bool isTitleOnDisplay() { return bitRead(flags, GFX_TITLE_ON_DISPLAY); }
-        bool isLastRowExactFit() { return bitRead(flags, GFX_LAST_ROW_FIT_FLAG); }
-        bool isRawTouchMode() { return bitRead(flags, GFX_USING_RAW_TOUCH); }
+        /**
+         * Turn off editing icons and editor indications of editing for a short time, for example during special layouts
+         * such as card layout.
+         * @param ena true to enable (Default)
+         */
+        void setEditStatusIconsEnabled(bool ena) { bitWrite(flags, GFX_EDIT_STATUS_ICONS_ENABLED, ena); }
+        /**
+         * @return if using sliders by default for analog items
+         */
+        bool isUseSliderForAnalog() const { return bitRead(flags, GFX_SLIDER_FOR_ANALOG); }
+        /**
+         * @return if there is a touch interface configured
+         */
+        bool isHasTouchInterface() const { return bitRead(flags, GFX_USING_TOUCH_INTERFACE); }
+        /**
+         * @return if the title is on display (somewhat internal)
+         */
+        bool isTitleOnDisplay() const { return bitRead(flags, GFX_TITLE_ON_DISPLAY); }
+        /**
+         * @return if the last row should fit on the display exactly
+         */
+        bool isLastRowExactFit() const { return bitRead(flags, GFX_LAST_ROW_FIT_FLAG); }
+        /**
+         * @return if raw touch mode is enabled where it will not recognise item spaces
+         */
+        bool isRawTouchMode() const { return bitRead(flags, GFX_USING_RAW_TOUCH); }
+        /**
+         * @return if the edit icons and other indications are being shown
+         */
+        bool isEditStatusIconEnabled() const { return bitRead(flags, GFX_EDIT_STATUS_ICONS_ENABLED); }
 
         void render() override;
 

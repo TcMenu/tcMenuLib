@@ -40,6 +40,17 @@ namespace tcgfx {
 
     class GraphicsDeviceRenderer;
 
+    /**
+     * Card layout is a layout where a single item (and possibly a title) are shown on the display with left and
+     * right indicators (or buttons on a touch screen).
+     * This class does most of the layout level calculations to make some attempt at taking new layouts outside
+     * of the core. If more new layouts are created, we'll formalize this into some kind of interface and tidy up
+     * the code in the renderer. On touch screens the buttons will work with touch.
+     *
+     * @param left the icon for the left button
+     * @param right the icon for the right button
+     * @param optionalTouch if using touch, provide the touch manager, otherwise null.
+     */
     class CardLayoutPane : public tcgfx::TouchObserver {
     public:
         enum CardLayoutDir {
@@ -56,31 +67,78 @@ namespace tcgfx {
         CardLayoutDir dirStatus = DOING_NOTHING;
         bool inUse = false;
         MenuTouchScreenManager *touchScreenManager = nullptr;
+        GraphicsDeviceRenderer* theRenderer;
     public:
-        CardLayoutPane(const DrawableIcon *left, const DrawableIcon *right, MenuTouchScreenManager *optionalTouch);
+        /**
+         * Creates a card layout with the left and right buttons, ready for use later when a card layout is presented.
+         * This class does most of the layout level calculations to make some attempt at taking new layouts outside
+         * of the core. If more new layouts are created, we'll formalize this into some kind of interface and tidy up
+         * the code in the renderer. On touch screens the buttons will work with touch.
+         *
+         * @param left the icon for the left button
+         * @param right the icon for the right button
+         * @param optionalTouch if using touch, provide the touch manager, otherwise null.
+         * @param monoDisplay if the display is mono
+         */
+        CardLayoutPane(const DrawableIcon *left, const DrawableIcon *right, MenuTouchScreenManager *optionalTouch, bool monoDisplay);
 
-        void setTouchManager(MenuTouchScreenManager *manager);
+        /**
+         * When a menu is presented in card layout this will be called when full re-draw is requested to set up the
+         * layout and prepare the available sizes.
+         * @param titleProps the display properties that the buttons should use
+         * @param gfxRenderer the renderer used to draw with
+         * @param titleNeeded if the title is needed or not.
+         */
+        void forMenu(ItemDisplayProperties *titleProps, ItemDisplayProperties *itemProps, GraphicsDeviceRenderer* gfxRenderer, bool titleNeeded);
 
-        void forMenu(ItemDisplayProperties *titleProps, DeviceDrawable *rootDrawable, bool titleNeeded);
-
+        /**
+         * When a card layout menu is going off display, this is called to reset anything adjust for the card layout.
+         */
         void notInUse();
 
+        /**
+         * Use this to add or remove submenus from the card layout
+         * @param item the item to check (or null for root)
+         * @param onOrOff if it should use card layout
+         */
         void setSubMenuState(MenuItem *item, bool onOrOff);
 
+        /**
+         * Check if a given menu item is using card layout.
+         * @param item the item to check (or null for root)
+         * @return true if card layout, otherwise false
+         */
         bool isSubMenuCardLayout(MenuItem *item);
 
-        tcgfx::TcDrawableButton &getLeftButton() { return leftButton; }
+        /**
+         * Call this every time the renderer paint runs, it makes sure the buttons are up to date and also returns if
+         * any buttons have been pressed.
+         * @param renderer the renderer
+         * @param active the currently active item index
+         * @param countOfItems the number of items
+         * @return the current button press mode.
+         */
+        CardLayoutDir prepareAndPaintButtons(GraphicsDeviceRenderer *renderer, int active, int countOfItems, bool titleActive);
 
-        tcgfx::TcDrawableButton &getRightButton() { return rightButton; }
-
-        CardLayoutDir prepareAndPaintButtons(GraphicsDeviceRenderer *renderer, int active, int countOfItems);
-
+        /**
+         * Part of the touch observer interface, called when there is a touch event .
+         * @param notification the touch notification
+         */
         void touched(const TouchNotification &notification);
 
+        /**
+         * @return the location of the start of the item to be presented
+         */
         const Coord &getMenuLocation() { return menuItemLocation; }
 
+        /**
+         * @return the size of the item to be presented
+         */
         const Coord &getMenuSize() { return menuItemSize; }
 
+        /**
+         * @return the size of the title area
+         */
         const Coord &getTitleSize() { return titleSize; }
     };
 

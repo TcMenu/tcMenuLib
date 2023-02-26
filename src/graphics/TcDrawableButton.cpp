@@ -42,6 +42,8 @@ TcDrawableButton::TcDrawableButton(const DrawableIcon *icon) : where(), size(), 
 
 
 bool TcDrawableButton::touchInBounds(const Coord& location) const {
+    if(drawingMode == NOT_SELECTABLE) return false; // can't select in this mode
+
     return (location.x > where.x && location.x < where.x + size.x
         && location.y > where.y && location.y < where.y + size.y);
 }
@@ -54,9 +56,14 @@ void TcDrawableButton::paintButton(DeviceDrawable* dr) {
 
     DeviceDrawableHelper helper(dr, palette, 4, where, size);
 
-    color_t bgCol = drawingMode == NORMAL ? bgColor : selectedColor;
+    color_t bgCol = drawingMode == NORMAL || drawingMode == NOT_SELECTABLE ? bgColor : selectedColor;
     helper.getDrawable()->setDrawColor(bgCol);
     helper.getDrawable()->drawBox(helper.offsetLocation(where), size, true);
+
+    if(isHiddenOnUnSelectable() && drawingMode == NOT_SELECTABLE) {
+        helper.endDraw();
+        return;
+    }
 
     color_t fgCol = drawingMode == NOT_SELECTABLE ? GREYED_OUT_COLOR : fgColor;
     helper.getDrawable()->drawBox(where, size, true);

@@ -106,23 +106,23 @@ namespace tcgfx {
             /** Justify the item name on the left and the value on the right */
             JUSTIFY_TITLE_LEFT_VALUE_RIGHT = 0,
             /** Justify the item name and value on the right */
-            JUSTIFY_TITLE_LEFT_WITH_VALUE = CORE_JUSTIFY_LEFT + CORE_JUSTIFY_NAME_REQUIRED + CORE_JUSTIFY_VALUE_REQUIRED,
+            JUSTIFY_TITLE_LEFT_WITH_VALUE = CORE_JUSTIFY_LEFT | CORE_JUSTIFY_NAME_REQUIRED | CORE_JUSTIFY_VALUE_REQUIRED,
             /** Justify the item name and value centered */
-            JUSTIFY_CENTER_WITH_VALUE = CORE_JUSTIFY_CENTER + CORE_JUSTIFY_NAME_REQUIRED + CORE_JUSTIFY_VALUE_REQUIRED,
+            JUSTIFY_CENTER_WITH_VALUE = CORE_JUSTIFY_CENTER | CORE_JUSTIFY_NAME_REQUIRED | CORE_JUSTIFY_VALUE_REQUIRED,
             /** Justify the item name and value on the right */
-            JUSTIFY_RIGHT_WITH_VALUE = CORE_JUSTIFY_RIGHT + CORE_JUSTIFY_NAME_REQUIRED + CORE_JUSTIFY_VALUE_REQUIRED,
+            JUSTIFY_RIGHT_WITH_VALUE = CORE_JUSTIFY_RIGHT | CORE_JUSTIFY_NAME_REQUIRED | CORE_JUSTIFY_VALUE_REQUIRED,
             /** Justify just the item name to the left */
-            JUSTIFY_LEFT_NO_VALUE = CORE_JUSTIFY_LEFT + CORE_JUSTIFY_NAME_REQUIRED,
+            JUSTIFY_LEFT_NO_VALUE = CORE_JUSTIFY_LEFT | CORE_JUSTIFY_NAME_REQUIRED,
             /** Justify just the item name in the center */
-            JUSTIFY_CENTER_NO_VALUE = CORE_JUSTIFY_CENTER + CORE_JUSTIFY_NAME_REQUIRED,
+            JUSTIFY_CENTER_NO_VALUE = CORE_JUSTIFY_CENTER | CORE_JUSTIFY_NAME_REQUIRED,
             /** Justify just the item name in the center */
-            JUSTIFY_RIGHT_NO_VALUE = CORE_JUSTIFY_RIGHT + CORE_JUSTIFY_NAME_REQUIRED,
+            JUSTIFY_RIGHT_NO_VALUE = CORE_JUSTIFY_RIGHT | CORE_JUSTIFY_NAME_REQUIRED,
             /** Justify just the items current value to the left */
-            JUSTIFY_LEFT_VALUE_ONLY= CORE_JUSTIFY_LEFT + CORE_JUSTIFY_VALUE_REQUIRED,
+            JUSTIFY_LEFT_VALUE_ONLY= CORE_JUSTIFY_LEFT | CORE_JUSTIFY_VALUE_REQUIRED,
             /** Justify just the items current value in the center */
-            JUSTIFY_CENTER_VALUE_ONLY = CORE_JUSTIFY_CENTER + CORE_JUSTIFY_VALUE_REQUIRED,
+            JUSTIFY_CENTER_VALUE_ONLY = CORE_JUSTIFY_CENTER | CORE_JUSTIFY_VALUE_REQUIRED,
             /** Justify just the items current value to the right */
-            JUSTIFY_RIGHT_VALUE_ONLY = CORE_JUSTIFY_RIGHT + CORE_JUSTIFY_VALUE_REQUIRED
+            JUSTIFY_RIGHT_VALUE_ONLY = CORE_JUSTIFY_RIGHT | CORE_JUSTIFY_VALUE_REQUIRED
         };
     private:
         /** the number of columns in the grid */
@@ -188,7 +188,7 @@ namespace tcgfx {
      * @return true if the value is needed
      */
     inline bool itemNeedsValue(GridPosition::GridJustification justification) {
-        return (justification & GridPosition::CORE_JUSTIFY_VALUE_REQUIRED) != 0;
+        return justification == GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT || (justification & GridPosition::CORE_JUSTIFY_VALUE_REQUIRED) != 0;
     }
 
     /**
@@ -268,40 +268,27 @@ namespace tcgfx {
         MenuPadding padding;
         const void* fontData;
         MenuBorder borderWidths;
-        uint8_t fontMagnification: 4;
-        uint8_t defaultJustification: 4;
+        uint8_t fontMagnification;
+        GridPosition::GridJustification defaultJustification;
         uint8_t spaceAfter;
         uint8_t requiredHeight;
     public:
-        ItemDisplayProperties() : propsKey(0), colors{}, padding(), fontData(nullptr), borderWidths(), fontMagnification(1), defaultJustification(0), spaceAfter(0), requiredHeight(0) {}
+        ItemDisplayProperties() : propsKey(0), colors{}, padding(), fontData(nullptr), borderWidths(), fontMagnification(1),
+                        defaultJustification(GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT), spaceAfter(0), requiredHeight(0) {}
         ItemDisplayProperties(uint32_t key, const color_t* palette, const MenuPadding& pad, const void* font, uint8_t mag, uint8_t spacing,
                               uint8_t height, GridPosition::GridJustification defaultJustification, MenuBorder borderWidths)
                               : propsKey(key), padding{pad}, fontData(font), borderWidths(borderWidths), fontMagnification(mag), defaultJustification(defaultJustification),
                                 spaceAfter(spacing), requiredHeight(height) {
             memcpy(colors, palette, sizeof colors);
         }
-        ItemDisplayProperties(const ItemDisplayProperties& other) : propsKey(other.propsKey), padding{other.padding}, fontData(other.fontData),
-                                borderWidths(other.borderWidths), fontMagnification(other.fontMagnification), defaultJustification(other.defaultJustification),
-                                spaceAfter(other.spaceAfter), requiredHeight(other.requiredHeight) {
-            memcpy(colors, other.colors, sizeof colors);
-        }
-        ItemDisplayProperties& operator=(const ItemDisplayProperties& other) {
-            if(&other == this) return *this;
-            propsKey = other.propsKey;
-            padding = other.padding;
-            fontData = other.fontData;
-            borderWidths = other.borderWidths;
-            fontMagnification = other.fontMagnification;
-            defaultJustification = other.defaultJustification;
-            spaceAfter = other.spaceAfter;
-            requiredHeight = other.requiredHeight;
-            memcpy(colors, other.colors, sizeof colors);
-            return *this;
-        }
+        ItemDisplayProperties(const ItemDisplayProperties& other) = default;
+        ItemDisplayProperties& operator=(const ItemDisplayProperties& other) = default;
 
         uint32_t getKey() const { return propsKey; }
 
-        GridPosition::GridJustification getDefaultJustification() const { return (GridPosition::GridJustification)defaultJustification; }
+        GridPosition::GridJustification getDefaultJustification() const {
+            return defaultJustification;
+        }
 
         void setDefaultJustification(GridPosition::GridJustification justification) { defaultJustification = justification; }
 

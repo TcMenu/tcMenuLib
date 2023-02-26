@@ -113,8 +113,9 @@ namespace tcgfx {
          * @param left the icon to use for left, (takes its colors from the title)
          * @param right the icon to use for right, (takes its colors from the title)
          * @param touchManager optionally provide the touch manager to make the buttons work with a touch screen
+         * @param monoDisplay for mono displays the direction buttons completely disappears instead of greying out
          */
-        void enableCardLayout(const DrawableIcon& left, const DrawableIcon& right, MenuTouchScreenManager* touchManager);
+        void enableCardLayout(const DrawableIcon& left, const DrawableIcon& right, MenuTouchScreenManager* touchManager, bool monoDisplay);
 
         /**
          * Allows the card layout mode to be enabled by submenu.
@@ -141,6 +142,8 @@ namespace tcgfx {
         void drawUpDownItem(GridPositionRowCacheEntry* entry, Coord& where, Coord& size);
         void drawIconItem(GridPositionRowCacheEntry *pEntry, Coord& where, Coord& size);
         void drawBorderAndAdjustSize(Coord &where, Coord &size, MenuBorder &border);
+
+        DrawableIcon *getStateIndicatorIcon(GridPositionRowCacheEntry *entry);
     };
 } // namespace tcgfx
 

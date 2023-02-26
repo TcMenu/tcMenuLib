@@ -136,7 +136,7 @@ namespace tcgfx {
         bool weAreEditingWithCursor = pEntry->getMenuItem()->isEditing() && menuMgr.getCurrentEditor() != nullptr
                                       && editorHintNeedsCursor(menuMgr.getEditorHints().getEditorRenderingType());
 
-        bool valueNeeded = true;
+        bool valueNeeded = itemNeedsValue(pEntry->getPosition().getJustification());
         if(pEntry->getMenuItem()->getMenuType() == MENUTYPE_BOOLEAN_VALUE) {
             if (reinterpret_cast<BooleanMenuItem *>(pEntry->getMenuItem())->getBooleanNaming() == NAMING_CHECKBOX) {
                 valueNeeded = false;
@@ -205,13 +205,15 @@ namespace tcgfx {
         color_t bgColor, textColor;
         bool forceBorder = false;
 
+        color_t entryBg = entry->getDisplayProperties()->getColor(ItemDisplayProperties::BACKGROUND);
+        color_t selBg = propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND);
         if(isActiveOrEditing(entry->getMenuItem())) {
-            bgColor = propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND);
+            bgColor = selBg;
             textColor = propertiesFactory.getSelectedColor(ItemDisplayProperties::TEXT);
-            forceBorder = (icon == nullptr) && (propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND) == entry->getDisplayProperties()->getColor(ItemDisplayProperties::BACKGROUND));
+            forceBorder = (icon == nullptr) && (selBg == entryBg) && isEditStatusIconEnabled();
         }
         else {
-            bgColor = entry->getDisplayProperties()->getColor(ItemDisplayProperties::BACKGROUND);
+            bgColor = entryBg;
             textColor = entry->getDisplayProperties()->getColor(ItemDisplayProperties::HIGHLIGHT2);
         }
 
@@ -288,7 +290,7 @@ namespace tcgfx {
 
     void GraphicsDeviceRenderer::drawCheckbox(GridPositionRowCacheEntry *entry, Coord& where, Coord& size) {
         auto padding = entry->getDisplayProperties()->getPadding();
-        auto* icon = propertiesFactory.iconForMenuItem(entry->getMenuItem()->isEditing() ? SPECIAL_ID_EDIT_ICON :SPECIAL_ID_ACTIVE_ICON);
+        auto* icon = getStateIndicatorIcon(entry);
 
         drawCoreLineItem(entry, icon, where, size, true);
         auto hei = size.y - (padding.top + padding.top);
@@ -311,7 +313,7 @@ namespace tcgfx {
 
     void GraphicsDeviceRenderer::drawUpDownItem(GridPositionRowCacheEntry *entry, Coord& where, Coord& size) {
         auto padding = entry->getDisplayProperties()->getPadding();
-        auto* icon = propertiesFactory.iconForMenuItem(entry->getMenuItem()->isEditing() ? SPECIAL_ID_EDIT_ICON :SPECIAL_ID_ACTIVE_ICON);
+        auto* icon = getStateIndicatorIcon(entry);
 
         drawCoreLineItem(entry, icon, where, size, true);
 
@@ -338,6 +340,11 @@ namespace tcgfx {
         }
     }
 
+    DrawableIcon *GraphicsDeviceRenderer::getStateIndicatorIcon(GridPositionRowCacheEntry *entry) {
+        if(!isEditStatusIconEnabled()) return nullptr; // no edit icons when explicitly turned off
+        return propertiesFactory.iconForMenuItem(entry->getMenuItem()->isEditing() ? SPECIAL_ID_EDIT_ICON : SPECIAL_ID_ACTIVE_ICON);
+    }
+
     void GraphicsDeviceRenderer::drawTextualItem(GridPositionRowCacheEntry* pEntry, Coord& where, Coord& size) {
         if(pEntry->getMenuItem()->getMenuType() == MENUTYPE_BOOLEAN_VALUE) {
             auto boolItem = reinterpret_cast<BooleanMenuItem*>(pEntry->getMenuItem());
@@ -346,13 +353,13 @@ namespace tcgfx {
                 return;
             }
         }
-        auto* icon = propertiesFactory.iconForMenuItem(pEntry->getMenuItem()->isEditing() ? SPECIAL_ID_EDIT_ICON :SPECIAL_ID_ACTIVE_ICON);
+        auto* icon = getStateIndicatorIcon(pEntry);
         drawCoreLineItem(pEntry, icon, where, size, true);
         internalDrawText(pEntry, Coord(where.x, where.y), Coord(size.x, size.y));
     }
 
     void GraphicsDeviceRenderer::drawSlider(GridPositionRowCacheEntry* entry, AnalogMenuItem* pItem, Coord& where, Coord& size) {
-        auto* icon = propertiesFactory.iconForMenuItem(entry->getMenuItem()->isEditing() ? SPECIAL_ID_EDIT_ICON :SPECIAL_ID_ACTIVE_ICON);
+        auto* icon = getStateIndicatorIcon(entry);
         drawCoreLineItem(entry, icon, where, size, false);
         ItemDisplayProperties *props = entry->getDisplayProperties();
         MenuPadding pad = props->getPadding();
@@ -437,10 +444,12 @@ namespace tcgfx {
         if(cardLayoutPane != nullptr && cardLayoutPane->isSubMenuCardLayout(menuMgr.getCurrentSubMenu())) {
             GridPositionRowCacheEntry *titleEntry = itemOrderByRow.itemAtIndex(0);
             int activeIndex = offsetOfCurrentActive(rootItem);
+            if(activeIndex == 0 && titleMode != NO_TITLE) activeIndex = 1; // do not allow 0 in this mode
             GridPositionRowCacheEntry *entry = itemOrderByRow.itemAtIndex(activeIndex);
             bool titleNeeded = titleMode == TITLE_ALWAYS || titleMode == TITLE_FIRST_ROW;
             if (locRedrawMode == MENUDRAW_COMPLETE_REDRAW) {
-                cardLayoutPane->forMenu(entry->getDisplayProperties(), getDeviceDrawable(), titleNeeded);
+                cardLayoutPane->forMenu(titleEntry->getDisplayProperties(), entry->getDisplayProperties(), this, titleNeeded);
+                forceDrawWidgets = true;
             }
             if (titleNeeded && (locRedrawMode == MENUDRAW_COMPLETE_REDRAW || titleEntry->getMenuItem()->isChanged())) {
                 drawMenuItem(titleEntry, Coord(0, 0), cardLayoutPane->getTitleSize(), true);
@@ -448,12 +457,12 @@ namespace tcgfx {
             if (entry->getMenuItem()->isChanged() || locRedrawMode == MENUDRAW_COMPLETE_REDRAW) {
                 getDeviceDrawable()->setDrawColor(entry->getDisplayProperties()->getColor(ItemDisplayProperties::BACKGROUND));
                 getDeviceDrawable()->drawBox(cardLayoutPane->getMenuLocation(), cardLayoutPane->getMenuSize(), true);
-                int offsetY = (cardLayoutPane->getMenuSize().y - entry->getHeight()) / 2;
+                int offsetY = (cardLayoutPane->getMenuSize().y - int(entry->getHeight())) / 2;
                 Coord menuStart(cardLayoutPane->getMenuLocation().x, cardLayoutPane->getMenuLocation().y + offsetY);
-                Coord menuSize(cardLayoutPane->getMenuSize().x, entry->getHeight());
+                Coord menuSize(cardLayoutPane->getMenuSize().x, int(entry->getHeight()));
                 drawMenuItem(entry, menuStart, menuSize, false);
             }
-            cardLayoutPane->prepareAndPaintButtons(this, activeIndex, itemOrderByRow.count());
+            cardLayoutPane->prepareAndPaintButtons(this, activeIndex, itemOrderByRow.count(), titleMode != NO_TITLE);
         } else {
             if(locRedrawMode == MENUDRAW_COMPLETE_REDRAW && cardLayoutPane != nullptr) {
                 cardLayoutPane->notInUse();
@@ -462,9 +471,9 @@ namespace tcgfx {
         }
     }
     
-    void GraphicsDeviceRenderer::enableCardLayout(const DrawableIcon& left, const DrawableIcon& right, MenuTouchScreenManager* touchScreenManager) {
+    void GraphicsDeviceRenderer::enableCardLayout(const DrawableIcon& left, const DrawableIcon& right, MenuTouchScreenManager* touchScreenManager, bool monoDisplay) {
         if(cardLayoutPane == nullptr) {
-            cardLayoutPane = new CardLayoutPane(&left, &right, touchScreenManager);
+            cardLayoutPane = new CardLayoutPane(&left, &right, touchScreenManager, monoDisplay);
         }
     }
 } // namespace tcgfx

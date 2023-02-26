@@ -19,6 +19,7 @@
 
 #define DRAW_BUTTON_FLAG_ICON_BOOL 0
 #define DRAW_BUTTON_FLAG_IS_DIRTY 1
+#define DRAW_BUTTON_HIDE_UNSELECTABLE 2
 
 namespace tcgfx {
 
@@ -87,6 +88,17 @@ namespace tcgfx {
          * @return true if within the buttons bounds
          */
         bool touchInBounds(const Coord &location) const;
+
+        /**
+         * On mono  OLED displays there is no in-between value that suits greying out, the easiest is to remove from view
+         * @param hide true- when not selectable hide the control, false- attempt to grey out.
+         */
+        void setHideOnUnselectable(bool hide) { bitWrite(flags, DRAW_BUTTON_HIDE_UNSELECTABLE, hide); }
+
+        /**
+         * @return true if the button hides when unselectable, otherwise false and the button will grey out instead.
+         */
+        bool isHiddenOnUnSelectable() { return bitRead(flags, DRAW_BUTTON_HIDE_UNSELECTABLE); }
 
         /**
          * Set the button mode

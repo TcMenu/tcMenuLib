@@ -16,10 +16,10 @@
 #include "tcMenuU8g2.h"
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
-#include <RemoteMenuItem.h>
 #include <RuntimeMenuItem.h>
-#include <ScrollChoiceMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
+#include <RemoteMenuItem.h>
+#include <ScrollChoiceMenuItem.h>
 #include <IoAbstraction.h>
 #include <EepromItemStorage.h>
 #include <mbed/HalStm32EepromAbstraction.h>
@@ -38,6 +38,9 @@ extern EthernetInitialisation ethernetInitialisation;
 
 // Global Menu Item exports
 extern EnumMenuItem menuDecimalStep;
+extern AnalogMenuItem menuDecimal;
+extern EditableLargeNumberMenuItem menuRuntimesLgeNum1;
+extern AnalogMenuItem menuRuntimesHalves1;
 extern EepromAuthenticationInfoMenuItem menuRuntimesAuthenticator;
 extern RemoteMenuItem menuRuntimesIoTMonitor;
 extern ListRuntimeMenuItem menuRuntimesCustomList;
@@ -52,12 +55,24 @@ extern BooleanMenuItem menuMoreItemsToppings;
 extern EnumMenuItem menuMoreItemsOptions;
 extern BackMenuItem menuBackMoreItems;
 extern SubMenuItem menuMoreItems;
-extern EditableLargeNumberMenuItem menuLgeNum;
-extern AnalogMenuItem menuHalves;
-extern AnalogMenuItem menuDecimal;
+extern ActionMenuItem menuSettingsSaveNow;
+extern EnumMenuItem menuSettingsDefault;
+extern AnalogMenuItem menuSettingsOfst78;
+extern AnalogMenuItem menuSettingsOfst45;
+extern AnalogMenuItem menuSettingsOfst33;
+extern BackMenuItem menuBackSettings;
+extern SubMenuItem menuSettings;
+extern AnalogMenuItem menuStatusWoW;
+extern AnalogMenuItem menuStatusMotor;
+extern AnalogMenuItem menuStatusCurrent;
+extern BackMenuItem menuBackStatus;
+extern SubMenuItem menuStatus;
+extern ActionMenuItem menu78;
+extern ActionMenuItem menu45;
+extern ActionMenuItem menu33;
 
 // Provide a wrapper to get hold of the root menu item and export setupMenu
-inline MenuItem& rootMenuItem() { return menuDecimal; }
+inline MenuItem& rootMenuItem() { return menu33; }
 void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type

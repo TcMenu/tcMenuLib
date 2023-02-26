@@ -52,7 +52,7 @@ void BaseGraphicalRenderer::subMenuRender(MenuItem* rootItem, uint8_t& locRedraw
     int startRow = 0;
     uint16_t adjustedHeight = height + (isLastRowExactFit() ? 0 : 1);
     bool drawCompleteScreen = locRedrawMode != MENUDRAW_NO_CHANGE;
-    uint16_t startY = 0;
+    int16_t startY = 0;
 
     if(titleMode == TITLE_ALWAYS) {
         startRow++;
@@ -76,7 +76,7 @@ void BaseGraphicalRenderer::subMenuRender(MenuItem* rootItem, uint8_t& locRedraw
 
     if(titleMode == TITLE_ALWAYS && (drawCompleteScreen  || itemOrderByRow.itemAtIndex(0)->getMenuItem()->isChanged())) {
         auto* pEntry = itemOrderByRow.itemAtIndex(0);
-        drawMenuItem(pEntry, Coord(0,0), Coord(width, startY), drawCompleteScreen);
+        drawMenuItem(pEntry, Coord(0,0), Coord(int(width), startY), drawCompleteScreen);
         forceDrawWidgets = true;
     }
 
@@ -144,12 +144,12 @@ GridPositionRowCacheEntry* BaseGraphicalRenderer::findMenuEntryAndDimensions(con
                 // single column row, so we must be within the item
                 auto iconAdjust = iconWidth + pEntry->getDisplayProperties()->getPadding().left;
                 localStart.x = iconAdjust;
-                localSize.x = width - iconAdjust;
+                localSize.x = int(width) - iconAdjust;
                 return pEntry;
             }
             else {
                 // multi column row, so we must work out which column we are in.
-                int colWidth = width / pEntry->getPosition().getGridSize();
+                int colWidth = int(width) / pEntry->getPosition().getGridSize();
                 int column = (screenPos.x / colWidth);
                 localStart.x = column * colWidth;
                 localSize.x = colWidth;
@@ -164,7 +164,7 @@ GridPositionRowCacheEntry* BaseGraphicalRenderer::findMenuEntryAndDimensions(con
 }
 
 bool BaseGraphicalRenderer::drawTheMenuItems(int startRow, int startY, bool drawEveryLine) {
-    uint16_t ypos = startY;
+    int16_t ypos = startY;
     int lastRow = 0;
     int addAmount = 0;
     bool didDrawTitle = false;
@@ -185,19 +185,19 @@ bool BaseGraphicalRenderer::drawTheMenuItems(int startRow, int startY, bool draw
                 item->setChanged(false);
                 taskManager.yieldForMicros(0);
                 if(itemCfg->getPosition().getGridSize() > 1) {
-                    int colWidth = width / itemCfg->getPosition().getGridSize();
+                    int colWidth = int(width) / itemCfg->getPosition().getGridSize();
                     int colOffset = colWidth * (itemCfg->getPosition().getGridPosition() - 1);
-                    drawMenuItem(itemCfg, Coord(colOffset, ypos), Coord(colWidth - 1, itemCfg->getHeight()), drawEveryLine);
+                    drawMenuItem(itemCfg, Coord(colOffset, int(ypos)), Coord(colWidth - 1, int(itemCfg->getHeight())), drawEveryLine);
                 }
                 else {
-                    drawMenuItem(itemCfg, Coord(0, ypos), Coord(width, itemCfg->getHeight()), drawEveryLine);
+                    drawMenuItem(itemCfg, Coord(0, ypos), Coord(int(width), int(itemCfg->getHeight())), drawEveryLine);
                 }
                 if(itemCfg->getPosition().getDrawingMode() == GridPosition::DRAW_TITLE_ITEM && itemCfg->getPosition().getRow() == 0) {
                     didDrawTitle = true;
                 }
             }
             lastRow = itemCfg->getPosition().getRow();
-            addAmount = itemCfg->getHeight() + itemCfg->getDisplayProperties()->getSpaceAfter();
+            addAmount = int(itemCfg->getHeight()) + itemCfg->getDisplayProperties()->getSpaceAfter();
         }
 
     }
@@ -205,7 +205,7 @@ bool BaseGraphicalRenderer::drawTheMenuItems(int startRow, int startY, bool draw
     // and lastly, if we are drawing every line, we must clear down everything
     totalHeight++;
     if(drawEveryLine && totalHeight < height) {
-        fillWithBackgroundTo(totalHeight);
+        fillWithBackgroundTo((int)totalHeight);
     }
 
     return didDrawTitle;
@@ -231,14 +231,14 @@ void BaseGraphicalRenderer::renderList() {
     cachedEntryItem = GridPositionRowCacheEntry(runList->asBackMenu(), GridPosition(GridPosition::DRAW_TITLE_ITEM,
                                                                              titleProps->getDefaultJustification(),
                                                                              0, titleHeight), titleProps);
-    drawMenuItem(&cachedEntryItem, Coord(0, 0), Coord(width, titleHeight), true);
+    drawMenuItem(&cachedEntryItem, Coord(0, 0), Coord((int)width, titleHeight), true);
 
     for (int i = 0; i <= maxOnScreen; i++) {
         uint8_t current = offset + i;
         if(current >= runList->getNumberOfRows()) break;
         RuntimeMenuItem* toDraw = runList->getChildItem(current);
         cachedEntryItem = GridPositionRowCacheEntry(toDraw, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, current + 1, rowHeight), itemProps);
-        drawMenuItem(&cachedEntryItem, Coord(0, totalTitleHeight), Coord(width, rowHeight), true);
+        drawMenuItem(&cachedEntryItem, Coord(0, totalTitleHeight), Coord((int)width, rowHeight), true);
         taskManager.yieldForMicros(0);
         totalTitleHeight += totalRowHeight;
     }
@@ -311,7 +311,8 @@ void BaseGraphicalRenderer::recalculateDisplayOrder(MenuItem *root, bool safeMod
                 serlogF3(SER_TCMENU_DEBUG, "Add manual id at row", item->getId(), row);
                 auto mode = modeFromItem(item, isUseSliderForAnalog());
                 auto* itemProps = getDisplayPropertiesFactory().configFor(item, toComponentType(mode, item));
-                itemOrderByRow.add(GridPositionRowCacheEntry(item, GridPosition(mode, itemProps->getDefaultJustification(), 1, 1, row, 0), itemProps));
+                GridPosition::GridJustification just = itemProps->getDefaultJustification();
+                itemOrderByRow.add(GridPositionRowCacheEntry(item, GridPosition(mode, just, 1, 1, row, 0), itemProps));
             }
         }
         item = item->getNext();
@@ -347,7 +348,7 @@ void BaseGraphicalRenderer::redrawAllWidgets(bool forceRedraw) {
     auto widBg = displayProps->getColor(ItemDisplayProperties::BACKGROUND);
 
     auto* widget = this->firstWidget;
-    int widgetRight = width;
+    int widgetRight = (int)width;
     while(widget) {
         widgetRight = widgetRight - (displayProps->getPadding().right + widget->getWidth());
         if(widget->isChanged() || forceRedraw) {

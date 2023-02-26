@@ -13,70 +13,79 @@
 #include <TaskManagerIO.h>
 #include <IoLogging.h>
 #include <stockIcons/directionalIcons.h>
+#include "RawCustomDrawing.h"
+#include "app_icondata.h"
+#include <stockIcons/wifiAndConnectionIcons16x12.h>
 
 // We added a RAM based scroll choice item, and this references a fixed width array variable.
 // This variable is the RAM data for scroll choice item Scroll
 // https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/scrollchoice-menu-item/
 char ramDataSet[] = "1\0        2\0        3\0        4\0        5\0        ~";
 
+//
+// These settings here simply set up the regular Stm32Ethernet library later on
+//
 const uint8_t myManualIp[] = { 192, 168, 0, 202 };
 const uint8_t myManualMac[] = { 0xde, 0xed, 0xbe, 0xef, 0xfe, 0xed };
 const uint8_t standardNetMask[] = { 255, 255, 255, 0 };
 
+
+// here we provide two title widgets, for ethernet connection, and client connection
+TitleWidget widgetConnection(iconsConnection, 2, 16, 12, nullptr);
+TitleWidget widgetEthernet(iconsEthernetConnection, 2, 16, 12, &widgetConnection);
+
+
+//
+// We use a card layout to present the items, here we demonstrate how to set it up and prepare custom menu items that
+// have different layouts and fonts.
+//
+// START card layout and custom layout code
+
+// first we need to define both a left and right button, we use the ones from stockIcons/directionalIcons.h
 DrawableIcon iconLeft(-1, Coord(11, 22), tcgfx::DrawableIcon::ICON_XBITMAP, ArrowHoriz11x22BitmapLeft, nullptr);
 DrawableIcon iconRight(-1, Coord(11, 22), tcgfx::DrawableIcon::ICON_XBITMAP, ArrowHoriz11x22BitmapRight, nullptr);
 
+color_t defaultCardPalette[] = {1, 0, 1, 1};
+
+void setupGridLayoutForCardView() {
+    auto & factory = renderer.getGraphicsPropertiesFactory();
+
+    // Now we define the grid layouts for the 33, 45 and 78 action items, each one has custom font size and therefore a
+    // custom height as well. It avoids the use of icons for the speed selectors.
+    factory.setDrawingPropertiesForItem(tcgfx::ItemDisplayProperties::COMPTYPE_ACTION, menu33.getId(), defaultCardPalette,
+                                        MenuPadding(2), u8g2_font_inr33_mn, 1, 2, 44, tcgfx::GridPosition::JUSTIFY_CENTER_NO_VALUE, MenuBorder());
+    factory.setDrawingPropertiesForItem(tcgfx::ItemDisplayProperties::COMPTYPE_ACTION, menu45.getId(), defaultCardPalette,
+                                        MenuPadding(2), u8g2_font_inr33_mn, 1, 2, 44, tcgfx::GridPosition::JUSTIFY_CENTER_NO_VALUE, MenuBorder());
+    factory.setDrawingPropertiesForItem(tcgfx::ItemDisplayProperties::COMPTYPE_ACTION, menu78.getId(), defaultCardPalette,
+                                        MenuPadding(2), u8g2_font_inr33_mn, 1, 2, 44, tcgfx::GridPosition::JUSTIFY_CENTER_NO_VALUE, MenuBorder());
+
+    // now we make the two settings and status menus use icons instead of regular drawing.
+    const Coord iconSize(APPICONS_WIDTH, APPICONS_HEIGHT);
+    factory.addImageToCache(DrawableIcon(menuSettings.getId(), iconSize, DrawableIcon::ICON_XBITMAP, settingsIcon40Bits));
+    factory.addImageToCache(DrawableIcon(menuStatus.getId(), iconSize, DrawableIcon::ICON_XBITMAP, statusIcon40Bits));
+    factory.addGridPosition(&menuSettings, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 4, 40));
+    factory.addGridPosition(&menuStatus, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 5, 40));
+
+    // after adding things to the drawing properties, we must refresh it.
+    tcgfx::ConfigurableItemDisplayPropertiesFactory::refreshCache();
+
+    // and now we set the title widgets that appear on the top right, for the link status we check the ethernet library
+    // status every half second and update the widget to represent that status.
+    renderer.setFirstWidget(&widgetEthernet);
+    taskManager.scheduleFixedRate(500, [] {
+        widgetEthernet.setCurrentState(Ethernet.linkStatus() == LinkON ? 1 : 0);
+    });
+
+    // for the connectivity icon, we use the IoT monitors notification pass through. It tells us of any changes
+    // for all incoming connections in one place.
+    menuRuntimesIoTMonitor.registerCommsNotification([](CommunicationInfo ci) {
+        widgetConnection.setCurrentState(ci.connected ? 1 : 0);
+    });
+}
+
+// END card / custom layouts
+
 using namespace tcremote;
-
-// Here we implement the custom drawing capability of the renderer, it allows us to receive reset and custom drawing
-// requests. More info in the link below:
-//  https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/renderer-take-over-display/
-//
-class MyCustomDrawing : public CustomDrawing {
-private:
-    GraphicsDeviceRenderer& dev;
-    int ticks;
-public:
-    MyCustomDrawing(GraphicsDeviceRenderer& r) : dev(r), ticks(0) {}
-
-    void registerWithRenderer() {
-        dev.setCustomDrawingHandler(this);
-    }
-
-    void started(BaseMenuRenderer *currentRenderer) override {
-        // called once when the take-over display  is started before calling renderLoop so you can set things up.
-        switches.getEncoder()->changePrecision(100, 50);
-    }
-
-    void reset() override {
-        // called whenever the display is reset, IE times out on editing etc.
-    }
-
-    void renderLoop(unsigned int currentValue, RenderPressMode userClick) override {
-        // called in a game loop between takeOverDisplay and giveBackDisplay, at this point you renderer the display.
-        if(userClick == RPRESS_PRESSED) {
-            dev.giveBackDisplay();
-        }
-        else if(++ticks % 10 == 1) {
-            // Why write your own code using device drawable? The main reason is, that it works exactly the same over
-            // adafruit, u8g2 and TFTeSPI with a moderately complete API.
-            DeviceDrawable *dd = dev.getDeviceDrawable();
-            dd->startDraw();
-            const Coord &dims = dd->getDisplayDimensions();
-            dd->setDrawColor(BLACK);
-            dd->drawBox(Coord(0, 0), dims, true);
-            dd->setColors(WHITE, BLACK);
-            auto height = int(dims.y) - 16;
-            int width = int(dims.x) - 20;
-            dd->drawText(Coord(rand() % width, (rand() % height) + 10), nullptr, 1, "hello");
-            dd->drawText(Coord(rand() % width, (rand() % height) + 10), nullptr, 1, "world");
-            char sz[10];
-            ltoaClrBuff(sz, currentValue, 4, NOT_PADDED, sizeof sz);
-            dd->drawText(Coord(0, 0), nullptr, 1, sz);
-            dd->endDraw();
-        }
-    }
-} myCustomDrawing(renderer);
 
 void setup() {
     // This example logs using IoLogging, see the following guide to enable
@@ -84,12 +93,13 @@ void setup() {
     IOLOG_START_SERIAL
     serEnableLevel(SER_NETWORK_DEBUG, true);
 
-    // Start up serial and prepare the correct SPI
+    // Start up serial and prepare the correct SPI, your pins may differ
     SPI.setMISO(PB4);
     SPI.setMOSI(PB5);
     SPI.setSCLK(PB3);
 
-    // Now start up the ethernet library.
+    //
+    // Here we start up the Stm32Ethernet library for STM32 boards/chips with built-in ethernet
     Ethernet.begin();
     Serial.print("My IP address is ");
     Ethernet.localIP().printTo(Serial);
@@ -98,10 +108,10 @@ void setup() {
     // and then run the menu setup
     setupMenu();
 
+    // now load back values from EEPROM, but only when we can read the confirmatory magic key, see EEPROM loading in the docs
     menuMgr.load(0xd00d, [] {
         // this gets called when the menu hasn't been saved before, to initialise the first time.
         menuDecimal.setCurrentValue(4);
-        menuHalves.setCurrentValue(6);
     });
 
     // here we register the custom drawing we created earlier with the renderer
@@ -114,7 +124,10 @@ void setup() {
 
     // lastly, we set the card layout for the main "root" menu. The last parameter is an optional touch screen interface
     // that the card layout will interact with, to "flip" between cards. Set to null when no touch screen available.
-    renderer.enableCardLayout(iconLeft, iconRight, nullptr);
+    renderer.enableCardLayout(iconLeft, iconRight, nullptr, true);
+
+    // now we set up the layouts to make the card view look right.
+    setupGridLayoutForCardView();
 }
 
 void loop() {

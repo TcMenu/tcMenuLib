@@ -1,44 +1,120 @@
 {
   "version": "1.00",
-  "projectName": "Project description",
+  "projectName": "Example of how a turntable PSU may look with some extra example types",
   "author": "dave",
   "items": [
     {
       "parentId": 0,
+      "type": "actionMenu",
+      "item": {
+        "name": "33",
+        "variableName": "33",
+        "id": 19,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "actionMenu",
+      "item": {
+        "name": "45",
+        "variableName": "45",
+        "id": 20,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "actionMenu",
+      "item": {
+        "name": "78",
+        "variableName": "78",
+        "id": 21,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "Status",
+        "variableName": "Status",
+        "id": 22,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 22,
       "type": "analogItem",
       "defaultValue": "0",
       "item": {
-        "maxValue": 1000,
+        "maxValue": 7800,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "RPM",
+        "step": 1,
+        "name": "Actual",
+        "variableName": "StatusCurrent",
+        "id": 23,
+        "eepromAddress": -1,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 22,
+      "type": "analogItem",
+      "defaultValue": "0",
+      "item": {
+        "maxValue": 300,
         "offset": 0,
         "divisor": 10,
-        "unitName": "d",
+        "unitName": "V",
         "step": 1,
-        "name": "Decimal",
-        "variableName": "Decimal",
-        "id": 1,
-        "eepromAddress": 2,
-        "functionName": "decimalDidChange",
-        "readOnly": false,
+        "name": "Motor",
+        "variableName": "StatusMotor",
+        "id": 24,
+        "eepromAddress": -1,
+        "readOnly": true,
         "localOnly": false,
         "visible": true,
         "staticDataInRAM": false
       }
     },
     {
-      "parentId": 0,
+      "parentId": 22,
       "type": "analogItem",
-      "defaultValue": "0",
+      "defaultValue": "15000",
       "item": {
-        "maxValue": 255,
-        "offset": 0,
-        "divisor": 2,
-        "unitName": "dB",
+        "maxValue": 30000,
+        "offset": -15000,
+        "divisor": 5000,
+        "unitName": "%",
         "step": 1,
-        "name": "Halves",
-        "variableName": "Halves",
-        "id": 2,
-        "eepromAddress": 4,
-        "readOnly": false,
+        "name": "WoW",
+        "variableName": "StatusWoW",
+        "id": 25,
+        "eepromAddress": -1,
+        "readOnly": true,
         "localOnly": false,
         "visible": true,
         "staticDataInRAM": false
@@ -46,17 +122,107 @@
     },
     {
       "parentId": 0,
-      "type": "largeNumItem",
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "Settings",
+        "variableName": "Settings",
+        "id": 26,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 26,
+      "type": "analogItem",
+      "defaultValue": "5000",
+      "item": {
+        "maxValue": 10000,
+        "offset": -5000,
+        "divisor": 1000,
+        "unitName": "%",
+        "step": 1,
+        "name": "Ofst33",
+        "variableName": "SettingsOfst33",
+        "id": 27,
+        "eepromAddress": 25,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 26,
+      "type": "analogItem",
+      "defaultValue": "5000",
+      "item": {
+        "maxValue": 10000,
+        "offset": -5000,
+        "divisor": 1000,
+        "unitName": "%",
+        "step": 1,
+        "name": "Ofst45",
+        "variableName": "SettingsOfst45",
+        "id": 28,
+        "eepromAddress": 27,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 26,
+      "type": "analogItem",
+      "defaultValue": "5000",
+      "item": {
+        "maxValue": 10000,
+        "offset": -5000,
+        "divisor": 1000,
+        "unitName": "%",
+        "step": 1,
+        "name": "Ofst78",
+        "variableName": "SettingsOfst78",
+        "id": 29,
+        "eepromAddress": 29,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 26,
+      "type": "enumItem",
       "defaultValue": "0",
       "item": {
-        "digitsAllowed": 9,
-        "decimalPlaces": 3,
-        "negativeAllowed": true,
-        "name": "Lge Num",
-        "variableName": "LgeNum",
-        "id": 3,
-        "eepromAddress": 6,
-        "functionName": "largeNumDidChange",
+        "enumEntries": [
+          "33",
+          "45",
+          "78"
+        ],
+        "name": "Default",
+        "variableName": "SettingsDefault",
+        "id": 30,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 26,
+      "type": "actionMenu",
+      "item": {
+        "name": "Save Now",
+        "variableName": "SettingsSaveNow",
+        "id": 31,
+        "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -258,6 +424,64 @@
       }
     },
     {
+      "parentId": 11,
+      "type": "analogItem",
+      "defaultValue": "0",
+      "item": {
+        "maxValue": 255,
+        "offset": 0,
+        "divisor": 2,
+        "unitName": "dB",
+        "step": 1,
+        "name": "Halves1",
+        "id": 17,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 11,
+      "type": "largeNumItem",
+      "defaultValue": "0",
+      "item": {
+        "digitsAllowed": 9,
+        "decimalPlaces": 3,
+        "negativeAllowed": true,
+        "name": "Lge Num1",
+        "id": 18,
+        "eepromAddress": -1,
+        "functionName": "largeNumDidChange",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "defaultValue": "0",
+      "item": {
+        "maxValue": 1000,
+        "offset": 0,
+        "divisor": 10,
+        "unitName": "d",
+        "step": 1,
+        "name": "Decimal",
+        "variableName": "Decimal",
+        "id": 1,
+        "eepromAddress": 2,
+        "functionName": "decimalDidChange",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
       "parentId": 0,
       "type": "enumItem",
       "defaultValue": "0",
@@ -289,7 +513,7 @@
     ],
     "lastThemeUuid": "0dd60ceb-7e0f-46e2-8d40-b264eb3aa7e0",
     "applicationUUID": "ecd5607f-55eb-4252-a512-aab769452dd3",
-    "applicationName": "stm32DuinoDemo",
+    "applicationName": "TcTT PSU",
     "lastProperties": [
       {
         "name": "DISPLAY_VARIABLE",
