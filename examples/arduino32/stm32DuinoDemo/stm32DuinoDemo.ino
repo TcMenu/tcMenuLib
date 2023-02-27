@@ -125,6 +125,7 @@ void setup() {
     // lastly, we set the card layout for the main "root" menu. The last parameter is an optional touch screen interface
     // that the card layout will interact with, to "flip" between cards. Set to null when no touch screen available.
     renderer.enableCardLayout(iconLeft, iconRight, nullptr, true);
+    renderer.setCardLayoutStatusForRootItem(&rootMenuItem(), true);
 
     // now we set up the layouts to make the card view look right.
     setupGridLayoutForCardView();

@@ -21,7 +21,7 @@ bool CardLayoutPane::isSubMenuCardLayout(MenuItem *item) {
     return (sc && sc->getState());
 }
 
-void CardLayoutPane::setSubMenuState(MenuItem *item, bool onOrOff) {
+void CardLayoutPane::setEnablementForRootMenu(MenuItem *item, bool onOrOff) {
     menuid_t itemId = item != nullptr ? item->getId() : 0;
     SubMenuUsingCardLayout* existing = usingCardLayout.getByKey(itemId);
     if(existing != nullptr) {
@@ -32,6 +32,7 @@ void CardLayoutPane::setSubMenuState(MenuItem *item, bool onOrOff) {
 }
 
 void CardLayoutPane::forMenu(ItemDisplayProperties* titleProps, ItemDisplayProperties* buttonProps, GraphicsDeviceRenderer* gfxRenderer, bool titleNeeded) {
+    serlogF(SER_TCMENU_INFO, "Card Layout init");
     theRenderer = gfxRenderer;
     inUse = true;
     if(touchScreenManager) {

@@ -101,7 +101,7 @@ namespace tcgfx {
          * @param item the item to check (or null for root)
          * @param onOrOff if it should use card layout
          */
-        void setSubMenuState(MenuItem *item, bool onOrOff);
+        void setEnablementForRootMenu(MenuItem *item, bool onOrOff);
 
         /**
          * Check if a given menu item is using card layout.

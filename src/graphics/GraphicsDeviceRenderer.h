@@ -109,7 +109,8 @@ namespace tcgfx {
          * Enables the card layout system for the items provided, a card layout shows a single item at once, with left
          * and right images present that work somewhat like buttons. Rotating the encoder (or up/down buttons) will result
          * in switching between the menu items. This works particularly well when combined with using drawable icons
-         * for each of the menu items. Note that when enabled, this layout is always enabled for root.
+         * for each of the menu items. Note that after enabling, you must call `setCardLayoutStatusForRootItem` to enable
+         * menus, see the method docs for details.
          * @param left the icon to use for left, (takes its colors from the title)
          * @param right the icon to use for right, (takes its colors from the title)
          * @param touchManager optionally provide the touch manager to make the buttons work with a touch screen
@@ -118,11 +119,13 @@ namespace tcgfx {
         void enableCardLayout(const DrawableIcon& left, const DrawableIcon& right, MenuTouchScreenManager* touchManager, bool monoDisplay);
 
         /**
-         * Allows the card layout mode to be enabled by submenu.
-         * @param sub the submenu to change status of (nullptr for root)
+         * Allows the card layout mode to be enabled for a root item, this is the first item in the linked list, for
+         * submenus you can obtain this by calling `menuSub.getChild()` on a submenu, or for root call `rootMenuItem()`
+         * to get the first item of the root menu.
+         * @param root the root menu item to change status
          * @param onOrOff true if on, otherwise false.
          */
-        void setCardLayoutStatusForSub(MenuItem* sub, bool onOrOff);
+        void setCardLayoutStatusForRootItem(MenuItem* root, bool onOrOff);
     protected:
         /**
          * Overrides the default implementation to allow for card based layouts, if this is not enabled for the submenu

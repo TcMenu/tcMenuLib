@@ -43,9 +43,10 @@ void setup() {
 
     setupMenu();
 
-    // Here we enable the card layout mode for the main menu (enabling card layout defaults root to enabled).
+    // Here we enable the card layout mode for the main menu by first enabling support, then adding the root menu.
     // We also set up the item layout for card view by calling our setup function, defined above.
     renderer.enableCardLayout(iconLeft, iconRight, nullptr, false);
+    renderer.setCardLayoutStatusForRootItem(&rootMenuItem(), true);
     setupGridLayoutForCardView();
 
     // We can set a callback for when the title item is pressed on the main menu, here we show the app version

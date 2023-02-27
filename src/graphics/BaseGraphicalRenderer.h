@@ -113,6 +113,7 @@ namespace tcgfx {
             setTitleOnDisplay(true);
             setLastRowExactFit(lastRowExact);
             setUseSliderForAnalog(true);
+            setEditStatusIconsEnabled(true);
             currentRootMenu = nullptr;
             pgmTitle = appTitle;
         }
@@ -150,7 +151,8 @@ namespace tcgfx {
         void setRawTouchMode(bool rawTouch) { bitWrite(flags, GFX_USING_RAW_TOUCH, rawTouch); }
         /**
          * Turn off editing icons and editor indications of editing for a short time, for example during special layouts
-         * such as card layout.
+         * such as card layout. This is an override that can force editing icons OFF, it cannot force them ON if no icons
+         * were registered.
          * @param ena true to enable (Default)
          */
         void setEditStatusIconsEnabled(bool ena) { bitWrite(flags, GFX_EDIT_STATUS_ICONS_ENABLED, ena); }
