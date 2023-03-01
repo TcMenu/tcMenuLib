@@ -1,5 +1,5 @@
 //
-// ESP32 S2 example based on Saola board
+// ESP32 S2 example based on Saola board with a dashboard configuration onto an OLED display
 // I2C on standard pin, 8 and 9 with an SH1106 display
 // encoder on 5, 6 with button on 7
 // Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
@@ -14,6 +14,7 @@
 #include <WiFi.h>
 #include <stockIcons/wifiAndConnectionIcons16x12.h>
 #include <tcUtil.h>
+#include "u8g2DashConfig.h"
 
 #define MENU_WIFIMODE_STATION 0
 const char pgmsListHeader[] PROGMEM = "List items";
@@ -49,6 +50,9 @@ void setup() {
     setTitlePressedCallback([](int titleCb) {
         showVersionDialog(&applicationInfo);
     });
+
+    // this project also contains a dashboard, see the u8g2DashConfig files.
+    setupDashboard();
 }
 
 void loop() {

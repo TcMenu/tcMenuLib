@@ -56,16 +56,26 @@ void TcDrawableButton::paintButton(DeviceDrawable* dr) {
 
     DeviceDrawableHelper helper(dr, palette, 4, where, size);
 
-    color_t bgCol = drawingMode == NORMAL || drawingMode == NOT_SELECTABLE ? bgColor : selectedColor;
+    color_t bgCol;
+    color_t fgCol;
+
+    if(isButtonOnMonoDisplay()) {
+        fgCol = drawingMode == SELECTED || drawingMode == PRESSED ? bgColor : fgColor;
+        bgCol = drawingMode == SELECTED || drawingMode == PRESSED ? fgColor : bgColor;
+    } else {
+        fgCol = drawingMode == NOT_SELECTABLE ? GREYED_OUT_COLOR : fgColor;
+        bgCol = drawingMode == NORMAL || drawingMode == NOT_SELECTABLE ? bgColor : selectedColor;
+    }
+
     helper.getDrawable()->setDrawColor(bgCol);
     helper.getDrawable()->drawBox(helper.offsetLocation(where), size, true);
 
-    if(isHiddenOnUnSelectable() && drawingMode == NOT_SELECTABLE) {
+    if(isButtonOnMonoDisplay() && drawingMode == NOT_SELECTABLE) {
         helper.endDraw();
         return;
     }
 
-    color_t fgCol = drawingMode == NOT_SELECTABLE ? GREYED_OUT_COLOR : fgColor;
+
     helper.getDrawable()->drawBox(where, size, true);
     if(isIconDrawn()) {
         // drawing an icon

@@ -19,7 +19,7 @@
 
 #define DRAW_BUTTON_FLAG_ICON_BOOL 0
 #define DRAW_BUTTON_FLAG_IS_DIRTY 1
-#define DRAW_BUTTON_HIDE_UNSELECTABLE 2
+#define DRAW_BUTTON_MONO 2
 
 namespace tcgfx {
 
@@ -91,14 +91,15 @@ namespace tcgfx {
 
         /**
          * On mono  OLED displays there is no in-between value that suits greying out, the easiest is to remove from view
-         * @param hide true- when not selectable hide the control, false- attempt to grey out.
+         * and the only selected action we have is to invert the button.
+         * @param mono true- when on a monochrmoe two color display
          */
-        void setHideOnUnselectable(bool hide) { bitWrite(flags, DRAW_BUTTON_HIDE_UNSELECTABLE, hide); }
+        void setButtonOnMonoDisplay(bool mono) { bitWrite(flags, DRAW_BUTTON_MONO, mono); }
 
         /**
          * @return true if the button hides when unselectable, otherwise false and the button will grey out instead.
          */
-        bool isHiddenOnUnSelectable() { return bitRead(flags, DRAW_BUTTON_HIDE_UNSELECTABLE); }
+        bool isButtonOnMonoDisplay() { return bitRead(flags, DRAW_BUTTON_MONO); }
 
         /**
          * Set the button mode

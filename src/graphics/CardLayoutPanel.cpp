@@ -10,8 +10,8 @@ CardLayoutPane::CardLayoutPane(const DrawableIcon *left, const DrawableIcon *rig
         : leftButton(left), rightButton(right), iconLeft(left), touchScreenManager(optionalTouch) {
     usingCardLayout.add(SubMenuUsingCardLayout(0, true));
     if(mono) {
-        leftButton.setHideOnUnselectable(true);
-        rightButton.setHideOnUnselectable(true);
+        leftButton.setButtonOnMonoDisplay(true);
+        rightButton.setButtonOnMonoDisplay(true);
     }
 }
 
