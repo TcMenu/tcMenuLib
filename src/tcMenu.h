@@ -203,7 +203,22 @@ public:
 	 */
 	void initForUpDownOk(MenuRenderer* renderer, MenuItem* root, pinid_t downPin, pinid_t upPin, pinid_t okPin, int speed=20);
 
-	/**
+    /**
+     * Initialise for up a 4 way digital joystick that has up, down, left and right. With this it is possible for the
+     * joystick to properly handle scrolling, sideways scrolling, and regular change.
+     * @param renderer the renderer used for drawing
+     * @param root the first menu item
+     * @param downPin the button for down
+     * @param upPin the button on up
+     * @param leftPin the button on left
+     * @param rightPin the button on right
+     * @param okPin the OK button for the menu select / edit action
+     * @param speed the repeat key interval in ticks (lower is faster), default 20
+     */
+    void initFor4WayJoystick(MenuRenderer* renderer, MenuItem* root, pinid_t downPin, pinid_t upPin, pinid_t leftPin,
+                             pinid_t rightPin, pinid_t okPin, int speed=20);
+
+    /**
 	 * Initialise in situations where local input is not needed or where a custom type of input is needed
      * that is not one of the common types.
      * 

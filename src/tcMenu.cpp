@@ -24,6 +24,35 @@ void MenuManager::initForUpDownOk(MenuRenderer* renderer, MenuItem* root, pinid_
 	renderer->initialise();
 }
 
+class Digital4WayPassThruListener : public SwitchListener {
+private:
+    pinid_t backPin, nextPin;
+public:
+    Digital4WayPassThruListener(pinid_t backPin, pinid_t nextPin) : backPin(backPin), nextPin(nextPin) {
+    }
+
+    void onPressed(pinid_t pin, bool held) override {
+        if(pin == backPin) {
+            if(!held) menuMgr.performDirectionMove(true);
+        } else if(pin == nextPin) {
+            if(!held) menuMgr.performDirectionMove(false);
+        }
+    }
+
+    void onReleased(pinid_t pin, bool held) override {}
+};
+
+void MenuManager::initFor4WayJoystick(MenuRenderer* renderer, MenuItem* root, pinid_t downPin, pinid_t upPin, pinid_t leftPin,
+                         pinid_t rightPin, pinid_t okPin, int speed) {
+    this->renderer = renderer;
+    navigator.setRootItem(root);
+
+    switches.addSwitch(okPin, nullptr);
+    switches.onRelease(okPin, [](pinid_t /*key*/, bool held) { menuMgr.onMenuSelect(held); });
+    setupUpDownButtonEncoder(upPin, downPin, leftPin, rightPin, new Digital4WayPassThruListener(leftPin, rightPin),
+                             [](int val) {menuMgr.valueChanged(val);});
+}
+
 void MenuManager::initForEncoder(MenuRenderer* renderer,  MenuItem* root, pinid_t encoderPinA, pinid_t encoderPinB, pinid_t encoderButton, EncoderType type) {
 	this->renderer = renderer;
     navigator.setRootItem(root);
