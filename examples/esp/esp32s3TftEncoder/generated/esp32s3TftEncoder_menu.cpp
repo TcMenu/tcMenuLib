@@ -10,7 +10,7 @@
 
 #include <tcMenu.h>
 #include "esp32s3TftEncoder_menu.h"
-#include "ThemeCoolBlueTraditional.h"
+#include "../ThemeCoolBlueTraditional.h"
 #include <Fonts/OpenSansCyrillicLatin12.h>
 
 // Global variable declarations

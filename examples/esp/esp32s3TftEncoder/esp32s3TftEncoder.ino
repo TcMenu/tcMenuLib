@@ -3,7 +3,7 @@
 //
 // Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
 
-#include "esp32s3TftEncoder_menu.h"
+#include "generated/esp32s3TftEncoder_menu.h"
 #include "stockIcons/directionalIcons.h"
 #include "app_icondata.h"
 #include "tcMenuVersion.h"
