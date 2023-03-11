@@ -15,6 +15,7 @@
 #include "../tcMenu.h"
 #include "BaseGraphicalRenderer.h"
 #include "GfxMenuConfig.h"
+#include "DeviceDrawable.h"
 #include "DeviceDrawableHelper.h"
 #include "TcDrawableButton.h"
 #include "MenuTouchScreenEncoder.h"
@@ -26,6 +27,25 @@
 namespace tcgfx {
 
     class CardLayoutPane;
+
+    /**
+     * This class implements TcUnicode's plot pipeline for tcMenu renderers, as a last resort way of drawing when we
+     * don't have a direct implementation for the hardware.
+     */
+    class DrawableTextPlotPipeline : public TextPlotPipeline {
+    private:
+        DeviceDrawable *drawable;
+        Coord cursor;
+    public:
+        explicit DrawableTextPlotPipeline(DeviceDrawable *drawable) : drawable(drawable) {}
+        void drawPixel(uint16_t x, uint16_t y, uint32_t color) override {
+            drawable->setDrawColor(color);
+            drawable->drawPixel(x, y);
+        }
+        void setCursor(const Coord& where) override { cursor = where; }
+        Coord getCursor() override { return cursor; }
+        Coord getDimensions() override { return drawable->getDisplayDimensions(); }
+    };
 
     /**
      * This class contains all the drawing code that is used for most graphical displays, it relies on an instance of

@@ -1,5 +1,6 @@
 
 #include "DeviceDrawable.h"
+#include "GraphicsDeviceRenderer.h"
 #include <tcUnicodeHelper.h>
 
 using namespace tcgfx;
@@ -24,7 +25,7 @@ UnicodeFontHandler *DeviceDrawable::getUnicodeHandler(bool enableIfNeeded) {
 }
 
 UnicodeFontHandler *DeviceDrawable::createFontHandler() {
-    return fontHandler = new UnicodeFontHandler(this, ENCMODE_UTF8);
+    return fontHandler = new UnicodeFontHandler(new DrawableTextPlotPipeline(this), ENCMODE_UTF8);
 }
 
 Coord DeviceDrawable::textExtents(const void *font, int mag, const char *text, int *baseline) {

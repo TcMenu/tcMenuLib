@@ -468,7 +468,6 @@
     "embeddedPlatform": "ARDUINO_ESP32",
     "lastDisplayUuid": "e6342680-6fab-4d1b-ac08-ce8dbfc0974c",
     "lastInputUuid": "183448ac-a717-4b2b-823d-ffc7c8140ab9",
-    "lastRemoteUuid": "46c30011-cac6-4598-a7b8-b0630d55daab",
     "lastRemoteUuids": [
       "46c30011-cac6-4598-a7b8-b0630d55daab"
     ],
@@ -673,8 +672,8 @@
       }
     ],
     "namingRecursive": true,
-    "saveToSrc": false,
     "useCppMain": false,
+    "saveLocation": "ALL_TO_CURRENT",
     "usingSizedEEPROMStorage": false,
     "eepromDefinition": "eeprom:",
     "authenticatorDefinition": "rom:200:6",

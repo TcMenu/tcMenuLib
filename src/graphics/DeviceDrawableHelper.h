@@ -14,6 +14,7 @@
 #include <PlatformDetermination.h>
 #include <tcUnicodeHelper.h>
 #include "GfxMenuConfig.h"
+#include "DeviceDrawable.h"
 
 namespace tcgfx {
     /**
