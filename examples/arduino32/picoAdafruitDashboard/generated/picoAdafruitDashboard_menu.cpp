@@ -10,11 +10,11 @@
 
 #include <tcMenu.h>
 #include "picoAdafruitDashboard_menu.h"
-#include "ThemeCoolBlueModern.h"
+#include "../ThemeCoolBlueModern.h"
 #include <Fonts/RobotoMedium24.h>
 
 // Global variable declarations
-const PROGMEM  ConnectorLocalInfo applicationInfo = { "adafruitDrawableTest", "0ad4bdde-34a4-4507-912e-b495b0eac2c1" };
+const PROGMEM  ConnectorLocalInfo applicationInfo = { TC_I18N_PROJECT_NAME, "0ad4bdde-34a4-4507-912e-b495b0eac2c1" };
 
 Adafruit_ILI9341 gfx(20, 18, 19);
 AdafruitDrawable gfxDrawable(&gfx, 40);
@@ -23,25 +23,26 @@ GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 // Global Menu Item declarations
 const PROGMEM BooleanMenuInfo minfoSettingsCheckBox = { "CheckBox", 9, 0xffff, 1, NO_CALLBACK, NAMING_CHECKBOX };
 BooleanMenuItem menuSettingsCheckBox(&minfoSettingsCheckBox, false, NULL, INFO_LOCATION_PGM);
-const PROGMEM BooleanMenuInfo minfoSettingsYesNo = { "YesNo", 8, 0xffff, 1, NO_CALLBACK, NAMING_YES_NO };
+const PROGMEM BooleanMenuInfo minfoSettingsYesNo = { TC_I18N_MENU_8_NAME, 8, 0xffff, 1, NO_CALLBACK, NAMING_YES_NO };
 BooleanMenuItem menuSettingsYesNo(&minfoSettingsYesNo, false, &menuSettingsCheckBox, INFO_LOCATION_PGM);
-RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRGBRtCall, rgbAlphaItemRenderFn, "RGB", -1, NO_CALLBACK)
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRGBRtCall, rgbAlphaItemRenderFn, TC_I18N_MENU_7_NAME, -1, NO_CALLBACK)
 Rgb32MenuItem menuSettingsRGB(fnSettingsRGBRtCall, RgbColor32(0, 0, 0), 7, false, &menuSettingsYesNo);
 const PROGMEM AnyMenuInfo minfoSettingsAction = { "Action", 6, 0xffff, 0, onSettingsAction };
 ActionMenuItem menuSettingsAction(&minfoSettingsAction, &menuSettingsRGB, INFO_LOCATION_PGM);
-const PROGMEM SubMenuInfo minfoSettings = { "Settings", 5, 0xffff, 0, NO_CALLBACK };
+const PROGMEM SubMenuInfo minfoSettings = { TC_I18N_MENU_5_NAME, 5, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackSettings(&minfoSettings, &menuSettingsAction, INFO_LOCATION_PGM);
 SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, NULL, INFO_LOCATION_PGM);
 const PROGMEM BooleanMenuInfo minfoPower = { "Power", 4, 0xffff, 1, NO_CALLBACK, NAMING_ON_OFF };
 BooleanMenuItem menuPower(&minfoPower, false, &menuSettings, INFO_LOCATION_PGM);
-const char enumStrEnum_0[] PROGMEM = "Item1";
-const char enumStrEnum_1[] PROGMEM = "Item2";
-const char* const enumStrEnum[] PROGMEM  = { enumStrEnum_0, enumStrEnum_1 };
-const PROGMEM EnumMenuInfo minfoEnum = { "Enum", 3, 0xffff, 1, NO_CALLBACK, enumStrEnum };
+const char enumStrEnum_0[] PROGMEM = TC_I18N_MENU_3_ENUM_0;
+const char enumStrEnum_1[] PROGMEM = TC_I18N_MENU_3_ENUM_1;
+const char enumStrEnum_2[] PROGMEM = TC_I18N_MENU_3_ENUM_2;
+const char* const enumStrEnum[] PROGMEM  = { enumStrEnum_0, enumStrEnum_1, enumStrEnum_2 };
+const PROGMEM EnumMenuInfo minfoEnum = { TC_I18N_MENU_3_NAME, 3, 0xffff, 2, NO_CALLBACK, enumStrEnum };
 EnumMenuItem menuEnum(&minfoEnum, 0, &menuPower, INFO_LOCATION_PGM);
-const PROGMEM FloatMenuInfo minfoFloat = { "Float", 2, 0xffff, 3, NO_CALLBACK };
+const PROGMEM FloatMenuInfo minfoFloat = { TC_I18N_MENU_2_NAME, 2, 0xffff, 3, NO_CALLBACK };
 FloatMenuItem menuFloat(&minfoFloat, 33.123, &menuEnum, INFO_LOCATION_PGM);
-const PROGMEM AnalogMenuInfo minfoAnalog = { "Analog", 1, 0xffff, 1000, NO_CALLBACK, 0, 10, "V" };
+const PROGMEM AnalogMenuInfo minfoAnalog = { TC_I18N_MENU_1_NAME, 1, 0xffff, 1000, NO_CALLBACK, 0, 10, TC_I18N_MENU_1_UNIT };
 AnalogMenuItem menuAnalog(&minfoAnalog, 222, &menuFloat, INFO_LOCATION_PGM);
 
 void setupMenu() {

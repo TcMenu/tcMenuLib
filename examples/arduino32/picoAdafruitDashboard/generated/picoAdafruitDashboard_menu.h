@@ -17,6 +17,7 @@
 #include <ScrollChoiceMenuItem.h>
 #include <IoAbstraction.h>
 #include <EepromItemStorage.h>
+#include "picoAdafruitDashboard_langSelect.h"
 
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;

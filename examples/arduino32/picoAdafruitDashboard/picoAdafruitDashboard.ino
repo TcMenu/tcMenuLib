@@ -6,8 +6,8 @@
  * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
  */
 
-#include "picoAdafruitDashboard_menu.h"
 #include <TaskManagerIO.h>
+#include "generated/picoAdafruitDashboard_menu.h"
 #include "dashboardConfig.h"
 
 void setup() {

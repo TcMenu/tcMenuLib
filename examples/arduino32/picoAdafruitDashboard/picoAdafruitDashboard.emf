@@ -11,9 +11,9 @@
         "maxValue": 1000,
         "offset": 0,
         "divisor": 10,
-        "unitName": "V",
+        "unitName": "%menu.1.unit",
         "step": 1,
-        "name": "Analog",
+        "name": "%menu.1.name",
         "variableName": "Analog",
         "id": 1,
         "eepromAddress": -1,
@@ -29,7 +29,7 @@
       "defaultValue": "33.123",
       "item": {
         "numDecimalPlaces": 3,
-        "name": "Float",
+        "name": "%menu.2.name",
         "variableName": "Float",
         "id": 2,
         "eepromAddress": -1,
@@ -45,10 +45,11 @@
       "defaultValue": "0",
       "item": {
         "enumEntries": [
-          "Item1",
-          "Item2"
+          "%menu.3.enum.0",
+          "%menu.3.enum.1",
+          "%menu.3.enum.2"
         ],
-        "name": "Enum",
+        "name": "%menu.3.name",
         "variableName": "Enum",
         "id": 3,
         "eepromAddress": -1,
@@ -79,7 +80,7 @@
       "type": "subMenu",
       "item": {
         "secured": false,
-        "name": "Settings",
+        "name": "%menu.5.name",
         "variableName": "Settings",
         "id": 5,
         "eepromAddress": -1,
@@ -110,7 +111,7 @@
       "defaultValue": "#000000FF",
       "item": {
         "includeAlphaChannel": false,
-        "name": "RGB",
+        "name": "%menu.7.name",
         "variableName": "SettingsRGB",
         "id": 7,
         "eepromAddress": -1,
@@ -126,7 +127,7 @@
       "defaultValue": "false",
       "item": {
         "naming": "YES_NO",
-        "name": "YesNo",
+        "name": "%menu.8.name",
         "variableName": "SettingsYesNo",
         "id": 8,
         "eepromAddress": -1,
@@ -162,7 +163,7 @@
     ],
     "lastThemeUuid": "850dc0a3-f534-47c2-94d8-1e64ff368a54",
     "applicationUUID": "0ad4bdde-34a4-4507-912e-b495b0eac2c1",
-    "applicationName": "adafruitDrawableTest",
+    "applicationName": "%project.name",
     "lastProperties": [
       {
         "name": "DISPLAY_VARIABLE",
@@ -312,7 +313,7 @@
     ],
     "namingRecursive": true,
     "useCppMain": false,
-    "saveLocation": "ALL_TO_CURRENT",
+    "saveLocation": "PROJECT_TO_CURRENT_WITH_GENERATED",
     "usingSizedEEPROMStorage": false,
     "eepromDefinition": "",
     "authenticatorDefinition": "",
