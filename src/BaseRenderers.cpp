@@ -251,3 +251,12 @@ bool isItemActionable(MenuItem* item) {
 	}
 	return false;
 }
+
+bool isCardLayoutActive(MenuItem* rootItem) {
+    if(BaseMenuRenderer::getInstance()->getRendererType() == RENDER_TYPE_CONFIGURABLE) {
+        auto r = reinterpret_cast<tcgfx::BaseGraphicalRenderer*>(BaseMenuRenderer::getInstance());
+        return (r->getLayoutMode(rootItem) == tcgfx::LAYOUT_CARD_SIDEWAYS);
+    } else {
+        return false;
+    }
+}

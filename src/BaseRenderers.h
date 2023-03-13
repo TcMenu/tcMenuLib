@@ -474,4 +474,6 @@ protected:
 	void countdownToDefaulting();
 };
 
+bool isCardLayoutActive(MenuItem* root);
+
 #endif

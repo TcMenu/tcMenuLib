@@ -485,4 +485,11 @@ namespace tcgfx {
         }
     }
 
+    LayoutMode GraphicsDeviceRenderer::getLayoutMode(MenuItem* rootItem) {
+        if(cardLayoutPane == nullptr) return LAYOUT_VERTICAL_DEFAULT;
+
+        return (cardLayoutPane->isSubMenuCardLayout(rootItem)) ? LAYOUT_CARD_SIDEWAYS : LAYOUT_VERTICAL_DEFAULT;
+    }
+
+
 } // namespace tcgfx

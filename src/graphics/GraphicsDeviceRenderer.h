@@ -146,6 +146,8 @@ namespace tcgfx {
          * @param onOrOff true if on, otherwise false.
          */
         void setCardLayoutStatusForRootItem(MenuItem* root, bool onOrOff);
+
+        LayoutMode getLayoutMode(MenuItem* rootItem) override;
     protected:
         /**
          * Overrides the default implementation to allow for card based layouts, if this is not enabled for the submenu

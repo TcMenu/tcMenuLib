@@ -16,7 +16,8 @@ MenuManager menuMgr;
 
 class Digital4WayPassThruListener : public SwitchListener {
 private:
-    pinid_t backPin, nextPin;
+    pinid_t backPin = -1, nextPin = -1;
+    bool rightIsSel = false;
 public:
     void init(pinid_t back, pinid_t next) {
         backPin = back;
@@ -26,21 +27,34 @@ public:
     void onPressed(pinid_t pin, bool held) override {
         if(pin == backPin) {
             if(!held) menuMgr.performDirectionMove(true);
-        } else if(pin == nextPin) {
+        } else if(pin == nextPin && !rightIsSel) {
             if(!held) menuMgr.performDirectionMove(false);
         }
     }
 
-    void onReleased(pinid_t pin, bool held) override {}
+    void onReleased(pinid_t pin, bool held) override {
+        if (rightIsSel) {
+            menuMgr.onMenuSelect(held);
+        }
+    }
+
+    void setRightIsSelect(bool rightSel) {
+        rightIsSel = rightSel;
+    }
 } fourWayPassThru;
 
 void MenuManager::initFor4WayJoystick(MenuRenderer* renderer, MenuItem* root, pinid_t downPin, pinid_t upPin, pinid_t leftPin,
                          pinid_t rightPin, pinid_t okPin, int speed) {
     this->renderer = renderer;
     navigator.setRootItem(root);
+    fourWayPassThru.init(leftPin, rightPin);
 
-    switches.addSwitch(okPin, nullptr);
-    switches.onRelease(okPin, [](pinid_t /*key*/, bool held) { menuMgr.onMenuSelect(held); });
+    if(okPin != -1) {
+        switches.addSwitch(okPin, nullptr);
+        switches.onRelease(okPin, [](pinid_t /*key*/, bool held) { menuMgr.onMenuSelect(held); });
+    } else {
+        fourWayPassThru.setRightIsSelect(true);
+    }
     setupUpDownButtonEncoder(upPin, downPin, leftPin, rightPin, &fourWayPassThru, [](int val) {menuMgr.valueChanged(val);}, speed);
     renderer->initialise();
 }
@@ -482,7 +496,7 @@ void MenuManager::setItemsInCurrentMenu(int size, int offs) {
     if(!enc) return;
     serlogF3(SER_TCMENU_INFO, "Set items in menu (size, offs) ", size, offs);
     enc->changePrecision(size, offs, useWrapAroundByDefault);
-    enc->setUserIntention(SCROLL_THROUGH_ITEMS);
+    enc->setUserIntention(isCardLayoutActive(getCurrentMenu()) ? SCROLL_THROUGH_SIDEWAYS : SCROLL_THROUGH_ITEMS);
 }
 
 void MenuManager::resetMenu(bool completeReset) {

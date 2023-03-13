@@ -67,6 +67,16 @@ namespace tcgfx {
     };
 
     /**
+     * Indicates the layout mode, IE how the items will be rendered onto the display
+     */
+    enum LayoutMode: uint8_t {
+        /** The items will be laid out using default vertical rendering */
+        LAYOUT_VERTICAL_DEFAULT,
+        /** The items will layout in card view horizontally */
+        LAYOUT_CARD_SIDEWAYS
+    };
+
+    /**
      * This is the base class for all simpler renderer classes where the height of a row is equal for all entries,
      * and there is always exactly one item on a row. This takes away much of the work to row allocation for simple
      * renderers. Examples of this are the LiquidCrystal renderer
@@ -193,6 +203,11 @@ namespace tcgfx {
             width = w;
             height = h;
         }
+
+        /**
+         * @return the layout mode that would be applied for a given root menu item, see the enum.
+         */
+        virtual LayoutMode getLayoutMode(MenuItem* rootItem) { return LAYOUT_VERTICAL_DEFAULT; }
 
         /**
          * Draw a widget into the title area at the position indicated, the background will need to be cleared before
