@@ -461,7 +461,7 @@
       },
       {
         "name": "BACK_SENSOR",
-        "latestValue": "3",
+        "latestValue": "2",
         "subsystem": "INPUT"
       },
       {

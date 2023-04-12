@@ -85,7 +85,7 @@ void setupMenu() {
     gfx.setRotation(1);
     renderer.setUpdatesPerSecond(5);
     switches.init(&esp32Touch, SWITCHES_POLL_EVERYTHING, false);
-    menuMgr.initFor4WayJoystick(&renderer, &menuSpeed, 7, 5, 3, 6, -1, 35);
+    menuMgr.initFor4WayJoystick(&renderer, &menuSpeed, 7, 5, 2, 6, -1, 35);
     esp32Touch.ensureInterruptRegistered();
     remoteServer.addConnection(&simhubConnection);
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
