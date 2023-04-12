@@ -21,7 +21,7 @@ TcMenuRemoteServer remoteServer(applicationInfo);
 Adafruit_ILI9341 gfx(22, 17, 16);
 AdafruitDrawable gfxDrawable(&gfx, 40);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
-ESP32TouchKeysAbstraction esp32Touch(800, TOUCH_HVOLT_2V7, TOUCH_LVOLT_0V5, TOUCH_HVOLT_ATTEN_1V);
+ESP32TouchKeysAbstraction esp32Touch(300, TOUCH_HVOLT_2V7, TOUCH_LVOLT_0V5, TOUCH_HVOLT_ATTEN_1V);
 SimHubRemoteConnection simhubConnection(&Serial, 3);
 
 // Global Menu Item declarations
@@ -84,7 +84,7 @@ void setupMenu() {
     gfx.begin();
     gfx.setRotation(1);
     renderer.setUpdatesPerSecond(5);
-    switches.init(&esp32Touch, SWITCHES_POLL_EVERYTHING, false);
+    switches.init(&esp32Touch, SWITCHES_POLL_EVERYTHING, true);
     menuMgr.initFor4WayJoystick(&renderer, &menuSpeed, 7, 5, 2, 6, -1, 35);
     esp32Touch.ensureInterruptRegistered();
     remoteServer.addConnection(&simhubConnection);
