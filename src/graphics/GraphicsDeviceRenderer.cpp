@@ -435,7 +435,7 @@ namespace tcgfx {
 
     void GraphicsDeviceRenderer::fillWithBackgroundTo(int endPoint) {
         if(endPoint >= height) return; // nothing to do when the display is already full.
-        auto* bgConfig = propertiesFactory.configFor(menuMgr.getCurrentMenu(), ItemDisplayProperties::COMPTYPE_ITEM);
+        auto* bgConfig = propertiesFactory.configFor(nullptr, ItemDisplayProperties::COMPTYPE_ITEM);
         helper.getDrawable()->setDrawColor(bgConfig->getColor(ItemDisplayProperties::BACKGROUND));
         helper.getDrawable()->drawBox(Coord(0, endPoint), Coord(width, height-endPoint), true);
     }

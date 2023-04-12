@@ -366,6 +366,15 @@ namespace tcgfx {
         virtual ItemDisplayProperties* configFor(MenuItem* pItem, ItemDisplayProperties::ComponentType compType) = 0;
 
         /**
+         * Returns the configuration for the parameters below, it should never return nullptr, but the difference to
+         * configFor is that this version will not check at the item level so is safe when there are overrides at
+         * both the item and the sub level.
+         * @param compType the type of component to get the rendering for
+         * @return the properties for the given component.
+         */
+        virtual ItemDisplayProperties* configForCurrentSub(ItemDisplayProperties::ComponentType compType) = 0;
+
+        /**
          * Returns the icon associated with the menu item ID, there are two special IDs for the edit and active icons
          * @param id the menu item ID or the special ID for edit or active icon
          * @return the icon or nullptr if not available
@@ -506,6 +515,15 @@ namespace tcgfx {
          * @return a display properties instance.
          */
         ItemDisplayProperties* configFor(MenuItem* pItem, ItemDisplayProperties::ComponentType compType)  override;
+
+        /**
+         * Get the display configuration for the submenu on display and therefore avoiding checking at the item level.
+         * Only checks at the sub menu item level, and finally it will use the default. It is  always safe to call this
+         * function, it never returns nullptr.
+         * @param compType the component type we are drawing
+         * @return a display properties instance.
+         */
+        ItemDisplayProperties* configForCurrentSub(ItemDisplayProperties::ComponentType compType) override;
 
         /**
          * Gets the selected color for a particular color type (such as background, text etc)
