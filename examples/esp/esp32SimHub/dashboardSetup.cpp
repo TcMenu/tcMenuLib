@@ -6,9 +6,10 @@
 DrawableDashboard* dashCustomDrawing;
 CustomDashboardDelegate dashboardDelegate;
 
-void CustomDashboardDelegate::dashboardWillOpen(BaseMenuRenderer *renderer) {
+bool CustomDashboardDelegate::dashboardWillOpen(BaseMenuRenderer *renderer) {
     ledsChanged = true;
     for (uint16_t &ledState : ledColors) ledState = 0;
+    return false;
 }
 
 void CustomDashboardDelegate::setLed(int i, uint16_t color) {

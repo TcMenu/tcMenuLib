@@ -15,7 +15,7 @@
 #include <tcMenu.h>
 #include <tcUnicodeHelper.h>
 #include "tcMenuAdaFruitGfx.h"
-#include "ESP32TouchKeysAbstraction.h"
+#include <esp32/ESP32TouchKeysAbstraction.h>
 #include "SimhubConnector.h"
 #include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
@@ -37,6 +37,12 @@ extern const GFXfont FreeSans12pt7b;
 
 
 // Global Menu Item exports
+extern ActionMenuItem menuEngineV836S;
+extern ActionMenuItem menuEngineV630T;
+extern ActionMenuItem menuEngineI420T;
+extern ActionMenuItem menuCardsI416T;
+extern BackMenuItem menuBackEngine;
+extern SubMenuItem menuEngine;
 extern ActionMenuItem menuShowDashboard;
 extern AnalogMenuItem menuLap;
 extern EnumMenuItem menuDashboard;
@@ -63,6 +69,7 @@ void setupMenu();
 
 void CALLBACK_FUNCTION onConnectionChange(int id);
 void CALLBACK_FUNCTION onDashChanged(int id);
+void CALLBACK_FUNCTION onEngineHasChanged(int id);
 void CALLBACK_FUNCTION onShowDash(int id);
 void CALLBACK_FUNCTION onShowDialogs(int id);
 

@@ -2,7 +2,7 @@
 #define TCLIBRARYDEV_DASHBOARDSETUP_H
 
 #include <Arduino.h>
-#include "esp32SimHub_menu.h"
+#include "generated/esp32SimHub_menu.h"
 #include <extras/DrawableDashboard.h>
 
 #define LED_STATES 10
@@ -15,7 +15,7 @@ public:
 
     void setLed(int i, uint16_t color);
 
-    void dashboardWillOpen(BaseMenuRenderer *renderer) override;
+    bool dashboardWillOpen(BaseMenuRenderer *renderer) override;
     void dashboardDidDraw(unsigned int encVal, RenderPressMode pressMode) override;
 };
 

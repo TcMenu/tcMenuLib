@@ -31,7 +31,7 @@
  */
 
 #include <Adafruit_ILI9341.h>
-#include "esp32SimHub_menu.h"
+#include "generated/esp32SimHub_menu.h"
 #include <Wire.h>
 #include <IoLogging.h>
 #include <AnalogDeviceAbstraction.h>
@@ -215,4 +215,10 @@ void CALLBACK_FUNCTION onShowDialogs(int id) {
         dlg->showController(false, &dialogController);
         dlg->copyIntoBuffer("text 1");
     }
+}
+
+
+
+void CALLBACK_FUNCTION onEngineHasChanged(int id) {
+    // TODO - your menu change code
 }

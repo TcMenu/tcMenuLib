@@ -271,13 +271,87 @@
         "visible": true,
         "staticDataInRAM": false
       }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "Engine",
+        "variableName": "Engine",
+        "id": 16,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 16,
+      "type": "actionMenu",
+      "item": {
+        "name": "I4 1.6T",
+        "variableName": "CardsI416T",
+        "id": 17,
+        "eepromAddress": -1,
+        "functionName": "onEngineHasChanged",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 16,
+      "type": "actionMenu",
+      "item": {
+        "name": "I4 2.0T",
+        "variableName": "EngineI420T",
+        "id": 18,
+        "eepromAddress": -1,
+        "functionName": "onEngineHasChanged",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 16,
+      "type": "actionMenu",
+      "item": {
+        "name": "V6 3.0T",
+        "variableName": "EngineV630T",
+        "id": 19,
+        "eepromAddress": -1,
+        "functionName": "onEngineHasChanged",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 16,
+      "type": "actionMenu",
+      "item": {
+        "name": "V8 3.6S",
+        "variableName": "EngineV836S",
+        "id": 20,
+        "eepromAddress": -1,
+        "functionName": "onEngineHasChanged",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
     }
   ],
   "codeOptions": {
     "embeddedPlatform": "ARDUINO_ESP32",
     "lastDisplayUuid": "4dcb12ec-13d8-4466-b8b6-bd575eae4612",
     "lastInputUuid": "cc0f9246-03be-4adf-b1f5-dd501085122a",
-    "lastRemoteUuid": "4123dfc3-5271-4727-81f0-1a21d06b666b",
     "lastRemoteUuids": [
       "4123dfc3-5271-4727-81f0-1a21d06b666b"
     ],
@@ -387,17 +461,17 @@
       },
       {
         "name": "BACK_SENSOR",
-        "latestValue": "-1",
+        "latestValue": "3",
         "subsystem": "INPUT"
       },
       {
         "name": "NEXT_SENSOR",
-        "latestValue": "-1",
+        "latestValue": "6",
         "subsystem": "INPUT"
       },
       {
         "name": "SELECT_SENSOR",
-        "latestValue": "6",
+        "latestValue": "-1",
         "subsystem": "INPUT"
       },
       {
@@ -452,8 +526,8 @@
       }
     ],
     "namingRecursive": true,
-    "saveToSrc": false,
     "useCppMain": false,
+    "saveLocation": "PROJECT_TO_CURRENT_WITH_GENERATED",
     "usingSizedEEPROMStorage": false,
     "eepromDefinition": "",
     "authenticatorDefinition": "",

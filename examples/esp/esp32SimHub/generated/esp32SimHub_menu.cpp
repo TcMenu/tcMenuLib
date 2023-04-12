@@ -10,7 +10,7 @@
 
 #include <tcMenu.h>
 #include "esp32SimHub_menu.h"
-#include "ThemeCoolBlueTraditional.h"
+#include "../ThemeCoolBlueTraditional.h"
 #include <Fonts/FreeSans9pt7b.h>
 #include <Fonts/FreeSans12pt7b.h>
 
@@ -25,8 +25,19 @@ ESP32TouchKeysAbstraction esp32Touch(800, TOUCH_HVOLT_2V7, TOUCH_LVOLT_0V5, TOUC
 SimHubRemoteConnection simhubConnection(&Serial, 3);
 
 // Global Menu Item declarations
+const PROGMEM AnyMenuInfo minfoEngineV836S = { "V8 3.6S", 20, 0xffff, 0, onEngineHasChanged };
+ActionMenuItem menuEngineV836S(&minfoEngineV836S, NULL, INFO_LOCATION_PGM);
+const PROGMEM AnyMenuInfo minfoEngineV630T = { "V6 3.0T", 19, 0xffff, 0, onEngineHasChanged };
+ActionMenuItem menuEngineV630T(&minfoEngineV630T, &menuEngineV836S, INFO_LOCATION_PGM);
+const PROGMEM AnyMenuInfo minfoEngineI420T = { "I4 2.0T", 18, 0xffff, 0, onEngineHasChanged };
+ActionMenuItem menuEngineI420T(&minfoEngineI420T, &menuEngineV630T, INFO_LOCATION_PGM);
+const PROGMEM AnyMenuInfo minfoCardsI416T = { "I4 1.6T", 17, 0xffff, 0, onEngineHasChanged };
+ActionMenuItem menuCardsI416T(&minfoCardsI416T, &menuEngineI420T, INFO_LOCATION_PGM);
+const PROGMEM SubMenuInfo minfoEngine = { "Engine", 16, 0xffff, 0, NO_CALLBACK };
+BackMenuItem menuBackEngine(&minfoEngine, &menuCardsI416T, INFO_LOCATION_PGM);
+SubMenuItem menuEngine(&minfoEngine, &menuBackEngine, NULL, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoShowDashboard = { "Show dashboard", 9, 0xffff, 0, onShowDash };
-ActionMenuItem menuShowDashboard(&minfoShowDashboard, NULL, INFO_LOCATION_PGM);
+ActionMenuItem menuShowDashboard(&minfoShowDashboard, &menuEngine, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoLap = { "Lap", 10, 0xffff, 999, NO_CALLBACK, 0, 1, "" };
 AnalogMenuItem menuLap(&minfoLap, 0, &menuShowDashboard, INFO_LOCATION_PGM);
 const char enumStrDashboard_0[] PROGMEM = "F1 Wheel";
@@ -74,7 +85,7 @@ void setupMenu() {
     gfx.setRotation(1);
     renderer.setUpdatesPerSecond(5);
     switches.init(&esp32Touch, SWITCHES_POLL_EVERYTHING, false);
-    menuMgr.initForUpDownOk(&renderer, &menuSpeed, 7, 5, 6, 35);
+    menuMgr.initFor4WayJoystick(&renderer, &menuSpeed, 7, 5, 3, 6, -1, 35);
     esp32Touch.ensureInterruptRegistered();
     remoteServer.addConnection(&simhubConnection);
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
