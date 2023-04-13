@@ -129,7 +129,7 @@ namespace tcgfx {
          * Enables the card layout system for the items provided, a card layout shows a single item at once, with left
          * and right images present that work somewhat like buttons. Rotating the encoder (or up/down buttons) will result
          * in switching between the menu items. This works particularly well when combined with using drawable icons
-         * for each of the menu items. Note that after enabling, you must call `setCardLayoutStatusForRootItem` to enable
+         * for each of the menu items. Note that after enabling, you must call `setCardLayoutStatusForSubMenu` to enable
          * menus, see the method docs for details.
          * @param left the icon to use for left, (takes its colors from the title)
          * @param right the icon to use for right, (takes its colors from the title)
@@ -145,7 +145,7 @@ namespace tcgfx {
          * @param root the root menu item to change status
          * @param onOrOff true if on, otherwise false.
          */
-        void setCardLayoutStatusForRootItem(MenuItem* root, bool onOrOff);
+        void setCardLayoutStatusForSubMenu(MenuItem* root, bool onOrOff);
 
         LayoutMode getLayoutMode(MenuItem* rootItem) override;
     protected:

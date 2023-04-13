@@ -255,7 +255,7 @@ bool isItemActionable(MenuItem* item) {
 bool isCardLayoutActive(MenuItem* rootItem) {
     if(BaseMenuRenderer::getInstance()->getRendererType() == RENDER_TYPE_CONFIGURABLE) {
         auto r = reinterpret_cast<tcgfx::BaseGraphicalRenderer*>(BaseMenuRenderer::getInstance());
-        return (r->getLayoutMode(rootItem) == tcgfx::LAYOUT_CARD_SIDEWAYS);
+        return (r->getLayoutMode(getSubMenuFor(rootItem)) == tcgfx::LAYOUT_CARD_SIDEWAYS);
     } else {
         return false;
     }
