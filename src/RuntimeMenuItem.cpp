@@ -266,21 +266,21 @@ int dateItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char
             return true;
         }
         case RENDERFN_GETRANGE: {
-            if(idx == toNaturalDateIndex(0)) return daysForMonth(data);
-            else if(idx == toNaturalDateIndex(1)) return 12;
+            if(idx == toNaturalDateIndex(0)) return daysForMonth(data) - 1;
+            else if(idx == toNaturalDateIndex(1)) return 11;
             else if(idx == toNaturalDateIndex(2)) return 9999;
             else return true;
         }
         case RENDERFN_GETPART: {
-            if(idx == toNaturalDateIndex(0)) return data.day;
-            else if(idx==toNaturalDateIndex(1)) return data.month;
+            if(idx == toNaturalDateIndex(0)) return data.day - 1;
+            else if(idx==toNaturalDateIndex(1)) return data.month - 1;
             else return data.year;
         }
 
         case RENDERFN_SET_VALUE: {
             int idx = row - 1;
-            if(idx == toNaturalDateIndex(0)) timeItem->getUnderlyingData()->day = buffer[0];
-            else if(idx == toNaturalDateIndex(1)) timeItem->getUnderlyingData()->month = buffer[0];
+            if(idx == toNaturalDateIndex(0)) timeItem->getUnderlyingData()->day = buffer[0] + 1;
+            else if(idx == toNaturalDateIndex(1)) timeItem->getUnderlyingData()->month = buffer[0] + 1;
             else if(idx == toNaturalDateIndex(2)) timeItem->getUnderlyingData()->year = *((int*)buffer);
             return true;
         }

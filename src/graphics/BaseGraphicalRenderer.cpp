@@ -271,6 +271,13 @@ void BaseGraphicalRenderer::checkIfRootHasChanged() {
         currentRootMenu = rootItem;
         redrawMode = MENUDRAW_COMPLETE_REDRAW;
         recalculateDisplayOrder(rootItem, false);
+
+        // if there is an encoder, we must update it if the values don't match because of hidden items
+        auto expectedCount = itemOrderByRow.count() - 1; // encoder is zero based so always one less.
+        if(switches.getEncoder() && expectedCount != switches.getEncoder()->getMaximumValue()) {
+            serlogF3(SER_TCMENU_INFO, "Force encoder size: ", switches.getEncoder()->getMaximumValue(), expectedCount)
+            menuMgr.setItemsInCurrentMenu(expectedCount, switches.getEncoder()->getCurrentReading());
+        }
     }
 }
 
