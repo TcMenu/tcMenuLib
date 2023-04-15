@@ -303,6 +303,9 @@ bool MenuManager::activateMenuItem(MenuItem *item) {
     for(int i=0; i < count; i++) {
         auto* pItem = r->getMenuItemAtIndex(getCurrentMenu(), i);
         if(pItem != nullptr && pItem->getId() == item->getId()) {
+            if(switches.getEncoder()) {
+                switches.getEncoder()->setCurrentReading(i);
+            }
             valueChanged(i);
             return true;
         }
