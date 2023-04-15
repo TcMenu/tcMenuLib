@@ -520,7 +520,6 @@
     "embeddedPlatform": "ARDUINO",
     "lastDisplayUuid": "61f370f4-0294-41cf-8988-1458f242914a",
     "lastInputUuid": "71DAF854-DF8D-4F0B-9039-23C5583C85B1",
-    "lastRemoteUuid": "0877131c-e03e-426b-8eaf-228e01f5e7f1",
     "lastRemoteUuids": [
       "0877131c-e03e-426b-8eaf-228e01f5e7f1"
     ],
@@ -790,14 +789,14 @@
       }
     ],
     "namingRecursive": true,
-    "saveToSrc": false,
     "useCppMain": false,
+    "saveLocation": "ALL_TO_CURRENT",
     "usingSizedEEPROMStorage": false,
     "eepromDefinition": "avr:",
     "authenticatorDefinition": "rom:100:6",
     "projectIoExpanders": [
-      "deviceIO:",
-      "mcp23017:io23017:32:2"
+      "mcp23017:io23017:32:2",
+      "deviceIO:"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []
