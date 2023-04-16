@@ -441,6 +441,8 @@ public:
 	 * a custom drawing class that implements CustomDrawing by calling setCustomDrawing(..)
 	 * then you can omit the display function parameter, and your custom drawing class will
 	 * be called instead.
+	 * Unlike standard drawing you callback must include api calls that would reset the display to a known state
+	 * for example when using U8G2 library you must call setDrawColor method prior to any other calls
 	 * @param displayFn the callback to render the display
 	 */
 	void takeOverDisplay(RendererCallbackFn displayFn = nullptr);
