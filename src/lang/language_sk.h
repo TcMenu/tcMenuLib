@@ -1,6 +1,6 @@
 /**
  * @file language_sk.h
- * @brief Never include directly. contains the Slovak language text for tcMenu text, controlled by TC_LOCALE.
+ * @brief Never include directly; contains the Slovak language text for tcMenu text, controlled by TC_LOCALE.
  */
 
 //

@@ -1,6 +1,6 @@
 /**
  * @file language_en.h
- * @brief Never include directly. contains the English language text for tcMenu text, controlled by TC_LOCALE, this is the default (EN).
+ * @brief Never include directly; contains the English language text for tcMenu text, controlled by TC_LOCALE, this is the default (EN).
  */
 
 //
