@@ -21,19 +21,21 @@
 
 #if __has_include(<project_locale.h>)
 # include <project_locale.h>
-#elif defined(TC_LOCALE_FR)
+#elif defined(TC_LOCALE_FR) || defined(TC_LOCALE_FR_BE) \
+ || defined(TC_LOCALE_FR_CA) || defined(TC_LOCALE_FR_FR) \
+ || defined(TC_LOCALE_FR_LU) || defined(TC_LOCALE_FR_CH)
 #if defined(TC_LOCAL_ASCII)
 # include "language_fr_ascii.h"
 #else
 # include "language_fr.h"
 #endif // use ASCII
-#elif defined(TC_LOCALE_SK)
+#elif defined(TC_LOCALE_SK) || defined(TC_LOCALE_SK_SK)
 #if defined(TC_LOCAL_ASCII)
 # include "language_sk_ascii.h"
 #else
 # include "language_sk.h"
 #endif // use ASCII
-#elif defined(TC_LOCALE_CS)
+#elif defined(TC_LOCALE_CS) || defined(TC_LOCALE_CS_CZ)
 #if defined(TC_LOCAL_ASCII)
 # include "language_cs_ascii.h"
 #else
