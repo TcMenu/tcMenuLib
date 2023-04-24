@@ -1,6 +1,6 @@
 /**
  * @file language_fr.h
- * @brief Never include directly. contains the French language text for tcMenu text (ASCII only), controlled by TC_LOCALE.
+ * @brief Never include directly; contains the French language text for tcMenu text (ASCII only), controlled by TC_LOCALE.
  */
 
 //

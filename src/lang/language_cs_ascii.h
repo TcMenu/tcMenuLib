@@ -1,6 +1,6 @@
 /**
  * @file language_cs_ascii.h
- * @brief Never include directly. contains the Czech language text for tcMenu text (ASCII only), controlled by TC_LOCALE.
+ * @brief Never include directly; contains the Czech language text for tcMenu text (ASCII only), controlled by TC_LOCALE.
  */
 
 //
