@@ -270,7 +270,8 @@
       "parentId": 0,
       "type": "runtimeList",
       "item": {
-        "initialRows": 0,
+        "initialRows": 116,
+        "usingInfoBlock": false,
         "name": "List",
         "variableName": "List",
         "id": 13,
@@ -599,8 +600,8 @@
     "eepromDefinition": "",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
-      "mcp23017:io23017:32:10",
-      "deviceIO:"
+      "deviceIO:",
+      "mcp23017:io23017:32:10"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []

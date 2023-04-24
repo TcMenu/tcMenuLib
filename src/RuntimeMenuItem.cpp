@@ -32,6 +32,28 @@ RuntimeMenuItem::RuntimeMenuItem(const AnyMenuInfo* rtInfo, bool isPgm, MenuType
     this->id = INVALID_MENU_ID;
 }
 
+int defaultRtListCallback(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
+    switch(mode) {
+        case RENDERFN_INVOKE:
+            item->runCallback();
+            return true;
+        case RENDERFN_NAME:
+            item->copyNameToBuffer(buffer, bufferSize);
+            return true;
+        case RENDERFN_EEPROM_POS:
+            return int(item->getEepromPosition());
+        case RENDERFN_VALUE:
+            if(row == LIST_PARENT_ITEM_POS) {
+                buffer[0] = '>'; buffer[1]=0;
+            } else {
+                ltoaClrBuff(buffer, row, 3, NOT_PADDED, bufferSize);
+            }
+            break;
+        default:
+            return false;
+    }
+}
+
 ListRuntimeMenuItem::ListRuntimeMenuItem(const AnyMenuInfo* info, int numberOfRows, RuntimeRenderingFn renderFn, MenuItem* next, bool isPgm)
         : RuntimeMenuItem(info, isPgm, MENUTYPE_RUNTIME_LIST, renderFn, 0xff, numberOfRows, next), activeItem(0) { }
 

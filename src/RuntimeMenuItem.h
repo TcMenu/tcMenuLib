@@ -212,6 +212,8 @@ public:
     }
 };
 
+int defaultRtListCallback(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
+
 /**
  * This menu item allows local editing of anything that can be described as a range of values to be edited with the 
  * spinwheel or emulator. It extends from runtime menu item so has a small footprint in RAM.
