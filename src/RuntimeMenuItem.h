@@ -78,13 +78,16 @@ protected:
 public:
     RuntimeMenuItem(MenuType menuType, menuid_t id, RuntimeRenderingFn renderFn,
 				    uint8_t itemPosition, uint8_t numberOfRows, MenuItem* next = nullptr);
-	
+
+    RuntimeMenuItem(const AnyMenuInfo* rtInfo, bool isPgm, MenuType menuType, RuntimeRenderingFn renderFn,
+                    uint8_t itemPosition, uint8_t numberOfRows, MenuItem* next = nullptr);
+
 	void copyValue(char* buffer, int bufferSize) const {
 		renderFn((RuntimeMenuItem*)this, itemPosition, RENDERFN_VALUE, buffer, bufferSize);
 	}
 
 	void runCallback() const { renderFn((RuntimeMenuItem*)this, itemPosition, RENDERFN_INVOKE, nullptr, 0); }
-	int getRuntimeId() const { return id; }
+	int getRuntimeId() const { return int(id); }
 	int getRuntimeEeprom() const { return renderFn((RuntimeMenuItem*)this, itemPosition, RENDERFN_EEPROM_POS, nullptr, 0); }
 	uint8_t getNumberOfParts() const { return noOfParts; }
 	void copyRuntimeName(char* buffer, int bufferSize) const { renderFn((RuntimeMenuItem*)this, itemPosition, RENDERFN_NAME, buffer, bufferSize); }
@@ -102,7 +105,7 @@ public:
 /**
  * Back menu item pairs with an associated SubMenuItem, it only exists in the embedded domain - not the API.
  * This type is always the first item in a series of items for a submenu. It provides the functionality required
- * to get back to root.
+ * to get back to root. The default render function is: backSubItemRenderFn
  *
  * For example
  *
@@ -138,12 +141,12 @@ public:
 };
 
 /**
- * The implementation of a Menuitem that can contain more menu items as children.
+ * The implementation of a Menuitem that can contain more menu items as children. The default render function for this
+ * menu item is: backSubItemRenderFn
  */
 class SubMenuItem : public RuntimeMenuItem {
 private:
     MenuItem* child;
-    const char* namePtr;
 public:
     /**
      * Create an instance of SubMenuItem using the traditional SubMenuInfo block, this is no longer used, but we
@@ -155,10 +158,8 @@ public:
      * @param next the next menu in the chain if there is one, or NULL.
      */
     SubMenuItem(const SubMenuInfo* info, MenuItem* child, MenuItem* next = nullptr, bool infoInPgm = INFO_LOCATION_PGM)
-                : RuntimeMenuItem(MENUTYPE_SUB_VALUE, get_info_uint(&info->id), backSubItemRenderFn, 0, 1, next) {
+                : RuntimeMenuItem(info, infoInPgm, MENUTYPE_SUB_VALUE, backSubItemRenderFn, 0, 1, next) {
         this->child = child;
-        this->namePtr = info->name;
-        bitWrite(flags, MENUITEM_INFO_STRUCT_PGM, infoInPgm);
     }
 
     /**
@@ -172,7 +173,6 @@ public:
             : RuntimeMenuItem(MENUTYPE_SUB_VALUE, id, renderFn,
                               0, 1, next) {
         this->child = child;
-        this->namePtr = nullptr;
     }
 
     /**
@@ -180,8 +180,6 @@ public:
      */
     MenuItem* getChild() const { return child; }
     void setChild(MenuItem* firstChildItem) { this->child = firstChildItem; }
-
-    const char* getNameUnsafe() const { return namePtr; }
 };
 
 #define LIST_PARENT_ITEM_POS 0xff
@@ -199,6 +197,7 @@ class ListRuntimeMenuItem : public RuntimeMenuItem {
 private:
 	uint8_t activeItem;
 public:
+    ListRuntimeMenuItem(const AnyMenuInfo* info, int numberOfRows, RuntimeRenderingFn renderFn, MenuItem* next = nullptr, bool isPgm = INFO_LOCATION_PGM);
     ListRuntimeMenuItem(menuid_t id, int numberOfRows, RuntimeRenderingFn renderFn, MenuItem* next = nullptr);
 
 	RuntimeMenuItem* getChildItem(int pos);
@@ -222,6 +221,9 @@ public:
     EditableMultiPartMenuItem(MenuType type, menuid_t id, int numberOfParts, RuntimeRenderingFn renderFn, MenuItem* next = nullptr)
 			: RuntimeMenuItem(type, id, renderFn, 0, numberOfParts, next) {
 	}
+    EditableMultiPartMenuItem(const AnyMenuInfo* rtInfo, bool isPgm, MenuType type, int numberOfParts, RuntimeRenderingFn renderFn, MenuItem* next = nullptr)
+            : RuntimeMenuItem(rtInfo, isPgm, type, renderFn, 0, numberOfParts, next) {
+    }
 
 	uint8_t beginMultiEdit();
 
@@ -249,36 +251,78 @@ public:
 
 /**
  * An item that can represent a text value that is held in RAM, and therefore change at runtime. We now manually
- * configure the settings for this menu item in the constructor. This variant gets the name from program memory
+ * configure the settings for this menu item in the constructor. This variant gets the name from program memory.
+ * The default render function for this type is: `textItemRenderFn`
  */
 class TextMenuItem : public EditableMultiPartMenuItem {
 private:
     char* data;
     bool passwordField;
 public:
+    /**
+     * Create a text menu item using a RuntimeRenderingFn to handle all elements of the item, including the name and
+     * eeprom, this requires you to define a custom callback.
+     * @param customRenderFn the custom callback render function
+     * @param id the ID of the item
+     * @param size the size of the text array
+     * @param next optionally, the next item in the linked list
+     */
     TextMenuItem(RuntimeRenderingFn customRenderFn, menuid_t id, int size, MenuItem* next = nullptr);
+    /**
+     * Create a text menu item using a RuntimeRenderingFn to handle all elements of the item, including the name and
+     * eeprom, this requires you to define a custom callback.
+     * @param customRenderFn the custom callback render function
+     * @param initial the initial value or nullptr
+     * @param id the ID of the item
+     * @param size the size of the text array
+     * @param next optionally, the next item in the linked list
+     */
     TextMenuItem(RuntimeRenderingFn customRenderFn, const char* initial, menuid_t id, int size, MenuItem* next = nullptr);
+    /**
+     * Create a text menu item using an info block that holds the name, eeprom and ID values, either in PGM or RAM. This
+     * version does not even need the render function to be provided, and uses the default.
+     * @param info the info block with the static parameters
+     * @param initial the initial value or nullptr
+     * @param size the size of the array for text
+     * @param next optionally the next item
+     */
+    TextMenuItem(const AnyMenuInfo* info, const char* initial, int size, MenuItem* next = nullptr, bool isPgm = INFO_LOCATION_PGM);
+
+    /**
+     * Create a text menu item using an info block that holds the name, eeprom and ID values, either in PGM or RAM. This
+     * version does not even need the render function to be provided, and uses the default.
+     * @param info the info block with the static parameters
+     * @param customRenderFn the rendering function for cases when you wish to override rendering
+     * @param initial the initial value or nullptr
+     * @param size the size of the array for text
+     * @param next optionally the next item
+     */
+    TextMenuItem(const AnyMenuInfo* info, RuntimeRenderingFn customRenderFn, const char* initial, int size, MenuItem* next = nullptr, bool isPgm = INFO_LOCATION_PGM);
 
     void setPasswordField(bool pwd) {
         this->passwordField = pwd;
     }
 
+    /**
+     * @return true if the field is being masked for password entry, otherwise false
+     */
     bool isPasswordField() const {
         return this->passwordField;
     }
 
 	~TextMenuItem() { delete data; }
 
-	/** get the max length of the text storage */
+	/** @return the max length of the text storage */
 	uint8_t textLength() const { return noOfParts; }
 
 	/**
 	 * Copies the text into the internal buffer.
   	 * @param text the text to be copied.
+  	 * @param silent if the update should be notified via callback
 	 */
 	void setTextValue(const char* text, bool silent = false);
 
-	/** returns the text value in the internal buffer */
+	/** @return the text value in the internal buffer */
 	const char* getTextValue() const { return data; }
 
 	/**
@@ -305,6 +349,7 @@ public:
      */
     bool valueChangedFromKeyboard(char keyPress);
 private:
+    void initTextItem(const char* initialData);
 };
 
 /**
@@ -314,6 +359,10 @@ private:
  */
 int findPositionInEditorSet(char ch);
 
+/**
+ * Provides storage for an IP-V4 address using a 4 byte data structure. This does not validate the inputs and purely
+ * acts as storage for the 4 parts of the address.
+ */
 class IpAddressStorage {
 private:
     uint8_t data[4];
@@ -329,7 +378,8 @@ public:
 
 /**
  * This menu item represents an IP address that can be configured / or just displayed on the device,
- * if it is editable it is edited 
+ * if it is editable it is edited using the typical 4 byte entries. The default render function for
+ * this type is: ipAddressRenderFn
  */
 class IpAddressMenuItem : public EditableMultiPartMenuItem {
 private:
@@ -353,6 +403,29 @@ public:
      */
     IpAddressMenuItem(RuntimeRenderingFn renderFn, const IpAddressStorage& initialIp, menuid_t id, MenuItem* next = nullptr)
 		: EditableMultiPartMenuItem(MENUTYPE_IPADDRESS, id, 4, renderFn, next), data(initialIp) {}
+
+    /**
+     * Create an IP address that has an initial value, with static data taken from an info block
+     * @param info the info block to use for static data
+     * @param renderFn the rendering function to use.
+     * @param id the ID of this item
+     * @param ipParts a 4 digit IP address as a constant array
+     * @param next optional pointer to next item
+     * @param isPgm optional, if the info block resides in PGM memory or RAM, default PGM.
+     */
+    IpAddressMenuItem(const AnyMenuInfo* info, RuntimeRenderingFn renderFn, const IpAddressStorage& initialIp, MenuItem* next = nullptr, bool isPgm = INFO_LOCATION_PGM)
+            : EditableMultiPartMenuItem(info, isPgm, MENUTYPE_IPADDRESS, 4, renderFn, next), data(initialIp) {}
+
+    /**
+     * Create an IP address that has an initial value, with a given ID and
+     * @param info the info block to use for static data
+     * @param id the ID of this item
+     * @param ipParts a 4 digit IP address as a constant array
+     * @param next optional pointer to next item
+     * @param isPgm optional, if the info block resides in PGM memory or RAM, default PGM.
+     */
+    IpAddressMenuItem(const AnyMenuInfo* info, const IpAddressStorage& initialIp, MenuItem* next = nullptr, bool isPgm = INFO_LOCATION_PGM)
+            : EditableMultiPartMenuItem(info, isPgm, MENUTYPE_IPADDRESS, 4, ipAddressRenderFn, next), data(initialIp) {}
 
 	void setIpAddress(const char* source);
 
@@ -420,7 +493,7 @@ struct DateStorage {
 /**
  * A runtime menu item that represents time value, either in the 24 hour clock or in the 12 hour clock. Further, the
  * hundreds can be configured to show as well. It is an extension of the multi part editor that supports editing
- * times in parts, hours, then minutes and so on.  Instances of this class should use the `dateItemRenderFn` for the
+ * times in parts, hours, then minutes and so on.  Instances of this class should use the `timeItemRenderFn` for the
  * base rendering.
  */
 class TimeFormattedMenuItem : public EditableMultiPartMenuItem {
@@ -430,7 +503,8 @@ private:
 public:
     TimeFormattedMenuItem(RuntimeRenderingFn renderFn, menuid_t id, MultiEditWireType format, MenuItem* next = nullptr);
     TimeFormattedMenuItem(RuntimeRenderingFn renderFn, const TimeStorage& initial, menuid_t id, MultiEditWireType format, MenuItem* next = nullptr);
-
+    TimeFormattedMenuItem(const AnyMenuInfo* info, RuntimeRenderingFn renderFn, const TimeStorage& initial, MultiEditWireType format, MenuItem* next = nullptr, bool isPgm = INFO_LOCATION_PGM);
+    TimeFormattedMenuItem(const AnyMenuInfo* info, const TimeStorage& initial, MultiEditWireType format, MenuItem* next = nullptr, bool isPgm = INFO_LOCATION_PGM);
 
 	/** gets the time as four separate bytes */
 	TimeStorage getTime() const { return data; }
@@ -465,6 +539,12 @@ public:
 
     DateFormattedMenuItem(RuntimeRenderingFn renderFn, const DateStorage& initial, menuid_t id, MenuItem* next = nullptr)
             : EditableMultiPartMenuItem(MENUTYPE_DATE, id, 3, renderFn, next), data(initial) {}
+
+    DateFormattedMenuItem(const AnyMenuInfo* info, RuntimeRenderingFn renderFn, const DateStorage& initial, menuid_t id, MenuItem* next = nullptr, bool isPgm = INFO_LOCATION_PGM)
+            : EditableMultiPartMenuItem(info, isPgm, MENUTYPE_DATE, 3, renderFn, next), data(initial) {}
+
+    DateFormattedMenuItem(const AnyMenuInfo* info, const DateStorage& initial, MenuItem* next = nullptr, bool isPgm = INFO_LOCATION_PGM)
+            : EditableMultiPartMenuItem(info, isPgm, MENUTYPE_DATE, 3, dateItemRenderFn, next), data(initial) {}
 
     /**
      * sets the global separator for date rendering.

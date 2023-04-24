@@ -13,7 +13,7 @@ MenuItem::MenuItem(MenuType menuType, const AnyMenuInfo* menuInfo, MenuItem* nex
 	this->flags = 0;
 	this->menuType = menuType;
 	bitWrite(flags, MENUITEM_INFO_STRUCT_PGM, infoProgmem);
-	if(menuInfo != nullptr) this->info = menuInfo;
+	this->info = menuInfo;
 	this->next = next;
     this->setChanged(true); // items always start out needing redrawing.
     this->setVisible(true); // always start out visible.
@@ -49,7 +49,7 @@ void MenuItem::clearSendRemoteNeededAll() {
 }
 
 void MenuItem::triggerCallback() const {
-	if (isMenuRuntime(this)) {
+	if (info == nullptr) {
 		return asRuntimeItem(this)->runCallback();
 	}
 
@@ -58,11 +58,26 @@ void MenuItem::triggerCallback() const {
 }
 
 uint8_t MenuItem::copyNameToBuffer(char* buf, int offset, int size) const {
-	if (isMenuRuntime(this)) {
+    // If there is no info block, it has to be a runtime item, process as runtime
+    if (info == nullptr) {
 		asRuntimeItem(this)->copyRuntimeName(buf + offset, size - offset);
 		return strlen(buf + offset) + offset;
 	}
-	else if(isInfoProgMem()) {
+
+    // quick check if this is a list with an info block, if it is and the parent position is not chosen then we
+    // need to get the name from the callback, otherwise we get the name from the info block for the parent by
+    // falling through to the code below
+    if(menuType == MENUTYPE_RUNTIME_LIST && info != nullptr) {
+        auto pList = reinterpret_cast<const ListRuntimeMenuItem*>(this);
+        if(pList->getActiveIndex() != LIST_PARENT_ITEM_POS) {
+            asRuntimeItem(this)->copyRuntimeName(buf + offset, size - offset);
+            return strlen(buf + offset) + offset;
+        }
+    }
+
+    // now we have determined that there must be an info block, so the only check left is if we are getting from
+    // program or regular memory.
+	if(isInfoProgMem()) {
 		const char* name = info->name;
 		uint8_t ret = safeProgCpy(buf + offset, name, size - offset);
 		return ret + offset;
@@ -75,7 +90,7 @@ uint8_t MenuItem::copyNameToBuffer(char* buf, int offset, int size) const {
 
 uint16_t MenuItem::getId() const
 {
-	if (isMenuRuntime(this)) {
+	if (info == nullptr) {
 		return asRuntimeItem(this)->getRuntimeId();
 	}
 
@@ -99,7 +114,7 @@ void MenuItem::changeOccurred(bool silent) {
 
 uint16_t MenuItem::getEepromPosition() const
 {
-	if (isMenuRuntime(this)) return asRuntimeItem(this)->getRuntimeEeprom();
+	if (info == nullptr) return asRuntimeItem(this)->getRuntimeEeprom();
 	
 	return  isInfoProgMem() ? get_info_uint(&info->eepromAddr) : info->eepromAddr;
 }

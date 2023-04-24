@@ -8,6 +8,7 @@
 #include "tcUtil.h"
 #include "BaseDialog.h"
 #include "tcMenuVersion.h"
+#include "MenuItems.h"
 
 #if defined __AVR__ || defined ESP_H
 char szGlobalBuffer[16];
@@ -35,5 +36,72 @@ void showVersionDialog(const ConnectorLocalInfo *localInfo) {
         tccore::copyTcMenuVersion(sz, sizeof(sz));
         dialog->copyIntoBuffer(sz);
     });
+}
 
+void populateCore(AnyMenuInfo* ptr, const char* n, boolean pgm, menuid_t id, uint16_t eeprom, MenuCallbackFn cb, uint16_t max) {
+    ptr->callback = cb;
+    ptr->maxValue = max;
+    ptr->eepromAddr = eeprom;
+    ptr->id = id;
+    if(pgm) {
+        safeProgCpy(ptr->name, n, sizeof(ptr->name));
+    } else {
+        strncpy(ptr->name, n, sizeof(ptr->name));
+    }
+}
+
+AnyMenuInfo *newAnyMenuInfoP(const char *name, menuid_t id, uint16_t eeprom, MenuCallbackFn cb, uint16_t max) {
+    auto ptr = new AnyMenuInfo();
+    populateCore(ptr, name, INFO_LOCATION_PGM, id, eeprom, cb, max);
+    return ptr;
+}
+
+AnyMenuInfo *newAnyMenuInfo(const char *name, menuid_t id, uint16_t eeprom, MenuCallbackFn cb, uint16_t max) {
+    auto ptr = new AnyMenuInfo();
+    populateCore(ptr, name, INFO_LOCATION_RAM, id, eeprom, cb, max);
+    return ptr;
+}
+
+AnalogMenuInfo* newAnalogMenuInfo(const char* name, menuid_t id, uint16_t eeprom, MenuCallbackFn cb, uint16_t max, uint16_t offset, uint16_t divisor, const char* unit) {
+    auto ptr = new AnalogMenuInfo();
+    populateCore((AnyMenuInfo*)ptr, name, INFO_LOCATION_RAM, id, eeprom, cb, max);
+    ptr->offset = offset;
+    ptr->divisor = divisor;
+    strncpy(ptr->unitName, unit, sizeof(ptr->unitName));
+    return ptr;
+}
+
+AnalogMenuInfo* newAnalogMenuInfoP(const char* name, menuid_t id, uint16_t eeprom, MenuCallbackFn cb, uint16_t max, uint16_t offset, uint16_t divisor, const char* unit) {
+    auto ptr = new AnalogMenuInfo();
+    populateCore((AnyMenuInfo*)ptr, name, INFO_LOCATION_PGM, id, eeprom, cb, max);
+    ptr->offset = offset;
+    ptr->divisor = divisor;
+    safeProgCpy(ptr->unitName, unit, sizeof(ptr->unitName));
+    return ptr;
+}
+
+BooleanMenuInfo *newBooleanMenuInfoP(const char *name, menuid_t id, uint16_t eeprom, MenuCallbackFn cb, BooleanNaming naming) {
+    auto ptr = new BooleanMenuInfo();
+    populateCore((AnyMenuInfo*)ptr, name, INFO_LOCATION_PGM, id, eeprom, cb, 1);
+    ptr->naming = naming;
+    return ptr;
+}
+
+BooleanMenuInfo *newBooleanMenuInfo(const char *name, menuid_t id, uint16_t eeprom, MenuCallbackFn cb, BooleanNaming naming) {
+    auto ptr = new BooleanMenuInfo();
+    populateCore((AnyMenuInfo*)ptr, name, INFO_LOCATION_RAM, id, eeprom, cb, 1);
+    ptr->naming = naming;
+    return ptr;
+}
+
+FloatMenuInfo *newFloatMenuInfoP(const char *name, menuid_t id, uint16_t eeprom, MenuCallbackFn cb, int decimalPlaces) {
+    auto ptr = new FloatMenuInfo();
+    populateCore((AnyMenuInfo*)ptr, name, INFO_LOCATION_PGM, id, eeprom, cb, decimalPlaces);
+    return ptr;
+}
+
+FloatMenuInfo *newFloatMenuInfo(const char *name, menuid_t id, uint16_t eeprom, MenuCallbackFn cb, int decimalPlaces) {
+    auto ptr = new FloatMenuInfo();
+    populateCore((AnyMenuInfo*)ptr, name, INFO_LOCATION_RAM, id, eeprom, cb, decimalPlaces);
+    return ptr;
 }

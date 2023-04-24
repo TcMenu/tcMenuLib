@@ -24,10 +24,19 @@ RuntimeMenuItem::RuntimeMenuItem(MenuType menuType, menuid_t id, RuntimeRenderin
 	this->itemPosition = itemPosition;
 }
 
-ListRuntimeMenuItem::ListRuntimeMenuItem(menuid_t id, int numberOfRows, RuntimeRenderingFn renderFn, MenuItem* next)
-	: RuntimeMenuItem(MENUTYPE_RUNTIME_LIST, id, renderFn, 0xff, numberOfRows, next) {
-	activeItem = 0;
+RuntimeMenuItem::RuntimeMenuItem(const AnyMenuInfo* rtInfo, bool isPgm, MenuType menuType, RuntimeRenderingFn renderFn,
+	uint8_t itemPosition, uint8_t numberOfRows, MenuItem* next)	: MenuItem(menuType, rtInfo, next, isPgm) {
+	this->noOfParts = numberOfRows;
+	this->renderFn = renderFn;
+	this->itemPosition = itemPosition;
+    this->id = INVALID_MENU_ID;
 }
+
+ListRuntimeMenuItem::ListRuntimeMenuItem(const AnyMenuInfo* info, int numberOfRows, RuntimeRenderingFn renderFn, MenuItem* next, bool isPgm)
+        : RuntimeMenuItem(info, isPgm, MENUTYPE_RUNTIME_LIST, renderFn, 0xff, numberOfRows, next), activeItem(0) { }
+
+ListRuntimeMenuItem::ListRuntimeMenuItem(menuid_t id, int numberOfRows, RuntimeRenderingFn renderFn, MenuItem* next)
+	: RuntimeMenuItem(MENUTYPE_RUNTIME_LIST, id, renderFn, 0xff, numberOfRows, next), activeItem(0) { }
 
 RuntimeMenuItem *ListRuntimeMenuItem::getChildItem(int pos) {
     menuType = MENUTYPE_RUNTIME_LIST;
@@ -292,15 +301,9 @@ int backSubItemRenderFn(RuntimeMenuItem* item, uint8_t /*row*/, RenderFnMode mod
 	switch (mode) {
 	    case RENDERFN_NAME: {
             buffer[0] = 0;
-            const char *name = nullptr;
-            if (item->getMenuType() == MENUTYPE_SUB_VALUE) {
-                name = reinterpret_cast<SubMenuItem*>(item)->getNameUnsafe();
-            } else if (item->getMenuType() == MENUTYPE_BACK_VALUE) {
-                name = reinterpret_cast<BackMenuItem*>(item)->getNameUnsafe();
-            }
-
+            if (item->getMenuType() != MENUTYPE_BACK_VALUE) return false; // only back should get this route
+            auto name = reinterpret_cast<BackMenuItem*>(item)->getNameUnsafe();
             if (name == nullptr) return true;
-
             if (item->isInfoProgMem()) {
                 safeProgCpy(buffer, name, bufferSize);
             } else {
@@ -396,18 +399,29 @@ int textItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char
 
 TextMenuItem::TextMenuItem(RuntimeRenderingFn customRenderFn, menuid_t id, int size, MenuItem *next)
     : EditableMultiPartMenuItem(MENUTYPE_TEXT_VALUE, id, size, customRenderFn, next) {
-        data = new char[size];
-        memset(data, 0, size);
-        passwordField = false;
-
+    initTextItem(nullptr);
 }
 
 TextMenuItem::TextMenuItem(RuntimeRenderingFn customRenderFn, const char* initial, menuid_t id, int size, MenuItem *next)
         : EditableMultiPartMenuItem(MENUTYPE_TEXT_VALUE, id, size, customRenderFn, next) {
-    data = new char[size];
-    memset(data, 0, size);
-    strncpy(data, initial, size);
+    initTextItem(initial);
+}
+
+TextMenuItem::TextMenuItem(const AnyMenuInfo* info, const char* initial, int size, MenuItem* next, bool isPgm)
+        : EditableMultiPartMenuItem(info, isPgm, menuType, size, textItemRenderFn, next) {
+    initTextItem(initial);
+}
+
+TextMenuItem::TextMenuItem(const AnyMenuInfo* info, RuntimeRenderingFn customRenderFn, const char* initial, int size, MenuItem* next, bool isPgm)
+        : EditableMultiPartMenuItem(info, isPgm, menuType, size, customRenderFn, next) {
+    initTextItem(initial);
+}
+
+void TextMenuItem::initTextItem(const char* initialData) {
+    data = new char[getNumberOfParts()];
+    memset(data, 0, getNumberOfParts());
     passwordField = false;
+    if(initialData) strncpy(data, initialData, getNumberOfParts());
 }
 
 IpAddressStorage::IpAddressStorage(const char *ipData) {
@@ -485,6 +499,19 @@ TimeFormattedMenuItem::TimeFormattedMenuItem(RuntimeRenderingFn renderFn, const 
     setTime(initial);
     this->format = format;
 }
+
+TimeFormattedMenuItem::TimeFormattedMenuItem(const AnyMenuInfo* info, RuntimeRenderingFn renderFn, const TimeStorage& initial, MultiEditWireType format, MenuItem* next, bool isPgm)
+        : EditableMultiPartMenuItem(info, isPgm, MENUTYPE_TIME, format == EDITMODE_TIME_HUNDREDS_24H ? 4 : 3, renderFn, next) {
+    setTime(initial);
+    this->format = format;
+}
+
+TimeFormattedMenuItem::TimeFormattedMenuItem(const AnyMenuInfo* info, const TimeStorage& initial, MultiEditWireType format, MenuItem* next, bool isPgm)
+        : EditableMultiPartMenuItem(info, isPgm, MENUTYPE_TIME, format == EDITMODE_TIME_HUNDREDS_24H ? 4 : 3, timeItemRenderFn, next) {
+    setTime(initial);
+    this->format = format;
+}
+
 
 void DateFormattedMenuItem::setDateFromString(const char *dateText) {
     int offset = 0;

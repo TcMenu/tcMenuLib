@@ -8,12 +8,10 @@
 
 #include <PlatformDetermination.h>
 #include <TextUtilities.h>
+#include <MenuItems.h>
 
 #include <BasicIoAbstraction.h>
 #include "RemoteTypes.h"
-
-// forward reference.
-class MenuItem;
 
 /**
  * @file tcUtil.h
@@ -29,7 +27,104 @@ struct ConnectorLocalInfo {
     char uuid[38];
 };
 
+/**
+ * Show the TcMenu version in a dialog that can be dismissed
+ * @param localInfo the local app information
+ */
 void showVersionDialog(const ConnectorLocalInfo* localInfo);
+
+/**
+ * Create a menu info structure using the new operator for the given parameters, max value is optional
+ * @param name the name to copy from RAM not PGM
+ * @param id the ID to give the info block
+ * @param eeprom the eerprom position or -1
+ * @param cb the callback to apply or nullptr
+ * @param max optional the max value
+ */
+AnyMenuInfo *newAnyMenuInfoP(const char *name, menuid_t id, uint16_t eeprom, MenuCallbackFn cb, uint16_t max = 0);
+
+/**
+ * Create a menu info structure using the new operator for the given parameters, max value is optional
+ * @param name the name to copy from RAM
+ * @param id the ID to give the info block
+ * @param eeprom the eerprom position or -1
+ * @param cb the callback to apply or nullptr
+ * @param max optional the max value
+ */
+AnyMenuInfo *newAnyMenuInfo(const char *name, menuid_t id, uint16_t eeprom, MenuCallbackFn cb, uint16_t max = 0);
+
+/**
+ * Create a menu info structure using the new operator for the given parameters, it populates all the fields for an
+ * analog item dynamically
+ * @param name the name to copy from PGM
+ * @param id the ID to give the info block
+ * @param eeprom the eerprom position or -1
+ * @param cb the callback to apply or nullptr
+ * @param max optional the max value
+ * @param offset the offset to apply
+ * @param divisor the divisor to apply
+ * @param unit the unit to copy from PGM
+ */
+AnalogMenuInfo* newAnalogMenuInfoP(const char* name, menuid_t id, uint16_t eeprom, MenuCallbackFn cb, uint16_t max, uint16_t offset, uint16_t divisor, const char* unit);
+
+/**
+ * Create a menu info structure using the new operator for the given parameters, it populates all the fields for an
+ * analog item dynamically
+ * @param name the name to copy from RAM
+ * @param id the ID to give the info block
+ * @param eeprom the eerprom position or -1
+ * @param cb the callback to apply or nullptr
+ * @param max optional the max value
+ * @param offset the offset to apply
+ * @param divisor the divisor to apply
+ * @param unit the unit to copy from RAM
+ */
+AnalogMenuInfo* newAnalogMenuInfo(const char* name, menuid_t id, uint16_t eeprom, MenuCallbackFn cb, uint16_t max, uint16_t offset, uint16_t divisor, const char* unit);
+
+/**
+ * Create a menu info structure using the new operator for the given parameters, it populates all the fields for a
+ * boolean item dynamically
+ * @param name the name to copy from PGM
+ * @param id the ID to give the info block
+ * @param eeprom the eerprom position or -1
+ * @param cb the callback to apply or nullptr
+ * @param naming the naming type to use
+ */
+BooleanMenuInfo *newBooleanMenuInfoP(const char *name, menuid_t id, uint16_t eeprom, MenuCallbackFn cb, BooleanNaming naming);
+
+/**
+ * Create a menu info structure using the new operator for the given parameters, it populates all the fields for a
+ * boolean item dynamically
+ * @param name the name to copy from RAM
+ * @param id the ID to give the info block
+ * @param eeprom the eerprom position or -1
+ * @param cb the callback to apply or nullptr
+ * @param naming the naming type to use
+ */
+BooleanMenuInfo *newBooleanMenuInfo(const char *name, menuid_t id, uint16_t eeprom, MenuCallbackFn cb, BooleanNaming naming);
+
+/**
+ * Create a menu info structure using the new operator for the given parameters, it populates all the fields for a
+ * float item dynamically
+ * @param name the name to copy from PGM
+ * @param id the ID to give the info block
+ * @param eeprom the eerprom position or -1
+ * @param cb the callback to apply or nullptr
+ * @param decimalPlaces the number of DP to display
+ */
+FloatMenuInfo *newFloatMenuInfoP(const char *name, menuid_t id, uint16_t eeprom, MenuCallbackFn cb, int decimalPlaces);
+
+/**
+ * Create a menu info structure using the new operator for the given parameters, it populates all the fields for a
+ * float item dynamically
+ * @param name the name to copy from RAM
+ * @param id the ID to give the info block
+ * @param eeprom the eerprom position or -1
+ * @param cb the callback to apply or nullptr
+ * @param decimalPlaces the number of DP to display
+ */
+FloatMenuInfo *newFloatMenuInfo(const char *name, menuid_t id, uint16_t eeprom, MenuCallbackFn cb, int decimalPlaces);
+
 
 // There now follows pretty much internal code, boolean negative for dealing with program memory
 // never use direct program memory commands, always prefer these, it allows us

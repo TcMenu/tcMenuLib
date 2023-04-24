@@ -18,6 +18,7 @@
 #include <graphics/RuntimeTitleMenuItem.h>
 #include <tcMenuVersion.h>
 #include <IoLogging.h>
+#include <tcUtil.h>
 
 //
 // ScrollChoice menu items when using data in RAM mode reference a fixed width array in your code, these will be
@@ -31,14 +32,11 @@ char pizzaToppings[] = {"Peperoni\0 Onions\0   Olives\0   Sweetcorn\0Mushrooms\0
 // to be the first of the two menu items, which are provided in a linked list. Notice that these are completely created
 // RAM, and not program memory.
 //
-BooleanMenuInfo minfoOvenFull = { "Start Oven", nextRandomId(), 0xffff, 1, NO_CALLBACK, NAMING_YES_NO};
-BooleanMenuItem menuOvenFull(&minfoOvenFull, false, nullptr, false);
-
+TextMenuItem menuTextExtra(newAnyMenuInfo("Text", nextRandomId(), 0xffff, NO_CALLBACK), "hello", 8, nullptr, INFO_LOCATION_RAM);
+BooleanMenuItem menuOvenFull(newBooleanMenuInfoP("Start Oven", nextRandomId(), 0xffff, NO_CALLBACK, NAMING_YES_NO), false, &menuTextExtra, INFO_LOCATION_RAM);
 AnyMenuInfo minfoOvenPower = { "Start Oven", nextRandomId(), 0xffff, 255, NO_CALLBACK};
-ActionMenuItem menuOvenPower(&minfoOvenPower, &menuOvenFull, false);
-
-AnalogMenuInfo minfoOvenTempInfo = { "Oven Temp", nextRandomId(), 0xffff, 255, NO_CALLBACK, 0, 1, "C" };
-AnalogMenuItem menuOvenTempItem(&minfoOvenTempInfo, 0, &menuOvenPower, false);
+ActionMenuItem menuOvenPower(&minfoOvenPower, &menuOvenFull, INFO_LOCATION_RAM);
+AnalogMenuItem menuOvenTempItem(newAnalogMenuInfo("Oven Temp", nextRandomId(), 0xffff, NO_CALLBACK, 255, 0, 1, "C"), 0, &menuOvenPower, INFO_LOCATION_RAM);
 
 //
 // Here's a few examples of how you can capture the state of various actions taking place in the menu manager, such as
@@ -186,8 +184,7 @@ void CALLBACK_FUNCTION onStartCooking(int id) {
 // title, the buffer line, and also this line, then the buttons. It uses the showRam function which shows from
 // a non constant / PGM string
 //
-RENDERING_CALLBACK_NAME_INVOKE(fnExtraDialogLine, textItemRenderFn, "Detail: ", -1, NO_CALLBACK)
-TextMenuItem secondItem(fnExtraDialogLine, nextRandomId(), 12, nullptr);
+TextMenuItem secondItem(newAnyMenuInfo("Detail: ", nextRandomId(), 0xffff, NO_CALLBACK), "det", 12, nullptr, INFO_LOCATION_RAM);
 
 void CALLBACK_FUNCTION onDialogInfo(int id) {
     // withMenuDialogIfAvailable checks if the dialog can be presented now, and if so will call the function
@@ -394,7 +391,8 @@ int CALLBACK_FUNCTION octalOnlyRtCall(RuntimeMenuItem* item, uint8_t row, Render
             if (row < 1 || *buffer < '0' || *buffer > '7') return false;
             textItem->setCharValue(row - 1, *buffer);
             return true;
+        default:
+            // when we are not handling something, we need to call through to the parent callback
+            return textItemRenderFn(item, row, mode, buffer, bufferSize);
     }
-    // when we are not handling something, we need to call through to the parent callback
-    return textItemRenderFn(item, row, mode, buffer, bufferSize);
 }

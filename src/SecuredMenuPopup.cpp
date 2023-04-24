@@ -7,6 +7,7 @@
 #include "tcMenu.h"
 #include "BaseDialog.h"
 #include "lang/language_select.h"
+#include "MenuItems.h"
 
 const char pgmProceedText[] PROGMEM = TXT_SECURE_MENU_PROCEED;
 const char pgmCancelText[] PROGMEM = TXT_SECURE_MENU_CANCEL;

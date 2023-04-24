@@ -88,6 +88,51 @@ public:
     ScrollChoiceMenuItem(uint16_t id, RuntimeRenderingFn renderFn, uint8_t currentSel, int numberOfItems, MenuItem *next = nullptr);
 
     /**
+     * Create an enum menu item that has values directly in RAM. The items are stored in ram in an equally spaced array.
+     * In this case you are responsible for the memory that makes up the array.
+     * @param info the block of static data
+     * @param currentSel the currently selected item
+     * @param enumItemsInRam the array of items, where each item is of itemSize length
+     * @param itemSize the size of each item
+     * @param numberOfItems the number of items
+     * @param next optional pointer to next item
+     * @param isPgm optional the memory location of the info block (default prog-mem)
+     */
+    ScrollChoiceMenuItem(const AnyMenuInfo* info, uint8_t currentSel, const char *enumItemsInRam,
+                         int itemSize, int numberOfItems, MenuItem *next = nullptr, bool isPgm = INFO_LOCATION_PGM);
+
+    /**
+     * Create a choice menu item that scrolls through available values. Use this constructor to store the values in
+     * EEPROM stoage. This uses a flat array where each item is itemSize. So item 0 would be at eemproStart and item
+     * 1 would be at eepromStart + itemSize.. Further, it can be cached into memory using cacheEepromValues(), calling
+     * this again, will refresh the cache. Before using this you must call menuMgr.setEepromRef(..) to initialise the
+     * EEPROM object that should be used.
+     *
+     * @param info the block of static data
+     * @param currentSel the currently selected item
+     * @param eepromStart the start location in eeprom of the array
+     * @param itemSize the size of each item
+     * @param numberOfItems the number of items to start with
+     * @param next optional pointer to next item
+     * @param isPgm optional the memory location of the info block (default prog-mem)
+     */
+    ScrollChoiceMenuItem(const AnyMenuInfo* info, uint8_t currentSel, EepromPosition eepromStart,
+                         int itemSize, int numberOfItems, MenuItem *next = nullptr, bool isPgm = INFO_LOCATION_PGM);
+
+    /**
+     * Create a choice menu item that scrolls through available values. Use this constructor to provide the values
+     * manually using a runtime menu callback, this is the most flexible method but requires extra coding.
+     *
+     * @param info the block of static data
+     * @param renderFn the function that will do the rendering, enumItemRenderFn is the default
+     * @param currentSel the currently selected choice
+     * @param numberOfItems the number of choices
+     * @param next optional pointer to next item
+     * @param isPgm optional the memory location of the info block (default prog-mem)
+     */
+    ScrollChoiceMenuItem(const AnyMenuInfo* info, RuntimeRenderingFn renderFn, uint8_t currentSel, int numberOfItems, MenuItem *next = nullptr, bool isPgm = INFO_LOCATION_PGM);
+
+    /**
      * For EEPROM based items you can choose to cache the values in RAM, the total size should not exceed 256 bytes.
      */
     void cacheEepromValues();
@@ -173,6 +218,7 @@ int rgbAlphaItemRenderFn(RuntimeMenuItem *item, uint8_t row, RenderFnMode mode, 
 /**
  * A Menu item that can display and edit RGB values that are 32 bits wide, that is 8 bit per element and
  * an optional alpha channel. This is based on editable runtime menu item.
+ * Rendering function is `rgbAlphaItemRenderFn`
  */
 class Rgb32MenuItem : public EditableMultiPartMenuItem {
 private:
@@ -198,6 +244,31 @@ public:
      * @param next optional pointer to the next menu item
      */
     Rgb32MenuItem(uint16_t id, RuntimeRenderingFn renderFn, bool includeAlpha, MenuItem* next = nullptr);
+
+
+    /**
+     * Creates a color data menu item that can be edited, optionally including an alpha channel from an info block for
+     * static name, id etc.
+     * @param info the info block containing the static data
+     * @param renderFn the rendering function to use - see default in the class definition
+     * @param col the initial color
+     * @param includeAlpha true to include alpha channel, otherwise false.
+     * @param next optional pointer to the next menu item
+     * @param isPgm optional if the item is in program memory or RAM.
+     */
+    Rgb32MenuItem(const AnyMenuInfo* info, RuntimeRenderingFn renderFn, const RgbColor32& col, bool includeAlpha, MenuItem *next = nullptr, bool isPgm = INFO_LOCATION_PGM);
+
+    /**
+     * Creates a color data menu item that can be edited, optionally including an alpha channel from an info block for
+     * static name, id etc.
+     * @param info the info block containing the static data
+     * @param col the initial color
+     * @param includeAlpha true to include alpha channel, otherwise false.
+     * @param next optional pointer to the next menu item
+     * @param isPgm optional if the item is in program memory or RAM.
+     */
+    Rgb32MenuItem(const AnyMenuInfo* info, const RgbColor32& col, bool includeAlpha, MenuItem *next = nullptr, bool isPgm = INFO_LOCATION_PGM);
+
 
     /**
      * @return the underlying color data that can be directly modified.

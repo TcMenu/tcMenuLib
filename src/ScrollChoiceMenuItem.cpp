@@ -18,6 +18,17 @@ ScrollChoiceMenuItem::ScrollChoiceMenuItem(int id, RuntimeRenderingFn renderFn, 
     lastCacheSize = 0;
 }
 
+ScrollChoiceMenuItem::ScrollChoiceMenuItem(const AnyMenuInfo* info, uint8_t currentSel, const char *enumItemsInRam,
+                                           int itemSize, int numberOfItems, MenuItem *next, bool isPgm)
+        : RuntimeMenuItem(info, isPgm, MENUTYPE_SCROLLER_VALUE, enumItemRenderFn, currentSel, numberOfItems, next) {
+    memMode = MEMORY_ONLY;
+    rangeValues = enumItemsInRam;
+    this->itemSize = itemSize;
+    eepromStart = 0;
+    lastCacheSize = 0;
+}
+
+
 ScrollChoiceMenuItem::ScrollChoiceMenuItem(uint16_t id, RuntimeRenderingFn renderFn, uint8_t currentSel,
                                            EepromPosition eepromStart, int itemSize, int numberOfItems, MenuItem *next)
         : RuntimeMenuItem(MENUTYPE_SCROLLER_VALUE, id, renderFn, currentSel, numberOfItems, next) {
@@ -28,9 +39,29 @@ ScrollChoiceMenuItem::ScrollChoiceMenuItem(uint16_t id, RuntimeRenderingFn rende
     lastCacheSize = 0;
 }
 
+ScrollChoiceMenuItem::ScrollChoiceMenuItem(const AnyMenuInfo* info, uint8_t currentSel, EepromPosition eepromStart,
+                                           int itemSize, int numberOfItems, MenuItem *next, bool isPgm)
+        : RuntimeMenuItem(info, isPgm, MENUTYPE_SCROLLER_VALUE, enumItemRenderFn, currentSel, numberOfItems, next) {
+    memMode = EEPROM_BASED;
+    rangeValues = nullptr;
+    this->itemSize = itemSize;
+    this->eepromStart = eepromStart;
+    lastCacheSize = 0;
+}
+
 ScrollChoiceMenuItem::ScrollChoiceMenuItem(uint16_t id, RuntimeRenderingFn renderFn, uint8_t currentSel,
                                            int numberOfItems, MenuItem *next)
         : RuntimeMenuItem(MENUTYPE_SCROLLER_VALUE, id, renderFn, currentSel, numberOfItems, next) {
+    memMode = CUSTOM;
+    rangeValues = nullptr;
+    this->itemSize = 0;
+    this->eepromStart = 0;
+    lastCacheSize = 0;
+}
+
+ScrollChoiceMenuItem::ScrollChoiceMenuItem(const AnyMenuInfo* info, RuntimeRenderingFn renderFn, uint8_t currentSel,
+                                           int numberOfItems, MenuItem *next, bool isPgm)
+        : RuntimeMenuItem(info, isPgm, MENUTYPE_SCROLLER_VALUE, renderFn, currentSel, numberOfItems, next) {
     memMode = CUSTOM;
     rangeValues = nullptr;
     this->itemSize = 0;
@@ -128,6 +159,18 @@ Rgb32MenuItem::Rgb32MenuItem(uint16_t id, RuntimeRenderingFn renderFn, bool incl
 
 Rgb32MenuItem::Rgb32MenuItem(RuntimeRenderingFn renderFn, const RgbColor32& col, uint16_t id, bool includeAlpha, MenuItem *next)
         : EditableMultiPartMenuItem(MENUTYPE_COLOR_VALUE, id, includeAlpha ? 4 : 3, renderFn, next) {
+    alphaChannel = includeAlpha;
+    data = col;
+}
+
+Rgb32MenuItem::Rgb32MenuItem(const AnyMenuInfo* info, RuntimeRenderingFn renderFn, const RgbColor32& col, bool includeAlpha, MenuItem *next, bool isPgm)
+        : EditableMultiPartMenuItem(info, isPgm, MENUTYPE_COLOR_VALUE, includeAlpha ? 4 : 3, renderFn, next) {
+    alphaChannel = includeAlpha;
+    data = col;
+}
+
+Rgb32MenuItem::Rgb32MenuItem(const AnyMenuInfo* info, const RgbColor32& col, bool includeAlpha, MenuItem *next, bool isPgm)
+        : EditableMultiPartMenuItem(info, isPgm, MENUTYPE_COLOR_VALUE, includeAlpha ? 4 : 3, rgbAlphaItemRenderFn, next) {
     alphaChannel = includeAlpha;
     data = col;
 }

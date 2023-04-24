@@ -14,10 +14,10 @@
 #ifndef _MENUITEMS_h
 #define _MENUITEMS_h
 
-#include "tcUtil.h"
-
 #define INFO_LOCATION_PGM true
 #define INFO_LOCATION_RAM false
+
+#include <PlatformDetermination.h>
 
 /** The maxmimum ID that is allowed manually, only automated ID's for back items and similar will exceed this */
 #define MAXIMUM_ID_ALLOWED 32000
@@ -172,18 +172,7 @@ struct BooleanMenuInfo {
  * 
  * Note: These items must remain in this order, as MenuItem relies upon it.
  */
-struct SubMenuInfo {
-	/** the name given to this menu item */ 
-	char name[NAME_SIZE_T];
-	/** the identifier for this menu */
-	menuid_t id;
-	/** Not used for submenus. */
-	uint16_t eepromAddr;
-	/** maximum value that this type can store - always 0 */
-	uint16_t maxValue;
-	/** the callback function - not used for submenu's */
-	MenuCallbackFn callback;
-};
+typedef AnyMenuInfo SubMenuInfo;
 
 /**
  * The information block for a floating point menu component. Floating point items are not editable, they are
@@ -222,6 +211,7 @@ enum Flags : uint8_t {
     MENUITEM_PIN_VISIBLE = 6,
     /** the info structure is in PROGMEM */
     MENUITEM_INFO_STRUCT_PGM = 7,
+
     /** indicates that remote 0 needs to resend this item */
 	MENUITEM_REMOTE_SEND0 = 10,
     /** indicates that remote 1 needs to resend this item */
@@ -341,10 +331,8 @@ protected:
 	uint16_t flags;
 	MenuItem* next;
 	/** we only have either an info structure or a runtime menu callback function */
-	union {
-		const AnyMenuInfo *info;
-		RuntimeRenderingFn renderFn;
-	};
+    const AnyMenuInfo *info = nullptr;
+    RuntimeRenderingFn renderFn = nullptr;
 	MenuType menuType;
 public:
 
@@ -422,7 +410,7 @@ public:
     /** gets the next menu (sibling) at this level */
 	MenuItem* getNext() const { return next; }
 	/** sets or changes the menu item that comes after this one, nullptr means this is the last item */
-	void setNext(MenuItem* next) { this->next = next; }
+	void setNext(MenuItem* pNext) { this->next = pNext; }
 
     /**
      * Marks the menu item as having updated locally and remotely and also calls the callback if not silent
@@ -576,7 +564,11 @@ public:
  * An item that can represent a known series of values, somewhat like a combo box. We provide a list
  * of choices and only one of those choices can be active at once. The choice is a zero based integer
  * with the first choice being 0 and so on.
+ *
+ * Don't create enum menu items dynamically, see ScrollChoiceMenuItem instead as that is easier to create dynamically.
+ *
  * @see EnumMenuInfo
+ * @see ScrollChoiceMenuItem
  */
 class EnumMenuItem : public ValueMenuItem {
 public:
