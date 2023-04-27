@@ -422,6 +422,10 @@ namespace tcgfx {
             return &props;
         }
 
+        ItemDisplayProperties* configForCurrentSub(ItemDisplayProperties::ComponentType compType) override {
+            return &props;
+        }
+
         DrawableIcon* iconForMenuItem(uint16_t id) override{
             return nullptr;
         }
