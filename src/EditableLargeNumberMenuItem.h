@@ -176,6 +176,7 @@ int largeNumItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, 
  * A multipart editor for very large numbers, either integer or fixed point decimal that exceed the usable range 
  * of a rotary encoder or joystick to set their value. This class works by editing each digit in turn. This is based
  * on LargeFixedNumber, see that for more details on the capabilities
+ * RenderFn - largeNumItemRenderFn
  * @see LargeFixedNumber
  */
 class EditableLargeNumberMenuItem : public EditableMultiPartMenuItem {
@@ -199,6 +200,12 @@ public:
 		: EditableMultiPartMenuItem(MENUTYPE_LARGENUM_VALUE, id, maxDigits + 1, renderFn, next) {
         data.setPrecision(dps, maxDigits);
         negativeAllowed = true;
+	}
+
+    EditableLargeNumberMenuItem(const AnyMenuInfo* info, const LargeFixedNumber& initial, bool allowNeg, MenuItem* next = nullptr, bool isPgm = INFO_LOCATION_PGM)
+		: EditableMultiPartMenuItem(info, isPgm, MENUTYPE_LARGENUM_VALUE, initial.getTotalDigits() + (allowNeg ? 1 : 0), largeNumItemRenderFn, next) {
+        data = initial;
+        negativeAllowed = allowNeg;
 	}
 
     /** gets the large integer value that this class is using */

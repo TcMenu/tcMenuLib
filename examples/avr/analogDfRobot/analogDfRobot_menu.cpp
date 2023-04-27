@@ -20,11 +20,12 @@ LiquidCrystalRenderer renderer(lcd, 16, 2);
 // Global Menu Item declarations
 const PROGMEM AnalogMenuInfo minfoCommits = { "Commits", 7, 0xffff, 65000, NO_CALLBACK, 0, 1, "" };
 AnalogMenuItem menuCommits(&minfoCommits, 0, NULL, INFO_LOCATION_PGM);
-ScrollChoiceMenuItem menuChooseItem(8, fnChooseItemRtCall, 0, 20, &menuCommits);
-RENDERING_CALLBACK_NAME_INVOKE(fnTextRtCall, textItemRenderFn, "Text", 4, NO_CALLBACK)
-TextMenuItem menuText(fnTextRtCall, "", 6, 6, &menuChooseItem);
-RENDERING_CALLBACK_NAME_INVOKE(fnLgeNumRtCall, largeNumItemRenderFn, "LgeNum", 10, NO_CALLBACK)
-EditableLargeNumberMenuItem menuLgeNum(fnLgeNumRtCall, LargeFixedNumber(8, 4, 0U, 0U, false), 5, true, &menuText);
+const PROGMEM AnyMenuInfo minfoChooseItem = { "Choose Item", 8, 18, 0, NO_CALLBACK };
+ScrollChoiceMenuItem menuChooseItem(&minfoChooseItem, fnChooseItemRtCall, 0, 20, &menuCommits);
+const PROGMEM AnyMenuInfo minfoText = { "Text", 6, 4, 0, NO_CALLBACK };
+TextMenuItem menuText(&minfoText, "", 6, &menuChooseItem, INFO_LOCATION_PGM);
+const PROGMEM AnyMenuInfo minfoLgeNum = { "LgeNum", 5, 10, 0, NO_CALLBACK };
+EditableLargeNumberMenuItem menuLgeNum(&minfoLgeNum, LargeFixedNumber(8, 4, 0U, 0U, false), true, &menuText, INFO_LOCATION_PGM);
 const PROGMEM BooleanMenuInfo minfoL2 = { "L2", 4, 3, 1, onLed2, NAMING_ON_OFF };
 BooleanMenuItem menuL2(&minfoL2, false, NULL, INFO_LOCATION_PGM);
 const PROGMEM BooleanMenuInfo minfoL1 = { "L1", 3, 2, 1, onLed1, NAMING_ON_OFF };

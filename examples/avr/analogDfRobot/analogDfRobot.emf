@@ -144,7 +144,6 @@
     "embeddedPlatform": "ARDUINO",
     "lastDisplayUuid": "bcd5fe34-9e9f-4fcb-9edf-f4e3caca0674",
     "lastInputUuid": "7daa6a81-dd09-422e-b83c-bda5045abaef",
-    "lastRemoteUuid": "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb",
     "lastRemoteUuids": [
       "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
     ],
@@ -165,6 +164,11 @@
       {
         "name": "DF_KEY_REPEAT",
         "latestValue": "10",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "DF_RIGHT_SEL",
+        "latestValue": "false",
         "subsystem": "INPUT"
       },
       {
@@ -204,8 +208,8 @@
       }
     ],
     "namingRecursive": false,
-    "saveToSrc": false,
     "useCppMain": false,
+    "saveLocation": "ALL_TO_CURRENT",
     "usingSizedEEPROMStorage": false,
     "eepromDefinition": "",
     "authenticatorDefinition": "",
