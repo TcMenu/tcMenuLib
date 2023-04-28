@@ -344,6 +344,7 @@
       "type": "runtimeList",
       "item": {
         "initialRows": 20,
+        "usingInfoBlock": false,
         "name": "Count List",
         "id": 18,
         "eepromAddress": -1,
@@ -795,8 +796,8 @@
     "eepromDefinition": "avr:",
     "authenticatorDefinition": "rom:100:6",
     "projectIoExpanders": [
-      "mcp23017:io23017:32:2",
-      "deviceIO:"
+      "deviceIO:",
+      "mcp23017:io23017:32:2"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []

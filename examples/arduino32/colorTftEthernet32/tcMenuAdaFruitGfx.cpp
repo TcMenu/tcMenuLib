@@ -15,6 +15,10 @@
 #include <ScrollChoiceMenuItem.h>
 #include "tcMenuAdaFruitGfx.h"
 #include <Adafruit_SPITFT.h>
+#include <tcUnicodeAdaGFX.h>
+
+using namespace tcgfx;
+
 
 #if DISPLAY_HAS_MEMBUFFER == true
 #define refreshDisplayIfNeeded(gr, needUpd) {if(needUpd) reinterpret_cast<Adafruit_ST7735*>(gr)->display();}
@@ -94,8 +98,34 @@ void AdafruitDrawable::drawPolygon(const Coord points[], int numPoints, bool fil
     }
 }
 
+void AdafruitDrawable::computeBaselineIfNeeded(const GFXfont* font) {
+    // we cache the last baseline, if the font is unchanged, don't calculate again
+    if(computedFont == font && computedBaseline > 0) return;
+
+    // we need to work out the biggest glyph and maximum extent beyond the baseline, we use 4 chars 'Agj(' for this
+    const char sz[] = "Agj(";
+    int height = 0;
+    int bl = 0;
+    const char* current = sz;
+    auto fontLast = pgm_read_word(&font->last);
+    auto fontFirst = pgm_read_word(&font->first);
+    while(*current && (*current < fontLast)) {
+        size_t glIdx = *current - fontFirst;
+        auto allGlyphs = (GFXglyph*)pgm_read_ptr(&font->glyph);
+        int glyphHeight = int(pgm_read_byte(&allGlyphs[glIdx].height));
+        if (glyphHeight > height) height = glyphHeight;
+        auto yOffset = int8_t(pgm_read_byte(&allGlyphs[glIdx].yOffset));
+        bl += glyphHeight + yOffset;
+        current++;
+    }
+    computedFont = font;
+    computedBaseline = bl / 4;
+    computedHeight = height;
+}
 
 Coord AdafruitDrawable::internalTextExtents(const void *f, int mag, const char *text, int *baseline) {
+    if(mag == 0) mag = 1; // never allow 0 magnification
+
     graphics->setFont(static_cast<const GFXfont *>(f));
     graphics->setTextSize(mag);
     auto* font = (GFXfont *) f;
@@ -109,23 +139,9 @@ Coord AdafruitDrawable::internalTextExtents(const void *f, int mag, const char *
         return Coord(w, h);
     }
     else {
-        // we need to work out the biggest glyph and maximum extent beyond the baseline, we use 'Ay(' for this
-        const char sz[] = "AgyjK(";
-        int height = 0;
-        int bl = 0;
-        const char* current = sz;
-        auto fontLast = pgm_read_word(&font->last);
-        auto fontFirst = pgm_read_word(&font->first);
-        while(*current && (*current < fontLast)) {
-            size_t glIdx = *current - fontFirst;
-            auto allGlyphs = (GFXglyph*)pgm_read_ptr(&font->glyph);
-            unsigned char glyphHeight = pgm_read_byte(&allGlyphs[glIdx].height);
-            if (glyphHeight > height) height = glyphHeight;
-            bl = glyphHeight + (signed char)pgm_read_byte(&allGlyphs[glIdx].yOffset);
-            current++;
-        }
-        if(baseline) *baseline = bl;
-        return Coord((int)w, height);
+        computeBaselineIfNeeded(font);
+        if(baseline) *baseline = (computedBaseline * mag);
+        return Coord(int(w), (computedHeight * mag));
     }
 }
 
@@ -134,7 +150,7 @@ void AdafruitDrawable::drawPixel(uint16_t x, uint16_t y) {
 }
 
 UnicodeFontHandler *AdafruitDrawable::createFontHandler() {
-    return new UnicodeFontHandler(graphics, ENCMODE_UTF8);
+    return new UnicodeFontHandler(newAdafruitTextPipeline(graphics), ENCMODE_UTF8);
 }
 
 //

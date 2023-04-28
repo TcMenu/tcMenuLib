@@ -128,7 +128,6 @@
     "embeddedPlatform": "ARDUINO",
     "lastDisplayUuid": "5EED8D08-CF04-420E-A190-E40743FEA20F",
     "lastInputUuid": "20409bb8-b8a1-4d1d-b632-2cf9b57353e3",
-    "lastRemoteUuid": "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb",
     "lastRemoteUuids": [
       "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
     ],
@@ -258,8 +257,8 @@
       }
     ],
     "namingRecursive": true,
-    "saveToSrc": false,
     "useCppMain": false,
+    "saveLocation": "ALL_TO_CURRENT",
     "usingSizedEEPROMStorage": false,
     "eepromDefinition": "avr:",
     "authenticatorDefinition": "",

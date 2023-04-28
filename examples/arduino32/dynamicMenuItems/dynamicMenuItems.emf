@@ -600,8 +600,8 @@
     "eepromDefinition": "",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
-      "deviceIO:",
-      "mcp23017:io23017:32:10"
+      "mcp23017:io23017:32:10",
+      "deviceIO:"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []

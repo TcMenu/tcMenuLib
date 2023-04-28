@@ -32,11 +32,12 @@ const AnyMenuInfo minfoTakeDisplay = { "Take display", 17, 0xffff, 0, onTakeDisp
 ActionMenuItem menuTakeDisplay(&minfoTakeDisplay, NULL, INFO_LOCATION_PGM);
 const AnyMenuInfo minfoSaveItem = { "Save item", 23, 0xffff, 0, onSaveItem };
 ActionMenuItem menuSaveItem(&minfoSaveItem, NULL, INFO_LOCATION_PGM);
-RENDERING_CALLBACK_NAME_INVOKE(fnRomTextRtCall, textItemRenderFn, "Rom Text", -1, NO_CALLBACK)
-TextMenuItem menuRomText(fnRomTextRtCall, "", 21, 10, &menuSaveItem);
-ScrollChoiceMenuItem menuRomLocation(24, fnRomLocationRtCall, 0, 10, &menuRomText);
-RENDERING_CALLBACK_NAME_INVOKE(fnRomChoiceRtCall, enumItemRenderFn, "Rom Choice", 14, NO_CALLBACK)
-ScrollChoiceMenuItem menuRomChoice(25, fnRomChoiceRtCall, 0, 1024, 10, 10, &menuRomLocation);
+const AnyMenuInfo minfoRomText = { "Rom Text", 21, 0xffff, 0, NO_CALLBACK };
+TextMenuItem menuRomText(&minfoRomText, "", 10, &menuSaveItem, INFO_LOCATION_PGM);
+const AnyMenuInfo minfoRomLocation = { "Rom Location", 24, 0xffff, 0, NO_CALLBACK };
+ScrollChoiceMenuItem menuRomLocation(&minfoRomLocation, fnRomLocationRtCall, 0, 10, &menuRomText);
+const AnyMenuInfo minfoRomChoice = { "Rom Choice", 25, 14, 0, NO_CALLBACK };
+ScrollChoiceMenuItem menuRomChoice(&minfoRomChoice, 0, 1024, 10, 10, &menuRomLocation);
 const SubMenuInfo minfoRomValues = { "Rom Values", 20, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackRomValues(&minfoRomValues, &menuRomChoice, INFO_LOCATION_PGM);
 SubMenuItem menuRomValues(&minfoRomValues, &menuBackRomValues, &menuTakeDisplay, INFO_LOCATION_PGM);
@@ -44,8 +45,8 @@ const char pgmStrIoTMonitorText[] = { "IoT Monitor" };
 RemoteMenuItem menuIoTMonitor(pgmStrIoTMonitorText, 29, NULL);
 const char pgmStrAuthenticatorText[] = { "Authenticator" };
 EepromAuthenticationInfoMenuItem menuAuthenticator(pgmStrAuthenticatorText, NO_CALLBACK, 28, &menuIoTMonitor);
-RENDERING_CALLBACK_NAME_INVOKE(fnIpAddressRtCall, ipAddressRenderFn, "Ip Address", 10, NO_CALLBACK)
-IpAddressMenuItem menuIpAddress(fnIpAddressRtCall, IpAddressStorage(127, 0, 0, 1), 15, &menuAuthenticator);
+const AnyMenuInfo minfoIpAddress = { "Ip Address", 15, 10, 0, NO_CALLBACK };
+IpAddressMenuItem menuIpAddress(&minfoIpAddress, IpAddressStorage(127, 0, 0, 1), &menuAuthenticator, INFO_LOCATION_PGM);
 const SubMenuInfo minfoConnectivity = { "Connectivity", 14, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackConnectivity(&minfoConnectivity, &menuIpAddress, INFO_LOCATION_PGM);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, &menuRomValues, INFO_LOCATION_PGM);
@@ -58,8 +59,8 @@ BackMenuItem menuBackStatus(&minfoStatus, &menuVoltA0, INFO_LOCATION_PGM);
 SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuConnectivity, INFO_LOCATION_PGM);
 const BooleanMenuInfo minfoShowHidden = { "Show Hidden", 30, 0xffff, 1, onShowHidden, NAMING_YES_NO };
 BooleanMenuItem menuShowHidden(&minfoShowHidden, false, NULL, INFO_LOCATION_PGM);
-RENDERING_CALLBACK_NAME_INVOKE(fnRGBRtCall, rgbAlphaItemRenderFn, "RGB", 16, onRgbChanged)
-Rgb32MenuItem menuRGB(fnRGBRtCall, RgbColor32(0, 0, 0), 26, false, &menuShowHidden);
+const AnyMenuInfo minfoRGB = { "RGB", 26, 16, 0, onRgbChanged };
+Rgb32MenuItem menuRGB(&minfoRGB, RgbColor32(0, 0, 0), false, &menuShowHidden, INFO_LOCATION_PGM);
 const BooleanMenuInfo minfoTempCheck = { "Temp Check", 13, 9, 1, NO_CALLBACK, NAMING_ON_OFF };
 BooleanMenuItem menuTempCheck(&minfoTempCheck, false, &menuRGB, INFO_LOCATION_PGM);
 const AnyMenuInfo minfoHiddenItem = { "Hidden item", 16, 0xffff, 0, NO_CALLBACK };

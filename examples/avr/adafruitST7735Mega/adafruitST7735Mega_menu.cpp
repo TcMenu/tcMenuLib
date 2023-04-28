@@ -28,8 +28,8 @@ ActionMenuItem menuSubPressMe(&minfoSubPressMe, &menuFlt, INFO_LOCATION_PGM);
 const PROGMEM SubMenuInfo minfoSub = { "Sub", 4, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackSub(&minfoSub, &menuSubPressMe, INFO_LOCATION_PGM);
 SubMenuItem menuSub(&minfoSub, &menuBackSub, NULL, INFO_LOCATION_PGM);
-RENDERING_CALLBACK_NAME_INVOKE(fnLgeRtCall, largeNumItemRenderFn, "Lge", -1, NO_CALLBACK)
-EditableLargeNumberMenuItem menuLge(fnLgeRtCall, LargeFixedNumber(5, 2, 0U, 0U, false), 3, true, &menuSub);
+const PROGMEM AnyMenuInfo minfoLge = { "Lge", 3, 0xffff, 0, NO_CALLBACK };
+EditableLargeNumberMenuItem menuLge(&minfoLge, LargeFixedNumber(5, 2, 0U, 0U, false), true, &menuSub, INFO_LOCATION_PGM);
 const PROGMEM BooleanMenuInfo minfoBool = { "Bool", 2, 0xffff, 1, NO_CALLBACK, NAMING_YES_NO };
 BooleanMenuItem menuBool(&minfoBool, false, &menuLge, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoAnalog = { "Analog", 1, 0xffff, 255, NO_CALLBACK, 0, 1, "Unit" };
