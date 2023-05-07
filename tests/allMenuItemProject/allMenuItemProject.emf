@@ -346,7 +346,6 @@
       "type": "runtimeList",
       "item": {
         "initialRows": 10,
-        "listCreationMode": "CUSTOM",
         "name": "%menu.22.name",
         "variableName": "SubRamListCustom",
         "id": 22,

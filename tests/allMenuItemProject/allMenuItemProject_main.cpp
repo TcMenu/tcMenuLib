@@ -104,3 +104,14 @@ void CALLBACK_FUNCTION listRamHasChanged(int id) {
 void CALLBACK_FUNCTION listItemWasSelected(int id) {
     // TODO - your menu change code
 }
+
+
+
+void CALLBACK_FUNCTION listItemWasSelected(int id) {
+    // TODO - your menu change code
+}
+
+
+void CALLBACK_FUNCTION listRamHasChanged(int id) {
+    // TODO - your menu change code
+}
