@@ -1,0 +1,590 @@
+{
+  "version": "1.00",
+  "projectName": "Project description",
+  "author": "dave",
+  "items": [
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "defaultValue": "0",
+      "item": {
+        "maxValue": 100,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "%menu.1.unit",
+        "step": 1,
+        "name": "%menu.1.name",
+        "variableName": "IntFlash",
+        "id": 1,
+        "eepromAddress": 4,
+        "functionName": "callback1",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "defaultValue": "0",
+      "item": {
+        "maxValue": 511,
+        "offset": 1,
+        "divisor": 1,
+        "unitName": "%menu.2.unit",
+        "step": 1,
+        "name": "%menu.2.name",
+        "variableName": "IntRAM",
+        "id": 2,
+        "eepromAddress": -1,
+        "functionName": "@helloWorld",
+        "readOnly": false,
+        "localOnly": true,
+        "visible": true,
+        "staticDataInRAM": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "boolItem",
+      "defaultValue": "false",
+      "item": {
+        "naming": "TRUE_FALSE",
+        "name": "%menu.8.name",
+        "variableName": "SubFlashBool1",
+        "id": 8,
+        "eepromAddress": 6,
+        "functionName": "callback1",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "boolItem",
+      "defaultValue": "false",
+      "item": {
+        "naming": "TRUE_FALSE",
+        "name": "%menu.9.name",
+        "variableName": "SubFlashBoolRam",
+        "id": 9,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "%menu.3.name",
+        "variableName": "SubFlash",
+        "id": 3,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 3,
+      "type": "largeNumItem",
+      "defaultValue": "1000",
+      "item": {
+        "digitsAllowed": 8,
+        "decimalPlaces": 0,
+        "negativeAllowed": false,
+        "name": "%menu.4.name",
+        "variableName": "SubFlashLargeNumW",
+        "id": 4,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 3,
+      "type": "largeNumItem",
+      "defaultValue": "100.123",
+      "item": {
+        "digitsAllowed": 10,
+        "decimalPlaces": 4,
+        "negativeAllowed": true,
+        "name": "%menu.5.name",
+        "variableName": "SubFlashLageNumRam",
+        "id": 5,
+        "eepromAddress": -1,
+        "functionName": "largeNumCustomRtCall",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": true
+      }
+    },
+    {
+      "parentId": 3,
+      "type": "floatItem",
+      "defaultValue": "0.0",
+      "item": {
+        "numDecimalPlaces": 2,
+        "name": "%menu.6.name",
+        "variableName": "SubFlashFltRam",
+        "id": 6,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": true
+      }
+    },
+    {
+      "parentId": 3,
+      "type": "floatItem",
+      "defaultValue": "12.34",
+      "item": {
+        "numDecimalPlaces": 3,
+        "name": "%menu.7.name",
+        "variableName": "SubFlashFltFlash",
+        "id": 7,
+        "eepromAddress": -1,
+        "readOnly": true,
+        "localOnly": true,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 3,
+      "type": "actionMenu",
+      "item": {
+        "name": "%menu.11.name",
+        "variableName": "SubFlashAction",
+        "id": 11,
+        "eepromAddress": -1,
+        "functionName": "actionItem",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 3,
+      "type": "enumItem",
+      "defaultValue": "0",
+      "item": {
+        "enumEntries": [
+          "%menu.12.enum.0",
+          "%menu.12.enum.1",
+          "%menu.12.enum.2"
+        ],
+        "name": "%menu.12.name",
+        "variableName": "SubFlashFoods",
+        "id": 12,
+        "eepromAddress": 7,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": true
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "%menu.10.name",
+        "variableName": "SubRam",
+        "id": 10,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": true
+      }
+    },
+    {
+      "parentId": 10,
+      "type": "rgbItem",
+      "defaultValue": "#FFAABBFF",
+      "item": {
+        "includeAlphaChannel": true,
+        "name": "%menu.14.name",
+        "variableName": "SubRamRGBA",
+        "id": 14,
+        "eepromAddress": -1,
+        "functionName": "rgbWasChanged",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 10,
+      "type": "rgbItem",
+      "defaultValue": "#DD00DDFF",
+      "item": {
+        "includeAlphaChannel": false,
+        "name": "%menu.15.name",
+        "variableName": "SubRamRGBR",
+        "id": 15,
+        "eepromAddress": -1,
+        "functionName": "callback1",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": true
+      }
+    },
+    {
+      "parentId": 10,
+      "type": "scrollItem",
+      "defaultValue": "1-",
+      "item": {
+        "itemWidth": 10,
+        "eepromOffset": 0,
+        "numEntries": 5,
+        "choiceMode": "ARRAY_IN_RAM",
+        "variable": "myScrollChoices",
+        "name": "%menu.16.name",
+        "variableName": "SubRamScrollRam",
+        "id": 16,
+        "eepromAddress": 9,
+        "functionName": "scrollRamFn",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": true
+      }
+    },
+    {
+      "parentId": 10,
+      "type": "scrollItem",
+      "defaultValue": "2-",
+      "item": {
+        "itemWidth": 5,
+        "eepromOffset": 400,
+        "numEntries": 3,
+        "choiceMode": "ARRAY_IN_EEPROM",
+        "name": "%menu.17.name",
+        "variableName": "SubRamScrollRom",
+        "id": 17,
+        "eepromAddress": 11,
+        "functionName": "scrollRomChange",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 10,
+      "type": "scrollItem",
+      "defaultValue": "2-",
+      "item": {
+        "itemWidth": 0,
+        "eepromOffset": 0,
+        "numEntries": 20,
+        "choiceMode": "CUSTOM_RENDERFN",
+        "name": "%menu.18.name",
+        "variableName": "SubRamCustomScroll",
+        "id": 18,
+        "eepromAddress": -1,
+        "functionName": "scrollCustomChanged",
+        "readOnly": false,
+        "localOnly": true,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 10,
+      "type": "runtimeList",
+      "item": {
+        "initialRows": 2,
+        "listCreationMode": "FLASH_ARRAY",
+        "name": "%menu.13.name",
+        "variableName": "SubRamList1",
+        "id": 13,
+        "eepromAddress": -1,
+        "functionName": "listItemWasSelected",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 10,
+      "type": "runtimeList",
+      "item": {
+        "initialRows": 6,
+        "listCreationMode": "RAM_ARRAY",
+        "name": "%menu.21.name",
+        "variableName": "SubRamListRam",
+        "id": 21,
+        "eepromAddress": -1,
+        "functionName": "listRamHasChanged",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": true
+      }
+    },
+    {
+      "parentId": 10,
+      "type": "runtimeList",
+      "item": {
+        "initialRows": 10,
+        "listCreationMode": "CUSTOM",
+        "name": "%menu.22.name",
+        "variableName": "SubRamListCustom",
+        "id": 22,
+        "eepromAddress": -1,
+        "functionName": "listCustomHasSelect",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "%menu.19.name",
+        "variableName": "Text",
+        "id": 19,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 19,
+      "type": "textItem",
+      "defaultValue": "",
+      "item": {
+        "textLength": 5,
+        "itemType": "PLAIN_TEXT",
+        "name": "%menu.20.name",
+        "variableName": "TextPlain",
+        "id": 20,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    }
+  ],
+  "codeOptions": {
+    "embeddedPlatform": "ARDUINO32",
+    "lastDisplayUuid": "e6342680-6fab-4d1b-ac08-ce8dbfc0974c",
+    "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
+    "lastRemoteUuids": [
+      "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
+    ],
+    "lastThemeUuid": "03c6b25f-db63-402a-8447-a5ce1484c14d",
+    "applicationUUID": "4b5a6563-df78-4352-8554-da66fefe8311",
+    "applicationName": "allMenuItemProject",
+    "lastProperties": [
+      {
+        "name": "DISPLAY_VARIABLE",
+        "latestValue": "gfx",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_ROTATION",
+        "latestValue": "2",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DOUBLE_BUFFER_ROWS",
+        "latestValue": "40",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "UPDATES_PER_SEC",
+        "latestValue": "5",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TOUCH_SEPARATOR",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TFT_TOUCH_SCREEN_REQUIRED",
+        "latestValue": "false",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TOUCH_CALIB_WIDTH",
+        "latestValue": "240",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TOUCH_CALIB_HEIGHT",
+        "latestValue": "320",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TOUCH_USE_RAW_TFT_FUNCTION",
+        "latestValue": "true",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "ORIENTATION_SEPARATOR",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TFT_TOUCH_SWAP_XY",
+        "latestValue": "false",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TFT_TOUCH_X_INVERTED",
+        "latestValue": "false",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TFT_TOUCH_Y_INVERTED",
+        "latestValue": "false",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "CALIB_SEPARATOR",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TFT_TOUCH_SCREEN_CALIBRATE",
+        "latestValue": "true",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TFT_TOUCH_CALIBRATION_STORAGE_LOC",
+        "latestValue": "400",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "SW_POLLING_MODE",
+        "latestValue": "SWITCHES_POLL_EVERYTHING",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SWITCH_IODEVICE",
+        "latestValue": "devicePins",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_A",
+        "latestValue": "2",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_B",
+        "latestValue": "3",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_PIN_OK",
+        "latestValue": "8",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_BACK_PIN",
+        "latestValue": "-1",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_NEXT_PIN",
+        "latestValue": "-1",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "PULLUP_LOGIC",
+        "latestValue": "true",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_IS_QUARTER_CYCLE",
+        "latestValue": "false",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ITEM_FONT",
+        "latestValue": "def:,1",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_FONT",
+        "latestValue": "def:,1",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "BORDER_FOR_ACTIONS",
+        "latestValue": "0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_SHOW_MODE",
+        "latestValue": "TITLE_FIRST_ROW",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "USE_TC_UNICODE",
+        "latestValue": "false",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "USE_SLIDER_ANALOG",
+        "latestValue": "true",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "NEED_EDITING_ICONS",
+        "latestValue": "false",
+        "subsystem": "THEME"
+      }
+    ],
+    "namingRecursive": true,
+    "useCppMain": true,
+    "saveLocation": "PROJECT_TO_CURRENT_WITH_GENERATED",
+    "usingSizedEEPROMStorage": true,
+    "eepromDefinition": "at24:80:PAGESIZE_AT24C32",
+    "authenticatorDefinition": "",
+    "projectIoExpanders": [
+      "deviceIO:"
+    ],
+    "menuInMenuCollection": {
+      "menuDefinitions": []
+    },
+    "packageNamespace": "",
+    "appIsModular": false
+  },
+  "stringLists": [
+    {
+      "id": 13,
+      "listItems": [
+        "%menu.13.list.0",
+        "%menu.13.list.1"
+      ]
+    }
+  ]
+}

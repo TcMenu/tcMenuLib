@@ -165,7 +165,7 @@ inline char* potentialProgramMemory(const char *x) {
 #define get_info_int(x) ((int16_t)pgm_read_word_near(x))
 #define get_info_uint(x) ((unsigned int)pgm_read_word_near(x))
 #define safeProgStrLen(x) (strlen_P(x))
-#else 
+#else
 #define TCMENU_DEFINED_PLATFORM PLATFORM_ARDUINO_32BIT
 #define PGM_TCM
 #define potentialProgramMemory(x) (x)
@@ -174,6 +174,15 @@ inline char* potentialProgramMemory(const char *x) {
 #define get_info_uint(x) ((unsigned int)(*x))
 #define get_info_callback(x) ((MenuCallbackFn)(*x))
 #define safeProgStrLen(x) (strlen(x))
+
+#if !defined(pgm_read_dword) && defined(__MBED__)
+# define pgm_read_byte(addr) (*(const unsigned char *)(addr))
+# define pgm_read_word(addr) (*(const unsigned short *)(addr))
+# define pgm_read_dword(addr) (*(const unsigned long *)(addr))
+# define pgm_read_float(addr) (*(const float *)(addr))
+# define pgm_read_ptr(addr) (*(addr))
+# define memcpy_P memcpy
+#endif // pgm_read_byte
 #endif
 
 #endif

@@ -194,9 +194,14 @@ public:
  * These are the only menu items that can presently be created dynamically at runtime.
  */
 class ListRuntimeMenuItem : public RuntimeMenuItem {
-private:
-	uint8_t activeItem;
 public:
+    enum ListMode: uint8_t { CUSTOM_RENDER, RAM_ARRAY, FLASH_ARRAY };
+private:
+    const char** dataArray;
+	uint8_t activeItem;
+    ListMode listMode = CUSTOM_RENDER;
+public:
+    ListRuntimeMenuItem(const AnyMenuInfo* info, int numberOfRows, const char* const* array, ListMode listMode, MenuItem* next = nullptr, bool isPgm = INFO_LOCATION_PGM);
     ListRuntimeMenuItem(const AnyMenuInfo* info, int numberOfRows, RuntimeRenderingFn renderFn, MenuItem* next = nullptr, bool isPgm = INFO_LOCATION_PGM);
     ListRuntimeMenuItem(menuid_t id, int numberOfRows, RuntimeRenderingFn renderFn, MenuItem* next = nullptr);
 
@@ -204,12 +209,14 @@ public:
 	RuntimeMenuItem* asParent();
 	RuntimeMenuItem* asBackMenu();
 
-	bool isActingAsParent() const { return itemPosition == LIST_PARENT_ITEM_POS; }
+    ListMode getListMode() const {return listMode;}
+    bool isActingAsParent() const { return itemPosition == LIST_PARENT_ITEM_POS; }
     uint8_t getActiveIndex() const { return activeItem; }
     void setActiveIndex(uint8_t idx) {
         activeItem = idx;
         setChanged(true);
     }
+    const char** getDataArray() { return dataArray; }
 };
 
 int defaultRtListCallback(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);

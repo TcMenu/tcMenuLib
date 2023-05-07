@@ -38,7 +38,11 @@ int defaultRtListCallback(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode,
             item->runCallback();
             return true;
         case RENDERFN_NAME:
-            item->copyNameToBuffer(buffer, bufferSize);
+            if(row != LIST_PARENT_ITEM_POS) {
+                ltoaClrBuff(buffer, row, 5, NOT_PADDED, bufferSize);
+            } else {
+                item->copyNameToBuffer(buffer, bufferSize);
+            }
             return true;
         case RENDERFN_EEPROM_POS:
             return int(item->getEepromPosition());
@@ -46,7 +50,26 @@ int defaultRtListCallback(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode,
             if(row == LIST_PARENT_ITEM_POS) {
                 buffer[0] = '>'; buffer[1]=0;
             } else {
-                ltoaClrBuff(buffer, row, 3, NOT_PADDED, bufferSize);
+                if(item->getMenuType() == MENUTYPE_RUNTIME_LIST && ((ListRuntimeMenuItem*)item)->getListMode() != ListRuntimeMenuItem::CUSTOM_RENDER) {
+                    auto list = reinterpret_cast<ListRuntimeMenuItem*>(item);
+                    auto data = list->getDataArray();
+                    buffer[0]=0;
+                    if(row < list->getNumberOfParts()) {
+                        if(list->getListMode() == ListRuntimeMenuItem::FLASH_ARRAY) {
+                            // flash assumes all in PROGMEM
+                            auto possibleData = pgm_read_ptr(&data[row]);
+                            if(possibleData) {
+                                strncpy_P(buffer, possibleData, bufferSize);
+                            }
+                        } else if(list->getListMode() == ListRuntimeMenuItem::RAM_ARRAY) {
+                            if(data[row]) {
+                                strncpy(buffer, data[row], bufferSize);
+                            }
+                        }
+                    }
+                } else {
+                    ltoaClrBuff(buffer, row, 3, NOT_PADDED, bufferSize);
+                }
             }
             break;
         default:
@@ -55,10 +78,13 @@ int defaultRtListCallback(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode,
 }
 
 ListRuntimeMenuItem::ListRuntimeMenuItem(const AnyMenuInfo* info, int numberOfRows, RuntimeRenderingFn renderFn, MenuItem* next, bool isPgm)
-        : RuntimeMenuItem(info, isPgm, MENUTYPE_RUNTIME_LIST, renderFn, 0xff, numberOfRows, next), activeItem(0) { }
+        : RuntimeMenuItem(info, isPgm, MENUTYPE_RUNTIME_LIST, renderFn, 0xff, numberOfRows, next), dataArray(nullptr), activeItem(0) { }
+
+ListRuntimeMenuItem::ListRuntimeMenuItem(const AnyMenuInfo* info, int numberOfRows, const char* const* array, ListRuntimeMenuItem::ListMode listMode, MenuItem* next, bool isPgm)
+        : RuntimeMenuItem(info, isPgm, MENUTYPE_RUNTIME_LIST, defaultRtListCallback, 0xff, numberOfRows, next), dataArray(array), activeItem(0), listMode(listMode) { }
 
 ListRuntimeMenuItem::ListRuntimeMenuItem(menuid_t id, int numberOfRows, RuntimeRenderingFn renderFn, MenuItem* next)
-	: RuntimeMenuItem(MENUTYPE_RUNTIME_LIST, id, renderFn, 0xff, numberOfRows, next), activeItem(0) { }
+	: RuntimeMenuItem(MENUTYPE_RUNTIME_LIST, id, renderFn, 0xff, numberOfRows, next), dataArray(nullptr), activeItem(0) { }
 
 RuntimeMenuItem *ListRuntimeMenuItem::getChildItem(int pos) {
     menuType = MENUTYPE_RUNTIME_LIST;
