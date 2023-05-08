@@ -128,10 +128,7 @@ namespace tcgfx {
             pgmTitle = appTitle;
         }
 
-        void setTitleMode(TitleMode mode) {
-            titleMode = mode;
-            displayPropertiesHaveChanged();
-        }
+        void setTitleMode(TitleMode mode);
 
         /**
          * set the use of sliders by default for all integer items
@@ -303,7 +300,10 @@ namespace tcgfx {
         /**
          * Force the renderer to completely recalculate the display parameters next time it's drawn.
          */
-        void displayPropertiesHaveChanged() { currentRootMenu = nullptr; }
+        void displayPropertiesHaveChanged() {
+            currentRootMenu = nullptr;
+            redrawMode = MENUDRAW_COMPLETE_REDRAW;
+        }
 
     protected:
         /**

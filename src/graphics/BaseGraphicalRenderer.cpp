@@ -457,6 +457,12 @@ BaseDialog* BaseGraphicalRenderer::getDialog() {
     return dialog;
 }
 
+void BaseGraphicalRenderer::setTitleMode(BaseGraphicalRenderer::TitleMode mode) {
+    titleMode = mode;
+    displayPropertiesHaveChanged();
+    menuMgr.changeMenu(menuMgr.getCurrentMenu());
+}
+
 void preparePropertiesFromConfig(ConfigurableItemDisplayPropertiesFactory& factory, const ColorGfxMenuConfig<const void*>* gfxConfig, int titleHeight, int itemHeight) {
     // TEXT, BACKGROUND, HIGHLIGHT1, HIGHLIGHT2, SELECTED_FG, SELECTED_BG
     color_t paletteItems[] { gfxConfig->fgItemColor, gfxConfig->bgItemColor, gfxConfig->bgSelectColor, gfxConfig->fgSelectColor};
