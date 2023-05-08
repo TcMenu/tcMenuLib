@@ -13,19 +13,19 @@
 
 #include <Arduino.h>
 #include <tcMenu.h>
-#include "tcMenuTfteSpi.h"
+#include "tcMenuU8g2.h"
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
 #include <IoAbstraction.h>
 #include <EepromItemStorage.h>
-#include <EepromAbstractionWire.h>
+#include <ArduinoEEPROMAbstraction.h>
 #include "allMenuItemProject_langSelect.h"
 
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
-extern TFT_eSPI gfx;
-extern TfteSpiDrawable gfxDrawable;
+extern U8G2_SH1106_128X64_NONAME_F_HW_I2C gfx;
+extern U8g2Drawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
 
 // Any externals needed by IO expanders, EEPROMs etc

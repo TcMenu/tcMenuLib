@@ -230,9 +230,40 @@ void RgbColor32::asHtmlString(char *buffer, size_t bufferSize, bool includeAlpha
     else {
         buffer[7] = 0;
     }
-
 }
+
+RgbPrintMode Rgb32MenuItem::printMode = DECIMAL;
+
 void wrapForEdit(int val, int idx, uint8_t row, char* buffer, int bufferSize, bool forTime = false);
+
+void rgbFormatHtml(char* buffer, int bufferSize, Rgb32MenuItem* item, int row) {
+    item->getUnderlying()->asHtmlString(buffer, bufferSize, item->isAlphaInUse());
+
+    if (row > 0 && row < 5) {
+        --row;
+        int start = (row * 2) + 1;
+        menuMgr.setEditorHints(CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT, start, start + 2);
+    }
+}
+
+void rgbFormatDecimal(char* buffer, int bufferSize, Rgb32MenuItem* item, int row) {
+    buffer[0] = 'R';
+    buffer[1] = 0;
+    auto data = item->getUnderlying();
+    wrapForEdit(data->red, 0, row, buffer, bufferSize, false);
+    appendChar(buffer, ' ', bufferSize);
+    appendChar(buffer, 'G', bufferSize);
+    wrapForEdit(data->green, 1, row, buffer, bufferSize, false);
+    appendChar(buffer, ' ', bufferSize);
+    appendChar(buffer, 'B', bufferSize);
+    wrapForEdit(data->blue, 2, row, buffer, bufferSize, false);
+    if(item->isAlphaInUse()) {
+        appendChar(buffer, ' ', bufferSize);
+        appendChar(buffer, 'A', bufferSize);
+        wrapForEdit(data->alpha, 3, row, buffer, bufferSize, false);
+    }
+}
+
 int rgbAlphaItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
     if (item->getMenuType() != MENUTYPE_COLOR_VALUE) return 0;
     auto rgbItem = reinterpret_cast<Rgb32MenuItem*>(item);
@@ -245,19 +276,13 @@ int rgbAlphaItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, 
             return true;
         }
         case RENDERFN_VALUE: {
-            buffer[0] = 'R';
-            buffer[1] = 0;
-            wrapForEdit(data->red, 0, row, buffer, bufferSize, false);
-            appendChar(buffer, ' ', bufferSize);
-            appendChar(buffer, 'G', bufferSize);
-            wrapForEdit(data->green, 1, row, buffer, bufferSize, false);
-            appendChar(buffer, ' ', bufferSize);
-            appendChar(buffer, 'B', bufferSize);
-            wrapForEdit(data->blue, 2, row, buffer, bufferSize, false);
-            if(rgbItem->isAlphaInUse()) {
-                appendChar(buffer, ' ', bufferSize);
-                appendChar(buffer, 'A', bufferSize);
-                wrapForEdit(data->alpha, 3, row, buffer, bufferSize, false);
+            switch(Rgb32MenuItem::getRgbPrintMode()) {
+                case DECIMAL:
+                    rgbFormatDecimal(buffer, bufferSize, rgbItem, row);
+                    break;
+                case HEX_HTML:
+                    rgbFormatHtml(buffer, bufferSize, rgbItem, row);
+                    break;
             }
             return true;
         }

@@ -40,9 +40,7 @@ int defaultRtListCallback(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode,
         case RENDERFN_NAME:
             if(row != LIST_PARENT_ITEM_POS) {
                 ltoaClrBuff(buffer, row, 5, NOT_PADDED, bufferSize);
-            } else {
-                item->copyNameToBuffer(buffer, bufferSize);
-            }
+            } else buffer[0]=0;
             return true;
         case RENDERFN_EEPROM_POS:
             return int(item->getEepromPosition());
@@ -57,7 +55,7 @@ int defaultRtListCallback(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode,
                     if(row < list->getNumberOfParts()) {
                         if(list->getListMode() == ListRuntimeMenuItem::FLASH_ARRAY) {
                             // flash assumes all in PROGMEM
-                            auto possibleData = pgm_read_ptr(&data[row]);
+                            auto possibleData = (const char*)pgm_read_ptr(&data[row]);
                             if(possibleData) {
                                 strncpy_P(buffer, possibleData, bufferSize);
                             }
@@ -67,14 +65,14 @@ int defaultRtListCallback(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode,
                             }
                         }
                     }
-                } else {
-                    ltoaClrBuff(buffer, row, 3, NOT_PADDED, bufferSize);
                 }
+                ltoaClrBuff(buffer, row, 3, NOT_PADDED, bufferSize);
             }
             break;
         default:
             return false;
     }
+    return false;
 }
 
 ListRuntimeMenuItem::ListRuntimeMenuItem(const AnyMenuInfo* info, int numberOfRows, RuntimeRenderingFn renderFn, MenuItem* next, bool isPgm)
@@ -456,12 +454,12 @@ TextMenuItem::TextMenuItem(RuntimeRenderingFn customRenderFn, const char* initia
 }
 
 TextMenuItem::TextMenuItem(const AnyMenuInfo* info, const char* initial, int size, MenuItem* next, bool isPgm)
-        : EditableMultiPartMenuItem(info, isPgm, menuType, size, textItemRenderFn, next) {
+        : EditableMultiPartMenuItem(info, isPgm, MENUTYPE_TEXT_VALUE, size, textItemRenderFn, next) {
     initTextItem(initial);
 }
 
 TextMenuItem::TextMenuItem(const AnyMenuInfo* info, RuntimeRenderingFn customRenderFn, const char* initial, int size, MenuItem* next, bool isPgm)
-        : EditableMultiPartMenuItem(info, isPgm, menuType, size, customRenderFn, next) {
+        : EditableMultiPartMenuItem(info, isPgm, MENUTYPE_TEXT_VALUE, size, customRenderFn, next) {
     initTextItem(initial);
 }
 

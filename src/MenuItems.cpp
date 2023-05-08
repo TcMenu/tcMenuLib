@@ -69,7 +69,7 @@ uint8_t MenuItem::copyNameToBuffer(char* buf, int offset, int size) const {
     // falling through to the code below
     if(menuType == MENUTYPE_RUNTIME_LIST && info != nullptr) {
         auto pList = reinterpret_cast<const ListRuntimeMenuItem*>(this);
-        if(pList->getActiveIndex() != LIST_PARENT_ITEM_POS) {
+        if(!pList->isActingAsParent()) {
             asRuntimeItem(this)->copyRuntimeName(buf + offset, size - offset);
             return strlen(buf + offset) + offset;
         }

@@ -216,14 +216,20 @@ public:
 int rgbAlphaItemRenderFn(RuntimeMenuItem *item, uint8_t row, RenderFnMode mode, char *buffer, int bufferSize);
 
 /**
+ * Defines which printing to use for RGB items globally, either DECIMAL which is more user friendly but takes more
+ * space, or HEX_HTML which is more much compact and uses HTML format.
+ */
+enum RgbPrintMode { DECIMAL, HEX_HTML };
+
+/**
  * A Menu item that can display and edit RGB values that are 32 bits wide, that is 8 bit per element and
  * an optional alpha channel. This is based on editable runtime menu item.
  * Rendering function is `rgbAlphaItemRenderFn`
  */
 class Rgb32MenuItem : public EditableMultiPartMenuItem {
-private:
     RgbColor32 data;
     bool alphaChannel;
+    static RgbPrintMode printMode;
 public:
 
     /**
@@ -292,6 +298,9 @@ public:
      * @return true if the alpha channel is in use for this menuitem, otherwise false.
      */
     bool isAlphaInUse() const { return alphaChannel; }
+
+    static void setRgbPrintMode(RgbPrintMode mode) { printMode = mode; }
+    static RgbPrintMode getRgbPrintMode() { return printMode; }
 };
 
 #endif //SCROLL_CHOICE_ENUM_MENU_ITEM_H

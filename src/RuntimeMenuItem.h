@@ -90,7 +90,7 @@ public:
 	int getRuntimeId() const { return int(id); }
 	int getRuntimeEeprom() const { return renderFn((RuntimeMenuItem*)this, itemPosition, RENDERFN_EEPROM_POS, nullptr, 0); }
 	uint8_t getNumberOfParts() const { return noOfParts; }
-	void copyRuntimeName(char* buffer, int bufferSize) const { renderFn((RuntimeMenuItem*)this, itemPosition, RENDERFN_NAME, buffer, bufferSize); }
+	void copyRuntimeName(char* buffer, int bufferSize) const { renderFn((RuntimeMenuItem*)this, itemPosition, RENDERFN_NAME, buffer, bufferSize);}
 
     uint8_t getNumberOfRows() const { return noOfParts; }
     uint8_t getItemPosition() const { return itemPosition; }
@@ -197,7 +197,7 @@ class ListRuntimeMenuItem : public RuntimeMenuItem {
 public:
     enum ListMode: uint8_t { CUSTOM_RENDER, RAM_ARRAY, FLASH_ARRAY };
 private:
-    const char** dataArray;
+    const char* const* dataArray;
 	uint8_t activeItem;
     ListMode listMode = CUSTOM_RENDER;
 public:
@@ -216,7 +216,7 @@ public:
         activeItem = idx;
         setChanged(true);
     }
-    const char** getDataArray() { return dataArray; }
+    const char* const* getDataArray() { return dataArray; }
 };
 
 int defaultRtListCallback(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
