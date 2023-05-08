@@ -2,7 +2,7 @@
 #include "generated/allMenuItemProject_menu.h"
 
 // This variable is the RAM data for scroll choice item %menu.16.name
-char myScrollChoices[] = "1\0        2\0        3\0        4\0        5\0        ~";
+char myScrollChoices[] = "Test\0     Case\0     Mem\0      Check\0    Project\0  ~";
 
 
 void setup() {
@@ -15,8 +15,19 @@ void setup() {
 
     Rgb32MenuItem::setRgbPrintMode(HEX_HTML);
 
+    // using list RAM Array mode the designer creates an array of the size intial items for you and fills it with nullptr,
+    // you can then simply "fill it in". This is easier than using the list in custom mode, but still gives you some
+    // freedom. IMPORTANTLY you must never set the rows to be bigger than initial rows.
+    enumStrSubRamListRam[0] = (char*)"Item123";
+    enumStrSubRamListRam[1] = (char*)"Another32";
+    enumStrSubRamListRam[2] = (char*)"Abcdef";
+    enumStrSubRamListRam[3] = (char*)"Xyz";
+    enumStrSubRamListRam[4] = (char*)"123";
+    enumStrSubRamListRam[5] = (char*)"456";
+
     setupMenu();
 
+    menuMgr.getEepromAbstraction()->writeArrayToRom(400, (const uint8_t*)"Rom12Test1Test2 ", 16);
 }
 
 void loop() {

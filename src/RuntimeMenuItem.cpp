@@ -47,28 +47,29 @@ int defaultRtListCallback(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode,
         case RENDERFN_VALUE:
             if(row == LIST_PARENT_ITEM_POS) {
                 buffer[0] = '>'; buffer[1]=0;
-            } else {
-                if(item->getMenuType() == MENUTYPE_RUNTIME_LIST && ((ListRuntimeMenuItem*)item)->getListMode() != ListRuntimeMenuItem::CUSTOM_RENDER) {
-                    auto list = reinterpret_cast<ListRuntimeMenuItem*>(item);
-                    auto data = list->getDataArray();
-                    buffer[0]=0;
-                    if(row < list->getNumberOfParts()) {
-                        if(list->getListMode() == ListRuntimeMenuItem::FLASH_ARRAY) {
-                            // flash assumes all in PROGMEM
-                            auto possibleData = (const char*)pgm_read_ptr(&data[row]);
-                            if(possibleData) {
-                                strncpy_P(buffer, possibleData, bufferSize);
-                            }
-                        } else if(list->getListMode() == ListRuntimeMenuItem::RAM_ARRAY) {
-                            if(data[row]) {
-                                strncpy(buffer, data[row], bufferSize);
-                            }
+            } else if(item->getMenuType() == MENUTYPE_RUNTIME_LIST && ((ListRuntimeMenuItem*)item)->getListMode() != ListRuntimeMenuItem::CUSTOM_RENDER) {
+                auto list = reinterpret_cast<ListRuntimeMenuItem*>(item);
+                auto data = list->getDataArray();
+                buffer[0]=0;
+                if(row < list->getNumberOfParts()) {
+                    if(list->getListMode() == ListRuntimeMenuItem::FLASH_ARRAY) {
+                        // flash assumes all in PROGMEM
+                        auto possibleData = (const char*)pgm_read_ptr(&data[row]);
+                        if(possibleData) {
+                            strncpy_P(buffer, possibleData, bufferSize);
+                        }
+                    } else {
+                        if(data[row]) {
+                            strncpy(buffer, data[row], bufferSize);
                         }
                     }
+                } else {
+                    ltoaClrBuff(buffer, row, 3, NOT_PADDED, bufferSize);
                 }
+            } else {
                 ltoaClrBuff(buffer, row, 3, NOT_PADDED, bufferSize);
             }
-            break;
+            return true;
         default:
             return false;
     }
