@@ -6,6 +6,7 @@
 #include "tcMenu.h"
 #include "ScrollChoiceMenuItem.h"
 #include <IoLogging.h>
+#include <TextUtilities.h>
 
 ScrollChoiceMenuItem::ScrollChoiceMenuItem(int id, RuntimeRenderingFn renderFn, uint8_t currentSel,
                                            const char *enumItemsInRam, int itemSize, int numberOfItems,
@@ -175,13 +176,6 @@ Rgb32MenuItem::Rgb32MenuItem(const AnyMenuInfo* info, const RgbColor32& col, boo
     data = col;
 }
 
-uint8_t hexValueOf(char val) {
-    if(val >= '0' && val <= '9') return val - '0';
-    val = (char)toupper(val);
-    if(val >= 'A' && val <= 'F') return val - ('A' - 10);
-    return 0;
-}
-
 RgbColor32::RgbColor32(const char *htmlColor) {
     alpha = 255;
     auto len = strlen(htmlColor);
@@ -202,11 +196,6 @@ RgbColor32::RgbColor32(const char *htmlColor) {
     }
 
     red = green = blue = 0;
-}
-
-char hexChar(uint8_t val) {
-    if(val < 9) return char(val + '0');
-    return char(val - 10) + 'A';
 }
 
 void RgbColor32::asHtmlString(char *buffer, size_t bufferSize, bool includeAlpha) const {
