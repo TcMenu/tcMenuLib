@@ -162,6 +162,16 @@ void MenuManager::setItemActive(MenuItem* item) {
         auto oldActive = findCurrentActive();
         if(oldActive) oldActive->setActive(false);
         item->setActive(true);
+
+        // change the encoder value if there is an encoder present
+        if(renderer->getRendererType() != RENDER_TYPE_NOLOCAL && switches.getEncoder() != nullptr) {
+            int activeIdx = reinterpret_cast<BaseMenuRenderer*>(renderer)->findItemIndex(getCurrentMenu(), item);
+            if(activeIdx >= 0 && activeIdx <= switches.getEncoder()->getMaximumValue()) {
+                switches.getEncoder()->setCurrentReading(activeIdx);
+            }
+        }
+
+        // and notify that we have just changed the value.
         for(auto n : structureNotifier) {
             if(n) n->activeItemHasChanged(item);
         }
@@ -230,7 +240,10 @@ void MenuManager::actionOnCurrentItem(MenuItem* toEdit) {
 				listItem->asParent();
 			}
 		}
-		else navigateToMenu(toEdit);
+		else {
+            notifyEditEnd(getCurrentMenu());
+            navigateToMenu(toEdit);
+        }
 	}
 	else if (toEdit->getMenuType() == MENUTYPE_BACK_VALUE) {
 	    toEdit->triggerCallback();

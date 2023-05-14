@@ -503,8 +503,12 @@ public:
      */
     void resetObservers();
 
-protected:
+	/**
+	 * Allows you to enable an item for editing directly without going through the UI
+	 * @param item the item to become the active edit, the right submenu should have already been enabled first
+	 */
 	void setupForEditing(MenuItem* item);
+protected:
 	void actionOnCurrentItem(MenuItem * toEdit);
     void actionOnSubMenu(MenuItem* nextSub);
 
