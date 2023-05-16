@@ -110,6 +110,7 @@ enum AckResponseStatus {
 #define FIELD_REMOTE_NO   msgFieldToWord('R', 'N')
 #define FIELD_FLOAT_DP    msgFieldToWord('F', 'D')
 #define FIELD_UUID        msgFieldToWord('U', 'U')
+#define FIELD_SERIAL_NO   msgFieldToWord('U', 'S')
 #define FIELD_CORRELATION msgFieldToWord('I', 'C')
 #define FIELD_ACK_STATUS  msgFieldToWord('S', 'T')
 #define FIELD_HEADER      msgFieldToWord('H', 'F')

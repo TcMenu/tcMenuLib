@@ -14,6 +14,21 @@
 char szGlobalBuffer[16];
 #endif
 
+// only if we are implementing the serial number storage
+#ifndef TC_MANUAL_SERIAL_NO_IMPL
+
+// if not defined give a developer one of one short of a billion
+#ifndef TC_BOARD_SERIAL_NO
+#define TC_BOARD_SERIAL_NO 999999999L
+#endif //!TC_BOARD_SERIAL_NO
+
+// and implement the function
+const long glTcSerialNumber PROGMEM = TC_BOARD_SERIAL_NO;
+uint32_t getBoardSerialNumber() {
+    return pgm_read_dword(&glTcSerialNumber);
+}
+#endif // !TC_MANUAL_SERIAL_NO_IMPL
+
 uint8_t safeProgCpy(char* dst, const char* pgmSrc, uint8_t size) {
     uint8_t pos = 0;
     char nm = get_info_char(pgmSrc);
@@ -32,8 +47,10 @@ void showVersionDialog(const ConnectorLocalInfo *localInfo) {
     withMenuDialogIfAvailable([](MenuBasedDialog *dialog) {
         dialog->setButtons(BTNTYPE_NONE, BTNTYPE_CLOSE);
         dialog->show(localInfoStatic->name, false, nullptr);
-        char sz[10];
+        char sz[25];
         tccore::copyTcMenuVersion(sz, sizeof(sz));
+        strncat(sz, " S/N:", sizeof(sz) - strlen(sz) - 1);
+        fastltoa(sz, (long)getBoardSerialNumber(), 9, NOT_PADDED, sizeof sz);
         dialog->copyIntoBuffer(sz);
     });
 }

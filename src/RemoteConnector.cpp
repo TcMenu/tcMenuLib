@@ -365,6 +365,7 @@ void TagValueRemoteConnector::encodeJoin() {
     char szName[40];
     safeProgCpy(szName, localInfoPgm->uuid, sizeof(szName));
     transport->writeField(FIELD_UUID, szName);
+    transport->writeFieldLong(FIELD_SERIAL_NO, (long)getBoardSerialNumber());
     safeProgCpy(szName, localInfoPgm->name, sizeof(szName));
     transport->writeField(FIELD_MSG_NAME, szName);
     transport->writeFieldInt(FIELD_VERSION, API_VERSION);
