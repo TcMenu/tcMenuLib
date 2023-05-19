@@ -61,7 +61,7 @@ void MenuEditingKeyListener::keyPressed(char key, bool held) {
             if(!currentActive) return;
             uint16_t indexOfActive = offsetOfCurrentActive(currentActive) + dir;
             uint8_t numItems = itemCount(menuMgr.getCurrentMenu(), false);
-            if (indexOfActive > numItems) return;
+            if (indexOfActive >= numItems) return;
             MenuItem *newActive = getItemAtPosition(menuMgr.getCurrentMenu(), indexOfActive);
             if (newActive) {
                 menuMgr.setItemActive(newActive);
