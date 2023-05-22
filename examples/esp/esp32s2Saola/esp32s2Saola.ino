@@ -5,7 +5,7 @@
 // Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
 //
 
-#include "esp32s2Saola_menu.h"
+#include "generated/esp32s2Saola_menu.h"
 #include <PlatformDetermination.h>
 
 #include <TaskManagerIO.h>
@@ -17,7 +17,6 @@
 #include "u8g2DashConfig.h"
 
 #define MENU_WIFIMODE_STATION 0
-const char pgmsListHeader[] PROGMEM = "List items";
 bool  connectedToWiFi = false;
 void startWiFiAndListener();
 
@@ -57,35 +56,6 @@ void setup() {
 
 void loop() {
     taskManager.runLoop();
-}
-
-
-// The below link discusses list items in detail
-// https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
-int CALLBACK_FUNCTION fnExtrasMyListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
-   switch(mode) {
-    case RENDERFN_INVOKE:
-        serdebugF2("Selection of ", row);
-        return true;
-    case RENDERFN_NAME:
-        if(row == LIST_PARENT_ITEM_POS) {
-            safeProgCpy(buffer, pgmsListHeader, bufferSize);
-        } else {
-            strcpy(buffer, "Row");
-            fastltoa(buffer, row, 2, NOT_PADDED, bufferSize);
-        }
-        return true;
-    case RENDERFN_VALUE:
-        if(row == LIST_PARENT_ITEM_POS) {
-            buffer[0]=0;
-        } else {
-            strcpy(buffer, "Val");
-            fastltoa(buffer, row, 2, NOT_PADDED, bufferSize);
-        }
-        return true;
-    case RENDERFN_EEPROM_POS: return 0xffffU; // lists are generally not saved to EEPROM
-    default: return false;
-    }
 }
 
 void startWiFiAndListener() {
@@ -136,4 +106,21 @@ void CALLBACK_FUNCTION pressMeActionRun(int id) {
         dlg->showRam("Saved", false);
         dlg->copyIntoBuffer("to flash");
     }
+}
+
+
+// This callback needs to be implemented by you, see the below docs:
+//  1. List Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
+//  2. ScrollChoice Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/scrollchoice-menu-item/
+int CALLBACK_FUNCTION fnExtrasMyListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
+    if(mode == RENDERFN_VALUE && row != LIST_PARENT_ITEM_POS) {
+        strncpy(buffer, "Val", bufferSize);
+        fastltoa(buffer, row, 3, NOT_PADDED, bufferSize);
+        return true;
+    }
+    return defaultRtListCallback(item, row, mode, buffer, bufferSize);
+}
+
+void CALLBACK_FUNCTION onListSelected(int id) {
+    Serial.print("List item select "); Serial.println(menuExtrasMyList.getActiveIndex());
 }

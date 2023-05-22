@@ -270,5 +270,6 @@
     },
     "packageNamespace": "",
     "appIsModular": false
-  }
+  },
+  "stringLists": []
 }

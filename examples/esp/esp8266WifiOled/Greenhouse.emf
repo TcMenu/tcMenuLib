@@ -306,7 +306,6 @@
     "embeddedPlatform": "ARDUINO_ESP8266",
     "lastDisplayUuid": "fd998437-c4b2-4386-ba88-d0ae7c20620b",
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
-    "lastRemoteUuid": "46c30011-cac6-4598-a7b8-b0630d55daab",
     "lastRemoteUuids": [
       "46c30011-cac6-4598-a7b8-b0630d55daab"
     ],
@@ -471,8 +470,8 @@
       }
     ],
     "namingRecursive": false,
-    "saveToSrc": false,
     "useCppMain": false,
+    "saveLocation": "ALL_TO_CURRENT",
     "usingSizedEEPROMStorage": false,
     "eepromDefinition": "eeprom:",
     "authenticatorDefinition": "rom:100:6",
@@ -485,5 +484,6 @@
     },
     "packageNamespace": "",
     "appIsModular": false
-  }
+  },
+  "stringLists": []
 }

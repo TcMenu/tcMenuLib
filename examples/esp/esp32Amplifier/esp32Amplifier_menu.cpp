@@ -31,21 +31,22 @@ TagValueRemoteServerConnection ethernetConnection(ethernetTransport, ethernetIni
 
 // Global Menu Item declarations
 const PROGMEM char pgmStrConnectivityAuthenticatorText[] = { "Authenticator" };
-EepromAuthenticationInfoMenuItem menuConnectivityAuthenticator(pgmStrConnectivityAuthenticatorText, NO_CALLBACK, 27, NULL);
+EepromAuthenticationInfoMenuItem menuConnectivityAuthenticator(pgmStrConnectivityAuthenticatorText, NO_CALLBACK, 27, nullptr);
 const PROGMEM char pgmStrConnectivityIoTMonitorText[] = { "IoT Monitor" };
 RemoteMenuItem menuConnectivityIoTMonitor(pgmStrConnectivityIoTMonitorText, 26, &menuConnectivityAuthenticator);
-RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityPasscodeRtCall, textItemRenderFn, "Passcode", 37, NO_CALLBACK)
-TextMenuItem menuConnectivityPasscode(fnConnectivityPasscodeRtCall, "", 19, 20, &menuConnectivityIoTMonitor);
-RENDERING_CALLBACK_NAME_INVOKE(fnConnectivitySSIDRtCall, textItemRenderFn, "SSID", 17, NO_CALLBACK)
-TextMenuItem menuConnectivitySSID(fnConnectivitySSIDRtCall, "", 18, 20, &menuConnectivityPasscode);
-RENDERING_CALLBACK_NAME_INVOKE(fnConnectivityIPAddressRtCall, ipAddressRenderFn, "IP address", -1, NO_CALLBACK)
-IpAddressMenuItem menuConnectivityIPAddress(fnConnectivityIPAddressRtCall, IpAddressStorage(127, 0, 0, 1), 13, &menuConnectivitySSID);
+const PROGMEM AnyMenuInfo minfoConnectivityPasscode = { "Passcode", 19, 37, 0, NO_CALLBACK };
+TextMenuItem menuConnectivityPasscode(&minfoConnectivityPasscode, "", 20, &menuConnectivityIoTMonitor, INFO_LOCATION_PGM);
+const PROGMEM AnyMenuInfo minfoConnectivitySSID = { "SSID", 18, 17, 0, NO_CALLBACK };
+TextMenuItem menuConnectivitySSID(&minfoConnectivitySSID, "", 20, &menuConnectivityPasscode, INFO_LOCATION_PGM);
+const PROGMEM AnyMenuInfo minfoConnectivityIPAddress = { "IP address", 13, 0xffff, 0, NO_CALLBACK };
+IpAddressMenuItem menuConnectivityIPAddress(&minfoConnectivityIPAddress, IpAddressStorage(127, 0, 0, 1), &menuConnectivitySSID, INFO_LOCATION_PGM);
 const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 12, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackConnectivity(&minfoConnectivity, &menuConnectivityIPAddress, INFO_LOCATION_PGM);
-SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL, INFO_LOCATION_PGM);
+SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, nullptr, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoStatusTest = { "Test", 28, 0xffff, 65535, NO_CALLBACK, -5000, 10, "U" };
-AnalogMenuItem menuStatusTest(&minfoStatusTest, 0, NULL, INFO_LOCATION_PGM);
-ListRuntimeMenuItem menuStatusDataList(21, 0, fnStatusDataListRtCall, &menuStatusTest);
+AnalogMenuItem menuStatusTest(&minfoStatusTest, 0, nullptr, INFO_LOCATION_PGM);
+const PROGMEM AnyMenuInfo minfoStatusDataList = { "Data List", 21, 0xffff, 0, NO_CALLBACK };
+ListRuntimeMenuItem menuStatusDataList(&minfoStatusDataList, 0, fnStatusDataListRtCall, &menuStatusTest, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoStatusShowDialogs = { "Show Dialogs", 20, 0xffff, 0, onShowDialogs };
 ActionMenuItem menuStatusShowDialogs(&minfoStatusShowDialogs, &menuStatusDataList, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoStatusRightVU = { "Right VU", 16, 0xffff, 30000, NO_CALLBACK, -20000, 1000, "dB" };
@@ -65,18 +66,19 @@ const PROGMEM SubMenuInfo minfoStatus = { "Status", 6, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackStatus(&minfoStatus, &menuStatusAmpStatus, INFO_LOCATION_PGM);
 SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuConnectivity, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoSettingsSaveSettings = { "Save settings", 25, 0xffff, 0, onSaveSettings };
-ActionMenuItem menuSettingsSaveSettings(&minfoSettingsSaveSettings, NULL, INFO_LOCATION_PGM);
+ActionMenuItem menuSettingsSaveSettings(&minfoSettingsSaveSettings, nullptr, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoSettingsValveHeating = { "Valve Heating", 17, 15, 600, valveHeatingChanged, 0, 10, "s" };
 AnalogMenuItem menuSettingsValveHeating(&minfoSettingsValveHeating, 0, &menuSettingsSaveSettings, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoSettingsWarmUpTime = { "Warm up time", 11, 7, 300, warmUpChanged, 0, 10, "s" };
 AnalogMenuItem menuSettingsWarmUpTime(&minfoSettingsWarmUpTime, 0, &menuSettingsValveHeating, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoChannelSettingsUpdateSettings = { "Update Settings", 24, 0xffff, 0, onChannelSetttingsUpdate };
-ActionMenuItem menuChannelSettingsUpdateSettings(&minfoChannelSettingsUpdateSettings, NULL, INFO_LOCATION_PGM);
-RENDERING_CALLBACK_NAME_INVOKE(fnChannelSettingsNameRtCall, textItemRenderFn, "Name", -1, NO_CALLBACK)
-TextMenuItem menuChannelSettingsName(fnChannelSettingsNameRtCall, "", 22, 15, &menuChannelSettingsUpdateSettings);
+ActionMenuItem menuChannelSettingsUpdateSettings(&minfoChannelSettingsUpdateSettings, nullptr, INFO_LOCATION_PGM);
+const PROGMEM AnyMenuInfo minfoChannelSettingsName = { "Name", 22, 0xffff, 0, NO_CALLBACK };
+TextMenuItem menuChannelSettingsName(&minfoChannelSettingsName, "", 15, &menuChannelSettingsUpdateSettings, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoChannelSettingsLevelTrim = { "Level Trim", 8, 9, 20, NO_CALLBACK, -10, 2, "dB" };
 AnalogMenuItem menuChannelSettingsLevelTrim(&minfoChannelSettingsLevelTrim, 0, &menuChannelSettingsName, INFO_LOCATION_PGM);
-ScrollChoiceMenuItem menuChannelSettingsChannel(23, fnChannelSettingsChannelRtCall, 0, 3, &menuChannelSettingsLevelTrim);
+const PROGMEM AnyMenuInfo minfoChannelSettingsChannel = { "Channel Num", 23, 0xffff, 0, NO_CALLBACK };
+ScrollChoiceMenuItem menuChannelSettingsChannel(&minfoChannelSettingsChannel, fnChannelSettingsChannelRtCall, 0, 3, &menuChannelSettingsLevelTrim, INFO_LOCATION_PGM);
 const PROGMEM SubMenuInfo minfoSettingsChannelSettings = { "Channel Settings", 7, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackSettingsChannelSettings(&minfoSettingsChannelSettings, &menuChannelSettingsChannel, INFO_LOCATION_PGM);
 SubMenuItem menuSettingsChannelSettings(&minfoSettingsChannelSettings, &menuBackSettingsChannelSettings, &menuSettingsWarmUpTime, INFO_LOCATION_PGM);
@@ -87,8 +89,8 @@ const PROGMEM BooleanMenuInfo minfoMute = { "Mute", 4, 0xffff, 1, onMuteSound, N
 BooleanMenuItem menuMute(&minfoMute, false, &menuSettings, INFO_LOCATION_PGM);
 const PROGMEM BooleanMenuInfo minfoDirect = { "Direct", 3, 6, 1, onAudioDirect, NAMING_TRUE_FALSE };
 BooleanMenuItem menuDirect(&minfoDirect, false, &menuMute, INFO_LOCATION_PGM);
-RENDERING_CALLBACK_NAME_INVOKE(fnChannelsRtCall, enumItemRenderFn, "Channel", 4, onChannelChanged)
-ScrollChoiceMenuItem menuChannels(2, fnChannelsRtCall, 0, 150, 16, 3, &menuDirect);
+const PROGMEM AnyMenuInfo minfoChannels = { "Channel", 2, 4, 0, onChannelChanged };
+ScrollChoiceMenuItem menuChannels(&minfoChannels, 0, 150, 16, 3, &menuDirect, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoVolume = { "Volume", 1, 2, 255, onVolumeChanged, -180, 2, "dB" };
 AnalogMenuItem menuVolume(&minfoVolume, 0, &menuChannels, INFO_LOCATION_PGM);
 
@@ -100,8 +102,8 @@ void setupMenu() {
     menuMgr.setAuthenticator(&authManager);
     // Now add any readonly, non-remote and visible flags.
     menuConnectivityIPAddress.setReadOnly(true);
-    menuConnectivityIoTMonitor.setLocalOnly(true);
     menuConnectivityAuthenticator.setLocalOnly(true);
+    menuConnectivityIoTMonitor.setLocalOnly(true);
 
     // Code generated by plugins.
     tft.begin();

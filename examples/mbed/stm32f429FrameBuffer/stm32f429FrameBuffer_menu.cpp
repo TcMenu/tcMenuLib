@@ -26,7 +26,7 @@ tcextras::IoaTouchScreenCalibrator touchCalibrator(&touchScreen, &renderer, 400)
 
 // Global Menu Item declarations
 const AnalogMenuInfo minfoUnicodeLevel = { "Рівень", 21, 0xffff, 1000, NO_CALLBACK, 0, 10, "П" };
-AnalogMenuItem menuUnicodeLevel(&minfoUnicodeLevel, 0, NULL, INFO_LOCATION_PGM);
+AnalogMenuItem menuUnicodeLevel(&minfoUnicodeLevel, 0, nullptr, INFO_LOCATION_PGM);
 const char enumStrUnicodeChoice_0[] = "Салат";
 const char enumStrUnicodeChoice_1[] = "піца";
 const char enumStrUnicodeChoice_2[] = "борщ";
@@ -35,19 +35,19 @@ const EnumMenuInfo minfoUnicodeChoice = { "Вибір", 20, 0xffff, 2, NO_CALLBA
 EnumMenuItem menuUnicodeChoice(&minfoUnicodeChoice, 0, &menuUnicodeLevel, INFO_LOCATION_PGM);
 const SubMenuInfo minfoUnicode = { "Unicode", 19, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackUnicode(&minfoUnicode, &menuUnicodeChoice, INFO_LOCATION_PGM);
-SubMenuItem menuUnicode(&minfoUnicode, &menuBackUnicode, NULL, INFO_LOCATION_PGM);
+SubMenuItem menuUnicode(&minfoUnicode, &menuBackUnicode, nullptr, INFO_LOCATION_PGM);
 const AnyMenuInfo minfoDialogs = { "Dialogs", 18, 0xffff, 0, onPresentDialog };
 ActionMenuItem menuDialogs(&minfoDialogs, &menuUnicode, INFO_LOCATION_PGM);
 const BooleanMenuInfo minfoSamplesBoolCheck = { "Bool Check", 22, 0xffff, 1, NO_CALLBACK, NAMING_CHECKBOX };
-BooleanMenuItem menuSamplesBoolCheck(&minfoSamplesBoolCheck, false, NULL, INFO_LOCATION_PGM);
-RENDERING_CALLBACK_NAME_INVOKE(fnSamplesLgePosRtCall, largeNumItemRenderFn, "LgePos", -1, NO_CALLBACK)
-EditableLargeNumberMenuItem menuSamplesLgePos(fnSamplesLgePosRtCall, LargeFixedNumber(7, 0, 12456U, 0U, false), 17, false, &menuSamplesBoolCheck);
-RENDERING_CALLBACK_NAME_INVOKE(fnSamplesRGBRtCall, rgbAlphaItemRenderFn, "RGB", -1, NO_CALLBACK)
-Rgb32MenuItem menuSamplesRGB(fnSamplesRGBRtCall, RgbColor32(255, 170, 187), 16, false, &menuSamplesLgePos);
-RENDERING_CALLBACK_NAME_INVOKE(fnSamplesTimeRtCall, timeItemRenderFn, "Time", -1, NO_CALLBACK)
-TimeFormattedMenuItem menuSamplesTime(fnSamplesTimeRtCall, TimeStorage(0, 0, 0, 0), 15, (MultiEditWireType)2, &menuSamplesRGB);
-RENDERING_CALLBACK_NAME_INVOKE(fnSamplesTextRtCall, textItemRenderFn, "Text", -1, NO_CALLBACK)
-TextMenuItem menuSamplesText(fnSamplesTextRtCall, "", 14, 10, &menuSamplesTime);
+BooleanMenuItem menuSamplesBoolCheck(&minfoSamplesBoolCheck, false, nullptr, INFO_LOCATION_PGM);
+const AnyMenuInfo minfoSamplesLgePos = { "LgePos", 17, 0xffff, 0, NO_CALLBACK };
+EditableLargeNumberMenuItem menuSamplesLgePos(&minfoSamplesLgePos, LargeFixedNumber(7, 0, 12456U, 0U, false), false, &menuSamplesBoolCheck, INFO_LOCATION_PGM);
+const AnyMenuInfo minfoSamplesRGB = { "RGB", 16, 0xffff, 0, NO_CALLBACK };
+Rgb32MenuItem menuSamplesRGB(&minfoSamplesRGB, RgbColor32(255, 170, 187), false, &menuSamplesLgePos, INFO_LOCATION_PGM);
+const AnyMenuInfo minfoSamplesTime = { "Time", 15, 0xffff, 0, NO_CALLBACK };
+TimeFormattedMenuItem menuSamplesTime(&minfoSamplesTime, TimeStorage(0, 0, 0, 0), (MultiEditWireType)2, &menuSamplesRGB, INFO_LOCATION_PGM);
+const AnyMenuInfo minfoSamplesText = { "Text", 14, 0xffff, 0, NO_CALLBACK };
+TextMenuItem menuSamplesText(&minfoSamplesText, "", 10, &menuSamplesTime, INFO_LOCATION_PGM);
 const AnalogMenuInfo minfoBeltSpeed = { "Belt Speed", 13, 0xffff, 200, NO_CALLBACK, 0, 100, "mS" };
 AnalogMenuItem menuBeltSpeed(&minfoBeltSpeed, 200, &menuSamplesText, INFO_LOCATION_PGM);
 const char enumStrBeltStatus_0[] = "Running";
@@ -60,18 +60,18 @@ const SubMenuInfo minfoSamples = { "Samples", 11, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackSamples(&minfoSamples, &menuBeltStatus, INFO_LOCATION_PGM);
 SubMenuItem menuSamples(&minfoSamples, &menuBackSamples, &menuDialogs, INFO_LOCATION_PGM);
 const BooleanMenuInfo minfoConnectivityEnableUSB = { "Enable USB", 10, 8, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
-BooleanMenuItem menuConnectivityEnableUSB(&minfoConnectivityEnableUSB, false, NULL, INFO_LOCATION_PGM);
+BooleanMenuItem menuConnectivityEnableUSB(&minfoConnectivityEnableUSB, false, nullptr, INFO_LOCATION_PGM);
 const SubMenuInfo minfoConnectivity = { "Connectivity", 9, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackConnectivity(&minfoConnectivity, &menuConnectivityEnableUSB, INFO_LOCATION_PGM);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, &menuSamples, INFO_LOCATION_PGM);
 AnyMenuInfo minfoSettingsDashboard = { "Dashboard", 25, 0xffff, 0, onShowDash };
-ActionMenuItem menuSettingsDashboard(&minfoSettingsDashboard, NULL, INFO_LOCATION_RAM);
+ActionMenuItem menuSettingsDashboard(&minfoSettingsDashboard, nullptr, INFO_LOCATION_RAM);
 const AnyMenuInfo minfoSettingsCalibrateNow = { "Calibrate Now", 24, 0xffff, 0, onCalibrateScreen };
 ActionMenuItem menuSettingsCalibrateNow(&minfoSettingsCalibrateNow, &menuSettingsDashboard, INFO_LOCATION_PGM);
 const BooleanMenuInfo minfoSettingsTSCalibration = { "TS Calibration", 23, 0xffff, 1, onTouchCalibration, NAMING_CHECKBOX };
 BooleanMenuItem menuSettingsTSCalibration(&minfoSettingsTSCalibration, false, &menuSettingsCalibrateNow, INFO_LOCATION_PGM);
-RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRunDurationRtCall, timeItemRenderFn, "Run duration", 4, NO_CALLBACK)
-TimeFormattedMenuItem menuSettingsRunDuration(fnSettingsRunDurationRtCall, TimeStorage(0, 0, 0, 0), 8, (MultiEditWireType)6, &menuSettingsTSCalibration);
+const AnyMenuInfo minfoSettingsRunDuration = { "Run duration", 8, 4, 0, NO_CALLBACK };
+TimeFormattedMenuItem menuSettingsRunDuration(&minfoSettingsRunDuration, TimeStorage(0, 0, 0, 0), (MultiEditWireType)6, &menuSettingsTSCalibration, INFO_LOCATION_PGM);
 const AnalogMenuInfo minfoSettingsTargetSpeed = { "Target speed", 7, 2, 200, onTargetChanged, 0, 100, "mS" };
 AnalogMenuItem menuSettingsTargetSpeed(&minfoSettingsTargetSpeed, 0, &menuSettingsRunDuration, INFO_LOCATION_PGM);
 const SubMenuInfo minfoSettings = { "Settings", 5, 0xffff, 0, NO_CALLBACK };

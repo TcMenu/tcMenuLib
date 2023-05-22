@@ -22,18 +22,18 @@ Adafruit_FT6206 touchDevice;
 iotouch::AdaLibTouchInterrogator touchInterrogator(touchDevice);
 iotouch::TouchOrientationSettings touchOrientation(true, false, true);
 MenuTouchScreenManager touchScreen(&touchInterrogator, &renderer, touchOrientation);
-tcextras::IoaTouchScreenCalibrator touchCalibrator(&touchScreen, &renderer, 400);
 
 // Global Menu Item declarations
 const PROGMEM AnyMenuInfo minfoPressMe = { "Press Me", 9, 0xffff, 0, NO_CALLBACK };
-ActionMenuItem menuPressMe(&minfoPressMe, NULL, INFO_LOCATION_PGM);
-ListRuntimeMenuItem menuNewRuntimeList(8, 10, fnNewRuntimeListRtCall, &menuPressMe);
+ActionMenuItem menuPressMe(&minfoPressMe, nullptr, INFO_LOCATION_PGM);
+const PROGMEM AnyMenuInfo minfoNewRuntimeList = { "New Runtime List", 8, 0xffff, 0, NO_CALLBACK };
+ListRuntimeMenuItem menuNewRuntimeList(&minfoNewRuntimeList, 10, fnNewRuntimeListRtCall, &menuPressMe, INFO_LOCATION_PGM);
 RENDERING_CALLBACK_NAME_OVERRIDDEN(fnRuntimesCustomRtCall, CustomTextCallbackRtCall, "Custom", -1)
-TextMenuItem menuRuntimesCustom(fnRuntimesCustomRtCall, "", 7, 5, NULL);
-RENDERING_CALLBACK_NAME_INVOKE(fnRuntimesRGBRtCall, rgbAlphaItemRenderFn, "RGB", -1, NO_CALLBACK)
-Rgb32MenuItem menuRuntimesRGB(fnRuntimesRGBRtCall, RgbColor32(0, 0, 0), 6, false, &menuRuntimesCustom);
-RENDERING_CALLBACK_NAME_INVOKE(fnRuntimesTextRtCall, textItemRenderFn, "Text", -1, NO_CALLBACK)
-TextMenuItem menuRuntimesText(fnRuntimesTextRtCall, "", 5, 5, &menuRuntimesRGB);
+TextMenuItem menuRuntimesCustom(fnRuntimesCustomRtCall, "", 7, 5, nullptr);
+const PROGMEM AnyMenuInfo minfoRuntimesRGB = { "RGB", 6, 0xffff, 0, NO_CALLBACK };
+Rgb32MenuItem menuRuntimesRGB(&minfoRuntimesRGB, RgbColor32(0, 0, 0), false, &menuRuntimesCustom, INFO_LOCATION_PGM);
+const PROGMEM AnyMenuInfo minfoRuntimesText = { "Text", 5, 0xffff, 0, NO_CALLBACK };
+TextMenuItem menuRuntimesText(&minfoRuntimesText, "", 5, &menuRuntimesRGB, INFO_LOCATION_PGM);
 const PROGMEM SubMenuInfo minfoRuntimes = { "Runtimes", 4, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackRuntimes(&minfoRuntimes, &menuRuntimesText, INFO_LOCATION_PGM);
 SubMenuItem menuRuntimes(&minfoRuntimes, &menuBackRuntimes, &menuNewRuntimeList, INFO_LOCATION_PGM);

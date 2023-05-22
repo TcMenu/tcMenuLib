@@ -231,11 +231,12 @@
       "type": "runtimeList",
       "item": {
         "initialRows": 0,
+        "listCreationMode": "CUSTOM_RTCALL",
         "name": "My List",
         "variableName": "ExtrasMyList",
         "id": 13,
         "eepromAddress": -1,
-        "functionName": "",
+        "functionName": "onListSelected",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -527,7 +528,7 @@
     ],
     "namingRecursive": true,
     "useCppMain": false,
-    "saveLocation": "ALL_TO_CURRENT",
+    "saveLocation": "PROJECT_TO_CURRENT_WITH_GENERATED",
     "usingSizedEEPROMStorage": false,
     "eepromDefinition": "eeprom:",
     "authenticatorDefinition": "rom:200:4",
@@ -539,5 +540,6 @@
     },
     "packageNamespace": "",
     "appIsModular": false
-  }
+  },
+  "stringLists": []
 }

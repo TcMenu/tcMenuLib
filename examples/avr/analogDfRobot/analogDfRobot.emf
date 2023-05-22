@@ -221,5 +221,6 @@
     },
     "packageNamespace": "",
     "appIsModular": false
-  }
+  },
+  "stringLists": []
 }

@@ -16,7 +16,6 @@
 #include "tcMenuTfteSpi.h"
 #include <graphics/MenuTouchScreenEncoder.h>
 #include "tcMenuAdaTouchDriver.h"
-#include <extras/DrawableTouchCalibrator.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 #include <IoAbstraction.h>
@@ -31,7 +30,6 @@ extern GraphicsDeviceRenderer renderer;
 extern Adafruit_FT6206 touchDevice;
 extern iotouch::AdaLibTouchInterrogator touchInterrogator;
 extern MenuTouchScreenManager touchScreen;
-extern tcextras::IoaTouchScreenCalibrator touchCalibrator;
 
 // Any externals needed by IO expanders, EEPROMs etc
 

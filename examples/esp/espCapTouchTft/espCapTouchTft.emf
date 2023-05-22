@@ -130,6 +130,7 @@
       "type": "runtimeList",
       "item": {
         "initialRows": 10,
+        "listCreationMode": "CUSTOM_RTCALL",
         "name": "New Runtime List",
         "id": 8,
         "eepromAddress": -1,
@@ -159,7 +160,6 @@
     "embeddedPlatform": "ARDUINO_ESP32",
     "lastDisplayUuid": "e6342680-6fab-4d1b-ac08-ce8dbfc0974c",
     "lastInputUuid": "406a3089-6bc6-491e-9e3b-2cc2ec20a3cb",
-    "lastRemoteUuid": "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb",
     "lastRemoteUuids": [
       "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
     ],
@@ -294,7 +294,7 @@
       },
       {
         "name": "TOUCH_SCREEN_CALIBRATE",
-        "latestValue": "true",
+        "latestValue": "false",
         "subsystem": "INPUT"
       },
       {
@@ -339,8 +339,8 @@
       }
     ],
     "namingRecursive": true,
-    "saveToSrc": false,
     "useCppMain": false,
+    "saveLocation": "ALL_TO_CURRENT",
     "usingSizedEEPROMStorage": false,
     "eepromDefinition": "eeprom:",
     "authenticatorDefinition": "",
@@ -352,5 +352,6 @@
     },
     "packageNamespace": "",
     "appIsModular": false
-  }
+  },
+  "stringLists": []
 }

@@ -49,7 +49,7 @@ void MenuItem::clearSendRemoteNeededAll() {
 }
 
 void MenuItem::triggerCallback() const {
-	if (info == nullptr) {
+	if (info == nullptr || (getMenuType() == MENUTYPE_RUNTIME_LIST && get_info_callback(&info->callback) == nullptr)) {
 		return asRuntimeItem(this)->runCallback();
 	}
 

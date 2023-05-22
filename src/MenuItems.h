@@ -18,6 +18,7 @@
 #define INFO_LOCATION_RAM false
 
 #include <PlatformDetermination.h>
+#include <IoAbstraction.h>
 
 /** The maxmimum ID that is allowed manually, only automated ID's for back items and similar will exceed this */
 #define MAXIMUM_ID_ALLOWED 32000

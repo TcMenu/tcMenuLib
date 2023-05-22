@@ -15,10 +15,12 @@
 #include <tcMenu.h>
 #include "tcMenuU8g2.h"
 #include <IoAbstraction.h>
+#include <EepromItemStorage.h>
 
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
 extern U8G2_SSD1306_128X64_NONAME_F_HW_I2C gfx;
+extern U8g2Drawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
 
 // Any externals needed by IO expanders, EEPROMs etc

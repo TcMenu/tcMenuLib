@@ -9,7 +9,7 @@
  */
 
 #include <mbed.h>
-#include "stm32OledEncoder_menu.h"
+#include "generated/stm32OledEncoder_menu.h"
 #include "NTPTimeEvent.h"
 #include "ScreenSaverCustomDrawing.h"
 #include "mbed/HalStm32EepromAbstraction.h"
@@ -125,26 +125,6 @@ void CALLBACK_FUNCTION onFrequencyChanged(int /*id*/) {
     menuEdit.setTextValue(sz);
 }
 
-// see tcMenu list documentation on thecoderscorner.com
-int CALLBACK_FUNCTION fnCountingListRtCall(RuntimeMenuItem * /*item*/, uint8_t row, RenderFnMode mode, char * buffer, int bufferSize) {
-   switch(mode) {
-    case RENDERFN_INVOKE:
-        serdebugF2("Invoked list item", row);
-        return true;
-    case RENDERFN_NAME:
-        strcpy(buffer, "Name");
-        fastltoa(buffer, row, 3, '0', bufferSize);
-        return true;
-    case RENDERFN_VALUE:
-        // TODO - return a value for the row (for list items row==LIST_PARENT_ITEMPOS is back)
-        buffer[0] = 'V'; buffer[1]=0;
-        fastltoa(buffer, row, 3, NOT_PADDED, bufferSize);
-        return true;
-    case RENDERFN_EEPROM_POS: return 0xFFFF; // lists are generally not saved to EEPROM
-    default: return false;
-    }
-}
-
 class NTPTimeMenuSetupEvent : public NTPTimeEvent {
 public:
 
@@ -217,4 +197,16 @@ void CALLBACK_FUNCTION onSaveAll(int id) {
         dlg->showRam("Saved to ROM", false);
         dlg->copyIntoBuffer("");
     }
+}
+
+// This callback needs to be implemented by you, see the below docs:
+//  1. List Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
+//  2. ScrollChoice Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/scrollchoice-menu-item/
+int CALLBACK_FUNCTION fnCountingListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
+    if(mode == RENDERFN_VALUE && row != LIST_PARENT_ITEM_POS) {
+        strncpy(buffer, "Val", bufferSize);
+        fastltoa(buffer, row, 3, NOT_PADDED, bufferSize);
+        return true;
+    }
+    return defaultRtListCallback(item, row, mode, buffer, bufferSize);
 }

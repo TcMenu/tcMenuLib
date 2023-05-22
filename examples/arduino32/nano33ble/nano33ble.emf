@@ -19,7 +19,8 @@
         "functionName": "",
         "readOnly": true,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -38,7 +39,8 @@
         "functionName": "",
         "readOnly": true,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -57,7 +59,8 @@
         "functionName": "",
         "readOnly": true,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -71,7 +74,8 @@
         "functionName": "",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -85,7 +89,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -99,7 +104,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -113,7 +119,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -127,7 +134,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -141,7 +149,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -156,7 +165,8 @@
         "functionName": "",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -169,7 +179,8 @@
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -184,7 +195,8 @@
         "functionName": "",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     },
     {
@@ -203,7 +215,8 @@
         "functionName": "onPWMChanged",
         "readOnly": false,
         "localOnly": false,
-        "visible": true
+        "visible": true,
+        "staticDataInRAM": false
       }
     }
   ],
@@ -211,7 +224,6 @@
     "embeddedPlatform": "ARDUINO32",
     "lastDisplayUuid": "fd998437-c4b2-4386-ba88-d0ae7c20620b",
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
-    "lastRemoteUuid": "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb",
     "lastRemoteUuids": [
       "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
     ],
@@ -351,18 +363,20 @@
       }
     ],
     "namingRecursive": true,
-    "saveToSrc": false,
     "useCppMain": false,
+    "saveLocation": "ALL_TO_CURRENT",
+    "usingSizedEEPROMStorage": false,
     "eepromDefinition": "",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
-      "deviceIO:",
-      "customIO:io23017"
+      "customIO:io23017",
+      "deviceIO:"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []
     },
     "packageNamespace": "",
     "appIsModular": false
-  }
+  },
+  "stringLists": []
 }

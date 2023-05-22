@@ -404,7 +404,6 @@
     "embeddedPlatform": "MBED_RTOS",
     "lastDisplayUuid": "fc7b8f22-6553-43d6-9968-df4ee2562aaf",
     "lastInputUuid": "89cd7f70-0457-4884-97c2-0db904ccb0ba",
-    "lastRemoteUuid": "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb",
     "lastRemoteUuids": [
       "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
     ],
@@ -509,8 +508,8 @@
       }
     ],
     "namingRecursive": true,
-    "saveToSrc": false,
     "useCppMain": true,
+    "saveLocation": "ALL_TO_CURRENT",
     "usingSizedEEPROMStorage": false,
     "eepromDefinition": "bsp:0",
     "authenticatorDefinition": "",
@@ -522,5 +521,6 @@
     },
     "packageNamespace": "",
     "appIsModular": false
-  }
+  },
+  "stringLists": []
 }

@@ -119,18 +119,18 @@ test(dateFormattedMenuItem) {
     assertStringEquals("11/08/2020", sz);
 
     assertEquals(uint8_t(3), dateItem.beginMultiEdit());
-    assertEquals(31, dateItem.nextPart());
-    assertEquals(11, dateItem.getPartValueAsInt());
-    dateItem.valueChanged(10);
+    assertEquals(30, dateItem.nextPart());
+    assertEquals(10, dateItem.getPartValueAsInt());
+    dateItem.valueChanged(9);
     dateItem.copyValue(sz, sizeof(sz));
     assertStringEquals("10/08/2020", sz);
     assertTrue(checkEditorHints(0, 2, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
 
-    assertEquals(12, dateItem.nextPart());
-    assertEquals(8, dateItem.getPartValueAsInt());
+    assertEquals(11, dateItem.nextPart());
+    assertEquals(7, dateItem.getPartValueAsInt());
     dateItem.valueChanged(2);
     dateItem.copyValue(sz, sizeof(sz));
-    assertStringEquals("10/02/2020", sz);
+    assertStringEquals("10/03/2020", sz);
     assertTrue(checkEditorHints(3, 5, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
 
     assertEquals(9999, dateItem.nextPart());
@@ -138,12 +138,12 @@ test(dateFormattedMenuItem) {
     dateItem.valueChanged(2018);
 
     dateItem.copyValue(sz, sizeof(sz));
-    assertStringEquals("10/02/2018", sz);
+    assertStringEquals("10/03/2018", sz);
     assertTrue(checkEditorHints(6, 10, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
     dateItem.stopMultiEdit();
 
     dateItem.copyValue(sz, sizeof(sz));
-    assertStringEquals("10/02/2018", sz);
+    assertStringEquals("10/03/2018", sz);
 
     DateFormattedMenuItem::setDateSeparator('-');
     DateFormattedMenuItem::setDateFormatStyle(DateFormattedMenuItem::MM_DD_YYYY);
@@ -155,16 +155,16 @@ test(dateFormattedMenuItem) {
 
     dateItem.beginMultiEdit();
 
-    assertEquals(12, dateItem.nextPart());
-    assertEquals(11, dateItem.getPartValueAsInt());
-    dateItem.valueChanged(10);
+    assertEquals(11, dateItem.nextPart());
+    assertEquals(10, dateItem.getPartValueAsInt());
+    dateItem.valueChanged(9);
     dateItem.copyValue(sz, sizeof(sz));
     assertStringEquals("10-20-2019", sz);
     assertTrue(checkEditorHints(0, 2, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
 
-    assertEquals(31, dateItem.nextPart());
-    assertEquals(20, dateItem.getPartValueAsInt());
-    dateItem.valueChanged(14);
+    assertEquals(30, dateItem.nextPart());
+    assertEquals(19, dateItem.getPartValueAsInt());
+    dateItem.valueChanged(13);
     dateItem.copyValue(sz, sizeof(sz));
     assertStringEquals("10-14-2019", sz);
     assertTrue(checkEditorHints(3, 5, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
@@ -196,16 +196,16 @@ test(dateFormattedMenuItem) {
     assertStringEquals("2018*11*20", sz);
     assertTrue(checkEditorHints(0, 4, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
 
-    assertEquals(12, dateItem.nextPart());
-    assertEquals(11, dateItem.getPartValueAsInt());
-    dateItem.valueChanged(3);
+    assertEquals(11, dateItem.nextPart());
+    assertEquals(10, dateItem.getPartValueAsInt());
+    dateItem.valueChanged(2);
     dateItem.copyValue(sz, sizeof(sz));
     assertStringEquals("2018*03*20", sz);
     assertTrue(checkEditorHints(5, 7, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
 
-    assertEquals(31, dateItem.nextPart());
-    assertEquals(20, dateItem.getPartValueAsInt());
-    dateItem.valueChanged(2);
+    assertEquals(30, dateItem.nextPart());
+    assertEquals(19, dateItem.getPartValueAsInt());
+    dateItem.valueChanged(1);
     dateItem.copyValue(sz, sizeof(sz));
     assertStringEquals("2018*03*02", sz);
     assertTrue(checkEditorHints(8, 10, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));

@@ -336,6 +336,7 @@
       "type": "runtimeList",
       "item": {
         "initialRows": 0,
+        "listCreationMode": "CUSTOM_RTCALL",
         "name": "Data List",
         "variableName": "StatusDataList",
         "id": 21,
@@ -685,5 +686,6 @@
     },
     "packageNamespace": "",
     "appIsModular": false
-  }
+  },
+  "stringLists": []
 }

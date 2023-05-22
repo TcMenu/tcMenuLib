@@ -267,13 +267,14 @@
     "eepromDefinition": "",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
-      "deviceIO:",
-      "mcp23017:mcp23017:32:2"
+      "mcp23017:mcp23017:32:2",
+      "deviceIO:"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []
     },
     "packageNamespace": "",
     "appIsModular": false
-  }
+  },
+  "stringLists": []
 }

@@ -3,7 +3,7 @@
 #ifndef TCEXAMPLE_DASHBOARDCONFIG_H
 #define TCEXAMPLE_DASHBOARDCONFIG_H
 
-#include "esp32s2Saola_menu.h"
+#include "generated/esp32s2Saola_menu.h"
 #include "extras/DrawableDashboard.h"
 
 void setupDashboard();

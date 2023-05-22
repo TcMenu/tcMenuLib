@@ -2,7 +2,7 @@
 #ifndef TCMENUEXAMPLE_SCREENSAVERCUSTOMDRAWING_H
 #define TCMENUEXAMPLE_SCREENSAVERCUSTOMDRAWING_H
 
-#include "stm32OledEncoder_menu.h"
+#include "generated/stm32OledEncoder_menu.h"
 #include <Fonts/FreeSans9pt7b.h>
 /**
  * Here we implement the custom drawing class so that we can register for drawing and reset events with it.

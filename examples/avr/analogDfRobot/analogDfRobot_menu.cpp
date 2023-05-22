@@ -19,15 +19,15 @@ LiquidCrystalRenderer renderer(lcd, 16, 2);
 
 // Global Menu Item declarations
 const PROGMEM AnalogMenuInfo minfoCommits = { "Commits", 7, 0xffff, 65000, NO_CALLBACK, 0, 1, "" };
-AnalogMenuItem menuCommits(&minfoCommits, 0, NULL, INFO_LOCATION_PGM);
+AnalogMenuItem menuCommits(&minfoCommits, 0, nullptr, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoChooseItem = { "Choose Item", 8, 18, 0, NO_CALLBACK };
-ScrollChoiceMenuItem menuChooseItem(&minfoChooseItem, fnChooseItemRtCall, 0, 20, &menuCommits);
+ScrollChoiceMenuItem menuChooseItem(&minfoChooseItem, fnChooseItemRtCall, 0, 20, &menuCommits, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoText = { "Text", 6, 4, 0, NO_CALLBACK };
 TextMenuItem menuText(&minfoText, "", 6, &menuChooseItem, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoLgeNum = { "LgeNum", 5, 10, 0, NO_CALLBACK };
 EditableLargeNumberMenuItem menuLgeNum(&minfoLgeNum, LargeFixedNumber(8, 4, 0U, 0U, false), true, &menuText, INFO_LOCATION_PGM);
 const PROGMEM BooleanMenuInfo minfoL2 = { "L2", 4, 3, 1, onLed2, NAMING_ON_OFF };
-BooleanMenuItem menuL2(&minfoL2, false, NULL, INFO_LOCATION_PGM);
+BooleanMenuItem menuL2(&minfoL2, false, nullptr, INFO_LOCATION_PGM);
 const PROGMEM BooleanMenuInfo minfoL1 = { "L1", 3, 2, 1, onLed1, NAMING_ON_OFF };
 BooleanMenuItem menuL1(&minfoL1, false, &menuL2, INFO_LOCATION_PGM);
 const PROGMEM SubMenuInfo minfoLEDStates = { "LED States", 2, 0xffff, 0, NO_CALLBACK };

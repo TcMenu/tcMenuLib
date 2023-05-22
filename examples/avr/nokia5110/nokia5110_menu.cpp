@@ -27,16 +27,16 @@ TagValueRemoteServerConnection ethernetConnection(ethernetTransport, ethernetIni
 
 // Global Menu Item declarations
 const PROGMEM char pgmStrAuthenticatorText[] = { "Authenticator" };
-EepromAuthenticationInfoMenuItem menuAuthenticator(pgmStrAuthenticatorText, NO_CALLBACK, 19, NULL);
+EepromAuthenticationInfoMenuItem menuAuthenticator(pgmStrAuthenticatorText, NO_CALLBACK, 19, nullptr);
 const PROGMEM char pgmStrIoTMonitorText[] = { "IoT Monitor" };
 RemoteMenuItem menuIoTMonitor(pgmStrIoTMonitorText, 18, &menuAuthenticator);
 const PROGMEM AnyMenuInfo minfoIP = { "IP", 16, 13, 0, NO_CALLBACK };
 IpAddressMenuItem menuIP(&minfoIP, IpAddressStorage(127, 0, 0, 1), &menuIoTMonitor, INFO_LOCATION_PGM);
 const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 15, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackConnectivity(&minfoConnectivity, &menuIP, INFO_LOCATION_PGM);
-SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL, INFO_LOCATION_PGM);
+SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, nullptr, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoTxt = { "Txt", 14, 0xffff, 0, NO_CALLBACK };
-TextMenuItem menuTxt(&minfoTxt, "", 6, NULL, INFO_LOCATION_PGM);
+TextMenuItem menuTxt(&minfoTxt, "", 6, nullptr, INFO_LOCATION_PGM);
 const PROGMEM FloatMenuInfo minfoCurrent = { "Current", 10, 0xffff, 2, NO_CALLBACK };
 FloatMenuItem menuCurrent(&minfoCurrent, 0.0, &menuTxt, INFO_LOCATION_PGM);
 const PROGMEM FloatMenuInfo minfoVoltsIn = { "Volts in", 9, 0xffff, 2, NO_CALLBACK };
@@ -45,7 +45,7 @@ const PROGMEM SubMenuInfo minfoStatus = { "Status", 8, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackStatus(&minfoStatus, &menuVoltsIn, INFO_LOCATION_PGM);
 SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuConnectivity, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoRGB = { "RGB", 17, 17, 0, NO_CALLBACK };
-Rgb32MenuItem menuRGB(&minfoRGB, RgbColor32(136, 119, 85, 255), true, NULL, INFO_LOCATION_PGM);
+Rgb32MenuItem menuRGB(&minfoRGB, RgbColor32(136, 119, 85, 255), true, nullptr, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoShutdownNow = { "Shutdown now", 11, 0xffff, 0, onPowerDownDetected };
 ActionMenuItem menuShutdownNow(&minfoShutdownNow, &menuRGB, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoDelay = { "Delay", 7, 11, 10, NO_CALLBACK, 0, 1, "S" };

@@ -8,6 +8,10 @@
 #include <tcUnicodeHelper.h>
 #include "CardLayoutPanel.h"
 
+#ifdef TC_TOUCH_DEBUG
+extern MenuTouchScreenManager touchScreen;
+#endif
+
 namespace tcgfx {
 
     const Coord rendererXbmArrowSize(8, 11);
@@ -102,6 +106,15 @@ namespace tcgfx {
         }
 
         helper.endDraw();
+
+#ifdef TC_TOUCH_DEBUG
+        // This is for debugging of touch coordinates
+        Coord circleLoc = Coord(
+                touchScreen.getLastX() * rootDrawable->getDisplayDimensions().x,
+                touchScreen.getLastY() * rootDrawable->getDisplayDimensions().y);
+        rootDrawable->setDrawColor(RGB(128, 128, 128));
+        rootDrawable->drawCircle(circleLoc, 5, true);
+#endif
     }
 
     int GraphicsDeviceRenderer::calculateSpaceBetween(const void* font, uint8_t mag, const char* buffer, int start, int end) {

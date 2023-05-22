@@ -344,7 +344,7 @@
       "type": "runtimeList",
       "item": {
         "initialRows": 20,
-        "usingInfoBlock": false,
+        "listCreationMode": "CUSTOM_RTCALL",
         "name": "Count List",
         "id": 18,
         "eepromAddress": -1,
@@ -796,13 +796,14 @@
     "eepromDefinition": "avr:",
     "authenticatorDefinition": "rom:100:6",
     "projectIoExpanders": [
-      "deviceIO:",
-      "mcp23017:io23017:32:2"
+      "mcp23017:io23017:32:2",
+      "deviceIO:"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []
     },
     "packageNamespace": "",
     "appIsModular": false
-  }
+  },
+  "stringLists": []
 }

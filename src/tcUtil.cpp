@@ -55,7 +55,7 @@ void showVersionDialog(const ConnectorLocalInfo *localInfo) {
     });
 }
 
-void populateCore(AnyMenuInfo* ptr, const char* n, boolean pgm, menuid_t id, uint16_t eeprom, MenuCallbackFn cb, uint16_t max) {
+void populateCore(AnyMenuInfo* ptr, const char* n, bool pgm, menuid_t id, uint16_t eeprom, MenuCallbackFn cb, uint16_t max) {
     ptr->callback = cb;
     ptr->maxValue = max;
     ptr->eepromAddr = eeprom;

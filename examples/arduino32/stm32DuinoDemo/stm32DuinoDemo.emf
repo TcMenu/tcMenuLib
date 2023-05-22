@@ -384,6 +384,7 @@
       "type": "runtimeList",
       "item": {
         "initialRows": 0,
+        "listCreationMode": "CUSTOM_RTCALL",
         "name": "Custom List",
         "variableName": "RuntimesCustomList",
         "id": 13,
@@ -507,7 +508,6 @@
     "embeddedPlatform": "STM32DUINO",
     "lastDisplayUuid": "fd998437-c4b2-4386-ba88-d0ae7c20620b",
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
-    "lastRemoteUuid": "0877131c-e03e-426b-8eaf-228e01f5e7f1",
     "lastRemoteUuids": [
       "0877131c-e03e-426b-8eaf-228e01f5e7f1"
     ],
@@ -672,8 +672,8 @@
       }
     ],
     "namingRecursive": true,
-    "saveToSrc": false,
     "useCppMain": false,
+    "saveLocation": "PROJECT_TO_CURRENT_WITH_GENERATED",
     "usingSizedEEPROMStorage": false,
     "eepromDefinition": "bsp:0",
     "authenticatorDefinition": "rom:150:4",
@@ -685,5 +685,6 @@
     },
     "packageNamespace": "",
     "appIsModular": false
-  }
+  },
+  "stringLists": []
 }

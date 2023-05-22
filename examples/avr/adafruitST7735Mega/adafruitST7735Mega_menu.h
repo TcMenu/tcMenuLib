@@ -17,8 +17,8 @@
 #include "tcMenuAdaFruitGfx.h"
 #include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
-#include <IoAbstraction.h>
 #include <IoAbstractionWire.h>
+#include <IoAbstraction.h>
 #include <EepromItemStorage.h>
 
 // variables we declare that you may need to access

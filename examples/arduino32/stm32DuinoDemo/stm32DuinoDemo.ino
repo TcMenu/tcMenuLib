@@ -6,7 +6,7 @@
  * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
  */
 
-#include "stm32DuinoDemo_menu.h"
+#include "generated/stm32DuinoDemo_menu.h"
 #include <STM32Ethernet.h>
 #include <PlatformDetermination.h>
 #include <SPI.h>
@@ -135,28 +135,17 @@ void loop() {
     taskManager.runLoop();
 }
 
-// see tcMenu list documentation on thecoderscorner.com
-// https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
-//
+// This callback needs to be implemented by you, see the below docs:
+//  1. List Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
+//  2. ScrollChoice Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/scrollchoice-menu-item/
 int CALLBACK_FUNCTION fnRuntimesCustomListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
-   switch(mode) {
-    case RENDERFN_INVOKE:
-        // TODO - your code to invoke goes here - row is the index of the item
-        return true;
-    case RENDERFN_NAME:
-        // TODO - each row has it's own name - 0xff is the parent item
-        ltoaClrBuff(buffer, row, 3, NOT_PADDED, bufferSize);
-        return true;
-    case RENDERFN_VALUE:
-        // TODO - each row can has its own value - 0xff is the parent item
-        buffer[0] = 'V'; buffer[1]=0;
+    if(mode == RENDERFN_VALUE && row != LIST_PARENT_ITEM_POS) {
+        strncpy(buffer, "Val", bufferSize);
         fastltoa(buffer, row, 3, NOT_PADDED, bufferSize);
         return true;
-    case RENDERFN_EEPROM_POS: return 0xffff; // lists are generally not saved to EEPROM
-    default: return false;
     }
+    return defaultRtListCallback(item, row, mode, buffer, bufferSize);
 }
-
 
 void CALLBACK_FUNCTION decimalDidChange(int id) {
     // TODO - your menu change code

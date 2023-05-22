@@ -20,23 +20,23 @@ U8g2Drawable gfxDrawable(&gfx, &Wire);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 
 // Global Menu Item declarations
-RENDERING_CALLBACK_NAME_INVOKE(fnExtrasDateRtCall, dateItemRenderFn, "Date", -1, NO_CALLBACK)
-DateFormattedMenuItem menuExtrasDate(fnExtrasDateRtCall, DateStorage(1, 1, 2022), 14, NULL);
-RENDERING_CALLBACK_NAME_INVOKE(fnExtrasTimeRtCall, timeItemRenderFn, "Time", -1, NO_CALLBACK)
-TimeFormattedMenuItem menuExtrasTime(fnExtrasTimeRtCall, TimeStorage(14, 00, 00, 0), 13, (MultiEditWireType)2, &menuExtrasDate);
-RENDERING_CALLBACK_NAME_INVOKE(fnExtrasIpRtCall, ipAddressRenderFn, "Ip", -1, NO_CALLBACK)
-IpAddressMenuItem menuExtrasIp(fnExtrasIpRtCall, IpAddressStorage(192, 168, 0, 0), 12, &menuExtrasTime);
-RENDERING_CALLBACK_NAME_INVOKE(fnExtrasRGBRtCall, rgbAlphaItemRenderFn, "RGB", -1, NO_CALLBACK)
-Rgb32MenuItem menuExtrasRGB(fnExtrasRGBRtCall, RgbColor32(221, 85, 238), 11, false, &menuExtrasIp);
+const PROGMEM AnyMenuInfo minfoExtrasDate = { "Date", 14, 0xffff, 0, NO_CALLBACK };
+DateFormattedMenuItem menuExtrasDate(&minfoExtrasDate, DateStorage(1, 1, 2022), nullptr, INFO_LOCATION_PGM);
+const PROGMEM AnyMenuInfo minfoExtrasTime = { "Time", 13, 0xffff, 0, NO_CALLBACK };
+TimeFormattedMenuItem menuExtrasTime(&minfoExtrasTime, TimeStorage(14, 00, 00, 0), (MultiEditWireType)2, &menuExtrasDate, INFO_LOCATION_PGM);
+const PROGMEM AnyMenuInfo minfoExtrasIp = { "Ip", 12, 0xffff, 0, NO_CALLBACK };
+IpAddressMenuItem menuExtrasIp(&minfoExtrasIp, IpAddressStorage(192, 168, 0, 0), &menuExtrasTime, INFO_LOCATION_PGM);
+const PROGMEM AnyMenuInfo minfoExtrasRGB = { "RGB", 11, 0xffff, 0, NO_CALLBACK };
+Rgb32MenuItem menuExtrasRGB(&minfoExtrasRGB, RgbColor32(221, 85, 238), false, &menuExtrasIp, INFO_LOCATION_PGM);
 const PROGMEM SubMenuInfo minfoExtras = { "Extras", 10, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackExtras(&minfoExtras, &menuExtrasRGB, INFO_LOCATION_PGM);
-SubMenuItem menuExtras(&minfoExtras, &menuBackExtras, NULL, INFO_LOCATION_PGM);
+SubMenuItem menuExtras(&minfoExtras, &menuBackExtras, nullptr, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoSettingsSaveSettings = { "SaveSettings", 9, 0xffff, 0, onSaveSettings };
-ActionMenuItem menuSettingsSaveSettings(&minfoSettingsSaveSettings, NULL, INFO_LOCATION_PGM);
-RENDERING_CALLBACK_NAME_INVOKE(fnSettingsSerialNumberRtCall, largeNumItemRenderFn, "Serial Number", 7, NO_CALLBACK)
-EditableLargeNumberMenuItem menuSettingsSerialNumber(fnSettingsSerialNumberRtCall, LargeFixedNumber(8, 0, 0U, 0U, false), 8, true, &menuSettingsSaveSettings);
-RENDERING_CALLBACK_NAME_INVOKE(fnSettingsUserNameRtCall, textItemRenderFn, "User Name", 16, onNameChanged)
-TextMenuItem menuSettingsUserName(fnSettingsUserNameRtCall, "", 7, 5, &menuSettingsSerialNumber);
+ActionMenuItem menuSettingsSaveSettings(&minfoSettingsSaveSettings, nullptr, INFO_LOCATION_PGM);
+const PROGMEM AnyMenuInfo minfoSettingsSerialNumber = { "Serial Number", 8, 7, 0, NO_CALLBACK };
+EditableLargeNumberMenuItem menuSettingsSerialNumber(&minfoSettingsSerialNumber, LargeFixedNumber(8, 0, 0U, 0U, false), true, &menuSettingsSaveSettings, INFO_LOCATION_PGM);
+const PROGMEM AnyMenuInfo minfoSettingsUserName = { "User Name", 7, 16, 0, onNameChanged };
+TextMenuItem menuSettingsUserName(&minfoSettingsUserName, "", 5, &menuSettingsSerialNumber, INFO_LOCATION_PGM);
 const PROGMEM BooleanMenuInfo minfoSettingsSafetyLock = { "Safety lock", 6, 15, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
 BooleanMenuItem menuSettingsSafetyLock(&minfoSettingsSafetyLock, false, &menuSettingsUserName, INFO_LOCATION_PGM);
 const PROGMEM SubMenuInfo minfoSettings = { "Settings", 5, 0xffff, 0, NO_CALLBACK };

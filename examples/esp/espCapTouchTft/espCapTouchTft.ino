@@ -19,10 +19,6 @@
 #include <ArduinoEEPROMAbstraction.h>
 #include <tcMenuVersion.h>
 
-#define START_CALIBRATION_FOR_TOUCH true
-
-using namespace iotouch;
-
 void setup() {
     // This example uses both serial and wire, we must start them ob
     Serial.begin(115200);
@@ -38,21 +34,6 @@ void setup() {
     setTitlePressedCallback([](int) {
         showVersionDialog(&applicationInfo);
     });
-
-#ifdef START_CALIBRATION_FOR_TOUCH
-    touchCalibrator.initCalibration([](bool starting) {
-        static TouchOrientationSettings oldTouchSettings(false, false, false);
-        if(starting) {
-            oldTouchSettings = touchScreen.changeOrientation(TouchOrientationSettings(false, true, true));
-            gfx.setRotation(0);
-        } else {
-            touchScreen.changeOrientation(oldTouchSettings);
-            gfx.setRotation(1);
-        }
-
-    }, true);
-#endif
-
 }
 
 void loop() {

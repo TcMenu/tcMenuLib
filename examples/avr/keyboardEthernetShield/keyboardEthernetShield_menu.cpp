@@ -34,19 +34,19 @@ TagValueRemoteServerConnection ethernetConnection2(ethernetTransport2, ethernetI
 
 // Global Menu Item declarations
 const PROGMEM AnyMenuInfo minfoRomChoicesSave = { "Save", 23, 0xffff, 0, onSaveValue };
-ActionMenuItem menuRomChoicesSave(&minfoRomChoicesSave, NULL, INFO_LOCATION_PGM);
+ActionMenuItem menuRomChoicesSave(&minfoRomChoicesSave, nullptr, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoRomChoicesValue = { "Value", 22, 0xffff, 0, NO_CALLBACK };
 TextMenuItem menuRomChoicesValue(&minfoRomChoicesValue, "", 10, &menuRomChoicesSave, INFO_LOCATION_PGM);
 extern char romSpaceNames[];
 const PROGMEM AnyMenuInfo minfoRomChoicesItemNum = { "Item Num", 21, 0xffff, 0, onItemChange };
-ScrollChoiceMenuItem menuRomChoicesItemNum(&minfoRomChoicesItemNum, 0, romSpaceNames, 7, 10, &menuRomChoicesValue);
+ScrollChoiceMenuItem menuRomChoicesItemNum(&minfoRomChoicesItemNum, 0, romSpaceNames, 7, 10, &menuRomChoicesValue, INFO_LOCATION_PGM);
 const PROGMEM SubMenuInfo minfoRomChoices = { "Rom Choices", 20, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackRomChoices(&minfoRomChoices, &menuRomChoicesItemNum, INFO_LOCATION_PGM);
-SubMenuItem menuRomChoices(&minfoRomChoices, &menuBackRomChoices, NULL, INFO_LOCATION_PGM);
+SubMenuItem menuRomChoices(&minfoRomChoices, &menuBackRomChoices, nullptr, INFO_LOCATION_PGM);
 RENDERING_CALLBACK_NAME_OVERRIDDEN(fnAdditionalCustomHexRtCall, customHexEditorRtCall, "Custom Hex", -1)
-TextMenuItem menuAdditionalCustomHex(fnAdditionalCustomHexRtCall, "", 32, 4, NULL);
+TextMenuItem menuAdditionalCustomHex(fnAdditionalCustomHexRtCall, "", 32, 4, nullptr);
 const PROGMEM BooleanMenuInfo minfoAdditionalBoolFlagFlag4 = { "Flag4", 28, 41, 1, NO_CALLBACK, NAMING_CHECKBOX };
-BooleanMenuItem menuAdditionalBoolFlagFlag4(&minfoAdditionalBoolFlagFlag4, false, NULL, INFO_LOCATION_PGM);
+BooleanMenuItem menuAdditionalBoolFlagFlag4(&minfoAdditionalBoolFlagFlag4, false, nullptr, INFO_LOCATION_PGM);
 const PROGMEM BooleanMenuInfo minfoAdditionalBoolFlagFlag3 = { "Flag3", 27, 40, 1, NO_CALLBACK, NAMING_CHECKBOX };
 BooleanMenuItem menuAdditionalBoolFlagFlag3(&minfoAdditionalBoolFlagFlag3, false, &menuAdditionalBoolFlagFlag4, INFO_LOCATION_PGM);
 const PROGMEM BooleanMenuInfo minfoAdditionalBoolFlagFlag2 = { "Flag2", 26, 39, 1, NO_CALLBACK, NAMING_ON_OFF };
@@ -56,18 +56,19 @@ BooleanMenuItem menuAdditionalBoolFlagFlag1(&minfoAdditionalBoolFlagFlag1, false
 const PROGMEM SubMenuInfo minfoAdditionalBoolFlag = { "Bool Flag", 24, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackAdditionalBoolFlag(&minfoAdditionalBoolFlag, &menuAdditionalBoolFlagFlag1, INFO_LOCATION_PGM);
 SubMenuItem menuAdditionalBoolFlag(&minfoAdditionalBoolFlag, &menuBackAdditionalBoolFlag, &menuAdditionalCustomHex, INFO_LOCATION_PGM);
-ListRuntimeMenuItem menuAdditionalCountList(18, 20, fnAdditionalCountListRtCall, &menuAdditionalBoolFlag);
+const PROGMEM AnyMenuInfo minfoAdditionalCountList = { "Count List", 18, 0xffff, 0, NO_CALLBACK };
+ListRuntimeMenuItem menuAdditionalCountList(&minfoAdditionalCountList, 20, fnAdditionalCountListRtCall, &menuAdditionalBoolFlag, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoAdditionalNumChoices = { "Num Choices", 17, 32, 0, NO_CALLBACK };
-ScrollChoiceMenuItem menuAdditionalNumChoices(&minfoAdditionalNumChoices, fnAdditionalNumChoicesRtCall, 0, 30, &menuAdditionalCountList);
+ScrollChoiceMenuItem menuAdditionalNumChoices(&minfoAdditionalNumChoices, fnAdditionalNumChoicesRtCall, 0, 30, &menuAdditionalCountList, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoAdditionalRomChoice = { "Rom Choice", 19, 30, 0, NO_CALLBACK };
-ScrollChoiceMenuItem menuAdditionalRomChoice(&minfoAdditionalRomChoice, 0, 500, 10, 9, &menuAdditionalNumChoices);
+ScrollChoiceMenuItem menuAdditionalRomChoice(&minfoAdditionalRomChoice, 0, 500, 10, 9, &menuAdditionalNumChoices, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoAdditionalRGB = { "RGB", 15, 34, 0, NO_CALLBACK };
 Rgb32MenuItem menuAdditionalRGB(&minfoAdditionalRGB, RgbColor32(0, 0, 0, 255), true, &menuAdditionalRomChoice, INFO_LOCATION_PGM);
 const PROGMEM SubMenuInfo minfoAdditional = { "Additional", 14, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackAdditional(&minfoAdditional, &menuAdditionalRGB, INFO_LOCATION_PGM);
 SubMenuItem menuAdditional(&minfoAdditional, &menuBackAdditional, &menuRomChoices, INFO_LOCATION_PGM);
 const PROGMEM char pgmStrConnectivityAuthenticatorText[] = { "Authenticator" };
-EepromAuthenticationInfoMenuItem menuConnectivityAuthenticator(pgmStrConnectivityAuthenticatorText, NO_CALLBACK, 30, NULL);
+EepromAuthenticationInfoMenuItem menuConnectivityAuthenticator(pgmStrConnectivityAuthenticatorText, NO_CALLBACK, 30, nullptr);
 const PROGMEM char pgmStrConnectivityIoTMonitorText[] = { "IoT Monitor" };
 RemoteMenuItem menuConnectivityIoTMonitor(pgmStrConnectivityIoTMonitorText, 29, &menuConnectivityAuthenticator);
 const PROGMEM AnyMenuInfo minfoConnectivitySaveToEEPROM = { "Save to EEPROM", 10, 0xffff, 0, onSaveToEeprom };
@@ -113,8 +114,8 @@ void setupMenu() {
     authManager.initialise(menuMgr.getEepromAbstraction(), 100);
     menuMgr.setAuthenticator(&authManager);
     // Now add any readonly, non-remote and visible flags.
-    menuConnectivityAuthenticator.setLocalOnly(true);
     menuConnectivityIoTMonitor.setLocalOnly(true);
+    menuConnectivityAuthenticator.setLocalOnly(true);
     menuConnectivity.setLocalOnly(true);
     menuConnectivity.setSecured(true);
     menuHiddenItem.setVisible(false);

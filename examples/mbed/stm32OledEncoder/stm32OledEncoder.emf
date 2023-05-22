@@ -178,6 +178,7 @@
       "type": "runtimeList",
       "item": {
         "initialRows": 10,
+        "listCreationMode": "CUSTOM_RTCALL",
         "name": "CountingList",
         "id": 11,
         "eepromAddress": -1,
@@ -318,7 +319,6 @@
     "embeddedPlatform": "MBED_RTOS",
     "lastDisplayUuid": "8a15d500-410f-489d-b3dc-540b05e630ed",
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
-    "lastRemoteUuid": "27e7a502-330e-4570-9f8e-bd26ac88051f",
     "lastRemoteUuids": [
       "27e7a502-330e-4570-9f8e-bd26ac88051f"
     ],
@@ -478,8 +478,8 @@
       }
     ],
     "namingRecursive": false,
-    "saveToSrc": false,
     "useCppMain": true,
+    "saveLocation": "PROJECT_TO_CURRENT_WITH_GENERATED",
     "usingSizedEEPROMStorage": false,
     "eepromDefinition": "bsp:0",
     "authenticatorDefinition": "rom:100:6",
@@ -491,5 +491,6 @@
     },
     "packageNamespace": "",
     "appIsModular": false
-  }
+  },
+  "stringLists": []
 }

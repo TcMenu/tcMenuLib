@@ -29,6 +29,7 @@
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
 extern TcMenuRemoteServer remoteServer;
 extern U8G2_SSD1306_128X64_NONAME_F_4W_HW_SPI gfx;
+extern U8g2Drawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
 extern EthernetServer server;
 extern EthernetInitialisation ethernetInitialisation;

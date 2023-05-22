@@ -12,7 +12,7 @@
  * MenuManager: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menumanager-and-iteration/
  */
 
-#include "dynamicMenuItems_menu.h"
+#include "generated/dynamicMenuItems_menu.h"
 #include <BaseDialog.h>
 #include <IoAbstractionWire.h>
 #include <graphics/RuntimeTitleMenuItem.h>
@@ -322,40 +322,27 @@ void CALLBACK_FUNCTION onDialogController(int id) {
     });
 }
 
+// This callback needs to be implemented by you, see the below docs:
+//  1. List Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
+//  2. ScrollChoice Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/scrollchoice-menu-item/
 //
 // This is called back each time a list item needs to draw data. This is a list that is based on an array of string values.
 //
 int CALLBACK_FUNCTION fnListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
-   switch(mode) {
-    case RENDERFN_INVOKE:
+    if(mode == RENDERFN_ACTIVATE) {
+        Serial.print("Activated "); Serial.println(row);
+        return true;
+    } else if(mode == RENDERFN_INVOKE) {
         Serial.print("Selected "); Serial.println(row);
         // do something with the selected item.
         menuMgr.resetMenu(false);
         return true;
-    case RENDERFN_NAME:
-        if(row > 253) {
-            // 254 and 255 are reserved for title and back, this is what is rendered in the back item text and also
-            // as the list name / title on the parent menu.
-            strncpy(buffer, "Food List", bufferSize);
-        }
-        else {
-            // when row is between 0..253 then the name is the item name.
-            ltoaClrBuff(buffer, row, 2, NOT_PADDED, bufferSize); // otherwise it's an active row
-        }
-        return true;
-    case RENDERFN_VALUE:
-        if(row < numListItems) {
-            // if the value is in range we copy the value from our array
-            strncpy(buffer, listElements[row], bufferSize);
-        }
-        else {
-            // otherwise just blank it.
-            buffer[0] = 0;
-        }
-        return true;
-    case RENDERFN_EEPROM_POS: return 0xffff; // lists are generally not saved to EEPROM
-    default: return false;
+    } else if(mode == RENDERFN_VALUE && row < numListItems) {
+        // if the value is in range we copy the value from our array
+        strncpy(buffer, listElements[row], bufferSize);
+        return true; // we have copied.
     }
+    return defaultRtListCallback(item, row, mode, buffer, bufferSize);
 }
 
 void CALLBACK_FUNCTION onDialogBack(int id) {

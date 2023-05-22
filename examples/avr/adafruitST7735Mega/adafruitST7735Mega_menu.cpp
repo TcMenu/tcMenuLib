@@ -22,12 +22,12 @@ GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 
 // Global Menu Item declarations
 const PROGMEM FloatMenuInfo minfoFlt = { "Flt", 6, 0xffff, 3, NO_CALLBACK };
-FloatMenuItem menuFlt(&minfoFlt, 0.0, NULL, INFO_LOCATION_PGM);
+FloatMenuItem menuFlt(&minfoFlt, 0.0, nullptr, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoSubPressMe = { "Press me", 5, 0xffff, 0, NO_CALLBACK };
 ActionMenuItem menuSubPressMe(&minfoSubPressMe, &menuFlt, INFO_LOCATION_PGM);
 const PROGMEM SubMenuInfo minfoSub = { "Sub", 4, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackSub(&minfoSub, &menuSubPressMe, INFO_LOCATION_PGM);
-SubMenuItem menuSub(&minfoSub, &menuBackSub, NULL, INFO_LOCATION_PGM);
+SubMenuItem menuSub(&minfoSub, &menuBackSub, nullptr, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoLge = { "Lge", 3, 0xffff, 0, NO_CALLBACK };
 EditableLargeNumberMenuItem menuLge(&minfoLge, LargeFixedNumber(5, 2, 0U, 0U, false), true, &menuSub, INFO_LOCATION_PGM);
 const PROGMEM BooleanMenuInfo minfoBool = { "Bool", 2, 0xffff, 1, NO_CALLBACK, NAMING_YES_NO };

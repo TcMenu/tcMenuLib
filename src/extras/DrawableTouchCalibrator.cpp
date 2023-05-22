@@ -41,12 +41,12 @@ void IoaTouchScreenCalibrator::renderLoop(unsigned int currentValue, RenderPress
     drawable->drawCircle(Coord(oldX, oldY), 10, true);
 
     Coord dims = drawable->getDisplayDimensions();
-    drawable->drawBox(Coord(0, 50), Coord(dims.x, 45), true);
+    drawable->drawBox(Coord(0, 100), Coord(dims.x, 45), true);
     drawable->setColors(TOUCH_WHITE, TOUCH_BLACK);
-    char sz[40];
+    char sz[50];
     strncpy_P(sz, TXT_TOUCH_CONFIGURE, sizeof(sz));
     auto titleConfig = renderer->getGraphicsPropertiesFactory().configFor(nullptr, tcgfx::ItemDisplayProperties::COMPTYPE_TITLE);
-    drawable->drawText(Coord(0, 45), titleConfig->getFont(), titleConfig->getFontMagnification(), sz);
+    drawable->drawText(Coord(0, 100), titleConfig->getFont(), titleConfig->getFontMagnification(), sz);
 
 #ifdef NEED_XYZ_DEBUG_PRINT
     auto itemConfig = renderer->getGraphicsPropertiesFactory().configFor(nullptr, tcgfx::ItemDisplayProperties::COMPTYPE_ITEM);
@@ -57,9 +57,21 @@ void IoaTouchScreenCalibrator::renderLoop(unsigned int currentValue, RenderPress
     strcat(sz, ", z: ");
     fastltoa(sz, touchState, 1, NOT_PADDED, sizeof sz);
     drawable->setDrawColor(TOUCH_BLACK);
-    drawable->drawBox(Coord(0, 100), Coord(dims.x, 26), true);
+    drawable->drawBox(Coord(0, 140), Coord(dims.x, 50), true);
     drawable->setColors(TOUCH_YELLOW, TOUCH_BLACK);
-    drawable->drawText(Coord(0, 120), itemConfig->getFont(), 0, sz);
+    drawable->drawText(Coord(0, 140), itemConfig->getFont(), 0, sz);
+
+    strcpy(sz, "sx:");
+    fastftoa(sz, calibrationHandler.getMinX(), 3, sizeof sz);
+    strcat(sz, ", ex:");
+    fastftoa(sz, calibrationHandler.getMaxX(), 3, sizeof sz);
+    strcat(sz, ", sy:");
+    fastftoa(sz, calibrationHandler.getMinY(), 3, sizeof sz);
+    strcat(sz, ", ey:");
+    fastftoa(sz, calibrationHandler.getMaxY(), 3, sizeof sz);
+    drawable->setDrawColor(TOUCH_BLACK);
+    drawable->setColors(TOUCH_YELLOW, TOUCH_BLACK);
+    drawable->drawText(Coord(0, 160), itemConfig->getFont(), 0, sz);
 #endif
 
     int buttonSize = 75;
@@ -80,14 +92,20 @@ void IoaTouchScreenCalibrator::renderLoop(unsigned int currentValue, RenderPress
     drawable->drawCircle(Coord(oldX, oldY), 10, true);
     drawable->endDraw();
 
+    // the saved values must ALWAYS be in the original format before any rotations or inverting.
+    auto orientation = touchScreen->getOrientation();
+    auto lastX = orientation.isXInverted() ? (1 - touchScreen->getLastX()) : touchScreen->getLastX();
+    auto lastY = orientation.isYInverted() ? (1 - touchScreen->getLastY()) : touchScreen->getLastY();
+
     if(oldY < buttonSize) {
         // top
         if(oldX < buttonSize) {
-            calibrationHandler.setCalibrationValues(touchScreen->getLastX(), calibrationHandler.getMaxX(),
-                                           touchScreen->getLastY(), calibrationHandler.getMaxY());
+            calibrationHandler.setXPosition(lastX, orientation.isXInverted());
+            calibrationHandler.setYPosition(lastY, orientation.isYInverted());
         } else if(oldX > rightCorner) {
-            calibrationHandler.setCalibrationValues(calibrationHandler.getMinX(), touchScreen->getLastX(),
-                                           touchScreen->getLastY(), calibrationHandler.getMaxY());
+            calibrationHandler.setXPosition(lastX, !orientation.isXInverted());
+            calibrationHandler.setYPosition(lastY, orientation.isYInverted());
+
         }
 
     } else if(oldY > (dims.y - buttonSize)) {
@@ -98,8 +116,7 @@ void IoaTouchScreenCalibrator::renderLoop(unsigned int currentValue, RenderPress
             giveItBack();
         }
         else if(oldX > rightCorner) {
-            calibrationHandler.setCalibrationValues(calibrationHandler.getMinX(), touchScreen->getLastX(),
-                                           calibrationHandler.getMinY(), touchScreen->getLastY());
+            calibrationHandler.setYPosition(lastY, orientation.isYInverted());
         }
     }
     

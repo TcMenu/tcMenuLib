@@ -31,25 +31,25 @@ const char enumStrWiFiMode_0[] PROGMEM = "Station";
 const char enumStrWiFiMode_1[] PROGMEM = "Access Point";
 const char* const enumStrWiFiMode[] PROGMEM  = { enumStrWiFiMode_0, enumStrWiFiMode_1 };
 const PROGMEM EnumMenuInfo minfoWiFiMode = { "WiFi Mode", 19, 0xffff, 1, NO_CALLBACK, enumStrWiFiMode };
-EnumMenuItem menuWiFiMode(&minfoWiFiMode, 0, NULL, INFO_LOCATION_PGM);
+EnumMenuItem menuWiFiMode(&minfoWiFiMode, 0, nullptr, INFO_LOCATION_PGM);
 const PROGMEM char pgmStrAuthenticatorText[] = { "Authenticator" };
 EepromAuthenticationInfoMenuItem menuAuthenticator(pgmStrAuthenticatorText, NO_CALLBACK, 18, &menuWiFiMode);
 const PROGMEM char pgmStrIoTMonitorText[] = { "IoT Monitor" };
 RemoteMenuItem menuIoTMonitor(pgmStrIoTMonitorText, 17, &menuAuthenticator);
-RENDERING_CALLBACK_NAME_INVOKE(fnIpAddressRtCall, ipAddressRenderFn, "IpAddress", -1, NO_CALLBACK)
-IpAddressMenuItem menuIpAddress(fnIpAddressRtCall, IpAddressStorage(127, 0, 0, 1), 10, &menuIoTMonitor);
-RENDERING_CALLBACK_NAME_INVOKE(fnPwdRtCall, textItemRenderFn, "Pwd", 23, NO_CALLBACK)
-TextMenuItem menuPwd(fnPwdRtCall, "", 12, 15, &menuIpAddress);
-RENDERING_CALLBACK_NAME_INVOKE(fnSSIDRtCall, textItemRenderFn, "SSID", 8, NO_CALLBACK)
-TextMenuItem menuSSID(fnSSIDRtCall, "", 11, 15, &menuPwd);
+const PROGMEM AnyMenuInfo minfoIpAddress = { "IpAddress", 10, 0xffff, 0, NO_CALLBACK };
+IpAddressMenuItem menuIpAddress(&minfoIpAddress, IpAddressStorage(127, 0, 0, 1), &menuIoTMonitor, INFO_LOCATION_PGM);
+const PROGMEM AnyMenuInfo minfoPwd = { "Pwd", 12, 23, 0, NO_CALLBACK };
+TextMenuItem menuPwd(&minfoPwd, "", 15, &menuIpAddress, INFO_LOCATION_PGM);
+const PROGMEM AnyMenuInfo minfoSSID = { "SSID", 11, 8, 0, NO_CALLBACK };
+TextMenuItem menuSSID(&minfoSSID, "", 15, &menuPwd, INFO_LOCATION_PGM);
 const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 9, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackConnectivity(&minfoConnectivity, &menuSSID, INFO_LOCATION_PGM);
-SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, NULL, INFO_LOCATION_PGM);
+SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, nullptr, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoLoadFiles = { "Load Files", 15, 0xffff, 0, onLoadFiles };
 ActionMenuItem menuLoadFiles(&minfoLoadFiles, &menuConnectivity, INFO_LOCATION_PGM);
 extern char fileChoicesArray[];
-RENDERING_CALLBACK_NAME_INVOKE(fnFileRtCall, enumItemRenderFn, "File", -1, onFileChoice)
-ScrollChoiceMenuItem menuFile(14, fnFileRtCall, 0, fileChoicesArray, 10, 1, &menuLoadFiles);
+const PROGMEM AnyMenuInfo minfoFile = { "File", 14, 0xffff, 0, onFileChoice };
+ScrollChoiceMenuItem menuFile(&minfoFile, 0, fileChoicesArray, 10, 1, &menuLoadFiles, INFO_LOCATION_PGM);
 const PROGMEM BooleanMenuInfo minfoSecretEntry = { "Secret Entry", 13, 0xffff, 1, NO_CALLBACK, NAMING_TRUE_FALSE };
 BooleanMenuItem menuSecretEntry(&minfoSecretEntry, false, &menuFile, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoSaveAll = { "Save All", 8, 0xffff, 0, onSaveAll };
@@ -68,7 +68,7 @@ const PROGMEM EnumMenuInfo minfoHeaterPower = { "Heater Power", 6, 4, 2, onHeate
 EnumMenuItem menuHeaterPower(&minfoHeaterPower, 0, &menuWinOpening, INFO_LOCATION_PGM);
 const PROGMEM SubMenuInfo minfoSetup = { "Setup", 5, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackSetup(&minfoSetup, &menuHeaterPower, INFO_LOCATION_PGM);
-SubMenuItem menuSetup(&minfoSetup, &menuBackSetup, NULL, INFO_LOCATION_PGM);
+SubMenuItem menuSetup(&minfoSetup, &menuBackSetup, nullptr, INFO_LOCATION_PGM);
 const PROGMEM BooleanMenuInfo minfoLockDoor = { "Lock Door", 16, 38, 1, onLockDoor, NAMING_YES_NO };
 BooleanMenuItem menuLockDoor(&minfoLockDoor, false, &menuSetup, INFO_LOCATION_PGM);
 const PROGMEM BooleanMenuInfo minfoElectricHeater = { "Electric Heater", 4, 3, 1, onElectricHeater, NAMING_ON_OFF };
@@ -85,11 +85,11 @@ void setupMenu() {
     authManager.initialise(menuMgr.getEepromAbstraction(), 100);
     menuMgr.setAuthenticator(&authManager);
     // Now add any readonly, non-remote and visible flags.
+    menuIpAddress.setReadOnly(true);
     menuCucumberTemp.setReadOnly(true);
     menuTomatoTemp.setReadOnly(true);
-    menuIpAddress.setReadOnly(true);
-    menuAuthenticator.setLocalOnly(true);
     menuPwd.setLocalOnly(true);
+    menuAuthenticator.setLocalOnly(true);
     menuSSID.setLocalOnly(true);
     menuIoTMonitor.setLocalOnly(true);
     menuSecretEntry.setVisible(false);

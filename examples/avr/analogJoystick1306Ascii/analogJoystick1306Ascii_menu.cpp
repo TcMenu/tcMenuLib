@@ -21,7 +21,7 @@ AnalogJoystickToButtons joystickIoXAxis(internalAnalogIo(), A1, 0.5);
 
 // Global Menu Item declarations
 const PROGMEM AnyMenuInfo minfoSettingsSaveAll = { "Save All", 7, 0xffff, 0, onSave };
-ActionMenuItem menuSettingsSaveAll(&minfoSettingsSaveAll, NULL, INFO_LOCATION_PGM);
+ActionMenuItem menuSettingsSaveAll(&minfoSettingsSaveAll, nullptr, INFO_LOCATION_PGM);
 const char enumStrSettingsDifficulty_0[] PROGMEM = "Easy";
 const char enumStrSettingsDifficulty_1[] PROGMEM = "Medium";
 const char enumStrSettingsDifficulty_2[] PROGMEM = "Hard";
@@ -32,7 +32,7 @@ const PROGMEM AnalogMenuInfo minfoSettingsFrameRate = { "Frame Rate", 5, 4, 10, 
 AnalogMenuItem menuSettingsFrameRate(&minfoSettingsFrameRate, 5, &menuSettingsDifficulty, INFO_LOCATION_PGM);
 const PROGMEM SubMenuInfo minfoSettings = { "Settings", 4, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackSettings(&minfoSettings, &menuSettingsFrameRate, INFO_LOCATION_PGM);
-SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, NULL, INFO_LOCATION_PGM);
+SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, nullptr, INFO_LOCATION_PGM);
 const PROGMEM AnalogMenuInfo minfoHighScore = { "High Score", 3, 2, 10000, NO_CALLBACK, 0, 1, "" };
 AnalogMenuItem menuHighScore(&minfoHighScore, 0, &menuSettings, INFO_LOCATION_PGM);
 const PROGMEM AnyMenuInfo minfoStartGame = { "Start Game", 2, 0xffff, 0, onStartGame };

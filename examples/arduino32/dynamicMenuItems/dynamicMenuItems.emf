@@ -271,7 +271,7 @@
       "type": "runtimeList",
       "item": {
         "initialRows": 116,
-        "usingInfoBlock": false,
+        "listCreationMode": "CUSTOM_RTCALL",
         "name": "List",
         "variableName": "List",
         "id": 13,
@@ -595,18 +595,19 @@
     ],
     "namingRecursive": true,
     "useCppMain": false,
-    "saveLocation": "ALL_TO_CURRENT",
+    "saveLocation": "PROJECT_TO_CURRENT_WITH_GENERATED",
     "usingSizedEEPROMStorage": false,
     "eepromDefinition": "",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
-      "mcp23017:io23017:32:10",
-      "deviceIO:"
+      "deviceIO:",
+      "mcp23017:io23017:32:10"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []
     },
     "packageNamespace": "",
     "appIsModular": false
-  }
+  },
+  "stringLists": []
 }
