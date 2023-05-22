@@ -26,11 +26,12 @@ MenuTouchScreenManager touchScreen(&touchInterrogator, &renderer, touchOrientati
 tcextras::IoaTouchScreenCalibrator touchCalibrator(&touchScreen, &renderer, 400);
 
 // Global Menu Item declarations
-ListRuntimeMenuItem menuRootList(17, 0, fnRootListRtCall, NULL);
+const AnyMenuInfo minfoRootList = { "Root List", 17, 0xffff, 0, NO_CALLBACK };
+ListRuntimeMenuItem menuRootList(&minfoRootList, 0, fnRootListRtCall, nullptr, INFO_LOCATION_PGM);
 const AnyMenuInfo minfoDialogs = { "Dialogs", 12, 0xffff, 0, onShowDialogs };
 ActionMenuItem menuDialogs(&minfoDialogs, &menuRootList, INFO_LOCATION_PGM);
 RENDERING_CALLBACK_NAME_OVERRIDDEN(fnStatusInfoRtCall, infoRenderingRtCall, "Info", -1)
-TextMenuItem menuStatusInfo(fnStatusInfoRtCall, "", 19, 5, NULL);
+TextMenuItem menuStatusInfo(fnStatusInfoRtCall, "", 19, 5, nullptr);
 AnyMenuInfo minfoStatusRestart = { "Restart", 11, 0xffff, 0, onRestart };
 ActionMenuItem menuStatusRestart(&minfoStatusRestart, &menuStatusInfo, INFO_LOCATION_RAM);
 const FloatMenuInfo minfoStatusLineVoltage = { "Line Voltage", 10, 0xffff, 2, NO_CALLBACK };
@@ -48,16 +49,16 @@ EnumMenuItem menuStatusAmpStatus(&minfoStatusAmpStatus, 0, &menuStatusAmpPower, 
 const SubMenuInfo minfoStatus = { "Status", 7, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackStatus(&minfoStatus, &menuStatusAmpStatus, INFO_LOCATION_PGM);
 SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuDialogs, INFO_LOCATION_PGM);
-RENDERING_CALLBACK_NAME_INVOKE(fnSettingsNlgeRtCall, largeNumItemRenderFn, "NLge", -1, NO_CALLBACK)
-EditableLargeNumberMenuItem menuSettingsNlge(fnSettingsNlgeRtCall, LargeFixedNumber(8, 0, 0U, 0U, false), 18, true, NULL);
-RENDERING_CALLBACK_NAME_INVOKE(fnSettingsLargeNumRtCall, largeNumItemRenderFn, "LargeNum", -1, NO_CALLBACK)
-EditableLargeNumberMenuItem menuSettingsLargeNum(fnSettingsLargeNumRtCall, LargeFixedNumber(8, 3, 100U, 500U, false), 16, false, &menuSettingsNlge);
-RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRGBRtCall, rgbAlphaItemRenderFn, "RGB", -1, NO_CALLBACK)
-Rgb32MenuItem menuSettingsRGB(fnSettingsRGBRtCall, RgbColor32(0, 0, 0), 15, false, &menuSettingsLargeNum);
-RENDERING_CALLBACK_NAME_INVOKE(fnSettingsIPRtCall, ipAddressRenderFn, "IP", 19, NO_CALLBACK)
-IpAddressMenuItem menuSettingsIP(fnSettingsIPRtCall, IpAddressStorage(192, 168, 0, 33), 14, &menuSettingsRGB);
-RENDERING_CALLBACK_NAME_INVOKE(fnSettingsTextRtCall, textItemRenderFn, "Text", 9, NO_CALLBACK)
-TextMenuItem menuSettingsText(fnSettingsTextRtCall, "hello", 13, 10, &menuSettingsIP);
+const AnyMenuInfo minfoSettingsNlge = { "NLge", 18, 0xffff, 0, NO_CALLBACK };
+EditableLargeNumberMenuItem menuSettingsNlge(&minfoSettingsNlge, LargeFixedNumber(8, 0, 0U, 0U, false), true, nullptr, INFO_LOCATION_PGM);
+const AnyMenuInfo minfoSettingsLargeNum = { "LargeNum", 16, 0xffff, 0, NO_CALLBACK };
+EditableLargeNumberMenuItem menuSettingsLargeNum(&minfoSettingsLargeNum, LargeFixedNumber(8, 3, 100U, 500U, false), false, &menuSettingsNlge, INFO_LOCATION_PGM);
+const AnyMenuInfo minfoSettingsRGB = { "RGB", 15, 0xffff, 0, NO_CALLBACK };
+Rgb32MenuItem menuSettingsRGB(&minfoSettingsRGB, RgbColor32(0, 0, 0), false, &menuSettingsLargeNum, INFO_LOCATION_PGM);
+const AnyMenuInfo minfoSettingsIP = { "IP", 14, 19, 0, NO_CALLBACK };
+IpAddressMenuItem menuSettingsIP(&minfoSettingsIP, IpAddressStorage(192, 168, 0, 33), &menuSettingsRGB, INFO_LOCATION_PGM);
+const AnyMenuInfo minfoSettingsText = { "Text", 13, 9, 0, NO_CALLBACK };
+TextMenuItem menuSettingsText(&minfoSettingsText, "hello", 10, &menuSettingsIP, INFO_LOCATION_PGM);
 const BooleanMenuInfo minfoSettingsProtection = { "Protection", 6, 0xffff, 1, NO_CALLBACK, NAMING_ON_OFF };
 BooleanMenuItem menuSettingsProtection(&minfoSettingsProtection, false, &menuSettingsText, INFO_LOCATION_PGM);
 const AnalogMenuInfo minfoSettingsMaxOnVolume = { "Max On Volume", 5, 7, 255, NO_CALLBACK, -180, 2, "dB" };
