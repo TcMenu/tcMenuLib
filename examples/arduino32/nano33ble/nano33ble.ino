@@ -14,6 +14,7 @@
 #include "MotionDetection.h"
 #include <AnalogDeviceAbstraction.h>
 #include <tcMenuVersion.h>
+#include <stockIcons/wifiAndConnectionIcons16x12.h>
 
 // on the analog menu, we both have an analog input and an analog output (PWM). You can configure those pins here.
 const int analogInputPin = A0;
@@ -24,6 +25,8 @@ SensorManager sensorManager;
 
 // We create an event class extending BaseEvent to manage the motion detection
 MotionDetection motionDetection;
+
+TitleWidget bleRssiWidget(iconsWifi, 5, 16, 12, nullptr);
 
 void setup() {
     // start up serial and wait for it to actually begin, needed on this board.
@@ -44,6 +47,17 @@ void setup() {
     menuMgr.setUseWrapAroundEncoder(false);
     // We can also define overrides for a particular menu item
     menuMgr.addEncoderWrapOverride(menuAnalogReadingsOutputPWM, true);
+
+    // add a title widget that represents the ble signal strength / connection
+    // and create a task that updates its status each second.
+    renderer.setFirstWidget(&bleRssiWidget);
+    taskManager.schedule(repeatSeconds(1), [] {
+        if(!BLE.connected()) bleRssiWidget.setCurrentState(0);
+        else if(BLE.rssi() > 80) bleRssiWidget.setCurrentState(1);
+        else if(BLE.rssi() > 65) bleRssiWidget.setCurrentState(2);
+        else if(BLE.rssi() > 55) bleRssiWidget.setCurrentState(3);
+        else bleRssiWidget.setCurrentState(4);
+    });
 
     // and set up the menu itself, so it starts displaying and accepting input
     setupMenu();
