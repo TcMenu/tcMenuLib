@@ -30,7 +30,7 @@ inline void logMessageHeader(const char* tx, int remoteNo, uint16_t msgType) {
     sz[0] = char(msgType>>8);
     sz[1] = char(msgType & 0xff);
     sz[2] = 0;
-    serlog2(SER_NETWORK_DEBUG, remoteNo, sz);
+    serlog3(SER_NETWORK_DEBUG, tx, remoteNo, sz);
 }
 #else
 #define logMessageHeader(x, y, z)

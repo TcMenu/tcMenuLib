@@ -11,6 +11,7 @@
 #include <tcMenu.h>
 #include "nano33ble_menu.h"
 #include "ThemeMonoInverse.h"
+#include "tcMenuBLERemoteConnector.h"
 
 // Global variable declarations
 const  ConnectorLocalInfo applicationInfo = { "Nano 33 BLE Sense", "e95fcf8a-8a03-4043-9313-01fd8b8e8707" };
@@ -49,6 +50,10 @@ AnalogMenuItem menuHumidity(&minfoHumidity, 0, &menuBPressure, INFO_LOCATION_PGM
 const AnalogMenuInfo minfoTemp = { "Temp", 1, 0xffff, 2000, NO_CALLBACK, 0, 10, "C" };
 AnalogMenuItem menuTemp(&minfoTemp, 0, &menuHumidity, INFO_LOCATION_PGM);
 
+tcremote::TcMenuRemoteServer remoteServer(applicationInfo);
+tcremote::BLEDeviceInitialisation bleInitialisation;
+tcremote::BLETagValTransport bleTransport;
+
 void setupMenu() {
     // First we set up eeprom and authentication (if needed).
     setSizeBasedEEPROMStorageEnabled(false);
@@ -65,5 +70,7 @@ void setupMenu() {
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
     renderer.setUseSliderForAnalog(false);
     installMonoInverseTitleTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(nullptr, 1), true);
+
+    remoteServer.addConnection(new tcremote::TagValueRemoteServerConnection(bleTransport, bleInitialisation));
 }
 

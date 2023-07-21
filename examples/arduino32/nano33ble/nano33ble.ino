@@ -9,7 +9,7 @@
  * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
  */
 
-#include "nano33ble_menu.h"
+#include "generated/nano33ble_menu.h"
 #include "SensorManager.h"
 #include "MotionDetection.h"
 #include <AnalogDeviceAbstraction.h>
@@ -26,7 +26,12 @@ SensorManager sensorManager;
 MotionDetection motionDetection;
 
 void setup() {
+    // start up serial and wait for it to actually begin, needed on this board.
     Serial.begin(115200);
+    while(!Serial);
+
+    serEnableLevel(SER_NETWORK_DEBUG, true);
+
     Wire.begin();
     Wire.setClock(400000);
 

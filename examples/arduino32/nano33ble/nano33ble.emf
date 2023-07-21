@@ -364,13 +364,13 @@
     ],
     "namingRecursive": true,
     "useCppMain": false,
-    "saveLocation": "ALL_TO_CURRENT",
+    "saveLocation": "PROJECT_TO_CURRENT_WITH_GENERATED",
     "usingSizedEEPROMStorage": false,
     "eepromDefinition": "",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
-      "customIO:io23017",
-      "deviceIO:"
+      "deviceIO:",
+      "customIO:io23017"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []

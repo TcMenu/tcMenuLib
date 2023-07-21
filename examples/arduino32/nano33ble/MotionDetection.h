@@ -3,7 +3,7 @@
 
 #include <TaskManager.h>
 #include <Arduino_LSM9DS1.h>
-#include "nano33ble_menu.h"
+#include "generated/nano33ble_menu.h"
 
 /**
  * Here we create a polling event that checks if the acceleration / magnetic data is available, and whenever it is

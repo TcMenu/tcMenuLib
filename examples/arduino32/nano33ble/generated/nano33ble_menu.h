@@ -16,6 +16,7 @@
 #include "tcMenuU8g2.h"
 #include <IoAbstraction.h>
 #include <EepromItemStorage.h>
+#include "tcMenuBLERemoteConnector.h"
 
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
