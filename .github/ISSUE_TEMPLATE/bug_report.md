@@ -13,9 +13,6 @@ A clear and concise description of what the bug is.
 **Confirm that the bug is in the embedded library**
 If the bug is in the designer, or you are not sure, raise in the main [tcMenu repo](https://github.com/davetcc/tcMenu).
 
-**Commerical or personal/community use**
-You must declare if you are a commercial entity using tcMenu in a business capacity.
-
 **To Reproduce**
 Please include a simple sketch that recreates the problem unless the problem is so easily recreated that such a sketch is not needed.
 
