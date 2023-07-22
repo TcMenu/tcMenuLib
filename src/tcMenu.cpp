@@ -9,6 +9,7 @@
 #include "ScrollChoiceMenuItem.h"
 #include "MenuIterator.h"
 #include "SecuredMenuPopup.h"
+#include "extras/TwoButtonSwitchEncoder.h"
 #include <IoAbstraction.h>
 #include <BaseDialog.h>
 
@@ -57,6 +58,12 @@ void MenuManager::initFor4WayJoystick(MenuRenderer* renderer, MenuItem* root, pi
     }
     setupUpDownButtonEncoder(upPin, downPin, leftPin, rightPin, &fourWayPassThru, [](int val) {menuMgr.valueChanged(val);}, speed);
     renderer->initialise();
+}
+
+void MenuManager::initForTwoButton(MenuRenderer *r, MenuItem *root, pinid_t upPin, pinid_t downPin) {
+    this->renderer = r;
+    navigator.setRootItem(root);
+    switches.setEncoder(new TwoButtonSwitchEncoder(upPin, downPin, [](int v) { menuMgr.valueChanged(v); }));
 }
 
 void MenuManager::initForUpDownOk(MenuRenderer* renderer, MenuItem* root, pinid_t pinDown, pinid_t pinUp, pinid_t pinOk, int speed) {

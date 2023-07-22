@@ -219,6 +219,15 @@ public:
                              pinid_t rightPin, pinid_t okPin, int speed=20);
 
     /**
+     * Initialise for up a 2 button joystick where the up doubles as back, and the down doubles as OK when held.
+     * @param renderer the renderer used for drawing
+     * @param root the first menu item
+     * @param upPin the button on up
+     * @param downPin the button for down
+     */
+    void initForTwoButton(MenuRenderer* renderer, MenuItem* root, pinid_t upPin, pinid_t downPin);
+
+    /**
 	 * Initialise in situations where local input is not needed or where a custom type of input is needed
      * that is not one of the common types.
      * 
