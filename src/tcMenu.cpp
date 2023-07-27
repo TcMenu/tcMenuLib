@@ -64,6 +64,7 @@ void MenuManager::initForTwoButton(MenuRenderer *r, MenuItem *root, pinid_t upPi
     this->renderer = r;
     navigator.setRootItem(root);
     switches.setEncoder(new TwoButtonSwitchEncoder(upPin, downPin, [](int v) { menuMgr.valueChanged(v); }));
+    renderer->initialise();
 }
 
 void MenuManager::initForUpDownOk(MenuRenderer* renderer, MenuItem* root, pinid_t pinDown, pinid_t pinUp, pinid_t pinOk, int speed) {

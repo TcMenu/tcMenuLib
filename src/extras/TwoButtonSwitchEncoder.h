@@ -31,34 +31,12 @@ public:
      * @param down the down button (doubles as OK when held)
      * @param callbackFn the encoder change callback.
      */
-    TwoButtonSwitchEncoder(pinid_t up, pinid_t down, EncoderCallbackFn callbackFn)
-                : RotaryEncoder(callbackFn), upPin(up), downPin(down) {
-        //switches.addSwitchListener(up, this, NO_REPEAT);
-        //switches.addSwitchListener(down, this, NO_REPEAT);
-    }
+    TwoButtonSwitchEncoder(pinid_t up, pinid_t down, EncoderCallbackFn callbackFn);
 
-    void onPressed(pinid_t pin, bool held) override {
-        // ignored as we need to only handle once the button is released.
-    }
+    void onPressed(pinid_t pin, bool held) override;
 
-    void onReleased(pinid_t pin, bool held) override {
-        auto invert = intent == SCROLL_THROUGH_ITEMS;
-        if(pin == upPin) {
-            if(held) {
-                menuMgr.performDirectionMove(true);
-            } else {
-                int8_t dir = invert ? -stepSize : stepSize;
-                increment(dir);
-            }
-        } else if(pin == downPin) {
-            if(held) {
-                menuMgr.onMenuSelect(false);
-            } else {
-                int8_t dir = invert ? stepSize : -stepSize;
-                increment(dir);
-            }
-        }
-    }
+    void onReleased(pinid_t pin, bool held) override;
+
 };
 
 #endif //TCMENU_TWOBUTTONSWITCHCONTROL_H
