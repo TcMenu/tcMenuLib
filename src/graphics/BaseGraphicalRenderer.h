@@ -76,6 +76,17 @@ namespace tcgfx {
         LAYOUT_CARD_SIDEWAYS
     };
 
+    class BaseGraphicalRenderer;
+
+    /** Used to tie together the navigation change events with the renderer without multiple inheritance */
+    class RenderingNavigationListener : public tcnav::NavigationListener {
+    private:
+        BaseGraphicalRenderer* renderer;
+    public:
+        explicit RenderingNavigationListener(BaseGraphicalRenderer* r);
+        void navigationHasChanged(MenuItem *newItem, bool completelyReset) override;
+    };
+
     /**
      * This is the base class for all simpler renderer classes where the height of a row is equal for all entries,
      * and there is always exactly one item on a row. This takes away much of the work to row allocation for simple
@@ -105,7 +116,15 @@ namespace tcgfx {
             /** this indicates that the drawing is ending */
             DRAW_COMMAND_ENDED
         };
+
+        /**
+         * The current menu from the renderers perspective
+         * @return the current menu that the rendering layer is drawing for
+         */
+        MenuItem *getCurrentRendererRoot() { return currentRootMenu; }
+
     private:
+        RenderingNavigationListener navigationListener;
         MenuItem *currentRootMenu;
         const char *pgmTitle;
         GridPositionRowCacheEntry cachedEntryItem;
@@ -115,18 +134,8 @@ namespace tcgfx {
         uint8_t flags;
         uint16_t width, height;
     public:
-        BaseGraphicalRenderer(int bufferSize, int wid, int hei, bool lastRowExact, const char *appTitle)
-                : BaseMenuRenderer(bufferSize, RENDER_TYPE_CONFIGURABLE) {
-            width = wid;
-            height = hei;
-            flags = 0;
-            setTitleOnDisplay(true);
-            setLastRowExactFit(lastRowExact);
-            setUseSliderForAnalog(true);
-            setEditStatusIconsEnabled(true);
-            currentRootMenu = nullptr;
-            pgmTitle = appTitle;
-        }
+        BaseGraphicalRenderer(int bufferSize, int wid, int hei, bool lastRowExact, const char *appTitle);
+        void initialise() override;
 
         void setTitleMode(TitleMode mode);
 
@@ -300,10 +309,14 @@ namespace tcgfx {
         /**
          * Force the renderer to completely recalculate the display parameters next time it's drawn.
          */
-        void displayPropertiesHaveChanged() {
-            currentRootMenu = nullptr;
-            redrawMode = MENUDRAW_COMPLETE_REDRAW;
-        }
+        void displayPropertiesHaveChanged();
+
+        /**
+         * This is generally called by the navigation listener when the root item has changed due to a new menu being
+         * displayed, or display reset event. It will force an immediate recalculation of all items.
+         * @param newItem the new root item
+         */
+        void rootHasChanged(MenuItem* newItem);
 
     protected:
         /**
@@ -317,8 +330,6 @@ namespace tcgfx {
         virtual void subMenuRender(MenuItem* rootItem, uint8_t& locRedrawMode, bool& forceDrawWidgets);
         int heightOfRow(int row, bool includeSpace=false);
     private:
-        void checkIfRootHasChanged();
-
         bool drawTheMenuItems(int startRow, int startY, bool drawEveryLine);
 
         void renderList();

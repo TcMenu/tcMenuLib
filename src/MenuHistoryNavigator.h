@@ -19,6 +19,13 @@
 #endif
 
 namespace tcnav {
+    class NavigationListener {
+        NavigationListener* next = nullptr;
+    public:
+        virtual void navigationHasChanged(MenuItem* newItem, bool completelyReset)=0;
+        NavigationListener* getNext() { return next; }
+        void setNext(NavigationListener* nxt) { next = nxt; }
+    };
 
     class MenuNavigationStore {
     private:
@@ -27,10 +34,15 @@ namespace tcnav {
         MenuItem* currentSub;
         MenuItem* navItems[NAV_ITEM_ARRAY_SIZE];
         MenuItem* activeItems[NAV_ITEM_ARRAY_SIZE];
+        NavigationListener* navigationLister = nullptr;
         uint8_t navIdx;
         bool currentIsCustom;
     public:
         MenuNavigationStore() = default;
+
+        void addNavigationListener(NavigationListener* newListener);
+
+        void triggerNavigationListener(bool completeReset);
 
         /**
          * @return the absolute root of all menu items

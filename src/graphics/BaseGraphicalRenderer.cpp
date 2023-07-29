@@ -9,9 +9,9 @@
 
 namespace tcgfx {
 
-
 void BaseGraphicalRenderer::render() {
-    checkIfRootHasChanged();
+    // do not attempt rendering before everything is initialised.
+    if(currentRootMenu == nullptr) return;
 
     uint8_t locRedrawMode = redrawMode;
     redrawMode = MENUDRAW_NO_CHANGE;
@@ -263,11 +263,7 @@ GridPosition::GridDrawingMode modeFromItem(MenuItem* item, bool useSlider) {
     }
 }
 
-void BaseGraphicalRenderer::checkIfRootHasChanged() {
-    auto* rootItem = menuMgr.getCurrentMenu();
-    if(currentRootMenu != rootItem)
-    {
-        serlogF(SER_TCMENU_INFO, "root has changed");
+void BaseGraphicalRenderer::rootHasChanged(MenuItem* rootItem) {
         currentRootMenu = rootItem;
         redrawMode = MENUDRAW_COMPLETE_REDRAW;
         recalculateDisplayOrder(rootItem, false);
@@ -278,7 +274,6 @@ void BaseGraphicalRenderer::checkIfRootHasChanged() {
             serlogF3(SER_TCMENU_INFO, "Force encoder size: ", switches.getEncoder()->getMaximumValue(), expectedCount)
             menuMgr.setItemsInCurrentMenu(expectedCount, switches.getEncoder()->getCurrentReading());
         }
-    }
 }
 
 void BaseGraphicalRenderer::recalculateDisplayOrder(MenuItem *root, bool safeMode) {
@@ -394,7 +389,6 @@ int BaseGraphicalRenderer::calculateHeightTo(int index, MenuItem *pItem) {
 }
 
 uint8_t BaseGraphicalRenderer::itemCount(MenuItem*, bool ) {
-    checkIfRootHasChanged();
     if(currentRootMenu && currentRootMenu->getMenuType() == MENUTYPE_RUNTIME_LIST) {
         auto* listItem = reinterpret_cast<ListRuntimeMenuItem*>(currentRootMenu);
         return listItem->getNumberOfRows() + 1; // accounts for title.
@@ -405,7 +399,6 @@ uint8_t BaseGraphicalRenderer::itemCount(MenuItem*, bool ) {
 }
 
 int BaseGraphicalRenderer::findItemIndex(MenuItem *root, MenuItem *toFind) {
-    checkIfRootHasChanged();
     for(bsize_t i=0;i<itemOrderByRow.count();i++) {
         auto* possibleActive = itemOrderByRow.itemAtIndex(i);
         if(possibleActive->getMenuItem() == toFind) return i;
@@ -414,7 +407,6 @@ int BaseGraphicalRenderer::findItemIndex(MenuItem *root, MenuItem *toFind) {
 }
 
 int BaseGraphicalRenderer::findActiveItem(MenuItem* root) {
-    checkIfRootHasChanged();
     if(currentRootMenu && currentRootMenu->getMenuType() == MENUTYPE_RUNTIME_LIST) {
         auto* listItem = reinterpret_cast<ListRuntimeMenuItem*>(currentRootMenu);
         return listItem->getActiveIndex(); // accounts for title.
@@ -427,7 +419,6 @@ int BaseGraphicalRenderer::findActiveItem(MenuItem* root) {
 }
 
 MenuItem *BaseGraphicalRenderer::getMenuItemAtIndex(MenuItem* item, uint8_t idx) {
-    checkIfRootHasChanged();
     if(currentRootMenu && currentRootMenu->getMenuType() == MENUTYPE_RUNTIME_LIST) {
         return currentRootMenu;
     }
@@ -463,6 +454,30 @@ void BaseGraphicalRenderer::setTitleMode(BaseGraphicalRenderer::TitleMode mode) 
     menuMgr.changeMenu(menuMgr.getCurrentMenu());
 }
 
+BaseGraphicalRenderer::BaseGraphicalRenderer(int bufferSize, int wid, int hei, bool lastRowExact,const char *appTitle)
+        : BaseMenuRenderer(bufferSize, RENDER_TYPE_CONFIGURABLE), navigationListener(this) {
+    width = wid;
+    height = hei;
+    flags = 0;
+    setTitleOnDisplay(true);
+    setLastRowExactFit(lastRowExact);
+    setUseSliderForAnalog(true);
+    setEditStatusIconsEnabled(true);
+    currentRootMenu = nullptr;
+    pgmTitle = appTitle;
+}
+
+void BaseGraphicalRenderer::initialise() {
+    BaseMenuRenderer::initialise();
+    menuMgr.getNavigationStore().addNavigationListener(&navigationListener);
+}
+
+void BaseGraphicalRenderer::displayPropertiesHaveChanged() {
+    currentRootMenu = nullptr;
+    rootHasChanged(menuMgr.getCurrentMenu());
+    redrawMode = MENUDRAW_COMPLETE_REDRAW;
+}
+
 void preparePropertiesFromConfig(ConfigurableItemDisplayPropertiesFactory& factory, const ColorGfxMenuConfig<const void*>* gfxConfig, int titleHeight, int itemHeight) {
     // TEXT, BACKGROUND, HIGHLIGHT1, HIGHLIGHT2, SELECTED_FG, SELECTED_BG
     color_t paletteItems[] { gfxConfig->fgItemColor, gfxConfig->bgItemColor, gfxConfig->bgSelectColor, gfxConfig->fgSelectColor};
@@ -477,6 +492,17 @@ void preparePropertiesFromConfig(ConfigurableItemDisplayPropertiesFactory& facto
     factory.addImageToCache(DrawableIcon(SPECIAL_ID_ACTIVE_ICON, Coord(gfxConfig->editIconWidth, gfxConfig->editIconHeight), DrawableIcon::ICON_XBITMAP, gfxConfig->activeIcon));
 
     ConfigurableItemDisplayPropertiesFactory::refreshCache();
+}
+
+void RenderingNavigationListener::navigationHasChanged(MenuItem *newItem, bool completelyReset) {
+    if(renderer->getCurrentRendererRoot() != newItem) {
+        serlogF(SER_TCMENU_INFO, "Rendering root needs to change");
+        renderer->rootHasChanged(newItem);
+    }
+}
+
+RenderingNavigationListener::RenderingNavigationListener(BaseGraphicalRenderer *r) {
+    renderer = r;
 }
 
 } // namespace tcgfx

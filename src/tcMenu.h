@@ -69,7 +69,7 @@ class CommitCallbackObserver : public MenuManagerObserver {
 private:
     MenuCallbackFn commitCb;
 public:
-    CommitCallbackObserver(MenuCallbackFn callbackFn) {
+    explicit CommitCallbackObserver(MenuCallbackFn callbackFn) {
         commitCb = callbackFn;
     }
 
@@ -534,4 +534,4 @@ inline bool editorHintNeedsCursor(CurrentEditorRenderingHints::EditorRenderingTy
  */
 extern MenuManager menuMgr;
 
-#endif // defined header file
+#endif // TCMENU_MANAGER_H
