@@ -67,7 +67,7 @@ namespace tcgfx {
         GraphicsDeviceRenderer(int bufferSize, const char *appTitle, DeviceDrawable *drawable);
 
         void drawWidget(Coord where, TitleWidget *widget, color_t colorFg, color_t colorBg) override;
-        void drawMenuItem(GridPositionRowCacheEntry *entry, Coord where, Coord areaSize, bool drawAll) override;
+        void drawMenuItem(GridPositionRowCacheEntry *entry, Coord where, Coord areaSize, const DrawingFlags& drawingFlags) override;
         void drawingCommand(RenderDrawingCommand command) override;
 
         void fillWithBackgroundTo(int endPoint) override;
@@ -156,16 +156,18 @@ namespace tcgfx {
          * @param locRedrawMode reference to the local redraw mode. May be updated
          * @param forceDrawWidgets reference to if the widgets are to be force drawn, may be updated
          */
-        virtual void subMenuRender(MenuItem* rootItem, uint8_t& locRedrawMode, bool& forceDrawWidgets);
+        void subMenuRender(MenuItem* rootItem, uint8_t& locRedrawMode, bool& forceDrawWidgets) override;
+        bool isActiveOrEditing(MenuItem* pItem, const DrawingFlags& drawingFlags);
     private:
         int calculateSpaceBetween(const void* font, uint8_t mag, const char* buffer, int start, int end);
-        void internalDrawText(GridPositionRowCacheEntry* pEntry, const Coord& where, const Coord& size);
-        void drawCoreLineItem(GridPositionRowCacheEntry* entry, DrawableIcon* icon, Coord &where, Coord &size, bool drawBg);
-        void drawTextualItem(GridPositionRowCacheEntry* entry, Coord& where, Coord& size);
-        void drawCheckbox(GridPositionRowCacheEntry *entry, Coord& where, Coord& size);
-        void drawSlider(GridPositionRowCacheEntry* entry, AnalogMenuItem* pItem, Coord& where, Coord& size);
-        void drawUpDownItem(GridPositionRowCacheEntry* entry, Coord& where, Coord& size);
-        void drawIconItem(GridPositionRowCacheEntry *pEntry, Coord& where, Coord& size);
+        void internalDrawText(GridPositionRowCacheEntry* pEntry, const Coord& where, const Coord& size, const DrawingFlags& drawingFlags);
+        void drawCoreLineItem(GridPositionRowCacheEntry* entry, DrawableIcon* icon, Coord &where, Coord &size,
+                              const DrawingFlags& drawingFlags, bool drawBg);
+        void drawTextualItem(GridPositionRowCacheEntry* entry, Coord& where, Coord& size, const DrawingFlags& drawingFlags);
+        void drawCheckbox(GridPositionRowCacheEntry *entry, Coord& where, Coord& size, const DrawingFlags& drawingFlags);
+        void drawSlider(GridPositionRowCacheEntry* entry, AnalogMenuItem* pItem, Coord& where, Coord& size, const DrawingFlags& drawingFlags);
+        void drawUpDownItem(GridPositionRowCacheEntry* entry, Coord& where, Coord& size, const DrawingFlags& drawingFlags);
+        void drawIconItem(GridPositionRowCacheEntry *pEntry, Coord& where, Coord& size, const DrawingFlags& drawingFlags);
         void drawBorderAndAdjustSize(Coord &where, Coord &size, MenuBorder &border);
 
         DrawableIcon *getStateIndicatorIcon(GridPositionRowCacheEntry *entry);

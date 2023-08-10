@@ -189,7 +189,7 @@ bool loadMenuItem(EepromAbstraction* eeprom, MenuItem* theItem, uint16_t magicKe
 
 void triggerAllChangedCallbacks() {
     getParentRootAndVisit(menuMgr.getRoot(), [](MenuItem* item) {
-        if(item->isChanged() && item->getEepromPosition() != 0xffff) {
+        if(item->isChanged(0) && item->getEepromPosition() != 0xffff) {
             item->triggerCallback();
         }
     });

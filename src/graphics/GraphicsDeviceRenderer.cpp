@@ -18,9 +18,9 @@ namespace tcgfx {
     static unsigned char rendererUpArrowXbm[] = { 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0x3f, 0x1f, 0x0f, 0x07, 0x03 };
     static unsigned char rendererDownArrowXbm[] = { 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0 };
 
-    inline bool isActiveOrEditing(MenuItem* pItem) {
+    bool GraphicsDeviceRenderer::isActiveOrEditing(MenuItem* pItem, const DrawingFlags& drawingFlags) {
         auto mt = pItem->getMenuType();
-        return (pItem->isEditing() || pItem->isActive()) && mt != MENUTYPE_TITLE_ITEM && mt != MENUTYPE_BACK_VALUE;
+        return (drawingFlags.isEditing() || drawingFlags.isActive()) && mt != MENUTYPE_TITLE_ITEM && mt != MENUTYPE_BACK_VALUE;
     }
 
     GraphicsDeviceRenderer::GraphicsDeviceRenderer(int bufferSize, const char *appTitle, DeviceDrawable *drawable)
@@ -52,7 +52,7 @@ namespace tcgfx {
         helper.getDrawable()->drawXBitmap(where, Coord(widget->getWidth(), widget->getHeight()), widget->getCurrentIcon());
     }
 
-    void GraphicsDeviceRenderer::drawMenuItem(GridPositionRowCacheEntry *entry, Coord where, Coord areaSize, bool drawAll) {
+    void GraphicsDeviceRenderer::drawMenuItem(GridPositionRowCacheEntry *entry, Coord where, Coord areaSize, const DrawingFlags& drawingFlags) {
         redrawNeeded = true;
         entry->getMenuItem()->setChanged(false);
 
@@ -66,7 +66,7 @@ namespace tcgfx {
         }
 
         // if we are drawing everything, then we need to clear out the areas in between items.
-        if(drawAll && entry->getDisplayProperties()->getSpaceAfter() > 0) {
+        if(drawingFlags.isDrawingAll() && entry->getDisplayProperties()->getSpaceAfter() > 0) {
             auto* bgConfig = propertiesFactory.configFor(menuMgr.getCurrentSubMenu(), ItemDisplayProperties::COMPTYPE_ITEM);
             helper.getDrawable()->setDrawColor(bgConfig->getColor(ItemDisplayProperties::BACKGROUND));
             helper.getDrawable()->drawBox(Coord(where.x, where.y + areaSize.y), Coord(areaSize.x, entry->getDisplayProperties()->getSpaceAfter()), true);
@@ -75,12 +75,12 @@ namespace tcgfx {
         // icons never use double buffer drawing because they may use a lot of BPP and don't change often in the main
         auto drawingMode = entry->getPosition().getDrawingMode();
         if(drawingMode == GridPosition::DRAW_AS_ICON_ONLY || drawingMode == GridPosition::DRAW_AS_ICON_TEXT) {
-            drawIconItem(entry, where, areaSize);
+            drawIconItem(entry, where, areaSize, drawingFlags);
             return;
         }
 
         color_t palette[4];
-        bool selected = isActiveOrEditing(entry->getMenuItem());
+        bool selected = isActiveOrEditing(entry->getMenuItem(), drawingFlags);
         palette[ItemDisplayProperties::TEXT] = (selected) ? propertiesFactory.getSelectedColor(ItemDisplayProperties::TEXT) : entry->getDisplayProperties()->getPalette()[ItemDisplayProperties::TEXT];
         palette[ItemDisplayProperties::BACKGROUND] = (selected) ? propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND) : entry->getDisplayProperties()->getPalette()[ItemDisplayProperties::BACKGROUND];
         palette[ItemDisplayProperties::HIGHLIGHT1] = entry->getDisplayProperties()->getPalette()[ItemDisplayProperties::HIGHLIGHT1];
@@ -94,14 +94,14 @@ namespace tcgfx {
             case GridPosition::DRAW_TEXTUAL_ITEM:
             case GridPosition::DRAW_TITLE_ITEM:
             default:
-                drawTextualItem(entry, wh, areaSize);
+                drawTextualItem(entry, wh, areaSize, drawingFlags);
                 break;
             case GridPosition::DRAW_INTEGER_AS_UP_DOWN:
-                drawUpDownItem(entry, wh, areaSize);
+                drawUpDownItem(entry, wh, areaSize, drawingFlags);
                 break;
             case GridPosition::DRAW_INTEGER_AS_SCROLL:
                 if(entry->getMenuItem()->getMenuType() != MENUTYPE_INT_VALUE) return; // disallowed
-                drawSlider(entry, reinterpret_cast<AnalogMenuItem*>(entry->getMenuItem()), wh, areaSize);
+                drawSlider(entry, reinterpret_cast<AnalogMenuItem*>(entry->getMenuItem()), wh, areaSize, drawingFlags);
                 break;
         }
 
@@ -132,22 +132,21 @@ namespace tcgfx {
         return int(extents.x);
     }
 
-    void GraphicsDeviceRenderer::internalDrawText(GridPositionRowCacheEntry* pEntry, const Coord& where, const Coord& size) {
+    void GraphicsDeviceRenderer::internalDrawText(GridPositionRowCacheEntry* pEntry, const Coord& where, const Coord& size, const DrawingFlags& drawingFlags) {
         GridPosition::GridJustification just = pEntry->getPosition().getJustification();
         ItemDisplayProperties *props = pEntry->getDisplayProperties();
         auto padding = props->getPadding();
 
         color_t fg;
-        if(isActiveOrEditing(pEntry->getMenuItem())) {
+        if(isActiveOrEditing(pEntry->getMenuItem(), drawingFlags)) {
             fg = propertiesFactory.getSelectedColor(ItemDisplayProperties::TEXT);
         }
         else {
             fg = props->getColor(ItemDisplayProperties::TEXT);
         }
 
-        copyMenuItemValue(pEntry->getMenuItem(), buffer, bufferSize);
-        bool weAreEditingWithCursor = pEntry->getMenuItem()->isEditing() && menuMgr.getCurrentEditor() != nullptr
-                                      && editorHintNeedsCursor(menuMgr.getEditorHints().getEditorRenderingType());
+        copyMenuItemValue(pEntry->getMenuItem(), buffer, bufferSize, drawingFlags.isActive());
+        bool weAreEditingWithCursor = drawingFlags.isEditing() && editorHintNeedsCursor(menuMgr.getEditorHints().getEditorRenderingType());
 
         bool valueNeeded = itemNeedsValue(pEntry->getPosition().getJustification());
         if(pEntry->getMenuItem()->getMenuType() == MENUTYPE_BOOLEAN_VALUE) {
@@ -167,7 +166,7 @@ namespace tcgfx {
             helper.drawText(wh, fg, buffer);
 
             if(valueNeeded) {
-                copyMenuItemValue(pEntry->getMenuItem(), buffer, bufferSize);
+                copyMenuItemValue(pEntry->getMenuItem(), buffer, bufferSize, drawingFlags.isActive());
             } else buffer[0] = 0;
             int bl;
             int16_t right = where.x + size.x - (helper.textExtents(buffer, &bl).x + padding.right);
@@ -190,9 +189,9 @@ namespace tcgfx {
             char sz[32];
             bool nameNeeded = itemNeedsName(just);
             if(valueNeeded && nameNeeded) {
-                copyMenuItemNameAndValue(pEntry->getMenuItem(), sz, sizeof sz, 0);
+                copyMenuItemNameAndValue(pEntry->getMenuItem(), sz, sizeof sz, 0, drawingFlags.isActive());
             } else if(valueNeeded) {
-                copyMenuItemValue(pEntry->getMenuItem(), sz, sizeof sz);
+                copyMenuItemValue(pEntry->getMenuItem(), sz, sizeof sz, drawingFlags.isActive());
             } else {
                 pEntry->getMenuItem()->copyNameToBuffer(sz, sizeof sz);
             }
@@ -210,7 +209,8 @@ namespace tcgfx {
         }
     }
 
-    void GraphicsDeviceRenderer::drawCoreLineItem(GridPositionRowCacheEntry* entry, DrawableIcon* icon, Coord &where, Coord &size, bool drawBg) {
+    void GraphicsDeviceRenderer::drawCoreLineItem(GridPositionRowCacheEntry* entry, DrawableIcon* icon, Coord &where, Coord &size,
+                                                  const DrawingFlags& drawingFlags, bool drawBg) {
         auto pad = entry->getDisplayProperties()->getPadding();
         serlogF4(SER_TCMENU_DEBUG, "Drawing at: ", where.y, size.x, size.y);
 
@@ -220,7 +220,7 @@ namespace tcgfx {
 
         color_t entryBg = entry->getDisplayProperties()->getColor(ItemDisplayProperties::BACKGROUND);
         color_t selBg = propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND);
-        if(isActiveOrEditing(entry->getMenuItem())) {
+        if(isActiveOrEditing(entry->getMenuItem(), drawingFlags)) {
             bgColor = selBg;
             textColor = propertiesFactory.getSelectedColor(ItemDisplayProperties::TEXT);
             forceBorder = (icon == nullptr) && (selBg == entryBg) && isEditStatusIconEnabled();
@@ -233,7 +233,7 @@ namespace tcgfx {
         auto xoffset = (icon) ? icon->getDimensions().x : 0;
 
         // draw any active arrow or blank space that's needed first
-        if((entry->getMenuItem()->isEditing() || entry->getMenuItem()->isActive())) {
+        if((drawingFlags.isEditing() || drawingFlags.isActive())) {
             helper.getDrawable()->setDrawColor(bgColor);
             // drawing too much as a real impact on some displays, when we don't need to render the background, we do not
             Coord adjustedSize = drawBg ? size : Coord(xoffset + pad.left, size.y);
@@ -301,11 +301,11 @@ namespace tcgfx {
         }
     }
 
-    void GraphicsDeviceRenderer::drawCheckbox(GridPositionRowCacheEntry *entry, Coord& where, Coord& size) {
+    void GraphicsDeviceRenderer::drawCheckbox(GridPositionRowCacheEntry *entry, Coord& where, Coord& size, const DrawingFlags& drawingFlags) {
         auto padding = entry->getDisplayProperties()->getPadding();
         auto* icon = getStateIndicatorIcon(entry);
 
-        drawCoreLineItem(entry, icon, where, size, true);
+        drawCoreLineItem(entry, icon, where, size, drawingFlags, true);
         auto hei = size.y - (padding.top + padding.top);
         auto startingX = where.x + size.x - (padding.left + padding.right + hei);
         auto boolItem = reinterpret_cast<BooleanMenuItem*>(entry->getMenuItem());
@@ -321,16 +321,16 @@ namespace tcgfx {
             helper.getDrawable()->setDrawColor(hl);
             helper.getDrawable()->drawBox(Coord(startingX + 2, where.y + padding.top + 2), Coord(hei - 4, hei - 4), true);
         }
-        internalDrawText(entry, where, Coord(size.x - (hei + padding.left), size.y));
+        internalDrawText(entry, where, Coord(size.x - (hei + padding.left), size.y), drawingFlags);
     }
 
-    void GraphicsDeviceRenderer::drawUpDownItem(GridPositionRowCacheEntry *entry, Coord& where, Coord& size) {
+    void GraphicsDeviceRenderer::drawUpDownItem(GridPositionRowCacheEntry *entry, Coord& where, Coord& size, const DrawingFlags& drawingFlags) {
         auto padding = entry->getDisplayProperties()->getPadding();
         auto* icon = getStateIndicatorIcon(entry);
 
-        drawCoreLineItem(entry, icon, where, size, true);
+        drawCoreLineItem(entry, icon, where, size, drawingFlags, true);
 
-        if(isHasTouchInterface() && (entry->getMenuItem()->isActive() || entry->getMenuItem()->isEditing())) {
+        if(isHasTouchInterface() && (drawingFlags.isActive() || drawingFlags.isEditing())) {
             int buttonSize = size.y - 1;
             int offset = (buttonSize - rendererXbmArrowSize.y) / 2;
             int downButtonLocation = where.x;
@@ -346,34 +346,35 @@ namespace tcgfx {
             helper.getDrawable()->drawXBitmap(Coord(upButtonLocation + offset, where.y + offset), rendererXbmArrowSize, rendererUpArrowXbm);
 
             internalDrawText(entry, Coord(where.x + textStartX, where.y),
-                             Coord(size.x - (((buttonSize + padding.right) * 2)), size.y));
+                             Coord(size.x - (((buttonSize + padding.right) * 2)), size.y), drawingFlags);
         }
         else {
-            internalDrawText(entry, Coord(where.x, where.y), Coord(size.x, size.y));
+            internalDrawText(entry, Coord(where.x, where.y), Coord(size.x, size.y), drawingFlags);
         }
     }
 
     DrawableIcon *GraphicsDeviceRenderer::getStateIndicatorIcon(GridPositionRowCacheEntry *entry) {
         if(!isEditStatusIconEnabled()) return nullptr; // no edit icons when explicitly turned off
-        return propertiesFactory.iconForMenuItem(entry->getMenuItem()->isEditing() ? SPECIAL_ID_EDIT_ICON : SPECIAL_ID_ACTIVE_ICON);
+        return propertiesFactory.iconForMenuItem(entry->getMenuItem() == menuMgr.getCurrentEditor() ? SPECIAL_ID_EDIT_ICON : SPECIAL_ID_ACTIVE_ICON);
     }
 
-    void GraphicsDeviceRenderer::drawTextualItem(GridPositionRowCacheEntry* pEntry, Coord& where, Coord& size) {
+    void GraphicsDeviceRenderer::drawTextualItem(GridPositionRowCacheEntry* pEntry, Coord& where, Coord& size, const DrawingFlags& drawingFlags) {
         if(pEntry->getMenuItem()->getMenuType() == MENUTYPE_BOOLEAN_VALUE) {
             auto boolItem = reinterpret_cast<BooleanMenuItem*>(pEntry->getMenuItem());
             if(boolItem->getBooleanNaming() == NAMING_CHECKBOX) {
-                drawCheckbox(pEntry, where, size);
+                drawCheckbox(pEntry, where, size, drawingFlags);
                 return;
             }
         }
         auto* icon = getStateIndicatorIcon(pEntry);
-        drawCoreLineItem(pEntry, icon, where, size, true);
-        internalDrawText(pEntry, Coord(where.x, where.y), Coord(size.x, size.y));
+        drawCoreLineItem(pEntry, icon, where, size, drawingFlags, true);
+        internalDrawText(pEntry, Coord(where.x, where.y), Coord(size.x, size.y), drawingFlags);
     }
 
-    void GraphicsDeviceRenderer::drawSlider(GridPositionRowCacheEntry* entry, AnalogMenuItem* pItem, Coord& where, Coord& size) {
+    void GraphicsDeviceRenderer::drawSlider(GridPositionRowCacheEntry* entry, AnalogMenuItem* pItem, Coord& where, Coord& size,
+                                            const DrawingFlags& drawingFlags) {
         auto* icon = getStateIndicatorIcon(entry);
-        drawCoreLineItem(entry, icon, where, size, false);
+        drawCoreLineItem(entry, icon, where, size, drawingFlags, false);
         ItemDisplayProperties *props = entry->getDisplayProperties();
         MenuPadding pad = props->getPadding();
         int maximumSliderArea = size.x - pad.right;
@@ -381,16 +382,16 @@ namespace tcgfx {
         int outsideAreaX = maximumSliderArea - filledAreaX;
         helper.getDrawable()->setDrawColor(props->getColor(ItemDisplayProperties::HIGHLIGHT1));
         helper.getDrawable()->drawBox(Coord(where.x, where.y), Coord(filledAreaX, size.y), true);
-        auto mainBg = (pItem->isActive() || pItem->isEditing()) ? propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND) : props->getColor(ItemDisplayProperties::BACKGROUND);
+        auto mainBg = (drawingFlags.isActive() || drawingFlags.isEditing()) ? propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND) : props->getColor(ItemDisplayProperties::BACKGROUND);
         helper.getDrawable()->setDrawColor(mainBg);
         helper.getDrawable()->drawBox(Coord(where.x + filledAreaX, where.y), Coord(outsideAreaX, size.y), true);
-        internalDrawText(entry, Coord(where.x, where.y), Coord(size.x, size.y));
+        internalDrawText(entry, Coord(where.x, where.y), Coord(size.x, size.y), drawingFlags);
     }
 
-    void GraphicsDeviceRenderer::drawIconItem(GridPositionRowCacheEntry* pEntry, Coord& where, Coord& size) {
+    void GraphicsDeviceRenderer::drawIconItem(GridPositionRowCacheEntry* pEntry, Coord& where, Coord& size, const DrawingFlags& drawingFlags) {
         auto* pItem = pEntry->getMenuItem();
 
-        drawCoreLineItem(pEntry, nullptr, where, size, true);
+        drawCoreLineItem(pEntry, nullptr, where, size, drawingFlags, true);
 
         auto* pIcon = propertiesFactory.iconForMenuItem(pItem->getId());
         if(pIcon == nullptr) return;
@@ -404,7 +405,7 @@ namespace tcgfx {
             sel = boolItem->getBoolean();
         }
 
-        if(isActiveOrEditing(pEntry->getMenuItem())) {
+        if(isActiveOrEditing(pEntry->getMenuItem(), drawingFlags)) {
             helper.getDrawable()->setColors(propertiesFactory.getSelectedColor(ItemDisplayProperties::TEXT), propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND));
         }
         else {
@@ -414,7 +415,7 @@ namespace tcgfx {
 
         if(pEntry->getPosition().getDrawingMode() == GridPosition::DRAW_AS_ICON_TEXT) {
             effectiveTop += pIcon->getDimensions().y;
-            internalDrawText(pEntry, Coord(where.x, effectiveTop), Coord(size.x, size.y - effectiveTop));
+            internalDrawText(pEntry, Coord(where.x, effectiveTop), Coord(size.x, size.y - effectiveTop), drawingFlags);
         }
     }
 
@@ -464,16 +465,16 @@ namespace tcgfx {
                 cardLayoutPane->forMenu(titleEntry->getDisplayProperties(), entry->getDisplayProperties(), this, titleNeeded);
                 forceDrawWidgets = true;
             }
-            if (titleNeeded && (locRedrawMode == MENUDRAW_COMPLETE_REDRAW || titleEntry->getMenuItem()->isChanged())) {
-                drawMenuItem(titleEntry, Coord(0, 0), cardLayoutPane->getTitleSize(), true);
+            if (titleNeeded && (locRedrawMode == MENUDRAW_COMPLETE_REDRAW || titleEntry->getMenuItem()->isChanged(displayNumber))) {
+                drawMenuItem(titleEntry, Coord(0, 0), cardLayoutPane->getTitleSize(), DrawingFlags(true, activeItem == titleEntry->getMenuItem(), menuMgr.getCurrentEditor() == titleEntry->getMenuItem()));
             }
-            if (entry->getMenuItem()->isChanged() || locRedrawMode == MENUDRAW_COMPLETE_REDRAW) {
+            if (entry->getMenuItem()->isChanged(displayNumber) || locRedrawMode == MENUDRAW_COMPLETE_REDRAW) {
                 getDeviceDrawable()->setDrawColor(entry->getDisplayProperties()->getColor(ItemDisplayProperties::BACKGROUND));
                 getDeviceDrawable()->drawBox(cardLayoutPane->getMenuLocation(), cardLayoutPane->getMenuSize(), true);
                 int offsetY = (cardLayoutPane->getMenuSize().y - int(entry->getHeight())) / 2;
                 Coord menuStart(cardLayoutPane->getMenuLocation().x, cardLayoutPane->getMenuLocation().y + offsetY);
                 Coord menuSize(cardLayoutPane->getMenuSize().x, int(entry->getHeight()));
-                drawMenuItem(entry, menuStart, menuSize, false);
+                drawMenuItem(entry, menuStart, menuSize, DrawingFlags(false, activeItem == titleEntry->getMenuItem(), menuMgr.getCurrentEditor() == titleEntry->getMenuItem()));
             }
             cardLayoutPane->prepareAndPaintButtons(this, activeIndex, itemOrderByRow.count(), titleMode != NO_TITLE);
         } else {

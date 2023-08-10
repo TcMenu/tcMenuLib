@@ -27,15 +27,10 @@ SecuredMenuPopup::SecuredMenuPopup(AuthenticationManager * authentication)
 
 MenuItem* SecuredMenuPopup::start(SubMenuItem* securedMenu) {
 	actionProceedItem.setSecuredItem(securedMenu);
-	actionProceedItem.setActive(false);
 	actionCancelItem.setSecuredItem(NULL);
-	actionCancelItem.setActive(false);
-	backMenuItem.setActive(false);
 
 	pinEntryItem.setTextValue("", true);
 	pinEntryItem.setPasswordField(true);
-	pinEntryItem.setActive(false);
-	pinEntryItem.setEditing(false);
 	return &backMenuItem;
 }
 

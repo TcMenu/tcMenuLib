@@ -34,6 +34,23 @@ namespace tcgfx {
         return (row * 100) + col;
     }
 
+    class DrawingFlags {
+    private:
+        uint16_t flags;
+    public:
+        DrawingFlags(bool drawAll, bool active, bool editing) : flags(0) {
+            bitWrite(flags, 0, drawAll);
+            bitWrite(flags, 1, active);
+            bitWrite(flags, 2, editing);
+        }
+        DrawingFlags(const DrawingFlags& other) = default;
+        DrawingFlags& operator=(const DrawingFlags& other) = default;
+
+        bool isDrawingAll() const { return bitRead(flags, 0); }
+        bool isActive() const { return bitRead(flags, 1); }
+        bool isEditing() const { return bitRead(flags, 2); }
+    };
+
     /**
      * Represents a grid position along with the menuID and also the drawable icon, if one exists. It is stored in the list
      * of drawing instructions in the base graphical renderer, and then read when a new menu is displayed in order to reorder
@@ -87,6 +104,25 @@ namespace tcgfx {
         void navigationHasChanged(MenuItem *newItem, bool completelyReset) override;
     };
 
+    class CachedDrawingLocation {
+    private:
+        uint16_t startY;
+        uint8_t currentOffset;
+    public:
+        CachedDrawingLocation() = default;
+        CachedDrawingLocation(uint16_t startY, uint8_t currentOffset) : startY(startY), currentOffset(currentOffset) {}
+        CachedDrawingLocation(const CachedDrawingLocation& other) = default;
+        CachedDrawingLocation& operator=(const CachedDrawingLocation& other) = default;
+
+        uint16_t getStartY() const {
+            return startY;
+        }
+
+        uint8_t getCurrentOffset() const {
+            return currentOffset;
+        }
+    };
+
     /**
      * This is the base class for all simpler renderer classes where the height of a row is equal for all entries,
      * and there is always exactly one item on a row. This takes away much of the work to row allocation for simple
@@ -131,13 +167,26 @@ namespace tcgfx {
     protected:
         BtreeList<uint16_t, GridPositionRowCacheEntry> itemOrderByRow;
         TitleMode titleMode = TITLE_FIRST_ROW;
-        uint8_t flags;
         uint16_t width, height;
+        CachedDrawingLocation drawingLocation;
+        uint8_t flags;
     public:
         BaseGraphicalRenderer(int bufferSize, int wid, int hei, bool lastRowExact, const char *appTitle);
         void initialise() override;
 
         void setTitleMode(TitleMode mode);
+
+        /**
+         * TcMenu supports more than one display now, (presently 2) so you set the display number here and it
+         * will be passed to the isChanged function to ensure rendering works for both items.
+         * @param displayNum the display number.
+         */
+        void setDisplayNumber(uint8_t displayNum) { this->displayNumber = displayNum; }
+
+        /**
+         * @return the display number as set using setDisplayNumber
+         */
+        uint8_t getDisplayNumber() { return this->displayNumber; }
 
         /**
          * set the use of sliders by default for all integer items
@@ -232,7 +281,7 @@ namespace tcgfx {
          * @param where the position on the display to render at
          * @param areaSize the size of the area where it should be rendered
          */
-        virtual void drawMenuItem(GridPositionRowCacheEntry *entry, Coord where, Coord areaSize, bool drawAll) = 0;
+        virtual void drawMenuItem(GridPositionRowCacheEntry *entry, Coord where, Coord areaSize, const DrawingFlags& drawFlags) = 0;
 
         /**
          * This sends general purpose commands that can be implemened by the leaf class as needed.
@@ -255,19 +304,12 @@ namespace tcgfx {
         virtual ItemDisplayPropertiesFactory &getDisplayPropertiesFactory() = 0;
 
         /**
-         * Find the active item in the current list that is being presented, defaults to item 0.
-         * @return the active item
-         */
-        int findActiveItem(MenuItem* root) override;
-
-        /**
          * Find an item's offset in a given root, safely returns 0.
          * @param root the root item
          * @param toFind the item within that root
          * @return the index if found, otherwise 0.
          */
         int findItemIndex(MenuItem *root, MenuItem *toFind) override;
-
 
         /**
          * @return the total number of items in the current menu
@@ -318,6 +360,13 @@ namespace tcgfx {
          */
         void rootHasChanged(MenuItem* newItem);
 
+        /**
+         * Sets the active item to be the menu item selected, also this recalculates the offset required to present
+         * that item.
+         * @param item the new active item
+         * @return the index of the item
+         */
+        uint8_t setActiveItem(MenuItem *item) override;
     protected:
         /**
          * This is responsible for redrawing a series of menu items onto the screen, it can be overridden as needed

@@ -6,7 +6,7 @@ using namespace tcgfx;
 
 void DrawableDashboard::addDrawingItem(MenuItem *theItem, Coord topLeft, DashDrawParameters *params, int numCharsInValue,
                                   const char *titleOverrideText, int updateTicks) {
-    drawingItems.add(DashMenuItem(theItem, topLeft, params, numCharsInValue, titleOverrideText, updateTicks));
+    drawingItems.add(DashMenuItem(this, theItem, topLeft, params, numCharsInValue, titleOverrideText, updateTicks));
     serdebugF2("added item to list #", drawingItems.count());
 }
 
@@ -24,11 +24,13 @@ void DrawableDashboard::reset() {
 }
 
 void DrawableDashboard::started(BaseMenuRenderer *currentRenderer) {
+    if(renderer != currentRenderer) {
+        serlogF(SER_ERROR, "Dashboard renderer mismatch!!");
+    }
     drawable->startDraw();
     bool screenCleared = false;
     if(delegate != nullptr) screenCleared = delegate->dashboardWillOpen(renderer);
 
-    renderer = currentRenderer;
     if(!screenCleared) {
         drawable->setDrawColor(screenBg);
         drawable->drawBox(Coord(0, 0), drawable->getDisplayDimensions(), true);
@@ -163,11 +165,11 @@ color_t DashDrawParametersTextUpdateRange::getFgColor(MenuItem *item, bool updat
     return (idx != -1) ? colorOverrides[idx].fgColor : fgColor;
 }
 
-DashMenuItem::DashMenuItem(MenuItem *theItem, Coord topLeft, DashDrawParameters* params, int numCharsInValue,
-                           const char* titleOverride, int countDownTicks) : item(theItem), screenLoc(topLeft),
-                               parameters(params), updateCountDown(countDownTicks), titleExtents(0, 0),
-                               numChars(numCharsInValue), valueWidth(0), countDownTicks(countDownTicks), baseline(0),
-                               titleText{} {
+DashMenuItem::DashMenuItem(DrawableDashboard* dashboard, MenuItem *theItem, Coord topLeft, DashDrawParameters* params,
+                           int numCharsInValue, const char* titleOverride, int countDownTicks) : dashboard(dashboard),
+                           item(theItem), screenLoc(topLeft),parameters(params), updateCountDown(countDownTicks),
+                           titleExtents(0, 0), numChars(numCharsInValue), valueWidth(0), countDownTicks(countDownTicks),
+                           baseline(0), titleText{} {
 
     if(titleOverride != nullptr) {
         strncpy(titleText, titleOverride, sizeof(titleText));
@@ -181,16 +183,16 @@ DashMenuItem::DashMenuItem(MenuItem *theItem, Coord topLeft, DashDrawParameters*
 bool DashMenuItem::needsPainting() {
     if (item == nullptr) return false;
 
-    if(item->isChanged()) updateCountDown = countDownTicks;
+    if(item->isChanged(dashboard->getDisplayNumber())) updateCountDown = countDownTicks;
 
     if(updateCountDown > 0) --updateCountDown;
-    return item->isChanged() || updateCountDown != 0;
+    return item->isChanged(dashboard->getDisplayNumber()) || updateCountDown != 0;
 }
 
 void DashMenuItem::paintTitle(DeviceDrawable* drawableRoot) {
     color_t palette[2];
-    palette[0] = parameters->getTitleBgColor(item, item->isChanged());
-    palette[1] = parameters->getTitleFgColor(item, item->isChanged());
+    palette[0] = parameters->getTitleBgColor(item, item->isChanged(dashboard->getDisplayNumber()));
+    palette[1] = parameters->getTitleFgColor(item, item->isChanged(dashboard->getDisplayNumber()));
     DeviceDrawableHelper wrapper(drawableRoot);
     wrapper.setFont(parameters->getFontMode());
 
@@ -215,8 +217,8 @@ void DashMenuItem::paintItem(DeviceDrawable* drawableRoot) {
     item->setChanged(false);
     char sz[20];
     color_t palette[2];
-    palette[0] = parameters->getBgColor(item, item->isChanged());
-    palette[1] = parameters->getFgColor(item, item->isChanged());
+    palette[0] = parameters->getBgColor(item, item->isChanged(dashboard->getDisplayNumber()));
+    palette[1] = parameters->getFgColor(item, item->isChanged(dashboard->getDisplayNumber()));
     DeviceDrawableHelper wrapper(drawableRoot, palette, 2, screenLoc, Coord(valueWidth, titleExtents.y));
 
     copyMenuItemValue(item, sz, sizeof(sz));

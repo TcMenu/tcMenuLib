@@ -93,6 +93,9 @@ void setup() {
     // of the widget is fixed, and the height field instead indicates the first custom character for the first icon.
     renderer.setFirstWidget(&connectedWidget);
 
+    // we can choose which way RGB items should present, either has HEX_HTML or DECIMAL
+    Rgb32MenuItem::setRgbPrintMode(HEX_HTML);
+
 	setupMenu();
 
 	auto* authenticator = reinterpret_cast<EepromAuthenticatorManager*>(menuMgr.getAuthenticator());

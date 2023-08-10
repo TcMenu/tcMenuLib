@@ -61,14 +61,6 @@ MenuItem* getSubMenuFor(MenuItem* current);
 MenuItem* getMenuItemById(menuid_t id);
 
 /**
- * Gets the item at the position requested within menu root.
- * @param root the root of the menu
- * @param pos the index of the item
- * @return either root or the item at the index.
- */
-MenuItem* getItemAtPosition(MenuItem* root, uint8_t pos);
-
-/**
  * Gets the zero based offset of the active item in the menu provided 
  * @param root the root of the current menu
  * @return the offset from zero of the item 

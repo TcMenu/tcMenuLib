@@ -289,7 +289,7 @@ void MenuBasedDialog::internalSetVisible(bool visible) {
         factory.addGridPosition(&btn2Item, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_RIGHT_NO_VALUE, 2, 2, row, 0));
         factory.addGridPosition(&bufferItem, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_LEFT_VALUE_ONLY, 1, 0));
 
-        auto toMakeActive = (lastBtnVal == 0 && btn1Item.isActive()) ? &btn1Item : &btn2Item;
+        auto toMakeActive = (lastBtnVal == 0 && renderer->getActiveItem() == &btn1Item) ? &btn1Item : &btn2Item;
         menuMgr.navigateToMenu(&backItem, toMakeActive, true);
     }
     else {
@@ -317,11 +317,6 @@ void MenuBasedDialog::resetDialogFields() {
     bufferItem.setReadOnly(true);
     btn1Item.setNext(&btn2Item);
     addedMenuItems = 0;
-
-    backItem.setActive(false);
-    bufferItem.setActive(false);
-    btn1Item.setActive(false);
-    btn2Item.setActive(false);
 }
 
 void withMenuDialogIfAvailable(DialogInitialiser dlgFn) {

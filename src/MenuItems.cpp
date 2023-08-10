@@ -27,16 +27,6 @@ void MenuItem::setSendRemoteNeeded(uint8_t remoteNo, bool needed) {
 	bitWrite(flags, (remoteNo + (int)MENUITEM_REMOTE_SEND0), (needed && !isLocalOnly()));
 }
 
-void MenuItem::setEditing(bool active) {
-	bool isEditOnEntry = isEditing();
-	bitWrite(flags, MENUITEM_EDITING, active);
-	setChanged(true);
-	if (isMenuRuntimeMultiEdit(this) && !active && isEditOnEntry) {
-		auto* item = reinterpret_cast<EditableMultiPartMenuItem*>(this);
-		item->stopMultiEdit();
-	}
-}
-
 void MenuItem::setSendRemoteNeededAll() {
     // make sure local only fields are never marked for sending.
     if(isLocalOnly()) clearSendRemoteNeededAll();
@@ -119,9 +109,10 @@ uint16_t MenuItem::getEepromPosition() const
 	return  isInfoProgMem() ? get_info_uint(&info->eepromAddr) : info->eepromAddr;
 }
 
-void MenuItem::setActive(bool active)  {
-    bitWrite(flags, MENUITEM_ACTIVE, active);
-    setChanged(true);
+void MenuItem::setChanged(bool changed) {
+    flags = flags | MENUITEM_ALL_CHANGE;
+    if(isLocalOnly()) return;
+    flags = flags | MENUITEM_ALL_REMOTES;
 }
 
 // on avr boards we store all info structures in progmem, so we need this code to
@@ -320,19 +311,19 @@ const char NO_STR[] PGM_TCM   = TXT_BOOL_NO_TEXT;
 const char TRUE_STR[] PGM_TCM = TXT_BOOL_TRUE_TEXT;
 const char FALSE_STR[] PGM_TCM= TXT_BOOL_FALSE_TEXT;
 
-void copyMenuItemNameAndValue(const MenuItem* item, char* buffer, size_t bufferSize, char additionalSep) {
+void copyMenuItemNameAndValue(const MenuItem* item, char* buffer, size_t bufferSize, char additionalSep, bool active) {
     item->copyNameToBuffer(buffer, bufferSize);
     if(additionalSep != 0) appendChar(buffer, additionalSep, bufferSize);
     appendChar(buffer, ' ', bufferSize);
 
     int pos = strlen(buffer);
-    copyMenuItemValue(item, buffer + pos, bufferSize - pos);
+    copyMenuItemValue(item, buffer + pos, bufferSize - pos, active);
 }
 
 const char CHECKED_STR[] PROGMEM = "[X]";
 const char UNCHECKED_STR[] PROGMEM = "[ ]";
 
-void copyMenuItemValue(const MenuItem* item, char* buffer, size_t bufferSize) {
+void copyMenuItemValue(const MenuItem* item, char* buffer, size_t bufferSize, bool active) {
     buffer[0] = 0;
     if(item->getMenuType() == MENUTYPE_ENUM_VALUE) {
         auto* enItem = reinterpret_cast<const EnumMenuItem*>(item);
@@ -372,12 +363,12 @@ void copyMenuItemValue(const MenuItem* item, char* buffer, size_t bufferSize) {
     }
     else if(item->getMenuType() == MENUTYPE_BACK_VALUE) {
         buffer[0]=0;
-        if(item->isActive()) {
+        if(active) {
             strncpy(buffer, "[..]", bufferSize);
         }
     }
     else if(item->getMenuType() == MENUTYPE_TITLE_ITEM) {
-        if(reinterpret_cast<const tcgfx::RuntimeTitleMenuItem*>(item)->getCallback() && item->isActive()) {
+        if(reinterpret_cast<const tcgfx::RuntimeTitleMenuItem*>(item)->getCallback() && active) {
             strncpy(buffer, "...", bufferSize);
         } else buffer[0] = 0;
     }
@@ -387,9 +378,9 @@ void copyMenuItemValue(const MenuItem* item, char* buffer, size_t bufferSize) {
     }
 }
 
-void copyMenuItemValueDefault(const MenuItem* item, char* buffer, size_t bufferSize, const char* defValue) {
+void copyMenuItemValueDefault(const MenuItem* item, char* buffer, size_t bufferSize, const char* defValue, bool active) {
     buffer[0]=0;
-    copyMenuItemValue(item, buffer, bufferSize);
+    copyMenuItemValue(item, buffer, bufferSize, active);
     if(strlen(buffer)==0) {
         strncpy(buffer, defValue, bufferSize);
         buffer[bufferSize - 1] = 0;

@@ -35,11 +35,12 @@ public:
 } menuMgrListener;
 
 
-BaseMenuRenderer::BaseMenuRenderer(int bufferSize, RendererType rType) : MenuRenderer(rType, bufferSize) {
+BaseMenuRenderer::BaseMenuRenderer(int bufferSize, RendererType rType, uint8_t displayNum) : MenuRenderer(rType, bufferSize) {
 	ticksToReset = 0;
     lastOffset = 0;
+    displayNumber = displayNum;
     resetValInTicks = 30 * TC_DISPLAY_UPDATES_PER_SECOND;
-	renderCallback = nullptr;
+    renderCallback = nullptr;
     renderFnPressType = RPRESS_NONE;
 	redrawMode = MENUDRAW_COMPLETE_REDRAW;
 	this->lastOffset = 0;
@@ -47,7 +48,10 @@ BaseMenuRenderer::BaseMenuRenderer(int bufferSize, RendererType rType) : MenuRen
     this->dialog = nullptr;
     displayTakenMode = NOT_TAKEN_OVER;
     updatesPerSecond = TC_DISPLAY_UPDATES_PER_SECOND;
-    MenuRenderer::theInstance = this;
+    // if this is the default display, it becomes the static (IE global) instance for dialogs etc.
+    if(displayNum == 0) {
+        MenuRenderer::theInstance = this;
+    }
 }
 
 void BaseMenuRenderer::initialise() {
@@ -151,6 +155,14 @@ void BaseMenuRenderer::setFirstWidget(TitleWidget* widget) {
 	this->redrawMode = MENUDRAW_COMPLETE_REDRAW;
 }
 
+uint8_t BaseMenuRenderer::setActiveItem(MenuItem* item) {
+    if(!item) return 0;
+    if(activeItem) activeItem->setChanged(true);
+    item->setChanged(true);
+    activeItem = item;
+    return findItemIndex(menuMgr.getCurrentMenu(), item);
+}
+
 int BaseMenuRenderer::findItemIndex(MenuItem *root, MenuItem *toFind) {
     uint8_t i = 0;
     MenuItem *itm = root;
@@ -165,18 +177,7 @@ int BaseMenuRenderer::findItemIndex(MenuItem *root, MenuItem *toFind) {
 }
 
 int BaseMenuRenderer::findActiveItem(MenuItem *root) {
-    uint8_t i = 0;
-    MenuItem *itm = root;
-    while (itm != nullptr) {
-        if (itm->isVisible()) {
-            if (itm->isActive() || itm->isEditing()) {
-                return i;
-            }
-            i++;
-        }
-        itm = itm->getNext();
-    }
-    return 0;
+    return findItemIndex(menuMgr.getCurrentMenu(), activeItem);
 }
 
 uint8_t BaseMenuRenderer::itemCount(MenuItem* item, bool includeNonVisible) {

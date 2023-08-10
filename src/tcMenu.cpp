@@ -167,16 +167,13 @@ void MenuManager::valueChanged(int value) {
 
 void MenuManager::setItemActive(MenuItem* item) {
     if(item) {
-        auto oldActive = findCurrentActive();
-        if(oldActive) oldActive->setActive(false);
-        item->setActive(true);
-
         // change the encoder value if there is an encoder present
-        if(renderer->getRendererType() != RENDER_TYPE_NOLOCAL && switches.getEncoder() != nullptr) {
-            int activeIdx = reinterpret_cast<BaseMenuRenderer*>(renderer)->findItemIndex(getCurrentMenu(), item);
-            if(activeIdx >= 0 && activeIdx <= switches.getEncoder()->getMaximumValue()) {
-                switches.getEncoder()->setCurrentReading(activeIdx);
-            }
+        if(renderer->getRendererType() == RENDER_TYPE_NOLOCAL || switches.getEncoder() == nullptr) return;
+        auto baseRenderer = reinterpret_cast<BaseMenuRenderer*>(renderer);
+
+        auto activeIdx = baseRenderer->setActiveItem(item);
+        if(activeIdx <= switches.getEncoder()->getMaximumValue()) {
+            switches.getEncoder()->setCurrentReading(activeIdx);
         }
 
         // and notify that we have just changed the value.
@@ -255,7 +252,6 @@ void MenuManager::actionOnCurrentItem(MenuItem* toEdit) {
 	}
 	else if (toEdit->getMenuType() == MENUTYPE_BACK_VALUE) {
 	    toEdit->triggerCallback();
-		toEdit->setActive(false);
 		resetMenu(false);
 	}
 	else if (isItemActionable(toEdit)) {
@@ -283,8 +279,6 @@ void MenuManager::stopEditingCurrentItem(bool doMultiPartNext) {
 		}
 	}
 
-	currentEditor->setEditing(false);
-
     notifyEditEnd(currentEditor);
 	
     currentEditor = nullptr;
@@ -303,16 +297,7 @@ MenuItem* MenuManager::getParentAndReset() {
         if(sub) return reinterpret_cast<SubMenuItem*>(sub)->getChild();
     }
 
-    if(menuMgr.getRenderer()->getRendererType() == RENDER_TYPE_CONFIGURABLE && navigator.isShowingRoot()) {
-        auto* titleItem = reinterpret_cast<BaseMenuRenderer*>(menuMgr.getRenderer())->getMenuItemAtIndex(getCurrentMenu(), 0);
-        if(titleItem) titleItem->setActive(false);
-    }
-
-	auto* pItem = getParentRootAndVisit(menuMgr.getCurrentMenu(), [](MenuItem* curr) {
-		curr->setActive(false);
-		curr->setEditing(false);
-	});
-
+	auto* pItem = getParentRoot(menuMgr.getCurrentMenu());
 	if(pItem == nullptr) pItem = menuMgr.getRoot();
 	return pItem;
 }
@@ -332,27 +317,6 @@ bool MenuManager::activateMenuItem(MenuItem *item) {
         }
     }
     return false;
-}
-
-/**
- * Finds teh currently active menu item with the selected SubMenuItem
- */
-MenuItem* MenuManager::findCurrentActive() {
-	MenuItem* itm = navigator.getCurrentRoot();
-	while (itm != nullptr) {
-		if (itm->isActive()) {
-			return itm;
-		}
-		itm = itm->getNext();
-	}
-
-	// there's a special case for the title menu on the main page that needs to be checked against.
-	if(renderer->getRendererType() == RENDER_TYPE_CONFIGURABLE) {
-	    auto* pItem = reinterpret_cast<BaseMenuRenderer*>(renderer)->getMenuItemAtIndex(getCurrentMenu(), 0);
-	    if(pItem && pItem->isActive()) return pItem;
-	}
-
-	return getCurrentMenu();
 }
 
 void MenuManager::setupForEditing(MenuItem* item) {
@@ -392,13 +356,12 @@ void MenuManager::setupForEditing(MenuItem* item) {
 
 void MenuManager::setCurrentEditor(MenuItem * editor) {
 	if (currentEditor != nullptr) {
-		currentEditor->setEditing(false);
-		currentEditor->setActive(editor == nullptr);
+		currentEditor->setChanged(true);
 	}
 	currentEditor = editor;
 
     if(currentEditor != nullptr) {
-        currentEditor->setEditing(true);
+        currentEditor->setChanged(true);
     }
 
     renderingHints.changeEditingParams(CurrentEditorRenderingHints::EDITOR_REGULAR, 0, 0);
@@ -572,6 +535,13 @@ void MenuManager::setEditorHints(CurrentEditorRenderingHints::EditorRenderingTyp
 void MenuManager::setEditorHintsLocked(bool locked) {
     renderingHints.lockEditor(locked);
     serlogF2(SER_TCMENU_DEBUG, "EditorHints Locked = ", locked);
+}
+
+MenuItem *MenuManager::findCurrentActive() {
+    if(renderer->getRendererType() == RENDER_TYPE_NOLOCAL) return getRoot();
+    auto bmr = reinterpret_cast<BaseMenuRenderer*>(renderer);
+    auto idx = bmr->findActiveItem(getCurrentMenu());
+    return bmr->getMenuItemAtIndex(getCurrentMenu(), idx);
 }
 
 void CurrentEditorRenderingHints::changeEditingParams(CurrentEditorRenderingHints::EditorRenderingType ty, int startOffset, int endOffset) {
