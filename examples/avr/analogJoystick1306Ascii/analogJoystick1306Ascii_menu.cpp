@@ -15,7 +15,7 @@
 const PROGMEM  ConnectorLocalInfo applicationInfo = { "Space Junk", "5049a016-0d7e-4004-a183-cabe4e9cf6b8" };
 AvrEeprom glAvrRom;
 SSD1306AsciiAvrI2c gfx;
-SSD1306AsciiRenderer renderer(20, Arial14, System5x7);
+SSD1306AsciiRenderer renderer(20, System5x7, System5x7);
 MultiIoAbstraction joystickMultiIo(200);
 AnalogJoystickToButtons joystickIoXAxis(internalAnalogIo(), A1, 0.5);
 
