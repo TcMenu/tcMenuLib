@@ -200,8 +200,6 @@ enum Flags : uint8_t {
 	MENUITEM_CHANGED = 0,
     /** the menu has changed and needs drawing by the renderer 1 */
 	MENUITEM_CHANGED_1 = 1,
-    /** the menu has changed and needs drawing by the renderer 2 */
-    MENUITEM_CHANGED_2 = 2,
     /** the menu cannot be changed by the renderer or remote, it can be changed by calling the setter. */
 	MENUITEM_READONLY = 3,
     /** the menu must not be sent remotely, and is only available via the local renderer */
@@ -366,8 +364,11 @@ public:
 
     bool isInfoProgMem() const { return bitRead(flags, MENUITEM_INFO_STRUCT_PGM); }
 
-	/** set the item to be changed, this lets the renderer know it needs painting */
+	/** set the item to be changed to all renderers, and when changed is true all remotes as well. When clearing
+	 * changed flag prefer to use the numbered version below. */
 	void setChanged(bool changed);
+	/** set the item to be changed, this lets a renderer know it needs painting */
+	void setChanged(int num, bool changed) { bitWrite(flags, (num & 3), changed); }
 	/** returns the changed state of the item */
 	bool isChanged(int num = 0) const { return bitRead(flags, (num & 3)); }
 	/** returns if the menu item needs to be sent remotely */

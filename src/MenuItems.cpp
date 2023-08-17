@@ -110,9 +110,15 @@ uint16_t MenuItem::getEepromPosition() const
 }
 
 void MenuItem::setChanged(bool changed) {
-    flags = flags | MENUITEM_ALL_CHANGE;
-    if(isLocalOnly()) return;
-    flags = flags | MENUITEM_ALL_REMOTES;
+    if(changed) {
+        flags = flags | MENUITEM_ALL_CHANGE;
+    } else {
+        flags = flags & (~MENUITEM_ALL_CHANGE);
+    }
+
+    if(isLocalOnly() || !changed) return;
+
+    setSendRemoteNeededAll();
 }
 
 // on avr boards we store all info structures in progmem, so we need this code to

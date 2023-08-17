@@ -54,7 +54,7 @@ namespace tcgfx {
 
     void GraphicsDeviceRenderer::drawMenuItem(GridPositionRowCacheEntry *entry, Coord where, Coord areaSize, const DrawingFlags& drawingFlags) {
         redrawNeeded = true;
-        entry->getMenuItem()->setChanged(false);
+        entry->getMenuItem()->setChanged(displayNumber, false);
 
         // if it's in a multi grid layout, put a small gap at the start of each one.
         if(entry->getPosition().getGridSize() > 1) {

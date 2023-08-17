@@ -18,7 +18,6 @@
 #include <EepromAbstraction.h>
 #include <Ethernet.h>
 #include <IoLogging.h>
-#include <stockIcons/wifiAndConnectionIconsLCD.h>
 
 using namespace tcremote;
 
@@ -33,12 +32,6 @@ byte mac[] = {
 const char pgmListPressed[] PROGMEM = "List Item Pressed";
 const char pgmHeaderSavedItem[] PROGMEM = "Saved Item";
 const char * romSpaceNames = "item 01item 02item 03item 04item 05item 06item 07item 08item 09item 10 ";
-
-// We add a title widget that shows when a user is connected to the device. Connection icons
-// are in the standard icon set we included at the top.
-// Yes even on LCD we now support title widgets, but they eat up a few of your custom chars.
-// The width must always be 1, and the height is the first custom character that is used.
-TitleWidget connectedWidget(iconsConnection, 2, 1, 0);
 
 // used by the take over display logic.
 int counter = 0;
@@ -61,15 +54,6 @@ void prepareLayout() {
                             GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_RIGHT_WITH_VALUE, 2, 2, 2, 1));
 }
 
-// when there's a change in communication status (client connects for example) this gets called.
-void onCommsChange(CommunicationInfo info) {
-    if(info.remoteNo == 0) {
-        connectedWidget.setCurrentState(info.connected ? 1 : 0);
-    }
-    // this relies on logging in IoAbstraction's ioLogging.h, to turn it on visit the file for instructions.
-    serdebugF4("Comms notify (rNo, con, enum)", info.remoteNo, info.connected, info.errorMode);
-}
-
 void setup() {
 	//
 	// If you are using serial (connectivity or logging) and wire they must be initialised 
@@ -87,11 +71,6 @@ void setup() {
 
     // Here we set the character to be used for back, next and editing for the "cursor".
     renderer.setEditorChars(0b01111111, 0b01111110, '=');
-
-    // You can also have title widgets on LCDs, maximum of 7 states. They use up the custom chars 0..7. How it works
-    // is that you define a custom character for each icon, and treat them just as you would a regular icon. The height
-    // of the widget is fixed, and the height field instead indicates the first custom character for the first icon.
-    renderer.setFirstWidget(&connectedWidget);
 
     // we can choose which way RGB items should present, either has HEX_HTML or DECIMAL
     Rgb32MenuItem::setRgbPrintMode(HEX_HTML);
@@ -131,10 +110,6 @@ void setup() {
 
     // here we customize the LCD layout for one menu, to have two items per line.
     prepareLayout();
-
-    // and lastly we register a communication listener, it updates the title widget
-    // that shows connectivity state on the right corner.
-    menuConnectivityIoTMonitor.registerCommsNotification(onCommsChange);
 
     // and finally, when the display times out, take over and draw a custom screen
     renderer.setResetCallback([] {
@@ -357,6 +332,6 @@ int CALLBACK_FUNCTION customHexEditorRtCall(RuntimeMenuItem* item, uint8_t row, 
             }
             return true;
         }
+        default: return textItemRenderFn(item, row, mode, buffer, bufferSize);
     }
-    return textItemRenderFn(item, row, mode, buffer, bufferSize);
 }

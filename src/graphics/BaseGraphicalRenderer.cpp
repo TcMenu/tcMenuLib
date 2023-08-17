@@ -48,7 +48,8 @@ void BaseGraphicalRenderer::render() {
 uint8_t BaseGraphicalRenderer::setActiveItem(MenuItem *item) {
     auto ret = BaseMenuRenderer::setActiveItem(item);
 
-    if(item->getMenuType() == MENUTYPE_RUNTIME_LIST) {
+    // if we're drawing a list, clear out the drawing location, lists handled differently
+    if(menuMgr.getCurrentMenu()->getMenuType() == MENUTYPE_RUNTIME_LIST) {
         drawingLocation = CachedDrawingLocation();
         return 0;
     }
@@ -58,19 +59,22 @@ uint8_t BaseGraphicalRenderer::setActiveItem(MenuItem *item) {
     uint16_t totalHeight = calculateHeightTo(activeIndex, rootItem);
     int startRow = 0;
     uint16_t adjustedHeight = height + (isLastRowExactFit() ? 0 : 1);
+    serdebugF4("toth, activeidx, adj ", totalHeight, activeIndex, adjustedHeight);
 
     auto startY = 0;
-    if(titleMode == TITLE_ALWAYS) {
+    if(titleMode == TITLE_ALWAYS && menuMgr.getRoot() == rootItem) {
         startRow++;
         startY = heightOfRow(0, true);
         adjustedHeight -= startY;
         totalHeight -= startY;
     }
+    serdebugF4("sy, sr, adj ", startY, startRow, adjustedHeight);
 
     while (totalHeight > adjustedHeight) {
         totalHeight -= heightOfRow(startRow, true);
         startRow++;
     }
+    serdebugF3("sr, th", startRow, totalHeight);
 
     // the screen has moved, we must completely redraw the area, and we need a clear first.
     if(drawingLocation.getCurrentOffset() != startRow) {
@@ -197,7 +201,7 @@ bool BaseGraphicalRenderer::drawTheMenuItems(int startRow, int startY, bool draw
 
             if (drawEveryLine || item->isChanged(displayNumber)) {
                 serlogF4(SER_TCMENU_DEBUG, "draw item (pos,id,chg)", i, item->getId(), item->isChanged(displayNumber));
-                item->setChanged(false);
+                item->setChanged(displayNumber, false);
                 taskManager.yieldForMicros(0);
                 if(itemCfg->getPosition().getGridSize() > 1) {
                     int colWidth = int(width) / itemCfg->getPosition().getGridSize();
@@ -261,7 +265,7 @@ void BaseGraphicalRenderer::renderList() {
 
     // reset the list item to a normal list again.
     runList->asParent();
-    runList->setChanged(false);
+    runList->setChanged(displayNumber, false);
     setTitleOnDisplay(true);
 }
 
