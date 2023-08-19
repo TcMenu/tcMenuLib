@@ -3,8 +3,6 @@
  * there should be general applicability to any mbed device with similar features. This uses our OLED library to present
  * the menu, we defaulted to SPI, but you could change easily to i2c.
  *
- * Compilation works for both mbed 5 and 6. Add build flag -DBUILD_FOR_MBED_6 to build for V6. This is an RTOS example.
- *
  * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
  */
 
@@ -18,11 +16,7 @@
 #include <tcMenuVersion.h>
 #include <Adafruit_SSD1306.h>
 
-#ifdef BUILD_FOR_MBED_6
 BufferedSerial serPort(USBTX, USBRX);
-#else
-Serial serPort(USBTX, USBRX);
-#endif
 MBedLogger LoggingPort(serPort);
 
 // indicates that the process is still active and the run loop should continue.
@@ -44,11 +38,7 @@ ScreenSaverCustomDrawing screenSaver;
 void prepareRealtimeClock();
 
 void setup() {
-#ifdef BUILD_FOR_MBED_6
     serPort.set_baud(115200);
-#else
-    serPort.baud(115200);
-#endif
 
     // we add a simple widget that appears on the top right of the menu, do this before calling setup to ensure that
     // it draws immediately. There's three things to do here
@@ -155,7 +145,6 @@ public:
     }
 };
 
-#ifdef BUILD_FOR_MBED_6
 void prepareRealtimeClock() {
 
     // make sure a connection was registered before trying to use it
@@ -175,18 +164,6 @@ void prepareRealtimeClock() {
     }
     taskManager.scheduleOnce(5, prepareRealtimeClock, TIME_SECONDS);
 }
-#else
-void prepareRealtimeClock() {
-    if(remoteServer.isBound()) {
-        menuIP.setIpAddress(remoteServer.networkInterface()->get_ip_address());
-        taskManager.registerEvent(new NTPTimeMenuSetupEvent(
-                remoteServer.networkInterface(),
-                "2.pool.ntp.org", 123),  true);
-        return;
-    }
-    taskManager.scheduleOnce(5, prepareRealtimeClock, TIME_SECONDS);
-}
-#endif // BUILD_FOR_MBED_5
 
 void CALLBACK_FUNCTION onSaveAll(int id) {
     menuMgr.save();
