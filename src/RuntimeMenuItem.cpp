@@ -35,7 +35,7 @@ RuntimeMenuItem::RuntimeMenuItem(const AnyMenuInfo* rtInfo, bool isPgm, MenuType
 int defaultRtListCallback(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
     switch(mode) {
         case RENDERFN_INVOKE:
-            item->runCallback();
+            // we must never call the invoke function on MenuItem from here
             return true;
         case RENDERFN_NAME:
             if(row != LIST_PARENT_ITEM_POS) {
@@ -102,8 +102,7 @@ RuntimeMenuItem *ListRuntimeMenuItem::asParent() {
 
 RuntimeMenuItem *ListRuntimeMenuItem::asBackMenu() {
     if(activeItem == 0) {
-        // the title is active.
-        renderFn(this, 0, RENDERFN_ACTIVATE, nullptr, 0);
+        runCallback();
     }
     menuType = MENUTYPE_BACK_VALUE;
     itemPosition = LIST_PARENT_ITEM_POS;

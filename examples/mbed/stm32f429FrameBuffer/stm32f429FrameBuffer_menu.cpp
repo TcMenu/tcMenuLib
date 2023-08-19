@@ -64,8 +64,16 @@ BooleanMenuItem menuConnectivityEnableUSB(&minfoConnectivityEnableUSB, false, nu
 const SubMenuInfo minfoConnectivity = { "Connectivity", 9, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackConnectivity(&minfoConnectivity, &menuConnectivityEnableUSB, INFO_LOCATION_PGM);
 SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, &menuSamples, INFO_LOCATION_PGM);
+const char enumStrSettingsBoardList_0[] = "STM32";
+const char enumStrSettingsBoardList_1[] = "ESP32";
+const char enumStrSettingsBoardList_2[] = "AVR";
+const char enumStrSettingsBoardList_3[] = "SAMD";
+const char enumStrSettingsBoardList_4[] = "RP2040";
+const char* const enumStrSettingsBoardList[]  = { enumStrSettingsBoardList_0, enumStrSettingsBoardList_1, enumStrSettingsBoardList_2, enumStrSettingsBoardList_3, enumStrSettingsBoardList_4 };
+const AnyMenuInfo minfoSettingsBoardList = { "Board List", 26, 0xffff, 0, NO_CALLBACK };
+ListRuntimeMenuItem menuSettingsBoardList(&minfoSettingsBoardList, 5, enumStrSettingsBoardList, ListRuntimeMenuItem::FLASH_ARRAY, nullptr, INFO_LOCATION_PGM);
 AnyMenuInfo minfoSettingsDashboard = { "Dashboard", 25, 0xffff, 0, onShowDash };
-ActionMenuItem menuSettingsDashboard(&minfoSettingsDashboard, nullptr, INFO_LOCATION_RAM);
+ActionMenuItem menuSettingsDashboard(&minfoSettingsDashboard, &menuSettingsBoardList, INFO_LOCATION_RAM);
 const AnyMenuInfo minfoSettingsCalibrateNow = { "Calibrate Now", 24, 0xffff, 0, onCalibrateScreen };
 ActionMenuItem menuSettingsCalibrateNow(&minfoSettingsCalibrateNow, &menuSettingsDashboard, INFO_LOCATION_PGM);
 const BooleanMenuInfo minfoSettingsTSCalibration = { "TS Calibration", 23, 0xffff, 1, onTouchCalibration, NAMING_CHECKBOX };
