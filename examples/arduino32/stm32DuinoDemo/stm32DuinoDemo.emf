@@ -662,7 +662,7 @@
       },
       {
         "name": "TITLE_SHOW_MODE",
-        "latestValue": "TITLE_ALWAYS",
+        "latestValue": "NO_TITLE",
         "subsystem": "THEME"
       },
       {

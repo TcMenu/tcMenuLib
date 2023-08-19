@@ -69,7 +69,10 @@ void MenuTouchScreenEncoder::touched(const TouchNotification &evt) {
             bool wasActive = renderer->getActiveItem() == theItem;
             if(!wasActive) {
                 // if it's not active try and activate, if it fails we can't continue.
-                if (!menuMgr.activateMenuItem(theItem)) return;
+                uint8_t itemIdx = renderer->setActiveItem(theItem);
+                if(switches.getEncoder()) {
+                    switches.getEncoder()->setCurrentReading(itemIdx);
+                }
             }
 
             auto menuType = theItem->getMenuType();

@@ -120,7 +120,7 @@ void setupMenu() {
     switches.init(internalDigitalIo(), SWITCHES_POLL_EVERYTHING, true);
     menuMgr.initForEncoder(&renderer, &menu33, PC8, PC10, PC9);
     remoteServer.addConnection(&ethernetConnection);
-    renderer.setTitleMode(BaseGraphicalRenderer::TITLE_ALWAYS);
+    renderer.setTitleMode(BaseGraphicalRenderer::NO_TITLE);
     renderer.setUseSliderForAnalog(false);
     installMonoInverseTitleTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(u8g2_font_prospero_bold_nbp_tr, 1), true);
 

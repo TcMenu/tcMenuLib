@@ -359,14 +359,6 @@ public:
 	MenuItem* findCurrentActive();
 
 	/**
-	 * Activates the menu item provided if it is within the current menu, this actually does
-	 * more than set active, it does the equivalent of an encoder button press.
-	 * @param item the item to activate
-	 * @return if the item was activated
-	 */
-	bool activateMenuItem(MenuItem* item);
-
-	/**
 	 * Get the root of all menus, the first menu item basically
 	 */
 	MenuItem* getRoot() { return navigator.getRoot(); }

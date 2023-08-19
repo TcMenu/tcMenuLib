@@ -302,23 +302,6 @@ MenuItem* MenuManager::getParentAndReset() {
 	return pItem;
 }
 
-bool MenuManager::activateMenuItem(MenuItem *item) {
-    if(renderer->getRendererType() == RENDER_TYPE_NOLOCAL) return false;
-    auto* r = reinterpret_cast<BaseMenuRenderer*>(renderer);
-    uint8_t count = r->itemCount(getCurrentMenu(), false);
-    for(int i=0; i < count; i++) {
-        auto* pItem = r->getMenuItemAtIndex(getCurrentMenu(), i);
-        if(pItem != nullptr && pItem->getId() == item->getId()) {
-            if(switches.getEncoder()) {
-                switches.getEncoder()->setCurrentReading(i);
-            }
-            valueChanged(i);
-            return true;
-        }
-    }
-    return false;
-}
-
 void MenuManager::setupForEditing(MenuItem* item) {
 	// if the item is NULL, or it's read only, then it can't be edited.
 	if (item == nullptr || item->isReadOnly()) return;

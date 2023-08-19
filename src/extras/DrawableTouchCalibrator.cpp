@@ -57,21 +57,24 @@ void IoaTouchScreenCalibrator::renderLoop(unsigned int currentValue, RenderPress
     strcat(sz, ", z: ");
     fastltoa(sz, touchState, 1, NOT_PADDED, sizeof sz);
     drawable->setDrawColor(TOUCH_BLACK);
-    drawable->drawBox(Coord(0, 140), Coord(dims.x, 50), true);
+    drawable->drawBox(Coord(0, 140), Coord(dims.x, 70), true);
     drawable->setColors(TOUCH_YELLOW, TOUCH_BLACK);
     drawable->drawText(Coord(0, 140), itemConfig->getFont(), 0, sz);
+
+    drawable->setDrawColor(TOUCH_BLACK);
+    drawable->setColors(TOUCH_YELLOW, TOUCH_BLACK);
 
     strcpy(sz, "sx:");
     fastftoa(sz, calibrationHandler.getMinX(), 3, sizeof sz);
     strcat(sz, ", ex:");
     fastftoa(sz, calibrationHandler.getMaxX(), 3, sizeof sz);
-    strcat(sz, ", sy:");
+    drawable->drawText(Coord(0, 160), itemConfig->getFont(), 0, sz);
+
+    strcpy(sz, ", sy:");
     fastftoa(sz, calibrationHandler.getMinY(), 3, sizeof sz);
     strcat(sz, ", ey:");
     fastftoa(sz, calibrationHandler.getMaxY(), 3, sizeof sz);
-    drawable->setDrawColor(TOUCH_BLACK);
-    drawable->setColors(TOUCH_YELLOW, TOUCH_BLACK);
-    drawable->drawText(Coord(0, 160), itemConfig->getFont(), 0, sz);
+    drawable->drawText(Coord(0, 180), itemConfig->getFont(), 0, sz);
 #endif
 
     int buttonSize = 75;
@@ -105,9 +108,7 @@ void IoaTouchScreenCalibrator::renderLoop(unsigned int currentValue, RenderPress
         } else if(oldX > rightCorner) {
             calibrationHandler.setXPosition(lastX, !orientation.isXInverted());
             calibrationHandler.setYPosition(lastY, orientation.isYInverted());
-
         }
-
     } else if(oldY > (dims.y - buttonSize)) {
         // bottom
         if(oldX < buttonSize) {
@@ -116,7 +117,7 @@ void IoaTouchScreenCalibrator::renderLoop(unsigned int currentValue, RenderPress
             giveItBack();
         }
         else if(oldX > rightCorner) {
-            calibrationHandler.setYPosition(lastY, orientation.isYInverted());
+            calibrationHandler.setYPosition(lastY, !orientation.isYInverted());
         }
     }
     
