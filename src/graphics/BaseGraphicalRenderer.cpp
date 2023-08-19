@@ -62,7 +62,7 @@ uint8_t BaseGraphicalRenderer::setActiveItem(MenuItem *item) {
     serdebugF4("toth, activeidx, adj ", totalHeight, activeIndex, adjustedHeight);
 
     auto startY = 0;
-    if(titleMode == TITLE_ALWAYS && menuMgr.getRoot() == rootItem) {
+    if(titleMode == TITLE_ALWAYS) {
         startRow++;
         startY = heightOfRow(0, true);
         adjustedHeight -= startY;
@@ -282,16 +282,19 @@ GridPosition::GridDrawingMode modeFromItem(MenuItem* item, bool useSlider) {
 }
 
 void BaseGraphicalRenderer::rootHasChanged(MenuItem* rootItem) {
-        currentRootMenu = rootItem;
-        redrawMode = MENUDRAW_COMPLETE_REDRAW;
-        recalculateDisplayOrder(rootItem, false);
+    currentRootMenu = rootItem;
+    redrawMode = MENUDRAW_COMPLETE_REDRAW;
 
-        // if there is an encoder, we must update it if the values don't match because of hidden items
-        auto expectedCount = itemOrderByRow.count() - 1; // encoder is zero based so always one less.
-        if(switches.getEncoder() && expectedCount != switches.getEncoder()->getMaximumValue()) {
-            serlogF3(SER_TCMENU_INFO, "Force encoder size: ", switches.getEncoder()->getMaximumValue(), expectedCount)
-            menuMgr.setItemsInCurrentMenu(expectedCount, switches.getEncoder()->getCurrentReading());
-        }
+    // force a complete recalculation of the grid.
+    recalculateDisplayOrder(rootItem, false);
+    setActiveItem(activeItem);
+
+    // if there is an encoder, we must update it if the values don't match because of hidden items
+    auto expectedCount = itemOrderByRow.count() - 1; // encoder is zero based so always one less.
+    if(switches.getEncoder() && expectedCount != switches.getEncoder()->getMaximumValue()) {
+        serlogF3(SER_TCMENU_INFO, "Force encoder size: ", switches.getEncoder()->getMaximumValue(), expectedCount)
+        menuMgr.setItemsInCurrentMenu(expectedCount, switches.getEncoder()->getCurrentReading());
+    }
 }
 
 void BaseGraphicalRenderer::recalculateDisplayOrder(MenuItem *root, bool safeMode) {
@@ -479,7 +482,6 @@ void BaseGraphicalRenderer::initialise() {
 }
 
 void BaseGraphicalRenderer::displayPropertiesHaveChanged() {
-    currentRootMenu = nullptr;
     rootHasChanged(menuMgr.getCurrentMenu());
     redrawMode = MENUDRAW_COMPLETE_REDRAW;
 }
