@@ -450,6 +450,11 @@
         "subsystem": "INPUT"
       },
       {
+        "name": "TP_THRESHOLD_DETECTION",
+        "latestValue": "TOUCH_TRIGGER_BELOW",
+        "subsystem": "INPUT"
+      },
+      {
         "name": "UP_SENSOR",
         "latestValue": "5",
         "subsystem": "INPUT"
@@ -539,5 +544,6 @@
     },
     "packageNamespace": "",
     "appIsModular": false
-  }
+  },
+  "stringLists": []
 }
