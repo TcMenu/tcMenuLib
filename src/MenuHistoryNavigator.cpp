@@ -7,11 +7,12 @@
 #include "MenuHistoryNavigator.h"
 #include "MenuIterator.h"
 #include "RuntimeMenuItem.h"
+#include "tcMenu.h"
 
 void tcnav::MenuNavigationStore::setRootItem(MenuItem *item) {
     root = item;
     currentRoot = root;
-    currentSub = nullptr;
+    currentSub = &MenuManager::ROOT;
     navIdx = 0;
     currentIsCustom = false;
     triggerNavigationListener(false);
@@ -38,7 +39,7 @@ MenuItem *tcnav::MenuNavigationStore::popNavigationGetActive() {
     currentIsCustom = false;
     if(navIdx == 0) {
         serlogF(SER_TCMENU_INFO, "Nav pop root");
-        currentSub = nullptr;
+        currentSub = &MenuManager::ROOT;
         currentRoot = root;
         triggerNavigationListener(false);
         return root;

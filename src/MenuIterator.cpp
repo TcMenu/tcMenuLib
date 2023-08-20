@@ -217,6 +217,6 @@ MenuItem* getSubRecurse(MenuItem* toSearch, MenuItem* subMenu, MenuItem* current
 }
 
 MenuItem* getSubMenuFor(MenuItem* current) {
-    if(current == nullptr) return nullptr;
-    return getSubRecurse(menuMgr.getRoot(), nullptr, current);
+    if(current == nullptr) return nullptr; // we cannot traverse: null -> null
+    return getSubRecurse(&MenuManager::ROOT, nullptr, current);
 }

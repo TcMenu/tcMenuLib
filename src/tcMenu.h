@@ -149,6 +149,7 @@ private:
     BtreeList<menuid_t, EncoderWrapOverride> encoderWrapOverrides;
     CurrentEditorRenderingHints renderingHints;
 public:
+    static SubMenuItem ROOT;
 	MenuManager();
 
     /**
@@ -361,7 +362,7 @@ public:
 	/**
 	 * Get the root of all menus, the first menu item basically
 	 */
-	MenuItem* getRoot() { return navigator.getRoot(); }
+	MenuItem* getRoot() { return ROOT.getChild(); }
 
     /**
      * Get the renderer that this menu is using
@@ -515,6 +516,8 @@ protected:
 
     void notifyEditEnd(MenuItem *pItem);
     bool notifyEditStarting(MenuItem *pItem);
+
+    void setRootItem(MenuItem *pItem);
 };
 
 inline bool editorHintNeedsCursor(CurrentEditorRenderingHints::EditorRenderingType ty) {
