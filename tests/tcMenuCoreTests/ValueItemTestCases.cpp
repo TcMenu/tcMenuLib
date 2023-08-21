@@ -6,10 +6,6 @@
 
 test(testCoreAndBooleanMenuItem) {
     // these may seem overkill but the setters are bitwise so quite complex.
-    boolItem1.setActive(true);
-    assertTrue(boolItem1.isActive());
-    boolItem1.setActive(false);
-    assertFalse(boolItem1.isActive());
     assertEquals(MENUTYPE_BOOLEAN_VALUE, boolItem1.getMenuType());
 
     boolItem1.setChanged(true);

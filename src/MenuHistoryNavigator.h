@@ -41,6 +41,7 @@ namespace tcnav {
         MenuNavigationStore() = default;
 
         void addNavigationListener(NavigationListener* newListener);
+        void clearNavigationListeners() { navigationLister = nullptr; }
 
         void triggerNavigationListener(bool completeReset);
 

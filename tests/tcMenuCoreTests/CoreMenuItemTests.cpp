@@ -42,12 +42,10 @@ testF(TaskManagerResettingTest, testIpAddressItem) {
 	ipItem.copyValue(sz, sizeof(sz));
 	assertStringEquals("192.168.2.201", sz);
     assertTrue(checkEditorHints(10, 13, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
-	assertTrue(ipItem.isEditing());
 
 	assertEquals(0, ipItem.nextPart());
 	ipItem.copyValue(sz, sizeof(sz));
 	assertStringEquals("192.168.2.201", sz);
-	assertFalse(ipItem.isEditing());
 
 	assertTrue(isMenuRuntime(&ipItem));
 	assertFalse(isMenuBasedOnValueItem(&ipItem));

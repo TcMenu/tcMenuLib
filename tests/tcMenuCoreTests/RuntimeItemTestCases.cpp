@@ -126,7 +126,6 @@ test(testTextMenuItemFromEmpty) {
 
     // ensure we can edit an empty string position
     assertEquals(uint8_t(10), textItem.beginMultiEdit());
-    assertTrue(textItem.isEditing());
     assertEquals(ALLOWABLE_CHARS_ENCODER_SIZE, textItem.nextPart());
     assertEquals(0, textItem.getPartValueAsInt());
 
@@ -204,7 +203,6 @@ test(testTextPasswordItem) {
     assertStringEquals("****", sz);
 
     assertEquals(uint8_t(5), textItem.beginMultiEdit());
-    assertTrue(textItem.isEditing());
     assertEquals(ALLOWABLE_CHARS_ENCODER_SIZE, textItem.nextPart());
     textItem.valueChanged(findPositionInEditorSet('9'));
     assertEquals(findPositionInEditorSet('9'), textItem.getPartValueAsInt());
@@ -229,7 +227,6 @@ test(testTextRuntimeItem) {
     assertStringEquals("Goodbye", sz);
 
     assertEquals(uint8_t(10), textItem.beginMultiEdit());
-    assertTrue(textItem.isEditing());
     assertEquals(ALLOWABLE_CHARS_ENCODER_SIZE, textItem.nextPart());
     assertEquals(findPositionInEditorSet('G'), textItem.getPartValueAsInt());
 
@@ -262,7 +259,6 @@ test(testTextRuntimeItem) {
     renderActivateCalled = false;
     textItem.stopMultiEdit();
     assertTrue(renderActivateCalled);
-    assertFalse(textItem.isEditing());
     textItem.copyValue(sz, sizeof(sz));
     assertStringEquals("0o1dbye", sz);
 }

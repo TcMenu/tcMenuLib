@@ -84,6 +84,7 @@ void populatePropsWithDefaults(ConfigurableItemDisplayPropertiesFactory& factory
     factory.setDrawingPropertiesAllInSub(ItemDisplayProperties::COMPTYPE_ITEM, menuSub.getId(), palette3, MenuPadding(3), pointer1, 3, 10, 60, GridPosition::JUSTIFY_CENTER_NO_VALUE, MenuBorder(0));
     factory.setDrawingPropertiesForItem(ItemDisplayProperties::COMPTYPE_ITEM, menuSubAnalog.getId(), palette1, MenuPadding(6), pointer2, 3, 12, 80, GridPosition::JUSTIFY_CENTER_WITH_VALUE, MenuBorder(0));
     factory.addGridPosition(&menuVolume, GridPosition(GridPosition::DRAW_INTEGER_AS_UP_DOWN, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 2, 100));
+    menuMgr.getNavigationStore().clearNavigationListeners();
     menuMgr.initWithoutInput(&noRenderer, &textMenuItem1);
     taskManager.reset();
 }
@@ -274,6 +275,7 @@ testF(TaskManagerResettingTest, testBaseRendererWithDefaults) {
     factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ACTION, palette1, MenuPadding(4), pointer1, 1, 5, 25, GridPosition::JUSTIFY_LEFT_NO_VALUE, MenuBorder(0));
     factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, palette1, MenuPadding(4), pointer1, 1, 5, 20, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, MenuBorder(0));
 
+    menuMgr.getNavigationStore().clearNavigationListeners();
     menuMgr.initWithoutInput(&renderer, &textMenuItem1);
     taskManager.reset();
 
@@ -325,13 +327,6 @@ testF(TaskManagerResettingTest, testBaseRendererWithDefaults) {
     assertTrue(checkItem(renderer.getMenuItemRecordings().getByKey(3), Coord(0, 95), Coord(320, 20), pointer1, GridPosition::DRAW_INTEGER_AS_UP_DOWN, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 1, &menuEnum1));
 }
 
-void selectItem(MenuItem* root, MenuItem* toSelect) {
-    while(root != nullptr) {
-        root->setActive(root == toSelect);
-        root = root->getNext();
-    }
-}
-
 testF(TaskManagerResettingTest, testScrollingWithMoreThanOneItemOnRow) {
     TestCapturingRenderer renderer(320, 100, false, pgmName);
     renderer.setTitleMode(BaseGraphicalRenderer::NO_TITLE);
@@ -344,6 +339,7 @@ testF(TaskManagerResettingTest, testScrollingWithMoreThanOneItemOnRow) {
     factory.addGridPosition(&boolItem1, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_WITH_VALUE, 2, 1, 1, 35));
     factory.addGridPosition(&menuSub, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 2, 2, 1, 35));
 
+    menuMgr.getNavigationStore().clearNavigationListeners();
     menuMgr.initWithoutInput(&renderer, &textMenuItem1);
     taskManager.reset(); // this must be done to clear out the task created by calling initialise above.
 
@@ -362,7 +358,7 @@ testF(TaskManagerResettingTest, testScrollingWithMoreThanOneItemOnRow) {
 
     // now select an item that's off the display, it should remove the first item from the display we clear down the all the
     // states in the test renderer so we can check that we completely refreshed the display, and the first item is not drawn
-    selectItem(&textMenuItem1, &menuAnalog);
+    renderer.setActiveItem(&textMenuItem1);
     renderer.resetCommandStates();
     renderer.getMenuItemRecordings().clear();
     renderer.exec();
@@ -407,6 +403,7 @@ public:
 
 testF(TaskManagerResettingTest, testTakeOverDisplay) {
     TestCapturingRenderer renderer(320, 100, false, pgmName);
+    menuMgr.getNavigationStore().clearNavigationListeners();
     menuMgr.initWithoutInput(&renderer, &textMenuItem1);
     DisplayDrawing drawingTest;
     renderer.setCustomDrawingHandler(&drawingTest);
@@ -438,6 +435,7 @@ testF(TaskManagerResettingTest, testListRendering) {
     ListRuntimeMenuItem runtimeItem(101, 20, testBasicRuntimeFn, nullptr);
     TestCapturingRenderer renderer(320, 100, false, pgmName);
     DisplayDrawing drawingTest;
+    menuMgr.getNavigationStore().clearNavigationListeners();
     menuMgr.initWithoutInput(&renderer, &runtimeItem);
     auto& factory = reinterpret_cast<ConfigurableItemDisplayPropertiesFactory &>(renderer.getDisplayPropertiesFactory());
     factory.setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_TITLE, palette1, MenuPadding(4), pointer2, 1, 10, 30, GridPosition::JUSTIFY_CENTER_NO_VALUE, MenuBorder(0));

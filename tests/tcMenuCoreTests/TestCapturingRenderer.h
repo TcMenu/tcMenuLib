@@ -76,7 +76,7 @@ public:
         else widgetRecordings.add(WidgetDrawingRecord(widget, where, colorBg, colorFg));
     }
 
-    void drawMenuItem(GridPositionRowCacheEntry *entry, Coord where, Coord areaSize, bool /*drawAll*/) override {
+    void drawMenuItem(GridPositionRowCacheEntry *entry, Coord where, Coord areaSize, const DrawingFlags&) override {
         uint8_t row = entry->getPosition().getRow() + ((entry->getPosition().getGridPosition() - 1) * 100);
         auto* itemRec = menuItemRecordings.getByKey(row);
         if(itemRec) {

@@ -294,7 +294,6 @@ test(LargeNumWithNegativeNotAllowed) {
     assertTrue(checkEditorHints(5, 6, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
     assertEquals(0, editable.nextPart());
 
-    assertFalse(editable.isEditing());
     editable.copyValue(sz, sizeof(sz));
     assertStringEquals("15265", sz);
 }
