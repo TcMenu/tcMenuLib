@@ -59,7 +59,6 @@ uint8_t BaseGraphicalRenderer::setActiveItem(MenuItem *item) {
     uint16_t totalHeight = calculateHeightTo(activeIndex, rootItem);
     int startRow = 0;
     uint16_t adjustedHeight = height + (isLastRowExactFit() ? 0 : 1);
-    serdebugF4("toth, activeidx, adj ", totalHeight, activeIndex, adjustedHeight);
 
     auto startY = 0;
     if(titleMode == TITLE_ALWAYS) {
@@ -68,13 +67,13 @@ uint8_t BaseGraphicalRenderer::setActiveItem(MenuItem *item) {
         adjustedHeight -= startY;
         totalHeight -= startY;
     }
-    serdebugF4("sy, sr, adj ", startY, startRow, adjustedHeight);
+    serlogF4(SER_TCMENU_DEBUG, "totH, actIdx, adjH ", totalHeight, activeIndex, adjustedHeight);
 
     while (totalHeight > adjustedHeight) {
         totalHeight -= heightOfRow(startRow, true);
         startRow++;
     }
-    serdebugF3("sr, th", startRow, totalHeight);
+    serlogF4(SER_TCMENU_DEBUG, "sy, sr, adj ", startY, startRow, adjustedHeight);
 
     // the screen has moved, we must completely redraw the area, and we need a clear first.
     if(drawingLocation.getCurrentOffset() != startRow) {

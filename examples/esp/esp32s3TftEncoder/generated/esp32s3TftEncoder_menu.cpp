@@ -71,7 +71,7 @@ void setupMenu() {
     renderer.setUpdatesPerSecond(15);
     switches.init(internalDigitalIo(), SWITCHES_NO_POLLING, true);
     menuMgr.initForEncoder(&renderer, &menuSettings, 3, 4, 5);
-    renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
+    renderer.setTitleMode(BaseGraphicalRenderer::NO_TITLE);
     renderer.setUseSliderForAnalog(true);
     renderer.enableTcUnicode();
     installCoolBlueTraditionalTheme(renderer, MenuFontDef(&OpenSansCyrillicLatin12, 0), MenuFontDef(&OpenSansCyrillicLatin12, 0), true);
