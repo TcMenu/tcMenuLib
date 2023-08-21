@@ -73,7 +73,9 @@ void MenuEditingKeyListener::keyPressed(char key, bool held) {
         clearState();
         menuMgr.resetMenu(held);
     } else if (key == enterKey) {
-        clearState();
+        if(menuMgr.getCurrentEditor() && menuMgr.getCurrentEditor()->getMenuType() != MENUTYPE_RUNTIME_LIST) {
+            clearState();
+        }
         menuMgr.onMenuSelect(held);
         if(menuMgr.getCurrentEditor() && menuMgr.getCurrentEditor()->getMenuType() == MENUTYPE_INT_VALUE) {
             processAnalogKeyPress(reinterpret_cast<AnalogMenuItem*>(menuMgr.getCurrentEditor()), key);

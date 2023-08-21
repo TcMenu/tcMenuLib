@@ -101,11 +101,11 @@ RuntimeMenuItem *ListRuntimeMenuItem::asParent() {
 }
 
 RuntimeMenuItem *ListRuntimeMenuItem::asBackMenu() {
+    menuType = MENUTYPE_BACK_VALUE;
+    itemPosition = LIST_PARENT_ITEM_POS;
     if(activeItem == 0) {
         runCallback();
     }
-    menuType = MENUTYPE_BACK_VALUE;
-    itemPosition = LIST_PARENT_ITEM_POS;
     return this;
 }
 

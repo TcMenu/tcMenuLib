@@ -466,7 +466,9 @@ namespace tcgfx {
                 forceDrawWidgets = true;
             }
             if (titleNeeded && (locRedrawMode == MENUDRAW_COMPLETE_REDRAW || titleEntry->getMenuItem()->isChanged(displayNumber))) {
-                drawMenuItem(titleEntry, Coord(0, 0), cardLayoutPane->getTitleSize(), DrawingFlags(true, activeItem == titleEntry->getMenuItem(), menuMgr.getCurrentEditor() == titleEntry->getMenuItem()));
+                bool active = titleNeeded && activeItem == titleEntry->getMenuItem();
+                drawMenuItem(titleEntry, Coord(0, 0), cardLayoutPane->getTitleSize(), DrawingFlags(true, active, menuMgr.getCurrentEditor() == titleEntry->getMenuItem()));
+                forceDrawWidgets = true;
             }
             if (entry->getMenuItem()->isChanged(displayNumber) || locRedrawMode == MENUDRAW_COMPLETE_REDRAW) {
                 getDeviceDrawable()->setDrawColor(entry->getDisplayProperties()->getColor(ItemDisplayProperties::BACKGROUND));
@@ -474,9 +476,11 @@ namespace tcgfx {
                 int offsetY = (cardLayoutPane->getMenuSize().y - int(entry->getHeight())) / 2;
                 Coord menuStart(cardLayoutPane->getMenuLocation().x, cardLayoutPane->getMenuLocation().y + offsetY);
                 Coord menuSize(cardLayoutPane->getMenuSize().x, int(entry->getHeight()));
-                drawMenuItem(entry, menuStart, menuSize, DrawingFlags(false, activeItem == titleEntry->getMenuItem(), menuMgr.getCurrentEditor() == titleEntry->getMenuItem()));
+                bool active = titleNeeded && activeItem == entry->getMenuItem();
+                drawMenuItem(entry, menuStart, menuSize, DrawingFlags(false, active, menuMgr.getCurrentEditor() == entry->getMenuItem()));
             }
             cardLayoutPane->prepareAndPaintButtons(this, activeIndex, itemOrderByRow.count(), titleMode != NO_TITLE);
+            setTitleOnDisplay(true);
         } else {
             if(locRedrawMode == MENUDRAW_COMPLETE_REDRAW && cardLayoutPane != nullptr) {
                 cardLayoutPane->notInUse();

@@ -96,11 +96,15 @@ void BaseGraphicalRenderer::subMenuRender(MenuItem* rootItem, uint8_t& locRedraw
         auto* pEntry = itemOrderByRow.itemAtIndex(0);
         drawMenuItem(pEntry, Coord(0,0), Coord(int(width), drawingLocation.getStartY()), DrawingFlags(drawCompleteScreen, activeItem == pEntry->getMenuItem(), menuMgr.getCurrentEditor() == pEntry->getMenuItem()));
         forceDrawWidgets = true;
+        setTitleOnDisplay(true);
+    } else if(itemOrderByRow.count() > 0){
+        bool drawingTitle = itemOrderByRow.itemAtIndex(0)->getPosition().getDrawingMode() == GridPosition::DRAW_TITLE_ITEM;
+        setTitleOnDisplay(drawingTitle && startRow == 0);
     }
 
     // and then we start drawing items until we run out of screen or items
     if(drawTheMenuItems(startRow, drawingLocation.getStartY(), drawCompleteScreen)) forceDrawWidgets = true;
-    setTitleOnDisplay((titleMode == TITLE_FIRST_ROW && startRow == 0) || titleMode == TITLE_ALWAYS);
+
 }
 
 GridPositionRowCacheEntry* BaseGraphicalRenderer::findMenuEntryAndDimensions(const Coord& screenPos, Coord& localStart, Coord& localSize) {
@@ -362,8 +366,10 @@ bool BaseGraphicalRenderer::areRowsOutOfOrder() {
 }
 
 void BaseGraphicalRenderer::redrawAllWidgets(bool forceRedraw) {
-    if(!isTitleOnDisplay() || itemOrderByRow.count() == 0) return;
-    if(itemOrderByRow.itemAtIndex(0)->getPosition().getDrawingMode() != GridPosition::DRAW_TITLE_ITEM) return;
+    if(itemOrderByRow.count() == 0 || !isTitleOnDisplay()) return;
+    if(itemOrderByRow.itemAtIndex(0)->getPosition().getDrawingMode() != GridPosition::DRAW_TITLE_ITEM) {
+        if(drawingLocation.getCurrentOffset() != 0) return;
+    }
 
     auto* displayProps = itemOrderByRow.itemAtIndex(0)->getDisplayProperties();
     auto widFg = displayProps->getColor(ItemDisplayProperties::HIGHLIGHT1);

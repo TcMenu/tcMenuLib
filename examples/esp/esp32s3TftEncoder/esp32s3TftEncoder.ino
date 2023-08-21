@@ -8,6 +8,7 @@
 #include "app_icondata.h"
 #include "tcMenuVersion.h"
 #include <IoLogging.h>
+#include <stockIcons/wifiAndConnectionIcons16x12.h>
 
 //
 // We use a card layout to present the items, here we demonstrate how to set it up and prepare custom menu items that
@@ -18,6 +19,8 @@
 // first we need to define both a left and right button, we use the ones from stockIcons/directionalIcons.h
 DrawableIcon iconLeft(-1, Coord(11, 22), tcgfx::DrawableIcon::ICON_XBITMAP, ArrowHoriz11x22BitmapLeft, nullptr);
 DrawableIcon iconRight(-1, Coord(11, 22), tcgfx::DrawableIcon::ICON_XBITMAP, ArrowHoriz11x22BitmapRight, nullptr);
+
+TitleWidget titleWidget(iconsEthernetConnection, 2, 16, 12);
 
 void setupGridLayoutForCardView() {
     auto & factory = renderer.getGraphicsPropertiesFactory();
@@ -43,6 +46,7 @@ void setup() {
     Serial.begin(115200);
 
     serEnableLevel(SER_TCMENU_DEBUG, true);
+    renderer.setFirstWidget(&titleWidget);
     setupMenu();
 
     // Here we enable the card layout mode for the main menu by first enabling support, then adding the root menu.
@@ -56,10 +60,14 @@ void setup() {
     });
 
     // every second we simulate updating the battery condition indicators.
-    taskManager.scheduleFixedRate(1, [] {
+    taskManager.schedule(repeatSeconds(1), [] {
         menuBatteryCharge.setCurrentValue(rand() % 100);
         menuBatteryCondition.setCurrentValue(rand() % 3);
-    }, TIME_SECONDS);
+    });
+
+    taskManager.schedule(repeatSeconds(30), [] {
+        titleWidget.setCurrentState(rand() % 2);
+    });
 }
 
 void loop() {

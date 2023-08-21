@@ -333,9 +333,12 @@ int CALLBACK_FUNCTION fnListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnM
         Serial.print("Activated "); Serial.println(row);
         return true;
     } else if(mode == RENDERFN_INVOKE) {
-        Serial.print("Selected "); Serial.println(row);
-        // do something with the selected item.
-        menuMgr.resetMenu(false);
+        if(row != LIST_PARENT_ITEM_POS) {
+            Serial.print("Selected ");
+            Serial.println(row);
+            // do something with the selected item.
+            menuMgr.resetMenu(false);
+        }
         return true;
     } else if(mode == RENDERFN_VALUE && row < numListItems) {
         // if the value is in range we copy the value from our array
