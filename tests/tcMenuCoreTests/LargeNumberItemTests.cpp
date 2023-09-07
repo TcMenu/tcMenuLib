@@ -199,6 +199,7 @@ test(testPersistLargeInteger) {
 	EditableLargeNumberMenuItem editable(largeNumTestCb, 101, 12, 5);
 	editable.getLargeNumber()->setValue(10029, 20349, false);
 	MockEepromAbstraction mockRom;
+    menuMgr.getNavigationStore().clearNavigationListeners();
 	menuMgr.setRootMenu(&editable);
 	menuMgr.save(mockRom);
 	dumpBuffer(editable.getLargeNumber());
@@ -216,6 +217,7 @@ test(testPersistLargeInteger) {
 	assertFalse(editable.getLargeNumber()->isNegative());
 
 	menuMgr.setRootMenu(NULL);
+    menuMgr.getNavigationStore().clearNavigationListeners();
 }
 
 test(testSetLargeIntFromString) {
