@@ -366,10 +366,19 @@ bool BaseGraphicalRenderer::areRowsOutOfOrder() {
 }
 
 void BaseGraphicalRenderer::redrawAllWidgets(bool forceRedraw) {
-    if(itemOrderByRow.count() == 0 || !isTitleOnDisplay()) return;
-    if(itemOrderByRow.itemAtIndex(0)->getPosition().getDrawingMode() != GridPosition::DRAW_TITLE_ITEM) {
-        if(drawingLocation.getCurrentOffset() != 0) return;
+    bool cardLayoutOn = isCardLayoutActive(menuMgr.getCurrentMenu());
+
+    // if there's nothing at all to draw, get out of here.
+    if(itemOrderByRow.count() == 0) return;
+
+    // if there is a title menu item, but it is not presently on the display (IE we've scrolled down)
+    // then we don't present any title items. NOTE this does not apply to card layout which always shows widgets.
+    if(itemOrderByRow.itemAtIndex(0)->getPosition().getDrawingMode() == GridPosition::DRAW_TITLE_ITEM) {
+        if(titleMode != TITLE_ALWAYS && drawingLocation.getCurrentOffset() != 0 && !cardLayoutOn) return;
     }
+
+    // for card layout, we always redraw all widgets to ensure they are present.
+    if(cardLayoutOn) forceRedraw = true;
 
     auto* displayProps = itemOrderByRow.itemAtIndex(0)->getDisplayProperties();
     auto widFg = displayProps->getColor(ItemDisplayProperties::HIGHLIGHT1);

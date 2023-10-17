@@ -578,29 +578,40 @@ void TagValueRemoteConnector::encodeActionMenu(int parentId, ActionMenuItem* ite
     transport->endMsg();
 }
 
+bool TagValueRemoteConnector::beginEncodeChange(MenuItem* item) {
+    if(!prepareWriteMsg(MSG_CHANGE_INT)) return false;
+    transport->writeFieldInt(FIELD_ID, item->getId());
+    return true;
+}
+
 void TagValueRemoteConnector::encodeChangeValue(MenuItem* theItem) {
     char sz[32];
-    if(!prepareWriteMsg(MSG_CHANGE_INT)) return;
-    transport->writeFieldInt(FIELD_ID, theItem->getId());
+
     switch(theItem->getMenuType()) {
     case MENUTYPE_ENUM_VALUE:
     case MENUTYPE_INT_VALUE:
     case MENUTYPE_BOOLEAN_VALUE:
+        if(!beginEncodeChange(theItem)) return;
         transport->writeFieldInt(FIELD_CHANGE_TYPE, CHANGE_ABSOLUTE); // menu host always sends absolute!
         transport->writeFieldInt(FIELD_CURRENT_VAL, ((ValueMenuItem*)theItem)->getCurrentValue());
+        transport->endMsg();
         break;
 	case MENUTYPE_COLOR_VALUE: {
+        if(!beginEncodeChange(theItem)) return;
 	    auto rgb = reinterpret_cast<Rgb32MenuItem*>(theItem);
 	    rgb->getUnderlying()->asHtmlString(sz, sizeof sz, true);
 	    transport->writeField(FIELD_CURRENT_VAL, sz);
 	    transport->writeFieldInt(FIELD_CHANGE_TYPE, CHANGE_ABSOLUTE);
+        transport->endMsg();
 	    break;
 	}
 	case MENUTYPE_SCROLLER_VALUE: {
+        if(!beginEncodeChange(theItem)) return;
 	    auto sc = reinterpret_cast<ScrollChoiceMenuItem*>(theItem);
 	    sc->copyTransportText(sz, sizeof sz);
 	    transport->writeField(FIELD_CURRENT_VAL, sz);
 	    transport->writeFieldInt(FIELD_CHANGE_TYPE, CHANGE_ABSOLUTE);
+        transport->endMsg();
 	    break;
 	}
     case MENUTYPE_IPADDRESS:
@@ -608,23 +619,30 @@ void TagValueRemoteConnector::encodeChangeValue(MenuItem* theItem) {
     case MENUTYPE_DATE:
     case MENUTYPE_LARGENUM_VALUE:
     case MENUTYPE_TEXT_VALUE: {
+        if(!beginEncodeChange(theItem)) return;
 		((RuntimeMenuItem*)theItem)->copyValue(sz, sizeof(sz));
 		transport->writeField(FIELD_CURRENT_VAL, sz);
         transport->writeFieldInt(FIELD_CHANGE_TYPE, CHANGE_ABSOLUTE); // menu host always sends absolute!
+        transport->endMsg();
 		break;
 	}
 	case MENUTYPE_RUNTIME_LIST:
+        if(!beginEncodeChange(theItem)) return;
         transport->writeFieldInt(FIELD_CHANGE_TYPE, CHANGE_LIST); // menu host always sends absolute!
 		runtimeSendList(reinterpret_cast<ListRuntimeMenuItem*>(theItem), transport);
+        transport->endMsg();
 		break;
 	case MENUTYPE_FLOAT_VALUE:
+        if(!beginEncodeChange(theItem)) return;
         transport->writeFieldInt(FIELD_CHANGE_TYPE, CHANGE_ABSOLUTE); // menu host always sends absolute!
         writeFloatValueToTransport(transport, (FloatMenuItem*)theItem);
+        transport->endMsg();
         break;
     default:
-        break;
+        // a type of menu that is unsupported for a remote update, eg title item, action item, submenu
+        // so do nothing here, save bandwidth and processing.
+        return;
     }
-    transport->endMsg();
 }
 
 //

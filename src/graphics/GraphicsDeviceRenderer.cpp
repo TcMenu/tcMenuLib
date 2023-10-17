@@ -469,6 +469,8 @@ namespace tcgfx {
                 bool active = titleNeeded && activeItem == titleEntry->getMenuItem();
                 drawMenuItem(titleEntry, Coord(0, 0), cardLayoutPane->getTitleSize(), DrawingFlags(true, active, menuMgr.getCurrentEditor() == titleEntry->getMenuItem()));
                 forceDrawWidgets = true;
+            } else {
+                forceDrawWidgets = true; // we always need to draw the titleWidgets if there is no title item
             }
             if (entry->getMenuItem()->isChanged(displayNumber) || locRedrawMode == MENUDRAW_COMPLETE_REDRAW) {
                 getDeviceDrawable()->setDrawColor(entry->getDisplayProperties()->getColor(ItemDisplayProperties::BACKGROUND));
