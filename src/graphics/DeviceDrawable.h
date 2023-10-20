@@ -165,7 +165,6 @@ namespace tcgfx {
          * optimal way possible for the platform
          * @param x the x location
          * @param y the y location
-         * @param col the color of the pixel
          */
         virtual void drawPixel(uint16_t x, uint16_t y) = 0;
 

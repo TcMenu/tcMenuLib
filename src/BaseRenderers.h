@@ -261,8 +261,8 @@ class NoRenderer : public MenuRenderer {
 private:
     BaseDialog* dialog;
 public:
-    NoRenderer() : MenuRenderer(RENDER_TYPE_NOLOCAL, 20) { MenuRenderer::theInstance = this; dialog = NULL;}
-    ~NoRenderer() override { }
+    NoRenderer() : MenuRenderer(RENDER_TYPE_NOLOCAL, 20) { MenuRenderer::theInstance = this; dialog = nullptr;}
+    ~NoRenderer() override = default;
 	bool tryTakeSelectIfNeeded(int, RenderPressMode) override { return false; }
 	void initialise() override { }
     BaseDialog* getDialog() override;
