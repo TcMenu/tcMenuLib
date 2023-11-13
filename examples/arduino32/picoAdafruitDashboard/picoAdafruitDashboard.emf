@@ -155,11 +155,11 @@
     }
   ],
   "codeOptions": {
-    "embeddedPlatform": "ARDUINO_ESP32",
+    "embeddedPlatform": "ARDUINO32",
     "lastDisplayUuid": "4dcb12ec-13d8-4466-b8b6-bd575eae4612",
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
     "lastRemoteUuids": [
-      "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
+      "1e38dc42-672d-4c1c-a393-2c7632bf6c5c"
     ],
     "lastThemeUuid": "850dc0a3-f534-47c2-94d8-1e64ff368a54",
     "applicationUUID": "0ad4bdde-34a4-4507-912e-b495b0eac2c1",
@@ -276,6 +276,11 @@
         "subsystem": "INPUT"
       },
       {
+        "name": "SERIAL_PORT",
+        "latestValue": "Serial",
+        "subsystem": "REMOTE"
+      },
+      {
         "name": "ITEM_FONT",
         "latestValue": "ada:RobotoMedium24,1",
         "subsystem": "THEME"
@@ -313,7 +318,7 @@
     ],
     "namingRecursive": true,
     "useCppMain": false,
-    "saveLocation": "PROJECT_TO_CURRENT_WITH_GENERATED",
+    "saveLocation": "ALL_TO_CURRENT",
     "usingSizedEEPROMStorage": false,
     "eepromDefinition": "",
     "authenticatorDefinition": "",

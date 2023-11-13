@@ -5,7 +5,7 @@
 // Reference docs https://www.thecoderscorner.com/ref-docs/tcmenu/html/_drawable_dashboard_8h.html
 //
 
-#include "generated/picoAdafruitDashboard_menu.h"
+#include "picoAdafruitDashboard_menu.h"
 #include <Adafruit_ILI9341.h>
 #include "dashboardConfig.h"
 #include <graphics/TcDrawableButton.h>

@@ -14,6 +14,8 @@
 #include <Arduino.h>
 #include <tcMenu.h>
 #include "tcMenuAdaFruitGfx.h"
+#include <RemoteConnector.h>
+#include "SerialTransport.h"
 #include <ScrollChoiceMenuItem.h>
 #include <IoAbstraction.h>
 #include <EepromItemStorage.h>
@@ -21,6 +23,7 @@
 
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
+extern TcMenuRemoteServer remoteServer;
 extern Adafruit_ILI9341 gfx;
 extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;

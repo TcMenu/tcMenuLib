@@ -7,13 +7,16 @@
  */
 
 #include <TaskManagerIO.h>
-#include "generated/picoAdafruitDashboard_menu.h"
+#include "picoAdafruitDashboard_menu.h"
 #include "dashboardConfig.h"
 
 void setup() {
     // This example logs using IoLogging, see the following guide to enable
     // https://www.thecoderscorner.com/products/arduino-libraries/io-abstraction/arduino-logging-with-io-logging/
     IOLOG_START_SERIAL
+
+    Serial.begin(115200);
+    while (!Serial && millis() < 10000UL);
 
     // prepare the SPI device on the right pins, configure as needed!
     SPI.setRX(4);

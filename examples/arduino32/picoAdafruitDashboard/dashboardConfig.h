@@ -3,7 +3,7 @@
 #ifndef TCEXAMPLE_DASHBOARDCONFIG_H
 #define TCEXAMPLE_DASHBOARDCONFIG_H
 
-#include "generated/picoAdafruitDashboard_menu.h"
+#include "picoAdafruitDashboard_menu.h"
 #include "extras/DrawableDashboard.h"
 
 void setupDashboard();
