@@ -42,7 +42,6 @@ namespace tcgfx {
         SubDeviceType subDeviceType = NO_SUB_DEVICE;
     public:
         virtual ~DeviceDrawable() = default;
-
         /**
          * @return the dimensions of the screen corrected for the current rotation
          */
@@ -232,6 +231,13 @@ namespace tcgfx {
          * @return the font handler if unicode is enabled, otherwise nullptr.
          */
         UnicodeFontHandler *getUnicodeHandler(bool enableIfNeeded = true);
+
+        /**
+         * If a native font handler has already been created, avoid creating a second instance and give the drawable
+         * the same instance to save memory.
+         * @param handler pointer to the existing handler
+         */
+        void setFontHandler(UnicodeFontHandler* handler) {fontHandler = handler;}
 
         /**
          * @return the type of sub-device that is supported by this display drawable.

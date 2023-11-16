@@ -188,7 +188,7 @@ inline char* potentialProgramMemory(const char *x) {
 #define get_info_callback(x) ((MenuCallbackFn)(*x))
 #define safeProgStrLen(x) (strlen(x))
 
-#if !defined(pgm_read_dword) && defined(__MBED__)
+#if !defined(pgm_read_dword) && (defined(__MBED__) || defined(BUILD_FOR_PICO_CMAKE))
 # define pgm_read_byte(addr) (*(const unsigned char *)(addr))
 # define pgm_read_word(addr) (*(const unsigned short *)(addr))
 # define pgm_read_dword(addr) (*(const unsigned long *)(addr))
