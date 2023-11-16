@@ -184,5 +184,6 @@ void CALLBACK_FUNCTION onDecimalStepChange(int id) {
             break;
     }
     menuDecimal.setStep(stepVal);
+    menuDecimal.setChanged(true);
     serlogF2(SER_DEBUG, "Decimal Step now ", stepVal);
 }
