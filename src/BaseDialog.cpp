@@ -279,6 +279,8 @@ void MenuBasedDialog::internalSetVisible(bool visible) {
 
     if(visible) {
         auto* renderer =  reinterpret_cast<BaseGraphicalRenderer*>(MenuRenderer::getInstance());
+        // make sure the display is given back before trying to present a menu based dialog!
+        renderer->giveBackDisplay();
         auto& factory = static_cast<ItemDisplayPropertiesFactory&>(renderer->getDisplayPropertiesFactory());
 
         btn1Item.setVisible(button1 != BTNTYPE_NONE);
