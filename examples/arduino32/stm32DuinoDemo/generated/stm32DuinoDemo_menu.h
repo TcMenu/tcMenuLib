@@ -85,4 +85,6 @@ void CALLBACK_FUNCTION largeNumDidChange(int id);
 void CALLBACK_FUNCTION onDecimalStepChange(int id);
 void CALLBACK_FUNCTION saveWasPressed(int id);
 
+extern const EmbedControlFlashedForm* tcMenuAllEmbeddedForms[];
+
 #endif // MENU_GENERATED_CODE_H

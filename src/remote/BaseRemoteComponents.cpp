@@ -36,6 +36,7 @@ void TagValueRemoteServerConnection::tick() {
 
 void TagValueRemoteServerConnection::init(int remoteNumber, const ConnectorLocalInfo& info) {
     // first we setup the remote number and initialise the connector
+    messageProcessor.initialise();
     connector()->initialise(transport(), messageProcessors(), &info, remoteNumber);
 }
 

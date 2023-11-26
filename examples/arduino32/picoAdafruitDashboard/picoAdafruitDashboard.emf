@@ -329,7 +329,10 @@
       "menuDefinitions": []
     },
     "packageNamespace": "",
-    "appIsModular": false
+    "appIsModular": false,
+    "listOfEmbeddedForms": [
+      "Mobile Pico"
+    ]
   },
   "stringLists": []
 }

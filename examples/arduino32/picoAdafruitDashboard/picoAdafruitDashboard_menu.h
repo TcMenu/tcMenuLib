@@ -53,4 +53,6 @@ void setupMenu();
 
 void CALLBACK_FUNCTION onSettingsAction(int id);
 
+const EmbedControlFlashedForm*[] tcMenuAllEmbeddedForms;
+
 #endif // MENU_GENERATED_CODE_H

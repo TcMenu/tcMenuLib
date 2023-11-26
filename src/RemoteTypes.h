@@ -84,6 +84,14 @@ enum AckResponseStatus {
 #define MSG_CHANGE_INT msgFieldToWord('V', 'C')
 /** Message type defintion for a dialog change msg */
 #define MSG_DIALOG msgFieldToWord('D', 'M')
+/** Message definition for getting the list of forms in FLASH */
+#define MSG_GET_FORMS_REQUEST msgFieldToWord('F', 'G')
+/** Message definition for responding with the list of forms in FLASH */
+#define MSG_GET_FORM_RESPONSE msgFieldToWord('F', 'N')
+/** Message definition for requesting the form data from FLASH */
+#define MSG_FORM_DATA_REQUEST msgFieldToWord('F', 'R')
+/** Message definition for responding in binary gzip with form data from FLASH */
+#define MSG_FORM_DATA_RESPONSE msgFieldToWord('F', 'D')
 
 #define FIELD_MSG_NAME    msgFieldToWord('N', 'M')
 #define FIELD_VERSION     msgFieldToWord('V', 'E')
