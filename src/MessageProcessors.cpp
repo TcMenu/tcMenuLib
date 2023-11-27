@@ -138,6 +138,7 @@ void fieldHandleFormRequest(TagValueRemoteConnector* connector, FieldAndValue* f
                     }, info);
                     return;
                 }
+                allTemplates++;
             }
         }
         connector->encodeAcknowledgement(0, ACK_ID_NOT_FOUND);

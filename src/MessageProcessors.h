@@ -45,7 +45,7 @@ union MessageProcessorInfo {
         bool authProvided;
 	} join;
     struct {
-        char name[16];
+        char name[20];
     } pairing;
     struct {
         char mode;
@@ -56,7 +56,7 @@ union MessageProcessorInfo {
         HeartbeatMode hbMode;
     } hb;
     struct {
-        uint8_t data[16];
+        uint8_t data[20];
     } custom;
     struct {
         uint16_t length;
