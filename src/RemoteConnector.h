@@ -21,7 +21,6 @@
 #include "ScrollChoiceMenuItem.h"
 
 #define TAG_VAL_PROTOCOL 0x01
-#define BINARY_GZ_PROTOCOL 0x02
 #define START_OF_MESSAGE 0x01
 #define TICK_INTERVAL 1
 
@@ -144,8 +143,7 @@ public:
 	virtual ~TagValueTransport() = default;
 
 	virtual void startMsg(uint16_t msgType);
-    void startBinMsg(uint16_t msgType, uint16_t byteLen);
-    void writeField(uint16_t field, const char* value);
+	void writeField(uint16_t field, const char* value);
 	void writeFieldInt(uint16_t field, int value);
     void writeFieldLong(uint16_t field, long value);
 	FieldAndValue* fieldIfAvailable();
@@ -162,6 +160,7 @@ public:
 	virtual bool connected() = 0;
 	virtual void close() = 0;
 	virtual void endMsg();
+
 private:
 	bool findNextMessageStart();
 	bool processMsgKey();
@@ -203,7 +202,8 @@ private:
 	uint8_t remoteNo;
 public:
 	/**
-	 * Construct an instance
+	 * Construct an instance/
+	 * @param transport the actual underlying transport
 	 * @param remoteNo the index of this connector, 0 based.
 	 */
 	explicit TagValueRemoteConnector(uint8_t remoteNo = 0);
@@ -263,23 +263,6 @@ public:
      * ```
      */
     void encodeCustomTagValMessage(uint16_t msgType, void (*msgWriter)(TagValueTransport*));
-
-    /**
-     * Encode a binary message onto the wire using your own format, note that the other end must be able to process this
-     * type of message. Embed Control UI will not understand such custom messages. This works by you providing the type
-     * of message and a function that will set all the binary data direct to the transport using the write function.
-     *
-     * ```
-     * // first we define out custom message, we'd define any custom fields the same way.
-     * #define MSG_CUSTOM msgFieldToWord('Z','Z')
-     *
-     * // then we call the function to send the message, it wraps up the message for us.
-     * myConnector.encodeCustomBinaryMessage(MSG_CUSTOM, len, [](TagValueTransport* transport) {
-     *     transport.write(binDataByte);
-     * });
-     * ```
-     */
-    void encodeCustomBinaryMessage(uint16_t msgType, uint16_t len, void (*msgWriter)(TagValueTransport*, void*), void* data = nullptr);
 
     /**
      * Encodes a dialog message that the UI can use to render / remove a dialog from the display.

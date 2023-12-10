@@ -30,7 +30,7 @@ typedef uint16_t menuid_t;
 
 /** the size of each name in program memory */
 #ifndef NAME_SIZE_T
-#define NAME_SIZE_T 20
+#define NAME_SIZE_T 30
 #endif // NAME_SIZE_T
 
 /** the size of each unit field in program memory */

@@ -684,10 +684,7 @@
       "menuDefinitions": []
     },
     "packageNamespace": "",
-    "appIsModular": false,
-    "listOfEmbeddedForms": [
-      "Mobile Friendly"
-    ]
+    "appIsModular": false
   },
   "stringLists": []
 }

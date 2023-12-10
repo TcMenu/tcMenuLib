@@ -36,9 +36,8 @@ class BaseDialog;
 // The updates per second value that indicates the display is not updating, and doesn't schedule rendering.
 #define UPDATES_SEC_DISPLAY_OFF 0xFFU
 
-#define RENDERER_MAXIMUM_TICK_MASK 0x1FFF
-#define RENDERER_RESET_OFF 0x8000
-#define RENDERER_RESET_NOTIFY_ONLY 0x4000
+/** The maximum number of screen ticks */
+#define MAX_TICKS 0xffff
 
 bool isItemActionable(MenuItem* item);
 
@@ -316,8 +315,8 @@ public:
 	void initialise() override;
 
 	/**
-	 * Set the number of updates per second for the display, use caution not to set too high, and never set to 0.
-	 * Important note: This re-initialises the reset interval to 30 seconds
+	 * Set the number of updates per second for the display, use caution not to set too high, never set to 0. This
+	 * re-initialises the reset interval to 30 seconds
 	 * @param updatesSec the number of updates.
 	 */
 	void setUpdatesPerSecond(int updatesSec);
@@ -333,27 +332,18 @@ public:
     /** 
      * Adjust the default reset interval of 30 seconds. Maximum value is 60 seconds.
      * At this point the reset callback is called and the menu is reset to root with
-     * no present editor. Values range from 1..4096
-     * @param resetTime the number of seconds before calling the reset handler.
+     * no present editor.
+     * @param resetTime
      */
     void setResetIntervalTimeSeconds(uint16_t interval) {
-        resetValInTicks = (interval * updatesPerSecond) & RENDERER_MAXIMUM_TICK_MASK;
+        resetValInTicks = interval * updatesPerSecond;
     }
 
     /**
-     * Completely turn off the reset interval so there will never be a reset event on the renderer.
+     * Completely turn off the reset interval so there will never be a reset.
      */
     void turnOffResetLogic() {
-        resetValInTicks = RENDERER_RESET_OFF;
-    }
-
-    /**
-     * Indicates to the renderer that you want reset notification, but you do not want any changes to be made to
-     * the position in the menu, instead of the default behaviour to reset to the root menu.
-     * @param ticks the number of seconds before calling the reset handler
-     */
-    void resetNotifiesOnly(uint16_t ticks) {
-        resetValInTicks = (ticks & RENDERER_MAXIMUM_TICK_MASK) | RENDERER_RESET_NOTIFY_ONLY;
+        resetValInTicks = MAX_TICKS;
     }
 
     /**

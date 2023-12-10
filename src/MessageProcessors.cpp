@@ -10,22 +10,13 @@
 #include "BaseDialog.h"
 #include "EditableLargeNumberMenuItem.h"
 
-const EmbedControlFlashedForm** CombinedMessageProcessor::flashedFormTemplates = nullptr;
-
 CombinedMessageProcessor::CombinedMessageProcessor() {
-    this->currHandler = nullptr;
-}
-
-void CombinedMessageProcessor::initialise() {
     messageHandlers.add(MsgHandler(MSG_CHANGE_INT, fieldUpdateValueMsg));
     messageHandlers.add(MsgHandler(MSG_JOIN, fieldUpdateJoinMsg));
     messageHandlers.add(MsgHandler(MSG_PAIR, fieldUpdatePairingMsg));
     messageHandlers.add(MsgHandler(MSG_DIALOG, fieldUpdateDialogMsg));
     messageHandlers.add(MsgHandler(MSG_HEARTBEAT, fieldUpdateHeartbeatMsg));
-    if(flashedFormTemplates != nullptr) {
-        messageHandlers.add(MsgHandler(MSG_GET_FORMS_REQUEST, fieldGetFormNames));
-        messageHandlers.add(MsgHandler(MSG_FORM_DATA_REQUEST, fieldHandleFormRequest));
-    }
+    this->currHandler = nullptr;
 }
 
 void CombinedMessageProcessor::newMsg(uint16_t msgType) {
@@ -96,58 +87,6 @@ void fieldUpdateDialogMsg(TagValueRemoteConnector* connector, FieldAndValue* fie
     }
 
 }
-
-void fieldGetFormNames(TagValueRemoteConnector* connector, FieldAndValue* field, MessageProcessorInfo* info) {
-    if(field->fieldType == FVAL_END_MSG) {
-        connector->encodeCustomTagValMessage(MSG_GET_FORM_RESPONSE, [](TagValueTransport* transport) {
-            auto **allTemplates = CombinedMessageProcessor::getFormTemplatesInFlash();
-            int i=0;
-            if(allTemplates != nullptr) {
-                while(auto* formInfo = (EmbedControlFlashedForm*)pgm_read_ptr(allTemplates)) {
-                    char sz[24];
-                    strncpy_P(sz, (const char*)pgm_read_ptr(&formInfo->formName), sizeof(sz));
-                    sz[sizeof(sz)-1]=0;
-                    transport->writeField(msgFieldToWord(FIELD_PREPEND_CHOICE, 'A' + i), sz);
-                    i++;
-                    allTemplates++;
-                }
-            }
-            transport->writeFieldInt(FIELD_NO_CHOICES, i);
-        });
-    }
-}
-
-void fieldHandleFormRequest(TagValueRemoteConnector* connector, FieldAndValue* field, MessageProcessorInfo* info) {
-    if(field->fieldType == FVAL_END_MSG) {
-        const auto **allTemplates = CombinedMessageProcessor::getFormTemplatesInFlash();
-        int i=0;
-        if(allTemplates != nullptr) {
-            while (auto *formInfo = (EmbedControlFlashedForm *) pgm_read_ptr(allTemplates)) {
-                char sz[24];
-                strncpy_P(sz, (const char*)pgm_read_ptr(&formInfo->formName), sizeof(sz));
-                sz[sizeof(sz)-1]=0;
-                if(strcmp((const char*)info->custom.data, sz) == 0) {
-                    info->formLoad.length = pgm_read_word(&formInfo->formDataLen);
-                    info->formLoad.data = (const uint8_t*)pgm_read_ptr(&formInfo->formDataGzipped);
-                    connector->encodeCustomBinaryMessage(MSG_FORM_DATA_RESPONSE, info->formLoad.length, [](TagValueTransport* transport, void* data) {
-                        auto* lInfo = reinterpret_cast<MessageProcessorInfo *>(data);
-                        const uint8_t* d = lInfo->formLoad.data;
-                        for(uint16_t i=0; i< lInfo->formLoad.length; ++i) {
-                            transport->writeChar(pgm_read_byte(d++));
-                        }
-                    }, info);
-                    return;
-                }
-            }
-        }
-        connector->encodeAcknowledgement(0, ACK_ID_NOT_FOUND);
-    } else if(field->fieldType == FVAL_FIELD && field->field == FIELD_ID) {
-        strncpy((char*)info->custom.data, field->value, sizeof(info->custom.data));
-    } else if(field->fieldType == FVAL_NEW_MSG) {
-        info->custom.data[0] = 0;
-    }
-}
-
 
 void fieldUpdatePairingMsg(TagValueRemoteConnector* connector, FieldAndValue* field, MessageProcessorInfo* info) {
 	if(field->fieldType == FVAL_END_MSG) return;

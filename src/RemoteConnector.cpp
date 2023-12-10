@@ -266,7 +266,7 @@ void TagValueRemoteConnector::performAnyWrites() {
 }
 
 void TagValueRemoteConnector::initiateBootstrap() {
-    serlogF2(SER_NETWORK_INFO, "Starting bootstrap", remoteNo);
+    serlogF2(SER_NETWORK_INFO, "Starting bootstrap mode", remoteNo);
     iterator.reset();
     iterator.setPredicate(&bootPredicate);
 	encodeBootstrap(false);
@@ -281,7 +281,7 @@ void TagValueRemoteConnector::nextBootstrap() {
 	MenuItem* parent = iterator.currentParent() ;
     int parentId = parent == nullptr ? 0 : parent->getId();
 	if(!bootItem) {
-        serlogF2(SER_NETWORK_INFO, "Finishing bootstrap", remoteNo);
+        serlogF2(SER_NETWORK_INFO, "Finishing bootstrap mode", remoteNo);
 		setBootstrapMode(false);
         setBootstrapComplete(true);
 		encodeBootstrap(true);
@@ -357,7 +357,7 @@ void TagValueRemoteConnector::encodeCustomTagValMessage(uint16_t msgType, void (
     if(!prepareWriteMsg(msgType)) return;
     msgWriter(transport);
     transport->endMsg();
-    serlogF2(SER_NETWORK_INFO, "Msg wr ", msgType);
+    serlogF2(SER_NETWORK_INFO, "Custom message write complete", msgType);
 }
 
 void TagValueRemoteConnector::encodeJoin() {
@@ -400,21 +400,6 @@ bool TagValueRemoteConnector::prepareWriteMsg(uint16_t msgType) {
     ticksLastSend = 0;
     logMessageHeader("Msg Out ", remoteNo, msgType);
     return true;
-}
-
-void TagValueRemoteConnector::encodeCustomBinaryMessage(uint16_t msgType, uint16_t len, void (*msgWriter)(TagValueTransport*, void* data), void* data) {
-    if(!transport->connected()) {
-        logMessageHeader("Wr ErrB ", remoteNo, msgType);
-        commsNotify(COMMSERR_WRITE_NOT_CONNECTED);
-        setConnected(false); // we are immediately not connected in this case.
-        return;
-    }
-    transport->startBinMsg(msgType, len);
-    ticksLastSend = 0;
-    logMessageHeader("Bin Out ", remoteNo, msgType);
-    msgWriter(transport, data);
-    transport->endMsg();
-    serlogF2(SER_NETWORK_INFO, "Bin write complete", msgType);
 }
 
 void TagValueRemoteConnector::encodeBaseMenuFields(int parentId, MenuItem* item) {
@@ -683,29 +668,6 @@ void TagValueTransport::startMsg(uint16_t msgType) {
     // message type high then low
 	writeChar(char(msgType >> 8));
 	writeChar(char(msgType & 0xff));
-}
-
-void TagValueTransport::startBinMsg(uint16_t msgType, uint16_t byteLen) {
-    // A binary gz message is formed as follows:
-    // 0x01 1 byte
-    // 0x02 1 byte
-    // Message Type - 2 bytes
-    // Length (hi first) - 2 bytes
-    // DATA of size Length
-
-    // start of message
-    writeChar(START_OF_MESSAGE);
-
-    // protocol byte
-    writeChar(BINARY_GZ_PROTOCOL);
-
-    // message type high then low
-    writeChar(char(msgType >> 8));
-    writeChar(char(msgType & 0xff));
-
-    // write out the high then low bytes of the length
-    writeChar(highByte(byteLen));
-    writeChar(lowByte(byteLen));
 }
 
 void TagValueTransport::writeField(uint16_t field, const char* value) {

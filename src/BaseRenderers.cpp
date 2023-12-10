@@ -109,15 +109,11 @@ void BaseMenuRenderer::exec() {
 
 void BaseMenuRenderer::resetToDefault() {
     serlogF2(SER_TCMENU_INFO, "Display reset - timeout ticks: ", resetValInTicks);
-    // call reset menu, but only if the reset mode is not notify only.
-    if((resetValInTicks & RENDERER_RESET_NOTIFY_ONLY) == 0) {
-        menuMgr.resetMenu(true);
-    }
+	menuMgr.resetMenu(true);
+	ticksToReset = MAX_TICKS;
 
-    // reset the value back to the largest value, it prevents it from ticking until there is an update.
-	ticksToReset = RENDERER_MAXIMUM_TICK_MASK;
-
-    // once the menu has been reset, if the reset callback is present then we call it.
+    // once the menu has been reset, if the reset callback is present
+    // then we call it.
     if(customDrawing) {
         customDrawing->reset();
     }
@@ -130,9 +126,9 @@ void BaseMenuRenderer::countdownToDefaulting() {
     }
 	if (ticksToReset == 0) {
 		resetToDefault();
-		ticksToReset = RENDERER_MAXIMUM_TICK_MASK;
+		ticksToReset = MAX_TICKS;
 	}
-	else if (ticksToReset != RENDERER_MAXIMUM_TICK_MASK) {
+	else if (ticksToReset != MAX_TICKS) {
 		--ticksToReset;
 	}
 }
@@ -212,7 +208,7 @@ MenuItem *BaseMenuRenderer::getMenuItemAtIndex(MenuItem *root, uint8_t pos) {
 void BaseMenuRenderer::setUpdatesPerSecond(int updatesSec) {
     bool needsReschedule = updatesPerSecond == UPDATES_SEC_DISPLAY_OFF;
     updatesPerSecond = updatesSec;
-    if(resetValInTicks != RENDERER_MAXIMUM_TICK_MASK) {
+    if(resetValInTicks != MAX_TICKS) {
         resetValInTicks = 30 * updatesSec;
     }
     if(needsReschedule) {

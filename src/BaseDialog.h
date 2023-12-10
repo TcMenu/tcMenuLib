@@ -101,7 +101,7 @@ public:
  */
 class BaseDialog {
 protected:
-    char header[20];
+    char header[50];
     const char* headerPgm; // for backwards compatibility with 1.7, not used in 2.0
     union {
         BaseDialogController* controller;

@@ -456,10 +456,6 @@ bool MenuManager::notifyEditStarting(MenuItem *item) {
 }
 
 void MenuManager::notifyStructureChanged() {
-    // before notifying structure change stop any edit operations.
-    setCurrentEditor(nullptr);
-
-    // and then notify all listeners of the structure change.
     serlogF(SER_TCMENU_INFO, "Menu structure change");
     for(auto & i : structureNotifier) {
         if(i != nullptr) {

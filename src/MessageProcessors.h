@@ -58,10 +58,6 @@ union MessageProcessorInfo {
     struct {
         uint8_t data[16];
     } custom;
-    struct {
-        uint16_t length;
-        const uint8_t* data;
-    } formLoad;
 };
 
 typedef void (*FieldUpdateFunction)(TagValueRemoteConnector*, FieldAndValue*, MessageProcessorInfo*);
@@ -117,20 +113,6 @@ void fieldUpdateDialogMsg(TagValueRemoteConnector* connector, FieldAndValue* fie
  * If you decide to write your own processor, this method can handle heartbeat updates
  */
 void fieldUpdateHeartbeatMsg(TagValueRemoteConnector* connector, FieldAndValue* field, MessageProcessorInfo* info);
-/**
- * If you decide to write your own processor, this method can handle get form names requests
- */
-void fieldGetFormNames(TagValueRemoteConnector* connector, FieldAndValue* field, MessageProcessorInfo* info);
-/**
- * If you decide to write your own processor, this method can handle get form data requests
- */
-void fieldHandleFormRequest(TagValueRemoteConnector* connector, FieldAndValue* field, MessageProcessorInfo* info);
-
-struct EmbedControlFlashedForm {
-    const char* formName;
-    const uint8_t* formDataGzipped;
-    const uint16_t formDataLen;
-};
 
 /**
  * This message processor is responsible for handling messages coming off the wire and processing them into
@@ -148,22 +130,12 @@ private:
 	MessageProcessorInfo val;
     BtreeList<uint16_t, MsgHandler> messageHandlers;
 	MsgHandler* currHandler;
-    static const EmbedControlFlashedForm** flashedFormTemplates;
 public:
-    static void setFormTemplatesInFlash(const EmbedControlFlashedForm** formTemplatesInFlash) { flashedFormTemplates = formTemplatesInFlash; }
-    static const EmbedControlFlashedForm** getFormTemplatesInFlash() { return flashedFormTemplates; }
-
-    /**
+	/**
 	 * Constructor takes an array of processors and the number of processors in the array.
 	 */
 	CombinedMessageProcessor();
-
-    /**
-     * Called by the remote server component to initialise the message handlers before use.
-     */
-    void initialise();
-
-    /**
+	/**
 	 * Whenever there is a new message, this will be called, to re-initialise the internal state
 	 */
 	void newMsg(uint16_t msgType);
@@ -171,7 +143,6 @@ public:
 	 * Called whenever a field has been processed in the current message, after a call to newMsg
 	 */
 	void fieldUpdate(TagValueRemoteConnector* connector, FieldAndValue* field);
-
     /**
      * If you want to be able to process a custom incoming message, simply add it here as a MsgHandler, see above.
      * It can be a local, even inline object as it will be copy constructed to an internal list.

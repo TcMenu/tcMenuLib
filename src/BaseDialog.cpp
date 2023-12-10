@@ -63,14 +63,14 @@ void BaseDialog::internalShow(bool allowRemote) {
     setRemoteUpdateNeededAll();
     internalSetVisible(true);
     needsDrawing = MENUDRAW_COMPLETE_REDRAW;
-}
 
-void BaseDialog::internalSetVisible(bool visible) {
     // we must do this after control of the menu has been taken for the dialog, otherwise it may recursively get called
     // for list and actions where there is a risk that changing the encoder will call again.
     int noOfOptions = (button1 != BTNTYPE_NONE && button2 != BTNTYPE_NONE)  ? 1 : 0;
     if(switches.getEncoder() && !isMenuItemBased()) switches.getEncoder()->changePrecision(noOfOptions, lastBtnVal);
+}
 
+void BaseDialog::internalSetVisible(bool visible) {
     if(MenuRenderer::getInstance()->getRendererType() == RENDER_TYPE_BASE) {
         ((BaseMenuRenderer*)MenuRenderer::getInstance())->giveBackDisplay();
     }
@@ -279,8 +279,6 @@ void MenuBasedDialog::internalSetVisible(bool visible) {
 
     if(visible) {
         auto* renderer =  reinterpret_cast<BaseGraphicalRenderer*>(MenuRenderer::getInstance());
-        // make sure the display is given back before trying to present a menu based dialog!
-        renderer->giveBackDisplay();
         auto& factory = static_cast<ItemDisplayPropertiesFactory&>(renderer->getDisplayPropertiesFactory());
 
         btn1Item.setVisible(button1 != BTNTYPE_NONE);
@@ -291,7 +289,7 @@ void MenuBasedDialog::internalSetVisible(bool visible) {
         factory.addGridPosition(&btn2Item, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_RIGHT_NO_VALUE, 2, 2, row, 0));
         factory.addGridPosition(&bufferItem, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_LEFT_VALUE_ONLY, 1, 0));
 
-        auto toMakeActive = (lastBtnVal == 0 && btn1Item.isVisible()) ? &btn1Item : &btn2Item;
+        auto toMakeActive = (lastBtnVal == 0 && renderer->getActiveItem() == &btn1Item) ? &btn1Item : &btn2Item;
         menuMgr.navigateToMenu(&backItem, toMakeActive, true);
     }
     else {
