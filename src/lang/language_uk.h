@@ -8,7 +8,7 @@
 //
 
 #define TXT_DIALOG_OK "ок"
-#define TXT_DIALOG_CANCEL "скасувати"
+#define TXT_DIALOG_CANCEL "відміна"
 #define TXT_DIALOG_CLOSE "закрити"
 #define TXT_DIALOG_ACCEPT "прийняти"
 
