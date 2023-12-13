@@ -259,7 +259,7 @@ void BaseGraphicalRenderer::renderList() {
         if(current >= runList->getNumberOfRows()) break;
         RuntimeMenuItem* toDraw = runList->getChildItem(current);
         cachedEntryItem = GridPositionRowCacheEntry(toDraw, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, current + 1, rowHeight), itemProps);
-        drawMenuItem(&cachedEntryItem, Coord(0, totalTitleHeight), Coord((int)width, rowHeight), DrawingFlags(true, (currentActive-1) == i, false));
+        drawMenuItem(&cachedEntryItem, Coord(0, totalTitleHeight), Coord((int)width, rowHeight), DrawingFlags(true, (currentActive-1) == current, false));
         taskManager.yieldForMicros(0);
         totalTitleHeight += totalRowHeight;
     }
