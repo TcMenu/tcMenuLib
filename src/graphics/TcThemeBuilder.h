@@ -443,7 +443,7 @@ namespace tcgfx {
          */
         void apply();
 
-        ConfigurableItemDisplayPropertiesFactory getItemFactory() { return factory; }
+        ConfigurableItemDisplayPropertiesFactory& getItemFactory() { return factory; }
 
         MenuPadding getPaddingFor(ItemDisplayProperties::ComponentType type) {
             return type == ItemDisplayProperties::COMPTYPE_TITLE ? globalTitlePadding : globalItemPadding;
