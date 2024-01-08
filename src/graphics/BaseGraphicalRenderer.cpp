@@ -323,14 +323,29 @@ void BaseGraphicalRenderer::recalculateDisplayOrder(MenuItem *root, bool safeMod
         item = root->getNext();
     }
 
+    // First we try and fill in all the calculated positions, once this is done, we will then try and fill in any spaces
+    // that are left below.
+    auto itemStored = item;
+    if(!safeMode) {
+        while (item != nullptr) {
+            if (item->isVisible()) {
+                auto *conf = getDisplayPropertiesFactory().gridPositionForItem(item);
+                if (conf) {
+                    serlogF3(SER_TCMENU_DEBUG, "Add config id at row", item->getId(), conf->getPosition().getRow());
+                    auto compType = toComponentType(conf->getPosition().getDrawingMode(), item);
+                    itemOrderByRow.add(GridPositionRowCacheEntry(item, conf->getPosition(),getDisplayPropertiesFactory().configFor(item,compType)));
+                }
+            }
+            item = item->getNext();
+        }
+    }
+
+    // Here we are using auto drawing, where we find any available row and add the results there using sensible defaults
+    item = itemStored;
     while(item != nullptr) {
         if(item->isVisible()) {
             auto* conf = getDisplayPropertiesFactory().gridPositionForItem(item);
-            if (conf && !safeMode) {
-                serlogF3(SER_TCMENU_DEBUG, "Add config id at row", item->getId(), conf->getPosition().getRow());
-                auto compType = toComponentType(conf->getPosition().getDrawingMode(), item);
-                itemOrderByRow.add(GridPositionRowCacheEntry(item, conf->getPosition(), getDisplayPropertiesFactory().configFor(item, compType)));
-            } else {
+             if(conf == nullptr) {
                 // We just find the first unused row and put the next item there.
                 int row = 0;
                 while(itemOrderByRow.getByKey(rowCol(row, 1)) != nullptr) row++;

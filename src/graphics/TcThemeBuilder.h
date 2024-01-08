@@ -29,22 +29,25 @@ namespace tcgfx {
             THEME_GLOBAL, THEME_SUB, THEME_ITEM, THEME_ITEM_NEEDS_PROPS, THEME_ITEM_NEEDS_GRID, THEME_ITEM_NEEDS_BOTH
         };
     private:
+        TcThemeBuilder *themeBuilder;
         color_t palette[4]{};
-        MenuPadding padding;
+        MenuPadding padding {};
         const void* fontData{};
-        GridPosition::GridJustification justification;
-        MenuBorder border{};
-        TcThemeBuilder *themeBuilder{};
+        GridPosition::GridJustification justification = GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT;
         MenuItem* menuItem = nullptr;
-        uint16_t gridHeight;
-        ThemeLevel currentLevel;
-        ItemDisplayProperties::ComponentType componentType;
+        uint16_t gridHeight {};
+        ThemeLevel currentLevel = THEME_GLOBAL;
+        ItemDisplayProperties::ComponentType componentType = ItemDisplayProperties::COMPTYPE_ITEM;
+        MenuBorder border{};
         uint8_t fontMag{};
         uint8_t spacing{};
         GridPosition::GridDrawingMode drawingMode{};
-        uint8_t row;
-        uint8_t colData;
+        uint8_t row {};
+        uint8_t colPos {};
+        uint8_t colCount {};
     public:
+        explicit ThemePropertiesBuilder(TcThemeBuilder *themeBuilder): themeBuilder(themeBuilder) {}
+
         /**
          * Sets the border to something other than the default
          * @param b the border
@@ -181,7 +184,8 @@ namespace tcgfx {
          */
         ThemePropertiesBuilder& onRowCol(uint8_t actualRow, uint8_t numberOfCols, uint8_t column) {
             row = actualRow;
-            colData = (numberOfCols << 4) & column;
+            colPos = column;
+            colCount = numberOfCols;
             return *this;
         }
 
@@ -191,7 +195,8 @@ namespace tcgfx {
          * @return reference to itself for chaining
          */
         ThemePropertiesBuilder& onRow(uint8_t actualRow) {
-            colData = 0x10;
+            colPos = 1;
+            colCount = 1;
             row = actualRow;
             return *this;
         }
@@ -244,7 +249,8 @@ namespace tcgfx {
          * Creates a theme builder by providing the renderer to use with it.
          * @param renderer the renderer to use, must be a GraphicsDeviceRenderer
          */
-        explicit TcThemeBuilder(GraphicsDeviceRenderer& renderer) : renderer(renderer), factory(renderer.getGraphicsPropertiesFactory()) {
+        explicit TcThemeBuilder(GraphicsDeviceRenderer& renderer) : renderer(renderer), factory(renderer.getGraphicsPropertiesFactory()),
+                                                                    propertiesBuilder(this) {
             auto *drawable = renderer.getDeviceDrawable();
             renderer.setDisplayDimensions(drawable->getDisplayDimensions().x, drawable->getDisplayDimensions().y);
         }

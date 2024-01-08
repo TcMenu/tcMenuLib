@@ -39,8 +39,7 @@ void ThemePropertiesBuilder::apply() {
             }
         }
 
-        themeBuilder->getItemFactory().addGridPosition(menuItem,
-                GridPosition(drawingMode, justification, colData >> 4, colData & 0x0f, row, gridHeight));
+        themeBuilder->getItemFactory().addGridPosition(menuItem, GridPosition(drawingMode, justification, colCount, colPos, row, gridHeight));
     }
 }
 
@@ -56,7 +55,7 @@ void ThemePropertiesBuilder::initForLevel(TcThemeBuilder *b, ItemDisplayProperti
     spacing = themeBuilder->getDefaultSpacing();
     memcpy(palette, themeBuilder->getDefaultPalette(), sizeof palette);
     gridHeight = 0xFFFF;
-    colData = 0;
+    colPos = colCount = 1;
     row = 0;
 
     if(level != THEME_GLOBAL) {
