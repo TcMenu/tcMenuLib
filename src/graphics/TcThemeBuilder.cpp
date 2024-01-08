@@ -39,7 +39,7 @@ void ThemePropertiesBuilder::apply() {
             }
         }
 
-        themeBuilder->getItemFactory().addGridPosition(menuItem, GridPosition(drawingMode, justification, colCount, colPos, row, gridHeight));
+        themeBuilder->getItemFactory().addGridPosition(menuItem, GridPosition(drawingMode, justification, colCount & 0x0F, colPos, row, gridHeight));
     }
 }
 
@@ -55,8 +55,11 @@ void ThemePropertiesBuilder::initForLevel(TcThemeBuilder *b, ItemDisplayProperti
     spacing = themeBuilder->getDefaultSpacing();
     memcpy(palette, themeBuilder->getDefaultPalette(), sizeof palette);
     gridHeight = 0xFFFF;
-    colPos = colCount = 1;
-    row = 0;
+    colPos = 1;
+    if(!isInBulkRowMode()) {
+        colCount = 1;
+        row = 1;
+    }
 
     if(level != THEME_GLOBAL) {
         auto props = b->getItemFactory().configFor(nullptr, compType);
@@ -119,4 +122,11 @@ TcThemeBuilder &TcThemeBuilder::withStandardLowResCursorIcons() {
 
 TcThemeBuilder &TcThemeBuilder::withStandardMedResCursorIcons() {
     return withCursorIconsXbmp(Coord(16, 12), defEditingIcon, defActiveIcon);
+}
+
+TcThemeBuilder &TcThemeBuilder::defineRowWithCols(int row, int colCount, RowBuilderCallback callback) {
+    propertiesBuilder.startBulkRowMode(row, colCount);
+    callback(*this);
+    propertiesBuilder.endBulkRowMode();
+    return *this;
 }

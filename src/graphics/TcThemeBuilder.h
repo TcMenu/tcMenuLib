@@ -14,8 +14,11 @@
 #include "GfxMenuConfig.h"
 #include <graphics/GraphicsDeviceRenderer.h>
 
+#define COL_COUNT_FLAG_BULK_MODE 0x80
+
 namespace tcgfx {
     class TcThemeBuilder;
+    typedef void (*RowBuilderCallback)(TcThemeBuilder& themeBuilder);
 
     /**
      * Represents a set of theme properties that can be applied at any level, if at the item level, this class can also
@@ -29,19 +32,20 @@ namespace tcgfx {
             THEME_GLOBAL, THEME_SUB, THEME_ITEM, THEME_ITEM_NEEDS_PROPS, THEME_ITEM_NEEDS_GRID, THEME_ITEM_NEEDS_BOTH
         };
     private:
+        // do not reorder these fields, they are ordered this way to reduce the size, IE the packing overhead.
         TcThemeBuilder *themeBuilder;
         color_t palette[4]{};
-        MenuPadding padding {};
         const void* fontData{};
-        GridPosition::GridJustification justification = GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT;
         MenuItem* menuItem = nullptr;
-        uint16_t gridHeight {};
-        ThemeLevel currentLevel = THEME_GLOBAL;
-        ItemDisplayProperties::ComponentType componentType = ItemDisplayProperties::COMPTYPE_ITEM;
+        MenuPadding padding {};
         MenuBorder border{};
+        uint16_t gridHeight {};
+        ItemDisplayProperties::ComponentType componentType = ItemDisplayProperties::COMPTYPE_ITEM;
+        ThemeLevel currentLevel = THEME_GLOBAL;
         uint8_t fontMag{};
         uint8_t spacing{};
         GridPosition::GridDrawingMode drawingMode{};
+        GridPosition::GridJustification justification = GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT;
         uint8_t row {};
         uint8_t colPos {};
         uint8_t colCount {};
@@ -182,10 +186,11 @@ namespace tcgfx {
          * @param column the column number
          * @return reference to itself for chaining
          */
-        ThemePropertiesBuilder& onRowCol(uint8_t actualRow, uint8_t numberOfCols, uint8_t column) {
-            row = actualRow;
+        ThemePropertiesBuilder& onCol(uint8_t column, uint8_t numberOfCols = 1) {
             colPos = column;
-            colCount = numberOfCols;
+            if(!isInBulkRowMode()) {
+                colCount = numberOfCols;
+            }
             return *this;
         }
 
@@ -195,9 +200,13 @@ namespace tcgfx {
          * @return reference to itself for chaining
          */
         ThemePropertiesBuilder& onRow(uint8_t actualRow) {
-            colPos = 1;
-            colCount = 1;
-            row = actualRow;
+            if(isInBulkRowMode()) {
+                serlogF(SER_ERROR, "onRow() in bulk mode");
+            } else {
+                colPos = 1;
+                colCount = 1;
+                row = actualRow;
+            }
             return *this;
         }
 
@@ -208,6 +217,14 @@ namespace tcgfx {
         void apply();
 
     protected:
+        void startBulkRowMode(uint8_t theRow, uint8_t numCols) {
+            this->row = theRow;
+            this->colCount = numCols | COL_COUNT_FLAG_BULK_MODE;
+        }
+        void endBulkRowMode() {
+            colCount = 1;
+        }
+        bool isInBulkRowMode() const { return (colCount & COL_COUNT_FLAG_BULK_MODE) != 0; }
         void initForLevel(TcThemeBuilder *b, ItemDisplayProperties::ComponentType compType, ThemeLevel level, MenuItem *item = nullptr);
 
         void needsProps() {
@@ -243,7 +260,6 @@ namespace tcgfx {
         const void *fontData = nullptr;
         uint8_t fontMag = 1;
         uint8_t defaultSpacing = 1;
-
     public:
         /**
          * Creates a theme builder by providing the renderer to use with it.
@@ -425,6 +441,8 @@ namespace tcgfx {
          * @return reference to itself for chaining
          */
         TcThemeBuilder& withPalette(const color_t* cols);
+
+        TcThemeBuilder& defineRowWithCols(int row, int colCount, RowBuilderCallback callback);
 
         /**
          * Use this to enable card layout for the root menu,  and configure the icons that will be used for left and
