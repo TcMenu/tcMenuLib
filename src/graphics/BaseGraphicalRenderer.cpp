@@ -56,9 +56,14 @@ uint8_t BaseGraphicalRenderer::setActiveItem(MenuItem *item) {
 
     auto rootItem = menuMgr.getCurrentMenu();
     int activeIndex = findActiveItem(rootItem);
+
     uint16_t totalHeight = calculateHeightTo(activeIndex, rootItem);
     int startRow = 0;
-    uint16_t adjustedHeight = height + (isLastRowExactFit() ? 0 : 1);
+    uint16_t adjustedHeight = height +  0;
+    if(!isLastRowExactFit()) {
+        auto props = itemOrderByRow.itemAtIndex(activeIndex);
+        adjustedHeight -= heightOfRow(props->getPosition().getRow());
+    }
 
     auto startY = 0;
     if(titleMode == TITLE_ALWAYS) {
@@ -70,8 +75,8 @@ uint8_t BaseGraphicalRenderer::setActiveItem(MenuItem *item) {
     serlogF4(SER_TCMENU_DEBUG, "totH, actIdx, adjH ", totalHeight, activeIndex, adjustedHeight);
 
     while (totalHeight > adjustedHeight) {
+        startRow += skipRow(startRow);
         totalHeight -= heightOfRow(startRow, true);
-        startRow++;
     }
     serlogF4(SER_TCMENU_DEBUG, "sy, sr, adj ", startY, startRow, adjustedHeight);
 
@@ -243,7 +248,7 @@ void BaseGraphicalRenderer::renderList() {
     int totalTitleHeight = titleHeight + titleProps->getSpaceAfter();
     int totalRowHeight = rowHeight + itemProps->getSpaceAfter();
 
-    uint8_t maxOnScreen = ((height + (rowHeight - 1)) - totalTitleHeight) / totalRowHeight;
+    uint8_t maxOnScreen = (height - totalTitleHeight) / totalRowHeight;
     uint8_t currentActive = runList->getActiveIndex();
 
     uint8_t offset = 0;
@@ -259,7 +264,7 @@ void BaseGraphicalRenderer::renderList() {
         if(current >= runList->getNumberOfRows()) break;
         RuntimeMenuItem* toDraw = runList->getChildItem(current);
         cachedEntryItem = GridPositionRowCacheEntry(toDraw, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, current + 1, rowHeight), itemProps);
-        drawMenuItem(&cachedEntryItem, Coord(0, totalTitleHeight), Coord((int)width, rowHeight), DrawingFlags(true, (currentActive-1) == i, false));
+        drawMenuItem(&cachedEntryItem, Coord(0, totalTitleHeight), Coord((int)width, rowHeight), DrawingFlags(true, (currentActive-1) == (offset + i), false));
         taskManager.yieldForMicros(0);
         totalTitleHeight += totalRowHeight;
     }
@@ -411,13 +416,18 @@ void BaseGraphicalRenderer::redrawAllWidgets(bool forceRedraw) {
     }
 }
 
-int BaseGraphicalRenderer::heightOfRow(int row, bool includeSpace) {
-    uint8_t i = 1;
-    GridPositionRowCacheEntry *rowData = nullptr;
+GridPositionRowCacheEntry* BaseGraphicalRenderer::firstItemOnRow(int row) {
+    GridPositionRowCacheEntry* rowData = nullptr;
+    int i=1;
     while(rowData == nullptr && i < 5) {
         rowData = itemOrderByRow.getByKey(rowCol(row, i));
         i++;
     }
+    return rowData;
+}
+
+int BaseGraphicalRenderer::heightOfRow(int row, bool includeSpace) {
+    GridPositionRowCacheEntry *rowData = firstItemOnRow(row);
 
     // if there's no configuration at this position, crazy situation, return 1..
     if(rowData == nullptr) return 1;
@@ -431,8 +441,13 @@ int BaseGraphicalRenderer::heightOfRow(int row, bool includeSpace) {
 
 int BaseGraphicalRenderer::calculateHeightTo(int index, MenuItem *pItem) {
     int totalY = 0;
-    index += 1;
-    for(int i=0; i<index; i++) {
+    auto rowEntry = itemOrderByRow.itemAtIndex(index);
+    if(rowEntry == nullptr) return height;
+
+    // get the current row and go through each row in turn getting the size, we do not use index calculations here
+    // because there could be more than item on a row.
+    auto row = rowEntry->getPosition().getRow();
+    for(int i=0; i<row; i++) {
         totalY += heightOfRow(i, true);
     }
     return totalY;
@@ -513,6 +528,20 @@ void BaseGraphicalRenderer::initialise() {
 void BaseGraphicalRenderer::displayPropertiesHaveChanged() {
     rootHasChanged(menuMgr.getCurrentMenu());
     redrawMode = MENUDRAW_COMPLETE_REDRAW;
+}
+
+int BaseGraphicalRenderer::skipRow(int idx) {
+    auto props = itemOrderByRow.itemAtIndex(idx);
+    int startingRow = props->getPosition().getRow();
+    int currentRow = startingRow;
+    int toSkip = 0;
+    while(currentRow == startingRow && toSkip < 5) {
+        toSkip++;
+        idx++;
+        if(idx >= itemOrderByRow.count()) break;
+        currentRow = itemOrderByRow.itemAtIndex(idx)->getPosition().getRow();
+    }
+    return toSkip;
 }
 
 void preparePropertiesFromConfig(ConfigurableItemDisplayPropertiesFactory& factory, const ColorGfxMenuConfig<const void*>* gfxConfig, int titleHeight, int itemHeight) {

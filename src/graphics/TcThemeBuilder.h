@@ -283,7 +283,8 @@ namespace tcgfx {
         }
 
         /**
-         * Configure the default font as an adafruit font
+         * Configure the default font as an adafruit font, normally for use either when using an Adafruit_GFX based
+         * library, or tcUnicode which also supports Adafruit font rendering.
          * @param font the adafruit font
          * @param mag the magnification factor - defaults to 1.
          * @return reference to itself for chaining
@@ -295,7 +296,7 @@ namespace tcgfx {
         }
 
         /**
-         * Configure the default font as a tcUnicode font
+         * Configure the default font as a tcUnicode font, this is only supported when tcUnicode is enabled.
          * @param font the tcUnicode font
          * @return reference to itself for chaining
          */
@@ -306,7 +307,8 @@ namespace tcgfx {
         }
 
         /**
-         * Configure the default font as a native font
+         * Configure the default font as a native font consulting the plugin documentation for the chosen display
+         * and library.
          * @param font the native font
          * @param mag the native mag value
          * @return reference to itself for chaining
@@ -318,7 +320,17 @@ namespace tcgfx {
         }
 
         /**
-         * Provide custom cursor icons that are used when an item is selected or edited.
+         * Turn on tcUnicode drawing support if it is not already turned on. This means that instead of using native
+         * fonts, the rendering engine will use TcUnicode for all text drawing. This is seamless from the rendering
+         * perspective, but requires that you use fonts supported by TcUnicode, these are Adafruit or TcUnicode fonts.
+         * @return reference to itself for chaining
+         */
+        TcThemeBuilder & enablingTcUnicode();
+
+        /**
+         * Provide custom cursor icons that are used when an item is selected or edited. Use this when you don't want
+         * to use the standard cursor icons. Note that the two icons must be the same size.
+         * Cursor icons are the visual cues, IE the active arrow and the editing icon usually on the left of an item.
          * @param size the size of the icons
          * @param editIcon the edit icon in XBM form
          * @param activeIcon the active icon in XBM form
@@ -327,13 +339,15 @@ namespace tcgfx {
         TcThemeBuilder &withCursorIconsXbmp(Coord size, const uint8_t *editIcon, const uint8_t *activeIcon);
 
         /**
-         * Use the standard lower resolution cursor icons suitable for OLED and similar resolution displays
+         * Use the standard lower resolution cursor icons suitable for OLED and similar resolution displays.
+         * Cursor icons are the visual cues, IE the active arrow and the editing icon usually on the left of an item.
          * @return reference to itself for chaining
          */
         TcThemeBuilder &withStandardLowResCursorIcons();
 
         /**
          * Use the standard medium resolution cursor icons suitable for larger TFT and higher resolution displays
+         * Cursor icons are the visual cues, IE the active arrow and the editing icon usually on the left of an item.
          * @return reference to itself for chaining
          */
         TcThemeBuilder &withStandardMedResCursorIcons();
@@ -442,7 +456,29 @@ namespace tcgfx {
          */
         TcThemeBuilder& withPalette(const color_t* cols);
 
+        /**
+         * With this option you conifugre the row and column count once and then within the provided closure you
+         * only need to provide the column for each item override. Instead of this you can also use the
+         * `onRow(row).onCol(col, colCount)` way of configuring instead. Either option is equal in end state.
+         * @param row the row on which the items will appear
+         * @param colCount the number of columns on that row
+         * @param callback a callback that will call `menuItemOverride` colCount times for each column
+         * @return reference to itself for chaining
+         */
         TcThemeBuilder& defineRowWithCols(int row, int colCount, RowBuilderCallback callback);
+
+        /**
+         * Set up the core rendering settings, that is the way the title should be drawn, and also if analog sliders
+         * should be used to represent analog items.
+         * @param mode how the title should be drawing, one of BaseGraphicalRenderer::TitleMode enum values.
+         * @param useAnalogSliders true to use sliders, otherwise false
+         * @return reference to itself for chaining
+         */
+        TcThemeBuilder& withRenderingSettings(BaseGraphicalRenderer::TitleMode mode, bool useAnalogSliders) {
+            renderer.setTitleMode(mode);
+            renderer.setUseSliderForAnalog(useAnalogSliders);
+            return *this;
+        }
 
         /**
          * Use this to enable card layout for the root menu,  and configure the icons that will be used for left and

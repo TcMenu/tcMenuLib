@@ -392,6 +392,10 @@ namespace tcgfx {
         int calculateHeightTo(int index, MenuItem *pItem);
 
         ItemDisplayProperties::ComponentType toComponentType(GridPosition::GridDrawingMode mode, MenuItem *pMenuItem);
+
+        GridPositionRowCacheEntry *firstItemOnRow(int row);
+
+        int skipRow(int row);
     };
 
     /**

@@ -130,3 +130,8 @@ TcThemeBuilder &TcThemeBuilder::defineRowWithCols(int row, int colCount, RowBuil
     propertiesBuilder.endBulkRowMode();
     return *this;
 }
+
+TcThemeBuilder & TcThemeBuilder::enablingTcUnicode() {
+    renderer.enableTcUnicode();
+    return *this;
+}
