@@ -49,6 +49,13 @@
 #else
 # include "language_cs.h"
 #endif // use ASCII
+//add ukrainian language as uk
+#elif defined(TC_LOCALE_UK) || defined(TC_LOCALE_UK_UA)
+#if defined(TC_LOCAL_ASCII)
+# include "language_uk_ascii.h"
+#else
+# include "language_uk.h"
+#endif
 #else
 # include "language_en.h"
 #endif
