@@ -18,7 +18,7 @@ namespace tcgfx {
 /**
  * Represents no mask
  */
-#define DRAW_NO_MASK 0xffff
+#define DRAW_NO_MASK 0xff
 
 
 #ifdef NEED_32BIT_COLOR_T_ALPHA
@@ -155,20 +155,15 @@ namespace tcgfx {
     struct PaletteDrawingData {
     public:
         const tcgfx::color_t *palette;
-        const uint8_t* data;
-        tcgfx::color_t maskColor;
         uint8_t bitDepth;
 
-        PaletteDrawingData(const tcgfx::color_t *palette, const uint8_t *data, tcgfx::color_t maskColor, uint8_t bitDepth)
-                : palette(palette), data(data), maskColor(maskColor), bitDepth(bitDepth) {}
-
-        PaletteDrawingData(const tcgfx::color_t *palette, const uint8_t *data, uint8_t bitDepth)
-                : palette(palette), data(data), maskColor(DRAW_NO_MASK), bitDepth(bitDepth) {}
+        PaletteDrawingData(const tcgfx::color_t *palette, uint8_t bitDepth)
+                : palette(palette), bitDepth(bitDepth) {}
 
         const color_t* getPalette() const { return palette; }
         const uint8_t* getData() const { return data; }
-        bool hasMask() const { return maskColor != DRAW_NO_MASK; }
-        color_t getMaskColor() const { return maskColor; }
+        bool hasMask() const { return maskColorIdx != DRAW_NO_MASK; }
+        uint8_t getMaskColor() const { return maskColorIdx; }
         uint8_t getBitDepth() const { return bitDepth; }
     };
 
@@ -179,13 +174,14 @@ namespace tcgfx {
     class DrawableIcon {
     public:
         enum IconType : uint8_t {
-            /** the image is in the well know XBM format */
+            /** the image is in the well know XBM format, no palette info provided */
             ICON_XBITMAP,
-            /** the image is a regular monochrome bitmap in native format */
+            /** the image is a regular monochrome bitmap in native format, no palette info provided */
             ICON_MONO,
-            /** the image is in a palette format, the data object will be a PaletteDrawingData */
+            /** the image is in a palette format, the palette information will be populated, it contains
+             * rendering instructions */
             ICON_PALLETE,
-            /** the image is in native format, that can be pushed directly to the underlying display */
+            /** the image is in a format that can be pushed directly to the display, no palette info provided*/
             ICON_NATIVE
         };
         enum MemoryLocation : uint8_t {
@@ -203,32 +199,20 @@ namespace tcgfx {
         MemoryLocation location;
         const uint8_t *normalIcon;
         const uint8_t *selectedIcon;
-
+        const PaletteDrawingData* palette;
     public:
         /**
          * Creates an empty drawable icon, used mainly by collection support
          */
         DrawableIcon() : menuId(0), dimensions(0, 0), iconType(ICON_XBITMAP), location(STORED_IN_ROM),
-                         normalIcon(nullptr), selectedIcon(nullptr) {}
+                         normalIcon(nullptr), selectedIcon(nullptr), palette(nullptr) {}
 
         /**
          * Copy constructor to copy an existing drawable icon
          */
-        DrawableIcon(const DrawableIcon &other) : menuId(other.menuId), dimensions(other.dimensions),
-                                                  iconType(other.iconType),
-                                                  location(other.location), normalIcon(other.normalIcon),
-                                                  selectedIcon(other.selectedIcon) {}
+        DrawableIcon(const DrawableIcon &other) = default;
+        DrawableIcon& operator=(const DrawableIcon& other) = default;
 
-        DrawableIcon& operator=(const DrawableIcon& other) {
-            if(&other == this) return *this;
-            menuId = other.menuId;
-            dimensions = other.dimensions;
-            iconType = other.iconType;
-            location = other.location;
-            normalIcon = other.normalIcon;
-            selectedIcon = other.selectedIcon;
-            return *this;
-        }
         /**
          * Create a drawable icon providing the size, icon type, and image data
          * @param id the menu id that this icon belongs to
@@ -240,7 +224,20 @@ namespace tcgfx {
         DrawableIcon(uint16_t id, const Coord &size, IconType ty, const uint8_t *normal,
                      const uint8_t *selected = nullptr)
                 : menuId(id), dimensions(size), iconType(ty), location(STORED_IN_ROM), normalIcon(normal),
-                  selectedIcon(selected) {}
+                  selectedIcon(selected), palette(nullptr) {}
+        /**
+         * Create a drawable icon providing the size, icon type, and image data along with a palette, this is suited
+         * for 2 and 4 bit per pixel images
+         * @param id the menu id that this icon belongs to
+         * @param size the size of the image, better to be in whole byte sizes
+         * @param palette the palette data for the image, will define this as a palette based image
+         * @param normal the image in the normal state.
+         * @param selected the image in the selected state.
+         */
+        DrawableIcon(uint16_t id, const Coord &size, const PaletteDrawingData& paletteDrawingData, const uint8_t *normal,
+                     const uint8_t *selected = nullptr)
+                : menuId(id), dimensions(size), iconType(ICON_PALLETE), location(STORED_IN_ROM), normalIcon(normal),
+                  selectedIcon(selected), palette(&paletteDrawingData) {}
 
         /**
          * Get the icon data for the current state
@@ -249,6 +246,14 @@ namespace tcgfx {
          */
         const uint8_t *getIcon(bool selected) const {
             return (selected && selectedIcon != nullptr) ? selectedIcon : normalIcon;
+        }
+
+        /**
+         * Get the palette information (if available) for this icon
+         * @return either icon palette data if available or nullptr.
+         */
+        const PaletteDrawingData* getPalette() const {
+            return palette;
         }
 
         /**
@@ -267,6 +272,10 @@ namespace tcgfx {
 
         uint16_t getKey() const {
             return menuId;
+        }
+
+        const PaletteDrawingData* getPaletteData() {
+            return palette;
         }
 
         void setFromValues(const Coord &size, IconType ty, const uint8_t *normal, const uint8_t *selected = nullptr) {
