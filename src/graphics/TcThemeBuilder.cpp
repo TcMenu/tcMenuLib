@@ -39,7 +39,7 @@ void ThemePropertiesBuilder::apply() {
             }
         }
 
-        themeBuilder->getItemFactory().addGridPosition(menuItem, GridPosition(drawingMode, justification, colCount & 0x0F, colPos, row, gridHeight));
+        themeBuilder->getItemFactory().addGridPosition(menuItem, GridPosition(drawingMode, justification, colCount, colPos, row, gridHeight));
     }
 }
 
@@ -56,10 +56,8 @@ void ThemePropertiesBuilder::initForLevel(TcThemeBuilder *b, ItemDisplayProperti
     memcpy(palette, themeBuilder->getDefaultPalette(), sizeof palette);
     gridHeight = 0xFFFF;
     colPos = 1;
-    if(!isInBulkRowMode()) {
-        colCount = 1;
-        row = 1;
-    }
+    colCount = 1;
+    row = 1;
 
     if(level != THEME_GLOBAL) {
         auto props = b->getItemFactory().configFor(nullptr, compType);
@@ -75,8 +73,8 @@ void ThemePropertiesBuilder::initForLevel(TcThemeBuilder *b, ItemDisplayProperti
     }
 }
 
-ThemePropertiesBuilder &ThemePropertiesBuilder::withImageXbmp(Coord size, const uint8_t* regIcon, const uint8_t* selIcon) {
-    themeBuilder->getItemFactory().addImageToCache(DrawableIcon(menuItem->getId(), size, DrawableIcon::ICON_XBITMAP, regIcon, selIcon));
+ThemePropertiesBuilder& ThemePropertiesBuilder::withImageOfType(Coord size, DrawableIcon::IconType iconType, const uint8_t* regIcon, const uint8_t* selIcon) {
+    themeBuilder->getItemFactory().addImageToCache(DrawableIcon(menuItem->getId(), size, iconType, regIcon, selIcon));
     if(drawingMode != GridPosition::DRAW_AS_ICON_TEXT) drawingMode = GridPosition::DRAW_AS_ICON_ONLY;
     needsGrid(false);
     return *this;
@@ -122,13 +120,6 @@ TcThemeBuilder &TcThemeBuilder::withStandardLowResCursorIcons() {
 
 TcThemeBuilder &TcThemeBuilder::withStandardMedResCursorIcons() {
     return withCursorIconsXbmp(Coord(16, 12), defEditingIcon, defActiveIcon);
-}
-
-TcThemeBuilder &TcThemeBuilder::defineRowWithCols(int row, int colCount, RowBuilderCallback callback) {
-    propertiesBuilder.startBulkRowMode(row, colCount);
-    callback(*this);
-    propertiesBuilder.endBulkRowMode();
-    return *this;
 }
 
 TcThemeBuilder & TcThemeBuilder::enablingTcUnicode() {

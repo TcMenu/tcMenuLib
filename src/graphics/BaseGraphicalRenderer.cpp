@@ -57,9 +57,9 @@ uint8_t BaseGraphicalRenderer::setActiveItem(MenuItem *item) {
     auto rootItem = menuMgr.getCurrentMenu();
     int activeIndex = findActiveItem(rootItem);
 
-    uint16_t totalHeight = calculateHeightTo(activeIndex, rootItem);
+    int totalHeight = calculateHeightTo(activeIndex, rootItem);
     int startRow = 0;
-    uint16_t adjustedHeight = height +  0;
+    int adjustedHeight = height;
     if(!isLastRowExactFit()) {
         auto props = itemOrderByRow.itemAtIndex(activeIndex);
         adjustedHeight -= heightOfRow(props->getPosition().getRow());
@@ -72,6 +72,7 @@ uint8_t BaseGraphicalRenderer::setActiveItem(MenuItem *item) {
         adjustedHeight -= startY;
         totalHeight -= startY;
     }
+    totalHeight = max(0, totalHeight);
     serlogF4(SER_TCMENU_DEBUG, "totH, actIdx, adjH ", totalHeight, activeIndex, adjustedHeight);
 
     while (totalHeight > adjustedHeight) {

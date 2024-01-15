@@ -157,14 +157,33 @@ namespace tcgfx {
             return *this;
         }
 
+        ThemePropertiesBuilder& withImageOfType(Coord size, DrawableIcon::IconType iconType, const uint8_t* regIcon, const uint8_t* selIcon);
+
         /**
-         * For item level use only, this sets the menu item to render as an image, instead of as text.
+         * For item level use only, this sets the menu item to render as an image, instead of as text. Xbmp format is a
+         * byte packed array in LSB first order. IE (0,0) is MSB of byte 1.
          * @param size size of the images provided
          * @param regIcon the icon when not active / edited
          * @param selIcon the icon when selected, IE active / edited
          * @return reference to itself for chaining
          */
-        ThemePropertiesBuilder& withImageXbmp(Coord size, const uint8_t* regIcon, const uint8_t* selIcon = nullptr);
+        ThemePropertiesBuilder& withImageXbmp(Coord size, const uint8_t* regIcon, const uint8_t* selIcon = nullptr) {
+            withImageOfType(size, DrawableIcon::ICON_XBITMAP, regIcon, selIcon);
+            return *this;
+        }
+
+        /**
+         * For item level use only, this sets the menu item to render as a mono bitmap, instead of as text. Mono bitmaps
+         * are byte packed arrays in MSB first order. IE (0,0) is LSB of byte 1.
+         * @param size size of the images provided
+         * @param regIcon the icon when not active / edited
+         * @param selIcon the icon when selected, IE active / edited
+         * @return reference to itself for chaining
+         */
+        ThemePropertiesBuilder& withMonoBitmap(Coord size, const uint8_t* regIcon, const uint8_t* selIcon = nullptr) {
+            withImageOfType(size, DrawableIcon::ICON_MONO, regIcon, selIcon);
+            return *this;
+        }
 
 
         /**
@@ -179,18 +198,16 @@ namespace tcgfx {
         }
 
         /**
-         * Sets the row, number of columns on the row, and column number. Note that each entry on the row must properly
+         * Sets the column index and number of columns on the row. Note that each entry on the row must properly
          * set the same number of columns.
          * @param actualRow the row where the item should appear
          * @param numberOfCols the number of columns across
          * @param column the column number
          * @return reference to itself for chaining
          */
-        ThemePropertiesBuilder& onCol(uint8_t column, uint8_t numberOfCols = 1) {
+        ThemePropertiesBuilder& multiCol(uint8_t column, uint8_t numberOfCols) {
             colPos = column;
-            if(!isInBulkRowMode()) {
-                colCount = numberOfCols;
-            }
+            colCount = numberOfCols;
             return *this;
         }
 
@@ -200,13 +217,9 @@ namespace tcgfx {
          * @return reference to itself for chaining
          */
         ThemePropertiesBuilder& onRow(uint8_t actualRow) {
-            if(isInBulkRowMode()) {
-                serlogF(SER_ERROR, "onRow() in bulk mode");
-            } else {
-                colPos = 1;
-                colCount = 1;
-                row = actualRow;
-            }
+            colPos = 1;
+            colCount = 1;
+            row = actualRow;
             return *this;
         }
 
@@ -217,14 +230,6 @@ namespace tcgfx {
         void apply();
 
     protected:
-        void startBulkRowMode(uint8_t theRow, uint8_t numCols) {
-            this->row = theRow;
-            this->colCount = numCols | COL_COUNT_FLAG_BULK_MODE;
-        }
-        void endBulkRowMode() {
-            colCount = 1;
-        }
-        bool isInBulkRowMode() const { return (colCount & COL_COUNT_FLAG_BULK_MODE) != 0; }
         void initForLevel(TcThemeBuilder *b, ItemDisplayProperties::ComponentType compType, ThemeLevel level, MenuItem *item = nullptr);
 
         void needsProps() {

@@ -38,6 +38,8 @@ class ScrollChoiceMenuItem;
  * When not in edit mode, the keyboard 0-9 keys can be used to select items where 1 is the first item to select. For
  * any keys you do not wish to map, set them to `KEY_NOT_CONFIGURED` or `-1`.
  *
+ * If you are not using this class alongside an encoder of some kind, then you should use the helper method to create a
+ * null rotary encoder interface which is needed by the library.
  */
 class MenuEditingKeyListener : public KeyboardListener {
 private:
@@ -58,8 +60,7 @@ public:
      * @param backKey the key code for back, defaulted to 'A'
      * @param nextKey the key code for next, defaulted to 'B'
      */
-	MenuEditingKeyListener(uint8_t enterKey = '*', uint8_t deleteKey = '#', uint8_t backKey = 'A', uint8_t nextKey = 'B') :
-            currentEditor(nullptr), mode(KEYEDIT_NONE), deleteKey(deleteKey), enterKey(enterKey), backKey(backKey), nextKey(nextKey) {}
+	explicit MenuEditingKeyListener(uint8_t enterKey = '*', uint8_t deleteKey = '#', uint8_t backKey = 'A', uint8_t nextKey = 'B');
 
     /**
      * Implements the key pressed interface method from KeyboardListener, this should not be called by user code
@@ -73,6 +74,14 @@ public:
      * @param key the keycode
      */
     void keyReleased(char key) override;
+
+    /**
+     * Create a basic rotary encoder that fulfils the duties of the interface but does not do anything else, without
+     * this some parts of TcMenu no longer work, there is a dependency on a rotary encoder interface of some kind being
+     * present. Do not use if already implementing the encoder.
+     */
+    void createInternalEncoder();
+
 private:
     void processDirectionalIndexItem(MenuItem *item, uint16_t currVal, char key, DirectionalItemCallback callback);
     void processSimpleValueKeyPress(ValueMenuItem* item, char key);

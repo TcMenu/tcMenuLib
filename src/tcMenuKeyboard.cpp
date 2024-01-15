@@ -261,3 +261,14 @@ void MenuEditingKeyListener::clearState() {
     currentEditor = nullptr;
     mode = KEYEDIT_NONE;
 }
+
+MenuEditingKeyListener::MenuEditingKeyListener(uint8_t enterKey, uint8_t deleteKey, uint8_t backKey, uint8_t nextKey) :currentEditor(nullptr), mode(KEYEDIT_NONE), deleteKey(deleteKey), enterKey(enterKey), backKey(backKey), nextKey(nextKey) {
+}
+
+void MenuEditingKeyListener::createInternalEncoder() {
+    if(switches.getEncoder() != nullptr) return;
+    serlogF(SER_TCMENU_INFO, "Create keyboard encoder");
+    switches.setEncoder(0, new RotaryEncoder([](int v) {
+        menuMgr.valueChanged(v);
+    }));
+}
