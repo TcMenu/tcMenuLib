@@ -146,28 +146,6 @@ namespace tcgfx {
 #endif // TC_COORD_DEFINED
 
     /**
-     * Structure that represent a palette based color image. For palette based images the data pointer will be to an
-     * instance of this struct. It is a struct because it can be stored in program memory. It has methods to make it
-     * easier for us to extend it later.
-     *
-     * Please avoid using the fields directly.
-     */
-    struct PaletteDrawingData {
-    public:
-        const tcgfx::color_t *palette;
-        uint8_t bitDepth;
-
-        PaletteDrawingData(const tcgfx::color_t *palette, uint8_t bitDepth)
-                : palette(palette), bitDepth(bitDepth) {}
-
-        const color_t* getPalette() const { return palette; }
-        const uint8_t* getData() const { return data; }
-        bool hasMask() const { return maskColorIdx != DRAW_NO_MASK; }
-        uint8_t getMaskColor() const { return maskColorIdx; }
-        uint8_t getBitDepth() const { return bitDepth; }
-    };
-
-    /**
      * Represents an icon that can be presented for actionable menu items such as submenus, boolean items, and action items.
      * It can have two items states, one for selected and one for normal.
      */
@@ -179,8 +157,11 @@ namespace tcgfx {
             /** the image is a regular monochrome bitmap in native format, no palette info provided */
             ICON_MONO,
             /** the image is in a palette format, the palette information will be populated, it contains
-             * rendering instructions */
-            ICON_PALLETE,
+             * rendering instructions for 2 bits per pixel */
+            ICON_PALLETE_2BPP,
+            /** the image is in a palette format, the palette information will be populated, it contains
+             * rendering instructions for 4 bits per pixel */
+            ICON_PALLETE_4BPP,
             /** the image is in a format that can be pushed directly to the display, no palette info provided*/
             ICON_NATIVE
         };
@@ -199,7 +180,7 @@ namespace tcgfx {
         MemoryLocation location;
         const uint8_t *normalIcon;
         const uint8_t *selectedIcon;
-        const PaletteDrawingData* palette;
+        const color_t* palette;
     public:
         /**
          * Creates an empty drawable icon, used mainly by collection support
@@ -234,10 +215,10 @@ namespace tcgfx {
          * @param normal the image in the normal state.
          * @param selected the image in the selected state.
          */
-        DrawableIcon(uint16_t id, const Coord &size, const PaletteDrawingData& paletteDrawingData, const uint8_t *normal,
+        DrawableIcon(uint16_t id, const Coord &size, IconType ty, const color_t* paletteEntries, const uint8_t *normal,
                      const uint8_t *selected = nullptr)
-                : menuId(id), dimensions(size), iconType(ICON_PALLETE), location(STORED_IN_ROM), normalIcon(normal),
-                  selectedIcon(selected), palette(&paletteDrawingData) {}
+                : menuId(id), dimensions(size), iconType(ty), location(STORED_IN_ROM), normalIcon(normal),
+                  selectedIcon(selected), palette(paletteEntries) {}
 
         /**
          * Get the icon data for the current state
@@ -252,7 +233,7 @@ namespace tcgfx {
          * Get the palette information (if available) for this icon
          * @return either icon palette data if available or nullptr.
          */
-        const PaletteDrawingData* getPalette() const {
+        const color_t* getPalette() const {
             return palette;
         }
 
@@ -272,10 +253,6 @@ namespace tcgfx {
 
         uint16_t getKey() const {
             return menuId;
-        }
-
-        const PaletteDrawingData* getPaletteData() {
-            return palette;
         }
 
         void setFromValues(const Coord &size, IconType ty, const uint8_t *normal, const uint8_t *selected = nullptr) {
