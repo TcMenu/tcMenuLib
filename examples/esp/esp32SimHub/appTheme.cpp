@@ -118,7 +118,6 @@ void setupTheme() {
     color_t coolBlueTitlePalette[] = {RGB(0,0,0), RGB(20,132,255), RGB(192,192,192), RGB(64, 64, 64)};
     color_t coolBlueItemPalette[] = {RGB(255, 255, 255), RGB(0,64,135), RGB(20,133,255), RGB(31,100,178)};
     TcThemeBuilder themeBuilder(renderer);
-    serlogF2(SER_DEBUG, "Loading themes, size = ", sizeof(themeBuilder));
 
     themeBuilder.withSelectedColors(RGB(31, 88, 100), RGB(255, 255, 255))
             .withRenderingSettings(tcgfx::BaseGraphicalRenderer::TITLE_FIRST_ROW, true)
