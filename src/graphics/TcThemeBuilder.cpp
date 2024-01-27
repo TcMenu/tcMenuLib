@@ -73,8 +73,8 @@ void ThemePropertiesBuilder::initForLevel(TcThemeBuilder *b, ItemDisplayProperti
     }
 }
 
-ThemePropertiesBuilder& ThemePropertiesBuilder::withImageOfType(Coord size, DrawableIcon::IconType iconType, const uint8_t* regIcon, const uint8_t* selIcon) {
-    themeBuilder->getItemFactory().addImageToCache(DrawableIcon(menuItem->getId(), size, iconType, regIcon, selIcon));
+ThemePropertiesBuilder& ThemePropertiesBuilder::withImageOfType(Coord size, DrawableIcon::IconType iconType, const uint8_t* regIcon, const uint8_t* selIcon, const color_t* pal) {
+    themeBuilder->getItemFactory().addImageToCache(DrawableIcon(menuItem->getId(), size, iconType, pal, regIcon, selIcon));
     if(drawingMode != GridPosition::DRAW_AS_ICON_TEXT) drawingMode = GridPosition::DRAW_AS_ICON_ONLY;
     needsGrid(false);
     return *this;

@@ -157,7 +157,11 @@ namespace tcgfx {
             return *this;
         }
 
-        ThemePropertiesBuilder& withImageOfType(Coord size, DrawableIcon::IconType iconType, const uint8_t* regIcon, const uint8_t* selIcon);
+        /**
+         * A somewhat internal method that allows for all withImage.. calls to be simplified.
+         */
+        ThemePropertiesBuilder& withImageOfType(Coord size, DrawableIcon::IconType iconType, const uint8_t* regIcon,
+                                                const uint8_t* selIcon, const color_t* palette = nullptr);
 
         /**
          * For item level use only, this sets the menu item to render as an image, instead of as text. Xbmp format is a
@@ -169,6 +173,34 @@ namespace tcgfx {
          */
         ThemePropertiesBuilder& withImageXbmp(Coord size, const uint8_t* regIcon, const uint8_t* selIcon = nullptr) {
             withImageOfType(size, DrawableIcon::ICON_XBITMAP, regIcon, selIcon);
+            return *this;
+        }
+
+        /**
+         * For item level use only, this sets the menu item to render as an image with 2 bits per pixel, that is the
+         * each color index defined by each 2 bits maps to en entry in the palette.
+         * @param size size of the images provided
+         * @param palette the palette for each color index, must be color_t array of size 4
+         * @param regIcon the icon when not active / edited
+         * @param selIcon the icon when selected, IE active / edited
+         * @return reference to itself for chaining
+         */
+        ThemePropertiesBuilder& withImage2bpp(Coord size, const color_t* imgPalette, const uint8_t* regIcon, const uint8_t* selIcon = nullptr) {
+            withImageOfType(size, DrawableIcon::ICON_PALLETE_2BPP, regIcon, selIcon, imgPalette);
+            return *this;
+        }
+
+        /**
+         * For item level use only, this sets the menu item to render as an image with 4 bits per pixel, that is the
+         * each color index defined by each 4 bits maps to en entry in the palette.
+         * @param size size of the images provided
+         * @param palette the palette for each color index, must be color_t array of size 16
+         * @param regIcon the icon when not active / edited
+         * @param selIcon the icon when selected, IE active / edited
+         * @return reference to itself for chaining
+         */
+        ThemePropertiesBuilder& withImage4bpp(Coord size, const color_t* imgPalette, const uint8_t* regIcon, const uint8_t* selIcon = nullptr) {
+            withImageOfType(size, DrawableIcon::ICON_PALLETE_4BPP, regIcon, selIcon, imgPalette);
             return *this;
         }
 

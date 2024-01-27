@@ -470,7 +470,7 @@ void MenuManager::notifyStructureChanged() {
 
 void MenuManager::setItemsInCurrentMenu(int size, int offs) {
     auto enc = switches.getEncoder();
-    if(!enc) return;
+    if(!enc || size < 0) return;
     serlogF3(SER_TCMENU_INFO, "Set items in menu (size, offs) ", size, offs);
     enc->changePrecision(size, offs, useWrapAroundByDefault);
     enc->setUserIntention(isCardLayoutActive(getCurrentMenu()) ? SCROLL_THROUGH_SIDEWAYS : SCROLL_THROUGH_ITEMS);

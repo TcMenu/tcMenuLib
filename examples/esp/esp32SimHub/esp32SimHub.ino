@@ -50,6 +50,8 @@ const int lcdBacklightPin = 5;
 // we need access to the analog device of the ESP32
 HardwareRotaryEncoder* secondEncoder;
 
+void setupTheme();
+
 void setup() {
     SPI.begin(18, 19, 23);
     SPI.setFrequency(20000000);
@@ -63,6 +65,7 @@ void setup() {
 
     // initialise the menu library, the following line was automatically added to setup by tcMenu.
     setupMenu();
+    setupTheme();
 
     // Here we register a custom drawing class, it will handle the reset events and also any
     // events to do with taking over the display.
@@ -225,3 +228,4 @@ void CALLBACK_FUNCTION onShowDialogs(int id) {
 void CALLBACK_FUNCTION onEngineHasChanged(int id) {
     // TODO - your menu change code
 }
+

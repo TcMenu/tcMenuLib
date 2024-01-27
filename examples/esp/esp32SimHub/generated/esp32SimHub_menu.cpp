@@ -10,7 +10,6 @@
 
 #include <tcMenu.h>
 #include "esp32SimHub_menu.h"
-#include "../ThemeCoolBlueTraditional.h"
 #include <Fonts/FreeSans9pt7b.h>
 #include <Fonts/FreeSans12pt7b.h>
 
@@ -89,10 +88,6 @@ void setupMenu() {
     menuMgr.initFor4WayJoystick(&renderer, &menuSpeed, 7, 5, 2, 6, -1, 35);
     esp32Touch.ensureInterruptRegistered();
     remoteServer.addConnection(&simhubConnection);
-    renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
-    renderer.setUseSliderForAnalog(true);
-    renderer.enableTcUnicode();
-    installCoolBlueTraditionalTheme(renderer, MenuFontDef(&FreeSans9pt7b, 1), MenuFontDef(&FreeSans12pt7b, 1), true);
 
     // We have an IoT monitor, register the server
     menuSettingsIoTMonitor.setRemoteServer(remoteServer);
