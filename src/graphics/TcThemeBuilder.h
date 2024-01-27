@@ -18,7 +18,6 @@
 
 namespace tcgfx {
     class TcThemeBuilder;
-    typedef void (*RowBuilderCallback)(TcThemeBuilder& themeBuilder);
 
     /**
      * Represents a set of theme properties that can be applied at any level, if at the item level, this class can also
@@ -304,8 +303,6 @@ namespace tcgfx {
          */
         explicit TcThemeBuilder(GraphicsDeviceRenderer& renderer) : renderer(renderer), factory(renderer.getGraphicsPropertiesFactory()),
                                                                     propertiesBuilder(this) {
-            auto *drawable = renderer.getDeviceDrawable();
-            renderer.setDisplayDimensions(drawable->getDisplayDimensions().x, drawable->getDisplayDimensions().y);
         }
 
         /**
@@ -492,17 +489,6 @@ namespace tcgfx {
          * @return reference to itself for chaining
          */
         TcThemeBuilder& withPalette(const color_t* cols);
-
-        /**
-         * With this option you conifugre the row and column count once and then within the provided closure you
-         * only need to provide the column for each item override. Instead of this you can also use the
-         * `onRow(row).onCol(col, colCount)` way of configuring instead. Either option is equal in end state.
-         * @param row the row on which the items will appear
-         * @param colCount the number of columns on that row
-         * @param callback a callback that will call `menuItemOverride` colCount times for each column
-         * @return reference to itself for chaining
-         */
-        TcThemeBuilder& defineRowWithCols(int row, int colCount, RowBuilderCallback callback);
 
         /**
          * Set up the core rendering settings, that is the way the title should be drawn, and also if analog sliders

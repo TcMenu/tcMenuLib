@@ -23,6 +23,7 @@
 #include "app_icondata.h"
 #include "TestingDialogController.h"
 #include <extras/DrawableTouchCalibrator.h>
+#include <graphics/TcThemeBuilder.h>
 
 #define MENU_USING_CALIBRATION_MGR true
 
@@ -81,29 +82,41 @@ void setup() {
 #else
     touchScreen.calibrateMinMaxValues(0.250F, 0.890F, 0.09F, 0.88F);
 #endif // TC_TFT_ESPI_NEEDS_TOUCH
-    // first we get the graphics factory
-    auto & factory = renderer.getGraphicsPropertiesFactory();
-
-    // now we add the icons that we want to use with certain menu items
+    /**
+     * Here we use the theme builder to modify the drawing of certain menu items, we want three of the main menu
+     * items to render using icons, we therefore request a "menuItemOverride" from the theme and then we simply
+     * say the item will render as an image.
+     */
+    TcThemeBuilder themeBuilder(renderer);
     const Coord iconSize(APPICONS_WIDTH, APPICONS_HEIGHT);
-    factory.addImageToCache(DrawableIcon(menuSettings.getId(), iconSize, DrawableIcon::ICON_XBITMAP, settingsIcon40Bits));
-    factory.addImageToCache(DrawableIcon(menuStatus.getId(), iconSize, DrawableIcon::ICON_XBITMAP, statusIcon40Bits));
-    factory.addImageToCache(DrawableIcon(menuMute.getId(), iconSize, DrawableIcon::ICON_XBITMAP, muteOffIcon40Bits, muteOnIcon40Bits));
+    themeBuilder.menuItemOverride(menuSettings)
+        .withImage4bpp(Coord(31, 40), statusBitmap_palette0, statusBitmap0)
+        .onRow(3).multiCol(1, 3)
+        .apply();
+    //themeBuilder.menuItemOverride(menuSettings)
+    //    .withImageXbmp(iconSize, settingsIcon40Bits)
+    //    .onRow(3).multiCol(1, 3)
+    //    .apply();
+    themeBuilder.menuItemOverride(menuStatus)
+        .withImageXbmp(iconSize, statusIcon40Bits)
+        .onRow(3).multiCol(2, 3)
+        .apply();
+    themeBuilder.menuItemOverride(menuMute)
+        .withImageXbmp(iconSize, muteOffIcon40Bits, muteOnIcon40Bits)
+        .onRow(3).multiCol(3, 3)
+        .apply();
 
-    // and now we define that row 3 of the main menu will have three columns, drawn as icons
-    factory.addGridPosition(&menuSettings, GridPosition(GridPosition::DRAW_AS_ICON_ONLY,
-                                                        GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 1, 4, 49));
-    factory.addGridPosition(&menuStatus, GridPosition(GridPosition::DRAW_AS_ICON_ONLY,
-                                                      GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 2, 4, 49));
-    factory.addGridPosition(&menuMute, GridPosition(GridPosition::DRAW_AS_ICON_ONLY,
-                                                    GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 3, 4, 49));
-
-    // here is how we completely redefine the drawing of a specific item, you can also define for submenu or default
+    /**
+     * here is how we override drawing for items only when a submenu is active, you can also define at the item level.
+     */
     color_t specialPalette[] { RGB(255, 255, 255), RGB(255, 0, 0), RGB(0, 0, 0), RGB(0, 0, 255) };
-    factory.setDrawingPropertiesAllInSub(ItemDisplayProperties::COMPTYPE_TITLE, menuStatus.getId(), specialPalette,
-                                        MenuPadding(4), nullptr, 4, 10, 36,
-                                        GridPosition::JUSTIFY_CENTER_WITH_VALUE , MenuBorder(2));
-    tcgfx::ConfigurableItemDisplayPropertiesFactory::refreshCache();
+    themeBuilder.submenuPropertiesTitleOverride(menuStatus)
+        .withPalette(specialPalette)
+        .withPadding(MenuPadding(4))
+        .withBorder(MenuBorder(2))
+        .apply();
+
+    themeBuilder.apply();
 
     setTitlePressedCallback([](int) {
         BaseDialog* dlg = MenuRenderer::getInstance()->getDialog();
