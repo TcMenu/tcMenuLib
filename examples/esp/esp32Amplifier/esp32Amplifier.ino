@@ -48,6 +48,8 @@ void setup() {
     Serial.begin(115200);
     EEPROM.begin(512);
 
+    //serEnableLevel(SER_TCMENU_DEBUG, true);
+
     renderer.setFirstWidget(&wifiWidget);
 
     setupMenu();

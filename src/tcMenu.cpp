@@ -276,6 +276,7 @@ void MenuManager::stopEditingCurrentItem(bool doMultiPartNext) {
 		// unless we've run out of parts to edit, stay in edit mode, moving to next part.
 		int editorRange = editableItem->nextPart();
 		if (editorRange != 0) {
+            serlogF2(SER_TCMENU_DEBUG, "Next Part", editableItem->getId());
 			switches.changeEncoderPrecision(0, editorRange, editableItem->getPartValueAsInt(),
                                             isWrapAroundEncoder(editableItem), 1);
 			return;

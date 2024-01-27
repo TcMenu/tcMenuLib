@@ -58,9 +58,10 @@ void MenuTouchScreenManager::sendEvent(float locationX, float locationY, float t
 }
 
 void MenuTouchScreenEncoder::touched(const TouchNotification &evt) {
-    serlogF4(SER_TCMENU_DEBUG, "Touch at (x,y,mode)", evt.getCursorPosition().x, evt.getCursorPosition().y, evt.isWithinItem())
     if(evt.isWithinItem()) {
         MenuItem *theItem = evt.getEntry()->getMenuItem();
+        serlogF4(SER_TCMENU_DEBUG, "Item Touched  (x,y,item)", evt.getCursorPosition().x, evt.getCursorPosition().y, theItem->getId());
+
         if(menuMgr.getCurrentEditor() && theItem != menuMgr.getCurrentEditor()) {
             // stop editing, selected outside of item
             menuMgr.stopEditingCurrentItem(false);
@@ -68,6 +69,7 @@ void MenuTouchScreenEncoder::touched(const TouchNotification &evt) {
         else {
             bool wasActive = renderer->getActiveItem() == theItem;
             if(!wasActive) {
+                serlogF(SER_TCMENU_DEBUG, "Activating item");
                 // if it's not active try and activate, if it fails we can't continue.
                 uint8_t itemIdx = renderer->setActiveItem(theItem);
                 if(switches.getEncoder()) {
@@ -92,9 +94,11 @@ void MenuTouchScreenEncoder::touched(const TouchNotification &evt) {
                 }
             }
             else if(isTouchActionable(theItem) && !held) {
+                serlogF(SER_TCMENU_DEBUG, "Touch Act");
                 menuMgr.onMenuSelect(false);
             }
             else if(isMenuRuntimeMultiEdit(theItem) && !theItem->isReadOnly()) {
+                serlogF(SER_TCMENU_DEBUG, "TMPart");
                 auto* dlg = renderer->getDialog();
                 if(dlg && !dlg->isInUse()) {
                     auto* menuDlg = reinterpret_cast<MenuBasedDialog*>(dlg);
@@ -105,6 +109,7 @@ void MenuTouchScreenEncoder::touched(const TouchNotification &evt) {
             else if(!theItem->isReadOnly()){
                 GridPosition::GridDrawingMode drawingMode = evt.getEntry()->getPosition().getDrawingMode();
                 if(drawingMode == GridPosition::DRAW_INTEGER_AS_UP_DOWN && wasActive) {
+                    serlogF(SER_TCMENU_DEBUG, "TUpDown");
                     if(menuMgr.getCurrentEditor() != theItem) menuMgr.onMenuSelect(false);
                     int increment = 0;
                     auto xPos = evt.getCursorPosition().x;
@@ -127,11 +132,15 @@ void MenuTouchScreenEncoder::touched(const TouchNotification &evt) {
                     }
                 }
                 else if(drawingMode == GridPosition::DRAW_INTEGER_AS_SCROLL && wasActive) {
+                    serlogF(SER_TCMENU_DEBUG, "TScroll");
                     if(menuMgr.getCurrentEditor() != theItem) menuMgr.onMenuSelect(false);
                     auto* analog = reinterpret_cast<AnalogMenuItem*>(theItem);
                     float correction =  float(analog->getMaximumValue()) / float(evt.getItemSize().x);
                     float percentage = evt.getCursorPosition().x * correction;
                     analog->setCurrentValue(percentage);
+                }
+                else {
+                    serlogF(SER_TCMENU_DEBUG, "Touch Ignored");
                 }
             }
         }
@@ -139,9 +148,11 @@ void MenuTouchScreenEncoder::touched(const TouchNotification &evt) {
     else if(menuMgr.getCurrentEditor()) {
         // touched outside of the item, stop editing.
         menuMgr.stopEditingCurrentItem(false);
+        serlogF(SER_TCMENU_DEBUG, "TEndEdit");
     }
     else {
         // deal with click completely outside of item area
+        serlogF3(SER_TCMENU_DEBUG, "TOut (x,y)", evt.getCursorPosition().x, evt.getCursorPosition().y);
     }
 }
 
