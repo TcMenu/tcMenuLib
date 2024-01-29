@@ -169,6 +169,7 @@
         "variableName": "SettingsBoardList",
         "id": 26,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -536,7 +537,8 @@
       "menuDefinitions": []
     },
     "packageNamespace": "",
-    "appIsModular": false
+    "appIsModular": false,
+    "listOfEmbeddedForms": []
   },
   "stringLists": [
     {

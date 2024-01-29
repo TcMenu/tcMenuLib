@@ -549,7 +549,7 @@ public:
     DateFormattedMenuItem(RuntimeRenderingFn renderFn, const DateStorage& initial, menuid_t id, MenuItem* next = nullptr)
             : EditableMultiPartMenuItem(MENUTYPE_DATE, id, 3, renderFn, next), data(initial) {}
 
-    DateFormattedMenuItem(const AnyMenuInfo* info, RuntimeRenderingFn renderFn, const DateStorage& initial, menuid_t id, MenuItem* next = nullptr, bool isPgm = INFO_LOCATION_PGM)
+    DateFormattedMenuItem(const AnyMenuInfo* info, RuntimeRenderingFn renderFn, const DateStorage& initial, menuid_t /*id*/, MenuItem* next = nullptr, bool isPgm = INFO_LOCATION_PGM)
             : EditableMultiPartMenuItem(info, isPgm, MENUTYPE_DATE, 3, renderFn, next), data(initial) {}
 
     DateFormattedMenuItem(const AnyMenuInfo* info, const DateStorage& initial, MenuItem* next = nullptr, bool isPgm = INFO_LOCATION_PGM)

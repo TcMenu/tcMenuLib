@@ -59,7 +59,7 @@ public:
      * be called after the active item is changed.
      * @param newActive
      */
-    virtual void activeItemHasChanged(MenuItem* newActive) {}
+    virtual void activeItemHasChanged(MenuItem* /*newActive*/) {}
 };
 
 /**

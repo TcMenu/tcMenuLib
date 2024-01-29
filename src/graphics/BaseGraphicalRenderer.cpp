@@ -60,10 +60,8 @@ uint8_t BaseGraphicalRenderer::setActiveItem(MenuItem *item) {
     int totalHeight = calculateHeightTo(activeIndex, rootItem);
     int startRow = 0;
     int adjustedHeight = height;
-    if(!isLastRowExactFit()) {
-        auto props = itemOrderByRow.itemAtIndex(activeIndex);
-        adjustedHeight -= heightOfRow(props->getPosition().getRow());
-    }
+    auto props = itemOrderByRow.itemAtIndex(activeIndex);
+    adjustedHeight -= heightOfRow(props->getPosition().getRow());
 
     auto startY = 0;
     if(titleMode == TITLE_ALWAYS) {

@@ -33,7 +33,7 @@ void setup() {
     setupMenu();
 
     // lastly we load state from EEPROM.
-    menuMgr.load();
+    menuMgr.load(0xD0FE);
 }
 
 //
@@ -73,7 +73,7 @@ void CALLBACK_FUNCTION onNameChanged(int id) {
 // low voltage detector or other solution for saving.
 //
 void CALLBACK_FUNCTION onSaveSettings(int id) {
-  menuMgr.save();
+  menuMgr.save(0xD0FE);
   EEPROM.commit();
 
   // here is a brief example of how to show a dialog, usually for information

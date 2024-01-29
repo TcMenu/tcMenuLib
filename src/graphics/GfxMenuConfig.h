@@ -418,19 +418,19 @@ namespace tcgfx {
     public:
         NullItemDisplayPropertiesFactory() : gridByItem(4) {}
 
-        ItemDisplayProperties* configFor(MenuItem* pItem, ItemDisplayProperties::ComponentType compType) override {
+        ItemDisplayProperties* configFor(MenuItem* pItem, ItemDisplayProperties::ComponentType /*compType*/) override {
             return &props;
         }
 
-        ItemDisplayProperties* configForCurrentSub(ItemDisplayProperties::ComponentType compType) override {
+        ItemDisplayProperties* configForCurrentSub(ItemDisplayProperties::ComponentType /*compType*/) override {
             return &props;
         }
 
-        DrawableIcon* iconForMenuItem(uint16_t id) override{
+        DrawableIcon* iconForMenuItem(uint16_t /*id*/) override{
             return nullptr;
         }
 
-        color_t getSelectedColor(ItemDisplayProperties::ColorType colorType, bool isUnderCursor = false) override {
+        color_t getSelectedColor(ItemDisplayProperties::ColorType colorType, bool /*isUnderCursor*/ = false) override {
             return 0;
         }
 

@@ -108,9 +108,9 @@ class ResetCallbackFunctionCustomDraw : public CustomDrawing {
     ResetCallbackFn resetFn;
 public:
     ResetCallbackFunctionCustomDraw(ResetCallbackFn fn): resetFn(fn) {}
-    void started(BaseMenuRenderer *currentRenderer) override { }
+    void started(BaseMenuRenderer* /*currentRenderer*/) override { }
     void reset() override {resetFn();}
-    void renderLoop(unsigned int currentValue, RenderPressMode userClick) override {}
+    void renderLoop(unsigned int /*currentValue*/, RenderPressMode /*userClick*/) override {}
 };
 
 /**
@@ -326,7 +326,7 @@ public:
      * Turn off the display updates to allow for low power state transition, to re-enable call setUpdatesPerSecond
      * @see setUpdatesPerSecond
      */
-    void turnOffDisplayUpdates(bool updatesEnabled) {
+    void turnOffDisplayUpdates(bool /*updatesEnabled*/) {
         updatesPerSecond = UPDATES_SEC_DISPLAY_OFF;
     }
 

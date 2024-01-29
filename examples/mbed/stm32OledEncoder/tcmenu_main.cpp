@@ -71,7 +71,7 @@ void setup() {
     renderer.setCustomDrawingHandler(&screenSaver);
 
     // we add another switch on the user button that just clears the screen saver.
-    switches.addSwitch(USER_BUTTON, [](pinid_t /*pin*/, bool /*held*/) {
+    switches.addSwitch(BUTTON1, [](pinid_t /*pin*/, bool /*held*/) {
         screenSaver.removeScreenSaver();
     });
 
