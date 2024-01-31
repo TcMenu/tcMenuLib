@@ -504,6 +504,21 @@ namespace tcgfx {
         }
 
         /**
+         * Apply the dimensions from the device drawable to the renderer, this takes the device specific size and applies
+         * it to the renderer.
+         * @return reference to itself for chaining
+         */
+        TcThemeBuilder& dimensionsFromRenderer();
+
+        /**
+         * Manually set the dimensions of the display, for cases where `dimensionsFromRenderer` does not work.
+         * @param x the width
+         * @param y the height
+         * @return reference to itself for chaining
+         */
+        TcThemeBuilder& manualDimensions(int x, int y);
+
+        /**
          * Use this to enable card layout for the root menu,  and configure the icons that will be used for left and
          * right buttons.
          * @param iconSize the size of the left and right icons

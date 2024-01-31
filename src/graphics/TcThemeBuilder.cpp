@@ -126,3 +126,14 @@ TcThemeBuilder & TcThemeBuilder::enablingTcUnicode() {
     renderer.enableTcUnicode();
     return *this;
 }
+
+TcThemeBuilder& TcThemeBuilder::dimensionsFromRenderer() {
+    auto dims = renderer.getDeviceDrawable()->getDisplayDimensions();
+    renderer.setDisplayDimensions(dims.x, dims.y);
+    return *this;
+}
+
+TcThemeBuilder& TcThemeBuilder::manualDimensions(int x, int y) {
+    renderer.setDisplayDimensions(x, y);
+    return *this;
+}
