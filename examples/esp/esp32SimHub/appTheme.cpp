@@ -115,11 +115,20 @@ const uint8_t engineBitmap0[] PROGMEM = {
 };
 
 void setupTheme() {
+    /**
+     * In the event that we want to modify how menu items are drawn, the easiest way is to use TcThemeBuilder.
+     * Here we use it to modify the drawing of certain menu items, we want three of the main menu items to render
+     * using icons, to do so we call `menuItemOverride` on the builder, and it returns a "properties builder" that is
+     * pre-prepared to adjust the menu item.
+     *
+     * See https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/themes/rendering-with-themes-icons-grids/
+     */
     color_t coolBlueTitlePalette[] = {RGB(0,0,0), RGB(20,132,255), RGB(192,192,192), RGB(64, 64, 64)};
     color_t coolBlueItemPalette[] = {RGB(255, 255, 255), RGB(0,64,135), RGB(20,133,255), RGB(31,100,178)};
     TcThemeBuilder themeBuilder(renderer);
 
     themeBuilder.withSelectedColors(RGB(31, 88, 100), RGB(255, 255, 255))
+            .dimensionsFromRenderer()
             .withRenderingSettings(tcgfx::BaseGraphicalRenderer::TITLE_FIRST_ROW, true)
             .enablingTcUnicode()
             .withItemPadding(MenuPadding(2))

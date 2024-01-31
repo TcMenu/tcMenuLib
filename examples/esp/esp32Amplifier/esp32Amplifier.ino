@@ -84,25 +84,33 @@ void setup() {
 #else
     touchScreen.calibrateMinMaxValues(0.250F, 0.890F, 0.09F, 0.88F);
 #endif // TC_TFT_ESPI_NEEDS_TOUCH
+
     /**
-     * Here we use the theme builder to modify the drawing of certain menu items, we want three of the main menu
-     * items to render using icons, we therefore request a "menuItemOverride" from the theme and then we simply
-     * say the item will render as an image.
+     * In the event that we want to modify how menu items are drawn, the easiest way is to use TcThemeBuilder.
+     * Here we use it to modify the drawing of certain menu items, we want three of the main menu items to render
+     * using icons, to do so we call `menuItemOverride` on the builder, and it returns a "properties builder" that is
+     * pre-prepared to adjust the menu item.
+     *
+     * See https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/themes/rendering-with-themes-icons-grids/
      */
     TcThemeBuilder themeBuilder(renderer);
     const Coord iconSize(APPICONS_WIDTH, APPICONS_HEIGHT);
+
+    // get the properties editor for the settings submenu item itself and override it to draw as an icon. Also make it
+    // draw in a specific row and column grid, then finally call `apply` to make the adjustment. Note that in this case
+    // use a 4BPP (16 color) icon bitmap by providing both the data and the palette.
     themeBuilder.menuItemOverride(menuSettings)
         .withImage4bpp(Coord(31, 40), statusBitmap_palette0, statusBitmap0)
         .onRow(3).multiCol(1, 3)
         .apply();
-    //themeBuilder.menuItemOverride(menuSettings)
-    //    .withImageXbmp(iconSize, settingsIcon40Bits)
-    //    .onRow(3).multiCol(1, 3)
-    //    .apply();
+
+    // Again we take a menu item override for the status submenu item, and this time it will render a single color bitmap
     themeBuilder.menuItemOverride(menuStatus)
         .withImageXbmp(iconSize, statusIcon40Bits)
         .onRow(3).multiCol(2, 3)
         .apply();
+
+    // Again we take a menu item override for the mute boolean menu, and this time it will render a single color bitmap
     themeBuilder.menuItemOverride(menuMute)
         .withImageXbmp(iconSize, muteOffIcon40Bits, muteOnIcon40Bits)
         .onRow(3).multiCol(3, 3)
@@ -110,6 +118,8 @@ void setup() {
 
     /**
      * here is how we override drawing for items only when a submenu is active, you can also define at the item level.
+     * Note that unlike above, this affects all title items in that sub menu. We could do the same for all action or
+     * even regular items within a submenu.
      */
     color_t specialPalette[] { RGB(255, 255, 255), RGB(255, 0, 0), RGB(0, 0, 0), RGB(0, 0, 255) };
     themeBuilder.submenuPropertiesTitleOverride(menuStatus)
@@ -118,6 +128,7 @@ void setup() {
         .withBorder(MenuBorder(2))
         .apply();
 
+    // whenever adjusting themes, we should always apply them
     themeBuilder.apply();
 
     setTitlePressedCallback([](int) {

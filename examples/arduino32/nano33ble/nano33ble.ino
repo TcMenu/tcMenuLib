@@ -14,6 +14,7 @@
 #include "MotionDetection.h"
 #include <AnalogDeviceAbstraction.h>
 #include <tcMenuVersion.h>
+#include <ArduinoBLE.h>
 #include <stockIcons/wifiAndConnectionIcons16x12.h>
 
 // on the analog menu, we both have an analog input and an analog output (PWM). You can configure those pins here.
@@ -74,13 +75,7 @@ void setup() {
     // the tcMenu version number in a dialog.
     // https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/rendering-with-tcmenu-lcd-tft-oled/#presenting-a-dialog-to-the-user
     setTitlePressedCallback([](int id) {
-        withMenuDialogIfAvailable([](MenuBasedDialog* dlg) {
-            dlg->setButtons(BTNTYPE_CLOSE, BTNTYPE_NONE);
-            dlg->showRam("Nano BLE Example", false);
-            char szVer[10];
-            tccore::copyTcMenuVersion(szVer, sizeof szVer);
-            dlg->copyIntoBuffer(szVer);
-        });
+        showVersionDialog(&applicationInfo);
     });
 
     // lastly we set up something simple to read from analog in

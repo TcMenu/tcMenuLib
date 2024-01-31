@@ -369,14 +369,15 @@
     "eepromDefinition": "",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
-      "deviceIO:",
-      "customIO:io23017"
+      "customIO:io23017",
+      "deviceIO:"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []
     },
     "packageNamespace": "",
-    "appIsModular": false
+    "appIsModular": false,
+    "listOfEmbeddedForms": []
   },
   "stringLists": []
 }
