@@ -230,20 +230,22 @@ namespace tcgfx {
 
         /**
          * Sets the column index and number of columns on the row. Note that each entry on the row must properly
-         * set the same number of columns.
+         * set the same number of columns. If you don't need to specify the column, prefer using onRow(n) instead.
          * @param actualRow the row where the item should appear
          * @param numberOfCols the number of columns across
          * @param column the column number
          * @return reference to itself for chaining
          */
-        ThemePropertiesBuilder& multiCol(uint8_t column, uint8_t numberOfCols) {
+        ThemePropertiesBuilder& onRowCol(uint8_t actRow, uint8_t column, uint8_t numberOfCols) {
+            row = actRow;
             colPos = column;
             colCount = numberOfCols;
             return *this;
         }
 
         /**
-         * Sets the row that an item should appear on, used when there is a single column on the row.
+         * Sets the row that an item should appear on, used when there is a single column on the row. Use this when
+         * there is only one item on the row as the column will be defaulted to column 1 spanning the row.
          * @param actualRow the row number
          * @return reference to itself for chaining
          */
