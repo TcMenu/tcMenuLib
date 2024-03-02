@@ -4,6 +4,8 @@
 
 Dave Cherry / TheCodersCorner.com made this framework available for you to use. It takes me significant effort to keep all my libraries current and working on a wide range of boards. Please consider making at least a one off donation via the sponsor button if you find it useful.
 
+<a href="https://www.buymeacoffee.com/davetcc" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+
 TcMenu is a modular, IoT ready multi level menu library for the Arduino and mbed platform, it uses plugins to support many displays, input devices and provides remote control using a simple protocol over Ethernet and Serial.
 
 In any fork, please ensure all text up to here is left unaltered.
@@ -44,7 +46,9 @@ If you are manually using tcMenu, without the designer, this page fully document
 
 ## Asking questions
 
-You can ask questions either in the [discussions section of the tcMenu repo](https://github.com/davetcc/tcMenu/discussions), or using the Arduino forum. We generally answer most questions, but the rules of engagement are: **this is my hobby, I make it available because it helps others**. Don't expect immediate answers, make sure you've recreated the problem in a simple sketch that you can send to me. Please consider making at least a one time donation using the sponsor link if we do help you out.
+TheCodersCorner.com invest a lot of time and resources into making this open source product which is used by literally thousands of users. We offer both [commercial support](https://www.thecoderscorner.com/support-services/training-support/) and [C++/Java/Dart consultancy](https://www.thecoderscorner.com/support-services/consultancy/), or if you just want to say thanks, you can also make a donation via [GitHub](https://github.com/davetcc/tcMenu) or use the link below. 
+
+<a href="https://www.buymeacoffee.com/davetcc" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
 * [discussions section of the tcMenu repo](https://github.com/davetcc/tcMenu/discussions) of tcmenu git repo
 * [Arduino discussion forum](https://forum.arduino.cc/) where questions can be asked, please tag me using `@davetcc`.
