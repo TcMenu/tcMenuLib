@@ -134,6 +134,15 @@ void MenuManager::performDirectionMove(bool dirIsBack) {
 void MenuManager::initWithoutInput(MenuRenderer* renderer, MenuItem* root) {
 	this->renderer = renderer;
     setRootItem(root);
+#ifndef TCMENU_NO_DEFAULT_ENCODER
+    // make sure there is always an encoder as one is needed for
+    if(switches.getEncoder() == nullptr) {
+        switches.setEncoder(0, new RotaryEncoder([](int v) {
+            menuMgr.valueChanged(v);
+        }));
+    }
+#endif
+
 	renderer->initialise();
 }
 
