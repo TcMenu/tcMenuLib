@@ -240,7 +240,8 @@ void MenuManager::actionOnCurrentItem(MenuItem* toEdit) {
 	// the current editor (if it's possible to edit that value)
 	if (toEdit->getMenuType() == MENUTYPE_SUB_VALUE) {
         if(toEdit != getCurrentMenu()) notifyEditEnd(getCurrentMenu());
-		actionOnSubMenu(toEdit);
+        toEdit->triggerCallback();
+        actionOnSubMenu(toEdit);
         return;
 	}
 
