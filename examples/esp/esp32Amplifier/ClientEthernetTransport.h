@@ -22,71 +22,52 @@
 
 #ifndef ETHERNET_BUFFER_SIZE
 #define ETHERNET_BUFFER_SIZE 96
-#endif
+#endif // ETHERNET_BUFFER_SIZE
 
-#if ETHERNET_BUFFER_SIZE > 0
+#ifndef DEFAULT_BACKOFF_PERIOD
+#define DEFAULT_BACKOFF_PERIOD (4 * (1000 / TICK_INTERVAL))
+#endif // DEFAULT_BACKOFF_PERIOD
+
 #include <remote/BaseBufferedRemoteTransport.h>
-#endif
 
 namespace tcremote {
-
-#if ETHERNET_BUFFER_SIZE > 0
 
 /**
  * An implementation of TagValueTransport that is able to read and write via a buffer to sockets.
  */
-    class EthernetTagValTransport : public tcremote::BaseBufferedRemoteTransport {
-    private:
-        WiFiClient client;
-    public:
-        EthernetTagValTransport() : BaseBufferedRemoteTransport(BUFFER_MESSAGES_TILL_FULL, ETHERNET_BUFFER_SIZE, MAX_VALUE_LEN) { }
-        ~EthernetTagValTransport() override = default;
-        void setClient(WiFiClient cl) { this->client = cl; }
-
-        int fillReadBuffer(uint8_t* data, int maxSize) override;
-        void flush() override;
-        bool available() override;
-        bool connected() override;
-        void close() override;
-    };
-
-#else // ethernet buffering not needed
-
-/**
- * An implementation of TagValueTransport that is able to read and write using sockets.
- */
-class EthernetTagValTransport : public TagValueTransport {
+class ClientEthernetTagValTransport : public tcremote::BaseBufferedRemoteTransport {
 private:
-	WiFiClient client;
+    WiFiClient client;
 public:
-	EthernetTagValTransport() : TagValueTransport(TagValueTransportType::TVAL_UNBUFFERED) {};
-	~EthernetTagValTransport() override = default;
-	void setClient(WiFiClient client) { this->client = client; }
+    ClientEthernetTagValTransport() : BaseBufferedRemoteTransport(BUFFER_ONE_MESSAGE, ETHERNET_BUFFER_SIZE, MAX_VALUE_LEN) { }
+    ~ClientEthernetTagValTransport() override = default;
+    void setClient(WiFiClient cl) { this->client = cl; }
 
-	int writeChar(char data) override ;
-	int writeStr(const char* data) override;
-	void flush() override;
-	bool available() override;
-	bool connected() override;
-	uint8_t readByte() override;
-	bool readAvailable() override;
+    int fillReadBuffer(uint8_t* data, int maxSize) override;
+    void flush() override;
+    bool available() override;
+    bool connected() override;
     void close() override;
 };
 
-#endif // ethernet buffering check
 
 /**
  * This class provides the initialisation and connection generation logic for ethernet connections.
  */
-class EthernetInitialisation : public DeviceInitialisation {
+class ClientEthernetInitialisation : public DeviceInitialisation {
 private:
-	WiFiServer *server;
+    WiFiClient client;
+    const char* host;
+    uint16_t port;
+    uint16_t backOffPeriod = 0;
 public:
-    explicit EthernetInitialisation(WiFiServer* server) : server(server) {}
+    explicit ClientEthernetInitialisation(const char* host, uint16_t port) : host(host), port(port) {}
 
     bool attemptInitialisation() override;
 
     bool attemptNewConnection(BaseRemoteServerConnection *transport) override;
+private:
+    bool checkBackoffPeriod();
 };
 
 /**

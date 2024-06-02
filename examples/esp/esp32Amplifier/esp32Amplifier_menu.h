@@ -16,7 +16,7 @@
 #include "tcMenuTfteSpi.h"
 #include <graphics/MenuTouchScreenEncoder.h>
 #include <extras/DrawableTouchCalibrator.h>
-#include "EthernetTransport.h"
+#include "ClientEthernetTransport.h"
 #include <RemoteConnector.h>
 #include <RemoteMenuItem.h>
 #include <RuntimeMenuItem.h>
@@ -36,7 +36,7 @@ extern iotouch::ResistiveTouchInterrogator touchInterrogator;
 extern MenuTouchScreenManager touchScreen;
 extern tcextras::IoaTouchScreenCalibrator touchCalibrator;
 extern WiFiServer server;
-extern EthernetInitialisation ethernetInitialisation;
+extern ClientEthernetInitialisation ethernetInitialisation;
 
 // Any externals needed by IO expanders, EEPROMs etc
 

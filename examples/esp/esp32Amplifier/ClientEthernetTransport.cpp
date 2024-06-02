@@ -9,22 +9,22 @@
  * make sure to rename it first.
  */
 
-#include "EthernetTransport.h"
+#include "ClientEthernetTransport.h"
 #include <TaskManager.h>
 
 using namespace tcremote;
 
 #if ETHERNET_BUFFER_SIZE > 0 // we need buffering when dealing with Ethernet2
 
-bool EthernetTagValTransport::available() {
+bool ClientEthernetTagValTransport::available() {
 	return client && client.connected();
 }
 
-bool EthernetTagValTransport::connected() {
+bool ClientEthernetTagValTransport::connected() {
 	return client && client.connected();
 }
 
-void EthernetTagValTransport::flush() {
+void ClientEthernetTagValTransport::flush() {
     if(!client || writeBufferPos == 0) return;
 
     if((int)client.write(writeBuffer, writeBufferPos) == writeBufferPos) {
@@ -38,7 +38,7 @@ void EthernetTagValTransport::flush() {
     }
 }
 
-int EthernetTagValTransport::fillReadBuffer(uint8_t* dataBuffer, int maxData) {
+int ClientEthernetTagValTransport::fillReadBuffer(uint8_t* dataBuffer, int maxData) {
     if(client && client.connected() && client.available()) {
         auto amt = client.read(dataBuffer, maxData);
         if(amt <= 0) {
@@ -51,7 +51,7 @@ int EthernetTagValTransport::fillReadBuffer(uint8_t* dataBuffer, int maxData) {
     return 0;
 }
 
-void EthernetTagValTransport::close() {
+void ClientEthernetTagValTransport::close() {
     serdebugF("socket close");
     BaseBufferedRemoteTransport::close();
     client.stop();
@@ -100,24 +100,34 @@ void EthernetTagValTransport::close() {
 
 #endif
 
-bool EthernetInitialisation::attemptInitialisation() {
+bool ClientEthernetInitialisation::attemptInitialisation() {
 #ifdef ARDUINO_ARCH_STM32
     // we'll keep checking if the link is up before trying to initialise further
     if(Ethernet.linkStatus() == LinkOFF) return false;
 #endif
     serdebugF("Initialising server ");
-    this->server->begin();
     initialised = true;
     return initialised;
 }
 
-bool EthernetInitialisation::attemptNewConnection(BaseRemoteServerConnection *remoteServerConnection) {
-    auto client = server->available();
-    if(client) {
+bool ClientEthernetInitialisation::attemptNewConnection(BaseRemoteServerConnection *remoteServerConnection) {
+    if(!checkBackoffPeriod()) return false;
+
+    client.connect(host, port);
+    if(client.connected()) {
         serdebugF("Client found");
         auto* tvCon = reinterpret_cast<TagValueRemoteServerConnection*>(remoteServerConnection);
-        reinterpret_cast<EthernetTagValTransport*>(tvCon->transport())->setClient(client);
+        reinterpret_cast<ClientEthernetTagValTransport*>(tvCon->transport())->setClient(client);
         return true;
     }
+    return false;
+}
+
+bool ClientEthernetInitialisation::checkBackoffPeriod() {
+    if(backOffPeriod == 0) {
+        backOffPeriod = DEFAULT_BACKOFF_PERIOD;
+        return true;
+    }
+    backOffPeriod--;
     return false;
 }

@@ -24,9 +24,8 @@ iotouch::ResistiveTouchInterrogator touchInterrogator(2, 33, 32, 0);
 iotouch::TouchOrientationSettings touchOrientation(true, false, true);
 MenuTouchScreenManager touchScreen(&touchInterrogator, &renderer, touchOrientation);
 tcextras::IoaTouchScreenCalibrator touchCalibrator(&touchScreen, &renderer, 400);
-WiFiServer server(3333);
-EthernetInitialisation ethernetInitialisation(&server);
-EthernetTagValTransport ethernetTransport;
+ClientEthernetInitialisation ethernetInitialisation("192.168.0.99", 3333);
+ClientEthernetTagValTransport ethernetTransport;
 TagValueRemoteServerConnection ethernetConnection(ethernetTransport, ethernetInitialisation);
 
 // Global Menu Item declarations
