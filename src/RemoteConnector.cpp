@@ -50,6 +50,7 @@ TagValueRemoteConnector::TagValueRemoteConnector(uint8_t remoteNo) :
 	this->flags = 0;
     this->commsCallback = nullptr;
     this->authManager = nullptr;
+    this->hbTimeoutTicks = HEARTBEAT_INTERVAL;
 }
 
 void TagValueRemoteConnector::initialise(TagValueTransport* transport_, CombinedMessageProcessor* processor_,
@@ -223,8 +224,8 @@ void TagValueRemoteConnector::dealWithHeartbeating() {
 	++ticksLastRead;
 	++ticksLastSend;
 
-    // pairing will not send heartbeats, so we wait about 10 seconds before closing out
-    unsigned int maximumWaitTime = isPairing() ? (PAIRING_TIMEOUT_TICKS) : (HEARTBEAT_INTERVAL_TICKS * 3);
+    // when pairing the timeout is hardwired to 15 seconds, otherwise we wait a multiplier of the heartbeat frequency
+    unsigned int maximumWaitTime = isPairing() ? (PAIRING_TIMEOUT_TICKS) : (hbTimeoutTicks > 10000) ? hbTimeoutTicks * 2U : hbTimeoutTicks * 3U;
 
 	if(ticksLastRead > maximumWaitTime && isConnected()) {
         serlogF3(SER_NETWORK_INFO, "Remote disconnected (rNo, ticks): ", remoteNo, ticksLastSend);
@@ -238,7 +239,7 @@ void TagValueRemoteConnector::dealWithHeartbeating() {
 		setConnected(true);
 	}
 
-	if(ticksLastSend > HEARTBEAT_INTERVAL_TICKS) {
+	if(ticksLastSend > hbTimeoutTicks) {
 		if(isConnectionFullyEstablished() && transport->available()) {
             serlogF3(SER_NETWORK_INFO, "Sending HB (rNo, ticks) : ", remoteNo, ticksLastSend);
             encodeHeartbeat(HBMODE_NORMAL);
@@ -383,7 +384,7 @@ void TagValueRemoteConnector::encodeBootstrap(bool isComplete) {
 
 void TagValueRemoteConnector::encodeHeartbeat(HeartbeatMode hbMode) {
 	if(!prepareWriteMsg(MSG_HEARTBEAT)) return;
-    transport->writeFieldInt(FIELD_HB_INTERVAL, HEARTBEAT_INTERVAL);
+    transport->writeFieldInt(FIELD_HB_INTERVAL, hbTimeoutTicks);
     transport->writeFieldLong(FIELD_HB_MILLISEC, millis());
     transport->writeFieldInt(FIELD_HB_MODE, hbMode);
     transport->endMsg();

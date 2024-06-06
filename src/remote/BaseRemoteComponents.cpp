@@ -84,6 +84,16 @@ void TcMenuRemoteServer::exec() {
     }
 }
 
+void TcMenuRemoteServer::setHeartbeatIntervalAll(uint16_t milli) {
+    serlogF2(SER_NETWORK_INFO, "Heartbeats set globally: ", milli);
+    for (int i = 0; i < remotesAdded; i++) {
+        if(connections[i] && connections[i]->getRemoteServerType() == TAG_VAL_REMOTE_SERVER) {
+            auto tvCon = reinterpret_cast<TagValueRemoteServerConnection*>(connections[i]);
+            tvCon->connector()->setHeartbeatTimeout(milli);
+        }
+    }
+}
+
 int tcremote::fromWiFiRSSITo4StateIndicator(int strength) {
     int qualityIcon = 0;
     if(strength > -50) qualityIcon = 4;

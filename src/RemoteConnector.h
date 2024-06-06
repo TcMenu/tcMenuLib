@@ -25,13 +25,17 @@
 #define START_OF_MESSAGE 0x01
 #define TICK_INTERVAL 1
 
-// when debugging to reduce disconnects set the following (give 1 minute timeout): -DHEARTBEAT_INTERVAL=20000
+// This sets the DEFAULT heartbeat interval when no other interval has been set on a connection. IE if you create a
+// connection and do not call setHeartbeatInterval(millis), this is what you'll get.
 #ifndef HEARTBEAT_INTERVAL
 # define HEARTBEAT_INTERVAL 1500
 #endif
 
-#define HEARTBEAT_INTERVAL_TICKS (HEARTBEAT_INTERVAL / TICK_INTERVAL)
+// Pairing is different to a normal connection, in that we just need to provide the user with reasonable time to
+// accept the pairing request on a device, usually around 15 seconds is enough. You can redefine if needed.
+#ifndef PAIRING_TIMEOUT_TICKS
 #define PAIRING_TIMEOUT_TICKS (15000 / TICK_INTERVAL)
+#endif
 
 /**
  * @file RemoteConnector.h
@@ -185,7 +189,8 @@ private:
 	const ConnectorLocalInfo* localInfoPgm;
 	uint16_t ticksLastSend;
 	uint16_t ticksLastRead;
-	CombinedMessageProcessor* processor;
+    uint16_t hbTimeoutTicks;
+    CombinedMessageProcessor* processor;
 	TagValueTransport* transport;	
     CommsCallbackFn commsCallback;
     AuthenticationManager* authManager;
@@ -480,6 +485,8 @@ public:
     /** indicates if the connection is yet authenicated */
     bool isAuthenticated() { return bitRead(flags, FLAG_AUTHENTICATED); }
     AuthenticationManager* getAuthManager() { return authManager; }
+
+    void setHeartbeatTimeout(uint16_t milli) { hbTimeoutTicks = milli / TICK_INTERVAL; }
 private:
 	void encodeBaseMenuFields(int parentId, MenuItem* item);
     bool prepareWriteMsg(uint16_t msgType);

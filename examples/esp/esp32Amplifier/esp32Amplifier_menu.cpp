@@ -24,7 +24,7 @@ iotouch::ResistiveTouchInterrogator touchInterrogator(2, 33, 32, 0);
 iotouch::TouchOrientationSettings touchOrientation(true, false, true);
 MenuTouchScreenManager touchScreen(&touchInterrogator, &renderer, touchOrientation);
 tcextras::IoaTouchScreenCalibrator touchCalibrator(&touchScreen, &renderer, 400);
-ClientEthernetInitialisation ethernetInitialisation("192.168.0.99", 3333);
+ClientEthernetInitialisation ethernetInitialisation("192.168.0.37", 3333);
 ClientEthernetTagValTransport ethernetTransport;
 TagValueRemoteServerConnection ethernetConnection(ethernetTransport, ethernetInitialisation);
 

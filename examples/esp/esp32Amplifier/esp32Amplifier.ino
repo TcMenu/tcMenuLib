@@ -62,7 +62,15 @@ void setup() {
         menuVolume.setCurrentValue(20, true);
         menuDirect.setBoolean(true, true);
     });
+
     prepareWifiForUse();
+
+    // option 1 globally set HB timeouts.
+    remoteServer.setHeartbeatIntervalAll(30000);
+
+    // option 2 selectively set HB timeouts.
+    //auto tvRemote = remoteServer.getRemoteConnector(0);
+    //if(tvRemote != nullptr) tvRemote->setHeartbeatTimeout(30000);
 
     controller.initialise();
 
@@ -101,19 +109,19 @@ void setup() {
     // use a 4BPP (16 color) icon bitmap by providing both the data and the palette.
     themeBuilder.menuItemOverride(menuSettings)
         .withImage4bpp(Coord(31, 40), statusBitmap_palette0, statusBitmap0)
-        .onRow(3).multiCol(1, 3)
+        .onRowCol(3, 1, 3)
         .apply();
 
     // Again we take a menu item override for the status submenu item, and this time it will render a single color bitmap
     themeBuilder.menuItemOverride(menuStatus)
         .withImageXbmp(iconSize, statusIcon40Bits)
-        .onRow(3).multiCol(2, 3)
+        .onRowCol(3, 2, 3)
         .apply();
 
     // Again we take a menu item override for the mute boolean menu, and this time it will render a single color bitmap
     themeBuilder.menuItemOverride(menuMute)
         .withImageXbmp(iconSize, muteOffIcon40Bits, muteOnIcon40Bits)
-        .onRow(3).multiCol(3, 3)
+        .onRowCol(3, 3, 3)
         .apply();
 
     /**
@@ -158,13 +166,13 @@ void prepareWifiForUse() {
     if(strlen(menuConnectivitySSID.getTextValue())==0) {
         // no SSID come up as an access point
         WiFi.mode(WIFI_AP);
-        WiFi.softAP("tcmenu", "secret");
+        WiFi.softAP("tcmenu", "secret1234");
         serdebugF("Started up in AP mode, connect with 'tcmenu' and 'secret'");
     }
     else {
-        WiFi.begin(menuConnectivitySSID.getTextValue(), menuConnectivityPasscode.getTextValue());
         WiFi.mode(WIFI_STA);
-        serdebugF("Connecting to Wifi using settings from connectivity menu");
+        WiFi.begin(menuConnectivitySSID.getTextValue(), menuConnectivityPasscode.getTextValue());
+        serdebugF2("Connecting to Wifi using settings for ", menuConnectivitySSID.getTextValue());
     }
 
     // now monitor the wifi level every few seconds and report it in a widget.

@@ -180,6 +180,8 @@ namespace tcremote {
             if(num >= remotesAdded) return nullptr;
             return connections[num];
         }
+
+        void setHeartbeatIntervalAll(uint16_t milli);
     };
 
     /**

@@ -38,6 +38,11 @@ extern tcextras::IoaTouchScreenCalibrator touchCalibrator;
 extern WiFiServer server;
 extern ClientEthernetInitialisation ethernetInitialisation;
 
+
+extern EepromAuthenticatorManager authManager;
+
+
+
 // Any externals needed by IO expanders, EEPROMs etc
 
 
