@@ -151,7 +151,7 @@ void setupTheme() {
             .apply();
 
     themeBuilder.menuItemOverride(menuEngine)
-            .onRow(3).multiCol(1, 1)
+            .onRowCol(3, 1, 1)
             .withImage4bpp(Coord(64, 64), engineBitmap_palette0,  engineBitmap0)
             .apply();
 
