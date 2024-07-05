@@ -1,6 +1,7 @@
 .DS_Store
 .development
 .vscode
+.pio
 
 # User-specific files
 *.suo

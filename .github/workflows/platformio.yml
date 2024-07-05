@@ -1,0 +1,73 @@
+name: PlatformIO CI
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        board:
+          - megaatmega2560
+          - esp32dev
+          - esp01_1m
+          # example:
+          # Arduino32
+          # - examples/arduino32/colorTftEthernet32
+          # - examples/arduino32/dynamicMenuItems
+          # - examples/arduino32/nano33ble
+          # - examples/arduino32/picoAdafruitDashboard
+          # - examples/arduino32/picoAw9523LcdEncoder
+          # - examples/arduino32/piPicoTftTouch
+          # - examples/arduino32/stm32DuinoDemo
+          # MBED
+          # - examples/mbed/stm32EncoderLcdI2c
+          # - examples/mbed/stm32f429FrameBuffer
+          # - examples/mbed/stm32OledEncoder
+        include:
+          # AVR
+          - example: examples/avr/adafruitST7735Mega
+            board: megaatmega2560
+          - example: examples/avr/analogDfRobot
+            board: megaatmega2560
+          - example: examples/avr/analogJoystick1306Ascii
+            board: megaatmega2560
+          - example: examples/avr/keyboardEthernetShield
+            board: megaatmega2560
+          - example: examples/avr/nokia5110
+            board: megaatmega2560
+          # ESP
+          - example: examples/esp/esp32Amplifier
+            board: esp32dev
+          - example: examples/esp/esp32s2Saola
+            board: esp32dev
+          - example: examples/esp/esp32s3TftEncoder
+            board: esp32dev
+          - example: examples/esp/esp32SimHub
+            board: esp32dev
+          - example: examples/esp/esp8266WifiOled
+            board: esp01_1m
+          - example: examples/esp/espCapTouchTft
+            board: esp32dev
+          - example: examples/esp/espCapTouchTft
+            board: esp01_1m
+          - example: examples/esp/simpleU8g2
+            board: esp32dev
+          - example: examples/esp/simpleU8g2
+            board: esp01_1m
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.platformio/.cache
+          key: ${{ runner.os }}-pio
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install PlatformIO Core
+        run: pip install --upgrade platformio
+
+      - name: Build PlatformIO examples
+        run: pio ci --lib "." --project-conf=platformio.ini --environment ${{ matrix.board }} ${{ matrix.example }}
