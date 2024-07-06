@@ -6,11 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        board:
-          - megaatmega2560
-          - esp32dev
-          - esp01_1m
-          # example:
+        include:
           # Arduino32
           # - examples/arduino32/colorTftEthernet32
           # - examples/arduino32/dynamicMenuItems
@@ -23,7 +19,6 @@ jobs:
           # - examples/mbed/stm32EncoderLcdI2c
           # - examples/mbed/stm32f429FrameBuffer
           # - examples/mbed/stm32OledEncoder
-        include:
           # AVR
           - example: examples/avr/adafruitST7735Mega
             board: megaatmega2560
@@ -47,14 +42,9 @@ jobs:
           - example: examples/esp/esp8266WifiOled
             board: esp01_1m
           - example: examples/esp/espCapTouchTft
-            board: esp32dev
-          - example: examples/esp/espCapTouchTft
-            board: esp01_1m
+            board: [esp32dev, esp01_1m]
           - example: examples/esp/simpleU8g2
-            board: esp32dev
-          - example: examples/esp/simpleU8g2
-            board: esp01_1m
-
+            board: [esp32dev, esp01_1m]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/cache@v4
@@ -68,6 +58,23 @@ jobs:
           python-version: '3.12'
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
-
+      - name: Set Board Environment Variables
+        run: |
+          if [ -n "${{ matrix.board }}" ] && [ "${{ matrix.board }}" != "null" ]; then
+            BOARD_ENVS=""
+            if [ "${{ matrix.board }}" = "Array" ]; then
+              # If matrix.board is an array
+              for board in $(echo '${{ toJSON(matrix.board) }}' | jq -r '.[]'); do
+                BOARD_ENVS="$BOARD_ENVS --environment $board"
+              done
+            else
+              # If matrix.board is a single value
+              BOARD_ENVS="--environment ${{ matrix.board }}"
+            fi
+            echo "BOARD_ENVS=$BOARD_ENVS" >> $GITHUB_ENV
+          fi
+        shell: bash
       - name: Build PlatformIO examples
-        run: pio ci --lib "." --project-conf=platformio.ini --environment ${{ matrix.board }} ${{ matrix.example }}
+        run: pio ci --lib "." --project-conf=platformio.ini $BOARD_ENVS
+        env:
+          PLATFORMIO_CI_SRC: ${{ matrix.example }}
