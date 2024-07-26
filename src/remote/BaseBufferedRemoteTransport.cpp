@@ -9,8 +9,8 @@ namespace tcremote {
 
     BaseBufferedRemoteTransport::BaseBufferedRemoteTransport(BufferingMode bufferMode, uint8_t readBufferSize,
                                                              uint8_t writeBufferSize, EncryptionHandler* encHandler)
-            : TagValueTransport(TVAL_BUFFERED), writeBufferSize(writeBufferSize),
-              readBufferSize(readBufferSize), writeBufferPos(0), readBufferPos(0), encryptionBufferPos(0), readBufferAvail(0),
+            : TagValueTransport(TVAL_BUFFERED), writeBufferSize(writeBufferSize), readBufferSize(readBufferSize),
+              encryptionBuffer(nullptr), writeBufferPos(0), readBufferPos(0), encryptionBufferPos(0), readBufferAvail(0),
               encryptionHandler(encHandler), mode(bufferMode),
               ticksSinceWrite(0) {
         if(mode != BUFFER_ONE_MESSAGE && encHandler != nullptr) {
@@ -19,7 +19,9 @@ namespace tcremote {
         }
         readBuffer = new uint8_t[readBufferSize];
         writeBuffer = new uint8_t[writeBufferSize];
-        encryptionBuffer = new uint8_t[readBufferSize];
+        if(encHandler != nullptr) {
+            encryptionBuffer = new uint8_t[readBufferSize];
+        }
     }
 
     BaseBufferedRemoteTransport::~BaseBufferedRemoteTransport() {

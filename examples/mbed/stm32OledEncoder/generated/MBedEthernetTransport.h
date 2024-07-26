@@ -31,7 +31,7 @@ namespace tcremote {
         InternetSocket* socket;
         bool isOpen;
     public:
-        MBedEthernetTransport() : BaseBufferedRemoteTransport(BUFFER_MESSAGES_TILL_FULL, 96, 250) {
+        MBedEthernetTransport(EncryptionHandler* encHandler) : BaseBufferedRemoteTransport(BUFFER_ONE_MESSAGE, 250, 250, encHandler) {
             this->socket = nullptr;
             isOpen = false;
         }

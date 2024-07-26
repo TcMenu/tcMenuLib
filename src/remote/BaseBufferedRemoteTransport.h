@@ -27,14 +27,15 @@ namespace tcremote {
     class EncryptionHandler {
     public:
         /**
-         * Encrypt plain text data into encrypted format into the buffer
+         * Encrypt plain text data into encrypted format into the buffer. Do note that plainText must be a mutable
+         * buffer and must be a multiple of 16 bytes
          * @param plainText the plain bytes to encrypt
          * @param bytesIn the number of bytes to encrypt
          * @param buffer the output encrypted message
          * @param buffLen the buffer maximum length
          * @return the number of bytes encrypted or 0 if it fails.
          */
-        virtual int encryptData(const uint8_t *plainText, int bytesIn, const uint8_t *buffer, size_t buffLen) = 0;
+        virtual int encryptData(uint8_t *plainText, int bytesIn, uint8_t *buffer, size_t buffLen) = 0;
         /**
          * Decrypt data from the wire into plain text and store the output into the buffer
          * @param encoded the encoded data to decrypt
@@ -43,7 +44,7 @@ namespace tcremote {
          * @param buffLen the size of the buffer
          * @return the number of bytes returned, or 0 if it fails.
          */
-        virtual int decryptData(const uint8_t *encoded, int bytesIn, const uint8_t *buffer, size_t buffLen) = 0;
+        virtual int decryptData(const uint8_t *encoded, int bytesIn, uint8_t *buffer, size_t buffLen) = 0;
     };
 
 

@@ -12,7 +12,15 @@
 #include "stm32OledEncoder_menu.h"
 #include "../ThemeMonoInverse.h"
 
+
+#include "MbedTlsEncryptionHandler.h"
+
 // Global variable declarations
+
+uint8_t keyData[] = { 0x13, 0x87, 0x6f, 0x1e, 0x3b, 0x66, 0xb6, 0xe2, 0xd5, 0xfc, 0x48, 0xf3, 0xea, 0xba, 0x5d, 0xc9, 0x57, 0x1a, 0x24, 0x3d, 0xbd, 0x3c, 0x8b, 0xf8, 0x61, 0x4f, 0x46, 0x9f, 0xb1, 0x6d, 0xa0, 0x51};
+
+MbedTlsEncryptionHandler encryptionHandler(keyData);
+
 const  ConnectorLocalInfo applicationInfo = { "Demo mbed", "f5325e26-a7f6-40ff-876e-47afa06df532" };
 TcMenuRemoteServer remoteServer(applicationInfo);
 HalStm32EepromAbstraction glBspRom;
@@ -21,7 +29,7 @@ Adafruit_SSD1306_Spi gfx(spi, PD_15, PF_12, PF_13, 64, 128, SSD_1306);
 AdafruitDrawable gfxDrawable(&gfx);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 MbedEthernetInitialiser mbedEthInitialisation(3333);
-MBedEthernetTransport ethernetTransport;
+MBedEthernetTransport ethernetTransport(&encryptionHandler);
 TagValueRemoteServerConnection ethernetConnection(ethernetTransport, mbedEthInitialisation);
 
 // Global Menu Item declarations
@@ -98,6 +106,21 @@ void setupMenu() {
     renderer.setTitleMode(BaseGraphicalRenderer::TITLE_ALWAYS);
     renderer.setUseSliderForAnalog(false);
     installMonoInverseTitleTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(nullptr, 1), true);
+
+    encryptionHandler.initialise();
+
+    char data[64] = {0};
+    uint8_t encrypted[64] = {0};
+
+    strcpy(data, "hello world this is text.");
+    serlogF2(SER_DEBUG, "Source: ", data);
+
+    auto dataLen = encryptionHandler.encryptData((uint8_t*)data, strlen(data), encrypted, sizeof encrypted);
+    serlogHexDump(SER_DEBUG, "encrypted: ", encrypted , 60);
+
+    encryptionHandler.decryptData(encrypted, dataLen, (uint8_t*)data, sizeof data);
+    serlogHexDump(SER_DEBUG, "plaintext: ", data, 60);
+    serlogF2(SER_DEBUG, "pt out: ", data);
 
     // We have an IoT monitor, register the server
     menuIoTMonitor.setRemoteServer(remoteServer);
