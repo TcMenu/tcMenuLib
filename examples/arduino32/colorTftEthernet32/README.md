@@ -9,7 +9,7 @@
 
 Out of the box this is built for an MKR board with an I2C 8574 expander and an I2C EEPROM also attached. For simplicity it does not use DHCP to configure the network interface. Just change the address to one within your networks range.
 
-In order to connect using the Java API there are two possibilities, either use the connector UI that's shipped with TcMenu, or work with the tcMenu API directly. See [https://github.com/davetcc/tcMenu]. We'll be building out the API in other languages over time, but you can also write directly to the
+In order to connect using the Java API there are two possibilities, either use the connector UI that's shipped with TcMenu, or work with the tcMenu API directly. See [https://github.com/TcMenu/tcMenu]. We'll be building out the API in other languages over time, but you can also write directly to the
 protocol, which is very simple.
 
 The files in this example are as follows:

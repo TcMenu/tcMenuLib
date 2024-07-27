@@ -10,7 +10,7 @@
 This example is built for the ESP device. However, with a few changes it could probably be used for other boards. Although you'd be better off starting
 with a more appropriate example for your hardware.
 
-In order to connect using the Java API there are two possibilities, either use the connector UI that's shipped with TcMenu, or work with the tcMenu API directly. See [https://github.com/davetcc/tcMenu]. We'll be building out the API in other languages over time, but you can also write directly to the
+In order to connect using the Java API there are two possibilities, either use the connector UI that's shipped with TcMenu, or work with the tcMenu API directly. See [https://github.com/TcMenu/tcMenu]. We'll be building out the API in other languages over time, but you can also write directly to the
 protocol, which is very simple.
 
 The authentication on this version is using the EEPROM based authenticator. This stores a number of keys in the EEPROM. However, its using the flash

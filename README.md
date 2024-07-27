@@ -1,9 +1,9 @@
 # TcMenu library for Arduino and mbed.
-[![PlatformIO](https://github.com/davetcc/tcMenuLib/actions/workflows/platformio.yml/badge.svg)](https://github.com/davetcc/tcMenuLib/actions/workflows/platformio.yml)
-[![License: Apache 2.0](https://img.shields.io/badge/license-Apache--2.0-green.svg)](https://github.com/davetcc/tcMenuLib/blob/master/LICENSE)
-[![GitHub release](https://img.shields.io/github/release/davetcc/tcMenuLib.svg?maxAge=3600)](https://github.com/davetcc/tcMenuLib/releases)
+[![PlatformIO](https://github.com/TcMenu/tcMenuLib/actions/workflows/platformio.yml/badge.svg)](https://github.com/TcMenu/tcMenuLib/actions/workflows/platformio.yml)
+[![License: Apache 2.0](https://img.shields.io/badge/license-Apache--2.0-green.svg)](https://github.com/TcMenu/tcMenuLib/blob/main/LICENSE)
+[![GitHub release](https://img.shields.io/github/release/TcMenu/tcMenuLib.svg?maxAge=3600)](https://github.com/TcMenu/tcMenuLib/releases)
 [![davetcc](https://img.shields.io/badge/davetcc-dev-blue.svg)](https://github.com/davetcc)
-[![JSC electronics](https://img.shields.io/badge/JSC-electronics-green.svg)](https://github.com/jsc-electronics)
+[![JSC TechMinds](https://img.shields.io/badge/JSC-TechMinds-green.svg)](https://www.jsctm.cz)
 
 ## Summary
 
@@ -17,7 +17,7 @@ In any fork, please ensure all text up to here is left unaltered.
 
 Menu designs are built using a designer UI and then generated for the platform. Target platform is anything from Arduino Uno upward to ST32F4 boards and beyond. Tested on many Arduino and mbed boards including Uno, Mega2560, SAMD, Nano, STM32F4 and ESP8266/ESP32 boards. Note that this repository contains just the Arduino/mbed library to meet the requirements in the Arduino specification. For the main repository see the links below. See the list of [Arduino and mbed library and board configurations we test with](https://www.thecoderscorner.com/products/arduino-libraries/)
 
-* [TcMenu main repo](https://github.com/davetcc/tcMenu)
+* [TcMenu main repo](https://github.com/TcMenu/tcMenu)
 * [TcMenu main page at TheCodersCorner website](https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/)
 
 ## Arduino Library Installation
@@ -36,7 +36,7 @@ Install the [tcMenu library dependency](https://platformio.org/lib/show/7316/tcM
 
 For designing menu structures we recommend using the TcMenu Designer which can design your menu in a round trip way, generate the code including the correct plugins for your hardware setup. There is a Linux package, notarized version for macOS, and a Windows Installer with an extended validation certificate. 
 
-All releases are available from: [https://github.com/davetcc/tcMenu/releases]
+All releases are available from: [https://github.com/TcMenu/tcMenu/releases]
 
 ### Controlling menu items remotely
 
@@ -51,10 +51,10 @@ If you are manually using tcMenu, without the designer, this page fully document
 
 ## Asking questions
 
-TheCodersCorner.com invest a lot of time and resources into making this open source product which is used by literally thousands of users. We offer both [commercial support](https://www.thecoderscorner.com/support-services/training-support/) and [C++/Java/Dart consultancy](https://www.thecoderscorner.com/support-services/consultancy/), or if you just want to say thanks, you can also make a donation via [GitHub](https://github.com/davetcc/tcMenu) or use the link below. 
+TheCodersCorner.com invest a lot of time and resources into making this open source product which is used by literally thousands of users. We offer both [commercial support](https://www.thecoderscorner.com/support-services/training-support/) and [C++/Java/Dart consultancy](https://www.thecoderscorner.com/support-services/consultancy/), or if you just want to say thanks, you can also make a donation via [GitHub](https://github.com/TcMenu/tcMenu) or use the link below. 
 
 <a href="https://www.buymeacoffee.com/davetcc" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
-* [discussions section of the tcMenu repo](https://github.com/davetcc/tcMenu/discussions) of tcmenu git repo
+* [discussions section of the tcMenu repo](https://github.com/TcMenu/tcMenu/discussions) of tcmenu git repo
 * [Arduino discussion forum](https://forum.arduino.cc/) where questions can be asked, please tag me using `@davetcc`.
 * [Legacy discussion forum probably to be made read only soon](https://www.thecoderscorner.com/jforum/).

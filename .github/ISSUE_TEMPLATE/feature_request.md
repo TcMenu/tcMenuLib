@@ -11,7 +11,7 @@ assignees: ''
 A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
 
 **Confirm that the bug is in the embedded library**
-If the bug is in the designer, or you are not sure, raise in the main [tcMenu repo](https://github.com/davetcc/tcMenu).
+If the bug is in the designer, or you are not sure, raise in the main [tcMenu repo](https://github.com/TcMenu/tcMenu).
 
 **Describe the solution you'd like**
 A clear and concise description of what you want to happen.
