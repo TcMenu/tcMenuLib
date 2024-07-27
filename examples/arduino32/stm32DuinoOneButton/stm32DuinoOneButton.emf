@@ -1,0 +1,252 @@
+{
+  "version": "1.00",
+  "projectName": "Example One Button Menu",
+  "author": "dave",
+  "items": [
+    {
+      "parentId": 0,
+      "type": "actionMenu",
+      "item": {
+        "name": "Press Me",
+        "variableName": "PressMe",
+        "id": 19,
+        "eepromAddress": -1,
+        "functionName": "onPressMe",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "defaultValue": "0",
+      "item": {
+        "maxValue": 100,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "%",
+        "step": 1,
+        "name": "Temp",
+        "variableName": "Temp",
+        "id": 20,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "Settings",
+        "variableName": "Settings",
+        "id": 21,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 21,
+      "type": "boolItem",
+      "defaultValue": "false",
+      "item": {
+        "naming": "TRUE_FALSE",
+        "name": "Option",
+        "variableName": "SettingsOption",
+        "id": 22,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 21,
+      "type": "analogItem",
+      "defaultValue": "0",
+      "item": {
+        "maxValue": 10,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "A",
+        "step": 1,
+        "name": "IntProp",
+        "variableName": "SettingsIntProp",
+        "id": 23,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 21,
+      "type": "enumItem",
+      "defaultValue": "0",
+      "item": {
+        "enumEntries": [
+          "Item1",
+          "Item2",
+          "Item3"
+        ],
+        "name": "EnumProp",
+        "variableName": "SettingsEnumProp",
+        "id": 24,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    }
+  ],
+  "codeOptions": {
+    "embeddedPlatform": "STM32DUINO",
+    "lastDisplayUuid": "fd998437-c4b2-4386-ba88-d0ae7c20620b",
+    "lastInputUuid": "4F92CBC0-D13A-4090-9B86-C1952FE42D9B",
+    "lastRemoteUuids": [
+      "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
+    ],
+    "lastThemeUuid": "0dd60ceb-7e0f-46e2-8d40-b264eb3aa7e0",
+    "applicationUUID": "4fe6e85d-2bbd-4d19-84e5-5d6746883028",
+    "applicationName": "One Button",
+    "lastProperties": [
+      {
+        "name": "DISPLAY_VARIABLE",
+        "latestValue": "gfx",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_TYPE",
+        "latestValue": "U8G2_SSD1306_128X64_NONAME_F_4W_HW_SPI",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_ROTATION",
+        "latestValue": "U8G2_R0",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CLOCK_PIN",
+        "latestValue": "U8X8_PIN_NONE",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_DATA_PIN",
+        "latestValue": "U8X8_PIN_NONE",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_RESET_PIN",
+        "latestValue": "PF12",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CS_PIN",
+        "latestValue": "PF13",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_RS_PIN",
+        "latestValue": "PD15",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "UPDATES_PER_SEC",
+        "latestValue": "5",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "YIELDING_WIRE_CB",
+        "latestValue": "false",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "USE_UTF8_SUPPORT",
+        "latestValue": "false",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "SW_POLLING_MODE",
+        "latestValue": "SWITCHES_POLL_EVERYTHING",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SWITCH_IODEVICE",
+        "latestValue": "devicePins",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "BUTTON_PIN",
+        "latestValue": "USER_BTN",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "PULLUP_LOGIC",
+        "latestValue": "false",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "DOUBLE_CLICK_THRESHOLD",
+        "latestValue": "250",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ITEM_FONT",
+        "latestValue": "ada:OpenSansRegular8pt,0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_FONT",
+        "latestValue": "ada:OpenSansRegular8pt,0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_HEADER_PADDING",
+        "latestValue": "1",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_TO_ITEM_SPACING",
+        "latestValue": "0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_SHOW_MODE",
+        "latestValue": "NO_TITLE",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "USE_TC_UNICODE",
+        "latestValue": "true",
+        "subsystem": "THEME"
+      }
+    ],
+    "namingRecursive": true,
+    "useCppMain": false,
+    "saveLocation": "PROJECT_TO_CURRENT_WITH_GENERATED",
+    "usingSizedEEPROMStorage": false,
+    "eepromDefinition": "bsp:0",
+    "authenticatorDefinition": "rom:150:4",
+    "projectIoExpanders": [
+      "deviceIO:"
+    ],
+    "menuInMenuCollection": {
+      "menuDefinitions": []
+    },
+    "packageNamespace": "",
+    "appIsModular": false,
+    "listOfEmbeddedForms": []
+  },
+  "stringLists": []
+}
