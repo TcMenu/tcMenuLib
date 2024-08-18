@@ -1,7 +1,8 @@
 #include <unity.h>
 #include <tcMenu.h>
-#include "../tutils/tcMenuFixtures.h"
 #include "../tutils/fixtures_extern.h"
+#include "../tutils/tcMenuFixturesExtra.h"
+#include <tcm_test/testFixtures.h>
 
 // core tests
 void testTcUtilGetParentAndVisit();

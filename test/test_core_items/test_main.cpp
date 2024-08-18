@@ -1,7 +1,8 @@
 #include <unity.h>
 #include <tcMenu.h>
 #include "../tutils/fixtures_extern.h"
-#include "../tutils/tcMenuFixtures.h"
+#include <tcm_test/testFixtures.h>
+#include "../tutils/tcMenuFixturesExtra.h"
 
 // core menu item tests
 void testIpAddressItem();

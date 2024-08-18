@@ -1,9 +1,10 @@
 #include <unity.h>
 #include <tcMenu.h>
 #include "../tutils/fixtures_extern.h"
-#include "../tutils/tcMenuFixtures.h"
+#include "../tutils/tcMenuFixturesExtra.h"
 #include "baseDialogTests.h"
 #include "CoreRendererTests.h"
+#include <tcm_test/testFixtures.h>
 
 void setup() {
     menuMgr.initWithoutInput(&noRenderer, &menuVolume);
@@ -30,3 +31,32 @@ void setup() {
 
 void loop() {
 }
+
+bool renderActivateCalled = false;
+
+int testBasicRuntimeFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
+    switch (mode) {
+        case RENDERFN_NAME: {
+            if (row < 10) {
+                strcpy(buffer, "name");
+                fastltoa(buffer, row, 3, NOT_PADDED, bufferSize);
+            }
+            else {
+                strcpy(buffer, "hello");
+            }
+            break;
+        }
+        case RENDERFN_VALUE:
+            ltoaClrBuff(buffer, row, row, NOT_PADDED, bufferSize);
+            break;
+        case RENDERFN_EEPROM_POS:
+            return 44;
+        case RENDERFN_INVOKE:
+            renderActivateCalled = true;
+            break;
+        default: break;
+    }
+    return true;
+}
+
+NoRenderer noRenderer;

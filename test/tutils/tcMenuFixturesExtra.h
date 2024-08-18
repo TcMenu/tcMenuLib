@@ -1,5 +1,5 @@
-#ifndef _TCMENU_FIXTURES_H_
-#define _TCMENU_FIXTURES_H_
+#ifndef _TCMENU_FIXTURES_LOCAL_H_
+#define _TCMENU_FIXTURES_LOCAL_H_
 
 #include "tcUtil.h"
 #include "MenuItems.h"
