@@ -2,22 +2,8 @@
 #include <tcMenu.h>
 #include "../tutils/fixtures_extern.h"
 #include "../tutils/tcMenuFixtures.h"
-
-// dialog tests
-void testBaseDialogInfo();
-void testBaseDialogQuestion();
-
-// core renderer tests
-void testEmptyItemPropertiesFactory();
-void testDefaultItemPropertiesFactory();
-void testSubAndItemSelectionPropertiesFactory();
-void testIconStorageAndRetrival();
-void testGridPositionStorageAndRetrival();
-void testWidgetFunctionality();
-void testBaseRendererWithDefaults();
-void testScrollingWithMoreThanOneItemOnRow();
-void testTakeOverDisplay();
-void testListRendering();
+#include "baseDialogTests.h"
+#include "CoreRendererTests.h"
 
 void setup() {
     menuMgr.initWithoutInput(&noRenderer, &menuVolume);
