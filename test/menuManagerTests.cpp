@@ -1,5 +1,5 @@
 
-#include <testing/SimpleTest.h>
+#include <unity.h>
 #include <MockIoAbstraction.h>
 #include <BaseRenderers.h>
 #include <MockEepromAbstraction.h>
@@ -12,7 +12,7 @@ extern MockEepromAbstraction eeprom;
 
 const char szCompareData[] = "123456789";
 
-test(saveAndLoadFromMenuSized) {
+void testSaveAndLoadFromMenuSized() {
     switches.initialise(&mockIo, true);
     setSizeBasedEEPROMStorageEnabled(true);
     menuMgr.initForUpDownOk(&noRenderer, &textMenuItem1, 0, 1, 2);
@@ -32,29 +32,29 @@ test(saveAndLoadFromMenuSized) {
     menuMgr.load(eeprom);
 
     // now check the values we've loaded back from eeprom.
-    assertEquals((int)menuAnalog2.getCurrentValue(), 8);
-    assertEquals((int)menuEnum1.getCurrentValue(), 2);
-    assertTrue(boolItem1.getBoolean());
+    TEST_ASSERT_EQUAL((int)menuAnalog2.getCurrentValue(), 8);
+    TEST_ASSERT_EQUAL((int)menuEnum1.getCurrentValue(), 2);
+    TEST_ASSERT_TRUE(boolItem1.getBoolean());
     // these items exceed position 8 in the rom and wont load
-    assertEquals((int)menuAnalog.getCurrentValue(), 0);
-    assertEquals((int)menuSubAnalog.getCurrentValue(), 0);
+    TEST_ASSERT_EQUAL((int)menuAnalog.getCurrentValue(), 0);
+    TEST_ASSERT_EQUAL((int)menuSubAnalog.getCurrentValue(), 0);
 
     menuSubAnalog.setCurrentValue(42);
 
     // save and then make sure the header is right
     menuMgr.save(eeprom);
-    assertEquals(uint16_t(0xfade), eeprom.read16(0));
-    assertEquals(uint16_t(34), eeprom.read16(2));
+    TEST_ASSERT_EQUAL(uint16_t(0xfade), eeprom.read16(0));
+    TEST_ASSERT_EQUAL(uint16_t(34), eeprom.read16(2));
 
     // and now the values
-    assertEquals(eeprom.read16(20), (uint16_t)42);
-    assertEquals(eeprom.read16(4), (uint16_t)8);
-    assertEquals(eeprom.read16(6), (uint16_t)2);
-    assertEquals(eeprom.read8(8), (uint8_t)1);
+    TEST_ASSERT_EQUAL(eeprom.read16(20), (uint16_t)42);
+    TEST_ASSERT_EQUAL(eeprom.read16(4), (uint16_t)8);
+    TEST_ASSERT_EQUAL(eeprom.read16(6), (uint16_t)2);
+    TEST_ASSERT_EQUAL(eeprom.read8(8), (uint8_t)1);
     switches.resetAllSwitches();
 }
 
-test(saveAndLoadFromMenuUnsized) {
+void testSaveAndLoadFromMenuUnsized() {
     // initialise the menu manager and switches with basic configuration
     switches.initialise(&mockIo, true);
     setSizeBasedEEPROMStorageEnabled(false);
@@ -76,41 +76,41 @@ test(saveAndLoadFromMenuUnsized) {
 	menuMgr.load(eeprom);
 
     // now check the values we've loaded back from eeprom.
-    assertEquals((int)menuAnalog.getCurrentValue(), 100);
-    assertEquals((int)menuAnalog2.getCurrentValue(), 8);
-    assertEquals((int)menuSubAnalog.getCurrentValue(), 50);
-    assertEquals((int)menuEnum1.getCurrentValue(), 2);
-    assertEquals((int)boolItem1.getBoolean(), 1);
-	assertEquals(uint8_t(10), textMenuItem1.textLength());
-	assertEquals(szCompareData, textMenuItem1.getTextValue());
+    TEST_ASSERT_EQUAL((int)menuAnalog.getCurrentValue(), 100);
+    TEST_ASSERT_EQUAL((int)menuAnalog2.getCurrentValue(), 8);
+    TEST_ASSERT_EQUAL((int)menuSubAnalog.getCurrentValue(), 50);
+    TEST_ASSERT_EQUAL((int)menuEnum1.getCurrentValue(), 2);
+    TEST_ASSERT_EQUAL((int)boolItem1.getBoolean(), 1);
+	TEST_ASSERT_EQUAL(uint8_t(10), textMenuItem1.textLength());
+	TEST_ASSERT_EQUAL(szCompareData, textMenuItem1.getTextValue());
 	
 	char sz[20];
 	menuIpAddr.copyValue(sz, sizeof(sz));
-	assertEquals("192.168.90.88", sz);
+	TEST_ASSERT_EQUAL("192.168.90.88", sz);
 
     // clear out the eeprom and then save the present structure.
     eeprom.reset();
     menuMgr.save(eeprom);
 
     // now compare back from eeprom what we saved.
-    assertEquals(eeprom.read16(0), (uint16_t)0xfade);
-    assertEquals(eeprom.read16(34), (uint16_t)100);
-    assertEquals(eeprom.read16(20), (uint16_t)50);
-    assertEquals(eeprom.read16(4), (uint16_t)8);
-    assertEquals(eeprom.read16(6), (uint16_t)2);
-    assertEquals(eeprom.read8(8), (uint8_t)1);
+    TEST_ASSERT_EQUAL(eeprom.read16(0), (uint16_t)0xfade);
+    TEST_ASSERT_EQUAL(eeprom.read16(34), (uint16_t)100);
+    TEST_ASSERT_EQUAL(eeprom.read16(20), (uint16_t)50);
+    TEST_ASSERT_EQUAL(eeprom.read16(4), (uint16_t)8);
+    TEST_ASSERT_EQUAL(eeprom.read16(6), (uint16_t)2);
+    TEST_ASSERT_EQUAL(eeprom.read8(8), (uint8_t)1);
     
     eeprom.readIntoMemArray((uint8_t*)sz, 9, 10);
     sz[9]=0;
-    assertEquals(szCompareData, sz);
+    TEST_ASSERT_EQUAL(szCompareData, sz);
 
-	assertEquals(eeprom.read8(22), (uint8_t)192);
-	assertEquals(eeprom.read8(23), (uint8_t)168);
-	assertEquals(eeprom.read8(24), (uint8_t)90);
-	assertEquals(eeprom.read8(25), (uint8_t)88);
+	TEST_ASSERT_EQUAL(eeprom.read8(22), (uint8_t)192);
+	TEST_ASSERT_EQUAL(eeprom.read8(23), (uint8_t)168);
+	TEST_ASSERT_EQUAL(eeprom.read8(24), (uint8_t)90);
+	TEST_ASSERT_EQUAL(eeprom.read8(25), (uint8_t)88);
 
     // lastly make sure there were no errors in eeprom.
-    assertFalse(eeprom.hasErrorOccurred());
+    TEST_ASSERT_FALSE(eeprom.hasErrorOccurred());
     switches.resetAllSwitches();
 }
 
@@ -163,7 +163,7 @@ ActionMenuItem testActionItem(&testActionInfo, nullptr);
 const PROGMEM AnyMenuInfo testActionInfo2 = { "ActTest", 2394, 0xffff,  0, NO_CALLBACK };
 ActionMenuItem testActionItem2(&testActionInfo2, nullptr);
 
-test(addingItemsAndMenuCallbacks) {
+void testAddingItemsAndMenuCallbacks() {
     menuMgr.resetObservers();
     TestCapturingRenderer testRenderer(320, 200, true, "hello");
     menuMgr.setRootMenu(&textMenuItem1);
@@ -173,13 +173,13 @@ test(addingItemsAndMenuCallbacks) {
 
     // first we add some menu items at the end of the menu and test the structure change call is made
     menuMgr.addMenuAfter(&menuNumTwoDp, &testActionItem, true);
-    assertFalse(menuMgrObserver.didTriggerStructure());
+    TEST_ASSERT_FALSE(menuMgrObserver.didTriggerStructure());
     menuMgr.addMenuAfter(&menuNumTwoDp, &testActionItem2);
-    assertTrue(menuMgrObserver.didTriggerStructure());
+    TEST_ASSERT_TRUE(menuMgrObserver.didTriggerStructure());
 
-    assertEquals(&testActionItem2, menuNumTwoDp.getNext());
-    assertEquals(&testActionItem, testActionItem2.getNext());
-    assertTrue(testActionItem.getNext() == nullptr);
+    TEST_ASSERT_EQUAL(&testActionItem2, menuNumTwoDp.getNext());
+    TEST_ASSERT_EQUAL(&testActionItem, testActionItem2.getNext());
+    TEST_ASSERT_TRUE(testActionItem.getNext() == nullptr);
 
     // put back as it was before.
     menuNumTwoDp.setNext(nullptr);
@@ -191,39 +191,39 @@ test(addingItemsAndMenuCallbacks) {
     menuMgr.valueChanged(2); // boolItem1
     menuMgr.onMenuSelect(false);
 
-    assertTrue(menuMgrObserver.didTriggerEndEdit());
-    assertTrue(menuMgrObserver.didOriginalCommitTrigger());
-    assertTrue(menuMgrObserver.didTriggerStartEdit());
-    assertTrue(boolItem1.getBoolean() != currentMenuValue);
+    TEST_ASSERT_TRUE(menuMgrObserver.didTriggerEndEdit());
+    TEST_ASSERT_TRUE(menuMgrObserver.didOriginalCommitTrigger());
+    TEST_ASSERT_TRUE(menuMgrObserver.didTriggerStartEdit());
+    TEST_ASSERT_TRUE(boolItem1.getBoolean() != currentMenuValue);
 
     // and now we test that when we return false in the start edit callback, we do not start editing.
     menuMgrObserver.reset();
     menuMgrObserver.setStartReturn(false);
     menuMgr.onMenuSelect(false);
-    assertTrue(menuMgrObserver.didTriggerStartEdit());
-    assertFalse(menuMgrObserver.didTriggerEndEdit());
-    assertTrue(boolItem1.getBoolean() != currentMenuValue);
+    TEST_ASSERT_TRUE(menuMgrObserver.didTriggerStartEdit());
+    TEST_ASSERT_FALSE(menuMgrObserver.didTriggerEndEdit());
+    TEST_ASSERT_TRUE(boolItem1.getBoolean() != currentMenuValue);
 
     // now we move on to test an enum (integer) item and ensure we get the edit callbacks.
     menuMgrObserver.reset();
     menuMgrObserver.setStartReturn(true);
     menuMgr.valueChanged(3); //  select menuEnum1
     menuMgr.onMenuSelect(false); // start edit
-    assertTrue(menuMgrObserver.didTriggerStartEdit());
-    assertTrue(&menuEnum1 == menuMgr.getCurrentEditor());
+    TEST_ASSERT_TRUE(menuMgrObserver.didTriggerStartEdit());
+    TEST_ASSERT_TRUE(&menuEnum1 == menuMgr.getCurrentEditor());
 
     menuMgr.valueChanged(1); // we are now editing, change the actual enum
     menuMgr.onMenuSelect(false); // stop editing
-    assertTrue(menuMgrObserver.didTriggerEndEdit());
-    assertTrue(menuMgrObserver.didOriginalCommitTrigger());
-    assertEquals((uint16_t)1, menuEnum1.getCurrentValue());
+    TEST_ASSERT_TRUE(menuMgrObserver.didTriggerEndEdit());
+    TEST_ASSERT_TRUE(menuMgrObserver.didOriginalCommitTrigger());
+    TEST_ASSERT_EQUAL((uint16_t)1, menuEnum1.getCurrentValue());
 
     // lastly try an enum item that does not go into editing because the callback returned false.
     menuMgrObserver.reset();
     menuMgrObserver.setStartReturn(false);
     menuMgr.valueChanged(3); // menuEnum1
     menuMgr.onMenuSelect(false);
-    assertTrue(menuMgrObserver.didTriggerStartEdit());
-    assertTrue(&menuEnum1 == menuMgr.getCurrentEditor());
+    TEST_ASSERT_TRUE(menuMgrObserver.didTriggerStartEdit());
+    TEST_ASSERT_TRUE(&menuEnum1 == menuMgr.getCurrentEditor());
 }
 

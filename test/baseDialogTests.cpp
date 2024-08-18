@@ -1,10 +1,6 @@
-#ifndef BASE_DIALOG_TESTS_H
-#define BASE_DIALOG_TESTS_H
-
-#include <testing/SimpleTest.h>
+#include <unity.h>
 #include <tcMenu.h>
 #include <BaseDialog.h>
-#include <RemoteTypes.h>
 #include <RemoteConnector.h>
 
 //
@@ -49,7 +45,7 @@ void dialogTestCallback(ButtonType buttonPressed, void* yourData) {
 	copyOfUserData = yourData;
 }
 
-test(testBaseDialogInfo) {
+void testBaseDialogInfo() {
     switches.resetAllSwitches();
 	NoRenderer noRenderer;
 	DialogTestImpl dialog(true);
@@ -58,75 +54,74 @@ test(testBaseDialogInfo) {
 	dialog.copyIntoBuffer("Blah blah");
 
 	// should be inuse when shown
-	assertTrue(dialog.isInUse());
+	TEST_ASSERT_TRUE(dialog.isInUse());
 
 	// when not a remote dialog, should never be remotely sent
-	assertFalse(dialog.isRemoteUpdateNeeded(0));
-	assertFalse(dialog.isRemoteUpdateNeeded(1));
-	assertFalse(dialog.isRemoteUpdateNeeded(2));
+	TEST_ASSERT_FALSE(dialog.isRemoteUpdateNeeded(0));
+	TEST_ASSERT_FALSE(dialog.isRemoteUpdateNeeded(1));
+	TEST_ASSERT_FALSE(dialog.isRemoteUpdateNeeded(2));
 	dialog.setRemoteUpdateNeeded(1, true);
-	assertFalse(dialog.isRemoteUpdateNeeded(1));
+	TEST_ASSERT_FALSE(dialog.isRemoteUpdateNeeded(1));
 
 	// now try the rendering
 	dialog.reset();
 	dialog.dialogRendering(0, false);
-	assertEquals(1, dialog.getRenderCount());
-	assertEquals(0, dialog.getValueWhenRenderered());
-	assertStringEquals("Blah blah", MenuRenderer::getInstance()->getBuffer());
-	assertStringEquals("CLOSE", dialog.getButtonText(1));
+	TEST_ASSERT_EQUAL(1, dialog.getRenderCount());
+	TEST_ASSERT_EQUAL(0, dialog.getValueWhenRenderered());
+	TEST_ASSERT_EQUAL_STRING("Blah blah", MenuRenderer::getInstance()->getBuffer());
+    TEST_ASSERT_EQUAL_STRING("CLOSE", dialog.getButtonText(1));
 
 	// and dismiss it by the button being clicked.
 	dialog.dialogRendering(0, true);
-	assertFalse(dialog.isInUse());
+	TEST_ASSERT_FALSE(dialog.isInUse());
 }
 
-test(testBaseDialogQuestion) {
+void testBaseDialogQuestion() {
 	NoRenderer noRenderer;
 	DialogTestImpl dialog(false);
 	dialog.setUserData((void*)myHeader);
 	dialog.setButtons(BTNTYPE_OK, BTNTYPE_CANCEL);
 	dialog.show(myHeader, true, dialogTestCallback); // can send remote, has callback.
 	dialog.copyIntoBuffer("buffer text");
-	assertTrue(dialog.isInUse());
+	TEST_ASSERT_TRUE(dialog.isInUse());
 
 	// check that the buffer is copied and it will need a remote send.
-	assertStringEquals("buffer text         ", MenuRenderer::getInstance()->getBuffer());
-	assertTrue(dialog.isRemoteUpdateNeeded(0));
-	assertTrue(dialog.isRemoteUpdateNeeded(1));
-	assertTrue(dialog.isRemoteUpdateNeeded(2));
+	TEST_ASSERT_EQUAL_STRING("buffer text         ", MenuRenderer::getInstance()->getBuffer());
+	TEST_ASSERT_TRUE(dialog.isRemoteUpdateNeeded(0));
+	TEST_ASSERT_TRUE(dialog.isRemoteUpdateNeeded(1));
+	TEST_ASSERT_TRUE(dialog.isRemoteUpdateNeeded(2));
 
 	// clear only one remote send and check.
 	dialog.setRemoteUpdateNeeded(1, false);
-	assertTrue(dialog.isRemoteUpdateNeeded(0));
-	assertFalse(dialog.isRemoteUpdateNeeded(1));
-	assertTrue(dialog.isRemoteUpdateNeeded(2));
+	TEST_ASSERT_TRUE(dialog.isRemoteUpdateNeeded(0));
+	TEST_ASSERT_FALSE(dialog.isRemoteUpdateNeeded(1));
+	TEST_ASSERT_TRUE(dialog.isRemoteUpdateNeeded(2));
 
 	// reset the text and ensure it requires remote send again
 	dialog.copyIntoBuffer("newText");
-	assertTrue(dialog.isRemoteUpdateNeeded(1));
+	TEST_ASSERT_TRUE(dialog.isRemoteUpdateNeeded(1));
 
 	// now simualte render
 	dialog.reset();
 	dialog.dialogRendering(0, false);
-	assertEquals(1, dialog.getRenderCount());
-	assertEquals(0, dialog.getValueWhenRenderered());
-	assertStringEquals("newText             ", MenuRenderer::getInstance()->getBuffer());
-	assertStringEquals("OK", dialog.getButtonText(0));
-	assertStringEquals("cancel", dialog.getButtonText(1));
+	TEST_ASSERT_EQUAL(1, dialog.getRenderCount());
+	TEST_ASSERT_EQUAL(0, dialog.getValueWhenRenderered());
+	TEST_ASSERT_EQUAL_STRING("newText             ", MenuRenderer::getInstance()->getBuffer());
+    TEST_ASSERT_EQUAL_STRING("OK", dialog.getButtonText(0));
+    TEST_ASSERT_EQUAL_STRING("cancel", dialog.getButtonText(1));
 
 	// and again, this time choose 2nd button.
 	dialog.dialogRendering(1, false);
-	assertEquals(2, dialog.getRenderCount());
-	assertStringEquals("ok", dialog.getButtonText(0));
-	assertStringEquals("CANCEL", dialog.getButtonText(1));
+	TEST_ASSERT_EQUAL(2, dialog.getRenderCount());
+    TEST_ASSERT_EQUAL_STRING("ok", dialog.getButtonText(0));
+    TEST_ASSERT_EQUAL_STRING("CANCEL", dialog.getButtonText(1));
 
 	// and now simulate the remote cancelling
 	dialog.remoteAction(BTNTYPE_CANCEL);
-	assertEquals(BTNTYPE_CANCEL, lastPressedBtn);
-	assertEquals(myHeader, copyOfUserData);
+	TEST_ASSERT_EQUAL(BTNTYPE_CANCEL, lastPressedBtn);
+	TEST_ASSERT_EQUAL(myHeader, copyOfUserData);
 
 	// it should not be in use after this.
-	assertFalse(dialog.isInUse());
+	TEST_ASSERT_FALSE(dialog.isInUse());
 }
 
-#endif //BASE_DIALOG_TESTS_H
