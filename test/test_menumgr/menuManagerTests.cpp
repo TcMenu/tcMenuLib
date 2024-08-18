@@ -3,8 +3,8 @@
 #include <MockIoAbstraction.h>
 #include <BaseRenderers.h>
 #include <MockEepromAbstraction.h>
-#include "fixtures_extern.h"
-#include "TestCapturingRenderer.h"
+#include "../tutils/fixtures_extern.h"
+#include "../tutils/TestCapturingRenderer.h"
 
 extern MockedIoAbstraction mockIo;
 extern NoRenderer noRenderer; 

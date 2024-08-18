@@ -1,7 +1,7 @@
 
 #include <unity.h>
 #include <MenuHistoryNavigator.h>
-#include "fixtures_extern.h"
+#include "../tutils/fixtures_extern.h"
 
 using namespace tcnav;
 

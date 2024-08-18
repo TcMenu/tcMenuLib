@@ -2,7 +2,7 @@
 #include <unity.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
-#include "fixtures_extern.h"
+#include "../tutils/fixtures_extern.h"
 #include <tcMenu.h>
 #include <IoLogging.h>
 

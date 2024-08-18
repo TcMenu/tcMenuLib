@@ -1,6 +1,6 @@
 #include <unity.h>
 #include <tcMenu.h>
-#include "tcMenuFixtures.h"
+#include "../tutils/tcMenuFixtures.h"
 #include <BaseRenderers.h>
 #include <MockEepromAbstraction.h>
 #include <MockIoAbstraction.h>

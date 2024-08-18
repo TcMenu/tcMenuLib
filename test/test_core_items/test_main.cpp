@@ -1,43 +1,12 @@
 #include <unity.h>
 #include <tcMenu.h>
-#include "fixtures_extern.h"
-
-// core tests
-void testTcUtilGetParentAndVisit();
-void testIteratorGetSubMenu();
-void testGetItemById();
-void testIterationWithPredicate();
-void testIteratorTypePredicateLocalOnly();
-void testIteratorNothingMatchesPredicate();
-void testIterationOverAllMenuItems();
-void testIterationOnSimpleMenu();
+#include "../tutils/fixtures_extern.h"
 
 // core menu item tests
 void testIpAddressItem();
 void testSettingIpItemDirectly();
 void testFloatType();
 void testAuthMenuItem();
-
-// authentication tests
-void authenticationTest();
-void testNoAuthenicatorMode();
-void testProgmemAuthenicatorMode();
-
-// dialog tests
-void testBaseDialogInfo();
-void testBaseDialogQuestion();
-
-// core renderer tests
-void testEmptyItemPropertiesFactory();
-void testDefaultItemPropertiesFactory();
-void testSubAndItemSelectionPropertiesFactory();
-void testIconStorageAndRetrival();
-void testGridPositionStorageAndRetrival();
-void testWidgetFunctionality();
-void testBaseRendererWithDefaults();
-void testScrollingWithMoreThanOneItemOnRow();
-void testTakeOverDisplay();
-void testListRendering();
 
 // Date time tests
 void testTimeMenuItem12Hr();
@@ -64,12 +33,6 @@ void testColorMenuItemNoAlpha();
 void testColorMenuItemWithAlphaAndFn();
 void testColor32Struct();
 
-// menu manager
-void testSaveAndLoadFromMenuSized();
-void testAddingItemsAndMenuCallbacks();
-void testCreatingAndInitialisation();
-void testNavigationPushAndPop();
-void testRebuildingNavigation();
 
 // value item cases
 void testCoreAndBooleanMenuItem();
@@ -142,50 +105,11 @@ void setup() {
     RUN_TEST(testDateFormattedMenuItem);
     RUN_TEST(testDateLeapYearAndMonthSizes);
 
-    /* core */
-    RUN_TEST(testTcUtilGetParentAndVisit);
-    RUN_TEST(testIteratorGetSubMenu);
-    RUN_TEST(testGetItemById);
-    RUN_TEST(testIterationWithPredicate);
-    RUN_TEST(testIteratorTypePredicateLocalOnly);
-    RUN_TEST(testIteratorNothingMatchesPredicate);
-    RUN_TEST(testIterationOverAllMenuItems);
-    RUN_TEST(testIterationOnSimpleMenu);
-
-    /* base dialog */
-    RUN_TEST(testBaseDialogInfo);
-    RUN_TEST(testBaseDialogQuestion);
-
-    /* Authentication tests file */
-    RUN_TEST(authenticationTest);
-    RUN_TEST(testNoAuthenicatorMode);
-    RUN_TEST(testProgmemAuthenicatorMode);
-
-    /* menu mgr and navigator */
-    RUN_TEST(testSaveAndLoadFromMenuSized);
-    RUN_TEST(testAddingItemsAndMenuCallbacks);
-    RUN_TEST(testCreatingAndInitialisation);
-    RUN_TEST(testNavigationPushAndPop);
-    RUN_TEST(testRebuildingNavigation);
-
     /* core item tests - keep last */
     RUN_TEST(testIpAddressItem);
     RUN_TEST(testSettingIpItemDirectly);
     RUN_TEST(testFloatType);
     RUN_TEST(testAuthMenuItem);
-
-
-    /* core renderer - keep last */
-    RUN_TEST(testEmptyItemPropertiesFactory);
-    RUN_TEST(testDefaultItemPropertiesFactory);
-    RUN_TEST(testSubAndItemSelectionPropertiesFactory);
-    RUN_TEST(testIconStorageAndRetrival);
-    RUN_TEST(testGridPositionStorageAndRetrival);
-    RUN_TEST(testWidgetFunctionality);
-    RUN_TEST(testBaseRendererWithDefaults);
-    RUN_TEST(testScrollingWithMoreThanOneItemOnRow);
-    RUN_TEST(testTakeOverDisplay);
-    RUN_TEST(testListRendering);
 
     UNITY_END();
 }

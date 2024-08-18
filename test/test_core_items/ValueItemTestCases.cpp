@@ -1,6 +1,6 @@
 
 #include <unity.h>
-#include "fixtures_extern.h"
+#include "../tutils/fixtures_extern.h"
 #include <tcUtil.h>
 
 void testCoreAndBooleanMenuItem() {

@@ -1,7 +1,7 @@
 
 #include <unity.h>
 #include <RuntimeMenuItem.h>
-#include "fixtures_extern.h"
+#include "../tutils/fixtures_extern.h"
 #include <tcUtil.h>
 
 void printMenuItem(MenuItem* menuItem);
