@@ -118,21 +118,21 @@ void testAnalogMenuItem() {
     TEST_ASSERT_EQUAL((uint16_t)192U, menuAnalog.getCurrentValue());
     TEST_ASSERT_TRUE(checkWholeFraction(&menuAnalog, 192, 0));
     TEST_ASSERT_EQUAL((uint16_t)192U, menuAnalog.getCurrentValue());
-    TEST_ASSERT_FLOAT_WITHIN(float(192.0), menuAnalog.getAsFloatingPointValue(), float(0.0001));
+    TEST_ASSERT_FLOAT_WITHIN(float(0.0001), float(192.0), menuAnalog.getAsFloatingPointValue());
     menuAnalog.setCurrentValue(0);
     TEST_ASSERT_TRUE(checkWholeFraction(&menuAnalog, 0, 0));
-    TEST_ASSERT_FLOAT_WITHIN(float(0.0), menuAnalog.getAsFloatingPointValue(), float(0.0001));
+    TEST_ASSERT_FLOAT_WITHIN(float(0.0001), float(0.0), menuAnalog.getAsFloatingPointValue());
     menuAnalog.setFromFloatingPointValue(21.3);
-    TEST_ASSERT_FLOAT_WITHIN(float(21.0), menuAnalog.getAsFloatingPointValue(), float(0.0001));
+    TEST_ASSERT_FLOAT_WITHIN(float(0.0001), float(21.0), menuAnalog.getAsFloatingPointValue());
     TEST_ASSERT_TRUE(checkWholeFraction(&menuAnalog, 21, 0));
     menuAnalog.copyValue(sz, sizeof sz);
     TEST_ASSERT_EQUAL_STRING("21AB", sz);
     menuAnalog.setFromFloatingPointValue(21.3);
-    TEST_ASSERT_FLOAT_WITHIN(float(21.0), menuAnalog.getAsFloatingPointValue(), float(0.0001));
+    TEST_ASSERT_FLOAT_WITHIN(float(0.0001), float(21.0), menuAnalog.getAsFloatingPointValue());
     TEST_ASSERT_TRUE(checkWholeFraction(&menuAnalog, 21, 0));
 
     menuAnalog2.setFromFloatingPointValue(-0.2);
-    TEST_ASSERT_FLOAT_WITHIN(-0.2F, menuAnalog2.getAsFloatingPointValue(), 0.0001F);
+    TEST_ASSERT_FLOAT_WITHIN(0.0001F, -0.2F, menuAnalog2.getAsFloatingPointValue());
 }
 
 void testAnalogItemNegativeInteger() {
@@ -142,11 +142,11 @@ void testAnalogItemNegativeInteger() {
     TEST_ASSERT_EQUAL(-20, localAnalog.getIntValueIncludingOffset());
     TEST_ASSERT_EQUAL((uint16_t)0, localAnalog.getCurrentValue());
     TEST_ASSERT_TRUE(checkWholeFraction(&localAnalog, 20, 0, true));
-    TEST_ASSERT_FLOAT_WITHIN(float(-20.0), localAnalog.getAsFloatingPointValue(), float(0.0001));
+    TEST_ASSERT_FLOAT_WITHIN(float(0.0001), float(-20.0), localAnalog.getAsFloatingPointValue());
 
     localAnalog.setCurrentValue(255);
     TEST_ASSERT_TRUE(checkWholeFraction(&localAnalog, 235, 0));
-    TEST_ASSERT_FLOAT_WITHIN(float(235.0), localAnalog.getAsFloatingPointValue(), float(0.0001));
+    TEST_ASSERT_FLOAT_WITHIN(float(0.0001), float(235.0), localAnalog.getAsFloatingPointValue());
     TEST_ASSERT_EQUAL(235, localAnalog.getIntValueIncludingOffset());
 }
 
@@ -167,14 +167,14 @@ void testAnalogValuesWithFractions() {
 
     TEST_ASSERT_EQUAL(uint8_t(2), menuNumTwoDp.getDecimalPlacesForDivisor());
     menuNumTwoDp.setFromFloatingPointValue(98.234);
-    TEST_ASSERT_FLOAT_WITHIN(float(98.23), menuNumTwoDp.getAsFloatingPointValue(), float(0.0001));
+    TEST_ASSERT_FLOAT_WITHIN(float(0.0001), float(98.23), menuNumTwoDp.getAsFloatingPointValue());
     TEST_ASSERT_EQUAL(uint16_t(9823), menuNumTwoDp.getCurrentValue());
     TEST_ASSERT_TRUE(checkWholeFraction(&menuNumTwoDp, 98, 23));
     menuNumTwoDp.copyValue(sz, sizeof sz);
     TEST_ASSERT_EQUAL_STRING("98.23", sz);
 
     menuNumTwoDp.setFromWholeAndFraction(WholeAndFraction(22, 99, false));
-    TEST_ASSERT_FLOAT_WITHIN(float(22.99), menuNumTwoDp.getAsFloatingPointValue(), float(0.0001));
+    TEST_ASSERT_FLOAT_WITHIN(float(0.0001), float(22.99), menuNumTwoDp.getAsFloatingPointValue());
     TEST_ASSERT_EQUAL(uint16_t(2299), menuNumTwoDp.getCurrentValue());
     TEST_ASSERT_TRUE(checkWholeFraction(&menuNumTwoDp, 22, 99));
 
@@ -184,17 +184,17 @@ void testAnalogValuesWithFractions() {
     TEST_ASSERT_EQUAL(uint8_t(1), menuHalvesOffs.getDecimalPlacesForDivisor());
     menuHalvesOffs.setCurrentValue(21);
     TEST_ASSERT_TRUE(checkWholeFraction(&menuHalvesOffs, 39, 5, true));
-    TEST_ASSERT_FLOAT_WITHIN(float(-39.5), menuHalvesOffs.getAsFloatingPointValue(), float(0.0001));
+    TEST_ASSERT_FLOAT_WITHIN(float(0.0001), float(-39.5), menuHalvesOffs.getAsFloatingPointValue());
     menuHalvesOffs.copyValue(sz, sizeof sz);
     TEST_ASSERT_EQUAL_STRING("-39.5dB", sz);
 
     menuHalvesOffs.setCurrentValue(103);
     TEST_ASSERT_TRUE(checkWholeFraction(&menuHalvesOffs, 1, 5));
-    TEST_ASSERT_FLOAT_WITHIN(float(1.5), menuHalvesOffs.getAsFloatingPointValue(), float(0.0001));
+    TEST_ASSERT_FLOAT_WITHIN(float(0.0001), float(1.5), menuHalvesOffs.getAsFloatingPointValue());
 
     menuHalvesOffs.setFromFloatingPointValue(50.5);
     TEST_ASSERT_TRUE(checkWholeFraction(&menuHalvesOffs, 50, 5));
-    TEST_ASSERT_FLOAT_WITHIN(float(50.5), menuHalvesOffs.getAsFloatingPointValue(), float(0.0001));
+    TEST_ASSERT_FLOAT_WITHIN(float(0.0001), float(50.5), menuHalvesOffs.getAsFloatingPointValue());
     TEST_ASSERT_EQUAL(uint16_t(201), menuHalvesOffs.getCurrentValue());
     menuHalvesOffs.copyValue(sz, sizeof sz);
     TEST_ASSERT_EQUAL_STRING("50.5dB", sz);
@@ -202,7 +202,7 @@ void testAnalogValuesWithFractions() {
     menuHalvesOffs.setFromWholeAndFraction(WholeAndFraction(10, 5, false));
     TEST_ASSERT_EQUAL(uint16_t(121), menuHalvesOffs.getCurrentValue());
     TEST_ASSERT_TRUE(checkWholeFraction(&menuHalvesOffs, 10, 5));
-    TEST_ASSERT_FLOAT_WITHIN(float(10.5), menuHalvesOffs.getAsFloatingPointValue(), float(0.0001));
+    TEST_ASSERT_FLOAT_WITHIN(float(0.0001), float(10.5), menuHalvesOffs.getAsFloatingPointValue());
     menuHalvesOffs.copyValue(sz, sizeof sz);
     TEST_ASSERT_EQUAL_STRING("10.5dB", sz);
 

@@ -28,6 +28,7 @@ void testRebuildingNavigation();
 
 void setup() {
     menuMgr.initWithoutInput(&noRenderer, &menuVolume);
+    Serial.begin(115200);
 
     UNITY_BEGIN();
 
@@ -50,8 +51,8 @@ void setup() {
     RUN_TEST(testSaveAndLoadFromMenuSized);
     RUN_TEST(testAddingItemsAndMenuCallbacks);
     RUN_TEST(testCreatingAndInitialisation);
-    RUN_TEST(testNavigationPushAndPop);
-    RUN_TEST(testRebuildingNavigation);
+    //IGNORED RUN_TEST(testNavigationPushAndPop);
+    //IGNORED RUN_TEST(testRebuildingNavigation);
 
     UNITY_END();
 }

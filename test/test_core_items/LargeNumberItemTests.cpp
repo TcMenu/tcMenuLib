@@ -69,7 +69,7 @@ void testLargeNumberGetAndSet() {
     TEST_ASSERT_EQUAL(largeNumber.getWhole(), (uint32_t)1234);
     TEST_ASSERT_EQUAL(largeNumber.getFraction(), (uint32_t)5678);
     TEST_ASSERT_FALSE(largeNumber.isNegative());
-    TEST_ASSERT_FLOAT_WITHIN(largeNumber.getAsFloat(), 1234.5678f, 0.0001f);
+    TEST_ASSERT_FLOAT_WITHIN(0.0001f, largeNumber.getAsFloat(), 1234.5678f);
 
     // now set a negative value and read it back
     largeNumber.setValue(123UL, 56UL, true);
@@ -78,7 +78,7 @@ void testLargeNumberGetAndSet() {
 	TEST_ASSERT_EQUAL(largeNumber.getWhole(), (uint32_t)123);
     TEST_ASSERT_EQUAL(largeNumber.getFraction(), (uint32_t)56);
     TEST_ASSERT_TRUE(largeNumber.isNegative());
-    TEST_ASSERT_FLOAT_WITHIN(largeNumber.getAsFloat(), -123.0056f, 0.0001f);
+    TEST_ASSERT_FLOAT_WITHIN(0.0001f, largeNumber.getAsFloat(), -123.0056f);
 
     // now set a really large value and try to read back
     largeNumber.setPrecision(5);
@@ -201,7 +201,7 @@ void testPersistLargeInteger() {
 	MockEepromAbstraction mockRom;
     menuMgr.getNavigationStore().clearNavigationListeners();
 	menuMgr.setRootMenu(&editable);
-	menuMgr.save(mockRom);
+	saveMenuItem(&mockRom, &editable);
 	dumpBuffer(editable.getLargeNumber());
 	TEST_ASSERT_EQUAL(mockRom.read8(4), (uint8_t)0);
 	TEST_ASSERT_EQUAL(mockRom.read8(5), (uint8_t)0x02);
@@ -249,7 +249,7 @@ void testLargeNumWithNegativeNotAllowed() {
     editable.setLargeNumberFromString("15234");
     TEST_ASSERT_EQUAL(editable.getLargeNumber()->getWhole(), (uint32_t)15234);
     TEST_ASSERT_EQUAL(editable.getLargeNumber()->getFraction(), (uint32_t)0);
-    TEST_ASSERT_FLOAT_WITHIN(editable.getLargeNumber()->getAsFloat(), 15234.0F, 0.00001);
+    TEST_ASSERT_FLOAT_WITHIN(0.00001F, editable.getLargeNumber()->getAsFloat(), 15234.0F);
     TEST_ASSERT_FALSE(editable.getLargeNumber()->isNegative());
 
     char sz[32];

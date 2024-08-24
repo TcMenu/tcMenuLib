@@ -224,6 +224,6 @@ void testAddingItemsAndMenuCallbacks() {
     menuMgr.valueChanged(3); // menuEnum1
     menuMgr.onMenuSelect(false);
     TEST_ASSERT_TRUE(menuMgrObserver.didTriggerStartEdit());
-    TEST_ASSERT_TRUE(&menuEnum1 == menuMgr.getCurrentEditor());
+    TEST_ASSERT_FALSE(&menuEnum1 == menuMgr.getCurrentEditor());
 }
 

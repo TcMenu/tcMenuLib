@@ -65,6 +65,7 @@ void testSubMenuItem();
 void testActionMenuItem();
 
 void setup() {
+    Serial.begin(115200);
     menuMgr.initWithoutInput(&noRenderer, &menuVolume);
 
     UNITY_BEGIN();
