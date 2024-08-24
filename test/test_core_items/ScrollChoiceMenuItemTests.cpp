@@ -2,7 +2,7 @@
 #include <unity.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
-#include "fixtures_extern.h"
+#include "../tutils/fixtures_extern.h"
 #include <tcMenu.h>
 #include <IoLogging.h>
 
@@ -139,38 +139,38 @@ void testColorMenuItemNoAlpha() {
     TEST_ASSERT_EQUAL((uint16_t)202, colorItemNoAlpha.getId());
     TEST_ASSERT_EQUAL((uint16_t)233, colorItemNoAlpha.getEepromPosition());
     colorItemNoAlpha.copyNameToBuffer(sz, sizeof(sz));
-    TEST_ASSERT_EQUAL("RGB NoAlpha", sz);
+    TEST_ASSERT_EQUAL_STRING("RGB NoAlpha", sz);
 
     colorItemNoAlpha.setColorData(RgbColor32(100, 50, 200));
 
     colorItemNoAlpha.copyValue(sz, sizeof sz);
-    TEST_ASSERT_EQUAL("R100 G50 B200", sz);
+    TEST_ASSERT_EQUAL_STRING("R100 G50 B200", sz);
 
     TEST_ASSERT_EQUAL(3, colorItemNoAlpha.beginMultiEdit());
     TEST_ASSERT_EQUAL(255, colorItemNoAlpha.nextPart());
     colorItemNoAlpha.copyValue(sz, sizeof sz);
-    TEST_ASSERT_EQUAL("R100 G50 B200", sz);
+    TEST_ASSERT_EQUAL_STRING("R100 G50 B200", sz);
     TEST_ASSERT_TRUE(checkEditorHints(1, 4, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
     colorItemNoAlpha.valueChanged(145);
     TEST_ASSERT_EQUAL(originalChangeCount + 2, colorCbCount);
 
     TEST_ASSERT_EQUAL(255, colorItemNoAlpha.nextPart());
     colorItemNoAlpha.copyValue(sz, sizeof sz);
-    TEST_ASSERT_EQUAL("R145 G50 B200", sz);
+    TEST_ASSERT_EQUAL_STRING("R145 G50 B200", sz);
     TEST_ASSERT_TRUE(checkEditorHints(6, 8, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
     colorItemNoAlpha.valueChanged(222);
     TEST_ASSERT_EQUAL(originalChangeCount + 3, colorCbCount);
 
     TEST_ASSERT_EQUAL(255, colorItemNoAlpha.nextPart());
     colorItemNoAlpha.copyValue(sz, sizeof sz);
-    TEST_ASSERT_EQUAL("R145 G222 B200", sz);
+    TEST_ASSERT_EQUAL_STRING("R145 G222 B200", sz);
     TEST_ASSERT_TRUE(checkEditorHints(11, 14, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
     colorItemNoAlpha.valueChanged(1);
     TEST_ASSERT_EQUAL(originalChangeCount + 4, colorCbCount);
 
     TEST_ASSERT_EQUAL(0, colorItemNoAlpha.nextPart());
     colorItemNoAlpha.copyValue(sz, sizeof sz);
-    TEST_ASSERT_EQUAL("R145 G222 B1", sz);
+    TEST_ASSERT_EQUAL_STRING("R145 G222 B1", sz);
 }
 
 RENDERING_CALLBACK_NAME_INVOKE(colorItemWithAlphaFn, rgbAlphaItemRenderFn, "RGB Alpha", 333, myCountingCallback);
@@ -182,12 +182,12 @@ void testColorMenuItemWithAlphaAndFn() {
     char sz[25];
     TEST_ASSERT_EQUAL((uint16_t)202, colorItemWithAlpha.getId());
     colorItemWithAlpha.copyNameToBuffer(sz, sizeof(sz));
-    TEST_ASSERT_EQUAL("RGB Alpha", sz);
+    TEST_ASSERT_EQUAL_STRING("RGB Alpha", sz);
 
     colorItemWithAlpha.setColorData(RgbColor32(100, 50, 200, 150));
 
     colorItemWithAlpha.copyValue(sz, sizeof sz);
-    TEST_ASSERT_EQUAL("R100 G50 B200 A150", sz);
+    TEST_ASSERT_EQUAL_STRING("R100 G50 B200 A150", sz);
 
     TEST_ASSERT_EQUAL(4, colorItemWithAlpha.beginMultiEdit());
     TEST_ASSERT_EQUAL(255, colorItemWithAlpha.nextPart());
@@ -195,14 +195,14 @@ void testColorMenuItemWithAlphaAndFn() {
     TEST_ASSERT_EQUAL(255, colorItemWithAlpha.nextPart());
     TEST_ASSERT_EQUAL(255, colorItemWithAlpha.nextPart());
     colorItemWithAlpha.copyValue(sz, sizeof sz);
-    TEST_ASSERT_EQUAL("R100 G50 B200 A150", sz);
+    TEST_ASSERT_EQUAL_STRING("R100 G50 B200 A150", sz);
     TEST_ASSERT_TRUE(checkEditorHints(15, 18, CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT));
     colorItemWithAlpha.valueChanged(225);
     TEST_ASSERT_EQUAL(originalChangeCount + 2, colorCbCount);
 
     TEST_ASSERT_EQUAL(0, colorItemWithAlpha.nextPart());
     colorItemWithAlpha.copyValue(sz, sizeof sz);
-    TEST_ASSERT_EQUAL("R100 G50 B200 A225", sz);
+    TEST_ASSERT_EQUAL_STRING("R100 G50 B200 A225", sz);
 }
 
 

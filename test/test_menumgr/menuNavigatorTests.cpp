@@ -1,7 +1,7 @@
 
 #include <unity.h>
 #include <MenuHistoryNavigator.h>
-#include "fixtures_extern.h"
+#include "../tutils/fixtures_extern.h"
 
 using namespace tcnav;
 
@@ -9,15 +9,21 @@ void testCreatingAndInitialisation() {
     MenuNavigationStore nav;
     nav.setRootItem(&menuVolume);
 
-    TEST_ASSERT_EQUAL(&menuVolume, nav.getRoot());
-    TEST_ASSERT_EQUAL(&menuVolume, nav.getCurrentRoot());
-    TEST_ASSERT_EQUAL(nullptr, nav.getCurrentSubMenu());
+    TEST_ASSERT_EQUAL_PTR(&menuVolume, nav.getRoot());
+    TEST_ASSERT_EQUAL_PTR(&menuVolume, nav.getCurrentRoot());
+    TEST_ASSERT_EQUAL(&MenuManager::ROOT, nav.getCurrentSubMenu());
 }
 
+// IGNORED - CAUSES BOARD CRASH
 void testNavigationPushAndPop() {
-    MenuNavigationStore nav;
-    nav.setRootItem(&menuVolume);
-    menuMgr.initWithoutInput(&noRenderer, &menuVolume);
+    taskManager.reset();
+    auto nav = menuMgr.getNavigationStore();
+    printf("at 1\n");
+    menuMgr.getNavigationStore().clearNavigationListeners();
+    printf("at 2\n");
+    menuMgr.getNavigationStore().resetStack();
+    menuMgr.setRootMenu(&menuVolume);
+    printf("at 3\n");
 
     nav.navigateTo(&menuChannel, menuStatus.getChild(), false);
     nav.navigateTo(&menuLHSTemp, menuSecondLevel.getChild(), false);
@@ -26,33 +32,35 @@ void testNavigationPushAndPop() {
     nav.navigateTo(&menuRHSTemp, &menuSub, false);
 
     auto* act = nav.popNavigationGetActive();
-    TEST_ASSERT_EQUAL(act, &menuRHSTemp);
-    TEST_ASSERT_EQUAL(menuSettings.getChild(), nav.getCurrentRoot());
-    TEST_ASSERT_EQUAL(&menuSettings, nav.getCurrentSubMenu());
+    TEST_ASSERT_EQUAL_PTR(act, &menuRHSTemp);
+    TEST_ASSERT_EQUAL_PTR(menuSettings.getChild(), nav.getCurrentRoot());
+    TEST_ASSERT_EQUAL_PTR(&menuSettings, nav.getCurrentSubMenu());
 
     act = nav.popNavigationGetActive();
-    TEST_ASSERT_EQUAL(act, &menu12VStandby);
-    TEST_ASSERT_EQUAL(menuSecondLevel.getChild(), nav.getCurrentRoot());
-    TEST_ASSERT_EQUAL(&menuSecondLevel, nav.getCurrentSubMenu());
+    TEST_ASSERT_EQUAL_PTR(act, &menu12VStandby);
+    TEST_ASSERT_EQUAL_PTR(menuSecondLevel.getChild(), nav.getCurrentRoot());
+    TEST_ASSERT_EQUAL_PTR(&menuSecondLevel, nav.getCurrentSubMenu());
 
     act = nav.popNavigationGetActive();
-    TEST_ASSERT_EQUAL(act, &menuLHSTemp);
-    TEST_ASSERT_EQUAL(menuStatus.getChild(), nav.getCurrentRoot());
-    TEST_ASSERT_EQUAL(&menuStatus, nav.getCurrentSubMenu());
+    TEST_ASSERT_EQUAL_PTR(act, &menuLHSTemp);
+    TEST_ASSERT_EQUAL_PTR(menuStatus.getChild(), nav.getCurrentRoot());
+    TEST_ASSERT_EQUAL_PTR(&menuStatus, nav.getCurrentSubMenu());
 
     act = nav.popNavigationGetActive();
-    TEST_ASSERT_EQUAL(act, &menuChannel);
-    TEST_ASSERT_EQUAL(&menuVolume, nav.getCurrentRoot());
-    TEST_ASSERT_EQUAL(nullptr, nav.getCurrentSubMenu());
+    TEST_ASSERT_EQUAL_PTR(act, &menuChannel);
+    TEST_ASSERT_EQUAL_PTR(&menuVolume, nav.getCurrentRoot());
+    TEST_ASSERT_EQUAL_PTR(nullptr, nav.getCurrentSubMenu());
 
     // try and over pop from array.
     act = nav.popNavigationGetActive();
-    TEST_ASSERT_EQUAL(act, &menuVolume);
-    TEST_ASSERT_EQUAL(&menuVolume, nav.getCurrentRoot());
-    TEST_ASSERT_EQUAL(nullptr, nav.getCurrentSubMenu());
+    TEST_ASSERT_EQUAL_PTR(act, &menuVolume);
+    TEST_ASSERT_EQUAL_PTR(&menuVolume, nav.getCurrentRoot());
+    TEST_ASSERT_EQUAL_PTR(nullptr, nav.getCurrentSubMenu());
 }
 
+// IGNORED - CAUSES BOARD CRASH
 void testRebuildingNavigation() {
+    taskManager.reset();
     MenuNavigationStore nav;
     nav.setRootItem(&menuVolume);
     menuMgr.initWithoutInput(&noRenderer, &menuVolume);

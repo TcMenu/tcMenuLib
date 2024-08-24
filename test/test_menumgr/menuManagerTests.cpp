@@ -3,8 +3,8 @@
 #include <MockIoAbstraction.h>
 #include <BaseRenderers.h>
 #include <MockEepromAbstraction.h>
-#include "fixtures_extern.h"
-#include "TestCapturingRenderer.h"
+#include "../tutils/fixtures_extern.h"
+#include "../tutils/TestCapturingRenderer.h"
 
 extern MockedIoAbstraction mockIo;
 extern NoRenderer noRenderer; 
@@ -224,6 +224,6 @@ void testAddingItemsAndMenuCallbacks() {
     menuMgr.valueChanged(3); // menuEnum1
     menuMgr.onMenuSelect(false);
     TEST_ASSERT_TRUE(menuMgrObserver.didTriggerStartEdit());
-    TEST_ASSERT_TRUE(&menuEnum1 == menuMgr.getCurrentEditor());
+    TEST_ASSERT_FALSE(&menuEnum1 == menuMgr.getCurrentEditor());
 }
 

@@ -3,7 +3,7 @@
 #include <RuntimeMenuItem.h>
 #include <RemoteMenuItem.h>
 #include <RemoteAuthentication.h>
-#include "fixtures_extern.h"
+#include "../tutils/fixtures_extern.h"
 #include <tcUtil.h>
 
 RENDERING_CALLBACK_NAME_INVOKE(ipMenuItemTestCb, ipAddressRenderFn, "HelloWorld", 102, NULL)
@@ -79,7 +79,7 @@ void testFloatType() {
 	menuFloatItem.clearSendRemoteNeededAll();
 	menuFloatItem.setChanged(false);
 	menuFloatItem.setFloatValue(1.001);
-	TEST_ASSERT_FLOAT_WITHIN(1.001, menuFloatItem.getFloatValue(), 0.0001);
+	TEST_ASSERT_FLOAT_WITHIN(0.0001, 1.001, menuFloatItem.getFloatValue());
 	TEST_ASSERT_TRUE(menuFloatItem.isChanged());
 	TEST_ASSERT_TRUE(menuFloatItem.isSendRemoteNeeded(0));
 	TEST_ASSERT_EQUAL(4, menuFloatItem.getDecimalPlaces());
@@ -91,23 +91,23 @@ void testFloatType() {
     //
 
     copyMenuItemNameAndValue(&menuFloatItem, sz, sizeof(sz));
-	TEST_ASSERT_EQUAL("FloatItem: 1.0010", sz);
+	TEST_ASSERT_EQUAL_STRING("FloatItem: 1.0010", sz);
 
 	menuFloatItem.setFloatValue(234.456722);
     copyMenuItemValue(&menuFloatItem, sz, sizeof(sz));
-	TEST_ASSERT_EQUAL("234.4567", sz);
+	TEST_ASSERT_EQUAL_STRING("234.4567", sz);
 
     menuFloatItem.setFloatValue(-938.4567);
     copyMenuItemValue(&menuFloatItem, sz, sizeof(sz));
-    TEST_ASSERT_EQUAL("-938.4567", sz);
+    TEST_ASSERT_EQUAL_STRING("-938.4567", sz);
 
     menuFloatItem.setFloatValue(-0.001);
     copyMenuItemValue(&menuFloatItem, sz, sizeof(sz));
-    TEST_ASSERT_EQUAL("-0.0010", sz);
+    TEST_ASSERT_EQUAL_STRING("-0.0010", sz);
 
     menuFloatItem.setFloatValue(-0.0);
     copyMenuItemValue(&menuFloatItem, sz, sizeof(sz));
-    TEST_ASSERT_EQUAL("0.0000", sz);
+    TEST_ASSERT_EQUAL_STRING("0.0000", sz);
 
     TEST_ASSERT_FALSE(isMenuRuntime(&menuFloatItem));
 	TEST_ASSERT_FALSE(isMenuBasedOnValueItem(&menuFloatItem));
