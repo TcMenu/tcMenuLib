@@ -4,9 +4,6 @@
 #include "../tutils/fixtures_extern.h"
 #include <tcUtil.h>
 
-void printMenuItem(MenuItem* menuItem);
-
-
 RENDERING_CALLBACK_NAME_INVOKE(timeMenuItemTestCb, timeItemRenderFn, "Time", 103, NULL)
 RENDERING_CALLBACK_NAME_INVOKE(dateFormattedTestCb, dateItemRenderFn, "Date", 999, NULL)
 

@@ -4,6 +4,7 @@
 #include <MockEepromAbstraction.h>
 #include <MockIoAbstraction.h>
 #include <MenuIterator.h>
+#include "../tutils/fixtures_extern.h"
 
 // here we set the pressMe menu item callback to our standard action callback.
 void myActionCb(int id);
@@ -20,18 +21,6 @@ char szData[10] = { "123456789" };
 const char PROGMEM pgmMyName[]  = "UnitTest";
 int counter = 0;
 const PROGMEM ConnectorLocalInfo applicationInfo = { "DfRobot", "2ba37227-a412-40b7-94e7-42caf9bb0ff4" };
-
-
-void printMenuItem(MenuItem* menuItem) {
-    if(menuItem == nullptr) {
-        serdebugF("NULL");
-    }
-    else {
-        char buffer[20];
-        menuItem->copyNameToBuffer(buffer, sizeof buffer);
-        serdebug3(menuItem->getId(), menuItem->getMenuType(),buffer);
-    }
-}
 
 bool checkMenuItem(MenuItem* actual, MenuItem* expected) {
     if(expected != actual) {

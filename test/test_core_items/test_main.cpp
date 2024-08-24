@@ -4,6 +4,13 @@
 #include <tcm_test/testFixtures.h>
 #include "../tutils/tcMenuFixturesExtra.h"
 
+const char *uuid1 = "07cd8bc6-734d-43da-84e7-6084990becfc";
+const char *uuid2 = "07cd8bc6-734d-43da-84e7-6084990becfd";
+const char *uuid3 = "07cd8bc6-734d-43da-84e7-6084990becfe";
+
+NoRenderer noRenderer;
+MockEepromAbstraction eeprom(400);
+
 // core menu item tests
 void testIpAddressItem();
 void testSettingIpItemDirectly();

@@ -31,10 +31,11 @@ extern SubMenuItem menuSettings;
 extern EnumMenuItem menuChannel;
 extern AnalogMenuItem menuVolume;
 
+extern AnalogMenuItem menuSimple1;
+extern AnalogMenuItem menuSimple2;
+
 extern int idOfCallback;
 extern MockEepromAbstraction eeprom;
-
-void printMenuItem(MenuItem* menuItem);
 
 extern const char pgmMyName[];
 extern NoRenderer noRenderer;
@@ -44,5 +45,17 @@ extern const char *uuid2;
 extern const char *uuid3;
 
 bool checkEditorHints(int start, int end, CurrentEditorRenderingHints::EditorRenderingType ty);
+
+inline void printMenuItem(MenuItem* menuItem) {
+    if(menuItem == nullptr) {
+        serdebugF("NULL");
+    }
+    else {
+        char buffer[20];
+        menuItem->copyNameToBuffer(buffer, sizeof buffer);
+        serdebug3(menuItem->getId(), menuItem->getMenuType(),buffer);
+    }
+}
+
 
 #endif //TCLIBRARYDEV_FIXTURES_EXTERN_H
