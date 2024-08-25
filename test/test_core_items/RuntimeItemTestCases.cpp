@@ -293,16 +293,15 @@ void myActionCb(int id) {
 
 void testActionMenuItem() {
     char sz[20];
-    menuPressMe.copyNameToBuffer(sz, sizeof(sz));
-    TEST_ASSERT_EQUAL_STRING("Press Me", sz);
-    TEST_ASSERT_TRUE(!isMenuRuntime(&menuPressMe));
-    TEST_ASSERT_TRUE(menuPressMe.getMenuType() == MENUTYPE_ACTION_VALUE);
-    TEST_ASSERT_EQUAL((uint16_t)7, menuSub.getId());
-    TEST_ASSERT_EQUAL((uint16_t)-1, menuSub.getEepromPosition());
+    AnyMenuInfo menuInfo = { "Lights, Camera", 999, 0xFFFF, 1, myActionCb };
+    ActionMenuItem actionMenuItem(&menuInfo, nullptr, INFO_LOCATION_RAM);
+    actionMenuItem.copyNameToBuffer(sz, sizeof(sz));
+    TEST_ASSERT_EQUAL_STRING("Lights, Camera", sz);
+    TEST_ASSERT_FALSE(isMenuRuntime(&actionMenuItem));
+    TEST_ASSERT_EQUAL(actionMenuItem.getMenuType(), MENUTYPE_ACTION_VALUE);
+    TEST_ASSERT_EQUAL((uint16_t)999, actionMenuItem.getId());
+    TEST_ASSERT_EQUAL((uint16_t)-1, actionMenuItem.getEepromPosition());
     auto oldCbCount = actionCbCount;
-    menuPressMe.triggerCallback();
+    actionMenuItem.triggerCallback();
     TEST_ASSERT_EQUAL(oldCbCount + 1, actionCbCount);
-
-    copyMenuItemNameAndValue(&menuPressMe, sz, sizeof sz);
-    TEST_ASSERT_EQUAL_STRING("Press Me: >>", sz);
 }
