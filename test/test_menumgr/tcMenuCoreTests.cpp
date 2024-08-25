@@ -56,7 +56,7 @@ void testIteratorGetSubMenu() {
     // passing in null returns null
     TEST_ASSERT_TRUE(getSubMenuFor(nullptr) == nullptr);
     // root is presented as null
-    TEST_ASSERT_TRUE(getSubMenuFor(&menuVolume) == nullptr);
+    TEST_ASSERT_TRUE(getSubMenuFor(&menuVolume) == &MenuManager::ROOT);
     // now check both menu levels including providing a submenu within a submenu
     TEST_ASSERT_TRUE(checkMenuItem(getSubMenuFor(&menuPressMe), &menuSecondLevel));
     TEST_ASSERT_TRUE(checkMenuItem(getSubMenuFor(&menuSecondLevel), &menuStatus));
