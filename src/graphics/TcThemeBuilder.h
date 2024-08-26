@@ -93,7 +93,7 @@ namespace tcgfx {
          * @param mag the magnification value
          * @return reference to itself for chaining
          */
-        ThemePropertiesBuilder& withNativeFont(void* data, uint8_t mag) {
+        ThemePropertiesBuilder& withNativeFont(const void* data, uint8_t mag) {
             fontData = data;
             fontMag = mag;
             needsProps();
@@ -349,7 +349,7 @@ namespace tcgfx {
          * @param mag the native mag value
          * @return reference to itself for chaining
          */
-        TcThemeBuilder& withNativeFont(void* data, uint8_t mag) {
+        TcThemeBuilder& withNativeFont(const void* data, uint8_t mag) {
             fontData = data;
             fontMag = mag;
             return *this;
