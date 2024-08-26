@@ -121,7 +121,7 @@ TcThemeBuilder &TcThemeBuilder::withStandardMedResCursorIcons() {
     return withCursorIconsXbmp(Coord(16, 12), defEditingIcon, defActiveIcon);
 }
 
-TcThemeBuilder & TcThemeBuilder::enablingTcUnicode() {
+TcThemeBuilder & TcThemeBuilder::enableTcUnicode() {
     renderer.enableTcUnicode();
     return *this;
 }
