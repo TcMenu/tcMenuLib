@@ -102,10 +102,9 @@ ThemePropertiesBuilder &TcThemeBuilder::menuItemOverride(MenuItem &item) {
 }
 
 TcThemeBuilder& TcThemeBuilder::enableCardLayoutWithXbmImages(Coord iconSize, const uint8_t *leftIcon, const uint8_t *rightIcon, bool isMono) {
-    renderer.enableCardLayout(
-            DrawableIcon(-1, iconSize, tcgfx::DrawableIcon::ICON_XBITMAP, leftIcon, nullptr),
-            DrawableIcon(-1, iconSize, tcgfx::DrawableIcon::ICON_XBITMAP, rightIcon, nullptr),
-            nullptr, isMono);
+    auto left = new DrawableIcon(-1, iconSize, tcgfx::DrawableIcon::ICON_XBITMAP, leftIcon, nullptr);
+    auto right = new DrawableIcon(-1, iconSize, tcgfx::DrawableIcon::ICON_XBITMAP, rightIcon, nullptr);
+    renderer.enableCardLayout(*left, *right, nullptr, isMono);
     return *this;
 }
 
@@ -137,3 +136,4 @@ TcThemeBuilder& TcThemeBuilder::manualDimensions(int x, int y) {
     renderer.setDisplayDimensions(x, y);
     return *this;
 }
+

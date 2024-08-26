@@ -494,6 +494,8 @@ namespace tcgfx {
     void GraphicsDeviceRenderer::enableCardLayout(const DrawableIcon& left, const DrawableIcon& right, MenuTouchScreenManager* touchScreenManager, bool monoDisplay) {
         if(cardLayoutPane == nullptr) {
             cardLayoutPane = new CardLayoutPane(&left, &right, touchScreenManager, monoDisplay);
+        } else {
+            serlogF(SER_TCMENU_INFO, "Card already init");
         }
     }
 
