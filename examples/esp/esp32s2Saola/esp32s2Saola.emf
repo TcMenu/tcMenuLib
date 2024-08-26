@@ -366,7 +366,7 @@
     "lastRemoteUuids": [
       "46c30011-cac6-4598-a7b8-b0630d55daab"
     ],
-    "lastThemeUuid": "0dd60ceb-7e0f-46e2-8d40-b264eb3aa7e0",
+    "lastThemeUuid": "396ED4DF-AD7B-4951-A848-A9E5838A549B",
     "applicationUUID": "b447b433-fe4f-4ce7-8746-d94bfeefc707",
     "applicationName": "ESP32-S2 Saola board",
     "lastProperties": [
@@ -539,7 +539,8 @@
       "menuDefinitions": []
     },
     "packageNamespace": "",
-    "appIsModular": false
+    "appIsModular": false,
+    "listOfEmbeddedForms": []
   },
   "stringLists": []
 }
