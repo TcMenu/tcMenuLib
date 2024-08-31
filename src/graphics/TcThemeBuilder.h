@@ -4,7 +4,7 @@
  */
 
 /**
- * @file TcDrawableButton.h
+ * @file TcThemeBuilder.h
  * @brief a theme builder that simplifies the creation of themes for GraphicsDeviceRenderer based displays.
  */
 
@@ -361,7 +361,13 @@ namespace tcgfx {
          * perspective, but requires that you use fonts supported by TcUnicode, these are Adafruit or TcUnicode fonts.
          * @return reference to itself for chaining
          */
-        TcThemeBuilder & enablingTcUnicode();
+        TcThemeBuilder & enableTcUnicode();
+
+        /**
+         * Prefer to use enableTcUnicode() instead
+         * @return reference to itself for chaining
+         */
+        TcThemeBuilder & enablingTcUnicode() {return enableTcUnicode();}
 
         /**
          * Provide custom cursor icons that are used when an item is selected or edited. Use this when you don't want

@@ -8,9 +8,11 @@
     use elsewhere.
  */
 
+// Generated for Arduino ESP32 by TcMenu 4.3.1-SNAPSHOT on 2024-08-31T09:58:46.844277900Z.
+
 #include <tcMenu.h>
 #include "espCapTouchTft_menu.h"
-#include "ThemeDarkModeModern.h"
+#include "ThemeDarkModeTraditionalBuilder.h"
 
 // Global variable declarations
 const PROGMEM  ConnectorLocalInfo applicationInfo = { "espCapTouchTft", "a32450f4-91fc-4747-9e6f-6317dd9e2309" };
@@ -59,8 +61,6 @@ void setupMenu() {
     touchInterrogator.init();
     touchScreen.start();
     menuMgr.initWithoutInput(&renderer, &menuPercentage);
-    renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
-    renderer.setUseSliderForAnalog(true);
-    installDarkModeModernTheme(renderer, MenuFontDef(nullptr, 2), MenuFontDef(nullptr, 2), false);
+    installDarkModeTraditionalTheme(renderer, MenuFontDef(nullptr, 2), MenuFontDef(nullptr, 4), true, BaseGraphicalRenderer::TITLE_ALWAYS, false);
 }
 
