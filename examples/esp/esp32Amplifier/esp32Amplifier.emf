@@ -470,9 +470,9 @@
     "lastDisplayUuid": "e6342680-6fab-4d1b-ac08-ce8dbfc0974c",
     "lastInputUuid": "183448ac-a717-4b2b-823d-ffc7c8140ab9",
     "lastRemoteUuids": [
-      "46c30011-cac6-4598-a7b8-b0630d55daab"
+      "B93C6ACA-F1A3-4FF3-87F1-07E4F2F1ED5A"
     ],
-    "lastThemeUuid": "850dc0a3-f534-47c2-94d8-1e64ff368a54",
+    "lastThemeUuid": "1947F585-9D36-448C-8A80-B425686107BD",
     "applicationUUID": "4656c798-10c6-4110-8e03-b9c51ed8fffb",
     "applicationName": "ESP Amplifier",
     "lastProperties": [
@@ -612,28 +612,18 @@
         "subsystem": "INPUT"
       },
       {
-        "name": "ESPWIFI_CONCURRENT_CONNECTIONS",
-        "latestValue": "1",
+        "name": "ETH_LIBRARY_TYPE",
+        "latestValue": "ESP32_WIFI",
         "subsystem": "REMOTE"
       },
       {
-        "name": "ESPWIFI_LISTEN_PORT1",
+        "name": "REMOTE_IP_ADDRESS",
+        "latestValue": "192.168.0.37",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "REMOTE_PORT",
         "latestValue": "3333",
-        "subsystem": "REMOTE"
-      },
-      {
-        "name": "ESPWIFI_LISTEN_PORT2",
-        "latestValue": "3334",
-        "subsystem": "REMOTE"
-      },
-      {
-        "name": "ESPWIFI_LISTEN_PORT3",
-        "latestValue": "3335",
-        "subsystem": "REMOTE"
-      },
-      {
-        "name": "ESPWIFI_BUFFERED",
-        "latestValue": "true",
         "subsystem": "REMOTE"
       },
       {

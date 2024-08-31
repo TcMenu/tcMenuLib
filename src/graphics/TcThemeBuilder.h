@@ -4,7 +4,7 @@
  */
 
 /**
- * @file TcDrawableButton.h
+ * @file TcThemeBuilder.h
  * @brief a theme builder that simplifies the creation of themes for GraphicsDeviceRenderer based displays.
  */
 
