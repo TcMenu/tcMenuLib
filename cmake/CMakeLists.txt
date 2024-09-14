@@ -35,12 +35,12 @@ add_library(tcMenu
         ../src/remote/BaseRemoteComponents.cpp
 )
 
-target_compile_definitions(IoAbstraction
+target_compile_definitions(tcMenu
         PUBLIC BUILD_FOR_PICO_CMAKE=1 BUILD_PICO_FORCE_UART=1 IO_LOGGING_DEBUG=1
 )
 
 target_include_directories(tcMenu PUBLIC
-        ${PROJECT_SOURCE_DIR}/tcMenu/src
+        ${PROJECT_SOURCE_DIR}/lib/tcMenu/src
 )
 
 target_link_libraries(tcMenu PUBLIC pico_stdlib pico_sync IoAbstraction TaskManagerIO tcUnicodeHelper)
