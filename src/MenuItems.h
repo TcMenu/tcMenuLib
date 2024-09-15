@@ -55,6 +55,8 @@ struct AnyMenuInfo {
 	menuid_t id;
 	/** eeprom address for this item or -1 if not stored */
 	uint16_t eepromAddr;
+	/** minimum value that this type can store */
+	uint16_t minValue;
 	/** maximum value that this type can store */
 	uint16_t maxValue;
 	/** the callback function */
@@ -75,6 +77,8 @@ struct AnalogMenuInfo {
 	menuid_t id;
 	/** eeprom address for this item or -1 if not stored */
 	uint16_t eepromAddr;
+	/** minimum value that this type can store */
+	uint16_t minValue;
 	/** maximum value that this type can store */
 	uint16_t maxValue;
 	/** the callback function */
@@ -353,6 +357,8 @@ public:
 	uint8_t copyNameToBuffer(char* sz, int offset, int size) const;
 	/** Retrieves the ID from the info block */
 	menuid_t getId() const;
+	/** Retrieves the minimum value for this menu type */
+	uint16_t getMinimumValue() const;
 	/** Retrieves the maximum value for this menu type */
 	uint16_t getMaximumValue() const;
 	/** Retrieves the eeprom storage position for this menu (or 0xffff if not applicable) */
