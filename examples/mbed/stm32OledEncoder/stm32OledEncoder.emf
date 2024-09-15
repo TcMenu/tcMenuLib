@@ -317,15 +317,20 @@
   ],
   "codeOptions": {
     "embeddedPlatform": "MBED_RTOS",
-    "lastDisplayUuid": "8a15d500-410f-489d-b3dc-540b05e630ed",
+    "lastDisplayUuid": "61159C5B-F23A-4050-980F-A8FE114E2965",
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
     "lastRemoteUuids": [
       "27e7a502-330e-4570-9f8e-bd26ac88051f"
     ],
-    "lastThemeUuid": "0dd60ceb-7e0f-46e2-8d40-b264eb3aa7e0",
+    "lastThemeUuid": "396ED4DF-AD7B-4951-A848-A9E5838A549B",
     "applicationUUID": "f5325e26-a7f6-40ff-876e-47afa06df532",
     "applicationName": "Demo mbed",
     "lastProperties": [
+      {
+        "name": "BUS_TYPE",
+        "latestValue": "SPI",
+        "subsystem": "DISPLAY"
+      },
       {
         "name": "SERIAL_BUS",
         "latestValue": "spi",
@@ -352,8 +357,8 @@
         "subsystem": "DISPLAY"
       },
       {
-        "name": "BUS_TYPE",
-        "latestValue": "SPI",
+        "name": "DISPLAY_I2C_ADDR",
+        "latestValue": "0xFF",
         "subsystem": "DISPLAY"
       },
       {
@@ -372,6 +377,11 @@
         "subsystem": "DISPLAY"
       },
       {
+        "name": "DISPLAY_SPI_FREQ",
+        "latestValue": "10000000",
+        "subsystem": "DISPLAY"
+      },
+      {
         "name": "DISPLAY_ROTATION",
         "latestValue": "0",
         "subsystem": "DISPLAY"
@@ -379,6 +389,11 @@
       {
         "name": "UPDATES_PER_SEC",
         "latestValue": "5",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "TEXT_ENCODING",
+        "latestValue": "ENCMODE_UTF8",
         "subsystem": "DISPLAY"
       },
       {
@@ -448,12 +463,12 @@
       },
       {
         "name": "ITEM_FONT",
-        "latestValue": "def:,1",
+        "latestValue": "ada:OpenSansRegular7pt,0",
         "subsystem": "THEME"
       },
       {
         "name": "TITLE_FONT",
-        "latestValue": "def:,1",
+        "latestValue": "ada:OpenSansRegular7pt,0",
         "subsystem": "THEME"
       },
       {
@@ -473,7 +488,7 @@
       },
       {
         "name": "USE_TC_UNICODE",
-        "latestValue": "false",
+        "latestValue": "true",
         "subsystem": "THEME"
       }
     ],

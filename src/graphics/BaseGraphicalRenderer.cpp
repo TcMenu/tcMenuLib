@@ -70,7 +70,7 @@ uint8_t BaseGraphicalRenderer::setActiveItem(MenuItem *item) {
         adjustedHeight -= startY;
         totalHeight -= startY;
     }
-    totalHeight = max(0, totalHeight);
+    totalHeight = internal_max(0, totalHeight);
     serlogF4(SER_TCMENU_DEBUG, "totH, actIdx, adjH ", totalHeight, activeIndex, adjustedHeight);
 
     while (totalHeight > adjustedHeight) {

@@ -567,7 +567,8 @@ void TagValueRemoteConnector::encodeAcknowledgement(uint32_t correlation, AckRes
     if(!prepareWriteMsg(MSG_ACKNOWLEDGEMENT)) return;
     transport->writeFieldInt(FIELD_ACK_STATUS, status);
     char sz[10];
-    ltoa(correlation, sz, 16);
+    sz[0]=0;
+    intToHexString(sz, sizeof sz, correlation, 8, false);
     transport->writeField(FIELD_CORRELATION, sz);
     transport->endMsg();
 
@@ -739,7 +740,7 @@ void TagValueTransport::writeFieldLong(uint16_t field, long value) {
 	sz[2] = '=';
 	sz[3] = 0;
 	writeStr(sz);
-	ltoa(value, sz, 10);
+	ltoaClrBuff(sz, value, 9,  NOT_PADDED, sizeof sz);
 	writeStr(sz);
 	writeChar('|');
 }

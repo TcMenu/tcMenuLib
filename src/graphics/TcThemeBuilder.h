@@ -70,7 +70,7 @@ namespace tcgfx {
          */
         ThemePropertiesBuilder& withAdaFont(const GFXfont* font, int mag = 1) {
             fontData = font;
-            fontMag = min(1, mag);
+            fontMag = internal_min(1, mag);
             needsProps();
             return *this;
         }
@@ -327,7 +327,7 @@ namespace tcgfx {
          */
         TcThemeBuilder& withAdaFont(const GFXfont* font, int mag = 1) {
             fontData = font;
-            fontMag = min(1, mag);
+            fontMag = internal_min(1, mag);
             return *this;
         }
 

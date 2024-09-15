@@ -21,7 +21,7 @@ using namespace tcgfx;
 
 void AdafruitDrawable::transaction(bool isStarting, bool redrawNeeded) {
     if(!isStarting && redrawNeeded) {
-        reinterpret_cast<Adafruit_SSD1306_Spi*>(graphics)->display();
+        reinterpret_cast<AdafruitSSD1306Spi*>(graphics)->display();
     }
 }
 
