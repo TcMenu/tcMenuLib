@@ -67,8 +67,12 @@ void ThemePropertiesBuilder::initForLevel(TcThemeBuilder *b, ItemDisplayProperti
         }
         border = props->getBorder();
         justification = props->getDefaultJustification();
+        if(menuItem != nullptr) {
+            drawingMode = modeFromItem(menuItem, b->getRenderer().isUseSliderForAnalog());
+        }
     } else {
         justification = GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT;
+        drawingMode = GridPosition::DRAW_TEXTUAL_ITEM;
         border = MenuBorder(0);
     }
 }
@@ -136,4 +140,5 @@ TcThemeBuilder& TcThemeBuilder::manualDimensions(int x, int y) {
     renderer.setDisplayDimensions(x, y);
     return *this;
 }
+
 

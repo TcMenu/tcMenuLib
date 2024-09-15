@@ -293,11 +293,11 @@ namespace tcgfx {
         ConfigurableItemDisplayPropertiesFactory &factory;
         ThemePropertiesBuilder propertiesBuilder;
         color_t defaultPalette[4] = {};
-        MenuPadding globalItemPadding = MenuPadding(1);
-        MenuPadding globalTitlePadding = MenuPadding(2);
-        const void *fontData = nullptr;
-        uint8_t fontMag = 1;
-        uint8_t defaultSpacing = 1;
+        MenuPadding globalItemPadding;
+        MenuPadding globalTitlePadding;
+        const void *fontData;
+        uint8_t fontMag;
+        uint8_t defaultSpacing;
     public:
         /**
          * Creates a theme builder by providing the renderer to use with it.
@@ -305,6 +305,14 @@ namespace tcgfx {
          */
         explicit TcThemeBuilder(GraphicsDeviceRenderer& renderer) : renderer(renderer), factory(renderer.getGraphicsPropertiesFactory()),
                                                                     propertiesBuilder(this) {
+            auto titleDef = factory.configFor(nullptr, ItemDisplayProperties::COMPTYPE_TITLE);
+            globalTitlePadding = titleDef->getPadding();
+            auto itemDef = factory.configFor(nullptr, ItemDisplayProperties::COMPTYPE_ITEM);
+            memcpy(defaultPalette, itemDef->getPalette(), sizeof defaultPalette);
+            globalItemPadding = itemDef->getPadding();
+            fontData = itemDef->getFont();
+            fontMag = itemDef->getFontMagnification();
+            defaultSpacing = itemDef->getSpaceAfter();
         }
 
         /**

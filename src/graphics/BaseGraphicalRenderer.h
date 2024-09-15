@@ -421,6 +421,15 @@ namespace tcgfx {
     void preparePropertiesFromConfig(ConfigurableItemDisplayPropertiesFactory &factory,
                                      const ColorGfxMenuConfig<const void *> *gfxConfig, int titleHeight,
                                      int itemHeight);
+
+    /**
+     * Gets the default drawing mode based on item type
+     * @param item the item
+     * @param useSlider if sliders are enabled.
+     * @return grid drawing mode
+     */
+    GridPosition::GridDrawingMode modeFromItem(MenuItem* item, bool useSlider);
+
 } // namespace tcgfx
 
 #endif //TCMENU_BASEGRAPHICALRENDERER_H

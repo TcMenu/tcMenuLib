@@ -16,6 +16,7 @@
 #include "RawCustomDrawing.h"
 #include "app_icondata.h"
 #include <stockIcons/wifiAndConnectionIcons16x12.h>
+#include <graphics/TcThemeBuilder.h>
 
 // We added a RAM based scroll choice item, and this references a fixed width array variable.
 // This variable is the RAM data for scroll choice item Scroll
@@ -29,47 +30,69 @@ const uint8_t myManualIp[] = { 192, 168, 0, 202 };
 const uint8_t myManualMac[] = { 0xde, 0xed, 0xbe, 0xef, 0xfe, 0xed };
 const uint8_t standardNetMask[] = { 255, 255, 255, 0 };
 
-
-// here we provide two title widgets, for ethernet connection, and client connection
-TitleWidget widgetConnection(iconsConnection, 2, 16, 12, nullptr);
-TitleWidget widgetEthernet(iconsEthernetConnection, 2, 16, 12, &widgetConnection);
-
-
 //
 // We use a card layout to present the items, here we demonstrate how to set it up and prepare custom menu items that
 // have different layouts and fonts.
 //
 // START card layout and custom layout code
 
-// first we need to define both a left and right button, we use the ones from stockIcons/directionalIcons.h
-DrawableIcon iconLeft(-1, Coord(11, 22), tcgfx::DrawableIcon::ICON_XBITMAP, ArrowHoriz11x22BitmapLeft, nullptr);
-DrawableIcon iconRight(-1, Coord(11, 22), tcgfx::DrawableIcon::ICON_XBITMAP, ArrowHoriz11x22BitmapRight, nullptr);
+// here we provide two title widgets, for ethernet connection, and client connection
+TitleWidget widgetConnection(iconsConnection, 2, 16, 12, nullptr);
+TitleWidget widgetEthernet(iconsEthernetConnection, 2, 16, 12, &widgetConnection);
 
 color_t defaultCardPalette[] = {1, 0, 1, 1};
 
 void setupGridLayoutForCardView() {
-    auto & factory = renderer.getGraphicsPropertiesFactory();
-
-    // Now we define the grid layouts for the 33, 45 and 78 action items, each one has custom font size and therefore a
-    // custom height as well. It avoids the use of icons for the speed selectors.
-    factory.setDrawingPropertiesForItem(tcgfx::ItemDisplayProperties::COMPTYPE_ACTION, menu33.getId(), defaultCardPalette,
-                                        MenuPadding(2), u8g2_font_inr33_mn, 1, 2, 44, tcgfx::GridPosition::JUSTIFY_CENTER_NO_VALUE, MenuBorder());
-    factory.setDrawingPropertiesForItem(tcgfx::ItemDisplayProperties::COMPTYPE_ACTION, menu45.getId(), defaultCardPalette,
-                                        MenuPadding(2), u8g2_font_inr33_mn, 1, 2, 44, tcgfx::GridPosition::JUSTIFY_CENTER_NO_VALUE, MenuBorder());
-    factory.setDrawingPropertiesForItem(tcgfx::ItemDisplayProperties::COMPTYPE_ACTION, menu78.getId(), defaultCardPalette,
-                                        MenuPadding(2), u8g2_font_inr33_mn, 1, 2, 44, tcgfx::GridPosition::JUSTIFY_CENTER_NO_VALUE, MenuBorder());
-
-    // now we make the two settings and status menus use icons instead of regular drawing.
+    // we're going to use this a few times so declare once
     const Coord iconSize(APPICONS_WIDTH, APPICONS_HEIGHT);
-    factory.addImageToCache(DrawableIcon(menuSettings.getId(), iconSize, DrawableIcon::ICON_XBITMAP, settingsIcon40Bits));
-    factory.addImageToCache(DrawableIcon(menuStatus.getId(), iconSize, DrawableIcon::ICON_XBITMAP, statusIcon40Bits));
-    factory.addGridPosition(&menuSettings, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 4, 40));
-    factory.addGridPosition(&menuStatus, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 5, 40));
 
-    // after adding things to the drawing properties, we must refresh it.
-    tcgfx::ConfigurableItemDisplayPropertiesFactory::refreshCache();
+    // create a theme builder to help us configure how to draw.
+    TcThemeBuilder themeBuilder(renderer);
 
-    // and now we set the title widgets that appear on the top right, for the link status we check the ethernet library
+    // enable card layout providing the left and right icons. This enables for root menu
+    themeBuilder.enableCardLayoutWithXbmImages(Coord(11, 22), ArrowHoriz11x22BitmapLeft, ArrowHoriz11x22BitmapRight, true);
+
+    // override menu33 to draw text centered in a large font with more padding
+    themeBuilder.menuItemOverride(menu33)
+            .withJustification(tcgfx::GridPosition::JUSTIFY_CENTER_NO_VALUE)
+            .withNativeFont(u8g2_font_inr33_mn, 1)
+            .withPadding(MenuPadding(2))
+            .onRow(0)
+            .apply();
+
+    // override menu45 to draw text centered in a large font with more padding
+    themeBuilder.menuItemOverride(menu45)
+            .withJustification(tcgfx::GridPosition::JUSTIFY_CENTER_NO_VALUE)
+            .withNativeFont(u8g2_font_inr33_mn, 1)
+            .withPadding(MenuPadding(2))
+            .onRow(1)
+            .apply();
+
+    // override menu78 to draw text centered in a large font with more padding
+    themeBuilder.menuItemOverride(menu78)
+            .withJustification(tcgfx::GridPosition::JUSTIFY_CENTER_NO_VALUE)
+            .withNativeFont(u8g2_font_inr33_mn, 1)
+            .withPadding(MenuPadding(2))
+            .onRow(2)
+            .apply();
+
+    // override settings to draw as an icon only
+    themeBuilder.menuItemOverride(menuSettings)
+            .withImageXbmp(iconSize, settingsIcon40Bits)
+            .withPalette(defaultCardPalette)
+            .onRow(3)
+            .withDrawingMode(tcgfx::GridPosition::DRAW_AS_ICON_ONLY).apply();
+
+    // override status to draw as an icon only
+    themeBuilder.menuItemOverride(menuStatus)
+            .withImageXbmp(iconSize, statusIcon40Bits)
+            .withPalette(defaultCardPalette)
+            .onRow(4)
+            .withDrawingMode(tcgfx::GridPosition::DRAW_AS_ICON_ONLY).apply();
+    // now we make the two settings and status menus use icons instead of regular drawing.
+    themeBuilder.apply();
+
+    // now we set the title widgets that appear on the top right, for the link status we check the ethernet library
     // status every half second and update the widget to represent that status.
     renderer.setFirstWidget(&widgetEthernet);
     taskManager.scheduleFixedRate(500, [] {
@@ -122,9 +145,8 @@ void setup() {
         renderer.takeOverDisplay();
     });
 
-    // lastly, we set the card layout for the main "root" menu. The last parameter is an optional touch screen interface
-    // that the card layout will interact with, to "flip" between cards. Set to null when no touch screen available.
-    renderer.enableCardLayout(iconLeft, iconRight, nullptr, true);
+    // set the list to have 10 rows, for each row the custom callback further down will be called to get the value.
+    menuRuntimesCustomList.setNumberOfRows(10);
 
     // now we set up the layouts to make the card view look right.
     setupGridLayoutForCardView();
