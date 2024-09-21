@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for STM32Duino by TcMenu 4.3.1 on 2024-09-15T10:15:26.406693600Z.
+// Generated for STM32Duino by TcMenu 4.3.1 on 2024-09-21T08:48:23.694313500Z.
 
 #include <tcMenu.h>
 #include "stm32DuinoDemo_menu.h"
@@ -97,8 +97,19 @@ AnalogMenuItem menuStatusCurrent(&minfoStatusCurrent, 0, &menuStatusMotor, INFO_
 const SubMenuInfo minfoStatus = { "Status", 22, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackStatus(&minfoStatus, &menuStatusCurrent, INFO_LOCATION_PGM);
 SubMenuItem menuStatus(&minfoStatus, &menuBackStatus, &menuSettings, INFO_LOCATION_PGM);
+const AnyMenuInfo minfoStatusCardsDmnd = { "Dmnd", 36, 0xffff, 0, NO_CALLBACK };
+ActionMenuItem menuStatusCardsDmnd(&minfoStatusCardsDmnd, nullptr, INFO_LOCATION_PGM);
+const AnyMenuInfo minfoStatusCardsHrts = { "Hrts", 35, 0xffff, 0, NO_CALLBACK };
+ActionMenuItem menuStatusCardsHrts(&minfoStatusCardsHrts, &menuStatusCardsDmnd, INFO_LOCATION_PGM);
+const AnyMenuInfo minfoStatusCardsClub = { "Club", 34, 0xffff, 0, NO_CALLBACK };
+ActionMenuItem menuStatusCardsClub(&minfoStatusCardsClub, &menuStatusCardsHrts, INFO_LOCATION_PGM);
+const AnyMenuInfo minfoStatusCardsAce = { "Ace", 33, 0xffff, 0, NO_CALLBACK };
+ActionMenuItem menuStatusCardsAce(&minfoStatusCardsAce, &menuStatusCardsClub, INFO_LOCATION_PGM);
+const SubMenuInfo minfoStatusCards = { "Cards", 32, 0xffff, 0, NO_CALLBACK };
+BackMenuItem menuBackStatusCards(&minfoStatusCards, &menuStatusCardsAce, INFO_LOCATION_PGM);
+SubMenuItem menuStatusCards(&minfoStatusCards, &menuBackStatusCards, &menuStatus, INFO_LOCATION_PGM);
 const AnyMenuInfo minfo78 = { "78", 21, 0xffff, 0, NO_CALLBACK };
-ActionMenuItem menu78(&minfo78, &menuStatus, INFO_LOCATION_PGM);
+ActionMenuItem menu78(&minfo78, &menuStatusCards, INFO_LOCATION_PGM);
 const AnyMenuInfo minfo45 = { "45", 20, 0xffff, 0, NO_CALLBACK };
 ActionMenuItem menu45(&minfo45, &menu78, INFO_LOCATION_PGM);
 const AnyMenuInfo minfo33 = { "33", 19, 0xffff, 0, NO_CALLBACK };

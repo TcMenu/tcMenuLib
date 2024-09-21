@@ -50,6 +50,77 @@
       "type": "subMenu",
       "item": {
         "secured": false,
+        "name": "Cards",
+        "variableName": "StatusCards",
+        "id": 32,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 32,
+      "type": "actionMenu",
+      "item": {
+        "name": "Ace",
+        "variableName": "StatusCardsAce",
+        "id": 33,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 32,
+      "type": "actionMenu",
+      "item": {
+        "name": "Club",
+        "variableName": "StatusCardsClub",
+        "id": 34,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 32,
+      "type": "actionMenu",
+      "item": {
+        "name": "Hrts",
+        "variableName": "StatusCardsHrts",
+        "id": 35,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 32,
+      "type": "actionMenu",
+      "item": {
+        "name": "Dmnd",
+        "variableName": "StatusCardsDmnd",
+        "id": 36,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
         "name": "Status",
         "variableName": "Status",
         "id": 22,

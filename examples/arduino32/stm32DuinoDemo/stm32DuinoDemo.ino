@@ -31,10 +31,22 @@ const uint8_t myManualMac[] = { 0xde, 0xed, 0xbe, 0xef, 0xfe, 0xed };
 const uint8_t standardNetMask[] = { 255, 255, 255, 0 };
 
 //
-// We use a card layout to present the items, here we demonstrate how to set it up and prepare custom menu items that
-// have different layouts and fonts.
+// We use a card layout to present the items, card layout means that only one item will be displayed at once on the
+// display with a left and right icon on the edges showing in which direction you can move between items. Below is a
+// somewhat rough ASCII-art example of how it may look on the display.
+//
+//  /    __    \  the left and right icons show when you can move in each direction
+//  |   |  |   |  one item (whatever is actively selected) is drawn in the middle
+//  \    --    /  it is recommended that the title be disabled during card-layout menus
+//
+// This demonstrates how to set up card layout for both the root menu and also an additional sub menu, preparing
+// custom drawing using icons or larger fonts for those items.
 //
 // START card layout and custom layout code
+
+// Some helpful guides for working with card layouts and theme builder:
+// 1. https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/creating-and-using-bitmaps-menu/
+// 2. https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/themes/rendering-with-themes-icons-grids/
 
 // here we provide two title widgets, for ethernet connection, and client connection
 TitleWidget widgetConnection(iconsConnection, 2, 16, 12, nullptr);
@@ -42,15 +54,9 @@ TitleWidget widgetEthernet(iconsEthernetConnection, 2, 16, 12, &widgetConnection
 
 color_t defaultCardPalette[] = {1, 0, 1, 1};
 
-void setupGridLayoutForCardView() {
+void overrideDrawingForMainMenu(TcThemeBuilder& themeBuilder) {
     // we're going to use this a few times so declare once
     const Coord iconSize(APPICONS_WIDTH, APPICONS_HEIGHT);
-
-    // create a theme builder to help us configure how to draw.
-    TcThemeBuilder themeBuilder(renderer);
-
-    // enable card layout providing the left and right icons. This enables for root menu
-    themeBuilder.enableCardLayoutWithXbmImages(Coord(11, 22), ArrowHoriz11x22BitmapLeft, ArrowHoriz11x22BitmapRight, true);
 
     // override menu33 to draw text centered in a large font with more padding
     themeBuilder.menuItemOverride(menu33)
@@ -89,6 +95,36 @@ void setupGridLayoutForCardView() {
             .withPalette(defaultCardPalette)
             .onRow(4)
             .withDrawingMode(tcgfx::GridPosition::DRAW_AS_ICON_ONLY).apply();
+
+    themeBuilder.menuItemOverride(menuStatusCards)
+            .withImageXbmp(Coord(32, 32), cardIconBitmap)
+            .onRow(5)
+            .withPalette(defaultCardPalette)
+            .withJustification(tcgfx::GridPosition::JUSTIFY_CENTER_NO_VALUE)
+            .apply();
+}
+
+void overrideDrawingForCardMenu(TcThemeBuilder& themeBuilder) {
+    // override every single item on the card menu to have larger font and different padding/justification
+    themeBuilder.submenuPropertiesActionOverride(menuStatusCards)
+            .withJustification(tcgfx::GridPosition::JUSTIFY_CENTER_NO_VALUE)
+            .withNativeFont(u8g2_font_inr33_mn, 1)
+            .withPadding(MenuPadding(2))
+            .apply();
+}
+
+void setupGridLayoutForCardView() {
+    // create a theme builder to help us configure how to draw.
+    TcThemeBuilder themeBuilder(renderer);
+
+    // enable card layout providing the left and right icons. This enables for root menu
+    themeBuilder.enableCardLayoutWithXbmImages(Coord(11, 22), ArrowHoriz11x22BitmapLeft, ArrowHoriz11x22BitmapRight, true)
+        .setMenuAsCard(menuStatusCards, true);
+
+    // see the method above where we override drawing for all items that are in card layout.
+    overrideDrawingForMainMenu(themeBuilder);
+    overrideDrawingForCardMenu(themeBuilder);
+
     // now we make the two settings and status menus use icons instead of regular drawing.
     themeBuilder.apply();
 
