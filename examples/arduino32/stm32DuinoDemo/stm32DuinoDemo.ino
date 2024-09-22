@@ -3,6 +3,10 @@
  * are available. By default it is setup for an OLED screen and a rotary encoder, although it could be moved to use
  * many other different display and input technologies.
  *
+ * It demonstrates the use of the card menu layout, where items are shown one at a time as you scroll through them,
+ * configuring some items to use larger than usual fonts, and other items to render as icons. It also has an ethernet
+ * network remote included too.
+ *
  * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
  */
 
@@ -49,12 +53,15 @@ const uint8_t standardNetMask[] = { 255, 255, 255, 0 };
 // 2. https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/themes/rendering-with-themes-icons-grids/
 
 // here we provide two title widgets, for ethernet connection, and client connection
-TitleWidget widgetConnection(iconsConnection, 2, 16, 12, nullptr);
-TitleWidget widgetEthernet(iconsEthernetConnection, 2, 16, 12, &widgetConnection);
+TitleWidget widgetConnection(iconsConnection, 2, 16, 12);
+TitleWidget widgetEthernet(iconsEthernetConnection, 2, 16, 12);
 
 color_t defaultCardPalette[] = {1, 0, 1, 1};
 
 void overrideDrawingForMainMenu(TcThemeBuilder& themeBuilder) {
+    // now we make the two settings and status menus use icons instead of regular drawing, and the numbered menu items
+    // 33,45,78 to use a larger font so it takes the entire screen.
+
     // we're going to use this a few times so declare once
     const Coord iconSize(APPICONS_WIDTH, APPICONS_HEIGHT);
 
@@ -105,15 +112,24 @@ void overrideDrawingForMainMenu(TcThemeBuilder& themeBuilder) {
 }
 
 void overrideDrawingForCardMenu(TcThemeBuilder& themeBuilder) {
-    // override every single item on the card menu to have larger font and different padding/justification
+    // override  back button on the card menu to be the default 32x32 back icon
+    themeBuilder.menuItemOverride(menuBackStatusCards)
+            .withJustification(tcgfx::GridPosition::JUSTIFY_CENTER_WITH_VALUE)
+            .withPadding(MenuPadding(2))
+            .withPalette(defaultCardPalette)
+            .withImageXbmp(Coord(32, 32), defaultBackIconBitmap)
+            .onRow(0) // <== if you prefer that the back item is not first, you can change its order here
+            .apply();
+
+    // override every single item on the card sub menu to have larger font and different padding/justification
     themeBuilder.submenuPropertiesActionOverride(menuStatusCards)
             .withJustification(tcgfx::GridPosition::JUSTIFY_CENTER_NO_VALUE)
-            .withNativeFont(u8g2_font_inr33_mn, 1)
+            .withNativeFont(u8g2_font_inb16_mf, 1)
             .withPadding(MenuPadding(2))
             .apply();
 }
 
-void setupGridLayoutForCardView() {
+void setupCardLayoutAndWidgets() {
     // create a theme builder to help us configure how to draw.
     TcThemeBuilder themeBuilder(renderer);
 
@@ -121,16 +137,19 @@ void setupGridLayoutForCardView() {
     themeBuilder.enableCardLayoutWithXbmImages(Coord(11, 22), ArrowHoriz11x22BitmapLeft, ArrowHoriz11x22BitmapRight, true)
         .setMenuAsCard(menuStatusCards, true);
 
-    // see the method above where we override drawing for all items that are in card layout.
+    // these two functions, defined directly above this one configure the icons and special text arrangements for
+    // the items in the card layouts.
     overrideDrawingForMainMenu(themeBuilder);
     overrideDrawingForCardMenu(themeBuilder);
 
-    // now we make the two settings and status menus use icons instead of regular drawing.
+    themeBuilder.addingTitleWidget(widgetEthernet)
+            .addingTitleWidget(widgetConnection);
+
+    // You must always call apply after doing anything with theme builder.
     themeBuilder.apply();
 
     // now we set the title widgets that appear on the top right, for the link status we check the ethernet library
     // status every half second and update the widget to represent that status.
-    renderer.setFirstWidget(&widgetEthernet);
     taskManager.scheduleFixedRate(500, [] {
         widgetEthernet.setCurrentState(Ethernet.linkStatus() == LinkON ? 1 : 0);
     });
@@ -148,17 +167,18 @@ using namespace tcremote;
 
 void setup() {
     // This example logs using IoLogging, see the following guide to enable
-    // https://www.thecoderscorner.com/products/arduino-libraries/io-abstraction/arduino-logging-with-io-logging/
+    // https://tcmenu.github.io/documentation/arduino-libraries//io-abstraction/arduino-logging-with-io-logging/
     IOLOG_START_SERIAL
     serEnableLevel(SER_NETWORK_DEBUG, true);
+    serEnableLevel(SER_TCMENU_DEBUG, true);
 
-    // Start up serial and prepare the correct SPI, your pins may differ
+    // Start up serial and prepare the correct SPI, your pins or method of doing this may differ
     SPI.setMISO(PB4);
     SPI.setMOSI(PB5);
     SPI.setSCLK(PB3);
 
-    //
-    // Here we start up the Stm32Ethernet library for STM32 boards/chips with built-in ethernet
+    // Here we start up the Stm32Ethernet library for STM32 boards/chips with built-in ethernet, again you could
+    // easily change this for your own boards network arrangements
     Ethernet.begin();
     Serial.print("My IP address is ");
     Ethernet.localIP().printTo(Serial);
@@ -167,13 +187,14 @@ void setup() {
     // and then run the menu setup
     setupMenu();
 
-    // now load back values from EEPROM, but only when we can read the confirmatory magic key, see EEPROM loading in the docs
+    // now load back values from EEPROM, but only when we can read the confirmatory magic key, see EEPROM docs:
+    // https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/menu-eeprom-integrations/
     menuMgr.load(0xd00d, [] {
         // this gets called when the menu hasn't been saved before, to initialise the first time.
         menuDecimal.setCurrentValue(4);
     });
 
-    // here we register the custom drawing we created earlier with the renderer
+    // here we register the custom drawing created in `RawCustomDrawing.h`
     myCustomDrawing.registerWithRenderer();
 
     // We can set a callback for when the title item is pressed on the main menu, here we just take over the display
@@ -185,7 +206,7 @@ void setup() {
     menuRuntimesCustomList.setNumberOfRows(10);
 
     // now we set up the layouts to make the card view look right.
-    setupGridLayoutForCardView();
+    setupCardLayoutAndWidgets();
 }
 
 void loop() {

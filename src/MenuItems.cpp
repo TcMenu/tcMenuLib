@@ -80,7 +80,7 @@ uint8_t MenuItem::copyNameToBuffer(char* buf, int offset, int size) const {
 
 uint16_t MenuItem::getId() const
 {
-	if (info == nullptr) {
+	if (info == nullptr || menuType == MENUTYPE_BACK_VALUE) {
 		return asRuntimeItem(this)->getRuntimeId();
 	}
 

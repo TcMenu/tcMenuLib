@@ -66,6 +66,7 @@ void prepareDefaultGfxConfig(ColorGfxMenuConfig<void*>* config) {
 ItemDisplayProperties *ConfigurableItemDisplayPropertiesFactory::configFor(MenuItem *pItem, ItemDisplayProperties::ComponentType compType) {
     // make sure that we never return null, in the worst case, provide a default row for this.
     if(displayProperties.count()==0) {
+        serlogF(SER_WARNING, "No theme set");
         color_t defaultColors[] = { RGB(255,255,255), RGB(0,0,0), RGB(192, 192, 192), RGB(255, 255, 255)};
         setDrawingPropertiesDefault(ItemDisplayProperties::COMPTYPE_ITEM, defaultColors, MenuPadding(2), nullptr,
                                     1, 2, 12, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, MenuBorder());
@@ -73,7 +74,9 @@ ItemDisplayProperties *ConfigurableItemDisplayPropertiesFactory::configFor(MenuI
 
     ItemDisplayProperties *pConf = nullptr;
     if(pItem != nullptr) {
-        pConf = displayProperties.getByKey(MakePropsKey(pItem->getId(), false, compType));
+        auto key = MakePropsKey(pItem->getId(), false, compType);
+        pConf = displayProperties.getByKey(key);
+        serlogF3(SER_TCMENU_DEBUG, "Find by key: ", key, pConf != nullptr);
         if(pConf) return pConf;
     }
     return configForCurrentSub(compType);
@@ -90,9 +93,13 @@ ItemDisplayProperties *ConfigurableItemDisplayPropertiesFactory::configForCurren
     ItemDisplayProperties *pConf = nullptr;
     auto sub = menuMgr.getCurrentSubMenu();
     uint16_t subId = sub ? sub->getId() : 0;
-    pConf = displayProperties.getByKey(MakePropsKey(subId, true, compType));
+    uint32_t key = MakePropsKey(subId, true, compType);
+
+    pConf = displayProperties.getByKey(key);
+    serlogF3(SER_TCMENU_DEBUG, "Find key sub: ", key, pConf != nullptr);
     if(pConf) return pConf;
 
+    serlogF(SER_TCMENU_DEBUG, "Find use def");
     pConf = displayProperties.getByKey(MakePropsKey(MENUID_NOTSET, false, compType));
     if(pConf) return pConf;
 

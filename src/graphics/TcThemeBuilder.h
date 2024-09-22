@@ -461,10 +461,22 @@ namespace tcgfx {
 
         /**
          * Get access to theme properties for a specific menu item, with this you can change how an item renders, and
-         * even apply different grid settings.
+         * even apply different grid settings. This guesses the component type in most cases but if you want to force a
+         * particular component type see the override method with the second parameter.
+         * @param item the menu item to override drawing
          * @return a theme properties builder
          */
         ThemePropertiesBuilder &menuItemOverride(MenuItem &item);
+
+        /**
+         * Get access to theme properties for a specific menu item, with this you can change how an item renders, and
+         * even apply different grid settings. This specifically sets the component type for situations where it cannot
+         * be easily guessed.
+         * @param item the menu item to override drawing.
+         * @param componentType one of `COMPTYPE_TITLE`, `COMPTYPE_ITEM`, `COMPTYPE_ACTION`
+         * @return a theme properties builder
+         */
+        ThemePropertiesBuilder &menuItemOverride(MenuItem &item, ItemDisplayProperties::ComponentType componentType);
 
         /**
          * Get access to theme properties for a sub menu, with this you can change how all items in that submenu render
@@ -551,6 +563,8 @@ namespace tcgfx {
          * @return reference to itself for chaining
          */
         TcThemeBuilder& setMenuAsCard(SubMenuItem& item, bool on);
+        
+        TcThemeBuilder& addingTitleWidget(TitleWidget& theWidget);
 
         /**
          * Call after you've finished configuring your theme, this forces a refresh and ensures it presents properly.

@@ -15,7 +15,9 @@
 #include "tcUtil.h"
 
 /** For items that dont need to have the same id each time (such as back menu items), we just randomly give them an ID */
-#define RANDOM_ID_START 50000
+#ifndef RANDOM_ID_START
+#define RANDOM_ID_START 30000
+#endif
 
 /** For items that dont need to have the same id each time (such as back menu items), we just randomly give them an ID */
 menuid_t nextRandomId();

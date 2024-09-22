@@ -323,7 +323,9 @@ void BaseGraphicalRenderer::recalculateDisplayOrder(MenuItem *root, bool safeMod
     if(root->getMenuType() == MENUTYPE_BACK_VALUE) {
         serlogF2(SER_TCMENU_DEBUG, "Handling back item", root->getId());
         auto* myProps = getDisplayPropertiesFactory().configFor(root, ItemDisplayProperties::COMPTYPE_TITLE);
-        itemOrderByRow.add(GridPositionRowCacheEntry(root, GridPosition(GridPosition::DRAW_TITLE_ITEM, myProps->getDefaultJustification(), 0), myProps));
+        auto *confGrid = getDisplayPropertiesFactory().gridPositionForItem(item);
+        auto pos = (confGrid) ? confGrid->getPosition() : GridPosition(GridPosition::DRAW_TITLE_ITEM, myProps->getDefaultJustification(), 0);
+        itemOrderByRow.add(GridPositionRowCacheEntry(root, pos, myProps));
         item = root->getNext();
     }
 
