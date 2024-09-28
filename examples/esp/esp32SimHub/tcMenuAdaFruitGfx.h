@@ -213,7 +213,7 @@ public:
     void transaction(bool isStarting, bool redrawNeeded) override;
     color_t getUnderlyingColor(color_t col) override;
     DeviceDrawable *getSubDeviceFor(const Coord &where, const Coord &size, const color_t *palette, int paletteSize) override;
-    void drawBitmapNbpp(const Coord& where, const uint8_t* data, const Coord& size, int bpp, const uint16_t* palette) override;
+    void drawBitmapNbpp(const Coord& where, const uint8_t* data, const Coord& size, int bpp, const color_t* palette) override;
 };
 
 #endif /* _TCMENU_TCMENUADAFRUITGFX_H_ */

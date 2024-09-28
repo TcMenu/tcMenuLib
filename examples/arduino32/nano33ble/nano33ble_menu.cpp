@@ -8,9 +8,11 @@
     use elsewhere.
  */
 
+// Generated for Arduino 32bit ARM by TcMenu 4.3.1 on 2024-09-28T18:34:44.260116300Z.
+
 #include <tcMenu.h>
 #include "nano33ble_menu.h"
-#include "../ThemeMonoInverse.h"
+#include "ThemeMonoInverseBuilder.h"
 
 // Global variable declarations
 const  ConnectorLocalInfo applicationInfo = { "Nano 33 BLE Sense", "e95fcf8a-8a03-4043-9313-01fd8b8e8707" };
@@ -62,8 +64,6 @@ void setupMenu() {
     renderer.setUpdatesPerSecond(10);
     switches.init(internalDigitalIo(), SWITCHES_POLL_EVERYTHING, true);
     menuMgr.initForEncoder(&renderer, &menuTemp, 5, 6, 4);
-    renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
-    renderer.setUseSliderForAnalog(false);
-    installMonoInverseTitleTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(nullptr, 1), true);
+    installMonoInverseTitleTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(nullptr, 1), true, BaseGraphicalRenderer::TITLE_FIRST_ROW, false);
 }
 

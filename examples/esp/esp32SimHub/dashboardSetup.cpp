@@ -2,6 +2,7 @@
 #include "dashboardSetup.h"
 #include "Fonts/RobotoMonoBold60pt.h"
 #include <Fonts/FreeSans18pt7b.h>
+#include <Fonts/FreeSans9pt7b.h>
 
 DrawableDashboard* dashCustomDrawing;
 CustomDashboardDelegate dashboardDelegate;

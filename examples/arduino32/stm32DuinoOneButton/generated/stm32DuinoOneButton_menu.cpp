@@ -8,11 +8,11 @@
     use elsewhere.
  */
 
-// Generated for STM32Duino by TcMenu 4.3.0-SNAPSHOT on 2024-07-27T07:53:35.721721700Z.
+// Generated for STM32Duino by TcMenu 4.3.1 on 2024-09-22T11:33:46.688735900Z.
 
 #include <tcMenu.h>
 #include "stm32DuinoOneButton_menu.h"
-#include "../ThemeMonoInverse.h"
+#include "../ThemeMonoInverseBuilder.h"
 #include <Fonts/OpenSansRegular8pt.h>
 
 // Global variable declarations
@@ -56,9 +56,6 @@ void setupMenu() {
     switches.init(internalDigitalIo(), SWITCHES_POLL_EVERYTHING, false);
     menuMgr.initWithoutInput(&renderer, &menuPressMe);
     oneButtonHandler.start();
-    renderer.setTitleMode(BaseGraphicalRenderer::NO_TITLE);
-    renderer.setUseSliderForAnalog(false);
-    renderer.enableTcUnicode();
-    installMonoInverseTitleTheme(renderer, MenuFontDef(&OpenSansRegular8pt, 0), MenuFontDef(&OpenSansRegular8pt, 0), true);
+    installMonoInverseTitleTheme(renderer, MenuFontDef(&OpenSansRegular8pt, 0), MenuFontDef(&OpenSansRegular8pt, 0), true, BaseGraphicalRenderer::NO_TITLE, true);
 }
 

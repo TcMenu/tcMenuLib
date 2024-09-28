@@ -9,7 +9,7 @@
  * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
  */
 
-#include "generated/nano33ble_menu.h"
+#include "nano33ble_menu.h"
 #include "SensorManager.h"
 #include "MotionDetection.h"
 #include <AnalogDeviceAbstraction.h>

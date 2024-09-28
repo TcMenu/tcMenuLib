@@ -14,7 +14,7 @@
 #include <Arduino.h>
 #include <tcMenu.h>
 #include <tcUnicodeHelper.h>
-#include "tcMenuTfteSpi.h"
+#include "tcMenuAdaFruitGfx.h"
 #include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
@@ -23,10 +23,11 @@
 
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
-extern TFT_eSPI gfx;
-extern TfteSpiDrawable gfxDrawable;
+extern Adafruit_ST7735 gfx;
+extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
-extern const UnicodeFont OpenSansCyrillicLatin12[];
+extern const UnicodeFont OpenSansRegular8pt[];
+extern const UnicodeFont OpenSansRegular10pt[];
 
 // Any externals needed by IO expanders, EEPROMs etc
 

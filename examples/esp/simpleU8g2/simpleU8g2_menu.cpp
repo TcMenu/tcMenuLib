@@ -8,9 +8,11 @@
     use elsewhere.
  */
 
+// Generated for Arduino ESP8266 by TcMenu 4.3.1 on 2024-09-28T17:02:47.500480100Z.
+
 #include <tcMenu.h>
 #include "simpleU8g2_menu.h"
-#include "ThemeMonoBordered.h"
+#include "ThemeMonoBorderedBuilder.h"
 
 // Global variable declarations
 const PROGMEM  ConnectorLocalInfo applicationInfo = { "Simple U8G2 Toaster", "fddaa423-cb5c-4024-8f67-a9742f4457f3" };
@@ -64,8 +66,6 @@ void setupMenu() {
     renderer.setUpdatesPerSecond(10);
     switches.init(internalDigitalIo(), SWITCHES_POLL_EVERYTHING, true);
     menuMgr.initForEncoder(&renderer, &menuToasterPower, 13, 12, 14);
-    renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
-    renderer.setUseSliderForAnalog(false);
-    installMonoBorderedTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(u8g2_font_finderskeepers_tf, 1), true);
+    installMonoBorderTitleTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(u8g2_font_finderskeepers_tf, 1), true, BaseGraphicalRenderer::TITLE_FIRST_ROW, false);
 }
 

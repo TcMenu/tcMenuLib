@@ -612,17 +612,22 @@
         "subsystem": "INPUT"
       },
       {
-        "name": "ETH_LIBRARY_TYPE",
+        "name": "CLIP_ETH_LIBRARY_TYPE",
         "latestValue": "ESP32_WIFI",
         "subsystem": "REMOTE"
       },
       {
-        "name": "REMOTE_IP_ADDRESS",
-        "latestValue": "192.168.0.37",
+        "name": "CLIP_ADDR_TYPE",
+        "latestValue": "variable",
         "subsystem": "REMOTE"
       },
       {
-        "name": "REMOTE_PORT",
+        "name": "CLIP_REMOTE_ADDRESS",
+        "latestValue": "myIpAddress",
+        "subsystem": "REMOTE"
+      },
+      {
+        "name": "CLIP_REMOTE_PORT",
         "latestValue": "3333",
         "subsystem": "REMOTE"
       },

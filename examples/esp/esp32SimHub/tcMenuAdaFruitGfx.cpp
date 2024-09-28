@@ -100,6 +100,7 @@ void AdafruitDrawable::drawBitmapNbpp(const Coord& where, const uint8_t* data, c
             asTft->writePixels(memBuffer, next);
             next = 0;
         }
+        byteIteration = bitsInByte; // always need a new byte in this case
     }
 
     asTft->endWrite();
@@ -622,5 +623,6 @@ void AdafruitCanvasDrawable2bpp::drawBitmapNbpp(const Coord& where, const uint8_
             byteIteration++;
             canvas->drawPixel(x, y, idx);
         }
+        byteIteration = bitsInByte; // always need a new byte in this case
     }
 }

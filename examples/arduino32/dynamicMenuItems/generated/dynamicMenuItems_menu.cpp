@@ -8,16 +8,19 @@
     use elsewhere.
  */
 
+// Generated for Arduino 32bit ARM by TcMenu 4.3.1 on 2024-09-28T08:15:53.193774100Z.
+
 #include <tcMenu.h>
 #include "dynamicMenuItems_menu.h"
-#include "../ThemeCoolBlueTraditional.h"
+#include "../ThemeCoolBlueTraditionalBuilder.h"
+#include <Fonts/OpenSansRegular8pt.h>
 #include <Fonts/OpenSansCyrillicLatin12.h>
 
 // Global variable declarations
 const  ConnectorLocalInfo applicationInfo = { "Dynamic Menus", "5f22995e-8da2-49c4-9ec8-d055901003af" };
 IoAbstractionRef ioexp_io23017 = ioFrom23017(0x20, ACTIVE_LOW_OPEN, 10);
 Adafruit_ST7735 gfx(1, 0, -1);
-AdafruitDrawable gfxDrawable(&gfx, 20);
+AdafruitDrawable gfxDrawable(&gfx, 40);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 MatrixKeyboardManager keyboard;
 const char keyboardKeys[]  = "123A456B789C*0#D";
@@ -95,9 +98,6 @@ void setupMenu() {
     keyboardLayout.setColPin(3, 12);
     keyboard.initialise(ioexp_io23017, &keyboardLayout, &tcMenuKeyListener, true);
     keyboard.setRepeatKeyMillis(850, 350);
-    renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
-    renderer.setUseSliderForAnalog(true);
-    renderer.enableTcUnicode();
-    installCoolBlueTraditionalTheme(renderer, MenuFontDef(&OpenSansCyrillicLatin12, 0), MenuFontDef(&OpenSansCyrillicLatin12, 0), true);
+    installCoolBlueTraditionalTheme(renderer, MenuFontDef(&OpenSansRegular8pt, 0), MenuFontDef(&OpenSansCyrillicLatin12, 0), true, BaseGraphicalRenderer::TITLE_FIRST_ROW, true);
 }
 

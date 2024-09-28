@@ -30,8 +30,8 @@ extern Adafruit_ILI9341 gfx;
 extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
 extern ESP32TouchKeysAbstraction esp32Touch;
-extern const GFXfont FreeSans9pt7b;
-extern const GFXfont FreeSans12pt7b;
+extern const UnicodeFont OpenSansCyrillicLatin14[];
+extern const UnicodeFont OpenSansCyrillicLatin18[];
 
 // Any externals needed by IO expanders, EEPROMs etc
 
