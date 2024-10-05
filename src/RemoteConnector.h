@@ -253,38 +253,40 @@ public:
      * Encode a custom message onto the wire in the TagVal protocol, provide the message type and a function that sets
      * the fields you wish to send. This works by you providing the type of message and a function that will set all the
      * fields by calling transport's add field methods. Once that method returns the message will be completed and
-     * sent on the wire.
+     * sent on the wire. Where myData can be a pointer to any data you need to provide, it allows you to get data into
+     * the lambda without enabling captures.
      *
      * ```
      * // first we define out custom message, we'd define any custom fields the same way.
      * #define MSG_CUSTOM msgFieldToWord('Z','Z')
      *
      * // then we call the function to send the message, it wraps up the message for us.
-     * myConnector.encodeCustomTagValMessage(MSG_CUSTOM, [](TagValueTransport* transport) {
+     * myConnector.encodeCustomTagValMessage(MSG_CUSTOM, [](TagValueTransport* transport, void* myData) {
      *     transport.writeField(FIELD_BUFFER, "12345");
      *     transport.writeFieldInt(FIELD_VERSION, 123);
      *     transport.writeFieldLong(FIELD_HB_MILLISEC, 2039349L);
-     * });
+     * }, myData);
      * ```
      */
-    void encodeCustomTagValMessage(uint16_t msgType, void (*msgWriter)(TagValueTransport*));
+    void encodeCustomTagValMessage(uint16_t msgType, void (*msgWriter)(TagValueTransport*, void*), void*);
 
     /**
      * Encode a binary message onto the wire using your own format, note that the other end must be able to process this
      * type of message. Embed Control UI will not understand such custom messages. This works by you providing the type
-     * of message and a function that will set all the binary data direct to the transport using the write function.
+     * of message and a function that will set all the binary data direct to the transport using the write function. The
+     * myData parameter allows you to pass data into the lambda with enabling capture.
      *
      * ```
      * // first we define out custom message, we'd define any custom fields the same way.
      * #define MSG_CUSTOM msgFieldToWord('Z','Z')
      *
      * // then we call the function to send the message, it wraps up the message for us.
-     * myConnector.encodeCustomBinaryMessage(MSG_CUSTOM, len, [](TagValueTransport* transport) {
-     *     transport.write(binDataByte);
-     * });
+     * myConnector.encodeCustomBinaryMessage(MSG_CUSTOM, len, [](TagValueTransport* transport, void* myData, size_t len) {
+     *     transport.writeChar(binDataByte);
+     * }, myData);
      * ```
      */
-    void encodeCustomBinaryMessage(uint16_t msgType, uint16_t len, void (*msgWriter)(TagValueTransport*, void*), void* data = nullptr);
+    void encodeCustomBinaryMessage(uint16_t msgType, uint16_t len, void (*msgWriter)(TagValueTransport*, void*, size_t), void* data = nullptr);
 
     /**
      * Encodes a dialog message that the UI can use to render / remove a dialog from the display.

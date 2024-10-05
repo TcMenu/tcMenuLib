@@ -37,6 +37,10 @@ extern const UnicodeFont OpenSansCyrillicLatin14[];
 
 
 // Global Menu Item exports
+extern BooleanMenuItem menuWiFiConnected;
+extern IpAddressMenuItem menuWiFiIPAddress;
+extern BackMenuItem menuBackWiFi;
+extern SubMenuItem menuWiFi;
 extern FloatMenuItem menuAnalogA1Value;
 extern AnalogMenuItem menuAnalogA0DAC;
 extern BackMenuItem menuBackAnalog;
@@ -47,17 +51,15 @@ extern BackMenuItem menuBackShowXbmp;
 extern SubMenuItem menuShowXbmp;
 extern ActionMenuItem menuScrollTextStartScroll;
 extern TextMenuItem menuScrollTextText;
-extern AnalogMenuItem menuScrollTextSpeed;
 extern BackMenuItem menuBackScrollText;
 extern SubMenuItem menuScrollText;
 extern ActionMenuItem menuZoomTextStartZoom;
-extern TextMenuItem menuZoomTextText;
-extern AnalogMenuItem menuZoomTextSpeed;
-extern BackMenuItem menuBackZoomText;
-extern SubMenuItem menuZoomText;
+extern AnalogMenuItem menuDiscoSpeed;
+extern BackMenuItem menuBackDisco;
+extern SubMenuItem menuDisco;
 
 // Provide a wrapper to get hold of the root menu item and export setupMenu
-inline MenuItem& rootMenuItem() { return menuZoomText; }
+inline MenuItem& rootMenuItem() { return menuDisco; }
 void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
@@ -66,5 +68,7 @@ void setupMenu();
 int fnShowXbmpXbmpRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
 void CALLBACK_FUNCTION onAnalogDacChange(int id);
 void CALLBACK_FUNCTION onShowXbmp(int id);
+void CALLBACK_FUNCTION onStartDisco(int id);
+void CALLBACK_FUNCTION onStartScroll(int id);
 
 #endif // MENU_GENERATED_CODE_H

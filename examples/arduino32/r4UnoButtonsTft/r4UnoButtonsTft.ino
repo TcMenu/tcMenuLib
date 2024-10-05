@@ -1,6 +1,9 @@
 /**
  * An example sketch for the Arduino Uno R4 Wifi board that includes support for a TFT screen and keypad input. It
- * also has remote connectivity in the form of the inbuilt Wi-Fi module.
+ * also has remote connectivity in the form of the inbuilt Wi-Fi module. The sketch controls the LED Matrix on the R4
+ * WiFi version somewhat akin to a disco.
+ *
+ * The "disco" functionality is in DiscoTime.h/cpp to keep this file cleaner.
  *
  * For the example I connected the TFT as follows:
  *   SCLK - 13, COPI - 12, CS - 10, RST - 12, RS/DC - 9
@@ -13,16 +16,35 @@
 #include <graphics/TcThemeBuilder.h>
 #include <stockIcons/wifiAndConnectionIcons16x12.h>
 #include <tcMenuVersion.h>
-#include <Arduino_LED_Matrix.h>
 #include <WiFi.h>
+#include "DiscoTime.h"
 
 bool wifiFailed = false;
 
 TitleWidget wifiWidget(iconsWifi, 5, 16, 12);
 TitleWidget connectedWidget(iconsConnection, 2, 16, 12);
 
-// This is the Arduino library that lets us control the LED matrix.
-ArduinoLEDMatrix matrix;
+DiscoTime discoTime;
+
+// At the moment the Wi-Fi on this board has an issue with TagVal.
+// We do not recommend using the Wi-Fi yet.
+#define R4_START_WIFI false
+
+void tryAndStartWifi() {
+#if (R4_START_WIFI == true)
+    serlogF(SER_DEBUG, "Attempt WiFi begin");
+    int started = WiFi.begin("yourssid", "yourpwd");
+    if(started == WL_CONNECTED) {
+        serlogF(SER_DEBUG, "WiFi Up");
+        menuWiFiConnected.setBoolean(true);
+        auto ip = WiFi.localIP();
+        menuWiFiIPAddress.setIpAddress(ip[0], ip[1], ip[2], ip[3]);
+    } else {
+        serlogF2(SER_ERROR, "Retrying in 2 seconds", started);
+        taskManager.schedule(onceSeconds(2), tryAndStartWifi);
+    }
+#endif
+}
 
 void setup() {
     Serial.begin(115200);
@@ -30,7 +52,6 @@ void setup() {
     internalAnalogDevice().initPin(DAC, DIR_OUT);
     internalAnalogDevice().initPin(A1, DIR_IN);
     internalAnalogDevice().setCurrentValue(DAC, 0);
-    matrix.begin();
 
     setupMenu();
 
@@ -47,6 +68,7 @@ void setup() {
         serlogF(SER_ERROR, "WiFi module failure");
         wifiFailed = true;
         wifiWidget.setCurrentState(0);
+        menuWiFiConnected.setBoolean(false);
     }
 
     if(!wifiFailed) {
@@ -54,7 +76,7 @@ void setup() {
         if (fv < WIFI_FIRMWARE_LATEST_VERSION) {
             serlogF(SER_WARNING, "Please upgrade the firmware");
         }
-        WiFi.config(IPAddress(192, 168, 0, 160));
+        taskManager.schedule(onceMillis(100), tryAndStartWifi);
     }
 
     // The easiest way to adjust drawing parameters is using theme builder. Here we are going to add two title widgets
@@ -68,6 +90,8 @@ void setup() {
     setTitlePressedCallback([](int) {
         showVersionDialog(&applicationInfo);
     });
+
+    discoTime.init();
 }
 
 void loop() {
@@ -94,28 +118,20 @@ void CALLBACK_FUNCTION onAnalogDacChange(int id) {
     internalAnalogDevice().setCurrentFloat(DAC, menuAnalogA0DAC.getCurrentValue() / 100.0F);
 }
 
-void drawCanvasToLeds(GFXcanvas1& canvas) {
-    uint32_t output[3] = {0};
-    int position = 0;
-    for(int row=0; row<8; row++) {
-        for(int col=0; col<12; col++) {
-            auto pix = canvas.getPixel(col, row);
-            if(pix) {
-                output[position / 32] |= (1 << ((31 - (position % 32))));
-                serlogF4(SER_DEBUG, "Pix/y pos on ", col, row, position);
-            }
-            position++;
-        }
-    }
-    serlogHexDump(SER_DEBUG, "Output=", output, 8);
-    matrix.loadFrame(output);
-}
-
 void CALLBACK_FUNCTION onShowXbmp(int id) {
     GFXcanvas1 canvas(12, 8);
     auto imgIdx = menuShowXbmpXbmp.getCurrentValue();
     if(imgIdx < 0 || imgIdx >= NUMBER_OF_XBMPS) return;
 
-    canvas.drawXBitmap(0, 0, imageWithDescription[imgIdx].getData(), 12, 8, 1);
-    drawCanvasToLeds(canvas);
+    discoTime.picture(imageWithDescription[imgIdx].getData());
+}
+
+void CALLBACK_FUNCTION onStartDisco(int id) {
+    discoTime.start(menuDiscoSpeed.getCurrentValue() * 20);
+}
+
+void CALLBACK_FUNCTION onStartScroll(int id) {
+    char sz[20];
+    menuScrollTextText.copyValue(sz, sizeof sz);
+    discoTime.text(sz);
 }

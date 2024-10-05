@@ -354,9 +354,9 @@ void TagValueRemoteConnector::encodeDialogMsg(uint8_t mode, uint8_t btn1, uint8_
     transport->endMsg();
 }
 
-void TagValueRemoteConnector::encodeCustomTagValMessage(uint16_t msgType, void (*msgWriter)(TagValueTransport*)) {
+void TagValueRemoteConnector::encodeCustomTagValMessage(uint16_t msgType, void (*msgWriter)(TagValueTransport*, void* data), void* data) {
     if(!prepareWriteMsg(msgType)) return;
-    msgWriter(transport);
+    msgWriter(transport, data);
     transport->endMsg();
     serlogF2(SER_NETWORK_INFO, "Msg wr ", msgType);
 }
@@ -403,7 +403,7 @@ bool TagValueRemoteConnector::prepareWriteMsg(uint16_t msgType) {
     return true;
 }
 
-void TagValueRemoteConnector::encodeCustomBinaryMessage(uint16_t msgType, uint16_t len, void (*msgWriter)(TagValueTransport*, void* data), void* data) {
+void TagValueRemoteConnector::encodeCustomBinaryMessage(uint16_t msgType, uint16_t len, void (*msgWriter)(TagValueTransport*, void* data, size_t len), void* data) {
     if(!transport->connected()) {
         logMessageHeader("Wr ErrB ", remoteNo, msgType);
         commsNotify(COMMSERR_WRITE_NOT_CONNECTED);
@@ -413,7 +413,7 @@ void TagValueRemoteConnector::encodeCustomBinaryMessage(uint16_t msgType, uint16
     transport->startBinMsg(msgType, len);
     ticksLastSend = 0;
     logMessageHeader("Bin Out ", remoteNo, msgType);
-    msgWriter(transport, data);
+    msgWriter(transport, data, len);
     transport->endMsg();
     serlogF2(SER_NETWORK_INFO, "Bin write complete", msgType);
 }

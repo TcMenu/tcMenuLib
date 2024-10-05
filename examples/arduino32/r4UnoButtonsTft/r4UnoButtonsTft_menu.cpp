@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for Arduino 32bit ARM by TcMenu 4.3.1 on 2024-09-30T14:19:12.727720400Z.
+// Generated for Arduino 32bit ARM by TcMenu 4.3.1 on 2024-10-05T10:48:44.197140800Z.
 
 #include <tcMenu.h>
 #include "r4UnoButtonsTft_menu.h"
@@ -17,7 +17,7 @@
 #include <Fonts/OpenSansCyrillicLatin14.h>
 
 // Global variable declarations
-const  ConnectorLocalInfo applicationInfo = { "Uno R4 Demo", "4f60a98f-ca51-4c80-acbd-78bfd1e90c8d" };
+const  ConnectorLocalInfo applicationInfo = { "R4 Disco", "4f60a98f-ca51-4c80-acbd-78bfd1e90c8d" };
 TcMenuRemoteServer remoteServer(applicationInfo);
 
 Adafruit_ST7735 gfx(10, 9, 12);
@@ -29,13 +29,20 @@ EthernetTagValTransport ethernetTransport;
 TagValueRemoteServerConnection ethernetConnection(ethernetTransport, ethernetInitialisation);
 
 // Global Menu Item declarations
+const BooleanMenuInfo minfoWiFiConnected = { "Connected", 17, 0xffff, 1, NO_CALLBACK, NAMING_YES_NO };
+BooleanMenuItem menuWiFiConnected(&minfoWiFiConnected, false, nullptr, INFO_LOCATION_PGM);
+const AnyMenuInfo minfoWiFiIPAddress = { "IP Address", 16, 0xffff, 0, NO_CALLBACK };
+IpAddressMenuItem menuWiFiIPAddress(&minfoWiFiIPAddress, IpAddressStorage(127, 0, 0, 1), &menuWiFiConnected, INFO_LOCATION_PGM);
+const SubMenuInfo minfoWiFi = { "WiFi", 15, 0xffff, 0, NO_CALLBACK };
+BackMenuItem menuBackWiFi(&minfoWiFi, &menuWiFiIPAddress, INFO_LOCATION_PGM);
+SubMenuItem menuWiFi(&minfoWiFi, &menuBackWiFi, nullptr, INFO_LOCATION_PGM);
 const FloatMenuInfo minfoAnalogA1Value = { "A1 Value", 14, 0xffff, 3, NO_CALLBACK };
 FloatMenuItem menuAnalogA1Value(&minfoAnalogA1Value, 0.0, nullptr, INFO_LOCATION_PGM);
 const AnalogMenuInfo minfoAnalogA0DAC = { "A0 DAC", 13, 0xffff, 100, onAnalogDacChange, 0, 1, "%" };
 AnalogMenuItem menuAnalogA0DAC(&minfoAnalogA0DAC, 0, &menuAnalogA1Value, INFO_LOCATION_PGM);
 const SubMenuInfo minfoAnalog = { "Analog", 12, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackAnalog(&minfoAnalog, &menuAnalogA0DAC, INFO_LOCATION_PGM);
-SubMenuItem menuAnalog(&minfoAnalog, &menuBackAnalog, nullptr, INFO_LOCATION_PGM);
+SubMenuItem menuAnalog(&minfoAnalog, &menuBackAnalog, &menuWiFi, INFO_LOCATION_PGM);
 const AnyMenuInfo minfoShowXbmpShowImage = { "Show Image", 11, 0xffff, 0, onShowXbmp };
 ActionMenuItem menuShowXbmpShowImage(&minfoShowXbmpShowImage, nullptr, INFO_LOCATION_PGM);
 const AnyMenuInfo minfoShowXbmpXbmp = { "Xbmp", 8, 0xffff, 0, NO_CALLBACK };
@@ -43,24 +50,20 @@ ScrollChoiceMenuItem menuShowXbmpXbmp(&minfoShowXbmpXbmp, fnShowXbmpXbmpRtCall, 
 const SubMenuInfo minfoShowXbmp = { "Show Xbmp", 7, 0xffff, 0, NO_CALLBACK };
 BackMenuItem menuBackShowXbmp(&minfoShowXbmp, &menuShowXbmpXbmp, INFO_LOCATION_PGM);
 SubMenuItem menuShowXbmp(&minfoShowXbmp, &menuBackShowXbmp, &menuAnalog, INFO_LOCATION_PGM);
-const AnyMenuInfo minfoScrollTextStartScroll = { "Start Scroll", 9, 0xffff, 0, NO_CALLBACK };
+const AnyMenuInfo minfoScrollTextStartScroll = { "Start Scroll", 9, 0xffff, 0, onStartScroll };
 ActionMenuItem menuScrollTextStartScroll(&minfoScrollTextStartScroll, nullptr, INFO_LOCATION_PGM);
 const AnyMenuInfo minfoScrollTextText = { "Text", 6, 0xffff, 0, NO_CALLBACK };
-TextMenuItem menuScrollTextText(&minfoScrollTextText, "Hello", 16, &menuScrollTextStartScroll, INFO_LOCATION_PGM);
-const AnalogMenuInfo minfoScrollTextSpeed = { "Speed", 5, 0xffff, 255, NO_CALLBACK, 0, 1, "Unit" };
-AnalogMenuItem menuScrollTextSpeed(&minfoScrollTextSpeed, 0, &menuScrollTextText, INFO_LOCATION_PGM);
+TextMenuItem menuScrollTextText(&minfoScrollTextText, "TcMenu", 16, &menuScrollTextStartScroll, INFO_LOCATION_PGM);
 const SubMenuInfo minfoScrollText = { "Scroll Text", 4, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackScrollText(&minfoScrollText, &menuScrollTextSpeed, INFO_LOCATION_PGM);
+BackMenuItem menuBackScrollText(&minfoScrollText, &menuScrollTextText, INFO_LOCATION_PGM);
 SubMenuItem menuScrollText(&minfoScrollText, &menuBackScrollText, &menuShowXbmp, INFO_LOCATION_PGM);
-const AnyMenuInfo minfoZoomTextStartZoom = { "Start Zoom", 10, 0xffff, 0, NO_CALLBACK };
+const AnyMenuInfo minfoZoomTextStartZoom = { "Start Disco", 10, 0xffff, 0, onStartDisco };
 ActionMenuItem menuZoomTextStartZoom(&minfoZoomTextStartZoom, nullptr, INFO_LOCATION_PGM);
-const AnyMenuInfo minfoZoomTextText = { "Text", 3, 0xffff, 0, NO_CALLBACK };
-TextMenuItem menuZoomTextText(&minfoZoomTextText, "TcMenu", 16, &menuZoomTextStartZoom, INFO_LOCATION_PGM);
-const AnalogMenuInfo minfoZoomTextSpeed = { "Speed", 2, 0xffff, 255, NO_CALLBACK, 0, 1, "Unit" };
-AnalogMenuItem menuZoomTextSpeed(&minfoZoomTextSpeed, 0, &menuZoomTextText, INFO_LOCATION_PGM);
-const SubMenuInfo minfoZoomText = { "Zoom Text", 1, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackZoomText(&minfoZoomText, &menuZoomTextSpeed, INFO_LOCATION_PGM);
-SubMenuItem menuZoomText(&minfoZoomText, &menuBackZoomText, &menuScrollText, INFO_LOCATION_PGM);
+const AnalogMenuInfo minfoDiscoSpeed = { "Speed", 2, 0xffff, 10, NO_CALLBACK, 0, 1, "" };
+AnalogMenuItem menuDiscoSpeed(&minfoDiscoSpeed, 2, &menuZoomTextStartZoom, INFO_LOCATION_PGM);
+const SubMenuInfo minfoDisco = { "Disco", 1, 0xffff, 0, NO_CALLBACK };
+BackMenuItem menuBackDisco(&minfoDisco, &menuDiscoSpeed, INFO_LOCATION_PGM);
+SubMenuItem menuDisco(&minfoDisco, &menuBackDisco, &menuScrollText, INFO_LOCATION_PGM);
 
 void setupMenu() {
     // First we set up eeprom and authentication (if needed).
@@ -70,7 +73,7 @@ void setupMenu() {
     gfx.setRotation(3);
     renderer.setUpdatesPerSecond(5);
     switches.init(internalDigitalIo(), SWITCHES_POLL_EVERYTHING, true);
-    menuMgr.initFor4WayJoystick(&renderer, &menuZoomText, 4, 5, 6, 7, -1, 20);
+    menuMgr.initFor4WayJoystick(&renderer, &menuDisco, 4, 5, 6, 7, -1, 20);
     remoteServer.addConnection(&ethernetConnection);
     installCoolBlueTraditionalTheme(renderer, MenuFontDef(&OpenSansRegular12pt, 0), MenuFontDef(&OpenSansCyrillicLatin14, 0), true, BaseGraphicalRenderer::TITLE_FIRST_ROW, true);
 }

@@ -8,8 +8,8 @@
       "type": "subMenu",
       "item": {
         "secured": false,
-        "name": "Zoom Text",
-        "variableName": "ZoomText",
+        "name": "Disco",
+        "variableName": "Disco",
         "id": 1,
         "eepromAddress": -1,
         "readOnly": false,
@@ -21,33 +21,16 @@
     {
       "parentId": 1,
       "type": "analogItem",
-      "defaultValue": "0",
+      "defaultValue": "2",
       "item": {
-        "maxValue": 255,
+        "maxValue": 10,
         "offset": 0,
         "divisor": 1,
-        "unitName": "Unit",
+        "unitName": "",
         "step": 1,
         "name": "Speed",
-        "variableName": "ZoomTextSpeed",
+        "variableName": "DiscoSpeed",
         "id": 2,
-        "eepromAddress": -1,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 1,
-      "type": "textItem",
-      "defaultValue": "TcMenu",
-      "item": {
-        "textLength": 16,
-        "itemType": "PLAIN_TEXT",
-        "name": "Text",
-        "variableName": "ZoomTextText",
-        "id": 3,
         "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
@@ -59,10 +42,11 @@
       "parentId": 1,
       "type": "actionMenu",
       "item": {
-        "name": "Start Zoom",
+        "name": "Start Disco",
         "variableName": "ZoomTextStartZoom",
         "id": 10,
         "eepromAddress": -1,
+        "functionName": "onStartDisco",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -86,28 +70,8 @@
     },
     {
       "parentId": 4,
-      "type": "analogItem",
-      "defaultValue": "0",
-      "item": {
-        "maxValue": 255,
-        "offset": 0,
-        "divisor": 1,
-        "unitName": "Unit",
-        "step": 1,
-        "name": "Speed",
-        "variableName": "ScrollTextSpeed",
-        "id": 5,
-        "eepromAddress": -1,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 4,
       "type": "textItem",
-      "defaultValue": "Hello",
+      "defaultValue": "TcMenu",
       "item": {
         "textLength": 16,
         "itemType": "PLAIN_TEXT",
@@ -129,6 +93,7 @@
         "variableName": "ScrollTextStartScroll",
         "id": 9,
         "eepromAddress": -1,
+        "functionName": "onStartScroll",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -235,6 +200,54 @@
         "visible": true,
         "staticDataInRAM": false
       }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "WiFi",
+        "variableName": "WiFi",
+        "id": 15,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 15,
+      "type": "textItem",
+      "defaultValue": "",
+      "item": {
+        "textLength": 5,
+        "itemType": "IP_ADDRESS",
+        "name": "IP Address",
+        "variableName": "WiFiIPAddress",
+        "id": 16,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 15,
+      "type": "boolItem",
+      "defaultValue": "false",
+      "item": {
+        "naming": "YES_NO",
+        "name": "Connected",
+        "variableName": "WiFiConnected",
+        "id": 17,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
     }
   ],
   "codeOptions": {
@@ -246,7 +259,7 @@
     ],
     "lastThemeUuid": "57945787-0A04-447B-BBA2-6461FC505397",
     "applicationUUID": "4f60a98f-ca51-4c80-acbd-78bfd1e90c8d",
-    "applicationName": "Uno R4 Demo",
+    "applicationName": "R4 Disco",
     "lastProperties": [
       {
         "name": "DISPLAY_VARIABLE",
@@ -422,8 +435,7 @@
       "menuDefinitions": []
     },
     "packageNamespace": "",
-    "appIsModular": false,
-    "listOfEmbeddedForms": []
+    "appIsModular": false
   },
   "stringLists": []
 }
