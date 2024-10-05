@@ -13,15 +13,12 @@ jobs:
           # - examples/arduino32/nano33ble
           # - examples/arduino32/picoAdafruitDashboard
           # - examples/arduino32/picoAw9523LcdEncoder
-          # - examples/arduino32/piPicoTftTouch
           # - examples/arduino32/stm32DuinoDemo
           # MBED
           # - examples/mbed/stm32EncoderLcdI2c
           # - examples/mbed/stm32f429FrameBuffer
           # - examples/mbed/stm32OledEncoder
           # AVR
-          - example: examples/avr/adafruitST7735Mega
-            board: megaatmega2560
           - example: examples/avr/analogDfRobot
             board: megaatmega2560
           - example: examples/avr/analogJoystick1306Ascii

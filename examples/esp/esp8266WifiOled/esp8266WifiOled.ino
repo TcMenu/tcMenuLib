@@ -25,6 +25,7 @@
 #include <ESP8266WiFi.h>
 #include <EepromItemStorage.h>
 #include "appicons.h"
+#include <graphics/TcThemeBuilder.h>
 
 // contains the graphical widget title components.
 #include "stockIcons/wifiAndConnectionIcons16x12.h"
@@ -39,9 +40,9 @@ char fileChoicesArray[255]{};
 
 // we add two widgets that show both the connection status and wifi signal strength
 // these are added to the renderer and rendered upon any change.
-// https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/rendering-with-tcmenu-lcd-tft-oled/#titlewidget-for-presenting-state-in-icon-form
+// https://tcmenu.github.io/documentation/arduino-libraries//tc-menu/rendering-with-tcmenu-lcd-tft-oled/#drawing-bitmaps-and-presenting-state-with-titlewidget
 TitleWidget connectedWidget(iconsConnection, 2, 16, 12);
-TitleWidget wifiWidget(iconsWifi, 5, 16, 12, &connectedWidget);
+TitleWidget wifiWidget(iconsWifi, 5, 16, 12);
 
 // state used by the sketch
 
@@ -88,9 +89,6 @@ void setup() {
     //Wire.setClock(400000);
     EEPROM.begin(512); // set up the inbuilt ESP rom to use for load and store.
 
-    // here we set the first widget that will be displayed in the title area.
-    renderer.setFirstWidget(&wifiWidget);
-
     // initialise the menu.
     setupMenu();
 
@@ -100,21 +98,36 @@ void setup() {
     startWiFi();
     menuIoTMonitor.registerCommsNotification(onCommsChange);
 
-    // now we add three icons into the icon cache, we should add one for each menu item that we give a grid position
-    // that draws as an image.
-    auto& props = static_cast<ConfigurableItemDisplayPropertiesFactory&>(renderer.getDisplayPropertiesFactory());
-    props.addImageToCache(DrawableIcon(menuElectricHeater.getId(), Coord(APPICON_HEAT_WIDTH, APPICON_HEAT_HEIGHT), DrawableIcon::ICON_XBITMAP, appIconHeatOff, appIconHeatOn));
-    props.addImageToCache(DrawableIcon(menuLockDoor.getId(), Coord(APPICON_LOCK_WIDTH, APPICON_LOCK_HEIGHT), DrawableIcon::ICON_XBITMAP, appIconLockOpen, appIconLockClosed));
-    props.addImageToCache(DrawableIcon(menuSetup.getId(), Coord(APPICON_SETTINGS_WIDTH, APPICON_SETTINGS_HEIGHT), DrawableIcon::ICON_XBITMAP, appIconSettings));
+    // Here we create a theme builder to add title widgets to the top right, and also to override drawing of some
+    // menu items to be multi column (IE three items on a row).
+    // https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/themes/rendering-with-themes-icons-grids/
 
-    // here we override the drawing grid for some menu items, we tell the renderer to draw as icons in a three position
-    // grid, with a fixed height.
-    props.addGridPosition(&menuElectricHeater, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE,3, 2, 3, 26));
-    props.addGridPosition(&menuLockDoor, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 3, 3, 26));
-    props.addGridPosition(&menuSetup, GridPosition(GridPosition::DRAW_AS_ICON_ONLY, GridPosition::JUSTIFY_CENTER_NO_VALUE, 3, 1, 3, 26));
+    TcThemeBuilder themeBuilder(renderer);
+    themeBuilder.addingTitleWidget(wifiWidget)
+        .addingTitleWidget(connectedWidget);
 
-    // after changing the drawing properties, always refresh the cache to ensure it draws properly.
-    tcgfx::ConfigurableItemDisplayPropertiesFactory::refreshCache();
+    // override the electric heater to be in column 1 on row 3 drawn with an icon
+    themeBuilder.menuItemOverride(menuElectricHeater)
+        .withImageXbmp(Coord(APPICON_HEAT_WIDTH, APPICON_HEAT_HEIGHT), appIconHeatOff, appIconHeatOn)
+        .withJustification(tcgfx::GridPosition::JUSTIFY_CENTER_NO_VALUE)
+        .onRowCol(3, 1, 3)
+        .apply();
+
+    // override the door lock to be in column 2 on row 3 drawn with an icon
+    themeBuilder.menuItemOverride(menuLockDoor)
+        .withImageXbmp(Coord(APPICON_LOCK_WIDTH, APPICON_LOCK_HEIGHT), appIconLockOpen, appIconLockClosed)
+        .withJustification(tcgfx::GridPosition::JUSTIFY_CENTER_NO_VALUE)
+        .onRowCol(3, 2, 3)
+        .apply();
+
+    // override the settings menu to be in column 3 on row 3 drawn with an icon
+    themeBuilder.menuItemOverride(menuSetup)
+        .withImageXbmp(Coord(APPICON_SETTINGS_WIDTH, APPICON_SETTINGS_HEIGHT), appIconSettings)
+        .withJustification(tcgfx::GridPosition::JUSTIFY_CENTER_NO_VALUE)
+        .onRowCol(3, 3, 3)
+        .apply();
+
+    themeBuilder.apply();
 
     // now monitor the wifi level every second and report it in a widget.
     taskManager.scheduleFixedRate(1000, [] {
@@ -148,10 +161,10 @@ void setup() {
     // Now we configure our simulated heater and window.. We use inverse
     // logic on the 8574 because it's better at pulling down to GND than up.
     //
-    ioDevicePinMode(ioexp_io8574, WINDOW_PIN, OUTPUT);
-    ioDevicePinMode(ioexp_io8574, HEATER_PIN, OUTPUT);
-    ioDeviceDigitalWrite(ioexp_io8574, WINDOW_PIN, HIGH);
-    ioDeviceDigitalWriteS(ioexp_io8574, HEATER_PIN, HIGH);
+    ioexp_io8574->pinMode(WINDOW_PIN, OUTPUT);
+    ioexp_io8574->pinMode(HEATER_PIN, OUTPUT);
+    ioexp_io8574->digitalWrite(WINDOW_PIN, HIGH);
+    ioexp_io8574->digitalWriteS(HEATER_PIN, HIGH);
 }
 
 //
@@ -182,7 +195,7 @@ void windowOpenFn() {
     }
     else windowOpen = false;
 
-    ioDeviceDigitalWriteS(ioexp_io8574, WINDOW_PIN, windowOpen);
+    ioexp_io8574->digitalWriteS(WINDOW_PIN, windowOpen);
 }
 
 // we are using a simulated low speed PWM to control the heater
@@ -199,7 +212,7 @@ void heaterOnFn() {
     }
     else heaterOn = false;
 
-    ioDeviceDigitalWriteS(ioexp_io8574, HEATER_PIN, heaterOn);
+    ioexp_io8574->digitalWriteS(HEATER_PIN, heaterOn);
 }
 
 //

@@ -70,7 +70,7 @@ namespace tcgfx {
          */
         ThemePropertiesBuilder& withAdaFont(const GFXfont* font, int mag = 1) {
             fontData = font;
-            fontMag = min(1, mag);
+            fontMag = internal_min(1, mag);
             needsProps();
             return *this;
         }
@@ -293,11 +293,11 @@ namespace tcgfx {
         ConfigurableItemDisplayPropertiesFactory &factory;
         ThemePropertiesBuilder propertiesBuilder;
         color_t defaultPalette[4] = {};
-        MenuPadding globalItemPadding = MenuPadding(1);
-        MenuPadding globalTitlePadding = MenuPadding(2);
-        const void *fontData = nullptr;
-        uint8_t fontMag = 1;
-        uint8_t defaultSpacing = 1;
+        MenuPadding globalItemPadding;
+        MenuPadding globalTitlePadding;
+        const void *fontData;
+        uint8_t fontMag;
+        uint8_t defaultSpacing;
     public:
         /**
          * Creates a theme builder by providing the renderer to use with it.
@@ -305,6 +305,14 @@ namespace tcgfx {
          */
         explicit TcThemeBuilder(GraphicsDeviceRenderer& renderer) : renderer(renderer), factory(renderer.getGraphicsPropertiesFactory()),
                                                                     propertiesBuilder(this) {
+            auto titleDef = factory.configFor(nullptr, ItemDisplayProperties::COMPTYPE_TITLE);
+            globalTitlePadding = titleDef->getPadding();
+            auto itemDef = factory.configFor(nullptr, ItemDisplayProperties::COMPTYPE_ITEM);
+            memcpy(defaultPalette, itemDef->getPalette(), sizeof defaultPalette);
+            globalItemPadding = itemDef->getPadding();
+            fontData = itemDef->getFont();
+            fontMag = itemDef->getFontMagnification();
+            defaultSpacing = itemDef->getSpaceAfter();
         }
 
         /**
@@ -327,7 +335,7 @@ namespace tcgfx {
          */
         TcThemeBuilder& withAdaFont(const GFXfont* font, int mag = 1) {
             fontData = font;
-            fontMag = min(1, mag);
+            fontMag = internal_min(1, mag);
             return *this;
         }
 
@@ -453,10 +461,22 @@ namespace tcgfx {
 
         /**
          * Get access to theme properties for a specific menu item, with this you can change how an item renders, and
-         * even apply different grid settings.
+         * even apply different grid settings. This guesses the component type in most cases but if you want to force a
+         * particular component type see the override method with the second parameter.
+         * @param item the menu item to override drawing
          * @return a theme properties builder
          */
         ThemePropertiesBuilder &menuItemOverride(MenuItem &item);
+
+        /**
+         * Get access to theme properties for a specific menu item, with this you can change how an item renders, and
+         * even apply different grid settings. This specifically sets the component type for situations where it cannot
+         * be easily guessed.
+         * @param item the menu item to override drawing.
+         * @param componentType one of `COMPTYPE_TITLE`, `COMPTYPE_ITEM`, `COMPTYPE_ACTION`
+         * @return a theme properties builder
+         */
+        ThemePropertiesBuilder &menuItemOverride(MenuItem &item, ItemDisplayProperties::ComponentType componentType);
 
         /**
          * Get access to theme properties for a sub menu, with this you can change how all items in that submenu render
@@ -543,6 +563,8 @@ namespace tcgfx {
          * @return reference to itself for chaining
          */
         TcThemeBuilder& setMenuAsCard(SubMenuItem& item, bool on);
+        
+        TcThemeBuilder& addingTitleWidget(TitleWidget& theWidget);
 
         /**
          * Call after you've finished configuring your theme, this forces a refresh and ensures it presents properly.

@@ -67,8 +67,12 @@ void ThemePropertiesBuilder::initForLevel(TcThemeBuilder *b, ItemDisplayProperti
         }
         border = props->getBorder();
         justification = props->getDefaultJustification();
+        if(menuItem != nullptr) {
+            drawingMode = modeFromItem(menuItem, b->getRenderer().isUseSliderForAnalog());
+        }
     } else {
         justification = GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT;
+        drawingMode = GridPosition::DRAW_TEXTUAL_ITEM;
         border = MenuBorder(0);
     }
 }
@@ -96,10 +100,21 @@ TcThemeBuilder& TcThemeBuilder::withPalette(const color_t *cols) {
 }
 
 ThemePropertiesBuilder &TcThemeBuilder::menuItemOverride(MenuItem &item) {
-    ItemDisplayProperties::ComponentType ty = (isItemActionable(&item)) ? ItemDisplayProperties::COMPTYPE_ACTION : ItemDisplayProperties::COMPTYPE_ITEM;
+    ItemDisplayProperties::ComponentType ty = ItemDisplayProperties::COMPTYPE_ITEM;
+    if(isItemActionable(&item)) {
+        ty = ItemDisplayProperties::COMPTYPE_ACTION;
+    } else if(item.getMenuType() == MENUTYPE_TITLE_ITEM || item.getMenuType() == MENUTYPE_BACK_VALUE) {
+        ty = ItemDisplayProperties::COMPTYPE_TITLE;
+    }
     propertiesBuilder.initForLevel(this, ty, ThemePropertiesBuilder::THEME_ITEM, &item);
     return propertiesBuilder;
 }
+
+ThemePropertiesBuilder &TcThemeBuilder::menuItemOverride(MenuItem &item, ItemDisplayProperties::ComponentType componentType) {
+    propertiesBuilder.initForLevel(this, componentType, ThemePropertiesBuilder::THEME_ITEM, &item);
+    return propertiesBuilder;
+}
+
 
 TcThemeBuilder& TcThemeBuilder::enableCardLayoutWithXbmImages(Coord iconSize, const uint8_t *leftIcon, const uint8_t *rightIcon, bool isMono) {
     auto left = new DrawableIcon(-1, iconSize, tcgfx::DrawableIcon::ICON_XBITMAP, leftIcon, nullptr);
@@ -136,4 +151,20 @@ TcThemeBuilder& TcThemeBuilder::manualDimensions(int x, int y) {
     renderer.setDisplayDimensions(x, y);
     return *this;
 }
+
+TcThemeBuilder &TcThemeBuilder::addingTitleWidget(TitleWidget &theWidget) {
+    TitleWidget *pWidget = renderer.getFirstWidget();
+    if(pWidget == nullptr) {
+        renderer.setFirstWidget(&theWidget);
+    } else {
+        int loopCount = 0;
+        while(pWidget->getNext() != nullptr && ++loopCount < 10) {
+            pWidget = pWidget->getNext();
+        }
+        pWidget->setNext(&theWidget);
+        renderer.redrawRequirement(MENUDRAW_COMPLETE_REDRAW);
+    }
+    return *this;
+}
+
 

@@ -1,7 +1,11 @@
 // This example shows a simple menu structure with a card layout for the root menu on a TFT. Very simple case of
-// TFT_eSPI for the display, encoder directly connected to device pins.
+// Adafruit GFX ST7735 driver for the display, encoder directly connected to device pins.
+// We have connected the following way, you can adjust as needed in code generator / sketch
+// TFT_DC: 7     MISO: 37      PIN_A:  3
+// TFT_CS: 34    MOSI: 35      PIN_B:  4
+// TFT_RST: 6    SCLK: 36      PIN_OK: 5
 //
-// Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
+// Getting started: https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
 
 #include "generated/esp32s3TftEncoder_menu.h"
 #include "stockIcons/directionalIcons.h"
@@ -9,6 +13,8 @@
 #include "tcMenuVersion.h"
 #include <IoLogging.h>
 #include <stockIcons/wifiAndConnectionIcons16x12.h>
+#include <graphics/TcThemeBuilder.h>
+#include <SPI.h>
 
 //
 // We use a card layout to present the items, here we demonstrate how to set it up and prepare custom menu items that
@@ -16,42 +22,55 @@
 //
 // START card layout and custom layout code
 
-// first we need to define both a left and right button, we use the ones from stockIcons/directionalIcons.h
-DrawableIcon iconLeft(-1, Coord(11, 22), tcgfx::DrawableIcon::ICON_XBITMAP, ArrowHoriz11x22BitmapLeft, nullptr);
-DrawableIcon iconRight(-1, Coord(11, 22), tcgfx::DrawableIcon::ICON_XBITMAP, ArrowHoriz11x22BitmapRight, nullptr);
-
 TitleWidget titleWidget(iconsEthernetConnection, 2, 16, 12);
 
+//
+// This example uses card layout for the main menu, this means that one item shows at a time, as we scroll through
+// the items, the item is replaced on display. We also override the menu items to render as icons using XBMP icons.
+// For each item in the card layout, we override how it is drawn and what row it is drawn on. See:
+// https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/themes/rendering-with-themes-icons-grids/
+//
 void setupGridLayoutForCardView() {
-    auto & factory = renderer.getGraphicsPropertiesFactory();
-
-    // now we make the two settings and status menus use icons instead of regular drawing.
     const Coord iconSize(APPICONS_WIDTH, APPICONS_HEIGHT);
-    factory.addImageToCache(DrawableIcon(menuSettings.getId(), iconSize, DrawableIcon::ICON_XBITMAP, settingsIcon40Bits));
-    factory.addImageToCache(DrawableIcon(menuMute.getId(), iconSize, DrawableIcon::ICON_XBITMAP, muteOffIcon40Bits, muteOnIcon40Bits));
-    const Coord iconBatSize(BATTERY_WIDTH, BATTERY_HEIGHT);
-    factory.addImageToCache(DrawableIcon(menuBattery.getId(), iconBatSize, DrawableIcon::ICON_XBITMAP, batteryIcon40Bits));
+    TcThemeBuilder themeBuilder(renderer);
+    themeBuilder.enableCardLayoutWithXbmImages(Coord(11, 22), ArrowHoriz11x22BitmapLeft, ArrowHoriz11x22BitmapRight, false)
+            .addingTitleWidget(titleWidget)
+            .manualDimensions(128, 128);
 
-    factory.addGridPosition(&menuSettings, GridPosition(GridPosition::DRAW_AS_ICON_TEXT, GridPosition::JUSTIFY_CENTER_NO_VALUE, 0, 60));
-    factory.addGridPosition(&menuMute, GridPosition(GridPosition::DRAW_AS_ICON_TEXT, GridPosition::JUSTIFY_CENTER_NO_VALUE, 1, 60));
-    factory.addGridPosition(&menuBattery, GridPosition(GridPosition::DRAW_AS_ICON_TEXT, GridPosition::JUSTIFY_CENTER_NO_VALUE, 2, 60));
+    themeBuilder.menuItemOverride(menuSettings)
+            .withImageXbmp(iconSize, settingsIcon40Bits)
+            .withDrawingMode(tcgfx::GridPosition::DRAW_AS_ICON_TEXT)
+            .withJustification(tcgfx::GridPosition::JUSTIFY_CENTER_NO_VALUE)
+            .onRow(0)
+            .apply();
 
-    // after adding things to the drawing properties, we must refresh it.
-    tcgfx::ConfigurableItemDisplayPropertiesFactory::refreshCache();
+    themeBuilder.menuItemOverride(menuMute)
+            .withImageXbmp(iconSize, muteOffIcon40Bits, muteOnIcon40Bits)
+            .withJustification(tcgfx::GridPosition::JUSTIFY_CENTER_NO_VALUE)
+            .onRow(1)
+            .apply();
+
+    themeBuilder.menuItemOverride(menuBattery)
+            .withImageXbmp(Coord(BATTERY_WIDTH, BATTERY_HEIGHT), batteryIcon40Bits)
+            .withDrawingMode(tcgfx::GridPosition::DRAW_AS_ICON_TEXT)
+            .withJustification(tcgfx::GridPosition::JUSTIFY_CENTER_NO_VALUE)
+            .onRow(2)
+            .apply();
+
+    // after doing anything with theme builder always call apply.
+    themeBuilder.apply();
 }
 
 // END card / custom layouts
 
 void setup() {
-    Serial.begin(115200);
-
-    serEnableLevel(SER_TCMENU_DEBUG, true);
-    renderer.setFirstWidget(&titleWidget);
     setupMenu();
+    // here we set up the devices and services that we are going to use.
+    Serial.begin(115200);
+    serEnableLevel(SER_TCMENU_DEBUG, true);
+    SPI.begin(36, 37, 35);
 
-    // Here we enable the card layout mode for the main menu by first enabling support, then adding the root menu.
-    // We also set up the item layout for card view by calling our setup function, defined above.
-    renderer.enableCardLayout(iconLeft, iconRight, nullptr, false);
+    // Now we enable the card layout mode for the main menu by first enabling support, then adding the root menu.
     setupGridLayoutForCardView();
 
     // We can set a callback for when the title item is pressed on the main menu, here we show the app version

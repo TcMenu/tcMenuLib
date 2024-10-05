@@ -39,8 +39,8 @@ void MenuTouchScreenManager::sendEvent(float locationX, float locationY, float t
     }
     if(currentlySelected) {
         // find the local size and ensure it does not drop below 0 in either dimension!
-        int locX = max(0, (int)(lastCoord.x - localStart.x));
-        int locY = max(0, (int)(lastCoord.y - localStart.y));
+        int locX = internal_max(0, (int)(lastCoord.x - localStart.x));
+        int locY = internal_max(0, (int)(lastCoord.y - localStart.y));
         sendToObservers(TouchNotification(currentlySelected, Coord(locX, locY), localStart, localSize, touched));
     }
     else {

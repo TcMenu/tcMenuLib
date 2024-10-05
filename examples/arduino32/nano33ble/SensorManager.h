@@ -5,7 +5,7 @@
 #include <Arduino_HTS221.h>
 #include <Arduino_LPS22HB.h>
 #include <MenuItems.h>
-#include "generated/nano33ble_menu.h"
+#include "nano33ble_menu.h"
 
 /**
  * Here we have a class that extends `Executable`, meaning that the `exec()` method is called every time the event

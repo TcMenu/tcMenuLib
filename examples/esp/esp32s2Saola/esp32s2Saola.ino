@@ -2,7 +2,7 @@
 // ESP32 S2 example based on Saola board with a dashboard configuration onto an OLED display
 // I2C on standard pin, 8 and 9 with an SH1106 display
 // encoder on 5, 6 with button on 7
-// Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
+// Getting started: https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
 //
 
 #include "generated/esp32s2Saola_menu.h"
@@ -22,11 +22,11 @@ void startWiFiAndListener();
 
 // we add two widgets that show both the connection status and wifi signal strength
 // these are added to the renderer and rendered upon any change.
-// https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/rendering-with-tcmenu-lcd-tft-oled/#titlewidget-for-presenting-state-in-icon-form
+// https://tcmenu.github.io/documentation/arduino-libraries//tc-menu/rendering-with-tcmenu-lcd-tft-oled
 TitleWidget wifiWidget(iconsWifi, 5, 16, 12);
 
 void setup() {
-    // before proceeding we must start wire and serial, then call setup menu.
+    // before proceeding, we must start wire and serial, then call setup menu.
     Serial.begin(115200);
     serdebugF("Starting ESP32-S2 example");
     Wire.begin();
@@ -110,8 +110,8 @@ void CALLBACK_FUNCTION pressMeActionRun(int id) {
 
 
 // This callback needs to be implemented by you, see the below docs:
-//  1. List Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
-//  2. ScrollChoice Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/scrollchoice-menu-item/
+//  1. List Docs - https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
+//  2. ScrollChoice Docs - https://tcmenu.github.io/documentation/arduino-libraries//tc-menu/menu-item-types/scrollchoice-menu-item/
 int CALLBACK_FUNCTION fnExtrasMyListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
     if(mode == RENDERFN_VALUE && row != LIST_PARENT_ITEM_POS) {
         strncpy(buffer, "Val", bufferSize);

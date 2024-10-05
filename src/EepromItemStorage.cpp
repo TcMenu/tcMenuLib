@@ -15,11 +15,11 @@ uint16_t saveRecursively(EepromAbstraction* eeprom, MenuItem* nextMenuItem) {
     uint16_t lastItemSaved = 0;
     while (nextMenuItem) {
         if (nextMenuItem->getMenuType() == MENUTYPE_SUB_VALUE) {
-            lastItemSaved = max(lastItemSaved, saveRecursively(eeprom, ((SubMenuItem *) nextMenuItem)->getChild()));
+            lastItemSaved = internal_max(lastItemSaved, saveRecursively(eeprom, ((SubMenuItem *) nextMenuItem)->getChild()));
         } else {
             saveMenuItem(eeprom, nextMenuItem);
             if(nextMenuItem->getEepromPosition() != 0xFFFF) {
-                lastItemSaved = max(lastItemSaved, nextMenuItem->getEepromPosition());
+                lastItemSaved = internal_max(lastItemSaved, nextMenuItem->getEepromPosition());
             }
         }
         nextMenuItem = nextMenuItem->getNext();

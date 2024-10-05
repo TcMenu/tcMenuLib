@@ -14,6 +14,7 @@
 #include <PlatformDetermination.h>
 #include <tcMenu.h>
 
+#include <tcUnicodeHelper.h>
 #include "Adafruit_SSD1306.h"
 #include "tcMenuAdaFruitGfxMono.h"
 #include "MBedEthernetTransport.h"
@@ -31,10 +32,11 @@
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
 extern TcMenuRemoteServer remoteServer;
 extern SPI spi;
-extern Adafruit_SSD1306_Spi gfx;
+extern AdafruitSSD1306Spi* gfx;
 extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
 extern MbedEthernetInitialiser mbedEthInitialisation;
+extern const UnicodeFont OpenSansRegular7pt[];
 
 // Any externals needed by IO expanders, EEPROMs etc
 

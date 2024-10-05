@@ -466,7 +466,7 @@ namespace tcgfx {
                 forceDrawWidgets = true;
             }
             if (titleNeeded && (locRedrawMode == MENUDRAW_COMPLETE_REDRAW || titleEntry->getMenuItem()->isChanged(displayNumber))) {
-                bool active = titleNeeded && activeItem == titleEntry->getMenuItem();
+                bool active = activeItem == titleEntry->getMenuItem();
                 drawMenuItem(titleEntry, Coord(0, 0), cardLayoutPane->getTitleSize(), DrawingFlags(true, active, menuMgr.getCurrentEditor() == titleEntry->getMenuItem()));
                 forceDrawWidgets = true;
             } else {
@@ -478,7 +478,7 @@ namespace tcgfx {
                 int offsetY = (cardLayoutPane->getMenuSize().y - int(entry->getHeight())) / 2;
                 Coord menuStart(cardLayoutPane->getMenuLocation().x, cardLayoutPane->getMenuLocation().y + offsetY);
                 Coord menuSize(cardLayoutPane->getMenuSize().x, int(entry->getHeight()));
-                bool active = titleNeeded && activeItem == entry->getMenuItem();
+                bool active = activeItem == entry->getMenuItem();
                 drawMenuItem(entry, menuStart, menuSize, DrawingFlags(false, active, menuMgr.getCurrentEditor() == entry->getMenuItem()));
             }
             cardLayoutPane->prepareAndPaintButtons(this, activeIndex, itemOrderByRow.count(), titleMode != NO_TITLE);
