@@ -680,8 +680,7 @@
       "menuDefinitions": []
     },
     "packageNamespace": "",
-    "appIsModular": false,
-    "listOfEmbeddedForms": []
+    "appIsModular": false
   },
   "stringLists": []
 }

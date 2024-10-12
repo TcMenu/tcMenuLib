@@ -490,7 +490,7 @@
       },
       {
         "name": "ITEM_FONT",
-        "latestValue": "ada:OpenSansCyrillicLatin18,0",
+        "latestValue": "ada:OpenSansCyrillicLatin14,0",
         "subsystem": "THEME"
       },
       {
