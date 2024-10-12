@@ -246,7 +246,7 @@
     "lastRemoteUuids": [
       "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
     ],
-    "lastThemeUuid": "815316bb-76c9-436a-8f83-be0bced963df",
+    "lastThemeUuid": "8D9B49C7-FD28-4533-9B00-21A4184BB0C9",
     "applicationUUID": "fddaa423-cb5c-4024-8f67-a9742f4457f3",
     "applicationName": "Simple U8G2 Toaster",
     "lastProperties": [
@@ -361,8 +361,8 @@
         "subsystem": "THEME"
       },
       {
-        "name": "TITLE_BORDER_WIDTH",
-        "latestValue": "1",
+        "name": "TITLE_HEADER_PADDING",
+        "latestValue": "2",
         "subsystem": "THEME"
       },
       {

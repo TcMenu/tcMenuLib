@@ -227,7 +227,7 @@
     "lastRemoteUuids": [
       "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
     ],
-    "lastThemeUuid": "0dd60ceb-7e0f-46e2-8d40-b264eb3aa7e0",
+    "lastThemeUuid": "396ED4DF-AD7B-4951-A848-A9E5838A549B",
     "applicationUUID": "e95fcf8a-8a03-4043-9313-01fd8b8e8707",
     "applicationName": "Nano 33 BLE Sense",
     "lastProperties": [
@@ -343,12 +343,12 @@
       },
       {
         "name": "TITLE_HEADER_PADDING",
-        "latestValue": "2",
+        "latestValue": "1",
         "subsystem": "THEME"
       },
       {
         "name": "TITLE_TO_ITEM_SPACING",
-        "latestValue": "2",
+        "latestValue": "0",
         "subsystem": "THEME"
       },
       {
@@ -364,13 +364,13 @@
     ],
     "namingRecursive": true,
     "useCppMain": false,
-    "saveLocation": "PROJECT_TO_CURRENT_WITH_GENERATED",
+    "saveLocation": "ALL_TO_CURRENT",
     "usingSizedEEPROMStorage": false,
     "eepromDefinition": "",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
-      "customIO:io23017",
-      "deviceIO:"
+      "deviceIO:",
+      "customIO:io23017"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []

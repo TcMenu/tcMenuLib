@@ -516,7 +516,7 @@ long parseIntUntilSeparator(const char* ptr, int& offset, size_t maximumDigits) 
         offset++;
     }
     // collect the numerics
-    auto maxPos = min(maximumDigits, sizeof(sz) -1);
+    auto maxPos = internal_min(maximumDigits, sizeof(sz) -1);
     while(pos < maxPos && ptr[offset] && ptr[offset] >= '0' && ptr[offset] <= '9') {
         sz[pos++] = ptr[offset++];
     }

@@ -13,6 +13,7 @@
 
 #include <Arduino.h>
 #include <tcMenu.h>
+#include <tcUnicodeHelper.h>
 #include "tcMenuAdaFruitGfx.h"
 #include <RemoteConnector.h>
 #include "SerialTransport.h"
@@ -27,7 +28,8 @@ extern TcMenuRemoteServer remoteServer;
 extern Adafruit_ILI9341 gfx;
 extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
-extern const GFXfont RobotoMedium24;
+extern const UnicodeFont OpenSansRegular18pt[];
+extern const UnicodeFont RobotoMedium24[];
 
 // Any externals needed by IO expanders, EEPROMs etc
 
@@ -52,7 +54,5 @@ void setupMenu();
 #define CALLBACK_FUNCTION
 
 void CALLBACK_FUNCTION onSettingsAction(int id);
-
-extern const EmbedControlFlashedForm* tcMenuAllEmbeddedForms[];
 
 #endif // MENU_GENERATED_CODE_H

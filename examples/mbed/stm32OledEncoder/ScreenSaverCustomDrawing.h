@@ -3,7 +3,7 @@
 #define TCMENUEXAMPLE_SCREENSAVERCUSTOMDRAWING_H
 
 #include "generated/stm32OledEncoder_menu.h"
-#include <Fonts/FreeSans9pt7b.h>
+#include <Fonts/OpenSansRegular8pt.h>
 /**
  * Here we implement the custom drawing class so that we can register for drawing and reset events with it.
  * When the display times out the reset method is called, where in this case we take over the display. Then
@@ -34,9 +34,8 @@ public:
         offsetX = 16;
         offsetY = 16;
 
-        gfx.clearDisplay();
-        gfx.setFont(&FreeSans9pt7b);
-        gfx.setTextSize(1);
+        gfx->clearDisplay();
+        gfx->setFont(OpenSansRegular8pt);
     }
 
     /**
@@ -55,22 +54,22 @@ public:
             offsetY = rand() % 25;
         }
 
-        gfx.clearDisplay();
+        gfx->clearDisplay();
 
-        gfx.setCursor(offsetX, offsetY + 12);
-        gfx.print("Mbed demo");
+        gfx->setCursor(offsetX, offsetY + 12);
+        gfx->print("Mbed demo");
 
-        gfx.setFont(nullptr);
-        gfx.setCursor(5 + offsetX, 20 + offsetY);
+        gfx->setFont(OpenSansRegular8pt);
+        gfx->setCursor(5 + offsetX, 20 + offsetY);
         char sz[32];
         menuRTCDate.copyValue(sz, sizeof sz);
-        gfx.print(sz);
+        gfx->print(sz);
 
-        gfx.setCursor(5 + offsetX, 32 + offsetY);
+        gfx->setCursor(5 + offsetX, 32 + offsetY);
         menuRTCTime.copyValue(sz, sizeof sz);
-        gfx.print(sz);
+        gfx->print(sz);
 
-        gfx.display();
+        gfx->display();
         renderTickCount++;
     }
 

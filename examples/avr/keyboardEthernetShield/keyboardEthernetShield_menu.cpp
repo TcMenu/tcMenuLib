@@ -8,6 +8,8 @@
     use elsewhere.
  */
 
+// Generated for Arduino AVR/Uno/Mega by TcMenu 4.3.1 on 2024-10-12T10:53:14.650442600Z.
+
 #include <tcMenu.h>
 #include "keyboardEthernetShield_menu.h"
 
@@ -114,8 +116,8 @@ void setupMenu() {
     authManager.initialise(menuMgr.getEepromAbstraction(), 100);
     menuMgr.setAuthenticator(&authManager);
     // Now add any readonly, non-remote and visible flags.
-    menuConnectivityAuthenticator.setLocalOnly(true);
     menuConnectivityIoTMonitor.setLocalOnly(true);
+    menuConnectivityAuthenticator.setLocalOnly(true);
     menuConnectivity.setLocalOnly(true);
     menuConnectivity.setSecured(true);
     menuHiddenItem.setVisible(false);

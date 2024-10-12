@@ -68,6 +68,12 @@ extern AnalogMenuItem menuStatusMotor;
 extern AnalogMenuItem menuStatusCurrent;
 extern BackMenuItem menuBackStatus;
 extern SubMenuItem menuStatus;
+extern ActionMenuItem menuStatusCardsDmnd;
+extern ActionMenuItem menuStatusCardsHrts;
+extern ActionMenuItem menuStatusCardsClub;
+extern ActionMenuItem menuStatusCardsAce;
+extern BackMenuItem menuBackStatusCards;
+extern SubMenuItem menuStatusCards;
 extern ActionMenuItem menu78;
 extern ActionMenuItem menu45;
 extern ActionMenuItem menu33;
@@ -84,7 +90,5 @@ int fnRuntimesCustomListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode 
 void CALLBACK_FUNCTION largeNumDidChange(int id);
 void CALLBACK_FUNCTION onDecimalStepChange(int id);
 void CALLBACK_FUNCTION saveWasPressed(int id);
-
-extern const EmbedControlFlashedForm* tcMenuAllEmbeddedForms[];
 
 #endif // MENU_GENERATED_CODE_H

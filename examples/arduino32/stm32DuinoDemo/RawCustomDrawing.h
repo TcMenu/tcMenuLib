@@ -20,7 +20,7 @@ public:
     }
 
     void started(BaseMenuRenderer *currentRenderer) override {
-        // called once when the take-over display  is started before calling renderLoop so you can set things up.
+        // called once when the take-over display is started before calling renderLoop so you can set things up.
         switches.getEncoder()->changePrecision(100, 50);
     }
 
@@ -35,7 +35,7 @@ public:
         }
         else if(++ticks % 10 == 1) {
             // Why write your own code using device drawable? The main reason is, that it works exactly the same over
-            // adafruit, u8g2 and TFTeSPI with a moderately complete API.
+            // Adafruit, PicoSDK, FrameBuffer, u8g2 and TFTeSPI with a moderately complete API.
             DeviceDrawable *dd = dev.getDeviceDrawable();
             dd->startDraw();
             const Coord &dims = dd->getDisplayDimensions();

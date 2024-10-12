@@ -161,7 +161,7 @@
     "lastRemoteUuids": [
       "1e38dc42-672d-4c1c-a393-2c7632bf6c5c"
     ],
-    "lastThemeUuid": "850dc0a3-f534-47c2-94d8-1e64ff368a54",
+    "lastThemeUuid": "57945787-0A04-447B-BBA2-6461FC505397",
     "applicationUUID": "0ad4bdde-34a4-4507-912e-b495b0eac2c1",
     "applicationName": "%project.name",
     "lastProperties": [
@@ -282,17 +282,12 @@
       },
       {
         "name": "ITEM_FONT",
-        "latestValue": "ada:RobotoMedium24,1",
+        "latestValue": "ada:OpenSansRegular18pt,0",
         "subsystem": "THEME"
       },
       {
         "name": "TITLE_FONT",
-        "latestValue": "ada:RobotoMedium24,1",
-        "subsystem": "THEME"
-      },
-      {
-        "name": "BORDER_FOR_ACTIONS",
-        "latestValue": "0",
+        "latestValue": "ada:RobotoMedium24,0",
         "subsystem": "THEME"
       },
       {
@@ -302,11 +297,6 @@
       },
       {
         "name": "USE_TC_UNICODE",
-        "latestValue": "false",
-        "subsystem": "THEME"
-      },
-      {
-        "name": "USE_SLIDER_ANALOG",
         "latestValue": "true",
         "subsystem": "THEME"
       },
@@ -329,10 +319,7 @@
       "menuDefinitions": []
     },
     "packageNamespace": "",
-    "appIsModular": false,
-    "listOfEmbeddedForms": [
-      "Mobile Pico"
-    ]
+    "appIsModular": false
   },
   "stringLists": []
 }

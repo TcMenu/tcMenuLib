@@ -424,7 +424,7 @@
     "lastRemoteUuids": [
       "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
     ],
-    "lastThemeUuid": "850dc0a3-f534-47c2-94d8-1e64ff368a54",
+    "lastThemeUuid": "1947F585-9D36-448C-8A80-B425686107BD",
     "applicationUUID": "4df3d784-674a-4a3d-bcee-54a49693788e",
     "applicationName": "Factory",
     "lastProperties": [
@@ -490,12 +490,12 @@
       },
       {
         "name": "ITEM_FONT",
-        "latestValue": "ada:OpenSansCyrillicLatin18,0",
+        "latestValue": "ada:OpenSansCyrillicLatin14,0",
         "subsystem": "THEME"
       },
       {
         "name": "TITLE_FONT",
-        "latestValue": "ada:RobotoMedium24,1",
+        "latestValue": "ada:RobotoMedium24,0",
         "subsystem": "THEME"
       },
       {
@@ -537,8 +537,7 @@
       "menuDefinitions": []
     },
     "packageNamespace": "",
-    "appIsModular": false,
-    "listOfEmbeddedForms": []
+    "appIsModular": false
   },
   "stringLists": [
     {

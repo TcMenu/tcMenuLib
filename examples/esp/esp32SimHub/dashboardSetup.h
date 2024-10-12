@@ -2,7 +2,7 @@
 #define TCLIBRARYDEV_DASHBOARDSETUP_H
 
 #include <Arduino.h>
-#include "generated/esp32SimHub_menu.h"
+#include "esp32SimHub_menu.h"
 #include <extras/DrawableDashboard.h>
 
 #define LED_STATES 10

@@ -5,9 +5,9 @@
  * However, you can take the ideas from this sketch and apply them in your own designs.
  *
  * More information about matrix keyboard support:
- * https://www.thecoderscorner.com/products/arduino-libraries/io-abstraction/matrix-keyboard-keypad-manager/
+ * https://tcmenu.github.io/documentation/arduino-libraries//io-abstraction/matrix-keyboard-keypad-manager/
  *
- * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
+ * Getting started: https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
  */
 #include "keyboardEthernetShield_menu.h"
 #include <IoAbstractionWire.h>
@@ -153,7 +153,7 @@ const char pgmPinTooShort[] PROGMEM = "Pin too short";
 
 void CALLBACK_FUNCTION onChangePin(int /*id*/) {
     // Here we check if the pin that's just been entered is too short.
-    // Diallowing setting and showing a dialog if it is.
+    // Disallowing setting and showing a dialog if it is.
     const char* newPin = menuConnectivityChangePin.getTextValue();
     if(strlen(newPin) < 4) {
         BaseDialog* dlg = renderer.getDialog();

@@ -29,6 +29,7 @@ extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
 extern MatrixKeyboardManager keyboard;
 extern MenuEditingKeyListener tcMenuKeyListener;
+extern const UnicodeFont OpenSansRegular8pt[];
 extern const UnicodeFont OpenSansCyrillicLatin12[];
 
 // Any externals needed by IO expanders, EEPROMs etc

@@ -233,12 +233,12 @@
   ],
   "codeOptions": {
     "embeddedPlatform": "ARDUINO32",
-    "lastDisplayUuid": "e6342680-6fab-4d1b-ac08-ce8dbfc0974c",
+    "lastDisplayUuid": "4dcb12ec-13d8-4466-b8b6-bd575eae4612",
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
     "lastRemoteUuids": [
       "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
     ],
-    "lastThemeUuid": "03c6b25f-db63-402a-8447-a5ce1484c14d",
+    "lastThemeUuid": "57945787-0A04-447B-BBA2-6461FC505397",
     "applicationUUID": "c035e186-32cc-45e4-ac28-773f57e108ee",
     "applicationName": "ESP32 S3 Tiny",
     "lastProperties": [
@@ -248,13 +248,53 @@
         "subsystem": "DISPLAY"
       },
       {
-        "name": "DISPLAY_ROTATION",
-        "latestValue": "1",
+        "name": "DISPLAY_TYPE",
+        "latestValue": "Adafruit_ST7735",
         "subsystem": "DISPLAY"
       },
       {
-        "name": "DOUBLE_BUFFER_ROWS",
-        "latestValue": "64",
+        "name": "DISPLAY_WIDTH",
+        "latestValue": "128",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_HEIGHT",
+        "latestValue": "128",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_RESET_PIN",
+        "latestValue": "6",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CS_PIN",
+        "latestValue": "34",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_RS_PIN",
+        "latestValue": "7",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_DATA_PIN",
+        "latestValue": "-1",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CLOCK_PIN",
+        "latestValue": "-1",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "ST7735_TAB_TYPE",
+        "latestValue": "INITR_GREENTAB",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_ROTATION",
+        "latestValue": "0",
         "subsystem": "DISPLAY"
       },
       {
@@ -263,63 +303,8 @@
         "subsystem": "DISPLAY"
       },
       {
-        "name": "TOUCH_SEPARATOR",
-        "latestValue": "",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "TFT_TOUCH_SCREEN_REQUIRED",
-        "latestValue": "false",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "TOUCH_CALIB_WIDTH",
-        "latestValue": "240",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "TOUCH_CALIB_HEIGHT",
-        "latestValue": "320",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "TOUCH_USE_RAW_TFT_FUNCTION",
-        "latestValue": "true",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "ORIENTATION_SEPARATOR",
-        "latestValue": "",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "TFT_TOUCH_SWAP_XY",
-        "latestValue": "false",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "TFT_TOUCH_X_INVERTED",
-        "latestValue": "false",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "TFT_TOUCH_Y_INVERTED",
-        "latestValue": "false",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "CALIB_SEPARATOR",
-        "latestValue": "",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "TFT_TOUCH_SCREEN_CALIBRATE",
-        "latestValue": "true",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "TFT_TOUCH_CALIBRATION_STORAGE_LOC",
-        "latestValue": "400",
+        "name": "DISPLAY_BUFFER_SIZE",
+        "latestValue": "40",
         "subsystem": "DISPLAY"
       },
       {
@@ -369,17 +354,12 @@
       },
       {
         "name": "ITEM_FONT",
-        "latestValue": "ada:OpenSansCyrillicLatin12,0",
+        "latestValue": "ada:OpenSansRegular8pt,0",
         "subsystem": "THEME"
       },
       {
         "name": "TITLE_FONT",
-        "latestValue": "ada:OpenSansCyrillicLatin12,0",
-        "subsystem": "THEME"
-      },
-      {
-        "name": "BORDER_FOR_ACTIONS",
-        "latestValue": "0",
+        "latestValue": "ada:OpenSansRegular10pt,0",
         "subsystem": "THEME"
       },
       {
@@ -389,11 +369,6 @@
       },
       {
         "name": "USE_TC_UNICODE",
-        "latestValue": "true",
-        "subsystem": "THEME"
-      },
-      {
-        "name": "USE_SLIDER_ANALOG",
         "latestValue": "true",
         "subsystem": "THEME"
       },
