@@ -21,8 +21,6 @@ jobs:
           # AVR
           - example: examples/avr/analogDfRobot
             board: megaatmega2560
-          - example: examples/avr/analogJoystick1306Ascii
-            board: megaatmega2560
           - example: examples/avr/keyboardEthernetShield
             board: megaatmega2560
           - example: examples/avr/nokia5110
