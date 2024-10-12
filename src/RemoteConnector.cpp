@@ -162,6 +162,7 @@ void TagValueRemoteConnector::close() {
 	if (transport->connected()) {
 		encodeHeartbeat(HBMODE_ENDCONNECT);
 	}
+    transport->flush();
 	transport->close();
 
 	if (isPairing()) stopPairing();

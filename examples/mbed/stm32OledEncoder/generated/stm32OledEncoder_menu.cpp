@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for mbed RTOS by TcMenu 4.3.1 on 2024-09-14T20:54:48.076722800Z.
+// Generated for mbed RTOS by TcMenu 4.3.1 on 2024-10-12T09:03:47.686418900Z.
 
 #include <tcMenu.h>
 #include "stm32OledEncoder_menu.h"
@@ -85,9 +85,9 @@ void setupMenu() {
     authManager.initialise(menuMgr.getEepromAbstraction(), 100);
     menuMgr.setAuthenticator(&authManager);
     // Now add any readonly, non-remote and visible flags.
-    menuIP.setReadOnly(true);
     menuEdit.setReadOnly(true);
     menuCommits.setReadOnly(true);
+    menuIP.setReadOnly(true);
     menuIoTMonitor.setLocalOnly(true);
     menuAuthenticator.setLocalOnly(true);
 

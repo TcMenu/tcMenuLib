@@ -34,7 +34,7 @@ extern StBspTouchInterrogator touchInterrogator;
 extern MenuTouchScreenManager touchScreen;
 extern tcextras::IoaTouchScreenCalibrator touchCalibrator;
 extern const UnicodeFont OpenSansCyrillicLatin18[];
-extern const GFXfont RobotoMedium24;
+extern const UnicodeFont RobotoMedium24[];
 
 // Any externals needed by IO expanders, EEPROMs etc
 

@@ -8,9 +8,11 @@
     use elsewhere.
  */
 
+// Generated for mbed RTOS by TcMenu 4.3.1 on 2024-10-12T09:31:02.461419500Z.
+
 #include <tcMenu.h>
 #include "stm32f429FrameBuffer_menu.h"
-#include "ThemeCoolBlueModern.h"
+#include "ThemeCoolBlueModernBuilder.h"
 #include <Fonts/OpenSansCyrillicLatin18.h>
 #include <Fonts/RobotoMedium24.h>
 
@@ -105,9 +107,6 @@ void setupMenu() {
     renderer.setUpdatesPerSecond(10);
     touchScreen.start();
     menuMgr.initWithoutInput(&renderer, &menuPower);
-    renderer.setTitleMode(BaseGraphicalRenderer::TITLE_FIRST_ROW);
-    renderer.setUseSliderForAnalog(true);
-    renderer.enableTcUnicode();
-    installCoolBlueModernTheme(renderer, MenuFontDef(&OpenSansCyrillicLatin18, 0), MenuFontDef(&RobotoMedium24, 1), false);
+    installCoolBlueModernTheme(renderer, MenuFontDef(&OpenSansCyrillicLatin18, 0), MenuFontDef(&RobotoMedium24, 0), false, BaseGraphicalRenderer::TITLE_FIRST_ROW, true);
 }
 
