@@ -34,7 +34,7 @@ DashDrawParametersIntUpdateRange::IntColorRange drawVoltageColorRanges[] {
         {LCD_WHITE, LCD_BLUE, 2440, 3000}
 };
 DashDrawParametersIntUpdateRange drawVoltageWithIntRange(LCD_BLACK, LCD_LIGHT_BLUE, LCD_BLACK, LCD_YELLOW,
-                                                       &RobotoMedium24, drawVoltageColorRanges, 2);
+                                                       RobotoMedium24, drawVoltageColorRanges, 2);
 
 // As above we create another one for the analog item, it has two ranges.
 // Note that this is a parameter, not the actual dashboard item, they are defined below
@@ -43,7 +43,7 @@ DashDrawParametersIntUpdateRange::IntColorRange drawPowerColorRanges[] {
         {LCD_YELLOW, LCD_RED, 2100, 3000}
 };
 DashDrawParametersIntUpdateRange drawPowerValueWithIntRange(LCD_BLACK, LCD_LIGHT_BLUE, LCD_BLACK, LCD_YELLOW,
-                                                             &RobotoMedium24, drawPowerColorRanges, 2);
+                                                             RobotoMedium24, drawPowerColorRanges, 2);
 
 //
 // Although the dashboard support provides a wide range of menu drawing capabilities, it does not cover every case,
@@ -52,9 +52,9 @@ DashDrawParametersIntUpdateRange drawPowerValueWithIntRange(LCD_BLACK, LCD_LIGHT
 // to the encoder state.
 //
 // For drawing onto device drawable see:
-//  https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/rendering-with-tcmenu-lcd-tft-oled/#drawing-direct-to-the-display-with-devicedrawabl
-// For more on the delegate class and all the points where you can extend
-//  https://www.thecoderscorner.com/ref-docs/tcmenu/html/class_drawable_dashboard_delegate.html
+//  https://tcmenu.github.io/documentation/arduino-libraries//tc-menu/rendering-with-tcmenu-lcd-tft-oled/#drawing-direct-to-the-display-with-devicedrawabl
+// For more on the dashboard, delegate class and all the points where you can extend
+//  https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/renderer-take-over-display/
 //
 class MyDrawableDashboardDelegate : public DrawableDashboardDelegate {
 private:
@@ -63,9 +63,9 @@ private:
     int lastEncoderTurn = 0;
 public:
     MyDrawableDashboardDelegate() : button1(Coord(10, 240), Coord(105, 60), LCD_LIGHT_BLUE, LCD_BLACK, LCD_SEL_BLUE, "AC",
-                                            DeviceFontDrawingMode(&RobotoMedium24)),
+                                            DeviceFontDrawingMode(RobotoMedium24)),
                                     button2(Coord(125, 240), Coord(105, 60), LCD_LIGHT_BLUE, LCD_BLACK, LCD_SEL_BLUE, "Batt",
-                                            DeviceFontDrawingMode(&RobotoMedium24)) { }
+                                            DeviceFontDrawingMode(RobotoMedium24)) { }
 
     // this is called before the dashboard titles are drawn when first presented.
     // you return true to tell the core code that you've already cleared the screen, otherwise false.
@@ -92,7 +92,7 @@ public:
         color_t palette[2] = { LCD_LIGHT_BLUE, RGB(0, 0, 0) };
         DeviceDrawableHelper helper(dr, palette, 2, Coord(10, 10), Coord(80, 25));
         helper.getDrawable()->setDrawColor(palette[0]);
-        helper.setFont(DeviceFontDrawingMode(&RobotoMedium24));
+        helper.setFont(DeviceFontDrawingMode(RobotoMedium24));
         helper.getDrawable()->drawBox(helper.offsetLocation(Coord(10, 10)), Coord(80, 25), true);
         helper.drawText(helper.offsetLocation(Coord(12, 10)), palette[1], "Power");
         helper.endDraw();
