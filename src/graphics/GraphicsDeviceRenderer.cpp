@@ -175,8 +175,8 @@ namespace tcgfx {
                 helper.getDrawable()->setDrawColor(propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND, true));
                 auto& hints = menuMgr.getEditorHints();
                 int startX = calculateSpaceBetween(props->getFont(), props->getFontMagnification(), buffer, 0, hints.getStartIndex() );
-                int lenX = max(MINIMUM_CURSOR_SIZE, calculateSpaceBetween(props->getFont(), props->getFontMagnification(), buffer, hints.getStartIndex(), hints.getEndIndex()));
-                int whereX = min(int(width) - MINIMUM_CURSOR_SIZE, int(wh.x + startX));
+                int lenX = internal_max(MINIMUM_CURSOR_SIZE, calculateSpaceBetween(props->getFont(), props->getFontMagnification(), buffer, hints.getStartIndex(), hints.getEndIndex()));
+                int whereX = internal_min(int(width) - MINIMUM_CURSOR_SIZE, int(wh.x + startX));
                 helper.getDrawable()->drawBox(Coord(whereX, where.y + size.y - 1), Coord(lenX, 1), true);
                 if(size_t(hints.getEndIndex()) > strlen(buffer)) wh.x = wh.x - (unsigned int)MINIMUM_CURSOR_SIZE;
                 helper.drawText(wh, fg, buffer);

@@ -127,7 +127,7 @@ GridPositionRowCacheEntry* BaseGraphicalRenderer::findMenuEntryAndDimensions(con
             return &cachedEntryItem;
         }
         else {
-            auto rowNum = min(int((screenPos.y - titleHeight) / rowHeight), int(runList->getNumberOfRows() - 1));
+            auto rowNum = internal_min(int((screenPos.y - titleHeight) / rowHeight), int(runList->getNumberOfRows() - 1));
             cachedEntryItem = GridPositionRowCacheEntry(runList, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, rowNum + 1, titleHeight), titleProps);
             return &cachedEntryItem;
         }
