@@ -115,7 +115,7 @@
     "lastDisplayUuid": "fd998437-c4b2-4386-ba88-d0ae7c20620b",
     "lastInputUuid": "4F92CBC0-D13A-4090-9B86-C1952FE42D9B",
     "lastRemoteUuids": [
-      "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
+      "1e38dc42-672d-4c1c-a393-2c7632bf6c5c"
     ],
     "lastThemeUuid": "396ED4DF-AD7B-4951-A848-A9E5838A549B",
     "applicationUUID": "4fe6e85d-2bbd-4d19-84e5-5d6746883028",
@@ -202,6 +202,11 @@
         "subsystem": "INPUT"
       },
       {
+        "name": "SERIAL_PORT",
+        "latestValue": "Serial",
+        "subsystem": "REMOTE"
+      },
+      {
         "name": "ITEM_FONT",
         "latestValue": "ada:OpenSansRegular8pt,0",
         "subsystem": "THEME"
@@ -237,7 +242,7 @@
     "saveLocation": "PROJECT_TO_CURRENT_WITH_GENERATED",
     "usingSizedEEPROMStorage": false,
     "eepromDefinition": "bsp:0",
-    "authenticatorDefinition": "rom:150:4",
+    "authenticatorDefinition": "",
     "projectIoExpanders": [
       "deviceIO:"
     ],
@@ -245,8 +250,7 @@
       "menuDefinitions": []
     },
     "packageNamespace": "",
-    "appIsModular": false,
-    "listOfEmbeddedForms": []
+    "appIsModular": false
   },
   "stringLists": []
 }
