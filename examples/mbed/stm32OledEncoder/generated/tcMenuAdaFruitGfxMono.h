@@ -23,7 +23,7 @@
 #include <BaseRenderers.h>
 #include <tcUnicodeHelper.h>
 #include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306_Spi.h>
+#include <oled/AdafruitSSD1306Spi.h>
 #include <graphics/GfxMenuConfig.h>
 #include <BaseDialog.h>
 #include <graphics/BaseGraphicalRenderer.h>

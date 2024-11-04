@@ -10,8 +10,8 @@
     "authors":
     [
       {
-        "name": "DaveTcc",
-        "url": "https://www.thecoderscorner.com",
+        "name": "tcmenu",
+        "url": "https://tcmenu.github.io/documentation/",
         "maintainer": true
       }
     ],
@@ -19,14 +19,14 @@
     [
       {
         "name": "IoAbstraction",
-        "authors": "DaveTCC"
+        "authors": "tcmenu"
       },
       {
         "name": "tcUnicodeHelper",
-        "authors": "DaveTCC"
+        "authors": "tcmenu"
       }
     ],
-    "version": "4.3.1",
+    "version": "4.4.0",
     "license": "Apache-2.0",
     "frameworks": "arduino, mbed",
     "platforms": "*"

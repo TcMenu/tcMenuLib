@@ -16,13 +16,15 @@
 #include <tcUnicodeHelper.h>
 #include "tcMenuU8g2.h"
 #include <extras/TcOneButtonHandler.h>
+#include <RemoteConnector.h>
+#include "SerialTransport.h"
 #include <IoAbstraction.h>
 #include <EepromItemStorage.h>
 #include <mbed/HalStm32EepromAbstraction.h>
-#include <RemoteAuthentication.h>
 
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
+extern TcMenuRemoteServer remoteServer;
 extern U8G2_SSD1306_128X64_NONAME_F_4W_HW_SPI gfx;
 extern U8g2Drawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;

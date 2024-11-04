@@ -35,6 +35,7 @@ extern GraphicsDeviceRenderer renderer;
 extern iotouch::ResistiveTouchInterrogator touchInterrogator;
 extern MenuTouchScreenManager touchScreen;
 extern tcextras::IoaTouchScreenCalibrator touchCalibrator;
+extern const char* myIpAddress;
 extern ClientEthernetInitialisation clientEthInit;
 extern ClientEthernetTagValTransport clientEthTransport;
 

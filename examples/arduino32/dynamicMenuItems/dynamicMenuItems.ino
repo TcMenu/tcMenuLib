@@ -2,14 +2,15 @@
  * This example shows how to create scroll choices, lists, and dynamically add items to both dialogs and existing menus
  * at runtime.
  *
- * Test environment: Seeed MG126 - Matrix Keyboard, Adafruit 128x128 display, rotary encoder
+ * Test environment: Seeed MG126 - Matrix Keyboard, Adafruit 128x128 display, rotary encoder. However, it is easy to
+ * apply these concepts to any other menu arrangements.
  *
  * Although it's set up to run on SAMD there is no reason it could not be easily reconfigured for any
  * other board. This is one of the biggest advantages of this framework, moving boards is easier.
  *
- * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
- * Dialogs: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/rendering-with-tcmenu-lcd-tft-oled/
- * MenuManager: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menumanager-and-iteration/
+ * Getting started: https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
+ * Dialogs: https://tcmenu.github.io/documentation/arduino-libraries//tc-menu/rendering-with-tcmenu-lcd-tft-oled/
+ * MenuManager: https://tcmenu.github.io/documentation/arduino-libraries//tc-menu/menumanager-and-iteration/
  */
 
 #include "generated/dynamicMenuItems_menu.h"
@@ -24,13 +25,14 @@
 // ScrollChoice menu items when using data in RAM mode reference a fixed width array in your code, these will be
 // created by the code generator if needed. Genreally they are an array of char large enough to hold all items.
 // In this case they are pizza toppings, each zero terminated.
+// https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/menu-item-types/scrollchoice-menu-item/
 //                       0123456789 0123456789 0123456789 0123456789 0123456789 0123456789
 char pizzaToppings[] = {"Peperoni\0 Onions\0   Olives\0   Sweetcorn\0Mushrooms\0Peppers\0  "};
 
 //
 // We now create some menu items that we manually add to the oven menu during initialisation. We set the sub menu child
 // to be the first of the two menu items, which are provided in a linked list. Notice that these are completely created
-// RAM, and not program memory.
+// RAM, and not program memory: https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/menu-item-types/
 //
 TextMenuItem menuTextExtra(newAnyMenuInfo("Text", nextRandomId(), 0xffff, NO_CALLBACK), "hello", 8, nullptr, INFO_LOCATION_RAM);
 BooleanMenuItem menuOvenFull(newBooleanMenuInfoP("Start Oven", nextRandomId(), 0xffff, NO_CALLBACK, NAMING_YES_NO), false, &menuTextExtra, INFO_LOCATION_RAM);
@@ -42,6 +44,7 @@ AnalogMenuItem menuOvenTempItem(newAnalogMenuInfo("Oven Temp", nextRandomId(), 0
 // Here's a few examples of how you can capture the state of various actions taking place in the menu manager, such as
 // actionable menu items being activated, editing starting and ending on editable items, and changes in tree structure.
 // We create an instance of this class and then register it with menuMgr further down.
+// https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/menumanager-and-iteration/
 //
 class MyMenuManagerObserver : public MenuManagerObserver {
 private:
@@ -133,7 +136,7 @@ void onTitlePressed(int /*id*/) {
 
 void setup() {
     // This example logs using IoLogging, see the following guide to enable
-    // https://www.thecoderscorner.com/products/arduino-libraries/io-abstraction/arduino-logging-with-io-logging/
+    //https://tcmenu.github.io/documentation/arduino-libraries//io-abstraction/arduino-logging-with-io-logging/
     IOLOG_START_SERIAL
     serEnableLevel(SER_TCMENU_DEBUG, true);
 
@@ -183,6 +186,7 @@ void CALLBACK_FUNCTION onStartCooking(int id) {
 // here we create an extra menu item that allows us to have three lines of text in the info dialog, made up of the
 // title, the buffer line, and also this line, then the buttons. It uses the showRam function which shows from
 // a non constant / PGM string
+// https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/rendering-with-tcmenu-lcd-tft-oled/#presenting-a-dialog-to-the-user
 //
 TextMenuItem secondItem(newAnyMenuInfo("Detail: ", nextRandomId(), 0xffff, NO_CALLBACK), "det", 12, nullptr, INFO_LOCATION_RAM);
 
@@ -323,8 +327,8 @@ void CALLBACK_FUNCTION onDialogController(int id) {
 }
 
 // This callback needs to be implemented by you, see the below docs:
-//  1. List Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
-//  2. ScrollChoice Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/scrollchoice-menu-item/
+//  1. List Docs - https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
+//  2. ScrollChoice Docs - https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/menu-item-types/scrollchoice-menu-item/
 //
 // This is called back each time a list item needs to draw data. This is a list that is based on an array of string values.
 //
@@ -357,7 +361,7 @@ void CALLBACK_FUNCTION onDialogBack(int id) {
 // rotary encoder and by keyboards, it will allow the user to only enter values between 0 and 7, and hence is an
 // octal text filter.
 int CALLBACK_FUNCTION octalOnlyRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
-    // See https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/based-on-runtimemenuitem/
+    // See https://tcmenu.github.io/documentation/arduino-libraries//tc-menu/menu-item-types/based-on-runtimemenuitem/
     auto textItem = reinterpret_cast<TextMenuItem*>(item);
     switch(mode) {
         case RENDERFN_NAME:

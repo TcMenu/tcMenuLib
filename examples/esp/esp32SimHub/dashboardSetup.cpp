@@ -1,7 +1,13 @@
-
+/*
+ * This file demonstrates the full use of the dashboard support built into TcMenu core, you can easily create and layout
+ * your own dashboards.
+ *
+ * https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/renderer-take-over-display/#3-using-the-drawabledashboard-to-draw-a-dashboard
+ */
 #include "dashboardSetup.h"
 #include "Fonts/RobotoMonoBold60pt.h"
 #include <Fonts/FreeSans18pt7b.h>
+#include <Fonts/FreeSans9pt7b.h>
 
 DrawableDashboard* dashCustomDrawing;
 CustomDashboardDelegate dashboardDelegate;

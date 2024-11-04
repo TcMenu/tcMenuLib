@@ -450,6 +450,7 @@ public:
 	 * @param the first widget in a chain of widgets linked by next pointer.
 	 */
 	void setFirstWidget(TitleWidget* widget);
+    TitleWidget* getFirstWidget() { return this->firstWidget; }
 
 	/**
 	 * Called when the menu has been altered, to reset the countdown to

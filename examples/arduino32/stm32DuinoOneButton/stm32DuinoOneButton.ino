@@ -4,17 +4,15 @@
 //
 // You configure the single pin in code generator, and away you go.
 //
-// Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
+// Getting started: https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
 //
 
 #include "generated/stm32DuinoOneButton_menu.h"
 #include <SPI.h>
 
 void setup() {
-    // This example logs using IoLogging, see the following guide to enable
-    // https://www.thecoderscorner.com/products/arduino-libraries/io-abstraction/arduino-logging-with-io-logging/
-    IOLOG_START_SERIAL
-    serEnableLevel(SER_NETWORK_DEBUG, true);
+    // Start the serial port so that we can use the remote connectivity
+    Serial.begin(115200);
 
     // Start up serial and prepare the correct SPI, your pins may differ
     SPI.setMISO(PB4);

@@ -455,7 +455,7 @@ namespace tcgfx {
 #define MENUID_NOTSET 0xffff
 
     inline uint32_t MakePropsKey(uint16_t menuId, bool parentKey, ItemDisplayProperties::ComponentType ty) {
-        return (uint32_t)menuId | (parentKey ? 0x10000UL : 0UL) | ((uint32_t)ty << 18UL);
+        return ((uint32_t)menuId) | (parentKey ? 0x10000UL : 0UL) | ((uint32_t)ty << 18UL);
     }
 
     /**
@@ -587,7 +587,10 @@ namespace tcgfx {
          */
         void setDrawingPropertiesDefault(ItemDisplayProperties::ComponentType drawing, const color_t* palette, MenuPadding pad, const void *font, uint8_t mag,
                                          uint8_t spacing, uint8_t requiredHeight, GridPosition::GridJustification defaultJustification, MenuBorder border) {
-            setDrawingProperties(MakePropsKey(MENUID_NOTSET, false, drawing), palette, pad, font, mag, spacing, requiredHeight, defaultJustification, border);
+
+            auto key = MakePropsKey(MENUID_NOTSET, false, drawing);
+            serlogF2(SER_TCMENU_DEBUG, "Add def prop: ", key);
+            setDrawingProperties(key, palette, pad, font, mag, spacing, requiredHeight, defaultJustification, border);
         }
 
         /**
@@ -605,7 +608,9 @@ namespace tcgfx {
          */
         void setDrawingPropertiesForItem(ItemDisplayProperties::ComponentType drawing, uint16_t id, const color_t* palette, MenuPadding pad, const void *font, uint8_t mag,
                                          uint8_t spacing, uint8_t requiredHeight, GridPosition::GridJustification defaultJustification, MenuBorder border) {
-            setDrawingProperties(MakePropsKey(id, false, drawing), palette, pad, font, mag, spacing, requiredHeight, defaultJustification, border);
+            auto key = MakePropsKey(id, false, drawing);
+            serlogF3(SER_TCMENU_DEBUG, "Add item prop: ", key, id);
+            setDrawingProperties(key, palette, pad, font, mag, spacing, requiredHeight, defaultJustification, border);
         }
 
         /**
@@ -623,7 +628,9 @@ namespace tcgfx {
          */
         void setDrawingPropertiesAllInSub(ItemDisplayProperties::ComponentType drawing, uint16_t id, const color_t* palette, MenuPadding pad, const void *font, uint8_t mag,
                                           uint8_t spacing, uint8_t requiredHeight, GridPosition::GridJustification defaultJustification, MenuBorder border) {
-            setDrawingProperties(MakePropsKey(id, true, drawing), palette, pad, font, mag, spacing, requiredHeight, defaultJustification, border);
+            auto key = MakePropsKey(id, true, drawing);
+            serlogF3(SER_TCMENU_DEBUG, "Add sub prop: ", key, id);
+            setDrawingProperties(key, palette, pad, font, mag, spacing, requiredHeight, defaultJustification, border);
         }
 
         /**

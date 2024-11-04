@@ -70,7 +70,7 @@ uint8_t BaseGraphicalRenderer::setActiveItem(MenuItem *item) {
         adjustedHeight -= startY;
         totalHeight -= startY;
     }
-    totalHeight = max(0, totalHeight);
+    totalHeight = internal_max(0, totalHeight);
     serlogF4(SER_TCMENU_DEBUG, "totH, actIdx, adjH ", totalHeight, activeIndex, adjustedHeight);
 
     while (totalHeight > adjustedHeight) {
@@ -127,7 +127,7 @@ GridPositionRowCacheEntry* BaseGraphicalRenderer::findMenuEntryAndDimensions(con
             return &cachedEntryItem;
         }
         else {
-            auto rowNum = min(int((screenPos.y - titleHeight) / rowHeight), int(runList->getNumberOfRows() - 1));
+            auto rowNum = internal_min(int((screenPos.y - titleHeight) / rowHeight), int(runList->getNumberOfRows() - 1));
             cachedEntryItem = GridPositionRowCacheEntry(runList, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, rowNum + 1, titleHeight), titleProps);
             return &cachedEntryItem;
         }
@@ -323,7 +323,9 @@ void BaseGraphicalRenderer::recalculateDisplayOrder(MenuItem *root, bool safeMod
     if(root->getMenuType() == MENUTYPE_BACK_VALUE) {
         serlogF2(SER_TCMENU_DEBUG, "Handling back item", root->getId());
         auto* myProps = getDisplayPropertiesFactory().configFor(root, ItemDisplayProperties::COMPTYPE_TITLE);
-        itemOrderByRow.add(GridPositionRowCacheEntry(root, GridPosition(GridPosition::DRAW_TITLE_ITEM, myProps->getDefaultJustification(), 0), myProps));
+        auto *confGrid = getDisplayPropertiesFactory().gridPositionForItem(item);
+        auto pos = (confGrid) ? confGrid->getPosition() : GridPosition(GridPosition::DRAW_TITLE_ITEM, myProps->getDefaultJustification(), 0);
+        itemOrderByRow.add(GridPositionRowCacheEntry(root, pos, myProps));
         item = root->getNext();
     }
 

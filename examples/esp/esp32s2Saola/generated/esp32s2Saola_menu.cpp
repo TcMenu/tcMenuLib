@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for Arduino ESP32 by TcMenu 4.3.1-SNAPSHOT on 2024-08-26T12:55:56.108558600Z.
+// Generated for Arduino ESP32 by TcMenu 4.3.1 on 2024-09-28T18:27:34.834990800Z.
 
 #include <tcMenu.h>
 #include "esp32s2Saola_menu.h"

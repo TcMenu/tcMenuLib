@@ -163,7 +163,7 @@
     "lastRemoteUuids": [
       "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
     ],
-    "lastThemeUuid": "2F1EAB1E-0469-42C8-A222-BE2DF96D6D81",
+    "lastThemeUuid": "1947F585-9D36-448C-8A80-B425686107BD",
     "applicationUUID": "a32450f4-91fc-4747-9e6f-6317dd9e2309",
     "applicationName": "espCapTouchTft",
     "lastProperties": [
@@ -313,6 +313,11 @@
         "subsystem": "THEME"
       },
       {
+        "name": "BORDER_FOR_ACTIONS",
+        "latestValue": "0",
+        "subsystem": "THEME"
+      },
+      {
         "name": "TITLE_SHOW_MODE",
         "latestValue": "TITLE_ALWAYS",
         "subsystem": "THEME"
@@ -320,6 +325,11 @@
       {
         "name": "USE_TC_UNICODE",
         "latestValue": "false",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "USE_SLIDER_ANALOG",
+        "latestValue": "true",
         "subsystem": "THEME"
       },
       {

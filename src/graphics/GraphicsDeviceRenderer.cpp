@@ -175,8 +175,8 @@ namespace tcgfx {
                 helper.getDrawable()->setDrawColor(propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND, true));
                 auto& hints = menuMgr.getEditorHints();
                 int startX = calculateSpaceBetween(props->getFont(), props->getFontMagnification(), buffer, 0, hints.getStartIndex() );
-                int lenX = max(MINIMUM_CURSOR_SIZE, calculateSpaceBetween(props->getFont(), props->getFontMagnification(), buffer, hints.getStartIndex(), hints.getEndIndex()));
-                int whereX = min(int(width) - MINIMUM_CURSOR_SIZE, int(wh.x + startX));
+                int lenX = internal_max(MINIMUM_CURSOR_SIZE, calculateSpaceBetween(props->getFont(), props->getFontMagnification(), buffer, hints.getStartIndex(), hints.getEndIndex()));
+                int whereX = internal_min(int(width) - MINIMUM_CURSOR_SIZE, int(wh.x + startX));
                 helper.getDrawable()->drawBox(Coord(whereX, where.y + size.y - 1), Coord(lenX, 1), true);
                 if(size_t(hints.getEndIndex()) > strlen(buffer)) wh.x = wh.x - (unsigned int)MINIMUM_CURSOR_SIZE;
                 helper.drawText(wh, fg, buffer);
@@ -466,7 +466,7 @@ namespace tcgfx {
                 forceDrawWidgets = true;
             }
             if (titleNeeded && (locRedrawMode == MENUDRAW_COMPLETE_REDRAW || titleEntry->getMenuItem()->isChanged(displayNumber))) {
-                bool active = titleNeeded && activeItem == titleEntry->getMenuItem();
+                bool active = activeItem == titleEntry->getMenuItem();
                 drawMenuItem(titleEntry, Coord(0, 0), cardLayoutPane->getTitleSize(), DrawingFlags(true, active, menuMgr.getCurrentEditor() == titleEntry->getMenuItem()));
                 forceDrawWidgets = true;
             } else {
@@ -478,7 +478,7 @@ namespace tcgfx {
                 int offsetY = (cardLayoutPane->getMenuSize().y - int(entry->getHeight())) / 2;
                 Coord menuStart(cardLayoutPane->getMenuLocation().x, cardLayoutPane->getMenuLocation().y + offsetY);
                 Coord menuSize(cardLayoutPane->getMenuSize().x, int(entry->getHeight()));
-                bool active = titleNeeded && activeItem == entry->getMenuItem();
+                bool active = activeItem == entry->getMenuItem();
                 drawMenuItem(entry, menuStart, menuSize, DrawingFlags(false, active, menuMgr.getCurrentEditor() == entry->getMenuItem()));
             }
             cardLayoutPane->prepareAndPaintButtons(this, activeIndex, itemOrderByRow.count(), titleMode != NO_TITLE);

@@ -9,7 +9,7 @@
  *
  * Screen setup for 320x240 LANDSCAPE.
  *
- * https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
+ * https://tcmenu.github.io/documentation/arduino-libraries//tc-menu/tcmenu-overview-quick-start/
  */
 
 #include <Arduino.h>
@@ -30,12 +30,16 @@
 using namespace tcremote;
 using namespace iotouch;
 
+//define the address for the remote connection
+const char* myIpAddress = "192.168.0.99";
+
 const char pgmVersionHeader[] PROGMEM = "tcMenu Version";
 
 bool connectedToWifi = false;
 TitleWidget wifiWidget(iconsWifi, 5, 16, 12, nullptr);
 AmplifierController controller;
 
+// we create a runtime list menu item  further down and it uses these as the possible values to display.
 const char* simFilesForList[] = { "SuperFile1.txt",  "CustomFile.cpp", "SuperDuper.h", "File303.cpp", "File123443.h",
                                   "Another.file", "TestMe.txt", "Program.txt" };
 #define SIM_FILES_ARRAY_SIZE 8
@@ -43,14 +47,14 @@ const char* simFilesForList[] = { "SuperFile1.txt",  "CustomFile.cpp", "SuperDup
 void prepareWifiForUse();
 
 void setup() {
+    // Start up the devices and services that we need, these may change depending on board etc.
     SPI.setFrequency(20000000);
     SPI.begin();
     Serial.begin(115200);
     EEPROM.begin(512);
 
+    // if needed you can enable extra logging
     //serEnableLevel(SER_TCMENU_DEBUG, true);
-
-    renderer.setFirstWidget(&wifiWidget);
 
     setupMenu();
 
@@ -136,9 +140,13 @@ void setup() {
         .withBorder(MenuBorder(2))
         .apply();
 
+    // now we add our title widget for the wifi strength
+    themeBuilder.addingTitleWidget(wifiWidget);
+
     // whenever adjusting themes, we should always apply them
     themeBuilder.apply();
 
+    // and finally provide a dialog that appears upon selecting the title
     setTitlePressedCallback([](int) {
         BaseDialog* dlg = MenuRenderer::getInstance()->getDialog();
         if(!dlg || dlg->isInUse()) return;

@@ -75,7 +75,8 @@ void EepromAuthenticatorManager::copyKeyNameToBuffer(int idx, char* buffer, int 
         return;
     }
 
-    eeprom->readIntoMemArray(reinterpret_cast<uint8_t*>(buffer), eepromOffset(idx), min(bufSize, CLIENT_DESC_SIZE));
+    auto maxSize = internal_min(bufSize, CLIENT_DESC_SIZE);
+    eeprom->readIntoMemArray(reinterpret_cast<uint8_t*>(buffer), eepromOffset(idx), maxSize);
     buffer[bufSize-1]=0;
 }
 
