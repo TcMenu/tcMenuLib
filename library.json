@@ -26,6 +26,9 @@
         "authors": "tcmenu"
       }
     ],
+    "build": {
+      "extraScript": "generator/platformio_generator.py"
+    },
     "version": "4.4.0",
     "license": "Apache-2.0",
     "frameworks": "arduino, mbed",
