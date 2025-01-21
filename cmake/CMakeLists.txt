@@ -41,6 +41,7 @@ target_compile_definitions(tcMenu
 
 target_include_directories(tcMenu PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/../src
+        ${CMAKE_CURRENT_LIST_DIR}/../src/graphics
 )
 
 target_link_libraries(tcMenu PUBLIC pico_stdlib pico_sync IoAbstraction TaskManagerIO tcUnicodeHelper)
