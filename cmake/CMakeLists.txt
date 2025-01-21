@@ -40,7 +40,7 @@ target_compile_definitions(tcMenu
 )
 
 target_include_directories(tcMenu PUBLIC
-        ${PROJECT_SOURCE_DIR}/lib/tcMenu/src
+        ${CMAKE_CURRENT_LIST_DIR}/../src
 )
 
 target_link_libraries(tcMenu PUBLIC pico_stdlib pico_sync IoAbstraction TaskManagerIO tcUnicodeHelper)
