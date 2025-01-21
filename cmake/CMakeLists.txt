@@ -1,4 +1,4 @@
-add_library(tcMenu INTERFACE
+add_library(tcMenu 
         ../src/BaseDialog.cpp
         ../src/BaseRenderers.cpp
         ../src/EditableLargeNumberMenuItem.cpp
@@ -36,11 +36,11 @@ add_library(tcMenu INTERFACE
 )
 
 target_compile_definitions(tcMenu
-        INTERFACE BUILD_FOR_PICO_CMAKE=1 BUILD_PICO_FORCE_UART=1 IO_LOGGING_DEBUG=1
+        PUBLIC BUILD_FOR_PICO_CMAKE=1 BUILD_PICO_FORCE_UART=1 IO_LOGGING_DEBUG=1
 )
 
-target_include_directories(tcMenu INTERFACE
+target_include_directories(tcMenu PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/../src
 )
 
-target_link_libraries(tcMenu INTERFACE pico_stdlib pico_sync IoAbstraction TaskManagerIO tcUnicodeHelper)
+target_link_libraries(tcMenu PUBLIC pico_stdlib pico_sync IoAbstraction TaskManagerIO tcUnicodeHelper)
