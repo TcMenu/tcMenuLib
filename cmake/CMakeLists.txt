@@ -1,4 +1,6 @@
-add_library(tcMenu
+cmake_minimum_required(VERSION 3.13)
+
+add_library(tcMenu 
         ../src/BaseDialog.cpp
         ../src/BaseRenderers.cpp
         ../src/EditableLargeNumberMenuItem.cpp
@@ -40,7 +42,7 @@ target_compile_definitions(tcMenu
 )
 
 target_include_directories(tcMenu PUBLIC
-        ${PROJECT_SOURCE_DIR}/lib/tcMenu/src
+        ../src
 )
 
 target_link_libraries(tcMenu PUBLIC pico_stdlib pico_sync IoAbstraction TaskManagerIO tcUnicodeHelper)
