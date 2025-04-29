@@ -19,13 +19,13 @@ char szGlobalBuffer[16];
 
 // if not defined give a developer one of one short of a billion
 #ifndef TC_BOARD_SERIAL_NO
-#define TC_BOARD_SERIAL_NO 999999999L
+#define TC_BOARD_SERIAL_NO "999999999"
 #endif //!TC_BOARD_SERIAL_NO
 
 // and implement the function
-const long glTcSerialNumber PROGMEM = TC_BOARD_SERIAL_NO;
-uint32_t getBoardSerialNumber() {
-    return pgm_read_dword(&glTcSerialNumber);
+const char glTcSerialNumber[] PROGMEM = TC_BOARD_SERIAL_NO;
+const char * getBoardSerialNumber() {
+    return reinterpret_cast<const char *>(glTcSerialNumber);
 }
 #endif // !TC_MANUAL_SERIAL_NO_IMPL
 
@@ -50,7 +50,7 @@ void showVersionDialog(const ConnectorLocalInfo *localInfo) {
         char sz[25];
         tccore::copyTcMenuVersion(sz, sizeof(sz));
         strncat(sz, " S/N:", sizeof(sz) - strlen(sz) - 1);
-        fastltoa(sz, (long)getBoardSerialNumber(), 9, NOT_PADDED, sizeof sz);
+        strncat(sz, getBoardSerialNumber(), sizeof(sz) - strlen(sz) - 1);
         dialog->copyIntoBuffer(sz);
     });
 }

@@ -31,14 +31,14 @@ struct ConnectorLocalInfo {
  * Provides the serial number for the board, it can be displayed and also used in remote JOIN messages to identify
  * the board uniquiely by UUID and serial number.
  *
- * If you want to use the default implementation you can define flag TC_BOARD_SERIAL_NO to a long int value that will
+ * If you want to use the default implementation you can define flag TC_BOARD_SERIAL_NO to a string literal that will
  * be stored as a constant in memory.
  *
  * If you want to have a custom implementation, define TC_MANUAL_SERIAL_NO_IMPL and then you must implement this method
  * yourself instead. This function should not take undue time if implemented by you as it could block networking.
  * @return the serial number
  */
-uint32_t getBoardSerialNumber();
+const char * getBoardSerialNumber();
 
 /**
  * Show the TcMenu version in a dialog that can be dismissed
