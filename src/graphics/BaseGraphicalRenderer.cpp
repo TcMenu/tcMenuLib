@@ -49,7 +49,7 @@ uint8_t BaseGraphicalRenderer::setActiveItem(MenuItem *item) {
     auto ret = BaseMenuRenderer::setActiveItem(item);
 
     // if we're drawing a list, clear out the drawing location, lists handled differently
-    if(menuMgr.getCurrentMenu()->getMenuType() == MENUTYPE_RUNTIME_LIST) {
+    if(menuMgr.getCurrentMenu() && menuMgr.getCurrentMenu()->getMenuType() == MENUTYPE_RUNTIME_LIST) {
         drawingLocation = CachedDrawingLocation();
         return 0;
     }
@@ -85,7 +85,6 @@ uint8_t BaseGraphicalRenderer::setActiveItem(MenuItem *item) {
         serlogF2(SER_TCMENU_DEBUG, "Screen Row moved ", startRow);
     }
     drawingLocation = CachedDrawingLocation(startY, startRow);
-
     return ret;
 }
 
@@ -369,6 +368,7 @@ void BaseGraphicalRenderer::recalculateDisplayOrder(MenuItem *root, bool safeMod
     if(areRowsOutOfOrder() && !safeMode) {
         recalculateDisplayOrder(root, true);
     }
+    serlogF(SER_TCMENU_INFO, "Calculated Display Order");
 }
 
 

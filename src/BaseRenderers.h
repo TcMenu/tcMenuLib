@@ -241,7 +241,7 @@ public:
     /**
      * Gets the buffer size of the buffer
      */
-    uint8_t getBufferSize() {return bufferSize;}
+    uint8_t getBufferSize() const {return bufferSize;}
 
     /** Returns if this is a no display type renderer or a base renderer type. */
     RendererType getRendererType() { return rendererType; }

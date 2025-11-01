@@ -25,9 +25,11 @@ namespace tcgfx {
 
     GraphicsDeviceRenderer::GraphicsDeviceRenderer(int bufferSize, const char *appTitle, DeviceDrawable *drawable)
             : BaseGraphicalRenderer(bufferSize, 1, 1, false, appTitle), rootDrawable(drawable), helper(drawable) {
-        const Coord &coord = rootDrawable->getDisplayDimensions();
-        width = coord.x;
-        height = coord.y;
+        if (rootDrawable) {
+            const Coord &coord = rootDrawable->getDisplayDimensions();
+            width = coord.x;
+            height = coord.y;
+        }
     }
 
     void GraphicsDeviceRenderer::drawingCommand(BaseGraphicalRenderer::RenderDrawingCommand command) {
@@ -513,5 +515,11 @@ namespace tcgfx {
         return (cardLayoutPane->isSubMenuCardLayout(rootItem)) ? LAYOUT_CARD_SIDEWAYS : LAYOUT_VERTICAL_DEFAULT;
     }
 
-
+    void GraphicsDeviceRenderer::setDrawable(DeviceDrawable *drawable) {
+        this->rootDrawable = drawable;
+        this->helper.setDrawable(drawable);
+        const Coord &coord = rootDrawable->getDisplayDimensions();
+        width = coord.x;
+        height = coord.y;
+    }
 } // namespace tcgfx

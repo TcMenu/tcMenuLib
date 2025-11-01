@@ -140,6 +140,11 @@ namespace tcgfx {
          */
         explicit DeviceDrawableHelper(DeviceDrawable* root);
 
+        void setDrawable(DeviceDrawable* dr) {
+            this-> drawable = dr;
+            this->rootDrawable = dr;
+        }
+
 
         void reConfigure(color_t *palette, uint8_t paletteSize, const Coord &startPosition, const Coord &size);
 

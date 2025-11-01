@@ -148,6 +148,14 @@ namespace tcgfx {
         void setCardLayoutStatusForSubMenu(MenuItem* root, bool onOrOff);
 
         LayoutMode getLayoutMode(MenuItem* rootItem) override;
+
+        /**
+         * this is for cases where the display driver and drawable are allocated during setup instead of at start up
+         * time, and therefore need to be configured in creation order.
+         * @param drawable the drawable instance to associate
+         */
+        void setDrawable(DeviceDrawable* drawable);
+
     protected:
         /**
          * Overrides the default implementation to allow for card based layouts, if this is not enabled for the submenu
