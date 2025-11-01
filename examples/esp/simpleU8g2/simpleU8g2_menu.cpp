@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for Arduino ESP8266 by TcMenu 4.3.1 on 2024-09-28T17:02:47.500480100Z.
+// Generated for Arduino ESP8266 by TcMenu 4.5.0 on 2025-11-01T15:31:12.903479Z.
 
 #include <tcMenu.h>
 #include "simpleU8g2_menu.h"

@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for Arduino ESP32 by TcMenu 4.3.1 on 2024-09-28T08:52:55.511970600Z.
+// Generated for Arduino ESP32 by TcMenu 4.5.0 on 2025-11-01T14:55:15.370037Z.
 
 #include <tcMenu.h>
 #include "esp32Amplifier_menu.h"
