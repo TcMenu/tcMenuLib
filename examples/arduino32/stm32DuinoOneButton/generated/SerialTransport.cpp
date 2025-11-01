@@ -9,7 +9,8 @@
  * make sure to rename it first.
  */
 
-// we'll wait 100 times this amount in a loop when serial is not available
+// we'll wait 100 times this amount in a task manager yielding loop when serial
+// would block
 #ifndef MICROS_TO_WAIT_FOR_SERIAL
 #define MICROS_TO_WAIT_FOR_SERIAL 10000
 #endif //MICROS_TO_WAIT_FOR_SERIAL

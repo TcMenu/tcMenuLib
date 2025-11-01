@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for mbed RTOS by TcMenu 4.3.1 on 2024-10-12T09:03:47.686418900Z.
+// Generated for mbed RTOS by TcMenu 4.5.0 on 2025-11-01T13:11:16.909154400Z.
 
 #include <tcMenu.h>
 #include "stm32OledEncoder_menu.h"
@@ -22,7 +22,7 @@ HalStm32EepromAbstraction glBspRom;
 EepromAuthenticatorManager authManager(6);
 AdafruitSSD1306Spi* gfx;
 AdafruitDrawable gfxDrawable;
-GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
+GraphicsDeviceRenderer renderer(30, applicationInfo.name, nullptr);
 MbedEthernetInitialiser mbedEthInitialisation(3333);
 MBedEthernetTransport ethernetTransport;
 TagValueRemoteServerConnection ethernetConnection(ethernetTransport, mbedEthInitialisation);
@@ -86,8 +86,8 @@ void setupMenu() {
     menuMgr.setAuthenticator(&authManager);
     // Now add any readonly, non-remote and visible flags.
     menuEdit.setReadOnly(true);
-    menuCommits.setReadOnly(true);
     menuIP.setReadOnly(true);
+    menuCommits.setReadOnly(true);
     menuIoTMonitor.setLocalOnly(true);
     menuAuthenticator.setLocalOnly(true);
 
@@ -98,6 +98,7 @@ void setupMenu() {
     renderer.setUpdatesPerSecond(5);
     gfxDrawable.setGraphics(gfx);
     gfxDrawable.setFontHandler(gfx->getFontHandler());
+    renderer.setDrawable(&gfxDrawable);
     switches.init(internalDigitalIo(), SWITCHES_POLL_EVERYTHING, true);
     menuMgr.initForEncoder(&renderer, &menuRTCDate, PC_8, PC_10, PC_9);
     remoteServer.addConnection(&ethernetConnection);

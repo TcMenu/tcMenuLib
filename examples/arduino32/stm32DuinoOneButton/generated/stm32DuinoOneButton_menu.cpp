@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for STM32Duino by TcMenu 4.4.0-SNAPSHOT on 2024-10-19T08:59:45.395538500Z.
+// Generated for STM32Duino by TcMenu 4.5.0 on 2025-11-01T12:40:18.579351300Z.
 
 #include <tcMenu.h>
 #include "stm32DuinoOneButton_menu.h"

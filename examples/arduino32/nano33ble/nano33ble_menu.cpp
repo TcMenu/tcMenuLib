@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for Arduino 32bit ARM by TcMenu 4.3.1 on 2024-09-28T18:34:44.260116300Z.
+// Generated for Arduino 32bit ARM by TcMenu 4.5.0 on 2025-11-01T13:28:24.143044100Z.
 
 #include <tcMenu.h>
 #include "nano33ble_menu.h"
