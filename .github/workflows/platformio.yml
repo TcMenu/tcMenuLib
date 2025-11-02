@@ -19,11 +19,7 @@ jobs:
           # - examples/mbed/stm32f429FrameBuffer
           # - examples/mbed/stm32OledEncoder
           # AVR
-          - example: examples/avr/analogDfRobot
-            board: megaatmega2560
           - example: examples/avr/keyboardEthernetShield
-            board: megaatmega2560
-          - example: examples/avr/nokia5110
             board: megaatmega2560
           # ESP
           - example: examples/esp/esp32Amplifier
