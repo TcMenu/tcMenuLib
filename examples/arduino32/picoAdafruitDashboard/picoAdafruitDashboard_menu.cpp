@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for Arduino 32bit ARM by TcMenu 4.3.1 on 2024-10-05T13:45:33.378923800Z.
+// Generated for Arduino 32bit ARM by TcMenu 4.5.0 on 2025-11-02T12:02:01.491586600Z.
 
 #include <tcMenu.h>
 #include "picoAdafruitDashboard_menu.h"
@@ -20,9 +20,13 @@
 const  ConnectorLocalInfo applicationInfo = { TC_I18N_PROJECT_NAME, "0ad4bdde-34a4-4507-912e-b495b0eac2c1" };
 TcMenuRemoteServer remoteServer(applicationInfo);
 
-Adafruit_ILI9341 gfx(20, 18, 19);
+Adafruit_ILI9341 gfx(&SPI1, 10, 11, 13);
 AdafruitDrawable gfxDrawable(&gfx, 40);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
+MatrixKeyboardManager keyboard;
+const char keyboardKeys[]  = "123456789*0#";
+KeyboardLayout keyboardLayout(4, 3, keyboardKeys);
+MenuEditingKeyListener tcMenuKeyListener('*', '#', '0', '9');
 NoInitialisationNeeded serialInitializer;
 SerialTagValueTransport serialTransport(&Serial);
 TagValueRemoteServerConnection serialConnection(serialTransport, serialInitializer);
@@ -60,7 +64,17 @@ void setupMenu() {
     gfx.setRotation(1);
     renderer.setUpdatesPerSecond(5);
     switches.init(internalDigitalIo(), SWITCHES_POLL_EVERYTHING, true);
-    menuMgr.initForEncoder(&renderer, &menuAnalog, 16, 17, 21);
+    tcMenuKeyListener.createInternalEncoder();
+    menuMgr.initWithoutInput(&renderer, &menuAnalog);
+    keyboardLayout.setRowPin(0, 22);
+    keyboardLayout.setRowPin(1, 21);
+    keyboardLayout.setRowPin(2, 20);
+    keyboardLayout.setRowPin(3, 19);
+    keyboardLayout.setColPin(0, 18);
+    keyboardLayout.setColPin(1, 17);
+    keyboardLayout.setColPin(2, 16);
+    keyboard.initialise(internalDigitalIo(), &keyboardLayout, &tcMenuKeyListener, false);
+    keyboard.setRepeatKeyMillis(850, 350);
     remoteServer.addConnection(&serialConnection);
     installCoolBlueTraditionalTheme(renderer, MenuFontDef(&OpenSansRegular18pt, 0), MenuFontDef(&RobotoMedium24, 0), false, BaseGraphicalRenderer::TITLE_FIRST_ROW, true);
 }

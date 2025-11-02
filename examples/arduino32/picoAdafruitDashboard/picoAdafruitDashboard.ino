@@ -19,9 +19,9 @@ void setup() {
     while (!Serial && millis() < 10000UL);
 
     // prepare the SPI device on the right pins, configure as needed!
-    SPI.setRX(4);
-    SPI.setTX(7);
-    SPI.setSCK(6);
+    SPI1.setRX(12);
+    SPI1.setTX(15);
+    SPI1.setSCK(14);
     SPI.begin();
 
     setupMenu();

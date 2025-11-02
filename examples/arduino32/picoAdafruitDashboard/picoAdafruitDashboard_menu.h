@@ -15,6 +15,7 @@
 #include <tcMenu.h>
 #include <tcUnicodeHelper.h>
 #include "tcMenuAdaFruitGfx.h"
+#include <tcMenuKeyboard.h>
 #include <RemoteConnector.h>
 #include "SerialTransport.h"
 #include <ScrollChoiceMenuItem.h>
@@ -28,6 +29,8 @@ extern TcMenuRemoteServer remoteServer;
 extern Adafruit_ILI9341 gfx;
 extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
+extern MatrixKeyboardManager keyboard;
+extern MenuEditingKeyListener tcMenuKeyListener;
 extern const UnicodeFont OpenSansRegular18pt[];
 extern const UnicodeFont RobotoMedium24[];
 

@@ -10,9 +10,6 @@
 #include "dashboardConfig.h"
 #include <graphics/TcDrawableButton.h>
 
-#define LCD_LIGHT_BLUE RGB(133, 226, 236)
-#define LCD_SEL_BLUE RGB(123, 196, 206)
-
 // START a title widget that was built using TcMenu Designers widget generator, see the "Code" menu for the widget
 // generator. This is added to both the main renderer and the dashboard.
 
@@ -47,20 +44,20 @@ DrawableDashboard* mainDashboard;
 // represented as below. In this case we are creating for an enum value.
 // Note that this is a parameter, not the actual dashboard item, they are defined below
 DashDrawParametersIntUpdateRange::IntColorRange drawEnumColorRanges[] {
-        {ILI9341_YELLOW, ILI9341_RED, 0, 1},
-        {ILI9341_CYAN, ILI9341_BLUE, 2, 3}
+        {RGB_COL_YELLOW, RGB_COL_RED, 0, 1},
+        {RGB_COL_LIGHT_YELLOW, RGB_COL_BLUE, 2, 3}
 };
-DashDrawParametersIntUpdateRange drawEnumWithIntRange(ILI9341_BLACK, LCD_LIGHT_BLUE, ILI9341_BLACK, ILI9341_YELLOW,
-                                                       NativeFontDesc(&RobotoMedium24, 1), drawEnumColorRanges, 2);
+DashDrawParametersIntUpdateRange drawEnumWithIntRange(RGB_COL_BLACK, RGB_COL_LIGHT_BLUE, RGB_COL_BLACK, RGB_COL_YELLOW,
+                                                       RobotoMedium24, drawEnumColorRanges, 2);
 
 // As above we create another one for the analog item, it has two ranges.
 // Note that this is a parameter, not the actual dashboard item, they are defined below
 DashDrawParametersIntUpdateRange::IntColorRange drawAnalogColorRanges[] {
-        {ILI9341_LIGHTGREY, ILI9341_BLUE, 0, 50},
-        {ILI9341_YELLOW, ILI9341_RED, 51, 100}
+        {RGB_COL_LIGHT_GRAY, RGB_COL_BLUE, 0, 50},
+        {RGB_COL_YELLOW, RGB_COL_RED, 51, 100}
 };
-DashDrawParametersIntUpdateRange drawAnalogValueWithIntRange(ILI9341_BLACK, LCD_LIGHT_BLUE, ILI9341_BLACK, ILI9341_YELLOW,
-                                                             NativeFontDesc(&RobotoMedium24, 1), drawAnalogColorRanges, 2);
+DashDrawParametersIntUpdateRange drawAnalogValueWithIntRange(RGB_COL_BLACK, RGB_COL_LIGHT_BLUE, RGB_COL_BLACK, RGB_COL_YELLOW,
+                                                             RobotoMedium24, drawAnalogColorRanges, 2);
 
 DrawableIcon iconForButton3(-1, Coord(17,12), tcgfx::DrawableIcon::ICON_XBITMAP, YesNoWidIcon0, YesNoWidIcon1);
 
@@ -82,11 +79,12 @@ private:
     TcDrawableButton button3;
     int lastEncoderTurn = 0;
 public:
-    MyDrawableDashboardDelegate() : button1(Coord(10, 190), Coord(90, 40), LCD_LIGHT_BLUE, ILI9341_BLACK, LCD_SEL_BLUE, "Btn1",
-                                            DeviceFontDrawingMode(NativeFontDesc(&RobotoMedium24, 1))),
-                                    button2(Coord(115, 190), Coord(90, 40), LCD_LIGHT_BLUE, ILI9341_BLACK, LCD_SEL_BLUE, "Btn2",
-                                            DeviceFontDrawingMode(NativeFontDesc(&RobotoMedium24, 1))),
-                                    button3(Coord(220, 190), Coord(90, 40), LCD_LIGHT_BLUE, ILI9341_BLACK, LCD_SEL_BLUE, &iconForButton3) { }
+    MyDrawableDashboardDelegate() : button1(Coord(10, 190), Coord(90, 40), RGB_COL_LIGHT_BLUE, RGB_COL_BLACK, RGB_COL_SEL_BLUE,
+                                            "Btn1", DeviceFontDrawingMode(RobotoMedium24)),
+                                    button2(Coord(115, 190), Coord(90, 40), RGB_COL_LIGHT_BLUE, RGB_COL_BLACK, RGB_COL_SEL_BLUE,
+                                        "Btn2", DeviceFontDrawingMode(RobotoMedium24)),
+                                    button3(Coord(220, 190), Coord(90, 40), RGB_COL_LIGHT_BLUE, RGB_COL_BLACK, RGB_COL_SEL_BLUE,
+                                        &iconForButton3) { }
 
     // this is called before the dashboard titles are drawn when first presented.
     // you return true to tell the core code that you've already cleared the screen, otherwise false.
@@ -100,20 +98,20 @@ public:
         switches.getEncoder()->changePrecision(2, 0); // encoder has range 0,1,2 and initial value of 0.
 
         // we can still make native library calls here if we wish.
-        gfx.fillScreen(ILI9341_BLACK);
+        gfx.fillScreen(RGB_COL_BLACK);
 
         // here we draw two boxes that make what looks like a tab
-        gfxDrawable.setDrawColor(LCD_LIGHT_BLUE);
+        gfxDrawable.setDrawColor(RGB_COL_LIGHT_BLUE);
         gfxDrawable.drawBox(Coord(10, 10), Coord(80, 25), true);
         gfxDrawable.drawBox(Coord(10, 35), Coord(300, 75), true);
 
         // and this is how we put some text into it, the text is off-screen buffered if the device supports it.
         // the wrapper takes care of the differences in different text implementations. We must call endDraw when
-        // we've finished with the helper class, as if the display is double buffered, it will push it at that point.
-        color_t palette[2] = { LCD_LIGHT_BLUE, RGB(0, 0, 0) };
+        // we've finished with the helper class, as if the display is double-buffered, it will push it at that point.
+        color_t palette[2] = { RGB_COL_LIGHT_BLUE, RGB(0, 0, 0) };
         DeviceDrawableHelper helper(&gfxDrawable, palette, 2, Coord(10, 10), Coord(80, 25));
         helper.getDrawable()->setDrawColor(palette[0]);
-        helper.setFont(DeviceFontDrawingMode(NativeFontDesc(&RobotoMedium24, 1)));
+        helper.setFont(DeviceFontDrawingMode(RobotoMedium24));
         helper.getDrawable()->drawBox(helper.offsetLocation(Coord(10, 10)), Coord(80, 25), true);
         helper.drawText(helper.offsetLocation(Coord(12, 10)), palette[1], "Test");
         helper.endDraw();
@@ -163,7 +161,7 @@ void setupDashboard() {
     mainDashboard->setDelegate(&myDrawableDashboardDelegate);
 
     // now prepare the base colors
-    mainDashboard->setBaseColors(RGB(0, 0, 0), RGB(220, 220, 220));
+    mainDashboard->setBaseColors(RGB_COL_BLACK, RGB_COL_LIGHT_GRAY);
 
     // here we set up the entries on the dashboard, this is where we provide the menu item and position on the display
     // for each entry. A parameter object that we defined above is then associated with an item. Note that more than

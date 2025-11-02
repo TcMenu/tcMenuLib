@@ -17,7 +17,7 @@ namespace tccore {
 
 // here we define the version as both a string and a separate field
 #define TCMENU_MAJOR 4
-#define TCMENU_MINOR 4
+#define TCMENU_MINOR 5
 #define TCMENU_PATCH 0
 
 /**
