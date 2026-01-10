@@ -42,26 +42,26 @@ void CustomDashboardDelegate::dashboardDidDraw(unsigned int encVal, RenderPressM
 // DashDrawParametersIntUpdateRange that can change colors when certain ranges are met, and finally a text matching
 // DashDrawParametersTextUpdateRange that changes color for certain string matches.
 DashDrawParametersIntUpdateRange::IntColorRange const rpmRanges[] = {
-        { ILI9341_GREEN, ILI9341_BLACK, 7000, 13000},
-        { ILI9341_ORANGE, ILI9341_BLACK, 13000, 14000 },
-        { ILI9341_RED, ILI9341_YELLOW , 14000, 20000},
+        { RGB_COL_GREEN, RGB_COL_BLACK, 7000, 13000},
+        { RGB_COL_ORANGE, RGB_COL_BLACK, 13000, 14000 },
+        { RGB_COL_RED, RGB_COL_YELLOW , 14000, 20000},
 };
 DashDrawParametersIntUpdateRange rpmDrawParams(ILI9341_WHITE, ILI9341_BLACK, ILI9341_WHITE, ILI9341_BLACK, &FreeSans18pt7b, rpmRanges, 3);
 
 DashDrawParametersTextUpdateRange::TextColorOverride const gearRanges[] = {
-        { "R", ILI9341_GREEN, ILI9341_BLACK },
-        { "N", ILI9341_ORANGE, ILI9341_BLACK }
+        { "R", RGB_COL_GREEN, RGB_COL_BLACK },
+        { "N", RGB_COL_ORANGE, RGB_COL_BLACK }
 };
 DashDrawParametersTextUpdateRange gearDrawParams(ILI9341_WHITE, ILI9341_BLACK, ILI9341_WHITE, ILI9341_PURPLE, &RobotoMono_SemiBold60pt7b,
                                                  gearRanges, 2, DashDrawParameters::NO_TITLE_VALUE_LEFT);
 
-DashDrawParameters white18ptNoUpdate(ILI9341_WHITE, ILI9341_BLACK, &FreeSans18pt7b);
+DashDrawParameters white18ptNoUpdate(RGB_COL_WHITE, RGB_COL_BLACK, &FreeSans18pt7b);
 
-DashDrawParametersUpdate white18ptUpdateRightParam(ILI9341_WHITE, ILI9341_BLACK, ILI9341_CYAN, ILI9341_PURPLE, &FreeSans18pt7b);
+DashDrawParametersUpdate white18ptUpdateRightParam(RGB_COL_WHITE, RGB_COL_BLACK, RGB_COL_CYAN, RGB_COL_PURPLE, &FreeSans18pt7b);
 
-DashDrawParametersUpdate yellow9PtUpdateLeft(ILI9341_YELLOW, ILI9341_BLACK, ILI9341_CYAN, ILI9341_PURPLE,
+DashDrawParametersUpdate yellow9PtUpdateLeft(RGB_COL_YELLOW, RGB_COL_BLACK, RGB_COL_CYAN, RGB_COL_PURPLE,
                                              &FreeSans9pt7b, DashDrawParameters::TITLE_LEFT_VALUE_LEFT);
-DashDrawParametersUpdate yellow9PtUpdateRight(ILI9341_YELLOW, ILI9341_BLACK, ILI9341_CYAN, ILI9341_PURPLE,
+DashDrawParametersUpdate yellow9PtUpdateRight(RGB_COL_YELLOW, RGB_COL_BLACK, RGB_COL_CYAN, RGB_COL_PURPLE,
                                               &FreeSans9pt7b, DashDrawParameters::TITLE_LEFT_VALUE_RIGHT);
 
 //

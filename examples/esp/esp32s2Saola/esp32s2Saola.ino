@@ -5,7 +5,7 @@
 // Getting started: https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
 //
 
-#include "generated/esp32s2Saola_menu.h"
+#include "esp32s2Saola_menu.h"
 #include <PlatformDetermination.h>
 
 #include <TaskManagerIO.h>
@@ -14,7 +14,6 @@
 #include <WiFi.h>
 #include <stockIcons/wifiAndConnectionIcons16x12.h>
 #include <tcUtil.h>
-#include "u8g2DashConfig.h"
 #include <SPI.h>
 
 #define MENU_WIFIMODE_STATION 0

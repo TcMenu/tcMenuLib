@@ -23,7 +23,7 @@
 #include <ScrollChoiceMenuItem.h>
 #include <IoAbstraction.h>
 #include <EepromItemStorage.h>
-#include <ArduinoEEPROMAbstraction.h>
+#include <esp32/EspPreferencesEeprom.h>
 #include <RemoteAuthentication.h>
 
 // variables we declare that you may need to access
@@ -36,7 +36,7 @@ extern WiFiServer server;
 extern EthernetInitialisation ethernetInitialisation;
 
 // Any externals needed by IO expanders, EEPROMs etc
-
+extern EspPreferencesEeprom glEspRom;
 
 // Global Menu Item exports
 extern EepromAuthenticationInfoMenuItem menuConnectivityAuthenticator;
