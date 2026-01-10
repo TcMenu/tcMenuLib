@@ -15,6 +15,7 @@
 #include <stockIcons/wifiAndConnectionIcons16x12.h>
 #include <tcUtil.h>
 #include "u8g2DashConfig.h"
+#include <SPI.h>
 
 #define MENU_WIFIMODE_STATION 0
 bool  connectedToWiFi = false;
@@ -29,7 +30,7 @@ void setup() {
     // before proceeding, we must start wire and serial, then call setup menu.
     Serial.begin(115200);
     serdebugF("Starting ESP32-S2 example");
-    Wire.begin();
+    SPI.begin();
     Wire.setClock(1000000);
     EEPROM.begin(512);
 

@@ -1,8 +1,68 @@
 {
   "version": "1.00",
-  "projectName": "",
+  "projectName": "MKR project with eInk display\t",
   "author": "dave",
   "items": [
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "defaultValue": "0",
+      "item": {
+        "maxValue": 255,
+        "offset": -55,
+        "divisor": 1,
+        "unitName": "oC",
+        "step": 1,
+        "name": "Kitchen",
+        "variableName": "Kitchen",
+        "id": 1,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "defaultValue": "0",
+      "item": {
+        "maxValue": 255,
+        "offset": -55,
+        "divisor": 1,
+        "unitName": "oC",
+        "step": 1,
+        "name": "Lounge",
+        "variableName": "Lounge",
+        "id": 2,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "defaultValue": "0",
+      "item": {
+        "maxValue": 255,
+        "offset": -55,
+        "divisor": 1,
+        "unitName": "oC",
+        "step": 1,
+        "name": "Hallway",
+        "variableName": "Hallway",
+        "id": 3,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
     {
       "parentId": 0,
       "type": "subMenu",
@@ -10,202 +70,6 @@
         "secured": false,
         "name": "Settings",
         "variableName": "Settings",
-        "id": 6,
-        "eepromAddress": -1,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 6,
-      "type": "rgbItem",
-      "defaultValue": "#000000FF",
-      "item": {
-        "includeAlphaChannel": false,
-        "name": "Color",
-        "variableName": "NewSubMenuColor",
-        "id": 7,
-        "eepromAddress": -1,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 6,
-      "type": "textItem",
-      "defaultValue": "",
-      "item": {
-        "textLength": 5,
-        "itemType": "PLAIN_TEXT",
-        "name": "Text",
-        "variableName": "NewSubMenuText",
-        "id": 8,
-        "eepromAddress": -1,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 6,
-      "type": "textItem",
-      "defaultValue": "",
-      "item": {
-        "textLength": 5,
-        "itemType": "GREGORIAN_DATE",
-        "name": "Date",
-        "variableName": "NewSubMenuDate",
-        "id": 9,
-        "eepromAddress": -1,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 6,
-      "type": "analogItem",
-      "defaultValue": "0",
-      "item": {
-        "maxValue": 100,
-        "offset": 0,
-        "divisor": 1,
-        "unitName": "%",
-        "step": 1,
-        "name": "Percent1",
-        "id": 10,
-        "eepromAddress": -1,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 6,
-      "type": "analogItem",
-      "defaultValue": "0",
-      "item": {
-        "maxValue": 1000,
-        "offset": 0,
-        "divisor": 10,
-        "unitName": "",
-        "step": 1,
-        "name": "Tenths1",
-        "id": 11,
-        "eepromAddress": -1,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 6,
-      "type": "largeNumItem",
-      "defaultValue": "0",
-      "item": {
-        "digitsAllowed": 6,
-        "decimalPlaces": 4,
-        "negativeAllowed": true,
-        "name": "Lge Num1",
-        "id": 12,
-        "eepromAddress": -1,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "boolItem",
-      "defaultValue": "false",
-      "item": {
-        "naming": "TRUE_FALSE",
-        "name": "Mute",
-        "variableName": "Mute",
-        "id": 13,
-        "eepromAddress": -1,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "subMenu",
-      "item": {
-        "secured": false,
-        "name": "Battery",
-        "variableName": "Battery",
-        "id": 14,
-        "eepromAddress": -1,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 14,
-      "type": "analogItem",
-      "defaultValue": "0",
-      "item": {
-        "maxValue": 100,
-        "offset": 0,
-        "divisor": 1,
-        "unitName": "%",
-        "step": 1,
-        "name": "Charge",
-        "variableName": "BatteryCharge",
-        "id": 15,
-        "eepromAddress": -1,
-        "readOnly": true,
-        "localOnly": false,
-        "visible": true,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 14,
-      "type": "enumItem",
-      "defaultValue": "0",
-      "item": {
-        "enumEntries": [
-          "Bad",
-          "Normal",
-          "Good"
-        ],
-        "name": "Condition",
-        "variableName": "BatteryCondition",
-        "id": 16,
-        "eepromAddress": -1,
-        "readOnly": true,
-        "localOnly": false,
-        "visible": true,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "enumItem",
-      "defaultValue": "0",
-      "item": {
-        "enumEntries": [
-          "Pizza",
-          "Pasta",
-          "Salad"
-        ],
-        "name": "Foods",
-        "variableName": "Foods",
         "id": 4,
         "eepromAddress": -1,
         "readOnly": false,
@@ -215,15 +79,137 @@
       }
     },
     {
-      "parentId": 0,
+      "parentId": 4,
+      "type": "analogItem",
+      "defaultValue": "0",
+      "item": {
+        "maxValue": 255,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": "Unit",
+        "step": 1,
+        "name": "Temp desired",
+        "variableName": "SettingsTempDesired",
+        "id": 5,
+        "eepromAddress": 4,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "enumItem",
+      "defaultValue": "0",
+      "item": {
+        "enumEntries": [
+          "Fully ON",
+          "Fully OFF",
+          "Vacation"
+        ],
+        "name": "Mode",
+        "variableName": "SettingsMode",
+        "id": 6,
+        "eepromAddress": 6,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 4,
       "type": "boolItem",
       "defaultValue": "false",
       "item": {
-        "naming": "YES_NO",
-        "name": "To go",
-        "variableName": "ToGo",
-        "id": 5,
+        "naming": "ON_OFF",
+        "name": "Protection",
+        "variableName": "SettingsProtection",
+        "id": 7,
+        "eepromAddress": 8,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 4,
+      "type": "actionMenu",
+      "item": {
+        "name": "Emergency off",
+        "variableName": "SettingsEmergencyOff",
+        "id": 8,
         "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "secured": false,
+        "name": "Other Types",
+        "variableName": "OtherTypes",
+        "id": 9,
+        "eepromAddress": -1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 9,
+      "type": "textItem",
+      "defaultValue": "",
+      "item": {
+        "textLength": 10,
+        "itemType": "PLAIN_TEXT",
+        "name": "Text",
+        "variableName": "OtherTypesText",
+        "id": 10,
+        "eepromAddress": 9,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 9,
+      "type": "rgbItem",
+      "defaultValue": "#000000FF",
+      "item": {
+        "includeAlphaChannel": false,
+        "name": "RGB Item",
+        "variableName": "OtherTypesRGBItem",
+        "id": 11,
+        "eepromAddress": 19,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 9,
+      "type": "scrollItem",
+      "defaultValue": "0-",
+      "item": {
+        "itemWidth": 10,
+        "eepromOffset": 0,
+        "numEntries": 5,
+        "choiceMode": "ARRAY_IN_RAM",
+        "variable": "ScrollRam",
+        "name": "Foods",
+        "variableName": "OtherTypesFoods",
+        "id": 12,
+        "eepromAddress": 23,
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -233,14 +219,14 @@
   ],
   "codeOptions": {
     "embeddedPlatform": "ARDUINO32",
-    "lastDisplayUuid": "4dcb12ec-13d8-4466-b8b6-bd575eae4612",
+    "lastDisplayUuid": "fd998437-c4b2-4386-ba88-d0ae7c20620b",
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
     "lastRemoteUuids": [
       "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
     ],
-    "lastThemeUuid": "57945787-0A04-447B-BBA2-6461FC505397",
-    "applicationUUID": "c035e186-32cc-45e4-ac28-773f57e108ee",
-    "applicationName": "ESP32 S3 Tiny",
+    "lastThemeUuid": "8D9B49C7-FD28-4533-9B00-21A4184BB0C9",
+    "applicationUUID": "2d36dbe4-4892-410f-b0d6-775ec3637f6f",
+    "applicationName": "MKR eInk",
     "lastProperties": [
       {
         "name": "DISPLAY_VARIABLE",
@@ -249,62 +235,52 @@
       },
       {
         "name": "DISPLAY_TYPE",
-        "latestValue": "Adafruit_ST7735",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "DISPLAY_WIDTH",
-        "latestValue": "128",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "DISPLAY_HEIGHT",
-        "latestValue": "128",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "DISPLAY_RESET_PIN",
-        "latestValue": "6",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "DISPLAY_CS_PIN",
-        "latestValue": "34",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "DISPLAY_RS_PIN",
-        "latestValue": "7",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "DISPLAY_DATA_PIN",
-        "latestValue": "-1",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "DISPLAY_CLOCK_PIN",
-        "latestValue": "-1",
-        "subsystem": "DISPLAY"
-      },
-      {
-        "name": "ST7735_TAB_TYPE",
-        "latestValue": "INITR_GREENTAB",
+        "latestValue": "U8G2_SH1106_128X64_NONAME_F_HW_I2C",
         "subsystem": "DISPLAY"
       },
       {
         "name": "DISPLAY_ROTATION",
-        "latestValue": "0",
+        "latestValue": "U8G2_R0",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CLOCK_PIN",
+        "latestValue": "12",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_DATA_PIN",
+        "latestValue": "13",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_RESET_PIN",
+        "latestValue": "-1",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CS_PIN",
+        "latestValue": "2",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_RS_PIN",
+        "latestValue": "U8X8_PIN_NONE",
         "subsystem": "DISPLAY"
       },
       {
         "name": "UPDATES_PER_SEC",
-        "latestValue": "15",
+        "latestValue": "4",
         "subsystem": "DISPLAY"
       },
       {
-        "name": "DISPLAY_BUFFER_SIZE",
-        "latestValue": "40",
+        "name": "YIELDING_WIRE_CB",
+        "latestValue": "true",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "USE_UTF8_SUPPORT",
+        "latestValue": "false",
         "subsystem": "DISPLAY"
       },
       {
@@ -314,22 +290,22 @@
       },
       {
         "name": "SWITCH_IODEVICE",
-        "latestValue": "devicePins",
+        "latestValue": "io8574",
         "subsystem": "INPUT"
       },
       {
         "name": "ENCODER_PIN_A",
-        "latestValue": "3",
+        "latestValue": "1",
         "subsystem": "INPUT"
       },
       {
         "name": "ENCODER_PIN_B",
-        "latestValue": "4",
+        "latestValue": "2",
         "subsystem": "INPUT"
       },
       {
         "name": "ENCODER_PIN_OK",
-        "latestValue": "5",
+        "latestValue": "0",
         "subsystem": "INPUT"
       },
       {
@@ -354,37 +330,43 @@
       },
       {
         "name": "ITEM_FONT",
-        "latestValue": "ada:OpenSansRegular8pt,0",
+        "latestValue": "ada:OpenSansRegular7pt,0",
         "subsystem": "THEME"
       },
       {
         "name": "TITLE_FONT",
-        "latestValue": "ada:OpenSansRegular10pt,0",
+        "latestValue": "ada:OpenSansRegular8pt,0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_HEADER_PADDING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_TO_ITEM_SPACING",
+        "latestValue": "2",
         "subsystem": "THEME"
       },
       {
         "name": "TITLE_SHOW_MODE",
-        "latestValue": "NO_TITLE",
+        "latestValue": "TITLE_FIRST_ROW",
         "subsystem": "THEME"
       },
       {
         "name": "USE_TC_UNICODE",
         "latestValue": "true",
         "subsystem": "THEME"
-      },
-      {
-        "name": "NEED_EDITING_ICONS",
-        "latestValue": "true",
-        "subsystem": "THEME"
       }
     ],
     "namingRecursive": true,
     "useCppMain": false,
-    "saveLocation": "PROJECT_TO_CURRENT_WITH_GENERATED",
-    "usingSizedEEPROMStorage": false,
+    "saveLocation": "ALL_TO_CURRENT",
+    "usingSizedEEPROMStorage": true,
     "eepromDefinition": "",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
+      "pcf8574:io8574:32:6:false",
       "deviceIO:"
     ],
     "menuInMenuCollection": {

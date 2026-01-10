@@ -26,7 +26,7 @@ const uint8_t* safeGetFont(const void* fnt) {
     return u8g2_font_6x10_tf;
 }
 
-#define TC_USE_UTF_8_ENCODING true
+#define TC_USE_UTF_8_ENCODING false
 
 #if WANT_TASK_MANAGER_FRIENDLY_YIELD == 1
 static uint8_t bytesSent = 0;

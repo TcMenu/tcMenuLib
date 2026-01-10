@@ -3,10 +3,9 @@
 
 #include <graphics/TcThemeBuilder.h>
 
-color_t defaultItemPaletteMono[] = {1, 0, 1, 1};
-color_t defaultTitlePaletteMono[] = {0, 1, 0, 0};
+color_t defaultItemPaletteMono[] = {WHITE, BLACK, WHITE, WHITE};
 
-#define TITLE_PADDING 2
+#define TITLE_BORDER_THICKNESS 2
 #define TITLE_SPACING 2
 
 /**
@@ -17,10 +16,12 @@ color_t defaultTitlePaletteMono[] = {0, 1, 0, 0};
  * @param titleFont the font for titles
  * @param needEditingIcons if editing icons are needed
  */
-void installMonoInverseTitleTheme(GraphicsDeviceRenderer& gr, const MenuFontDef& itemFont, const MenuFontDef& titleFont,
-                                  bool needEditingIcons, BaseGraphicalRenderer::TitleMode titleMode, bool useUnicode) {
+void installMonoBorderTitleTheme(GraphicsDeviceRenderer& gr, const MenuFontDef& itemFont, const MenuFontDef& titleFont,
+                                 bool needEditingIcons, BaseGraphicalRenderer::TitleMode titleMode, bool useUnicode) {
+
+    // See https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/themes/rendering-with-themes-icons-grids/
     TcThemeBuilder themeBuilder(gr);
-    themeBuilder.withSelectedColors(0, 2)
+    themeBuilder.withSelectedColors(0, 1)
             .dimensionsFromRenderer()
             .withItemPadding(MenuPadding(1))
             .withRenderingSettings(titleMode, false)
@@ -33,15 +34,14 @@ void installMonoInverseTitleTheme(GraphicsDeviceRenderer& gr, const MenuFontDef&
     }
 
     if(useUnicode) {
-        themeBuilder.enablingTcUnicode();
+        themeBuilder.enableTcUnicode();
     }
 
     themeBuilder.defaultTitleProperties()
             .withNativeFont(titleFont.fontData, titleFont.fontMag)
-            .withPalette(defaultTitlePaletteMono)
-            .withPadding(MenuPadding(TITLE_PADDING))
             .withJustification(tcgfx::GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE)
             .withSpacing(TITLE_SPACING)
+            .withBorder(MenuBorder(0, 0, TITLE_BORDER_THICKNESS, 0))
             .apply();
 
     themeBuilder.defaultActionProperties()
