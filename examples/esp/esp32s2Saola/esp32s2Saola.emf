@@ -5,6 +5,21 @@
   "items": [
     {
       "parentId": 0,
+      "type": "actionMenu",
+      "item": {
+        "name": "Hibernate",
+        "variableName": "Hibernate",
+        "id": 21,
+        "eepromAddress": -1,
+        "functionName": "onHibernate",
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "staticDataInRAM": false
+      }
+    },
+    {
+      "parentId": 0,
       "type": "analogItem",
       "defaultValue": "0",
       "item": {
@@ -94,85 +109,6 @@
         "variableName": "DoorOpen",
         "id": 5,
         "eepromAddress": 10,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 0,
-      "type": "subMenu",
-      "item": {
-        "secured": false,
-        "name": "Hibernate",
-        "variableName": "Hibernate",
-        "id": 6,
-        "eepromAddress": -1,
-        "functionName": "onHibernate",
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 6,
-      "type": "floatItem",
-      "defaultValue": "0.0",
-      "item": {
-        "numDecimalPlaces": 3,
-        "name": "Float 1",
-        "variableName": "SelectMeFloat1",
-        "id": 7,
-        "eepromAddress": -1,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 6,
-      "type": "floatItem",
-      "defaultValue": "0.0",
-      "item": {
-        "numDecimalPlaces": 3,
-        "name": "Float 2",
-        "variableName": "SelectMeFloat2",
-        "id": 8,
-        "eepromAddress": -1,
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 6,
-      "type": "actionMenu",
-      "item": {
-        "name": "Press Me",
-        "variableName": "SelectMePressMe",
-        "id": 9,
-        "eepromAddress": -1,
-        "functionName": "pressMeActionRun",
-        "readOnly": false,
-        "localOnly": false,
-        "visible": true,
-        "staticDataInRAM": false
-      }
-    },
-    {
-      "parentId": 6,
-      "type": "boolItem",
-      "defaultValue": "true",
-      "item": {
-        "naming": "CHECKBOX",
-        "name": "New BoolItem",
-        "variableName": "SelectMeNewBoolItem",
-        "id": 21,
-        "eepromAddress": -1,
         "readOnly": false,
         "localOnly": false,
         "visible": true,

@@ -51,20 +51,15 @@ extern Rgb32MenuItem menuExtrasColor;
 extern TextMenuItem menuExtrasText;
 extern BackMenuItem menuBackExtras;
 extern SubMenuItem menuExtras;
-extern BooleanMenuItem menuSelectMeNewBoolItem;
-extern ActionMenuItem menuSelectMePressMe;
-extern FloatMenuItem menuSelectMeFloat2;
-extern FloatMenuItem menuSelectMeFloat1;
-extern BackMenuItem menuBackHibernate;
-extern SubMenuItem menuHibernate;
 extern BooleanMenuItem menuDoorOpen;
 extern EnumMenuItem menuFoods;
 extern AnalogMenuItem menuHalves;
 extern AnalogMenuItem menuDecEdit;
 extern AnalogMenuItem menuIntEdit;
+extern ActionMenuItem menuHibernate;
 
 // Provide a wrapper to get hold of the root menu item and export setupMenu
-inline MenuItem& rootMenuItem() { return menuIntEdit; }
+inline MenuItem& rootMenuItem() { return menuHibernate; }
 void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
@@ -73,6 +68,5 @@ void setupMenu();
 void CALLBACK_FUNCTION onListSelected(int id);
 int fnExtrasMyListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
 void CALLBACK_FUNCTION onHibernate(int id);
-void CALLBACK_FUNCTION pressMeActionRun(int id);
 
 #endif // MENU_GENERATED_CODE_H
