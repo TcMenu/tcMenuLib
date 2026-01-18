@@ -105,10 +105,11 @@
       "type": "subMenu",
       "item": {
         "secured": false,
-        "name": "Select Me",
-        "variableName": "SelectMe",
+        "name": "Hibernate",
+        "variableName": "Hibernate",
         "id": 6,
         "eepromAddress": -1,
+        "functionName": "onHibernate",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -362,7 +363,7 @@
   "codeOptions": {
     "embeddedPlatform": "ARDUINO_ESP32",
     "lastDisplayUuid": "cfe4e465-451b-47d8-b026-3be79ecf1cd3",
-    "lastInputUuid": "89cd7f70-0457-4884-97c2-0db904ccb0ba",
+    "lastInputUuid": "2a3ae3ba-05f4-4c9c-aad3-3ddc88df9049",
     "lastRemoteUuids": [
       "46c30011-cac6-4598-a7b8-b0630d55daab"
     ],
@@ -382,22 +383,22 @@
       },
       {
         "name": "DISPLAY_RESET_PIN",
-        "latestValue": "-1",
+        "latestValue": "15",
         "subsystem": "DISPLAY"
       },
       {
         "name": "DISPLAY_CS_PIN",
-        "latestValue": "-1",
+        "latestValue": "13",
         "subsystem": "DISPLAY"
       },
       {
         "name": "DISPLAY_DC_PIN",
-        "latestValue": "-1",
+        "latestValue": "14",
         "subsystem": "DISPLAY"
       },
       {
         "name": "DISPLAY_BUSY_PIN",
-        "latestValue": "-1",
+        "latestValue": "16",
         "subsystem": "DISPLAY"
       },
       {
@@ -407,7 +408,7 @@
       },
       {
         "name": "UPDATES_PER_SEC",
-        "latestValue": "2",
+        "latestValue": "1",
         "subsystem": "DISPLAY"
       },
       {
@@ -427,8 +428,58 @@
       },
       {
         "name": "EINK_RESET_PULLDOWN",
-        "latestValue": "true",
+        "latestValue": "false",
         "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_VARIABLE",
+        "latestValue": "display",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "SW_POLLING_MODE",
+        "latestValue": "SWITCHES_POLL_EVERYTHING",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SWITCH_IODEVICE",
+        "latestValue": "devicePins",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_UP_PIN",
+        "latestValue": "1",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_DOWN_PIN",
+        "latestValue": "2",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_BACK_PIN",
+        "latestValue": "3",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_NEXT_PIN",
+        "latestValue": "4",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_OK_PIN",
+        "latestValue": "-1",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENC_KEY_REPEAT",
+        "latestValue": "20",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "PULLUP_LOGIC",
+        "latestValue": "true",
+        "subsystem": "INPUT"
       },
       {
         "name": "ESPWIFI_CONCURRENT_CONNECTIONS",
@@ -456,22 +507,22 @@
         "subsystem": "REMOTE"
       },
       {
-        "name": "FONT_SEPARATOR_IN",
+        "name": "FONT_SEPARATOR_DISP",
         "latestValue": "",
         "subsystem": "THEME"
       },
       {
         "name": "THEME_ITEM_FONT",
-        "latestValue": "def:,1",
+        "latestValue": "ada:OpenSansRegular12pt,0",
         "subsystem": "THEME"
       },
       {
         "name": "THEME_TITLE_FONT",
-        "latestValue": "def:,1",
+        "latestValue": "ada:OpenSansRegular14pt,0",
         "subsystem": "THEME"
       },
       {
-        "name": "SPACING_SEPARATOR_IN",
+        "name": "SPACING_SEPARATOR_DISP",
         "latestValue": "",
         "subsystem": "THEME"
       },
@@ -501,58 +552,58 @@
         "subsystem": "THEME"
       },
       {
-        "name": "COLORS_SEPARATOR_IN",
+        "name": "COLORS_SEPARATOR_DISP",
         "latestValue": "",
         "subsystem": "THEME"
       },
       {
-        "name": "THEME_COLOR_ITEM_BG",
-        "latestValue": "1",
+        "name": "THEME_COLOR_ITEM_FG",
+        "latestValue": "GxEPD_BLACK",
         "subsystem": "THEME"
       },
       {
-        "name": "THEME_COLOR_ITEM_FG",
-        "latestValue": "0",
+        "name": "THEME_COLOR_ITEM_BG",
+        "latestValue": "GxEPD_WHITE",
         "subsystem": "THEME"
       },
       {
         "name": "THEME_COLOR_ITEM_HL",
-        "latestValue": "1",
+        "latestValue": "GxEPD_BLACK",
         "subsystem": "THEME"
       },
       {
         "name": "THEME_COLOR_ITEM_EX",
-        "latestValue": "1",
-        "subsystem": "THEME"
-      },
-      {
-        "name": "THEME_COLOR_TITLE_BG",
-        "latestValue": "0",
+        "latestValue": "GxEPD_BLACK",
         "subsystem": "THEME"
       },
       {
         "name": "THEME_COLOR_TITLE_FG",
-        "latestValue": "1",
+        "latestValue": "GxEPD_WHITE",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_COLOR_TITLE_BG",
+        "latestValue": "GxEPD_BLACK",
         "subsystem": "THEME"
       },
       {
         "name": "THEME_COLOR_TITLE_HL",
-        "latestValue": "1",
+        "latestValue": "GxEPD_WHITE",
         "subsystem": "THEME"
       },
       {
         "name": "THEME_COLOR_TITLE_EX",
-        "latestValue": "1",
+        "latestValue": "GxEPD_WHITE",
         "subsystem": "THEME"
       },
       {
         "name": "THEME_SELECTED_BG",
-        "latestValue": "0",
+        "latestValue": "GxEPD_BLACK",
         "subsystem": "THEME"
       },
       {
         "name": "THEME_SELECTED_FG",
-        "latestValue": "1",
+        "latestValue": "GxEPD_WHITE",
         "subsystem": "THEME"
       }
     ],
@@ -560,7 +611,7 @@
     "useCppMain": false,
     "saveLocation": "ALL_TO_CURRENT",
     "usingSizedEEPROMStorage": false,
-    "eepromDefinition": "prefs:menuStore:1024",
+    "eepromDefinition": "prefs:menuStore:512",
     "authenticatorDefinition": "rom:200:4",
     "projectIoExpanders": [
       "deviceIO:"

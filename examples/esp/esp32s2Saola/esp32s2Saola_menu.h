@@ -30,7 +30,6 @@
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
 extern TcMenuRemoteServer remoteServer;
 extern TcGxEPD2 display;
-extern TcMenuGxEPDeInk drawable;
 extern GraphicsDeviceRenderer renderer;
 extern WiFiServer server;
 extern EthernetInitialisation ethernetInitialisation;
@@ -56,8 +55,8 @@ extern BooleanMenuItem menuSelectMeNewBoolItem;
 extern ActionMenuItem menuSelectMePressMe;
 extern FloatMenuItem menuSelectMeFloat2;
 extern FloatMenuItem menuSelectMeFloat1;
-extern BackMenuItem menuBackSelectMe;
-extern SubMenuItem menuSelectMe;
+extern BackMenuItem menuBackHibernate;
+extern SubMenuItem menuHibernate;
 extern BooleanMenuItem menuDoorOpen;
 extern EnumMenuItem menuFoods;
 extern AnalogMenuItem menuHalves;
@@ -73,6 +72,7 @@ void setupMenu();
 
 void CALLBACK_FUNCTION onListSelected(int id);
 int fnExtrasMyListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
+void CALLBACK_FUNCTION onHibernate(int id);
 void CALLBACK_FUNCTION pressMeActionRun(int id);
 
 #endif // MENU_GENERATED_CODE_H

@@ -3,63 +3,70 @@
  * This product is licensed under an Apache license, see the LICENSE file in the top-level directory.
  */
 
-#include "TcMenuGxEPDeInk.h"
+/**
+ * Adafruit_GFX renderer that renders menus onto this type of display. This file is a plugin file and should not
+ * be directly edited, it will be replaced each time the project is built. If you want to edit this file in place,
+ * make sure to rename it first.
+ * 
+ * LIBRARY REQUIREMENT
+ * This library requires the AdaGfx library along with a suitable driver.
+ */
 
-void TcMenuGxEPDeInk::internalDrawText(const Coord &where, const void *font, int mag, const char *text) {
-    display.setTextWrap(false);
+#include <ScrollChoiceMenuItem.h>
+#include "TcMenuGxEPDeInk.h"
+#include <tcUnicodeHelper.h>
+#include <tcUnicodeAdaGFX.h>
+
+using namespace tcgfx;
+
+void AdafruitDrawable::transaction(bool isStarting, bool redrawNeeded) {
+    auto gr = reinterpret_cast<TcGxEPD2*>(graphics);
+    if (isStarting && redrawNeeded) {
+    gr->setFullWindow();
+    if (!firstPageDone) {
+        firstPageDone = true;
+        gr->firstPage();
+    }
+    } else if (redrawNeeded) {
+        gr->nextPage();
+    }
+
+}
+
+
+void AdafruitDrawable::internalDrawText(const Coord &where, const void *font, int mag, const char *sz) {
+    graphics->setTextWrap(false);
     int baseline=0;
     Coord exts = textExtents(font, mag, "(;y", &baseline);
-    auto yCursor = font ? (where.y + (exts.y - baseline)) : where.y;
-    display.setCursor(where.x, static_cast<int16_t>(yCursor));
-    display.setTextColor(drawColor);
-    display.print(text);
+    int yCursor = font ? (where.y + (exts.y - baseline)) : where.y;
+    graphics->setCursor(where.x, yCursor);
+    graphics->setTextColor(drawColor);
+    graphics->print(sz);
 }
 
-void TcMenuGxEPDeInk::drawBitmap(const Coord &where, const DrawableIcon *icon, bool selected) {
-    if(icon->getIconType() == DrawableIcon::ICON_XBITMAP) {
-        display.drawXBitmap(where.x, where.y, icon->getIcon(selected), icon->getDimensions().x, icon->getDimensions().y, drawColor);
-    } else if(icon->getIconType() == DrawableIcon::ICON_MONO) {
-        display.drawBitmap(where.x, where.y, icon->getIcon(selected), icon->getDimensions().x, icon->getDimensions().y, drawColor, backgroundColor);
+Coord AdafruitDrawable::internalTextExtents(const void *f, int mag, const char *text, int *baseline) {
+    if(mag == 0) mag = 1; // never allow 0 magnification
+
+    graphics->setFont(static_cast<const GFXfont *>(f));
+    graphics->setTextSize(mag);
+    auto* font = (GFXfont *) f;
+    int16_t x1, y1;
+    uint16_t w, h;
+    graphics->getTextBounds((char*)text, 3, font?30:2, &x1, &y1, &w, &h);
+
+    if(font == nullptr) {
+        // for the default font, the starting offset is 0, and we calculate the height.
+        if(baseline) *baseline = 0;
+        return Coord(w, h);
+    }
+    else {
+        computeBaselineIfNeeded(font);
+        if(baseline) *baseline = (computedBaseline * mag);
+        return Coord(int(w), (computedHeight * mag));
     }
 }
 
-void TcMenuGxEPDeInk::drawXBitmap(const Coord &where, const Coord &size, const uint8_t *data) {
-    display.fillRect(where.x, where.y, size.x, size.y, backgroundColor);
-    display.drawXBitmap(where.x, where.y, data, size.x, size.y, drawColor);
-}
-
-void TcMenuGxEPDeInk::drawBox(const Coord &where, const Coord &size, bool filled) {
-    if(filled) {
-       display.fillRect(where.x, where.y, size.x, size.y, drawColor);
-    } else {
-        display.drawRect(where.x, where.y, size.x, size.y, drawColor);
-    }
-}
-
-void TcMenuGxEPDeInk::drawCircle(const Coord &where, int radius, bool filled) {
-    if(filled) {
-        display.fillCircle(where.x, where.y, radius, drawColor);
-    } else {
-        display.drawCircle(where.x, where.y, radius, drawColor);
-    }
-}
-
-void TcMenuGxEPDeInk::drawPolygon(const Coord *points, int numPoints, bool filled) {
-    if(numPoints == 2) {
-        display.drawLine(points[0].x, points[0].y, points[1].x, points[1].y, drawColor);
-    }
-    else if(numPoints == 3) {
-        if(filled) {
-            display.fillTriangle(points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y, drawColor);
-        }
-        else {
-            display.drawTriangle(points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y, drawColor);
-        }
-    }
-
-}
-
-void TcMenuGxEPDeInk::computeBaselineIfNeeded(const GFXfont* font) {
+void AdafruitDrawable::computeBaselineIfNeeded(const GFXfont* font) {
     // we cache the last baseline, if the font is unchanged, don't calculate again
     if(computedFont == font && computedBaseline > 0) return;
 
@@ -84,57 +91,93 @@ void TcMenuGxEPDeInk::computeBaselineIfNeeded(const GFXfont* font) {
     computedHeight = height;
 }
 
-void TcMenuGxEPDeInk::transaction(bool isStarting, bool redrawNeeded) {
-    if (isStarting && redrawNeeded) {
-        display.setFullWindow();
-        if (!firstPageDone) {
-            firstPageDone = true;
-            display.firstPage();
-        }
-    } else if (redrawNeeded) {
-        display.nextPage();
+UnicodeFontHandler *AdafruitDrawable::createFontHandler() {
+    return new UnicodeFontHandler(newAdafruitTextPipeline(graphics), ENCMODE_UTF8);
+}
+
+
+
+void AdafruitDrawable::drawBitmap(const Coord &where, const DrawableIcon *icon, bool selected) {
+    if(icon->getIconType() == DrawableIcon::ICON_XBITMAP) {
+        graphics->fillRect(where.x, where.y, icon->getDimensions().x, icon->getDimensions().y, backgroundColor);
+        graphics->drawXBitmap(where.x, where.y, icon->getIcon(selected), icon->getDimensions().x, icon->getDimensions().y, drawColor);
+    }
+    else if(icon->getIconType() == DrawableIcon::ICON_NATIVE) {
+        graphics->drawRGBBitmap(where.x, where.y, (const uint16_t*)icon->getIcon(selected), icon->getDimensions().x, icon->getDimensions().y);
+    }
+    else if(icon->getIconType() == DrawableIcon::ICON_MONO) {
+        graphics->drawBitmap(where.x, where.y, icon->getIcon(selected), icon->getDimensions().x, icon->getDimensions().y, drawColor, backgroundColor);
     }
 }
 
-Coord TcMenuGxEPDeInk::internalTextExtents(const void *font, int mag, const char *text, int *baseline) {
-    auto f = static_cast<const GFXfont *>(font);
-    display.setFont(f);
-    int16_t x1, y1;
-    uint16_t w, h;
-    display.getTextBounds((char*)text, 3, font?30:2, &x1, &y1, &w, &h);
+void AdafruitDrawable::drawXBitmap(const Coord &where, const Coord &size, const uint8_t *data) {
+    graphics->fillRect(where.x, where.y, size.x, size.y, backgroundColor);
+    graphics->drawXBitmap(where.x, where.y, data, size.x, size.y, drawColor);
+}
 
-    if(font == nullptr) {
-        // for the default font, the starting offset is 0, and we calculate the height.
-        if(baseline) *baseline = 0;
-        return Coord(w, h);
+void AdafruitDrawable::drawBox(const Coord &where, const Coord &size, bool filled) {
+    if(filled) {
+        graphics->fillRect(where.x, where.y, size.x, size.y, drawColor);
     }
     else {
-        computeBaselineIfNeeded(f);
-        if(baseline) *baseline = (computedBaseline * mag);
-        return Coord(int(w), (computedHeight * mag));
+        graphics->drawRect(where.x, where.y, size.x, size.y, drawColor);
     }
 }
 
-void TcMenuGxEPDeInk::drawPixel(uint16_t x, uint16_t y) {
-    display.drawPixel(static_cast<int16_t>(x), static_cast<int16_t>(y), drawColor);
+void AdafruitDrawable::drawCircle(const Coord& where, int radius, bool filled) {
+    if(filled) {
+        graphics->fillCircle(where.x, where.y, radius, drawColor);
+    }
+    else {
+        graphics->drawCircle(where.x, where.y, radius, drawColor);
+    }
 }
 
-UnicodeFontHandler * TcMenuGxEPDeInk::createFontHandler() {
-    return new UnicodeFontHandler(new TcMenuGxEPDFontPlotter(display), ENCMODE_UTF8);
+void AdafruitDrawable::drawPolygon(const Coord points[], int numPoints, bool filled) {
+    if(numPoints == 2) {
+        graphics->drawLine(points[0].x, points[0].y, points[1].x, points[1].y, drawColor);
+    }
+    else if(numPoints == 3) {
+        if(filled) {
+            graphics->fillTriangle(points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y, drawColor);
+        }
+        else {
+            graphics->drawTriangle(points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y, drawColor);
+        }
+    }
 }
 
-void TcMenuGxEPDFontPlotter::drawPixel(uint16_t x, uint16_t y, uint32_t color) {
-    display.drawPixel(static_cast<int16_t>(x), static_cast<int16_t>(y), color);
+void AdafruitDrawable::drawPixel(uint16_t x, uint16_t y) {
+    graphics->writePixel(x, y, drawColor);
 }
 
-void TcMenuGxEPDFontPlotter::setCursor(const Coord &where) {
-    display.setCursor(where.x, where.y);
-}
+//
+// helper functions
+//
 
-Coord TcMenuGxEPDFontPlotter::getCursor() {
-    return Coord(display.getCursorX(), display.getCursorY());
-}
+void drawCookieCutBitmap(Adafruit_GFX* gfx, int16_t x, int16_t y, const uint8_t *bitmap, int16_t w,
+                         int16_t h, int16_t totalWidth, int16_t xStart, int16_t yStart,
+                         uint16_t fgColor, uint16_t bgColor) {
 
-Coord TcMenuGxEPDFontPlotter::getDimensions() {
-    return Coord(display.width(), display.height());
+    // total width here is different to the width we are drawing, imagine rolling out a long
+    // line of dough and cutting cookies from it. The cookie is the part of the image we want
+    uint16_t byteWidth = (totalWidth + 7) / 8; // Bitmap scanline pad = whole byte
+    uint16_t yEnd = h + yStart;
+    uint16_t xEnd = w + xStart;
+    uint8_t byte;
+
+    gfx->startWrite();
+
+    for (uint16_t j = yStart; j < yEnd; j++, y++) {
+        byte = bitmap[size_t(((j * byteWidth) + xStart) / 8)];
+        for (uint16_t i = xStart; i < xEnd; i++) {
+            if (i & 7U)
+                byte <<= 1U;
+            else
+                byte = bitmap[size_t((j * byteWidth) + i / 8)];
+            gfx->writePixel(x + (i - xStart), y, (byte & 0x80U) ? fgColor : bgColor);
+        }
+    }
+
+    gfx->endWrite();
 }

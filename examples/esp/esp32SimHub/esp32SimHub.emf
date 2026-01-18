@@ -360,13 +360,18 @@
     "applicationName": "SimHub Link",
     "lastProperties": [
       {
-        "name": "DISPLAY_VARIABLE",
-        "latestValue": "gfx",
+        "name": "DISPLAY_SEPARATOR_DISP",
+        "latestValue": "",
         "subsystem": "DISPLAY"
       },
       {
         "name": "DISPLAY_TYPE",
         "latestValue": "Adafruit_ILI9341",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_VARIABLE",
+        "latestValue": "gfx",
         "subsystem": "DISPLAY"
       },
       {
@@ -377,6 +382,11 @@
       {
         "name": "DISPLAY_HEIGHT",
         "latestValue": "240",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "PINS_SEPARATOR_DISP",
+        "latestValue": "",
         "subsystem": "DISPLAY"
       },
       {
@@ -405,13 +415,13 @@
         "subsystem": "DISPLAY"
       },
       {
-        "name": "ST7735_TAB_TYPE",
-        "latestValue": "INITR_BLACKTAB",
+        "name": "OTHER_SEPARATOR_DISP",
+        "latestValue": "",
         "subsystem": "DISPLAY"
       },
       {
-        "name": "DISPLAY_ROTATION",
-        "latestValue": "1",
+        "name": "ST7735_TAB_TYPE",
+        "latestValue": "INITR_BLACKTAB",
         "subsystem": "DISPLAY"
       },
       {
@@ -420,8 +430,18 @@
         "subsystem": "DISPLAY"
       },
       {
+        "name": "DISPLAY_ROTATION",
+        "latestValue": "1",
+        "subsystem": "DISPLAY"
+      },
+      {
         "name": "DISPLAY_BUFFER_SIZE",
         "latestValue": "40",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CUSTOM_SPI_NAME",
+        "latestValue": "SPI",
         "subsystem": "DISPLAY"
       },
       {
@@ -533,8 +553,7 @@
       "menuDefinitions": []
     },
     "packageNamespace": "",
-    "appIsModular": false,
-    "listOfEmbeddedForms": []
+    "appIsModular": false
   },
   "stringLists": []
 }

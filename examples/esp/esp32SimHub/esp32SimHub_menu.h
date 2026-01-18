@@ -27,7 +27,6 @@
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
 extern TcMenuRemoteServer remoteServer;
 extern Adafruit_ILI9341 gfx;
-extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
 extern ESP32TouchKeysAbstraction esp32Touch;
 extern const UnicodeFont OpenSansCyrillicLatin14[];

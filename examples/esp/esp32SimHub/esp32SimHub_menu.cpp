@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for Arduino ESP32 by TcMenu 4.3.1 on 2024-09-28T16:58:40.173767400Z.
+// Generated for Arduino ESP32 by TcMenu 4.5.0 on 2026-01-17T21:26:26.287434Z.
 
 #include <tcMenu.h>
 #include "esp32SimHub_menu.h"
@@ -20,7 +20,7 @@
 const PROGMEM  ConnectorLocalInfo applicationInfo = { "SimHub Link", "4db9fbfe-9fab-4759-b8ff-3e0c6700f475" };
 TcMenuRemoteServer remoteServer(applicationInfo);
 
-Adafruit_ILI9341 gfx(22, 17, 16);
+Adafruit_ILI9341 gfx(&SPI, 22, 17, 16);
 AdafruitDrawable gfxDrawable(&gfx, 40);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 ESP32TouchKeysAbstraction esp32Touch(800, TOUCH_HVOLT_2V7, TOUCH_LVOLT_0V5, TOUCH_HVOLT_ATTEN_1V);

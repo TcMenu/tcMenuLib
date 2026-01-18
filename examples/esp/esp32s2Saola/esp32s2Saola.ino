@@ -15,6 +15,9 @@
 #include <stockIcons/wifiAndConnectionIcons16x12.h>
 #include <tcUtil.h>
 #include <SPI.h>
+#include <BaseDialog.h>
+
+#include "graphics/TcThemeBuilder.h"
 
 #define MENU_WIFIMODE_STATION 0
 bool  connectedToWiFi = false;
@@ -29,8 +32,8 @@ void setup() {
     // before proceeding, we must start wire and serial, then call setup menu.
     Serial.begin(115200);
     serdebugF("Starting ESP32-S2 example");
-    SPI.begin();
-    Wire.setClock(1000000);
+    SPI.begin(36, 37, 35, -1);
+
     EEPROM.begin(512);
 
     setupMenu();
@@ -43,15 +46,14 @@ void setup() {
 
     // next start WiFi and register our wifi widget
     startWiFiAndListener();
-    renderer.setFirstWidget(&wifiWidget);
+
+    auto themeBuilder = TcThemeBuilder(renderer);
+    themeBuilder.addingTitleWidget(wifiWidget);
 
     // lastly we capture when the root title is pressed present a standard version dialog.
     setTitlePressedCallback([](int titleCb) {
         showVersionDialog(&applicationInfo);
     });
-
-    // this project also contains a dashboard, see the u8g2DashConfig files.
-    setupDashboard();
 }
 
 void loop() {
@@ -123,4 +125,10 @@ int CALLBACK_FUNCTION fnExtrasMyListRtCall(RuntimeMenuItem* item, uint8_t row, R
 
 void CALLBACK_FUNCTION onListSelected(int id) {
     Serial.print("List item select "); Serial.println(menuExtrasMyList.getActiveIndex());
+}
+
+
+void CALLBACK_FUNCTION onHibernate(int id) {
+    display.clearScreen();
+    display.hibernate();
 }
