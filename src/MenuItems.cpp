@@ -87,6 +87,11 @@ uint16_t MenuItem::getId() const
 	return (isInfoProgMem()) ? get_info_uint(&info->id) : info->id;
 }
 
+uint16_t MenuItem::getMinimumValue() const
+{
+	return (isInfoProgMem()) ? get_info_uint(&info->minValue) : info->minValue;
+}
+
 uint16_t MenuItem::getMaximumValue() const
 {
 	if (isMenuRuntime(this)) {
@@ -305,6 +310,9 @@ int FloatMenuItem::getDecimalPlaces() const {
 void ValueMenuItem::setCurrentValue(uint16_t val, bool silent) {
 	if (val == currentValue || val > getMaximumValue()) {
 		return;
+	}
+	if (val < getMinimumValue()) {
+		val = getMinimumValue();
 	}
 	currentValue = val;
 	changeOccurred(silent);
