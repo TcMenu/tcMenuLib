@@ -192,6 +192,15 @@ struct FloatMenuInfo {
 	MenuCallbackFn callback;
 };
 
+union AllMenuInfoTypes {
+	AnyMenuInfo anyInfo;
+	AnalogMenuInfo analogInfo;
+	EnumMenuInfo enumInfo;
+	BooleanMenuInfo booleanInfo;
+	SubMenuInfo subInfo;
+	FloatMenuInfo floatInfo;
+};
+
 /** 
  * Each menu item can be in the following states.
  */
