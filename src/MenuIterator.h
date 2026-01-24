@@ -4,6 +4,7 @@
  */
 
 #include <PlatformDetermination.h>
+#include "ScrollChoiceMenuItem.h"
 
 /**
  * @file MenuIterator.h
@@ -17,6 +18,7 @@
 # define MAX_MENU_DEPTH 4
 #endif // MAX_MENU_DEPTH
 
+class EditableLargeNumberMenuItem;
 // forward reference of menu item
 class MenuItem;
 
@@ -210,5 +212,104 @@ public:
      */
     MenuItem* currentParent();
 };
+
+template<typename T>
+inline T *asMenuItem(MenuItem *item, MenuType expectedType, const char *typeName) {
+    if (item == nullptr || item->getMenuType() != expectedType) {
+        while (1) {
+            // literally stop here if we get a fault, continuing will lead to worse.
+            serlogF2(SER_ERROR, typeName, item == nullptr ? 0 : item->getId());
+            delay(1000);
+        }
+    }
+    return reinterpret_cast<T *>(item);
+}
+
+inline AnalogMenuItem &asAnalogItem(MenuItem *item) {
+    return *asMenuItem<AnalogMenuItem>(item, MENUTYPE_INT_VALUE, "Item not analog");
+}
+inline AnalogMenuItem& getAnalogItemById(menuid_t id) { return asAnalogItem(getMenuItemById(id)); }
+
+
+inline EnumMenuItem &asEnumItem(MenuItem *item) {
+    return *asMenuItem<EnumMenuItem>(item, MENUTYPE_ENUM_VALUE, "Item not enum");
+}
+inline EnumMenuItem& getEnumItemById(menuid_t id) { return asEnumItem(getMenuItemById(id)); }
+
+
+inline BooleanMenuItem &asBooleanItem(MenuItem *item) {
+    return *asMenuItem<BooleanMenuItem>(item, MENUTYPE_BOOLEAN_VALUE, "Item not bool");
+}
+inline BooleanMenuItem& getBooleanItemById(menuid_t id) { return asBooleanItem(getMenuItemById(id)); }
+
+inline TextMenuItem& asTextItem(MenuItem *item) {
+    return *asMenuItem<TextMenuItem>(item, MENUTYPE_TEXT_VALUE, "Item not text");
+}
+inline TextMenuItem& getTextItemById(menuid_t id) { return asTextItem(getMenuItemById(id)); }
+
+inline FloatMenuItem& asFloatItem(MenuItem *item) {
+    return *asMenuItem<FloatMenuItem>(item, MENUTYPE_FLOAT_VALUE, "Item not float");
+}
+inline FloatMenuItem& getFloatItemById(menuid_t id) { return asFloatItem(getMenuItemById(id)); }
+
+inline SubMenuItem &asSubMenu(MenuItem *item) {
+    return *asMenuItem<SubMenuItem>(item, MENUTYPE_SUB_VALUE, "Item not submenu");
+}
+inline SubMenuItem& getSubMenuById(menuid_t id) { return asSubMenu(getMenuItemById(id)); }
+
+inline ActionMenuItem &asActionItem(MenuItem *item) {
+    return *asMenuItem<ActionMenuItem>(item, MENUTYPE_ACTION_VALUE, "Item not action");
+}
+inline ActionMenuItem& getActionItemById(menuid_t id) { return asActionItem(getMenuItemById(id)); }
+
+inline IpAddressMenuItem &asIpAddressItem(MenuItem *item) {
+    return *asMenuItem<IpAddressMenuItem>(item, MENUTYPE_IPADDRESS, "Item not IP");
+}
+inline IpAddressMenuItem& getIpAddressItemById(menuid_t id) { return asIpAddressItem(getMenuItemById(id)); }
+
+inline BackMenuItem &asBackMenu(MenuItem *item) {
+    return *asMenuItem<BackMenuItem>(item, MENUTYPE_BACK_VALUE, "Item not back");
+}
+inline BackMenuItem& getBackMenuById(menuid_t id) { return asBackMenu(getMenuItemById(id)); }
+
+inline ScrollChoiceMenuItem &asScrollChoiceItem(MenuItem *item) {
+    return *asMenuItem<ScrollChoiceMenuItem>(item, MENUTYPE_SCROLLER_VALUE, "Item not scroll");
+}
+inline ScrollChoiceMenuItem& getScrollChoiceItemById(menuid_t id) { return asScrollChoiceItem(getMenuItemById(id)); }
+
+inline TimeFormattedMenuItem &asTimeItem(MenuItem *item) {
+    return *asMenuItem<TimeFormattedMenuItem>(item, MENUTYPE_TIME, "Item not time");
+}
+inline TimeFormattedMenuItem& getTimeItemById(menuid_t id) { return asTimeItem(getMenuItemById(id)); }
+
+inline DateFormattedMenuItem &asDateItem(MenuItem *item) {
+    return *asMenuItem<DateFormattedMenuItem>(item, MENUTYPE_DATE, "Item not date");
+}
+inline DateFormattedMenuItem& getDateItemById(menuid_t id) { return asDateItem(getMenuItemById(id)); }
+
+inline Rgb32MenuItem &asRgb32Item(MenuItem *item) {
+    return *asMenuItem<Rgb32MenuItem>(item, MENUTYPE_COLOR_VALUE, "Item not rgb32");
+}
+inline Rgb32MenuItem& getRgb32ItemById(menuid_t id) { return asRgb32Item(getMenuItemById(id)); }
+
+inline EditableLargeNumberMenuItem &asLargeNumberItem(MenuItem *item) {
+    return *asMenuItem<EditableLargeNumberMenuItem>(item, MENUTYPE_LARGENUM_VALUE, "Item not lgenum");
+}
+inline EditableLargeNumberMenuItem& getLargeNumberItemById(menuid_t id) { return asLargeNumberItem(getMenuItemById(id)); }
+
+inline ListRuntimeMenuItem &asListItem(MenuItem *item) {
+    return *asMenuItem<ListRuntimeMenuItem>(item, MENUTYPE_RUNTIME_LIST, "Item not list");
+}
+inline ListRuntimeMenuItem& getListItemById(menuid_t id) { return asListItem(getMenuItemById(id)); }
+
+class RemoteMenuItem; // forward declaration
+class EepromAuthenticationInfoMenuItem; // forward declaration
+
+RemoteMenuItem& asIoTRemoteItem(MenuItem *item);
+inline RemoteMenuItem& getIoTRemoteMenuById(menuid_t id) { return asIoTRemoteItem(getMenuItemById(id)); }
+
+EepromAuthenticationInfoMenuItem& asAuthenticationMenuItem(MenuItem *item);
+inline EepromAuthenticationInfoMenuItem& getAuthenticationMenuById(menuid_t id) { return asAuthenticationMenuItem(getMenuItemById(id));}
+
 
 #endif

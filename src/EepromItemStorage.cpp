@@ -9,7 +9,7 @@
 #include "ScrollChoiceMenuItem.h"
 #include "MenuIterator.h"
 
-bool tcMenuUseSizedEeprom = false;
+TcEepromStorageMode tcStorageMode = TC_STORE_ROM_LEGACY;
 
 uint16_t saveRecursively(EepromAbstraction* eeprom, MenuItem* nextMenuItem) {
     uint16_t lastItemSaved = 0;
@@ -80,11 +80,16 @@ void saveMenuItem(EepromAbstraction* eeprom, MenuItem* nextMenuItem) {
 }
 
 void saveMenuStructure(EepromAbstraction* eeprom, uint16_t magicKey) {
-	serlogF2(SER_TCMENU_INFO, "Save to EEPROM with key ", magicKey);
-	eeprom->write16(0, magicKey);
-	uint16_t maxPos = saveRecursively(eeprom, menuMgr.getRoot());
-    if(tcMenuUseSizedEeprom) {
-        eeprom->write16(2, maxPos);
+        serlogF3(SER_TCMENU_INFO, "Save to EEPROM with key, mode ", magicKey, tcStorageMode);
+    if (tcStorageMode == TC_STORE_ROM_DYNAMIC) {
+        DynamicEepromStore dynamic;
+        dynamic.saveMenuStructure(eeprom, magicKey);
+    } else {
+        eeprom->write16(0, magicKey);
+        uint16_t maxPos = saveRecursively(eeprom, menuMgr.getRoot());
+        if(tcStorageMode == TC_STORE_ROM_WITH_SIZE) {
+            eeprom->write16(2, maxPos);
+        }
     }
 }
 
@@ -164,8 +169,13 @@ void loadRecursively(EepromAbstraction* eeprom, MenuItem* nextMenuItem, uint16_t
 }
 
 bool loadMenuStructure(EepromAbstraction* eeprom, uint16_t magicKey) {
+    if (tcStorageMode == TC_STORE_ROM_DYNAMIC) {
+        DynamicEepromStore dynamic;
+        return dynamic.loadMenuStructure(eeprom, magicKey);
+    }
+
 	if (eeprom->read16(0) == magicKey) {
-        uint16_t maxEntry = (tcMenuUseSizedEeprom) ? eeprom->read16(2) : 0xFFFE;
+        uint16_t maxEntry = (tcStorageMode == TC_STORE_ROM_WITH_SIZE) ? eeprom->read16(2) : 0xFFFE;
 		serlogFHex(SER_TCMENU_INFO, "Load from EEPROM key found ", magicKey);
 		MenuItem* nextMenuItem = menuMgr.getRoot();
 		loadRecursively(eeprom, nextMenuItem, maxEntry);
@@ -178,6 +188,8 @@ bool loadMenuStructure(EepromAbstraction* eeprom, uint16_t magicKey) {
 }
 
 bool loadMenuItem(EepromAbstraction* eeprom, MenuItem* theItem, uint16_t magicKey) {
+    if (tcStorageMode == TC_STORE_ROM_DYNAMIC) return false; // cant read single item
+    bool tcMenuUseSizedEeprom = tcStorageMode == TC_STORE_ROM_WITH_SIZE;
     if (eeprom->read16(0) == magicKey && (!tcMenuUseSizedEeprom || eeprom->read16(2) <= theItem->getEepromPosition())) {
         loadSingleItem(eeprom, theItem);
         return true;
@@ -196,5 +208,183 @@ void triggerAllChangedCallbacks() {
 }
 
 void setSizeBasedEEPROMStorageEnabled(bool ena) {
-    tcMenuUseSizedEeprom = ena;
+    setEepromStorageMode(ena ? TC_STORE_ROM_WITH_SIZE : TC_STORE_ROM_LEGACY);
+}
+
+void setEepromStorageMode(TcEepromStorageMode mode) {
+    tcStorageMode = mode;
+}
+
+#define MAX_ALLOWABLE 0x7FFF
+
+/**
+ * We load items from the eeprom one at a time, each item is in memory has a two byte ID, then two bytes
+ * for size, followed by the data for that size. This allows up to 64K of data for each item. An ID and size of
+ * zero indicate end of stream
+ *
+ * | ID | Size | Data      |
+ * | 1  | 2    | 0x0001    |
+ * | 0  | 0    | none      |
+ *
+ * @param eeprom
+ * @param magicKey
+ * @return
+ */
+bool DynamicEepromStore::loadMenuStructure(EepromAbstraction *eeprom, uint16_t magicKey) {
+    if (eeprom->read16(0) != magicKey || tcStorageMode != TC_STORE_ROM_DYNAMIC) {
+        return false;
+    }
+    serlogF2(SER_TCMENU_INFO, "Load dynamic EEPROM with key ", magicKey);
+
+    uint16_t position = 2; // Start after magic key
+
+    while (position < MAX_ALLOWABLE) {
+        uint16_t itemId = eeprom->read16(position);
+        position += 2;
+
+        uint16_t dataLength = eeprom->read16(position);
+        position += 2;
+
+        if (itemId == 0 || dataLength == 0) {
+            return true; // End of stored items
+        }
+
+        MenuItem *item = getMenuItemById(itemId);
+        if (item != nullptr) {
+            // Temporarily set the eeprom position to where the data is stored
+            loadItemFromRom(eeprom, item, position, dataLength);
+        }
+
+        position += dataLength;
+    }
+
+    return false;
+}
+
+bool DynamicEepromStore::saveMenuStructure(EepromAbstraction *eeprom, uint16_t magicKey) {
+    if (eeprom->read16(0) != magicKey || tcStorageMode != TC_STORE_ROM_DYNAMIC) {
+        return false;
+    }
+
+    uint16_t position = 2;
+    MenuItemIterator iterator;;
+    MenuItem *next;
+    while ((next = iterator.nextItem()) != nullptr) {
+        if (next->getEepromPosition() == 0xFFFF) continue;
+        size_t written = saveItemDynamically(eeprom, next, position + 2);
+        if (written > 0) {
+            eeprom->write16(position, next->getId());
+            position += written + 2;
+        }
+    }
+    return true;
+}
+
+void DynamicEepromStore::loadItemFromRom(EepromAbstraction* eeprom, MenuItem* nextMenuItem, EepromPosition pos, size_t len) {
+    if (nextMenuItem->getEepromPosition() == 0xFFFF) return;
+    auto menuType = nextMenuItem->getMenuType();
+    if (menuType == MENUTYPE_TEXT_VALUE) {
+        auto textItem = asTextItem(nextMenuItem);
+        eeprom->readCharArrIntoMemArray(const_cast<char *>(textItem->getTextValue()), pos, textItem->textLength());
+        textItem->cleanUpArray();
+        textItem->setChanged(true);
+    }
+    else if (menuType == MENUTYPE_TIME) {
+        auto timeItem = asTimeItem(nextMenuItem);
+        eeprom->readIntoMemArray(reinterpret_cast<uint8_t *>(timeItem->getUnderlyingData()), pos, 4);
+        timeItem->setChanged(true);
+    }
+    else if (menuType == MENUTYPE_DATE) {
+        auto dateItem = asDateItem(nextMenuItem);
+        eeprom->readIntoMemArray(reinterpret_cast<uint8_t *>(dateItem->getUnderlyingData()), pos, 4);
+        dateItem->setChanged(true);
+    }
+    else if (menuType == MENUTYPE_IPADDRESS) {
+        auto ipItem = asIpAddressItem(nextMenuItem);
+        eeprom->readIntoMemArray(ipItem->getIpAddress(), pos, 4);
+        ipItem->setChanged(true);
+    }
+    else if (menuType == MENUTYPE_SCROLLER_VALUE) {
+        auto scroller = asScrollChoiceItem(nextMenuItem);
+        scroller->setCurrentValue(eeprom->read16(pos), true);
+    }
+    else if (menuType == MENUTYPE_COLOR_VALUE) {
+        auto rgb = reinterpret_cast<Rgb32MenuItem*>(nextMenuItem);
+        auto data = rgb->getUnderlying();
+        data->red = eeprom->read8(pos);
+        data->green = eeprom->read8(pos + 1);
+        data->blue = eeprom->read8(pos + 2);
+        data->alpha = eeprom->read8(pos + 3);
+        rgb->setChanged(true);
+    }
+    else if (menuType == MENUTYPE_LARGENUM_VALUE) {
+        auto numItem = asLargeNumberItem(nextMenuItem);
+        numItem->getLargeNumber()->setNegative(eeprom->read8(pos));
+        eeprom->readIntoMemArray(numItem->getLargeNumber()->getNumberBuffer(), pos + 1, 6);
+        numItem->setChanged(true);
+    }
+    else if (menuType == MENUTYPE_INT_VALUE || menuType == MENUTYPE_ENUM_VALUE || menuType == MENUTYPE_BOOLEAN_VALUE) {
+        auto intItem = reinterpret_cast<ValueMenuItem*>(nextMenuItem);
+        intItem->setCurrentValue(eeprom->read16(pos), true);
+    }
+}
+
+size_t DynamicEepromStore::saveItemDynamically(EepromAbstraction *eeprom, MenuItem *nextMenuItem, uint16_t pos) {
+    auto menuType = nextMenuItem->getMenuType();
+    if (menuType == MENUTYPE_TEXT_VALUE) {
+        auto textItem = asTextItem(nextMenuItem);
+        eeprom->write16(pos, textItem->textLength());
+        eeprom->writeCharArrToRom(pos + 2, textItem->getTextValue(), textItem->textLength());
+        return textItem->textLength();
+    }
+    else if (menuType == MENUTYPE_TIME) {
+        auto timeItem = asTimeItem(nextMenuItem);
+        eeprom->write16(pos, 4);
+        eeprom->writeArrayToRom(pos + 2, reinterpret_cast<const uint8_t *>(timeItem->getUnderlyingData()), 4);
+        return 4;
+    }
+    else if (menuType == MENUTYPE_DATE) {
+        auto dateItem = asDateItem(nextMenuItem);
+        eeprom->write16(pos, 4);
+        eeprom->writeArrayToRom(pos + 2, reinterpret_cast<const uint8_t *>(dateItem->getUnderlyingData()), 4);
+        return 4;
+    }
+    else if (menuType == MENUTYPE_IPADDRESS) {
+        auto ipItem = asIpAddressItem(nextMenuItem);
+        eeprom->write16(pos, 4);
+        eeprom->writeArrayToRom(pos + 2, ipItem->getIpAddress(), 4);
+        return 4;
+    }
+    else if (menuType == MENUTYPE_SCROLLER_VALUE) {
+        auto scroller = asScrollChoiceItem(nextMenuItem);
+        eeprom->write16(pos, 2);
+        eeprom->write16(pos + 2, scroller->getCurrentValue());
+        return 2;
+    }
+    else if (menuType == MENUTYPE_COLOR_VALUE) {
+        auto rgb = reinterpret_cast<Rgb32MenuItem*>(nextMenuItem);
+        auto data = rgb->getUnderlying();
+        eeprom->write16(pos, 4);
+        eeprom->write8(pos + 2, data->red);
+        eeprom->write8(pos + 3, data->green);
+        eeprom->write8(pos + 4, data->blue);
+        eeprom->write8(pos + 5, data->alpha);
+        rgb->setChanged(true);
+        return 4;
+    }
+    else if (menuType == MENUTYPE_LARGENUM_VALUE) {
+        auto numItem = asLargeNumberItem(nextMenuItem);
+        eeprom->write16(pos, 8);
+        numItem->getLargeNumber()->setNegative(eeprom->read8(pos));
+        eeprom->readIntoMemArray(numItem->getLargeNumber()->getNumberBuffer(), pos + 1, 6);
+        numItem->setChanged(true);
+        return 8;
+    }
+    else if (menuType == MENUTYPE_INT_VALUE || menuType == MENUTYPE_ENUM_VALUE || menuType == MENUTYPE_BOOLEAN_VALUE) {
+        auto intItem = reinterpret_cast<ValueMenuItem*>(nextMenuItem);
+        eeprom->write16(pos, 2);
+        eeprom->write16(pos + 2, intItem->getCurrentValue());
+        return 2;
+    }
+    return -1;
 }

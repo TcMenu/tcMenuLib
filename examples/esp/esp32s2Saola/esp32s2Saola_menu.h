@@ -37,29 +37,26 @@ extern EthernetInitialisation ethernetInitialisation;
 // Any externals needed by IO expanders, EEPROMs etc
 extern EspPreferencesEeprom glEspRom;
 
-// Global Menu Item exports
-extern EepromAuthenticationInfoMenuItem menuConnectivityAuthenticator;
-extern RemoteMenuItem menuConnectivityIoTMonitor;
-extern IpAddressMenuItem menuConnectivityIPAddress;
-extern EnumMenuItem menuConnectivityWiFiMode;
-extern TextMenuItem menuConnectivityPasscode;
-extern TextMenuItem menuConnectivitySSID;
-extern BackMenuItem menuBackConnectivity;
-extern SubMenuItem menuConnectivity;
-extern ListRuntimeMenuItem menuExtrasMyList;
-extern Rgb32MenuItem menuExtrasColor;
-extern TextMenuItem menuExtrasText;
-extern BackMenuItem menuBackExtras;
-extern SubMenuItem menuExtras;
-extern BooleanMenuItem menuDoorOpen;
-extern EnumMenuItem menuFoods;
-extern AnalogMenuItem menuHalves;
-extern AnalogMenuItem menuDecEdit;
-extern AnalogMenuItem menuIntEdit;
-extern ActionMenuItem menuHibernate;
+#define HIBERNATE_ID 21
+#define INT_EDIT_ID 1
+#define DEC_EDIT_ID 2
+#define HALVES_ID 3
+#define FOODS_ID 4
+#define DOOR_OPEN_ID 5
+#define EXTRAS_ID 6
+#define EXTRAS_TEXT_ID 11
+#define EXTRAS_RGB_ID 12
+#define EXTRAS_LIST_ID 13
+#define CONNECTIVITY_ID 14
+#define CONNECTIVITY_SSID_ID 15
+#define CONNECTIVITY_PASSCODE_ID 16
+#define CONNECTIVITY_WIFI_MODE_ID 17
+#define CONNECTIVITY_IP_ADDR_ID 18
+#define CONNECTIVITY_MON_ID 19
+#define CONNECTIVITY_AUTH_ID 20
 
 // Provide a wrapper to get hold of the root menu item and export setupMenu
-inline MenuItem& rootMenuItem() { return menuHibernate; }
+inline MenuItem& rootMenuItem() { return *getMenuItemById(HIBERNATE_ID); }
 void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
