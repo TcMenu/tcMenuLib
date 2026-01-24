@@ -3,14 +3,10 @@
 #define TCLIBRARYDEV_TCMENUBUILDER_H
 #include "EepromAbstraction.h"
 #include "MenuItems.h"
+#include "RuntimeMenuItem.h"
 
 class TcMenuBuilder;
 struct RgbColor32;
-enum MultiEditWireType : uint8_t;
-class IpAddressStorage;
-class SubMenuItem;
-struct TimeStorage;
-struct DateStorage;
 class MenuManager;
 class ScrollChoiceMenuItem;
 

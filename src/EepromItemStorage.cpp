@@ -285,28 +285,28 @@ void DynamicEepromStore::loadItemFromRom(EepromAbstraction* eeprom, MenuItem* ne
     auto menuType = nextMenuItem->getMenuType();
     if (menuType == MENUTYPE_TEXT_VALUE) {
         auto textItem = asTextItem(nextMenuItem);
-        eeprom->readCharArrIntoMemArray(const_cast<char *>(textItem->getTextValue()), pos, textItem->textLength());
-        textItem->cleanUpArray();
-        textItem->setChanged(true);
+        eeprom->readCharArrIntoMemArray(const_cast<char *>(textItem.getTextValue()), pos, textItem.textLength());
+        textItem.cleanUpArray();
+        textItem.setChanged(true);
     }
     else if (menuType == MENUTYPE_TIME) {
         auto timeItem = asTimeItem(nextMenuItem);
-        eeprom->readIntoMemArray(reinterpret_cast<uint8_t *>(timeItem->getUnderlyingData()), pos, 4);
-        timeItem->setChanged(true);
+        eeprom->readIntoMemArray(reinterpret_cast<uint8_t *>(timeItem.getUnderlyingData()), pos, 4);
+        timeItem.setChanged(true);
     }
     else if (menuType == MENUTYPE_DATE) {
         auto dateItem = asDateItem(nextMenuItem);
-        eeprom->readIntoMemArray(reinterpret_cast<uint8_t *>(dateItem->getUnderlyingData()), pos, 4);
-        dateItem->setChanged(true);
+        eeprom->readIntoMemArray(reinterpret_cast<uint8_t *>(dateItem.getUnderlyingData()), pos, 4);
+        dateItem.setChanged(true);
     }
     else if (menuType == MENUTYPE_IPADDRESS) {
         auto ipItem = asIpAddressItem(nextMenuItem);
-        eeprom->readIntoMemArray(ipItem->getIpAddress(), pos, 4);
-        ipItem->setChanged(true);
+        eeprom->readIntoMemArray(ipItem.getIpAddress(), pos, 4);
+        ipItem.setChanged(true);
     }
     else if (menuType == MENUTYPE_SCROLLER_VALUE) {
         auto scroller = asScrollChoiceItem(nextMenuItem);
-        scroller->setCurrentValue(eeprom->read16(pos), true);
+        scroller.setCurrentValue(eeprom->read16(pos), true);
     }
     else if (menuType == MENUTYPE_COLOR_VALUE) {
         auto rgb = reinterpret_cast<Rgb32MenuItem*>(nextMenuItem);
@@ -319,9 +319,9 @@ void DynamicEepromStore::loadItemFromRom(EepromAbstraction* eeprom, MenuItem* ne
     }
     else if (menuType == MENUTYPE_LARGENUM_VALUE) {
         auto numItem = asLargeNumberItem(nextMenuItem);
-        numItem->getLargeNumber()->setNegative(eeprom->read8(pos));
-        eeprom->readIntoMemArray(numItem->getLargeNumber()->getNumberBuffer(), pos + 1, 6);
-        numItem->setChanged(true);
+        numItem.getLargeNumber()->setNegative(eeprom->read8(pos));
+        eeprom->readIntoMemArray(numItem.getLargeNumber()->getNumberBuffer(), pos + 1, 6);
+        numItem.setChanged(true);
     }
     else if (menuType == MENUTYPE_INT_VALUE || menuType == MENUTYPE_ENUM_VALUE || menuType == MENUTYPE_BOOLEAN_VALUE) {
         auto intItem = reinterpret_cast<ValueMenuItem*>(nextMenuItem);
@@ -333,32 +333,32 @@ size_t DynamicEepromStore::saveItemDynamically(EepromAbstraction *eeprom, MenuIt
     auto menuType = nextMenuItem->getMenuType();
     if (menuType == MENUTYPE_TEXT_VALUE) {
         auto textItem = asTextItem(nextMenuItem);
-        eeprom->write16(pos, textItem->textLength());
-        eeprom->writeCharArrToRom(pos + 2, textItem->getTextValue(), textItem->textLength());
-        return textItem->textLength();
+        eeprom->write16(pos, textItem.textLength());
+        eeprom->writeCharArrToRom(pos + 2, textItem.getTextValue(), textItem.textLength());
+        return textItem.textLength();
     }
     else if (menuType == MENUTYPE_TIME) {
         auto timeItem = asTimeItem(nextMenuItem);
         eeprom->write16(pos, 4);
-        eeprom->writeArrayToRom(pos + 2, reinterpret_cast<const uint8_t *>(timeItem->getUnderlyingData()), 4);
+        eeprom->writeArrayToRom(pos + 2, reinterpret_cast<const uint8_t *>(timeItem.getUnderlyingData()), 4);
         return 4;
     }
     else if (menuType == MENUTYPE_DATE) {
         auto dateItem = asDateItem(nextMenuItem);
         eeprom->write16(pos, 4);
-        eeprom->writeArrayToRom(pos + 2, reinterpret_cast<const uint8_t *>(dateItem->getUnderlyingData()), 4);
+        eeprom->writeArrayToRom(pos + 2, reinterpret_cast<const uint8_t *>(dateItem.getUnderlyingData()), 4);
         return 4;
     }
     else if (menuType == MENUTYPE_IPADDRESS) {
         auto ipItem = asIpAddressItem(nextMenuItem);
         eeprom->write16(pos, 4);
-        eeprom->writeArrayToRom(pos + 2, ipItem->getIpAddress(), 4);
+        eeprom->writeArrayToRom(pos + 2, ipItem.getIpAddress(), 4);
         return 4;
     }
     else if (menuType == MENUTYPE_SCROLLER_VALUE) {
         auto scroller = asScrollChoiceItem(nextMenuItem);
         eeprom->write16(pos, 2);
-        eeprom->write16(pos + 2, scroller->getCurrentValue());
+        eeprom->write16(pos + 2, scroller.getCurrentValue());
         return 2;
     }
     else if (menuType == MENUTYPE_COLOR_VALUE) {
@@ -375,9 +375,9 @@ size_t DynamicEepromStore::saveItemDynamically(EepromAbstraction *eeprom, MenuIt
     else if (menuType == MENUTYPE_LARGENUM_VALUE) {
         auto numItem = asLargeNumberItem(nextMenuItem);
         eeprom->write16(pos, 8);
-        numItem->getLargeNumber()->setNegative(eeprom->read8(pos));
-        eeprom->readIntoMemArray(numItem->getLargeNumber()->getNumberBuffer(), pos + 1, 6);
-        numItem->setChanged(true);
+        numItem.getLargeNumber()->setNegative(eeprom->read8(pos));
+        eeprom->readIntoMemArray(numItem.getLargeNumber()->getNumberBuffer(), pos + 1, 6);
+        numItem.setChanged(true);
         return 8;
     }
     else if (menuType == MENUTYPE_INT_VALUE || menuType == MENUTYPE_ENUM_VALUE || menuType == MENUTYPE_BOOLEAN_VALUE) {
