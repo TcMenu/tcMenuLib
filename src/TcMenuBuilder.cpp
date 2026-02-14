@@ -205,9 +205,18 @@ TcMenuBuilder & TcMenuBuilder::rgb32Item(menuid_t id, const char *name, EepromPo
     return rgb32Item(id, name, eepromPosition, alphaChannel, flags, RgbColor32(0, 0, 0), callbackFn);
 }
 
-TcMenuBuilder & TcMenuBuilder::rgb32Item(menuid_t id, const char *name, EepromPosition eepromPosition, bool alphaChannel, MenuFlags flags, RgbColor32 initial, MenuCallbackFn callbackFn) {
+TcMenuBuilder & TcMenuBuilder::rgb32Item(menuid_t id, const char *name, EepromPosition eepromPosition, bool alphaChannel, MenuFlags flags, const RgbColor32& initial, MenuCallbackFn callbackFn) {
     AnyInfoReserve* reserve = fillInAnyInfo(id, name, eepromPosition, 3, callbackFn);
     auto item = new Rgb32MenuItem(&reserve->getInfo()->anyInfo, initial, alphaChannel, nullptr, false);
+    flags.setOnMenuItem(item);
+    putAtEndOfSub(item);
+    return *this;
+}
+
+TcMenuBuilder& TcMenuBuilder::rgb32CustomRt(menuid_t id, const char *name, EepromPosition eepromPosition, bool alphaChannel,
+                                 RuntimeRenderingFn renderFn, MenuFlags flags, const RgbColor32& initial, MenuCallbackFn callbackFn) {
+    AnyInfoReserve* reserve = fillInAnyInfo(id, name, eepromPosition, 3, callbackFn);
+    auto item = new Rgb32MenuItem(&reserve->getInfo()->anyInfo, renderFn, initial, alphaChannel, nullptr, false);
     flags.setOnMenuItem(item);
     putAtEndOfSub(item);
     return *this;
@@ -255,10 +264,47 @@ TcMenuBuilder& TcMenuBuilder::ipAddressItem(menuid_t id, const char *name, Eepro
     return ipAddressItem(id, name, eepromPosition, flags, IpAddressStorage(127, 0, 0, 1), callbackFn);
 }
 
+TcMenuBuilder& TcMenuBuilder::ipAddressCustomRt(menuid_t id, const char *name, EepromPosition eepromPosition, MenuFlags flags,
+                                 RuntimeRenderingFn renderFn, IpAddressStorage ipInitial, MenuCallbackFn callbackFn) {
+    AnyInfoReserve* reserve = fillInAnyInfo(id, name, eepromPosition, 3, callbackFn);
+    auto item = new IpAddressMenuItem(&reserve->getInfo()->anyInfo, renderFn, ipInitial, nullptr, false);
+    flags.setOnMenuItem(item);
+    putAtEndOfSub(item);
+    return *this;
+}
+
+TcMenuBuilder& TcMenuBuilder::dateItemCustomRt(menuid_t id, const char *name, EepromPosition eepromPosition, MenuFlags flags, DateStorage initial,
+                    RuntimeRenderingFn renderFn, MenuCallbackFn callbackFn) {
+    AnyInfoReserve* reserve = fillInAnyInfo(id, name, eepromPosition, 3, callbackFn);
+    auto item = new DateFormattedMenuItem(&reserve->getInfo()->anyInfo, renderFn, initial, id, nullptr, false);
+    flags.setOnMenuItem(item);
+    putAtEndOfSub(item);
+    return *this;
+}
+
+TcMenuBuilder& TcMenuBuilder::timeItemCustomRt(menuid_t id, const char *name, EepromPosition eepromPosition, const TimeStorage& timeStorage,
+                                RuntimeRenderingFn renderFn, MenuFlags flags, MultiEditWireType timeFormat, MenuCallbackFn callbackFn) {
+    AnyInfoReserve* reserve = fillInAnyInfo(id, name, eepromPosition, 3, callbackFn);
+    auto item = new TimeFormattedMenuItem(&reserve->getInfo()->anyInfo, renderFn, timeStorage, timeFormat, nullptr, false);
+    flags.setOnMenuItem(item);
+    putAtEndOfSub(item);
+    return *this;
+}
+
 TcMenuBuilder& TcMenuBuilder::textItem(menuid_t id, const char *name, EepromPosition eepromPosition, uint16_t textLength,
                         MenuFlags flags, const char *initial, MenuCallbackFn callbackFn) {
     AnyInfoReserve* reserve = fillInAnyInfo(id, name, eepromPosition, textLength, callbackFn);
     auto item = new TextMenuItem(&reserve->getInfo()->anyInfo, initial, textLength, nullptr, false);
+    flags.setOnMenuItem(item);
+    putAtEndOfSub(item);
+    return *this;
+}
+
+TcMenuBuilder& TcMenuBuilder::textCustomRt(menuid_t id, const char *name, EepromPosition eepromPosition,
+                                           uint16_t textLength, RuntimeRenderingFn renderFn, MenuFlags flags,
+                                           const char *initial, MenuCallbackFn callbackFn) {
+    AnyInfoReserve* reserve = fillInAnyInfo(id, name, eepromPosition, textLength, callbackFn);
+    auto item = new TextMenuItem(&reserve->getInfo()->anyInfo, renderFn, initial, textLength, nullptr, false);
     flags.setOnMenuItem(item);
     putAtEndOfSub(item);
     return *this;

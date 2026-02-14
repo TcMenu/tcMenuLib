@@ -422,10 +422,67 @@ public:
     TcMenuBuilder& textItem(menuid_t id, const char *name, EepromPosition eepromPosition, uint16_t textLength,
                             MenuFlags flags, const char *initial = "", MenuCallbackFn callbackFn = nullptr);
 
+    /**
+     * Advanced build option for override of the regular text component for advanced cases, for example editing values that
+     * need customization such as editing hex values for example.
+     * @param id the ID of the item
+     * @param name the name of the item
+     * @param eepromPosition for dynamic set to ROM_SAVE or DONT_SAVE, for legacy mode use an eeprom address.
+     * @param textLength The length of the text to be edited.
+     * @param renderFn The callback function that will customize the control. Consult documentation for details.
+     * @param flags The configuration flags that define the item's behavior and state.
+     * @param initial the initial value, optional.
+     * @param callbackFn The callback function triggered when the item's value changes.
+     * @return
+     */
+    TcMenuBuilder& textCustomRt(menuid_t id, const char *name, EepromPosition eepromPosition, uint16_t textLength,
+                                RuntimeRenderingFn renderFn, MenuFlags flags, const char* initial = "", MenuCallbackFn callbackFn = nullptr);
+
+    /**
+     * Adds an IP address menu item to the menu structure. This item allows the user
+     * to interact with and configure an IP address.
+     *
+     * @param id The unique identifier for this menu item.
+     * @param name The display name for this menu item.
+     * @param eepromPosition for dynamic set to ROM_SAVE or DONT_SAVE, for legacy mode use an eeprom address.
+     * @param flags The configuration flags that define the item's behavior and state.
+     * @param callbackFn An optional callback function triggered when the menu item is changed.
+     * @return Reference to the TcMenuBuilder instance to allow for method chaining.
+     */
     TcMenuBuilder& ipAddressItem(menuid_t id, const char *name, EepromPosition eepromPosition, MenuFlags flags, MenuCallbackFn callbackFn = nullptr);
 
+    /**
+     * Adds an IP Address type menu item to the menu structure being built. The IP Address menu item allows users
+     * to configure or display an IP address directly within the menu.
+     *
+     * @param id The unique identifier for the menu item.
+     * @param name The display name for the menu item.
+     * @param eepromPosition The EEPROM storage position for persisting the value, or -1 if not stored in EEPROM.
+     * @param flags The flags specifying visibility, read-only status, and other properties of the menu item.
+     * @param initial The initial value for the IP address storage.
+     * @param callbackFn The callback function invoked when the menu item is selected or updated.
+     * @return Reference to the current instance of TcMenuBuilder to allow method chaining.
+     */
     TcMenuBuilder& ipAddressItem(menuid_t id, const char *name, EepromPosition eepromPosition, MenuFlags flags,
                                  IpAddressStorage ipInitial, MenuCallbackFn callbackFn = nullptr);
+
+    /**
+     * Advanced construction/build option. Adds a custom IP address menu item to the menu using the provided parameters.
+     * This method allows customization of properties such as the menu ID, display name, EEPROM storage position, flags,
+     * initial IP address, and an optional
+     * callback function.
+     *
+     * @param id The unique identifier for the menu item.
+     * @param name The display name of the menu item.
+     * @param eepromPosition The EEPROM storage position for the value of this item.
+     * @param flags Additional menu flags controlling visibility, read-only status, etc.
+     * @param renderFn The callback function that will customize the control. Consult documentation for details.
+     * @param ipInitial The initial value for the IP address to be displayed or stored.
+     * @param callbackFn (Optional) A callback function invoked when the menu item is interacted with. Defaults to nullptr if not provided.
+     * @return A reference to the TcMenuBuilder for further modification or chaining of method calls.
+     */
+    TcMenuBuilder& ipAddressCustomRt(menuid_t id, const char *name, EepromPosition eepromPosition, MenuFlags flags,
+                                     RuntimeRenderingFn renderFn, IpAddressStorage ipInitial, MenuCallbackFn callbackFn = nullptr);
 
     TcMenuBuilder& timeItem(menuid_t id, const char *name, EepromPosition eepromPosition, MenuFlags flags, MultiEditWireType timeFormat,
                             const TimeStorage& timeStorage, MenuCallbackFn callbackFn = nullptr);
@@ -433,9 +490,16 @@ public:
     TcMenuBuilder& timeItem(menuid_t id, const char *name, EepromPosition eepromPosition, MenuFlags flags, MultiEditWireType timeFormat,
                             MenuCallbackFn callbackFn = nullptr);
 
+    TcMenuBuilder& timeItemCustomRt(menuid_t id, const char *name, EepromPosition eepromPosition, const TimeStorage& timeStorage,
+                                    RuntimeRenderingFn renderFn, MenuFlags flags, MultiEditWireType timeFormat, MenuCallbackFn callbackFn = nullptr);
+
     TcMenuBuilder& dateItem(menuid_t id, const char *name, EepromPosition eepromPosition, MenuFlags flags, DateStorage initial,
                             MenuCallbackFn callbackFn = nullptr);
+
     TcMenuBuilder& dateItem(menuid_t id, const char *name, EepromPosition eepromPosition, MenuFlags flags, MenuCallbackFn callbackFn = nullptr);
+
+    TcMenuBuilder& dateItemCustomRt(menuid_t id, const char *name, EepromPosition eepromPosition, MenuFlags flags, DateStorage initial,
+                        RuntimeRenderingFn renderFn, MenuCallbackFn callbackFn = nullptr);
 
     /**
      * @brief Creates and preconfigures a ScrollChoiceBuilder to define a scrollable choice menu item.
@@ -500,7 +564,24 @@ public:
      * @return A reference to the current `TcMenuBuilder` instance to allow for method chaining.
      */
     TcMenuBuilder& rgb32Item(menuid_t id, const char *name, EepromPosition eepromPosition, bool alphaChannel,
-                             MenuFlags flags, RgbColor32 initial, MenuCallbackFn callbackFn = nullptr);
+                             MenuFlags flags, const RgbColor32& initial, MenuCallbackFn callbackFn = nullptr);
+
+    /**
+     * Advanced construction/build case for RGB items where you need to override the menu in a custom way. This is
+     * normally used when you want to customize the rendering or behavior of the RGB menu item beyond the standard options.
+     *
+     * @param id The unique identifier for the RGB32 menu item.
+     * @param name The display name of the menu item.
+     * @param eepromPosition for dynamic set to ROM_SAVE or DONT_SAVE, for legacy mode use an eeprom address.
+     * @param alphaChannel Boolean flag indicating whether the alpha channel is supported.
+     * @param renderFn The custom rendering function for the RGB menu item. Consult the documentation
+     * @param flags Additional configuration flags for the menu item.
+     * @param initial The initial color value of type `RgbColor32` for the menu item.
+     * @param callbackFn A function pointer for the menu item callback, invoked on user interaction.
+     * @return A reference to the current `TcMenuBuilder` instance to allow for method chaining.
+     */
+    TcMenuBuilder& rgb32CustomRt(menuid_t id, const char *name, EepromPosition eepromPosition, bool alphaChannel,
+                                 RuntimeRenderingFn renderFn, MenuFlags flags, const RgbColor32& initial, MenuCallbackFn callbackFn = nullptr);
 
     /**
      * @brief Adds a list menu item to the menu structure with content stored in RAM.
@@ -579,7 +660,7 @@ public:
     /**
      * Add an item that you've created manually, such as a custom item outside the scope of this builder. For example, if
      * you had used the traditional static method for some complex items, you could add them using this method.
-     * @param itemToAdd the item to append to the menu hierarchy.
+     * @param itemToAdd the item to append to the menu hierarchy. The item must not be deallocated after addition!
      * @return A reference to the current TcMenuBuilder instance for method chaining.
      */
     TcMenuBuilder& appendCustomItem(MenuItem* itemToAdd);
@@ -625,6 +706,5 @@ private:
     TcMenuBuilder* parent;
 
 };
-
 
 #endif //TCLIBRARYDEV_TCMENUBUILDER_H
