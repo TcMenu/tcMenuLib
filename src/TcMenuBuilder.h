@@ -1,10 +1,12 @@
 
 #ifndef TCLIBRARYDEV_TCMENUBUILDER_H
 #define TCLIBRARYDEV_TCMENUBUILDER_H
+#include "EditableLargeNumberMenuItem.h"
 #include "EepromAbstraction.h"
 #include "MenuItems.h"
 #include "RuntimeMenuItem.h"
 
+class LargeFixedNumber;
 class TcMenuBuilder;
 struct RgbColor32;
 class MenuManager;
@@ -459,7 +461,7 @@ public:
      * @param name The display name for the menu item.
      * @param eepromPosition The EEPROM storage position for persisting the value, or -1 if not stored in EEPROM.
      * @param flags The flags specifying visibility, read-only status, and other properties of the menu item.
-     * @param initial The initial value for the IP address storage.
+     * @param ipInitial The initial value for the IP address storage.
      * @param callbackFn The callback function invoked when the menu item is selected or updated.
      * @return Reference to the current instance of TcMenuBuilder to allow method chaining.
      */
@@ -506,8 +508,8 @@ public:
      *
      * This method facilitates the setup of a scrollable choice menu item that allows the user to select
      * a value from a list of predefined choices. The ScrollChoiceBuilder returned by this method enables
-     * further customization before the item is finalized and integrated into the menu structure. When you've configured
-     * it make sure you call `endItem()` to finalize the menu item and add it to the menu structure.
+     * further customization before the item is finalized and integrated into the menu structure. When you've finished
+     * configuring it, make sure you call `endItem()` to finalize the menu item and add it to the menu structure.
      *
      * @code
      *  builder.scrollChoiceBuilder(myId, "Choice Menu", myRomLocation, NoMenuFlags)
@@ -559,7 +561,7 @@ public:
      * @param eepromPosition for dynamic set to ROM_SAVE or DONT_SAVE, for legacy mode use an eeprom address.
      * @param alphaChannel Boolean flag indicating whether the alpha channel is supported.
      * @param flags Additional configuration flags for the menu item.
-     * @param initial The initial color value of type `RgbColor32` for the menu item.
+     * @param initial The initial color value, for example, `RgbColor32(255, 0, 0)` for red.
      * @param callbackFn A function pointer for the menu item callback, invoked on user interaction.
      * @return A reference to the current `TcMenuBuilder` instance to allow for method chaining.
      */
@@ -635,6 +637,43 @@ public:
     TcMenuBuilder& listItemRtCustom(menuid_t id, const char *name, uint16_t numberOfRows, RuntimeRenderingFn rtRenderFn, MenuFlags flags, MenuCallbackFn callbackFn = nullptr);
 
     /**
+     * Adds a large number menu item to the menu structure. This is used for numeric values with a significant number of digits,
+     * including fractional parts, such as financial or scientific fields. The total and fractional places control the format
+     * and precision of the number.
+     *
+     * When you edit a large number, the editing occurs one digit at a time, allowing for precise control over the number's value,
+     * even when there's a large number of digits.
+     *
+     * @param id The unique identifier for the menu item.
+     * @param name The display name of the menu item.
+     * @param eepromPosition The EEPROM position for storing the large number value.
+     * @param num The large fixed number, for example, `LargeFixedNumber(10, 4, 98765, 1234)` is 10.4 digits representing "98765.1234".
+     * @param allowNegative Whether negative numbers are allowed in the large number.
+     * @param flags Additional flags to control visibility, read-only status, or other properties of the menu item.
+     * @param callbackFn An optional callback function that is triggered when the value changes.
+     * @return A reference to the builder, allowing method chaining.
+     */
+    TcMenuBuilder& largeNumberItem(menuid_t id, const char *name, EepromPosition eepromPosition, const LargeFixedNumber& num,
+                                   bool allowNegative, MenuFlags flags, MenuCallbackFn callbackFn = nullptr);
+
+    /**
+     * Advanced construction case, adds a customized large number menu item with a renderFn callback to specialize how
+     * it is displayed and processed. For regular large numbers use the standard method "largeNumber".
+     *
+     * @param id The unique identifier for the menu item.
+     * @param name The display name of the menu item.
+     * @param eepromPosition The EEPROM position for storing the large number value.
+     * @param num The large fixed number, for example, `LargeFixedNumber(10, 4, 98765, 1234)` is 10.4 digits representing "98765.1234".
+     * @param allowNegative Whether negative numbers are allowed in the large number.
+     * @param renderFn  The function used to render the list item's contents dynamically at runtime.
+     * @param flags Additional flags to control visibility, read-only status, or other properties of the menu item.
+     * @param callbackFn An optional callback function that is triggered when the value changes.
+     * @return A reference to the builder, allowing method chaining.
+     */
+    TcMenuBuilder& largeNumberRtCustom(menuid_t id, const char *name, EepromPosition eepromPosition, const LargeFixedNumber& num,
+                                       bool allowNegative, RuntimeRenderingFn renderFn, MenuFlags flags, MenuCallbackFn callbackFn = nullptr);
+
+    /**
      * Add an item to the menu that allows for authentication using EEPROM storage. This item is read-only and displays
      * authentication status. When the authentication status changes, the provided callback function is invoked.
      *
@@ -672,7 +711,7 @@ public:
      * If the current menu has no parent, it returns a reference to the root TcMenuBuilder instance.
      * This allows chaining and continuation of the menu-building process.
      *
-     * @return A reference to the parent TcMenuBuilder instance, or the root builder instance if no parent exists.
+     * @return A reference to the parent TcMenuBuilder instance or the root builder instance if no parent exists.
      */
     TcMenuBuilder& endSub();
 

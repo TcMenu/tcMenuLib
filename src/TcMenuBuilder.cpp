@@ -222,6 +222,24 @@ TcMenuBuilder& TcMenuBuilder::rgb32CustomRt(menuid_t id, const char *name, Eepro
     return *this;
 }
 
+TcMenuBuilder& TcMenuBuilder::largeNumberRtCustom(menuid_t id, const char *name, EepromPosition eepromPosition, const LargeFixedNumber& num,
+                                                  bool allowNegative, RuntimeRenderingFn renderFn, MenuFlags flags, MenuCallbackFn callbackFn) {
+    AnyInfoReserve* reserve = fillInAnyInfo(id, name, eepromPosition, 0, callbackFn);
+    auto item = new EditableLargeNumberMenuItem(&reserve->getInfo()->anyInfo, renderFn, num, allowNegative, nullptr, false);
+    flags.setOnMenuItem(item);
+    putAtEndOfSub(item);
+    return *this;
+}
+
+TcMenuBuilder& TcMenuBuilder::largeNumberItem(menuid_t id, const char *name, EepromPosition eepromPosition, const LargeFixedNumber& num, bool allowNegative, MenuFlags flags, MenuCallbackFn callbackFn) {
+    AnyInfoReserve* reserve = fillInAnyInfo(id, name, eepromPosition, 0, callbackFn);
+    auto item = new EditableLargeNumberMenuItem(&reserve->getInfo()->anyInfo, num, allowNegative, nullptr, false);
+    flags.setOnMenuItem(item);
+    putAtEndOfSub(item);
+    return *this;
+}
+
+
 TcMenuBuilder & TcMenuBuilder::listItemRam(menuid_t id, const char *name, uint16_t numberOfRows, const char** arrayOfItems, MenuFlags flags, MenuCallbackFn callbackFn) {
     AnyInfoReserve* reserve = fillInAnyInfo(id, name, 0xFFFF, numberOfRows, callbackFn);
     auto item = new ListRuntimeMenuItem(&reserve->getInfo()->anyInfo, numberOfRows, arrayOfItems, ListRuntimeMenuItem::RAM_ARRAY, nullptr, false);
