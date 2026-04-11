@@ -13,6 +13,7 @@
 #include <tcMenu.h>
 #include "esp32s2Saola_menu.h"
 #include "einkThemeBuilderBlock.h"
+#include "TcMenuBuilder.h"
 
 // Global variable declarations
 const PROGMEM  ConnectorLocalInfo applicationInfo = { "ESP32-S2 Saola board", "b447b433-fe4f-4ce7-8746-d94bfeefc707" };
@@ -27,76 +28,59 @@ EthernetInitialisation ethernetInitialisation(&server);
 EthernetTagValTransport ethernetTransport;
 TagValueRemoteServerConnection ethernetConnection(ethernetTransport, ethernetInitialisation);
 
-// Global Menu Item declarations
-const PROGMEM char pgmStrConnectivityAuthenticatorText[] = { "Authenticator" };
-EepromAuthenticationInfoMenuItem menuConnectivityAuthenticator(pgmStrConnectivityAuthenticatorText, NO_CALLBACK, 20, nullptr);
-const PROGMEM char pgmStrConnectivityIoTMonitorText[] = { "IoT Monitor" };
-RemoteMenuItem menuConnectivityIoTMonitor(pgmStrConnectivityIoTMonitorText, 19, &menuConnectivityAuthenticator);
-const PROGMEM AnyMenuInfo minfoConnectivityIPAddress = { "IP Address", 15, 0xffff, 0, NO_CALLBACK };
-IpAddressMenuItem menuConnectivityIPAddress(&minfoConnectivityIPAddress, IpAddressStorage(127, 0, 0, 1), &menuConnectivityIoTMonitor, INFO_LOCATION_PGM);
-const char enumStrConnectivityWiFiMode_0[] PROGMEM = "Station";
-const char enumStrConnectivityWiFiMode_1[] PROGMEM = "Soft AP";
-const char* const enumStrConnectivityWiFiMode[] PROGMEM  = { enumStrConnectivityWiFiMode_0, enumStrConnectivityWiFiMode_1 };
-const PROGMEM EnumMenuInfo minfoConnectivityWiFiMode = { "WiFi Mode", 18, 64, 1, NO_CALLBACK, enumStrConnectivityWiFiMode };
-EnumMenuItem menuConnectivityWiFiMode(&minfoConnectivityWiFiMode, 0, &menuConnectivityIPAddress, INFO_LOCATION_PGM);
-const PROGMEM AnyMenuInfo minfoConnectivityPasscode = { "Passcode", 17, 42, 0, NO_CALLBACK };
-TextMenuItem menuConnectivityPasscode(&minfoConnectivityPasscode, "", 22, &menuConnectivityWiFiMode, INFO_LOCATION_PGM);
-const PROGMEM AnyMenuInfo minfoConnectivitySSID = { "SSID", 16, 20, 0, NO_CALLBACK };
-TextMenuItem menuConnectivitySSID(&minfoConnectivitySSID, "", 22, &menuConnectivityPasscode, INFO_LOCATION_PGM);
-const PROGMEM SubMenuInfo minfoConnectivity = { "Connectivity", 14, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackConnectivity(&minfoConnectivity, &menuConnectivitySSID, INFO_LOCATION_PGM);
-SubMenuItem menuConnectivity(&minfoConnectivity, &menuBackConnectivity, nullptr, INFO_LOCATION_PGM);
-const PROGMEM AnyMenuInfo minfoExtrasMyList = { "My List", 13, 0xffff, 0, onListSelected };
-ListRuntimeMenuItem menuExtrasMyList(&minfoExtrasMyList, 0, fnExtrasMyListRtCall, nullptr, INFO_LOCATION_PGM);
-const PROGMEM AnyMenuInfo minfoExtrasColor = { "Color", 12, 16, 0, NO_CALLBACK };
-Rgb32MenuItem menuExtrasColor(&minfoExtrasColor, RgbColor32(0, 0, 0), false, &menuExtrasMyList, INFO_LOCATION_PGM);
-const PROGMEM AnyMenuInfo minfoExtrasText = { "Text", 11, 11, 0, NO_CALLBACK };
-TextMenuItem menuExtrasText(&minfoExtrasText, "", 5, &menuExtrasColor, INFO_LOCATION_PGM);
-const PROGMEM SubMenuInfo minfoExtras = { "Extras", 10, 0xffff, 0, NO_CALLBACK };
-BackMenuItem menuBackExtras(&minfoExtras, &menuExtrasText, INFO_LOCATION_PGM);
-SubMenuItem menuExtras(&minfoExtras, &menuBackExtras, &menuConnectivity, INFO_LOCATION_PGM);
-const PROGMEM BooleanMenuInfo minfoDoorOpen = { "Door Open", 5, 10, 1, NO_CALLBACK, NAMING_YES_NO };
-BooleanMenuItem menuDoorOpen(&minfoDoorOpen, false, &menuExtras, INFO_LOCATION_PGM);
-const char enumStrFoods_0[] PROGMEM = "Pizza";
-const char enumStrFoods_1[] PROGMEM = "Pasta";
-const char enumStrFoods_2[] PROGMEM = "Salad";
-const char enumStrFoods_3[] PROGMEM = "Pie";
-const char* const enumStrFoods[] PROGMEM  = { enumStrFoods_0, enumStrFoods_1, enumStrFoods_2, enumStrFoods_3 };
-const PROGMEM EnumMenuInfo minfoFoods = { "Foods", 4, 8, 3, NO_CALLBACK, enumStrFoods };
-EnumMenuItem menuFoods(&minfoFoods, 0, &menuDoorOpen, INFO_LOCATION_PGM);
-const PROGMEM AnalogMenuInfo minfoHalves = { "Halves", 3, 6, 200, NO_CALLBACK, 0, 2, "" };
-AnalogMenuItem menuHalves(&minfoHalves, 0, &menuFoods, INFO_LOCATION_PGM);
-const PROGMEM AnalogMenuInfo minfoDecEdit = { "Dec Edit", 2, 4, 1000, NO_CALLBACK, 0, 10, "oC" };
-AnalogMenuItem menuDecEdit(&minfoDecEdit, 0, &menuHalves, INFO_LOCATION_PGM);
-const PROGMEM AnalogMenuInfo minfoIntEdit = { "Int Edit", 1, 2, 100, NO_CALLBACK, 0, 1, "%" };
-AnalogMenuItem menuIntEdit(&minfoIntEdit, 0, &menuDecEdit, INFO_LOCATION_PGM);
-const PROGMEM AnyMenuInfo minfoHibernate = { "Hibernate", 21, 0xffff, 0, onHibernate };
-ActionMenuItem menuHibernate(&minfoHibernate, &menuIntEdit, INFO_LOCATION_PGM);
+const char* enumWiFiMode[] = { "Station", "Soft AP" };
+const char* enumFoodsArray[] = { "Pizza", "Pasta", "Salad", "Pie" };
+
+void buildMenu(TcMenuBuilder& builder) {
+    builder.usingDynamicEEPROMStorage()
+        .actionItem(HIBERNATE_ID, "Hibernate", NoMenuFlags, onHibernate)
+        .analogBuilder(INT_EDIT_ID, "Int Edit", ROM_SAVE, NoMenuFlags, 4)
+            .offset(0).divisor(1).maxValue(100).unit("%").endItem()
+        .analogBuilder(DEC_EDIT_ID, "Dec Edit", ROM_SAVE, NoMenuFlags, 0)
+            .offset(0).divisor(100).maxValue(1000).unit("oC").endItem()
+        .analogBuilder(HALVES_ID, "Halves", ROM_SAVE, MenuFlags().readOnly(), 0)
+            .offset(0).divisor(2).maxValue(100).unit("").endItem()
+        .enumItem(FOODS_ID, "Foods", ROM_SAVE, enumFoodsArray, 4, NoMenuFlags)
+        .boolItem(DOOR_OPEN_ID, "Door Open", ROM_SAVE, NAMING_YES_NO, NoMenuFlags)
+        .subMenu(EXTRAS_ID, "Extras", NoMenuFlags)
+            .textItem(EXTRAS_TEXT_ID, "Text", ROM_SAVE, 10, NoMenuFlags)
+            .rgb32Item(EXTRAS_RGB_ID, "Color", ROM_SAVE, false, NoMenuFlags)
+            .listItemRtCustom(EXTRAS_LIST_ID, "My List", 10, fnExtrasMyListRtCall, NoMenuFlags)
+            .endSub()
+        .subMenu(CONNECTIVITY_ID, "Connectivity", NoMenuFlags)
+            .textItem(CONNECTIVITY_SSID_ID, "SSID", ROM_SAVE, 20, NoMenuFlags)
+            .textItem(CONNECTIVITY_PASSCODE_ID, "Passcode", ROM_SAVE, 20, NoMenuFlags)
+            .enumItem(CONNECTIVITY_WIFI_MODE_ID, "WiFi Mode", ROM_SAVE, enumWiFiMode, 2, NoMenuFlags)
+            .ipAddressItem(CONNECTIVITY_IP_ADDR_ID, "IP Address", DONT_SAVE, NoMenuFlags)
+            .remoteConnectivityMonitor(CONNECTIVITY_MON_ID, "IoT Monitor", MenuFlags().localOnly())
+            .eepromAuthenticationItem(CONNECTIVITY_AUTH_ID, "Authenticator", MenuFlags().localOnly())
+            .endSub();
+}
 
 void setupMenu() {
+    auto builder = TcMenuBuilder(&MenuManager::ROOT);
+    buildMenu(builder);
+
     // First we set up eeprom and authentication (if needed).
     setSizeBasedEEPROMStorageEnabled(false);
     glEspRom.init();
     menuMgr.setEepromRef(&glEspRom);
     authManager.initialise(menuMgr.getEepromAbstraction(), 200);
     menuMgr.setAuthenticator(&authManager);
-    // Now add any readonly, non-remote and visible flags.
-    menuConnectivityIoTMonitor.setLocalOnly(true);
-    menuConnectivityAuthenticator.setLocalOnly(true);
 
     // Code generated by plugins and new operators.
     display.init(115200, true, 10, false);
     display.setRotation(0);
     renderer.setUpdatesPerSecond(1);
     switches.init(internalDigitalIo(), SWITCHES_POLL_EVERYTHING, true);
-    menuMgr.initFor4WayJoystick(&renderer, &menuHibernate, 2, 1, 3, 4, -1, 20);
+    menuMgr.initFor4WayJoystick(&renderer, builder.getRootItem(), 2, 1, 3, 4, -1, 20);
     remoteServer.addConnection(&ethernetConnection);
     applyTheme(renderer);
 
     // We have an IoT monitor, register the server
-    menuConnectivityIoTMonitor.setRemoteServer(remoteServer);
+    getIoTRemoteMenuById(CONNECTIVITY_MON_ID).setRemoteServer(remoteServer);
 
     // We have an EEPROM authenticator, it needs initialising
-    menuConnectivityAuthenticator.init();
+    getAuthenticationMenuById(CONNECTIVITY_AUTH_ID).init();
 }
 

@@ -510,6 +510,7 @@ public:
 	 * @param item the item to become the active edit, the right submenu should have already been enabled first
 	 */
 	void setupForEditing(MenuItem* item);
+
 protected:
 	void actionOnCurrentItem(MenuItem * toEdit);
     void actionOnSubMenu(MenuItem* nextSub);

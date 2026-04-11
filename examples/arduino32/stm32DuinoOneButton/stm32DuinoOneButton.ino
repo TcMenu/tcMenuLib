@@ -7,7 +7,7 @@
 // Getting started: https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
 //
 
-#include "generated/stm32DuinoOneButton_menu.h"
+#include "stm32DuinoOneButton_menu.h"
 #include <SPI.h>
 
 void setup() {

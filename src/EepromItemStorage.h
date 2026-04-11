@@ -62,4 +62,20 @@ void triggerAllChangedCallbacks();
  */
 void setSizeBasedEEPROMStorageEnabled(bool ena);
 
+enum TcEepromStorageMode {
+    TC_STORE_ROM_LEGACY,
+    TC_STORE_ROM_WITH_SIZE,
+    TC_STORE_ROM_DYNAMIC
+};
+
+void setEepromStorageMode(TcEepromStorageMode mode);
+
+class DynamicEepromStore {
+    static void loadItemFromRom(EepromAbstraction* eeprom, MenuItem* nextMenuItem, EepromPosition pos, size_t len);
+    static size_t saveItemDynamically(EepromAbstraction * eeprom, MenuItem * next, uint16_t position);
+public:
+    bool loadMenuStructure(EepromAbstraction* eeprom, uint16_t magicKey = 0xf00d);
+    bool saveMenuStructure(EepromAbstraction* eeprom, uint16_t magicKey = 0xf00d);
+};
+
 #endif //_EEPROM_ITEM_STORAGE_H_

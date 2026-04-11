@@ -167,6 +167,14 @@ MenuItem* MenuItemIterator::currentParent() {
     else return parentItems[level - 1];
 }
 
+RemoteMenuItem & asIoTRemoteItem(MenuItem *item) {
+    return *asMenuItem<RemoteMenuItem>(item, MENUTYPE_RUNTIME_LIST, "Item not list");
+}
+
+EepromAuthenticationInfoMenuItem & asAuthenticationMenuItem(MenuItem *item) {
+    return *asMenuItem<EepromAuthenticationInfoMenuItem>(item, MENUTYPE_RUNTIME_LIST, "Item not list");
+}
+
 bool RemoteNoMenuItemPredicate::matches(MenuItem* item) {
     if(item->getMenuType() == MENUTYPE_SUB_VALUE) {
         return !item->isLocalOnly();

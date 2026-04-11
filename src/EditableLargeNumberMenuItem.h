@@ -208,6 +208,12 @@ public:
         negativeAllowed = allowNeg;
 	}
 
+    EditableLargeNumberMenuItem(const AnyMenuInfo* info, RuntimeRenderingFn renderFn, const LargeFixedNumber& initial, bool allowNeg, MenuItem* next = nullptr, bool isPgm = INFO_LOCATION_PGM)
+		: EditableMultiPartMenuItem(info, isPgm, MENUTYPE_LARGENUM_VALUE, initial.getTotalDigits() + (allowNeg ? 1 : 0), renderFn, next) {
+        data = initial;
+        negativeAllowed = allowNeg;
+	}
+
     /** gets the large integer value that this class is using */
 	LargeFixedNumber* getLargeNumber() { return &data; }  
 

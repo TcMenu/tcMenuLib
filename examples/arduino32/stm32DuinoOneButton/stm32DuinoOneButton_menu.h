@@ -34,17 +34,16 @@ extern const UnicodeFont OpenSansRegular8pt[];
 // Any externals needed by IO expanders, EEPROMs etc
 
 
-// Global Menu Item exports
-extern EnumMenuItem menuSettingsEnumProp;
-extern AnalogMenuItem menuSettingsIntProp;
-extern BooleanMenuItem menuSettingsOption;
-extern BackMenuItem menuBackSettings;
-extern SubMenuItem menuSettings;
-extern AnalogMenuItem menuTemp;
-extern ActionMenuItem menuPressMe;
+// Global Menu Item IDs
+#define MENU_PRESS_ME_ID 1
+#define MENU_TEMP_ID 2
+#define MENU_SETTINGS_ID 3
+#define MENU_SETTINGS_OPTION_ID 4
+#define MENU_SETTINGS_INT_ID 5
+#define MENU_SETTINGS_ENUM_ID 6
 
 // Provide a wrapper to get hold of the root menu item and export setupMenu
-inline MenuItem& rootMenuItem() { return menuPressMe; }
+inline MenuItem& rootMenuItem() { return *getMenuItemById(MENU_PRESS_ME_ID); }
 void setupMenu();
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
