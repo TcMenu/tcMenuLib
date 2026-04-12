@@ -1,7 +1,7 @@
 {
   "version": "1.00",
   "projectName": "MKR project with eInk display\t",
-  "author": "dave",
+  "author": "root",
   "items": [
     {
       "parentId": 0,
@@ -17,6 +17,7 @@
         "variableName": "Kitchen",
         "id": 1,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -37,6 +38,7 @@
         "variableName": "Lounge",
         "id": 2,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -57,6 +59,7 @@
         "variableName": "Hallway",
         "id": 3,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -72,6 +75,7 @@
         "variableName": "Settings",
         "id": 4,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -92,6 +96,7 @@
         "variableName": "SettingsTempDesired",
         "id": 5,
         "eepromAddress": 4,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -112,6 +117,7 @@
         "variableName": "SettingsMode",
         "id": 6,
         "eepromAddress": 6,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -128,6 +134,7 @@
         "variableName": "SettingsProtection",
         "id": 7,
         "eepromAddress": 8,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -142,6 +149,7 @@
         "variableName": "SettingsEmergencyOff",
         "id": 8,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -157,6 +165,7 @@
         "variableName": "OtherTypes",
         "id": 9,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -174,6 +183,7 @@
         "variableName": "OtherTypesText",
         "id": 10,
         "eepromAddress": 9,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -190,6 +200,7 @@
         "variableName": "OtherTypesRGBItem",
         "id": 11,
         "eepromAddress": 19,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -210,6 +221,7 @@
         "variableName": "OtherTypesFoods",
         "id": 12,
         "eepromAddress": 23,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -226,7 +238,7 @@
     ],
     "lastThemeUuid": "8D9B49C7-FD28-4533-9B00-21A4184BB0C9",
     "applicationUUID": "2d36dbe4-4892-410f-b0d6-775ec3637f6f",
-    "applicationName": "MKR eInk",
+    "applicationName": "Mkr Ethernet OLED",
     "lastProperties": [
       {
         "name": "DISPLAY_VARIABLE",
@@ -361,19 +373,19 @@
     ],
     "namingRecursive": true,
     "useCppMain": false,
-    "saveLocation": "ALL_TO_CURRENT",
-    "usingSizedEEPROMStorage": true,
+    "saveLocation": "ONE_SINGLE_FILE",
+    "useDynamicMenus": true,
+    "usingSizedEEPROMStorage": false,
+    "eepromSaveMode": "DYNAMIC_WRITE_BY_ID",
     "eepromDefinition": "",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
-      "pcf8574:io8574:32:6:false",
-      "deviceIO:"
+      "deviceIO:",
+      "pcf8574:io8574:32:6:false"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []
-    },
-    "packageNamespace": "",
-    "appIsModular": false
+    }
   },
   "stringLists": []
 }

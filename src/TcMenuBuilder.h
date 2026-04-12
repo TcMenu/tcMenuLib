@@ -54,17 +54,14 @@ public:
  */
 const MenuFlags NoMenuFlags;
 
-class AnyInfoReserve {
-    AllMenuInfoTypes info;
-public:
-    AnyInfoReserve() : info() {}
-    AnyInfoReserve(const AnyInfoReserve&) = default;
-    AnyInfoReserve& operator=(const AnyInfoReserve&) = default;
-    ~AnyInfoReserve() = default;
-    menuid_t getKey() const { return info.anyInfo.id; }
-    bool isInUse() const { return info.anyInfo.id > 0;}
-    AllMenuInfoTypes* getInfo() { return &info; }
-};
+// The builder allocator size allows you to re-configure initial amount that the builder will
+// allocate for info blocks. There are up to 8 blocks, meaning 8 * 10 = 80 items by default.
+// You can boost the allocater size and it increases by 8 times that amount.
+#ifndef BUILDER_ALLOCATER_SIZE
+#define BUILDER_ALLOCATER_SIZE 10
+#define BUILDER_ALLOCATER_MAX_SEG (BUILDER_ALLOCATER_SIZE - 1)
+#define BUILDER_ALLOCATER_TOTAL (BUILDER_ALLOCATER_SIZE * 8)
+#endif
 
 /**
  * @class AnalogItemBuilder
@@ -730,9 +727,9 @@ public:
      * @param eeprom The EEPROM position for persisting the menu item's state, or -1 if not using EEPROM.
      * @param maxVal The maximum value for the menu item (interpretation depends on item type).
      * @param callback_fn A callback function that will be triggered when the menu item is interacted with, or nullptr if no callback is needed.
-     * @return A pointer to an AnyInfoReserve object containing the populated menu item information.
+     * @return A pointer to an info object containing the populated menu item information.
      */
-    AnyInfoReserve* fillInAnyInfo(menuid_t id, const char *name, int eeprom, int maxVal, MenuCallbackFn callback_fn);
+    AllMenuInfoTypes* fillInAnyInfo(menuid_t id, const char *name, int eeprom, int maxVal, MenuCallbackFn callback_fn);
 
     void putAtEndOfSub(MenuItem * toAdd) const;
 
