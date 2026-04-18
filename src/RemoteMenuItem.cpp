@@ -85,6 +85,8 @@ RemoteMenuItem* RemoteMenuItem::instance = nullptr;
 RemoteMenuItem::RemoteMenuItem(const char* pgmName, menuid_t id, MenuItem* next)
 	: ListRuntimeMenuItem(id, 0, remoteInfoRenderFn, next), pgmName(pgmName) {
     instance = this;
+	pRemoteServer = nullptr;
+	passThru = nullptr;
 }
 
 void RemoteMenuItem::setRemoteServer(tcremote::TcMenuRemoteServer& server) {
