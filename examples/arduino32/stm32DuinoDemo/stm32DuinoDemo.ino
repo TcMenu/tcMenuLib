@@ -173,9 +173,9 @@ void setup() {
     serEnableLevel(SER_TCMENU_DEBUG, true);
 
     // Start up serial and prepare the correct SPI, your pins or method of doing this may differ
-    SPI.setMISO(PB4);
-    SPI.setMOSI(PB5);
-    SPI.setSCLK(PB3);
+    // SPI.setMISO(PB4);
+    // SPI.setMOSI(PB5);
+    // SPI.setSCLK(PB3);
 
     // Here we start up the Stm32Ethernet library for STM32 boards/chips with built-in ethernet, again you could
     // easily change this for your own boards network arrangements

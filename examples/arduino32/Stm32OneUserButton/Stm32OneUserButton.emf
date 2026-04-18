@@ -32,6 +32,7 @@
         "variableName": "Temp",
         "id": 20,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -47,6 +48,7 @@
         "variableName": "Settings",
         "id": 21,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -63,6 +65,7 @@
         "variableName": "SettingsOption",
         "id": 22,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -83,6 +86,7 @@
         "variableName": "SettingsIntProp",
         "id": 23,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -103,6 +107,7 @@
         "variableName": "SettingsEnumProp",
         "id": 24,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -119,7 +124,7 @@
     ],
     "lastThemeUuid": "396ED4DF-AD7B-4951-A848-A9E5838A549B",
     "applicationUUID": "4fe6e85d-2bbd-4d19-84e5-5d6746883028",
-    "applicationName": "One Button",
+    "applicationName": "Stm32 One User Button",
     "lastProperties": [
       {
         "name": "DISPLAY_VARIABLE",
@@ -237,10 +242,12 @@
         "subsystem": "THEME"
       }
     ],
-    "namingRecursive": true,
+    "namingRecursive": false,
     "useCppMain": false,
-    "saveLocation": "PROJECT_TO_CURRENT_WITH_GENERATED",
+    "saveLocation": "ONE_SINGLE_FILE",
+    "useDynamicMenus": true,
     "usingSizedEEPROMStorage": false,
+    "eepromSaveMode": "DYNAMIC_WRITE_BY_ID",
     "eepromDefinition": "bsp:0",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
@@ -248,9 +255,7 @@
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []
-    },
-    "packageNamespace": "",
-    "appIsModular": false
+    }
   },
   "stringLists": []
 }
