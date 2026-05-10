@@ -17,7 +17,7 @@ color_t defaultTitlePalette[] = { GxEPD_WHITE, GxEPD_BLACK, GxEPD_WHITE, GxEPD_W
  */
 void applyTheme(GraphicsDeviceRenderer& gr) {
 
-    // See https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/themes/rendering-with-themes-icons-grids/
+    // See https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/themes/rendering-with-themes-icons-grids/
     TcThemeBuilder themeBuilder(gr);
     themeBuilder.withSelectedColors(GxEPD_WHITE, GxEPD_BLACK)
             .dimensionsFromRenderer()

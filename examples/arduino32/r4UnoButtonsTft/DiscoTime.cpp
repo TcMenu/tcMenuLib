@@ -43,7 +43,7 @@ void DiscoTime::start(int sp) {
 }
 
 // This is called during event handling, we can set here when we want to be asked again if the event is triggered.
-// https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/tcmenu-iot/embed-control-tagval-wire-protocol/
+// https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-iot/embed-control-tagval-wire-protocol/
 uint32_t DiscoTime::timeOfNextCheck() {
     setTriggered(discoIsRunning);
     return discoIsRunning ? millisToMicros(speed) : secondsToMicros(1);
@@ -167,7 +167,7 @@ DiscoTime::DiscoTime() : canvas(12, 8), textBuffer{}, unicodeHelper(newAdafruitT
 // need to write.
 // For the second case of binary message, we simply encode the binary data within the lambda callback instead of
 // tag val fields.
-// https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/tcmenu-iot/embed-control-tagval-wire-protocol/
+// https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-iot/embed-control-tagval-wire-protocol/
 //
 void DiscoTime::sendDiscoMsg() {
     auto tagValConnector = remoteServer.getRemoteConnector(0);

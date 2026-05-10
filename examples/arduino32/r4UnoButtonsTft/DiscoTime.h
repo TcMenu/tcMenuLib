@@ -41,7 +41,7 @@ public:
 
     //
     // These two are part of TaskManagerIO BaseEvent processing, see TaskManagerIO event handling for docs:
-    // https://tcmenu.github.io/documentation/arduino-libraries/taskmanager-io/
+    // https://www.thecoderscorner.com/products/arduino-libraries/taskmanager-io/
     //
     void exec() override;
     uint32_t timeOfNextCheck() override;
@@ -56,7 +56,7 @@ public:
     void stop();
 
     // These two send non-standard custom messages over the wire, this shows how easy it is to define your own.
-    // https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/tcmenu-iot/embed-control-tagval-wire-protocol/
+    // https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-iot/embed-control-tagval-wire-protocol/
     void sendDiscoMsg();
     void sendXbmpData(const uint8_t* xbmpData, size_t length);
 

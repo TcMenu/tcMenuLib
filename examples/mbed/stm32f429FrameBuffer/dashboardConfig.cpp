@@ -52,9 +52,9 @@ DashDrawParametersIntUpdateRange drawPowerValueWithIntRange(LCD_BLACK, LCD_LIGHT
 // to the encoder state.
 //
 // For drawing onto device drawable see:
-//  https://tcmenu.github.io/documentation/arduino-libraries//tc-menu/rendering-with-tcmenu-lcd-tft-oled/#drawing-direct-to-the-display-with-devicedrawabl
+//  https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/rendering-with-tcmenu-LCD-TFT-OLED/
 // For more on the dashboard, delegate class and all the points where you can extend
-//  https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/renderer-take-over-display/
+//  https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/renderer-take-over-display/
 //
 class MyDrawableDashboardDelegate : public DrawableDashboardDelegate {
 private:
