@@ -8,7 +8,7 @@
 //
 // To build your own menu: https://designer.thecoderscorner.com/
 // Getting started: https://www.thecoderscorner.com/products/apps/tcmenu-designer/
-// Documentation: https://tcmenu.github.io/documentation/
+// Documentation: https://www.thecoderscorner.com/products/arduino-libraries/
 //
 
 #include "Stm32OneUserButton_menu.h"
