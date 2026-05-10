@@ -14,6 +14,7 @@
         "unitName": "C",
         "step": 1,
         "name": "Temp",
+        "variableName": "",
         "id": 1,
         "eepromAddress": -1,
         "functionName": "",
@@ -34,6 +35,7 @@
         "unitName": "%",
         "step": 1,
         "name": "Humidity",
+        "variableName": "",
         "id": 3,
         "eepromAddress": -1,
         "functionName": "",
@@ -54,6 +56,7 @@
         "unitName": "KPa",
         "step": 1,
         "name": "B. Pressure",
+        "variableName": "",
         "id": 2,
         "eepromAddress": -1,
         "functionName": "",
@@ -69,6 +72,7 @@
       "item": {
         "secured": false,
         "name": "Accelerometer",
+        "variableName": "",
         "id": 4,
         "eepromAddress": -1,
         "functionName": "",
@@ -83,10 +87,12 @@
       "type": "floatItem",
       "defaultValue": "0.0",
       "item": {
-        "numDecimalPlaces": 2,
+        "numDecimalPlaces": 1,
         "name": "MagX",
+        "variableName": "",
         "id": 5,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -98,10 +104,12 @@
       "type": "floatItem",
       "defaultValue": "0.0",
       "item": {
-        "numDecimalPlaces": 2,
+        "numDecimalPlaces": 1,
         "name": "MagY",
+        "variableName": "",
         "id": 6,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -113,10 +121,12 @@
       "type": "floatItem",
       "defaultValue": "0.0",
       "item": {
-        "numDecimalPlaces": 2,
+        "numDecimalPlaces": 1,
         "name": "MagZ",
+        "variableName": "",
         "id": 7,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -128,10 +138,12 @@
       "type": "floatItem",
       "defaultValue": "0.0",
       "item": {
-        "numDecimalPlaces": 2,
+        "numDecimalPlaces": 1,
         "name": "AccelX",
+        "variableName": "",
         "id": 8,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -143,10 +155,12 @@
       "type": "floatItem",
       "defaultValue": "0.0",
       "item": {
-        "numDecimalPlaces": 2,
+        "numDecimalPlaces": 1,
         "name": "AccelY",
+        "variableName": "",
         "id": 9,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -158,8 +172,9 @@
       "type": "floatItem",
       "defaultValue": "0.0",
       "item": {
-        "numDecimalPlaces": 2,
+        "numDecimalPlaces": 1,
         "name": "AccelZ",
+        "variableName": "",
         "id": 10,
         "eepromAddress": -1,
         "functionName": "",
@@ -175,8 +190,10 @@
       "item": {
         "secured": false,
         "name": "Analog Readings",
+        "variableName": "",
         "id": 11,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -188,8 +205,9 @@
       "type": "floatItem",
       "defaultValue": "0.0",
       "item": {
-        "numDecimalPlaces": 2,
+        "numDecimalPlaces": 1,
         "name": "In A0",
+        "variableName": "",
         "id": 12,
         "eepromAddress": -1,
         "functionName": "",
@@ -210,6 +228,7 @@
         "unitName": "%",
         "step": 1,
         "name": "Output PWM",
+        "variableName": "",
         "id": 13,
         "eepromAddress": -1,
         "functionName": "onPWMChanged",
@@ -229,7 +248,7 @@
     ],
     "lastThemeUuid": "396ED4DF-AD7B-4951-A848-A9E5838A549B",
     "applicationUUID": "e95fcf8a-8a03-4043-9313-01fd8b8e8707",
-    "applicationName": "Nano 33 BLE Sense",
+    "applicationName": "Nano 33 BLE OLED",
     "lastProperties": [
       {
         "name": "DISPLAY_VARIABLE",
@@ -364,19 +383,19 @@
     ],
     "namingRecursive": true,
     "useCppMain": false,
-    "saveLocation": "ALL_TO_CURRENT",
+    "saveLocation": "ONE_SINGLE_FILE_MENU_MAIN",
+    "useDynamicMenus": true,
     "usingSizedEEPROMStorage": false,
+    "eepromSaveMode": "DYNAMIC_WRITE_BY_ID",
     "eepromDefinition": "",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
-      "customIO:io23017",
-      "deviceIO:"
+      "deviceIO:",
+      "customIO:io23017"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []
-    },
-    "packageNamespace": "",
-    "appIsModular": false
+    }
   },
   "stringLists": []
 }

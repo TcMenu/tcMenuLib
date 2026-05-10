@@ -3,7 +3,7 @@
 
 #include <TaskManager.h>
 #include <Arduino_LSM9DS1.h>
-#include "nano33ble_menu.h"
+#include "Nano33BLEOLED_menu.h"
 
 /**
  * Here we create a polling event that checks if the acceleration / magnetic data is available, and whenever it is
@@ -31,14 +31,14 @@ public:
     void exec() override {
         float x, y, z;
         IMU.readMagneticField(x, y, z);
-        menuAccelerometerMagX.setFloatValue(x);
-        menuAccelerometerMagY.setFloatValue(y);
-        menuAccelerometerMagZ.setFloatValue(z);
+        getMenuMagX().setFloatValue(x);
+        getMenuMagY().setFloatValue(y);
+        getMenuMagZ().setFloatValue(z);
 
         IMU.readAcceleration(x, y, z);
-        menuAccelerometerAccelX.setFloatValue(x);
-        menuAccelerometerAccelY.setFloatValue(y);
-        menuAccelerometerAccelZ.setFloatValue(z);
+        getMenuAccelX().setFloatValue(x);
+        getMenuAccelY().setFloatValue(y);
+        getMenuAccelZ().setFloatValue(z);
     }
 };
 

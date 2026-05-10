@@ -5,7 +5,7 @@
 #include <Arduino_HTS221.h>
 #include <Arduino_LPS22HB.h>
 #include <MenuItems.h>
-#include "nano33ble_menu.h"
+#include "Nano33BLEOLED_menu.h"
 
 /**
  * Here we have a class that extends `Executable`, meaning that the `exec()` method is called every time the event
@@ -21,9 +21,9 @@ public:
     }
 
     void exec() override {
-        menuTemp.setFromFloatingPointValue(HTS.readTemperature());
-        menuHumidity.setFromFloatingPointValue(HTS.readHumidity());
-        menuBPressure.setFromFloatingPointValue(BARO.readPressure());
+        getMenuTemp().setFromFloatingPointValue(HTS.readTemperature());
+        getMenuHumidity().setFromFloatingPointValue(HTS.readHumidity());
+        getMenuBPressure().setFromFloatingPointValue(BARO.readPressure());
     }
 };
 
