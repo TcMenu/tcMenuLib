@@ -1,7 +1,7 @@
 /**
  * Cool blue modern theme by tcMenu organisation. This is part of the standard themes shipped with TcMenu.
  * This file will not be updated by the designer, you can edit.
- * See https://tcmenu.github.io/documentation/arduino-libraries//tc-menu/themes/rendering-with-themes-icons-grids/
+ * See https://www.thecoderscorner.com/products/arduino-libraries//tc-menu/themes/rendering-with-themes-icons-grids/
  */
 
 #ifndef THEME_COOL_BLUE
@@ -27,7 +27,7 @@ const color_t coolBlueActionPalette[] = {RGB(255, 255, 255), RGB(0,45,120), RGB(
 void installCoolBlueModernTheme(GraphicsDeviceRenderer& gr, const MenuFontDef& itemFont, const MenuFontDef& titleFont,
                                 bool needEditingIcons, BaseGraphicalRenderer::TitleMode titleMode, bool useUnicode) {
 
-    // See https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/themes/rendering-with-themes-icons-grids/
+    // See https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/themes/rendering-with-themes-icons-grids/
     TcThemeBuilder themeBuilder(gr);
 
     themeBuilder.dimensionsFromRenderer()

@@ -11,7 +11,7 @@
  *
  * To build your own menu: https://designer.thecoderscorner.com/
  * Getting started: https://www.thecoderscorner.com/products/apps/tcmenu-designer/
- * Documentation: https://tcmenu.github.io/documentation/
+ * Documentation: https://www.thecoderscorner.com/products/arduino-libraries/
  */
 
 
@@ -85,10 +85,10 @@ void setup() {
     // We now copy the current value out of the IP address item and print it to the console.
 
     // here we use task manager to schedule some tasks to happen ever 500 millis
-    // https://tcmenu.github.io/documentation/arduino-libraries/taskmanager-io/task-manager-scheduling-guide/
+    // https://www.thecoderscorner.com/products/arduino-libraries/taskmanager-io/task-manager-scheduling-guide/
     taskManager.schedule(repeatMillis(500), [] {
         // Here we adjust some menu items at runtime, every 500 millis.
-        //https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/menu-item-types/
+        //https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/
         getMenuKitchen().setCurrentValue(random(100));
         getMenuLounge().setCurrentValue(random(100));
     });

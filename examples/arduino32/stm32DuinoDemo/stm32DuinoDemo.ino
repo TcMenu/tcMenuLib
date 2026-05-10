@@ -49,8 +49,8 @@ const uint8_t standardNetMask[] = { 255, 255, 255, 0 };
 // START card layout and custom layout code
 
 // Some helpful guides for working with card layouts and theme builder:
-// 1. https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/creating-and-using-bitmaps-menu/
-// 2. https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/themes/rendering-with-themes-icons-grids/
+// 1. https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/creating-and-using-bitmaps-menu/
+// 2. https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/themes/rendering-with-themes-icons-grids/
 
 // here we provide two title widgets, for ethernet connection, and client connection
 TitleWidget widgetConnection(iconsConnection, 2, 16, 12);
@@ -167,7 +167,7 @@ using namespace tcremote;
 
 void setup() {
     // This example logs using IoLogging, see the following guide to enable
-    // https://tcmenu.github.io/documentation/arduino-libraries//io-abstraction/arduino-logging-with-io-logging/
+    // https://www.thecoderscorner.com/products/arduino-libraries//io-abstraction/arduino-logging-with-io-logging/
     IOLOG_START_SERIAL
     serEnableLevel(SER_NETWORK_DEBUG, true);
     serEnableLevel(SER_TCMENU_DEBUG, true);
@@ -188,7 +188,7 @@ void setup() {
     setupMenu();
 
     // now load back values from EEPROM, but only when we can read the confirmatory magic key, see EEPROM docs:
-    // https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/menu-eeprom-integrations/
+    // https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-eeprom-integrations/
     menuMgr.load(0xd00d, [] {
         // this gets called when the menu hasn't been saved before, to initialise the first time.
         menuDecimal.setCurrentValue(4);

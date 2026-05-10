@@ -9,7 +9,7 @@
  *
  * Screen setup for 320x240 LANDSCAPE.
  *
- * https://tcmenu.github.io/documentation/arduino-libraries//tc-menu/tcmenu-overview-quick-start/
+ * https://www.thecoderscorner.com/products/arduino-libraries//tc-menu/tcmenu-overview-quick-start/
  */
 
 #include <Arduino.h>

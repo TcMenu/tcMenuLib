@@ -5,9 +5,9 @@
  * However, you can take the ideas from this sketch and apply them in your own designs.
  *
  * More information about matrix keyboard support:
- * https://tcmenu.github.io/documentation/arduino-libraries//io-abstraction/matrix-keyboard-keypad-manager/
+ * https://www.thecoderscorner.com/products/arduino-libraries/io-abstraction/matrix-keyboard-keypad-manager/
  *
- * Getting started: https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
+ * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
  */
 #include "keyboardEthernetShield_menu.h"
 #include <IoAbstractionWire.h>

@@ -5,7 +5,7 @@
 // TFT_CS: 34    MOSI: 35      PIN_B:  4
 // TFT_RST: 6    SCLK: 36      PIN_OK: 5
 //
-// Getting started: https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
+// Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
 
 #include "generated/esp32s3TftEncoder_menu.h"
 #include "stockIcons/directionalIcons.h"
@@ -28,7 +28,7 @@ TitleWidget titleWidget(iconsEthernetConnection, 2, 16, 12);
 // This example uses card layout for the main menu, this means that one item shows at a time, as we scroll through
 // the items, the item is replaced on display. We also override the menu items to render as icons using XBMP icons.
 // For each item in the card layout, we override how it is drawn and what row it is drawn on. See:
-// https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/themes/rendering-with-themes-icons-grids/
+// https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/themes/rendering-with-themes-icons-grids/
 //
 void setupGridLayoutForCardView() {
     const Coord iconSize(APPICONS_WIDTH, APPICONS_HEIGHT);

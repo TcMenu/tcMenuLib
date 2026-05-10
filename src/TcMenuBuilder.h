@@ -76,7 +76,7 @@ const MenuFlags NoMenuFlags;
  * item is integrated into the menu hierarchy via the `commit` operation, returning control to the
  * parent `TcMenuBuilder`.
  *
- * @see https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/menu-item-types/analog-menu-item/
+ * @see https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/analog-menu-item/
  */
 class AnalogItemBuilder {
 private:
@@ -165,8 +165,8 @@ public:
      *
      * Each entry occupies exactly fixedLen characters. If the text is shorter than fixedLen,
      * it should be padded with spaces or zero terminated. Entry N starts at position (N * fixedLen).     *
-     * List Docs - https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
-     * ScrollChoice Docs - https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/menu-item-types/scrollchoice-menu-item/
+     * List Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
+     * ScrollChoice Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/scrollchoice-menu-item/
      *
      * @param fixedArray A pointer to a fixed array of choices stored in RAM.
      * @param numItems The total number of items available in the fixed array.
@@ -197,8 +197,8 @@ public:
      * Each entry occupies exactly fixedLen characters. If the text is shorter than fixedLen,
      * it should be padded with spaces or zero terminated. Entry N starts at position (N * fixedLen).
      *
-     * List Docs - https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
-     * ScrollChoice Docs - https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/menu-item-types/scrollchoice-menu-item/
+     * List Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
+     * ScrollChoice Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/scrollchoice-menu-item/
      *
      * @param eepromPosition offset into the eeprom of the fixed array
      * @param numItems The total number of items available in the fixed array.
@@ -270,7 +270,7 @@ public:
      * parent menu hierarchy during the build process. Additional behavior and display attributes
      * can be controlled using the provided flags and callback function.
      *
-     * @see https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/menu-item-types/float-menu-item/
+     * @see https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/float-menu-item/
      *
      * @param id The unique identifier for the menu item.
      * @param name The display name of the menu item.
@@ -289,7 +289,7 @@ public:
      * Action items are menu items that trigger a callback function when selected. They are typically used for
      * executing specific actions or commands within the menu system.
      *
-     * @see https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/menu-item-types/action-menu-item/
+     * @see https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/action-menu-item/
      *
      * @param id The unique identifier for the menu item.
      * @param name The display name of the menu item.
@@ -306,7 +306,7 @@ public:
      * EEPROM storage position, naming convention, flags, initial state, and callback function. The resulting menu item is
      * integrated into the menu system and linked to its parent container.
      *
-     * @see https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/menu-item-types/boolean-menu-item/
+     * @see https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/boolean-menu-item/
      *
      * @param id The unique identifier for the menu item.
      * @param name The display name of the menu item.
@@ -337,7 +337,7 @@ public:
      *          boolItem(....)
      * @endcode
      *
-     *  @see https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/menu-item-types/analog-menu-item/
+     *  @see https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/analog-menu-item/
      *
      *
      * @param id              The unique identifier for the analog menu item.
@@ -357,7 +357,7 @@ public:
      * a predefined list of options. The options are represented as an array of string identifiers, providing
      * a set number of choices for the menu item.
      *
-     * @see https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/menu-item-types/enum-menu-item/
+     * @see https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/enum-menu-item/
      *
      * In the example we first create an array globally (IE outside any function), then we use that array later to build
      * the menu item:
@@ -407,7 +407,7 @@ public:
      * to store and edit textual data in the menu. The method allocates the necessary resources and integrates
      * the created item with the menu hierarchy.
      *
-     * https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/menu-item-types/editabletext-menu-item/
+     * https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/editabletext-menu-item/
      *
      * @param id The unique identifier of the menu item.
      * @param name The display name of the menu item.
@@ -587,7 +587,7 @@ public:
      *
      * This method creates a runtime-configurable list menu item, where the items in the list and their metadata
      * are stored in RAM. The list menu item is added as a child to the current submenu.
-     * List Docs - https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
+     * List Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
 
      * @param id The unique identifier for the menu item.
      * @param name The name of the menu item, displayed in the menu.
@@ -604,7 +604,7 @@ public:
      *
      * This method creates a runtime-configurable list menu item, where the items in the list items are stored in FLASH.
      * The list menu item is added as a child to the current submenu.
-     * List Docs - https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
+     * List Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
      *
      * @param id The unique identifier for the menu item.
      * @param name The name of the menu item, displayed in the menu.
@@ -621,7 +621,7 @@ public:
      *
      * This method allows the addition of a list item that uses a custom runtime rendering function
      * to dynamically determine its content. The item is read-only by default and can display multiple rows of data.
-     * List Docs - https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
+     * List Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
      *
      * @param id The unique ID of the menu item.
      * @param name The name (or label) of the menu item.

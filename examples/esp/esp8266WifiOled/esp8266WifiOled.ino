@@ -40,7 +40,7 @@ char fileChoicesArray[255]{};
 
 // we add two widgets that show both the connection status and wifi signal strength
 // these are added to the renderer and rendered upon any change.
-// https://tcmenu.github.io/documentation/arduino-libraries//tc-menu/rendering-with-tcmenu-lcd-tft-oled/#drawing-bitmaps-and-presenting-state-with-titlewidget
+// https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/rendering-with-tcmenu-LCD-TFT-OLED/
 TitleWidget connectedWidget(iconsConnection, 2, 16, 12);
 TitleWidget wifiWidget(iconsWifi, 5, 16, 12);
 
@@ -100,7 +100,7 @@ void setup() {
 
     // Here we create a theme builder to add title widgets to the top right, and also to override drawing of some
     // menu items to be multi column (IE three items on a row).
-    // https://tcmenu.github.io/documentation/arduino-libraries/tc-menu/themes/rendering-with-themes-icons-grids/
+    // https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/themes/rendering-with-themes-icons-grids/
 
     TcThemeBuilder themeBuilder(renderer);
     themeBuilder.addingTitleWidget(wifiWidget)
