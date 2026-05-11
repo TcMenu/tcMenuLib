@@ -7,20 +7,24 @@
  * configuring some items to use larger than usual fonts, and other items to render as icons. It also has an ethernet
  * network remote included too.
  *
- * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
+ * To build your own menu: https://designer.thecoderscorner.com/
+ * Getting started: https://www.thecoderscorner.com/products/apps/tcmenu-designer/
+ * Documentation: https://www.thecoderscorner.com/products/arduino-libraries/
  */
 
-#include "generated/stm32DuinoDemo_menu.h"
+// this is the menu project wiring file, always needs to be included
+#include "Stm32DashEth_menu.h"
+// now we include the libraries that we're using.
 #include <STM32Ethernet.h>
-#include <PlatformDetermination.h>
 #include <SPI.h>
 #include <TaskManagerIO.h>
+#include <graphics/TcThemeBuilder.h>
 #include <IoLogging.h>
 #include <stockIcons/directionalIcons.h>
+#include <stockIcons/wifiAndConnectionIcons16x12.h>
+// and then we wire in the custom drawing that we demo in this sketch
 #include "RawCustomDrawing.h"
 #include "app_icondata.h"
-#include <stockIcons/wifiAndConnectionIcons16x12.h>
-#include <graphics/TcThemeBuilder.h>
 
 // We added a RAM based scroll choice item, and this references a fixed width array variable.
 // This variable is the RAM data for scroll choice item Scroll
@@ -58,6 +62,62 @@ TitleWidget widgetEthernet(iconsEthernetConnection, 2, 16, 12);
 
 color_t defaultCardPalette[] = {1, 0, 1, 1};
 
+
+// Declaring any arrays used by enum/list items
+const char* SettingsDefaultEnumEntries[] = { "33", "45", "78" };
+const char* MoreItemsOptionsEnumEntries[] = { "Pizza", "Pasta", "Salad" };
+const char* DecimalStepEnumEntries[] = { "1x", "2x", "4x" };
+
+void buildMenu(TcMenuBuilder& builder) {
+    builder        .actionItem(MENU_33_ID, "33", NoMenuFlags, nullptr)
+        .actionItem(MENU_45_ID, "45", NoMenuFlags, nullptr)
+        .actionItem(MENU_78_ID, "78", NoMenuFlags, nullptr)
+        .subMenu(MENU_STATUS_CARDS_ID, "Cards", NoMenuFlags, nullptr)
+            .actionItem(MENU_STATUS_CARDS_ACE_ID, "Ace", NoMenuFlags, nullptr)
+            .actionItem(MENU_STATUS_CARDS_CLUB_ID, "Club", NoMenuFlags, nullptr)
+            .actionItem(MENU_STATUS_CARDS_HRTS_ID, "Hrts", NoMenuFlags, nullptr)
+            .actionItem(MENU_STATUS_CARDS_DMND_ID, "Dmnd", NoMenuFlags, nullptr)
+            .endSub()
+        .subMenu(MENU_STATUS_ID, "Status", NoMenuFlags, nullptr)
+            .analogBuilder(MENU_STATUS_CURRENT_ID, "Actual", DONT_SAVE, MenuFlags().readOnly(), 0, nullptr)
+                .offset(0).divisor(1).step(1).maxValue(7800).unit("RPM").endItem()
+            .analogBuilder(MENU_STATUS_MOTOR_ID, "Motor", DONT_SAVE, MenuFlags().readOnly(), 0, nullptr)
+                .offset(0).divisor(10).step(1).maxValue(300).unit("V").endItem()
+            .analogBuilder(MENU_STATUS_WO_W_ID, "WoW", DONT_SAVE, MenuFlags().readOnly(), 15000, nullptr)
+                .offset(-15000).divisor(5000).step(1).maxValue(30000).unit("%").endItem()
+            .endSub()
+        .subMenu(MENU_SETTINGS_ID, "Settings", NoMenuFlags, nullptr)
+            .analogBuilder(MENU_SETTINGS_OFST33_ID, "Ofst33", 25, NoMenuFlags, 5000, nullptr)
+                .offset(-5000).divisor(1000).step(1).maxValue(10000).unit("%").endItem()
+            .analogBuilder(MENU_SETTINGS_OFST45_ID, "Ofst45", 27, NoMenuFlags, 5000, nullptr)
+                .offset(-5000).divisor(1000).step(1).maxValue(10000).unit("%").endItem()
+            .analogBuilder(MENU_SETTINGS_OFST78_ID, "Ofst78", 29, NoMenuFlags, 5000, nullptr)
+                .offset(-5000).divisor(1000).step(1).maxValue(10000).unit("%").endItem()
+            .enumItem(MENU_SETTINGS_DEFAULT_ID, "Default", DONT_SAVE, SettingsDefaultEnumEntries, 3, NoMenuFlags, 0, nullptr)
+            .actionItem(MENU_SETTINGS_SAVE_NOW_ID, "Save Now", NoMenuFlags, nullptr)
+            .endSub()
+        .subMenu(MENU_MORE_ITEMS_ID, "More Items", NoMenuFlags, nullptr)
+            .enumItem(MENU_MORE_ITEMS_OPTIONS_ID, "Options", 14, MoreItemsOptionsEnumEntries, 3, NoMenuFlags, 0, nullptr)
+            .boolItem(MENU_MORE_ITEMS_TOPPINGS_ID, "Toppings", 16, NAMING_YES_NO, NoMenuFlags, false, nullptr)
+            .boolItem(MENU_MORE_ITEMS_POWER_ID, "Power", 17, NAMING_ON_OFF, NoMenuFlags, false, nullptr)
+            .actionItem(MENU_MORE_ITEMS_PRESS_ME_ID, "Save", NoMenuFlags, saveWasPressed)
+            .floatItem(MENU_MORE_ITEMS_NUMBER_ID, "Number", DONT_SAVE, 1, NoMenuFlags, 0.0, nullptr)
+            .scrollChoiceBuilder(MENU_MORE_ITEMS_SCROLL_ID, "Scroll", DONT_SAVE, NoMenuFlags, 0, nullptr).fromRamChoices(ramDataSet, 5, 10).endItem()
+            .endSub()
+        .subMenu(MENU_RUNTIMES_ID, "Runtimes", NoMenuFlags, nullptr)
+            .textItem(MENU_RUNTIMES_TEXT_ID, "Text", 18, 5, NoMenuFlags, "", nullptr)
+            .listItemRtCustom(MENU_RUNTIMES_CUSTOM_LIST_ID, "Custom List", 0, fnRuntimesCustomListRtCall, NoMenuFlags, nullptr)
+            .remoteConnectivityMonitor(MENU_IO_T_MONITOR_ID, "IoT Monitor", NoMenuFlags)
+            .eepromAuthenticationItem(MENU_AUTHENTICATOR_ID, "Authenticator", NoMenuFlags, nullptr)
+            .analogBuilder(MENU_HALVES1_ID, "Halves1", DONT_SAVE, NoMenuFlags, 0, nullptr)
+                .offset(0).divisor(2).step(1).maxValue(255).unit("dB").endItem()
+            .largeNumberItem(MENU_LGE_NUM1_ID, "Lge Num1", DONT_SAVE, LargeFixedNumber(9, 3, 0U, 0U, false), true, NoMenuFlags, largeNumDidChange)
+            .endSub()
+        .analogBuilder(MENU_DECIMAL_ID, "Decimal", 2, NoMenuFlags, 0, decimalDidChange)
+            .offset(0).divisor(10).step(1).maxValue(1000).unit("d").endItem()
+        .enumItem(MENU_DECIMAL_STEP_ID, "Decimal Step", 23, DecimalStepEnumEntries, 3, NoMenuFlags, 0, onDecimalStepChange);
+}
+
 void overrideDrawingForMainMenu(TcThemeBuilder& themeBuilder) {
     // now we make the two settings and status menus use icons instead of regular drawing, and the numbered menu items
     // 33,45,78 to use a larger font so it takes the entire screen.
@@ -66,7 +126,7 @@ void overrideDrawingForMainMenu(TcThemeBuilder& themeBuilder) {
     const Coord iconSize(APPICONS_WIDTH, APPICONS_HEIGHT);
 
     // override menu33 to draw text centered in a large font with more padding
-    themeBuilder.menuItemOverride(menu33)
+    themeBuilder.menuItemOverride(getMenu33())
             .withJustification(tcgfx::GridPosition::JUSTIFY_CENTER_NO_VALUE)
             .withNativeFont(u8g2_font_inr33_mn, 1)
             .withPadding(MenuPadding(2))
@@ -74,7 +134,7 @@ void overrideDrawingForMainMenu(TcThemeBuilder& themeBuilder) {
             .apply();
 
     // override menu45 to draw text centered in a large font with more padding
-    themeBuilder.menuItemOverride(menu45)
+    themeBuilder.menuItemOverride(getMenu45())
             .withJustification(tcgfx::GridPosition::JUSTIFY_CENTER_NO_VALUE)
             .withNativeFont(u8g2_font_inr33_mn, 1)
             .withPadding(MenuPadding(2))
@@ -82,7 +142,7 @@ void overrideDrawingForMainMenu(TcThemeBuilder& themeBuilder) {
             .apply();
 
     // override menu78 to draw text centered in a large font with more padding
-    themeBuilder.menuItemOverride(menu78)
+    themeBuilder.menuItemOverride(getMenu78())
             .withJustification(tcgfx::GridPosition::JUSTIFY_CENTER_NO_VALUE)
             .withNativeFont(u8g2_font_inr33_mn, 1)
             .withPadding(MenuPadding(2))
@@ -90,20 +150,20 @@ void overrideDrawingForMainMenu(TcThemeBuilder& themeBuilder) {
             .apply();
 
     // override settings to draw as an icon only
-    themeBuilder.menuItemOverride(menuSettings)
+    themeBuilder.menuItemOverride(getMenuSettings())
             .withImageXbmp(iconSize, settingsIcon40Bits)
             .withPalette(defaultCardPalette)
             .onRow(3)
             .withDrawingMode(tcgfx::GridPosition::DRAW_AS_ICON_ONLY).apply();
 
     // override status to draw as an icon only
-    themeBuilder.menuItemOverride(menuStatus)
+    themeBuilder.menuItemOverride(getMenuStatus())
             .withImageXbmp(iconSize, statusIcon40Bits)
             .withPalette(defaultCardPalette)
             .onRow(4)
             .withDrawingMode(tcgfx::GridPosition::DRAW_AS_ICON_ONLY).apply();
 
-    themeBuilder.menuItemOverride(menuStatusCards)
+    themeBuilder.menuItemOverride(getMenuCards())
             .withImageXbmp(Coord(32, 32), cardIconBitmap)
             .onRow(5)
             .withPalette(defaultCardPalette)
@@ -113,7 +173,7 @@ void overrideDrawingForMainMenu(TcThemeBuilder& themeBuilder) {
 
 void overrideDrawingForCardMenu(TcThemeBuilder& themeBuilder) {
     // override  back button on the card menu to be the default 32x32 back icon
-    themeBuilder.menuItemOverride(menuBackStatusCards)
+    themeBuilder.menuItemOverride(*(getMenuCards().getChild()))
             .withJustification(tcgfx::GridPosition::JUSTIFY_CENTER_WITH_VALUE)
             .withPadding(MenuPadding(2))
             .withPalette(defaultCardPalette)
@@ -122,7 +182,7 @@ void overrideDrawingForCardMenu(TcThemeBuilder& themeBuilder) {
             .apply();
 
     // override every single item on the card sub menu to have larger font and different padding/justification
-    themeBuilder.submenuPropertiesActionOverride(menuStatusCards)
+    themeBuilder.submenuPropertiesActionOverride(getMenuCards())
             .withJustification(tcgfx::GridPosition::JUSTIFY_CENTER_NO_VALUE)
             .withNativeFont(u8g2_font_inb16_mf, 1)
             .withPadding(MenuPadding(2))
@@ -135,7 +195,7 @@ void setupCardLayoutAndWidgets() {
 
     // enable card layout providing the left and right icons. This enables for root menu
     themeBuilder.enableCardLayoutWithXbmImages(Coord(11, 22), ArrowHoriz11x22BitmapLeft, ArrowHoriz11x22BitmapRight, true)
-        .setMenuAsCard(menuStatusCards, true);
+        .setMenuAsCard(getMenuCards(), true);
 
     // these two functions, defined directly above this one configure the icons and special text arrangements for
     // the items in the card layouts.
@@ -156,14 +216,13 @@ void setupCardLayoutAndWidgets() {
 
     // for the connectivity icon, we use the IoT monitors notification pass through. It tells us of any changes
     // for all incoming connections in one place.
-    menuRuntimesIoTMonitor.registerCommsNotification([](CommunicationInfo ci) {
+    getMenuIoTMonitor().registerCommsNotification([](CommunicationInfo ci) {
         widgetConnection.setCurrentState(ci.connected ? 1 : 0);
     });
 }
 
 // END card / custom layouts
 
-using namespace tcremote;
 
 void setup() {
     // This example logs using IoLogging, see the following guide to enable
@@ -184,14 +243,13 @@ void setup() {
     Ethernet.localIP().printTo(Serial);
     Serial.println();
 
-    // and then run the menu setup
     setupMenu();
 
     // now load back values from EEPROM, but only when we can read the confirmatory magic key, see EEPROM docs:
     // https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-eeprom-integrations/
     menuMgr.load(0xd00d, [] {
         // this gets called when the menu hasn't been saved before, to initialise the first time.
-        menuDecimal.setCurrentValue(4);
+        getMenuDecimal().setCurrentValue(4);
     });
 
     // here we register the custom drawing created in `RawCustomDrawing.h`
@@ -203,7 +261,7 @@ void setup() {
     });
 
     // set the list to have 10 rows, for each row the custom callback further down will be called to get the value.
-    menuRuntimesCustomList.setNumberOfRows(10);
+    getMenuCustomList().setNumberOfRows(10);
 
     // now we set up the layouts to make the card view look right.
     setupCardLayoutAndWidgets();
@@ -211,7 +269,14 @@ void setup() {
 
 void loop() {
     taskManager.runLoop();
+
 }
+
+
+void CALLBACK_FUNCTION saveWasPressed(int id) {
+    auto bspBackupRam = reinterpret_cast<HalStm32EepromAbstraction*>(menuMgr.getEepromAbstraction());
+    menuMgr.save(0xd00d);
+    bspBackupRam->commit();}
 
 // This callback needs to be implemented by you, see the below docs:
 //  1. List Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
@@ -225,44 +290,38 @@ int CALLBACK_FUNCTION fnRuntimesCustomListRtCall(RuntimeMenuItem* item, uint8_t 
     return defaultRtListCallback(item, row, mode, buffer, bufferSize);
 }
 
-void CALLBACK_FUNCTION decimalDidChange(int id) {
-    // TODO - your menu change code
-}
-
-
-void CALLBACK_FUNCTION saveWasPressed(int id) {
-     auto bspBackupRam = reinterpret_cast<HalStm32EepromAbstraction*>(menuMgr.getEepromAbstraction());
-     menuMgr.save(0xd00d);
-     bspBackupRam->commit();
-}
-
-
-void CALLBACK_FUNCTION largeNumDidChange(int id) {
-    // TODO - your menu change code
-}
-
-
 void CALLBACK_FUNCTION onDecimalStepChange(int id) {
     //
     // Analog menu items support the concept of step, that is the number of ticks forward that one detent of the
     // encoder represents, here we read the step enum item to get the current value, and then call setStep on the
     // analog item to set how much one tick moves the current value.
     //
-    int stepChoice = menuDecimalStep.getCurrentValue();
+    int stepChoice = getMenuDecimalStep().getCurrentValue();
     int stepVal;
     switch (stepChoice) {
-        case 0:
-        default:
-            stepVal = 1;
-            break;
-        case 1:
-            stepVal = 2;
-            break;
-        case 2:
-            stepVal = 4;
-            break;
+    case 0:
+    default:
+        stepVal = 1;
+        break;
+    case 1:
+        stepVal = 2;
+        break;
+    case 2:
+        stepVal = 4;
+        break;
     }
-    menuDecimal.setStep(stepVal);
-    menuDecimal.setChanged(true);
+    getMenuDecimal().setStep(stepVal);
+    getMenuDecimal().setChanged(true);
     serlogF2(SER_DEBUG, "Decimal Step now ", stepVal);
+}
+
+
+void CALLBACK_FUNCTION decimalDidChange(int id) {
+    char sz[20];
+    getMenuDecimal().copyValue(sz, sizeof sz);
+    serlogF2(SER_DEBUG, "Value decimal ", sz);
+}
+
+
+void CALLBACK_FUNCTION largeNumDidChange(int id) {
 }
