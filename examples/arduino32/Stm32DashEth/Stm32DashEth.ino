@@ -1,11 +1,15 @@
 /**
- * This is a simple demo application for Stm32Duino based boards. It just showcases many of the types of editor that
- * are available. By default it is setup for an OLED screen and a rotary encoder, although it could be moved to use
- * many other different display and input technologies.
+ * This is a complete demo application for Stm32Duino based boards. It showcases
+ * many of the types of editor that are available. By default, it is setup for an
+ * OLED screen and a rotary encoder, although it could be moved to use many other
+ * different display and input technologies.
  *
- * It demonstrates the use of the card menu layout, where items are shown one at a time as you scroll through them,
- * configuring some items to use larger than usual fonts, and other items to render as icons. It also has an ethernet
- * network remote included too.
+ * For a simpler Stm32 example, look at one button instead.
+ *
+ * It demonstrates the use of the card menu layout, where items are shown one at a
+ * time as you scroll through them, configuring some items to use larger than usual
+ * fonts, and other items to render as icons. It also has an ethernet network remote
+ * included too.
  *
  * To build your own menu: https://designer.thecoderscorner.com/
  * Getting started: https://www.thecoderscorner.com/products/apps/tcmenu-designer/
