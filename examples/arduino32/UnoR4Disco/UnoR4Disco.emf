@@ -1,7 +1,7 @@
 {
   "version": "1.00",
-  "projectName": "Project description",
-  "author": "dave",
+  "projectName": "Uno R4 disco project that has buttons and TFT",
+  "author": "root",
   "items": [
     {
       "parentId": 0,
@@ -12,6 +12,7 @@
         "variableName": "Disco",
         "id": 1,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -32,6 +33,7 @@
         "variableName": "DiscoSpeed",
         "id": 2,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -62,6 +64,7 @@
         "variableName": "ScrollText",
         "id": 4,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -79,6 +82,7 @@
         "variableName": "ScrollTextText",
         "id": 6,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -109,6 +113,7 @@
         "variableName": "ShowXbmp",
         "id": 7,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -128,6 +133,7 @@
         "variableName": "ShowXbmpXbmp",
         "id": 8,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -158,6 +164,7 @@
         "variableName": "Analog",
         "id": 12,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -190,11 +197,12 @@
       "type": "floatItem",
       "defaultValue": "0.0",
       "item": {
-        "numDecimalPlaces": 3,
+        "numDecimalPlaces": 1,
         "name": "A1 Value",
         "variableName": "AnalogA1Value",
         "id": 14,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -210,6 +218,7 @@
         "variableName": "WiFi",
         "id": 15,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -227,6 +236,7 @@
         "variableName": "WiFiIPAddress",
         "id": 16,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -243,6 +253,7 @@
         "variableName": "WiFiConnected",
         "id": 17,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -259,7 +270,7 @@
     ],
     "lastThemeUuid": "57945787-0A04-447B-BBA2-6461FC505397",
     "applicationUUID": "4f60a98f-ca51-4c80-acbd-78bfd1e90c8d",
-    "applicationName": "R4 Disco",
+    "applicationName": "Uno R4 Disco",
     "lastProperties": [
       {
         "name": "DISPLAY_VARIABLE",
@@ -420,12 +431,34 @@
         "name": "NEED_EDITING_ICONS",
         "latestValue": "true",
         "subsystem": "THEME"
+      },
+      {
+        "name": "DISPLAY_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "PINS_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "OTHER_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CUSTOM_SPI_NAME",
+        "latestValue": "SPI",
+        "subsystem": "DISPLAY"
       }
     ],
     "namingRecursive": true,
     "useCppMain": false,
-    "saveLocation": "ALL_TO_CURRENT",
+    "saveLocation": "ONE_SINGLE_FILE_MENU_MAIN",
+    "useDynamicMenus": true,
     "usingSizedEEPROMStorage": true,
+    "eepromSaveMode": "WRITE_BY_POSITION_WITH_SIZE",
     "eepromDefinition": "",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
@@ -433,9 +466,7 @@
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []
-    },
-    "packageNamespace": "",
-    "appIsModular": false
+    }
   },
   "stringLists": []
 }

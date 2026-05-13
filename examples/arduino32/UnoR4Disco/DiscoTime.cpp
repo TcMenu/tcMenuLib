@@ -3,8 +3,8 @@
  * schedule very frequently and use an AdaFruit_GFX GFXCanvas1 to represent the 12x8 display, and with that you can
  * draw anything onto it that is possible with Adafruit_GFX. Feel free to make it better!
  *
- * This also shows how to create custom messages, we have two custom "disco messages" that the Java API can receive and
- * you can easily create additional protocol handlers to process them.
+ * This also shows how to create custom messages, we have two custom "disco messages" that the Java API can receive, and
+ * you can create additional protocol handlers to process them.
  */
 
 #include "DiscoTime.h"

@@ -2,7 +2,7 @@
 #ifndef TCLIBRARYDEV_DISCOTIME_H
 #define TCLIBRARYDEV_DISCOTIME_H
 
-#include "r4UnoButtonsTft_menu.h"
+#include "../r4UnoButtonsTft/r4UnoButtonsTft_menu.h"
 #include <Adafruit_GFX.h>
 #include <tcUnicodeAdaGFX.h>
 
