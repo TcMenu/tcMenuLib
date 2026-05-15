@@ -1,7 +1,7 @@
 {
   "version": "1.00",
-  "projectName": "",
-  "author": "dave",
+  "projectName": "ESP32 S3 example for S3 Tiny that uses card layout.",
+  "author": "root",
   "items": [
     {
       "parentId": 0,
@@ -12,6 +12,7 @@
         "variableName": "Settings",
         "id": 6,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -28,6 +29,7 @@
         "variableName": "NewSubMenuColor",
         "id": 7,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -45,6 +47,7 @@
         "variableName": "NewSubMenuText",
         "id": 8,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -62,6 +65,7 @@
         "variableName": "NewSubMenuDate",
         "id": 9,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -79,8 +83,10 @@
         "unitName": "%",
         "step": 1,
         "name": "Percent1",
+        "variableName": "",
         "id": 10,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -98,8 +104,10 @@
         "unitName": "",
         "step": 1,
         "name": "Tenths1",
+        "variableName": "",
         "id": 11,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -115,8 +123,10 @@
         "decimalPlaces": 4,
         "negativeAllowed": true,
         "name": "Lge Num1",
+        "variableName": "",
         "id": 12,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -133,6 +143,7 @@
         "variableName": "Mute",
         "id": 13,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -148,6 +159,7 @@
         "variableName": "Battery",
         "id": 14,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -168,6 +180,7 @@
         "variableName": "BatteryCharge",
         "id": 15,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": true,
         "localOnly": false,
         "visible": true,
@@ -188,6 +201,7 @@
         "variableName": "BatteryCondition",
         "id": 16,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": true,
         "localOnly": false,
         "visible": true,
@@ -208,6 +222,7 @@
         "variableName": "Foods",
         "id": 4,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -224,6 +239,7 @@
         "variableName": "ToGo",
         "id": 5,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -376,12 +392,34 @@
         "name": "NEED_EDITING_ICONS",
         "latestValue": "true",
         "subsystem": "THEME"
+      },
+      {
+        "name": "DISPLAY_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "PINS_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "OTHER_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CUSTOM_SPI_NAME",
+        "latestValue": "SPI",
+        "subsystem": "DISPLAY"
       }
     ],
     "namingRecursive": true,
     "useCppMain": false,
-    "saveLocation": "PROJECT_TO_CURRENT_WITH_GENERATED",
+    "saveLocation": "ONE_SINGLE_FILE_MENU_MAIN",
+    "useDynamicMenus": true,
     "usingSizedEEPROMStorage": false,
+    "eepromSaveMode": "LEGACY_WRITE_BY_POSITION",
     "eepromDefinition": "",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
@@ -389,9 +427,7 @@
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []
-    },
-    "packageNamespace": "",
-    "appIsModular": false
+    }
   },
   "stringLists": []
 }

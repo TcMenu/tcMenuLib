@@ -9,6 +9,10 @@
  *   SCLK - 13, COPI - 12, CS - 10, RST - 12, RS/DC - 9
  * and for the keypad
  *   UP - 5, DOWN - 4, LEFT - 6, RIGHT - 7
+ *
+ * To build your own menu: https://designer.thecoderscorner.com/
+ * Getting started: https://www.thecoderscorner.com/products/apps/tcmenu-designer/
+ * Documentation: https://www.thecoderscorner.com/products/arduino-libraries/
  */
 
 #include "UnoR4Disco_menu.h"

@@ -1,13 +1,4 @@
-//
-// ESP32 S2 example based on Saola board with a dashboard configuration onto an OLED display
-// I2C on standard pin, 8 and 9 with an SH1106 display
-// encoder on 5, 6 with button on 7
-// Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
-//
-
-#include "esp32s2Saola_menu.h"
-#include <PlatformDetermination.h>
-
+#include "ESP32S2EInk_menu.h"
 #include <TaskManagerIO.h>
 #include <EEPROM.h>
 #include <tcMenuVersion.h>
@@ -50,6 +41,41 @@ TitleWidget myWidgetWidget(myWidgetWidIcons, 2, 12, 12, nullptr);
 
 // END widgets
 
+// Declaring any arrays used by enum/list items
+const char* FoodsEnumEntries[] = { "Pizza", "Pasta", "Salad", "Pie" };
+const char* ConnectivityWiFiModeEnumEntries[] = { "Station", "Soft AP" };
+
+void buildMenu(TcMenuBuilder& builder) {
+    builder        .actionItem(MENU_HIBERNATE_ID, "Hibernate", NoMenuFlags, onHibernate)
+        .analogBuilder(MENU_INT_EDIT_ID, "Int Edit", 2, NoMenuFlags, 0, nullptr)
+            .offset(0).divisor(1).step(1).maxValue(100).unit("%").endItem()
+        .analogBuilder(MENU_DEC_EDIT_ID, "Dec Edit", 4, NoMenuFlags, 0, nullptr)
+            .offset(0).divisor(10).step(1).maxValue(1000).unit("oC").endItem()
+        .analogBuilder(MENU_HALVES_ID, "Halves", 6, NoMenuFlags, 0, nullptr)
+            .offset(0).divisor(2).step(1).maxValue(200).unit("").endItem()
+        .enumItem(MENU_FOODS_ID, "Foods", 8, FoodsEnumEntries, 4, NoMenuFlags, 0, nullptr)
+        .boolItem(MENU_DOOR_OPEN_ID, "Door Open", 10, NAMING_YES_NO, NoMenuFlags, false, nullptr)
+        .subMenu(MENU_EXTRAS_ID, "Extras", NoMenuFlags, nullptr)
+            .textItem(MENU_EXTRAS_TEXT_ID, "Text", 11, 5, NoMenuFlags, "", nullptr)
+            .rgb32Item(MENU_EXTRAS_COLOR_ID, "Color", 16, false, NoMenuFlags, RgbColor32(0, 0, 0), nullptr)
+            .listItemRtCustom(MENU_EXTRAS_MY_LIST_ID, "My List", 0, fnExtrasMyListRtCall, NoMenuFlags, onListSelected)
+            .endSub()
+        .subMenu(MENU_CONNECTIVITY_ID, "Connectivity", NoMenuFlags, nullptr)
+            .textItem(MENU_CONNECTIVITY_S_S_I_D_ID, "SSID", 20, 22, NoMenuFlags, "", nullptr)
+            .textItem(MENU_CONNECTIVITY_PASSCODE_ID, "Passcode", 42, 22, NoMenuFlags, "", nullptr)
+            .enumItem(MENU_CONNECTIVITY_WI_FI_MODE_ID, "WiFi Mode", 64, ConnectivityWiFiModeEnumEntries, 2, NoMenuFlags, 0, nullptr)
+            .ipAddressItem(MENU_CONNECTIVITY_I_P_ADDRESS_ID, "IP Address", DONT_SAVE, NoMenuFlags, IpAddressStorage(127, 0, 0, 1), nullptr)
+            .remoteConnectivityMonitor(MENU_CONNECTIVITY_IO_T_MONITOR_ID, "IoT Monitor", MenuFlags().localOnly())
+            .eepromAuthenticationItem(MENU_CONNECTIVITY_AUTHENTICATOR_ID, "Authenticator", MenuFlags().localOnly(), nullptr)
+            .endSub()
+        .subMenu(MENU_IO_T_SETUP_ID, "IoT Setup", NoMenuFlags, nullptr)
+            .ipAddressItem(MENU_I_P_ADDR_ID, "IP Addr", DONT_SAVE, NoMenuFlags, IpAddressStorage(127, 0, 0, 1), nullptr)
+            .remoteConnectivityMonitor(MENU_IO_T_MONITOR1_ID, "IoT Monitor1", MenuFlags().localOnly())
+            .endSub();
+}
+
+
+
 void setup() {
     // before proceeding, we must start wire and serial, then call setup menu.
     Serial.begin(115200);
@@ -62,7 +88,7 @@ void setup() {
     menuMgr.load();
 
     // set the number of rows in the list.
-    getListItemById(EXTRAS_LIST_ID).setNumberOfRows(42);
+    getMenuMyList().setNumberOfRows(42);
 
     // next start WiFi and register our wifi widget
     startWiFiAndListener();
@@ -79,14 +105,46 @@ void setup() {
 
 void loop() {
     taskManager.runLoop();
+
+}
+
+// This callback needs to be implemented by you, see the below docs:
+//  1. List Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
+//  2. ScrollChoice Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/scrollchoice-menu-item/
+int CALLBACK_FUNCTION fnExtrasMyListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
+    switch(mode) {
+    default:
+        return defaultRtListCallback(item, row, mode, buffer, bufferSize);
+    }
+}
+
+void CALLBACK_FUNCTION onListSelected(int id) {
+    Serial.print("List item select "); Serial.println(getMenuMyList().getActiveIndex());
+
+}
+
+void CALLBACK_FUNCTION onHibernate(int id) {
+    display.clearScreen();
+    display.hibernate();
+}
+
+void saveToRom() {
+    menuMgr.save();
+    EEPROM.commit();
+    auto dlg = renderer.getDialog();
+    if(!dlg->isInUse()) {
+        dlg->setButtons(BTNTYPE_NONE, BTNTYPE_CLOSE);
+        dlg->showRam("Saved", false);
+        dlg->copyIntoBuffer("to flash");
+    }
 }
 
 void startWiFiAndListener() {
-    TextMenuItem& ssidMenuItem = getTextItemById(CONNECTIVITY_SSID_ID);
-    TextMenuItem& passphraseMenuItem = getTextItemById(CONNECTIVITY_PASSCODE_ID);
+    TextMenuItem& ssidMenuItem = getMenuSSID();
+    TextMenuItem& passphraseMenuItem = getMenuPasscode();
     // You can choose between station and access point mode by setting the connectivity/Wifi Mode option to your
     // own choice
-    if(asEnumItem(getMenuItemById(CONNECTIVITY_WIFI_MODE_ID)).getCurrentValue() == MENU_WIFIMODE_STATION) {
+    if(getMenuWiFiMode().getCurrentValue() == MENU_WIFIMODE_STATION) {
         // we are in station mode
         WiFi.begin(ssidMenuItem.getTextValue(), passphraseMenuItem.getTextValue());
         WiFi.mode(WIFI_STA);
@@ -116,7 +174,7 @@ void startWiFiAndListener() {
                 IPAddress localIp = WiFi.localIP();
                 Serial.print("Now connected to WiFi");
                 Serial.println(localIp);
-                getIpAddressItemById(CONNECTIVITY_IP_ADDR_ID).setIpAddress(localIp[0], localIp[1], localIp[2], localIp[3]);
+                getMenuIPAddr().setIpAddress(localIp[0], localIp[1], localIp[2], localIp[3]);
                 connectedToWiFi = true;
             }
 
@@ -129,38 +187,4 @@ void startWiFiAndListener() {
             wifiWidget.setCurrentState(0);
         }
     });
-}
-
-void CALLBACK_FUNCTION pressMeActionRun(int id) {
-    menuMgr.save();
-    EEPROM.commit();
-    auto dlg = renderer.getDialog();
-    if(!dlg->isInUse()) {
-        dlg->setButtons(BTNTYPE_NONE, BTNTYPE_CLOSE);
-        dlg->showRam("Saved", false);
-        dlg->copyIntoBuffer("to flash");
-    }
-}
-
-
-// This callback needs to be implemented by you, see the below docs:
-//  1. List Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
-//  2. ScrollChoice Docs - https://www.thecoderscorner.com/products/arduino-libraries//tc-menu/menu-item-types/scrollchoice-menu-item/
-int CALLBACK_FUNCTION fnExtrasMyListRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
-    if(mode == RENDERFN_VALUE && row != LIST_PARENT_ITEM_POS) {
-        strncpy(buffer, "Val", bufferSize);
-        fastltoa(buffer, row, 3, NOT_PADDED, bufferSize);
-        return true;
-    }
-    return defaultRtListCallback(item, row, mode, buffer, bufferSize);
-}
-
-void CALLBACK_FUNCTION onListSelected(int id) {
-    Serial.print("List item select "); Serial.println(getListItemById(EXTRAS_LIST_ID).getActiveIndex());
-}
-
-
-void CALLBACK_FUNCTION onHibernate(int id) {
-    display.clearScreen();
-    display.hibernate();
 }

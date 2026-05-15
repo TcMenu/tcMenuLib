@@ -5,6 +5,9 @@
  * Be careful using UIP in production boards as it is GPL. Fine for small
  * home projects. TcMenu has an Apache license but UIP does not. Prefer
  * Ethernet2 for production boards as it is LGPL.
+ *
+ * We think there's more benefit to using static structures on AVR than on other platforms, so we've left this example
+ * using static menu building instead of the fluent API. However, for your project, the choice is yours to make.
  * 
  * Getting started: https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-overview-quick-start/
  */

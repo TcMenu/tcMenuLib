@@ -4,6 +4,9 @@
  * This sketch is setup for MEGA2560 AVR with a 20x4 LCD on I2C and also an encoder on I2C. It also assumes an I2C ROM.
  * However, you can take the ideas from this sketch and apply them in your own designs.
  *
+ * We think there's more benefit to using static structures on AVR than on other platforms, so we've left this example
+ * using static menu building instead of the fluent API. However, for your project, the choice is yours to make.
+ *
  * More information about matrix keyboard support:
  * https://www.thecoderscorner.com/products/arduino-libraries/io-abstraction/matrix-keyboard-keypad-manager/
  *

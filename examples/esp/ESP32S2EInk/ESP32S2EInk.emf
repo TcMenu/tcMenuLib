@@ -1,7 +1,7 @@
 {
   "version": "1.00",
   "projectName": "eInk demonstration with digital joystick",
-  "author": "dave",
+  "author": "root",
   "items": [
     {
       "parentId": 0,
@@ -32,6 +32,7 @@
         "variableName": "IntEdit",
         "id": 1,
         "eepromAddress": 2,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -52,6 +53,7 @@
         "variableName": "DecEdit",
         "id": 2,
         "eepromAddress": 4,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -72,6 +74,7 @@
         "variableName": "Halves",
         "id": 3,
         "eepromAddress": 6,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -93,6 +96,7 @@
         "variableName": "Foods",
         "id": 4,
         "eepromAddress": 8,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -109,6 +113,7 @@
         "variableName": "DoorOpen",
         "id": 5,
         "eepromAddress": 10,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -124,6 +129,7 @@
         "variableName": "Extras",
         "id": 10,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -141,6 +147,7 @@
         "variableName": "ExtrasText",
         "id": 11,
         "eepromAddress": 11,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -157,6 +164,7 @@
         "variableName": "ExtrasColor",
         "id": 12,
         "eepromAddress": 16,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -189,6 +197,7 @@
         "variableName": "Connectivity",
         "id": 14,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -206,6 +215,7 @@
         "variableName": "ConnectivitySSID",
         "id": 16,
         "eepromAddress": 20,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -223,6 +233,7 @@
         "variableName": "ConnectivityPasscode",
         "id": 17,
         "eepromAddress": 42,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -242,6 +253,7 @@
         "variableName": "ConnectivityWiFiMode",
         "id": 18,
         "eepromAddress": 64,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -259,6 +271,7 @@
         "variableName": "ConnectivityIPAddress",
         "id": 15,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -274,6 +287,7 @@
         "variableName": "ConnectivityIoTMonitor",
         "id": 19,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": true,
         "visible": true,
@@ -289,6 +303,7 @@
         "variableName": "ConnectivityAuthenticator",
         "id": 20,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": true,
         "visible": true,
@@ -301,8 +316,10 @@
       "item": {
         "secured": false,
         "name": "IoT Setup",
+        "variableName": "",
         "id": 22,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -317,8 +334,10 @@
         "textLength": 5,
         "itemType": "IP_ADDRESS",
         "name": "IP Addr",
+        "variableName": "",
         "id": 23,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -331,8 +350,10 @@
       "item": {
         "menuType": "REMOTE_IOT_MONITOR",
         "name": "IoT Monitor1",
+        "variableName": "",
         "id": 24,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": true,
         "visible": true,
@@ -347,9 +368,9 @@
     "lastRemoteUuids": [
       "46c30011-cac6-4598-a7b8-b0630d55daab"
     ],
-    "lastThemeUuid": "bcd5fe34-9e9f-4fcb-9edf-f4e3caca0674",
+    "lastThemeUuid": "D88EC638-8E17-4D23-8CCC-A99A836D3C2C",
     "applicationUUID": "b447b433-fe4f-4ce7-8746-d94bfeefc707",
-    "applicationName": "ESP32-S2 Saola board",
+    "applicationName": "ESP32 S2 eInk",
     "lastProperties": [
       {
         "name": "DISPLAY_TYPE",
@@ -585,12 +606,19 @@
         "name": "THEME_SELECTED_FG",
         "latestValue": "GxEPD_WHITE",
         "subsystem": "THEME"
+      },
+      {
+        "name": "UNO_OR_FULL",
+        "latestValue": "unoLcd",
+        "subsystem": "DISPLAY"
       }
     ],
     "namingRecursive": true,
     "useCppMain": false,
-    "saveLocation": "ALL_TO_CURRENT",
+    "saveLocation": "ONE_SINGLE_FILE_MENU_MAIN",
+    "useDynamicMenus": true,
     "usingSizedEEPROMStorage": false,
+    "eepromSaveMode": "LEGACY_WRITE_BY_POSITION",
     "eepromDefinition": "prefs:menuStore:512",
     "authenticatorDefinition": "rom:200:4",
     "projectIoExpanders": [
@@ -598,9 +626,7 @@
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []
-    },
-    "packageNamespace": "",
-    "appIsModular": false
+    }
   },
   "stringLists": []
 }

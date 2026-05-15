@@ -19,7 +19,7 @@ void applyTheme(GraphicsDeviceRenderer& gr) {
 
     // See https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/themes/rendering-with-themes-icons-grids/
     TcThemeBuilder themeBuilder(gr);
-    themeBuilder.withSelectedColors(GxEPD_WHITE, GxEPD_BLACK)
+    themeBuilder.withSelectedColors(GxEPD_BLACK, GxEPD_WHITE)
             .dimensionsFromRenderer()
             .withItemPadding(MenuPadding(2))
             .withRenderingSettings(BaseGraphicalRenderer::TITLE_FIRST_ROW, false)
