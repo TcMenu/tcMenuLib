@@ -218,7 +218,7 @@ inline T *asMenuItem(MenuItem *item, MenuType expectedType, const char *typeName
     if (item == nullptr || item->getMenuType() != expectedType) {
         while (1) {
             // literally stop here if we get a fault, continuing will lead to worse.
-            serlogF2(SER_ERROR, typeName, item == nullptr ? 0 : item->getId());
+            serlog2(SER_ERROR, typeName, item == nullptr ? 0 : item->getId());
             delay(1000);
         }
     }
