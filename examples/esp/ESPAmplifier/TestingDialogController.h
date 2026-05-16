@@ -1,11 +1,12 @@
 #ifndef TCMENU_ESPAMPLIFIER_TESTINGDIALOGCONTROLLER_H
 #define TCMENU_ESPAMPLIFIER_TESTINGDIALOGCONTROLLER_H
 
+#include <PlatformDetermination.h>
 #include <BaseDialog.h>
 
 class TestingDialogController : public BaseDialogController {
 private:
-    MenuBasedDialog* theDialog;
+    MenuBasedDialog* theDialog = nullptr;
 public:
     void initialiseAndGetHeader(BaseDialog *dialog, char *buffer, size_t bufferSize) override {
         theDialog = reinterpret_cast<MenuBasedDialog *>(dialog);

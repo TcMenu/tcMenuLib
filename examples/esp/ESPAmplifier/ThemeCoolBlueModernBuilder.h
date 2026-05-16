@@ -1,7 +1,9 @@
 /**
- * Cool blue modern theme by TheCodersCorner.com. This is part of the standard themes shipped with TcMenu.
+ * Cool blue modern theme by tcMenu organisation. This is part of the standard themes shipped with TcMenu.
  * This file will not be updated by the designer, you can edit.
+ * See https://www.thecoderscorner.com/products/arduino-libraries//tc-menu/themes/rendering-with-themes-icons-grids/
  */
+
 #ifndef THEME_COOL_BLUE
 #define THEME_COOL_BLUE
 
@@ -12,7 +14,7 @@ const color_t coolBlueItemPalette[] = {RGB(255, 255, 255), RGB(0,64,135), RGB(20
 const color_t coolBlueActionPalette[] = {RGB(255, 255, 255), RGB(0,45,120), RGB(20,133,255), RGB(31,100,178)};
 
 #define ACTION_BORDER_WIDTH 0
-#define USE_SLIDER_FOR_ANALOG 1
+#define USE_SLIDER_FOR_ANALOG true
 
 /**
  * This is one of the stock themes, you can modify it to meet your requirements, and it will not be updated by tcMenu
@@ -25,6 +27,7 @@ const color_t coolBlueActionPalette[] = {RGB(255, 255, 255), RGB(0,45,120), RGB(
 void installCoolBlueModernTheme(GraphicsDeviceRenderer& gr, const MenuFontDef& itemFont, const MenuFontDef& titleFont,
                                 bool needEditingIcons, BaseGraphicalRenderer::TitleMode titleMode, bool useUnicode) {
 
+    // See https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/themes/rendering-with-themes-icons-grids/
     TcThemeBuilder themeBuilder(gr);
 
     themeBuilder.dimensionsFromRenderer()
@@ -43,7 +46,7 @@ void installCoolBlueModernTheme(GraphicsDeviceRenderer& gr, const MenuFontDef& i
     if(useUnicode) {
         themeBuilder.enableTcUnicode();
     }
-
+    
     themeBuilder.defaultItemProperties()
             .withJustification(GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT)
             .apply();

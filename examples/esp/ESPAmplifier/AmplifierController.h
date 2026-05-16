@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <tcMenu.h>
 #include <IoLogging.h>
-#include "esp32Amplifier_menu.h"
+#include "ESPAmplifier_menu.h"
 
 #ifndef MENU_MAGIC_KEY
 #define MENU_MAGIC_KEY 0xfade
@@ -35,35 +35,36 @@ private:
     bool muted = true;
     int levelTrims[NUM_CHANNELS];
 public:
-    explicit AmplifierController() : levelTrims{} {
-        menuMute.setBoolean(true);
-        setAmpStatus(WARMING_UP);
+    explicit AmplifierController() : audioDirect(true), muted(true), levelTrims{} {
     }
 
     void initialise() {
+        getMenuMute().setBoolean(true);
+        setAmpStatus(WARMING_UP);
+
         for(int i=0; i<NUM_CHANNELS; i++) {
             levelTrims[i] = menuMgr.getEepromAbstraction()->read8(EEPROM_TRIM_POS + i);
         }
     }
 
     uint8_t getChannelInt() {
-        uint8_t ch = menuChannels.getCurrentValue();
+        uint8_t ch = getMenuChannel().getCurrentValue();
         if(ch > NUM_CHANNELS) return 0;
         return ch;
     }
 
     void setAmpStatus(AmplifierStatus status) {
-        menuStatusAmpStatus.setCurrentValue(status);
+        getMenuAmpStatus().setCurrentValue(status);
     }
 
     AmplifierStatus getAmpStatus() {
-        return static_cast<AmplifierStatus>(menuStatusAmpStatus.getCurrentValue());
+        return static_cast<AmplifierStatus>(getMenuAmpStatus().getCurrentValue());
     }
 
     void onVolumeChanged() {
         auto trim = levelTrims[getChannelInt()];
-        auto vol = menuVolume.getCurrentValue() + trim;
-        auto volToWrite = menuMute.getBoolean() ? 0 : vol;
+        auto vol = getMenuVolume().getCurrentValue() + trim;
+        auto volToWrite = getMenuMute().getBoolean() ? 0 : vol;
         serdebugF2("write volume to bus", volToWrite);
     }
 
