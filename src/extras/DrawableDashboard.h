@@ -257,6 +257,7 @@ public:
  */
 class DrawableDashboardDelegate {
 public:
+    virtual ~DrawableDashboardDelegate() = default;
     /**
      * Indicates that the dashboard has closed and no longer displayed
      */
