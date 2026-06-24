@@ -280,10 +280,10 @@ void buildMenu(TcMenuBuilder& builder);
 #define MENU_RUNTIMES_ID  11
 #define MENU_RUNTIMES_TEXT_ID  12
 #define MENU_RUNTIMES_CUSTOM_LIST_ID  13
-#define MENU_IO_T_MONITOR_ID  14
-#define MENU_AUTHENTICATOR_ID  15
-#define MENU_HALVES1_ID  17
-#define MENU_LGE_NUM1_ID  18
+#define MENU_RUNTIMES_IO_TMONITOR_ID  14
+#define MENU_RUNTIMES_AUTHENTICATOR_ID  15
+#define MENU_RUNTIMES_HALVES1_ID  17
+#define MENU_RUNTIMES_LGE_NUM1_ID  18
 #define MENU_DECIMAL_ID  1
 #define MENU_DECIMAL_STEP_ID  16
 
@@ -291,35 +291,35 @@ void buildMenu(TcMenuBuilder& builder);
 inline ActionMenuItem& getMenu33() { return getActionItemById(MENU_33_ID); }
 inline ActionMenuItem& getMenu45() { return getActionItemById(MENU_45_ID); }
 inline ActionMenuItem& getMenu78() { return getActionItemById(MENU_78_ID); }
-inline SubMenuItem& getMenuCards() { return getSubMenuById(MENU_STATUS_CARDS_ID); }
-inline ActionMenuItem& getMenuAce() { return getActionItemById(MENU_STATUS_CARDS_ACE_ID); }
-inline ActionMenuItem& getMenuClub() { return getActionItemById(MENU_STATUS_CARDS_CLUB_ID); }
-inline ActionMenuItem& getMenuHrts() { return getActionItemById(MENU_STATUS_CARDS_HRTS_ID); }
-inline ActionMenuItem& getMenuDmnd() { return getActionItemById(MENU_STATUS_CARDS_DMND_ID); }
+inline SubMenuItem& getMenuStatusCards() { return getSubMenuById(MENU_STATUS_CARDS_ID); }
+inline ActionMenuItem& getMenuStatusCardsAce() { return getActionItemById(MENU_STATUS_CARDS_ACE_ID); }
+inline ActionMenuItem& getMenuStatusCardsClub() { return getActionItemById(MENU_STATUS_CARDS_CLUB_ID); }
+inline ActionMenuItem& getMenuStatusCardsHrts() { return getActionItemById(MENU_STATUS_CARDS_HRTS_ID); }
+inline ActionMenuItem& getMenuStatusCardsDmnd() { return getActionItemById(MENU_STATUS_CARDS_DMND_ID); }
 inline SubMenuItem& getMenuStatus() { return getSubMenuById(MENU_STATUS_ID); }
-inline AnalogMenuItem& getMenuActual() { return getAnalogItemById(MENU_STATUS_CURRENT_ID); }
-inline AnalogMenuItem& getMenuMotor() { return getAnalogItemById(MENU_STATUS_MOTOR_ID); }
-inline AnalogMenuItem& getMenuWoW() { return getAnalogItemById(MENU_STATUS_WO_W_ID); }
+inline AnalogMenuItem& getMenuStatusCurrent() { return getAnalogItemById(MENU_STATUS_CURRENT_ID); }
+inline AnalogMenuItem& getMenuStatusMotor() { return getAnalogItemById(MENU_STATUS_MOTOR_ID); }
+inline AnalogMenuItem& getMenuStatusWoW() { return getAnalogItemById(MENU_STATUS_WO_W_ID); }
 inline SubMenuItem& getMenuSettings() { return getSubMenuById(MENU_SETTINGS_ID); }
-inline AnalogMenuItem& getMenuOfst33() { return getAnalogItemById(MENU_SETTINGS_OFST33_ID); }
-inline AnalogMenuItem& getMenuOfst45() { return getAnalogItemById(MENU_SETTINGS_OFST45_ID); }
-inline AnalogMenuItem& getMenuOfst78() { return getAnalogItemById(MENU_SETTINGS_OFST78_ID); }
-inline EnumMenuItem& getMenuDefault() { return getEnumItemById(MENU_SETTINGS_DEFAULT_ID); }
-inline ActionMenuItem& getMenuSaveNow() { return getActionItemById(MENU_SETTINGS_SAVE_NOW_ID); }
+inline AnalogMenuItem& getMenuSettingsOfst33() { return getAnalogItemById(MENU_SETTINGS_OFST33_ID); }
+inline AnalogMenuItem& getMenuSettingsOfst45() { return getAnalogItemById(MENU_SETTINGS_OFST45_ID); }
+inline AnalogMenuItem& getMenuSettingsOfst78() { return getAnalogItemById(MENU_SETTINGS_OFST78_ID); }
+inline EnumMenuItem& getMenuSettingsDefault() { return getEnumItemById(MENU_SETTINGS_DEFAULT_ID); }
+inline ActionMenuItem& getMenuSettingsSaveNow() { return getActionItemById(MENU_SETTINGS_SAVE_NOW_ID); }
 inline SubMenuItem& getMenuMoreItems() { return getSubMenuById(MENU_MORE_ITEMS_ID); }
-inline EnumMenuItem& getMenuOptions() { return getEnumItemById(MENU_MORE_ITEMS_OPTIONS_ID); }
-inline BooleanMenuItem& getMenuToppings() { return getBooleanItemById(MENU_MORE_ITEMS_TOPPINGS_ID); }
-inline BooleanMenuItem& getMenuPower() { return getBooleanItemById(MENU_MORE_ITEMS_POWER_ID); }
-inline ActionMenuItem& getMenuSave() { return getActionItemById(MENU_MORE_ITEMS_PRESS_ME_ID); }
-inline FloatMenuItem& getMenuNumber() { return getFloatItemById(MENU_MORE_ITEMS_NUMBER_ID); }
-inline ScrollChoiceMenuItem& getMenuScroll() { return getScrollChoiceItemById(MENU_MORE_ITEMS_SCROLL_ID); }
+inline EnumMenuItem& getMenuMoreItemsOptions() { return getEnumItemById(MENU_MORE_ITEMS_OPTIONS_ID); }
+inline BooleanMenuItem& getMenuMoreItemsToppings() { return getBooleanItemById(MENU_MORE_ITEMS_TOPPINGS_ID); }
+inline BooleanMenuItem& getMenuMoreItemsPower() { return getBooleanItemById(MENU_MORE_ITEMS_POWER_ID); }
+inline ActionMenuItem& getMenuMoreItemsPressMe() { return getActionItemById(MENU_MORE_ITEMS_PRESS_ME_ID); }
+inline FloatMenuItem& getMenuMoreItemsNumber() { return getFloatItemById(MENU_MORE_ITEMS_NUMBER_ID); }
+inline ScrollChoiceMenuItem& getMenuMoreItemsScroll() { return getScrollChoiceItemById(MENU_MORE_ITEMS_SCROLL_ID); }
 inline SubMenuItem& getMenuRuntimes() { return getSubMenuById(MENU_RUNTIMES_ID); }
-inline TextMenuItem& getMenuText() { return getTextItemById(MENU_RUNTIMES_TEXT_ID); }
-inline ListRuntimeMenuItem& getMenuCustomList() { return getListItemById(MENU_RUNTIMES_CUSTOM_LIST_ID); }
-inline RemoteMenuItem& getMenuIoTMonitor() { return getIoTRemoteMenuById(MENU_IO_T_MONITOR_ID); }
-inline EepromAuthenticationInfoMenuItem& getMenuAuthenticator() { return getAuthenticationMenuById(MENU_AUTHENTICATOR_ID); }
-inline AnalogMenuItem& getMenuHalves1() { return getAnalogItemById(MENU_HALVES1_ID); }
-inline EditableLargeNumberMenuItem& getMenuLgeNum1() { return getLargeNumberItemById(MENU_LGE_NUM1_ID); }
+inline TextMenuItem& getMenuRuntimesText() { return getTextItemById(MENU_RUNTIMES_TEXT_ID); }
+inline ListRuntimeMenuItem& getMenuRuntimesCustomList() { return getListItemById(MENU_RUNTIMES_CUSTOM_LIST_ID); }
+inline RemoteMenuItem& getMenuRuntimesIoTMonitor() { return getIoTRemoteMenuById(MENU_RUNTIMES_IO_TMONITOR_ID); }
+inline EepromAuthenticationInfoMenuItem& getMenuRuntimesAuthenticator() { return getAuthenticationMenuById(MENU_RUNTIMES_AUTHENTICATOR_ID); }
+inline AnalogMenuItem& getMenuRuntimesHalves1() { return getAnalogItemById(MENU_RUNTIMES_HALVES1_ID); }
+inline EditableLargeNumberMenuItem& getMenuRuntimesLgeNum1() { return getLargeNumberItemById(MENU_RUNTIMES_LGE_NUM1_ID); }
 inline AnalogMenuItem& getMenuDecimal() { return getAnalogItemById(MENU_DECIMAL_ID); }
 inline EnumMenuItem& getMenuDecimalStep() { return getEnumItemById(MENU_DECIMAL_STEP_ID); }
 

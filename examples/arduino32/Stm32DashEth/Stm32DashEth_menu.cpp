@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for STM32Duino by TcMenu 4.5.6-SNAPSHOT on 2026-05-11T16:41:07.122529Z.
+// Generated for STM32Duino by TcMenu 4.5.8 on 2026-05-18T12:46:52.450640512Z.
 
 #include <tcMenu.h>
 #include "Stm32DashEth_menu.h"
@@ -336,9 +336,9 @@ void setupMenu() {
         installMonoInverseTitleTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(u8g2_font_prospero_bold_nbp_tr, 1), true, BaseGraphicalRenderer::NO_TITLE, false);
 
     // We have an IoT monitor, register the server
-    getMenuIoTMonitor().setRemoteServer(remoteServer);
+    getMenuRuntimesIoTMonitor().setRemoteServer(remoteServer);
 
     // We have an EEPROM authenticator, it needs initialising
-    getMenuAuthenticator().init();
+    getMenuRuntimesAuthenticator().init();
 }
 

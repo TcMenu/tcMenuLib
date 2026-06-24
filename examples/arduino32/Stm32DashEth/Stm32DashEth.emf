@@ -1,7 +1,7 @@
 {
   "version": "1.00",
   "projectName": "Example of how a turntable PSU may look with some extra example types",
-  "author": "dave",
+  "author": "root",
   "items": [
     {
       "parentId": 0,

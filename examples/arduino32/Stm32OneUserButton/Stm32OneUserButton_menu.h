@@ -191,6 +191,9 @@ extern const UnicodeFont OpenSansRegular8pt[];
 // Any externals needed by IO expanders, EEPROMs etc
 
 
+// Forward define the menu builder function
+void buildMenu(TcMenuBuilder& builder);
+
 // The following defines all menu item IDs.
 #define MENU_PRESS_ME_ID  19
 #define MENU_TEMP_ID  20
@@ -203,9 +206,9 @@ extern const UnicodeFont OpenSansRegular8pt[];
 inline ActionMenuItem& getMenuPressMe() { return getActionItemById(MENU_PRESS_ME_ID); }
 inline AnalogMenuItem& getMenuTemp() { return getAnalogItemById(MENU_TEMP_ID); }
 inline SubMenuItem& getMenuSettings() { return getSubMenuById(MENU_SETTINGS_ID); }
-inline BooleanMenuItem& getMenuOption() { return getBooleanItemById(MENU_SETTINGS_OPTION_ID); }
-inline AnalogMenuItem& getMenuIntProp() { return getAnalogItemById(MENU_SETTINGS_INT_PROP_ID); }
-inline EnumMenuItem& getMenuEnumProp() { return getEnumItemById(MENU_SETTINGS_ENUM_PROP_ID); }
+inline BooleanMenuItem& getMenuSettingsOption() { return getBooleanItemById(MENU_SETTINGS_OPTION_ID); }
+inline AnalogMenuItem& getMenuSettingsIntProp() { return getAnalogItemById(MENU_SETTINGS_INT_PROP_ID); }
+inline EnumMenuItem& getMenuSettingsEnumProp() { return getEnumItemById(MENU_SETTINGS_ENUM_PROP_ID); }
 
 
 // Provide a wrapper to get hold of the root menu item and export setupMenu

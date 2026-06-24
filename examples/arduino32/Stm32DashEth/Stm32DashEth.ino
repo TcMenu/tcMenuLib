@@ -67,10 +67,13 @@ TitleWidget widgetEthernet(iconsEthernetConnection, 2, 16, 12);
 color_t defaultCardPalette[] = {1, 0, 1, 1};
 
 
+// Declaring as extern any custom RtCalls and scroll variables
+extern char ramDataSet[];
+
 // Declaring any arrays used by enum/list items
-const char* SettingsDefaultEnumEntries[] = { "33", "45", "78" };
-const char* MoreItemsOptionsEnumEntries[] = { "Pizza", "Pasta", "Salad" };
-const char* DecimalStepEnumEntries[] = { "1x", "2x", "4x" };
+const char* strSettingsDefaultEnumEntries[] = { "33", "45", "78" };
+const char* strMoreItemsOptionsEnumEntries[] = { "Pizza", "Pasta", "Salad" };
+const char* strDecimalStepEnumEntries[] = { "1x", "2x", "4x" };
 
 void buildMenu(TcMenuBuilder& builder) {
     builder        .actionItem(MENU_33_ID, "33", NoMenuFlags, nullptr)
@@ -97,11 +100,11 @@ void buildMenu(TcMenuBuilder& builder) {
                 .offset(-5000).divisor(1000).step(1).maxValue(10000).unit("%").endItem()
             .analogBuilder(MENU_SETTINGS_OFST78_ID, "Ofst78", 29, NoMenuFlags, 5000, nullptr)
                 .offset(-5000).divisor(1000).step(1).maxValue(10000).unit("%").endItem()
-            .enumItem(MENU_SETTINGS_DEFAULT_ID, "Default", DONT_SAVE, SettingsDefaultEnumEntries, 3, NoMenuFlags, 0, nullptr)
+            .enumItem(MENU_SETTINGS_DEFAULT_ID, "Default", DONT_SAVE, strSettingsDefaultEnumEntries, 3, NoMenuFlags, 0, nullptr)
             .actionItem(MENU_SETTINGS_SAVE_NOW_ID, "Save Now", NoMenuFlags, nullptr)
             .endSub()
         .subMenu(MENU_MORE_ITEMS_ID, "More Items", NoMenuFlags, nullptr)
-            .enumItem(MENU_MORE_ITEMS_OPTIONS_ID, "Options", 14, MoreItemsOptionsEnumEntries, 3, NoMenuFlags, 0, nullptr)
+            .enumItem(MENU_MORE_ITEMS_OPTIONS_ID, "Options", 14, strMoreItemsOptionsEnumEntries, 3, NoMenuFlags, 0, nullptr)
             .boolItem(MENU_MORE_ITEMS_TOPPINGS_ID, "Toppings", 16, NAMING_YES_NO, NoMenuFlags, false, nullptr)
             .boolItem(MENU_MORE_ITEMS_POWER_ID, "Power", 17, NAMING_ON_OFF, NoMenuFlags, false, nullptr)
             .actionItem(MENU_MORE_ITEMS_PRESS_ME_ID, "Save", NoMenuFlags, saveWasPressed)
@@ -111,15 +114,15 @@ void buildMenu(TcMenuBuilder& builder) {
         .subMenu(MENU_RUNTIMES_ID, "Runtimes", NoMenuFlags, nullptr)
             .textItem(MENU_RUNTIMES_TEXT_ID, "Text", 18, 5, NoMenuFlags, "", nullptr)
             .listItemRtCustom(MENU_RUNTIMES_CUSTOM_LIST_ID, "Custom List", 0, fnRuntimesCustomListRtCall, NoMenuFlags, nullptr)
-            .remoteConnectivityMonitor(MENU_IO_T_MONITOR_ID, "IoT Monitor", NoMenuFlags)
-            .eepromAuthenticationItem(MENU_AUTHENTICATOR_ID, "Authenticator", NoMenuFlags, nullptr)
-            .analogBuilder(MENU_HALVES1_ID, "Halves1", DONT_SAVE, NoMenuFlags, 0, nullptr)
+            .remoteConnectivityMonitor(MENU_RUNTIMES_IO_TMONITOR_ID, "IoT Monitor", NoMenuFlags)
+            .eepromAuthenticationItem(MENU_RUNTIMES_AUTHENTICATOR_ID, "Authenticator", NoMenuFlags, nullptr)
+            .analogBuilder(MENU_RUNTIMES_HALVES1_ID, "Halves1", DONT_SAVE, NoMenuFlags, 0, nullptr)
                 .offset(0).divisor(2).step(1).maxValue(255).unit("dB").endItem()
-            .largeNumberItem(MENU_LGE_NUM1_ID, "Lge Num1", DONT_SAVE, LargeFixedNumber(9, 3, 0U, 0U, false), true, NoMenuFlags, largeNumDidChange)
+            .largeNumberItem(MENU_RUNTIMES_LGE_NUM1_ID, "Lge Num1", DONT_SAVE, LargeFixedNumber(9, 3, 0U, 0U, false), true, NoMenuFlags, largeNumDidChange)
             .endSub()
         .analogBuilder(MENU_DECIMAL_ID, "Decimal", 2, NoMenuFlags, 0, decimalDidChange)
             .offset(0).divisor(10).step(1).maxValue(1000).unit("d").endItem()
-        .enumItem(MENU_DECIMAL_STEP_ID, "Decimal Step", 23, DecimalStepEnumEntries, 3, NoMenuFlags, 0, onDecimalStepChange);
+        .enumItem(MENU_DECIMAL_STEP_ID, "Decimal Step", 23, strDecimalStepEnumEntries, 3, NoMenuFlags, 0, onDecimalStepChange);
 }
 
 void overrideDrawingForMainMenu(TcThemeBuilder& themeBuilder) {
@@ -167,7 +170,7 @@ void overrideDrawingForMainMenu(TcThemeBuilder& themeBuilder) {
             .onRow(4)
             .withDrawingMode(tcgfx::GridPosition::DRAW_AS_ICON_ONLY).apply();
 
-    themeBuilder.menuItemOverride(getMenuCards())
+    themeBuilder.menuItemOverride(getMenuStatusCards())
             .withImageXbmp(Coord(32, 32), cardIconBitmap)
             .onRow(5)
             .withPalette(defaultCardPalette)
@@ -177,7 +180,7 @@ void overrideDrawingForMainMenu(TcThemeBuilder& themeBuilder) {
 
 void overrideDrawingForCardMenu(TcThemeBuilder& themeBuilder) {
     // override  back button on the card menu to be the default 32x32 back icon
-    themeBuilder.menuItemOverride(*(getMenuCards().getChild()))
+    themeBuilder.menuItemOverride(*(getMenuStatusCards().getChild()))
             .withJustification(tcgfx::GridPosition::JUSTIFY_CENTER_WITH_VALUE)
             .withPadding(MenuPadding(2))
             .withPalette(defaultCardPalette)
@@ -186,7 +189,7 @@ void overrideDrawingForCardMenu(TcThemeBuilder& themeBuilder) {
             .apply();
 
     // override every single item on the card sub menu to have larger font and different padding/justification
-    themeBuilder.submenuPropertiesActionOverride(getMenuCards())
+    themeBuilder.submenuPropertiesActionOverride(getMenuStatusCards())
             .withJustification(tcgfx::GridPosition::JUSTIFY_CENTER_NO_VALUE)
             .withNativeFont(u8g2_font_inb16_mf, 1)
             .withPadding(MenuPadding(2))
@@ -199,7 +202,7 @@ void setupCardLayoutAndWidgets() {
 
     // enable card layout providing the left and right icons. This enables for root menu
     themeBuilder.enableCardLayoutWithXbmImages(Coord(11, 22), ArrowHoriz11x22BitmapLeft, ArrowHoriz11x22BitmapRight, true)
-        .setMenuAsCard(getMenuCards(), true);
+        .setMenuAsCard(getMenuStatusCards(), true);
 
     // these two functions, defined directly above this one configure the icons and special text arrangements for
     // the items in the card layouts.
@@ -220,7 +223,7 @@ void setupCardLayoutAndWidgets() {
 
     // for the connectivity icon, we use the IoT monitors notification pass through. It tells us of any changes
     // for all incoming connections in one place.
-    getMenuIoTMonitor().registerCommsNotification([](CommunicationInfo ci) {
+    getMenuRuntimesIoTMonitor().registerCommsNotification([](CommunicationInfo ci) {
         widgetConnection.setCurrentState(ci.connected ? 1 : 0);
     });
 }
@@ -265,7 +268,7 @@ void setup() {
     });
 
     // set the list to have 10 rows, for each row the custom callback further down will be called to get the value.
-    getMenuCustomList().setNumberOfRows(10);
+    getMenuRuntimesCustomList().setNumberOfRows(10);
 
     // now we set up the layouts to make the card view look right.
     setupCardLayoutAndWidgets();

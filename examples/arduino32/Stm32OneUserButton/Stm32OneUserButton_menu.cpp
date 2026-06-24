@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for STM32Duino by TcMenu 4.5.4 on 2026-04-18T09:52:13.405505600Z.
+// Generated for STM32Duino by TcMenu 4.5.7 on 2026-05-18T10:19:46.223421798Z.
 
 #include <tcMenu.h>
 #include "Stm32OneUserButton_menu.h"
@@ -256,22 +256,6 @@ TcOneButtonHandler oneButtonHandler(USER_BTN, 250);
 NoInitialisationNeeded serialInitializer;
 SerialTagValueTransport serialTransport(&Serial);
 TagValueRemoteServerConnection serialConnection(serialTransport, serialInitializer);
-
-// Declaring any arrays used by enum/list items
-const char* SettingsEnumPropEnumEntries[] = { "Item1", "Item2", "Item3" };
-
-void buildMenu(TcMenuBuilder& builder) {
-    builder.usingDynamicEEPROMStorage()
-        .actionItem(MENU_PRESS_ME_ID, "Press Me", NoMenuFlags, onPressMe)
-        .analogBuilder(MENU_TEMP_ID, "Temp", DONT_SAVE, NoMenuFlags, 0, nullptr)
-            .offset(0).divisor(1).step(1).maxValue(100).unit("%").endItem()
-        .subMenu(MENU_SETTINGS_ID, "Settings", NoMenuFlags, nullptr)
-            .boolItem(MENU_SETTINGS_OPTION_ID, "Option", DONT_SAVE, NAMING_TRUE_FALSE, NoMenuFlags, false, nullptr)
-            .analogBuilder(MENU_SETTINGS_INT_PROP_ID, "IntProp", DONT_SAVE, NoMenuFlags, 0, nullptr)
-                .offset(0).divisor(1).step(1).maxValue(10).unit("A").endItem()
-            .enumItem(MENU_SETTINGS_ENUM_PROP_ID, "EnumProp", DONT_SAVE, SettingsEnumPropEnumEntries, 3, NoMenuFlags, 0, nullptr)
-            .endSub();
-}
 
 void setupMenu() {
     // First we set up eeprom and authentication (if needed).
