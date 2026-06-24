@@ -17,6 +17,7 @@
 #include <ArduinoBLE.h>
 // and stock icons that include things like Wi-Fi and connectivity icons.
 #include "stockIcons/wifiAndConnectionIcons16x12.h"
+#include "TemperatureDashboard.h"
 
 // on the analog menu, we both have an analog input and an analog output (PWM). Change as appropriate.
 constexpr int analogInputPin = A0;
@@ -88,6 +89,9 @@ void setup() {
         else if(BLE.rssi() > 55) bleRssiWidget.setCurrentState(3);
         else bleRssiWidget.setCurrentState(4);
     });
+
+    // See the TemperatureDashboard.cpp file for the dashboard implementation.
+    setupDashboard();
 
     // then we initialise our sensor and motion detection and register with task manager.
     sensorManager.initialise();
