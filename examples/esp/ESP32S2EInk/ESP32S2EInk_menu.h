@@ -292,15 +292,15 @@ void buildMenu(TcMenuBuilder& builder);
 #define MENU_EXTRAS_COLOR_ID  12
 #define MENU_EXTRAS_MY_LIST_ID  13
 #define MENU_CONNECTIVITY_ID  14
-#define MENU_CONNECTIVITY_S_S_I_D_ID  16
+#define MENU_CONNECTIVITY_SSID_ID  16
 #define MENU_CONNECTIVITY_PASSCODE_ID  17
 #define MENU_CONNECTIVITY_WI_FI_MODE_ID  18
-#define MENU_CONNECTIVITY_I_P_ADDRESS_ID  15
-#define MENU_CONNECTIVITY_IO_T_MONITOR_ID  19
+#define MENU_CONNECTIVITY_IPADDRESS_ID  15
+#define MENU_CONNECTIVITY_IO_TMONITOR_ID  19
 #define MENU_CONNECTIVITY_AUTHENTICATOR_ID  20
-#define MENU_IO_T_SETUP_ID  22
-#define MENU_I_P_ADDR_ID  23
-#define MENU_IO_T_MONITOR1_ID  24
+#define MENU_IO_TSETUP_ID  22
+#define MENU_IO_TSETUP_IPADDR_ID  23
+#define MENU_IO_TSETUP_IO_TMONITOR1_ID  24
 
 // Inline helper methods to access menu items
 inline ActionMenuItem& getMenuHibernate() { return getActionItemById(MENU_HIBERNATE_ID); }
@@ -310,19 +310,19 @@ inline AnalogMenuItem& getMenuHalves() { return getAnalogItemById(MENU_HALVES_ID
 inline EnumMenuItem& getMenuFoods() { return getEnumItemById(MENU_FOODS_ID); }
 inline BooleanMenuItem& getMenuDoorOpen() { return getBooleanItemById(MENU_DOOR_OPEN_ID); }
 inline SubMenuItem& getMenuExtras() { return getSubMenuById(MENU_EXTRAS_ID); }
-inline TextMenuItem& getMenuText() { return getTextItemById(MENU_EXTRAS_TEXT_ID); }
-inline Rgb32MenuItem& getMenuColor() { return getRgb32ItemById(MENU_EXTRAS_COLOR_ID); }
-inline ListRuntimeMenuItem& getMenuMyList() { return getListItemById(MENU_EXTRAS_MY_LIST_ID); }
+inline TextMenuItem& getMenuExtrasText() { return getTextItemById(MENU_EXTRAS_TEXT_ID); }
+inline Rgb32MenuItem& getMenuExtrasColor() { return getRgb32ItemById(MENU_EXTRAS_COLOR_ID); }
+inline ListRuntimeMenuItem& getMenuExtrasMyList() { return getListItemById(MENU_EXTRAS_MY_LIST_ID); }
 inline SubMenuItem& getMenuConnectivity() { return getSubMenuById(MENU_CONNECTIVITY_ID); }
-inline TextMenuItem& getMenuSSID() { return getTextItemById(MENU_CONNECTIVITY_S_S_I_D_ID); }
-inline TextMenuItem& getMenuPasscode() { return getTextItemById(MENU_CONNECTIVITY_PASSCODE_ID); }
-inline EnumMenuItem& getMenuWiFiMode() { return getEnumItemById(MENU_CONNECTIVITY_WI_FI_MODE_ID); }
-inline IpAddressMenuItem& getMenuIPAddress() { return getIpAddressItemById(MENU_CONNECTIVITY_I_P_ADDRESS_ID); }
-inline RemoteMenuItem& getMenuIoTMonitor() { return getIoTRemoteMenuById(MENU_CONNECTIVITY_IO_T_MONITOR_ID); }
-inline EepromAuthenticationInfoMenuItem& getMenuAuthenticator() { return getAuthenticationMenuById(MENU_CONNECTIVITY_AUTHENTICATOR_ID); }
-inline SubMenuItem& getMenuIoTSetup() { return getSubMenuById(MENU_IO_T_SETUP_ID); }
-inline IpAddressMenuItem& getMenuIPAddr() { return getIpAddressItemById(MENU_I_P_ADDR_ID); }
-inline RemoteMenuItem& getMenuIoTMonitor1() { return getIoTRemoteMenuById(MENU_IO_T_MONITOR1_ID); }
+inline TextMenuItem& getMenuConnectivitySSID() { return getTextItemById(MENU_CONNECTIVITY_SSID_ID); }
+inline TextMenuItem& getMenuConnectivityPasscode() { return getTextItemById(MENU_CONNECTIVITY_PASSCODE_ID); }
+inline EnumMenuItem& getMenuConnectivityWiFiMode() { return getEnumItemById(MENU_CONNECTIVITY_WI_FI_MODE_ID); }
+inline IpAddressMenuItem& getMenuConnectivityIPAddress() { return getIpAddressItemById(MENU_CONNECTIVITY_IPADDRESS_ID); }
+inline RemoteMenuItem& getMenuConnectivityIoTMonitor() { return getIoTRemoteMenuById(MENU_CONNECTIVITY_IO_TMONITOR_ID); }
+inline EepromAuthenticationInfoMenuItem& getMenuConnectivityAuthenticator() { return getAuthenticationMenuById(MENU_CONNECTIVITY_AUTHENTICATOR_ID); }
+inline SubMenuItem& getMenuIoTSetup() { return getSubMenuById(MENU_IO_TSETUP_ID); }
+inline IpAddressMenuItem& getMenuIoTSetupIPAddr() { return getIpAddressItemById(MENU_IO_TSETUP_IPADDR_ID); }
+inline RemoteMenuItem& getMenuIoTSetupIoTMonitor1() { return getIoTRemoteMenuById(MENU_IO_TSETUP_IO_TMONITOR1_ID); }
 
 
 // Provide a wrapper to get hold of the root menu item and export setupMenu

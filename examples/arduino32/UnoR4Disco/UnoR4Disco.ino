@@ -66,12 +66,12 @@ void buildMenu(TcMenuBuilder& builder) {
             .actionItem(MENU_SHOW_XBMP_SHOW_IMAGE_ID, "Show Image", NoMenuFlags, onShowXbmp)
             .endSub()
         .subMenu(MENU_ANALOG_ID, "Analog", NoMenuFlags, nullptr)
-            .analogBuilder(MENU_ANALOG_A0_D_A_C_ID, "A0 DAC", DONT_SAVE, NoMenuFlags, 0, onAnalogDacChange)
+            .analogBuilder(MENU_ANALOG_A0_DAC_ID, "A0 DAC", DONT_SAVE, NoMenuFlags, 0, onAnalogDacChange)
                 .offset(0).divisor(1).step(1).maxValue(100).unit("%").endItem()
             .floatItem(MENU_ANALOG_A1_VALUE_ID, "A1 Value", DONT_SAVE, 1, NoMenuFlags, 0.0, nullptr)
             .endSub()
         .subMenu(MENU_WI_FI_ID, "WiFi", NoMenuFlags, nullptr)
-            .ipAddressItem(MENU_WI_FI_I_P_ADDRESS_ID, "IP Address", DONT_SAVE, NoMenuFlags, IpAddressStorage(127, 0, 0, 1), nullptr)
+            .ipAddressItem(MENU_WI_FI_IPADDRESS_ID, "IP Address", DONT_SAVE, NoMenuFlags, IpAddressStorage(127, 0, 0, 1), nullptr)
             .boolItem(MENU_WI_FI_CONNECTED_ID, "Connected", DONT_SAVE, NAMING_YES_NO, NoMenuFlags, false, nullptr)
             .endSub();
 }
@@ -89,10 +89,10 @@ void setup() {
 
     setupMenu();
 
-    getMenuXbmp().setNumberOfRows(2);
+    getMenuShowXbmpXbmp().setNumberOfRows(2);
 
     taskManager.schedule(repeatSeconds(1), [] {
-        getMenuA1Value().setFloatValue(internalAnalogDevice().getCurrentFloat(A1) * analogReference());
+        getMenuAnalogA1Value().setFloatValue(internalAnalogDevice().getCurrentFloat(A1) * analogReference());
         if(!wifiFailed) {
             wifiWidget.setCurrentState(fromWiFiRSSITo4StateIndicator(WiFi.RSSI()));
         }
@@ -103,7 +103,7 @@ void setup() {
         serlogF(SER_ERROR, "WiFi module failure");
         wifiFailed = true;
         wifiWidget.setCurrentState(0);
-        getMenuConnected().setBoolean(false);
+        getMenuWiFiConnected().setBoolean(false);
     }
 
     if(!wifiFailed) {
@@ -146,7 +146,7 @@ int CALLBACK_FUNCTION fnShowXbmpXbmpRtCall(RuntimeMenuItem* item, uint8_t row, R
 
 void CALLBACK_FUNCTION onStartDisco(int id) {
     // called when the start disco action is clicked. We start the disco!
-    discoTime.start(getMenuSpeed().getCurrentValue() * 20);
+    discoTime.start(getMenuDiscoSpeed().getCurrentValue() * 20);
 }
 
 
@@ -154,7 +154,7 @@ void CALLBACK_FUNCTION onShowXbmp(int id) {
     // called whenever the start xbitmap is called, it shows how to convert
     // an XBitmap onto the LEDs.
     GFXcanvas1 canvas(12, 8);
-    auto imgIdx = getMenuXbmp().getCurrentValue();
+    auto imgIdx = getMenuShowXbmpXbmp().getCurrentValue();
     if(imgIdx < 0 || imgIdx >= NUMBER_OF_XBMPS) return;
 
     discoTime.picture(imageWithDescription[imgIdx].getData());
@@ -163,7 +163,7 @@ void CALLBACK_FUNCTION onShowXbmp(int id) {
 
 void CALLBACK_FUNCTION onAnalogDacChange(int id) {
     // here we take the current value of the DAC menu item and put it onto the dac.
-    internalAnalogDevice().setCurrentFloat(DAC, getMenuA0DAC().getCurrentValue() / 100.0F);
+    internalAnalogDevice().setCurrentFloat(DAC, getMenuAnalogA0DAC().getCurrentValue() / 100.0F);
 }
 
 

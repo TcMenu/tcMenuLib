@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for Arduino 32bit ARM by TcMenu 4.5.6 on 2026-05-13T10:12:58.765036145Z.
+// Generated for Arduino ESP32 by TcMenu 4.5.7 on 2026-05-18T08:03:04.614232Z.
 
 #include <tcMenu.h>
 #include "ESP32S3Tiny_menu.h"
@@ -646,7 +646,7 @@ void AdafruitCanvasDrawable2bpp::drawBitmapNbpp(const Coord& where, const uint8_
 #include <Fonts/OpenSansRegular10pt.h>
 
 // Global variable declarations
-const  ConnectorLocalInfo applicationInfo = { "ESP32 S3 Tiny", "c035e186-32cc-45e4-ac28-773f57e108ee" };
+const PROGMEM  ConnectorLocalInfo applicationInfo = { "ESP32 S3 Tiny", "c035e186-32cc-45e4-ac28-773f57e108ee" };
 
 Adafruit_ST7735 gfx(&SPI, 34, 7, 6);
 AdafruitDrawable gfxDrawable(&gfx, 40);

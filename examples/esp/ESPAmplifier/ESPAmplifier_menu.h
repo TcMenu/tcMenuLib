@@ -276,55 +276,55 @@ void buildMenu(TcMenuBuilder& builder);
 #define MENU_DIRECT_ID  3
 #define MENU_MUTE_ID  4
 #define MENU_SETTINGS_ID  5
-#define MENU_CHANNEL_SETTINGS_ID  7
+#define MENU_SETTINGS_CHANNEL_SETTINGS_ID  7
 #define MENU_CHANNEL_SETTINGS_CHANNEL_ID  23
 #define MENU_CHANNEL_SETTINGS_LEVEL_TRIM_ID  8
 #define MENU_CHANNEL_SETTINGS_NAME_ID  22
 #define MENU_CHANNEL_SETTINGS_UPDATE_SETTINGS_ID  24
 #define MENU_SETTINGS_WARM_UP_TIME_ID  11
 #define MENU_SETTINGS_VALVE_HEATING_ID  17
-#define MENU_SAVE_SETTINGS_ID  25
+#define MENU_SETTINGS_SAVE_SETTINGS_ID  25
 #define MENU_STATUS_ID  6
-#define MENU_AMP_STATUS_ID  14
-#define MENU_STATUS_LEFT_V_U_ID  15
-#define MENU_RIGHT_V_U_ID  16
-#define MENU_SHOW_DIALOGS_ID  20
+#define MENU_STATUS_AMP_STATUS_ID  14
+#define MENU_STATUS_LEFT_VU_ID  15
+#define MENU_STATUS_RIGHT_VU_ID  16
+#define MENU_STATUS_SHOW_DIALOGS_ID  20
 #define MENU_STATUS_DATA_LIST_ID  21
 #define MENU_STATUS_TEST_ID  28
 #define MENU_CONNECTIVITY_ID  12
-#define MENU_I_P_ADDRESS_ID  13
-#define MENU_SSID_ID  18
-#define MENU_PASSCODE_ID  19
-#define MENU_CONNECTIVITY_IO_T_MONITOR_ID  26
+#define MENU_CONNECTIVITY_IPADDRESS_ID  13
+#define MENU_CONNECTIVITY_SSID_ID  18
+#define MENU_CONNECTIVITY_PASSCODE_ID  19
+#define MENU_CONNECTIVITY_IO_TMONITOR_ID  26
 #define MENU_CONNECTIVITY_AUTHENTICATOR_ID  27
 
 // Inline helper methods to access menu items
 inline AnalogMenuItem& getMenuVolume() { return getAnalogItemById(MENU_VOLUME_ID); }
-inline ScrollChoiceMenuItem& getMenuChannel() { return getScrollChoiceItemById(MENU_CHANNELS_ID); }
+inline ScrollChoiceMenuItem& getMenuChannels() { return getScrollChoiceItemById(MENU_CHANNELS_ID); }
 inline BooleanMenuItem& getMenuDirect() { return getBooleanItemById(MENU_DIRECT_ID); }
 inline BooleanMenuItem& getMenuMute() { return getBooleanItemById(MENU_MUTE_ID); }
 inline SubMenuItem& getMenuSettings() { return getSubMenuById(MENU_SETTINGS_ID); }
-inline SubMenuItem& getMenuChannelSettings() { return getSubMenuById(MENU_CHANNEL_SETTINGS_ID); }
-inline ScrollChoiceMenuItem& getMenuChannelNum() { return getScrollChoiceItemById(MENU_CHANNEL_SETTINGS_CHANNEL_ID); }
-inline AnalogMenuItem& getMenuLevelTrim() { return getAnalogItemById(MENU_CHANNEL_SETTINGS_LEVEL_TRIM_ID); }
-inline TextMenuItem& getMenuName() { return getTextItemById(MENU_CHANNEL_SETTINGS_NAME_ID); }
-inline ActionMenuItem& getMenuUpdateSettings() { return getActionItemById(MENU_CHANNEL_SETTINGS_UPDATE_SETTINGS_ID); }
-inline AnalogMenuItem& getMenuWarmUpTime() { return getAnalogItemById(MENU_SETTINGS_WARM_UP_TIME_ID); }
-inline AnalogMenuItem& getMenuValveHeating() { return getAnalogItemById(MENU_SETTINGS_VALVE_HEATING_ID); }
-inline ActionMenuItem& getMenuSaveSettings() { return getActionItemById(MENU_SAVE_SETTINGS_ID); }
+inline SubMenuItem& getMenuSettingsChannelSettings() { return getSubMenuById(MENU_SETTINGS_CHANNEL_SETTINGS_ID); }
+inline ScrollChoiceMenuItem& getMenuChannelSettingsChannel() { return getScrollChoiceItemById(MENU_CHANNEL_SETTINGS_CHANNEL_ID); }
+inline AnalogMenuItem& getMenuChannelSettingsLevelTrim() { return getAnalogItemById(MENU_CHANNEL_SETTINGS_LEVEL_TRIM_ID); }
+inline TextMenuItem& getMenuChannelSettingsName() { return getTextItemById(MENU_CHANNEL_SETTINGS_NAME_ID); }
+inline ActionMenuItem& getMenuChannelSettingsUpdateSettings() { return getActionItemById(MENU_CHANNEL_SETTINGS_UPDATE_SETTINGS_ID); }
+inline AnalogMenuItem& getMenuSettingsWarmUpTime() { return getAnalogItemById(MENU_SETTINGS_WARM_UP_TIME_ID); }
+inline AnalogMenuItem& getMenuSettingsValveHeating() { return getAnalogItemById(MENU_SETTINGS_VALVE_HEATING_ID); }
+inline ActionMenuItem& getMenuSettingsSaveSettings() { return getActionItemById(MENU_SETTINGS_SAVE_SETTINGS_ID); }
 inline SubMenuItem& getMenuStatus() { return getSubMenuById(MENU_STATUS_ID); }
-inline EnumMenuItem& getMenuAmpStatus() { return getEnumItemById(MENU_AMP_STATUS_ID); }
-inline AnalogMenuItem& getMenuLeftVU() { return getAnalogItemById(MENU_STATUS_LEFT_V_U_ID); }
-inline AnalogMenuItem& getMenuRightVU() { return getAnalogItemById(MENU_RIGHT_V_U_ID); }
-inline ActionMenuItem& getMenuShowDialogs() { return getActionItemById(MENU_SHOW_DIALOGS_ID); }
-inline ListRuntimeMenuItem& getMenuDataList() { return getListItemById(MENU_STATUS_DATA_LIST_ID); }
-inline AnalogMenuItem& getMenuTest() { return getAnalogItemById(MENU_STATUS_TEST_ID); }
+inline EnumMenuItem& getMenuStatusAmpStatus() { return getEnumItemById(MENU_STATUS_AMP_STATUS_ID); }
+inline AnalogMenuItem& getMenuStatusLeftVU() { return getAnalogItemById(MENU_STATUS_LEFT_VU_ID); }
+inline AnalogMenuItem& getMenuStatusRightVU() { return getAnalogItemById(MENU_STATUS_RIGHT_VU_ID); }
+inline ActionMenuItem& getMenuStatusShowDialogs() { return getActionItemById(MENU_STATUS_SHOW_DIALOGS_ID); }
+inline ListRuntimeMenuItem& getMenuStatusDataList() { return getListItemById(MENU_STATUS_DATA_LIST_ID); }
+inline AnalogMenuItem& getMenuStatusTest() { return getAnalogItemById(MENU_STATUS_TEST_ID); }
 inline SubMenuItem& getMenuConnectivity() { return getSubMenuById(MENU_CONNECTIVITY_ID); }
-inline IpAddressMenuItem& getMenuIPAddress() { return getIpAddressItemById(MENU_I_P_ADDRESS_ID); }
-inline TextMenuItem& getMenuSSID() { return getTextItemById(MENU_SSID_ID); }
-inline TextMenuItem& getMenuPasscode() { return getTextItemById(MENU_PASSCODE_ID); }
-inline RemoteMenuItem& getMenuIoTMonitor() { return getIoTRemoteMenuById(MENU_CONNECTIVITY_IO_T_MONITOR_ID); }
-inline EepromAuthenticationInfoMenuItem& getMenuAuthenticator() { return getAuthenticationMenuById(MENU_CONNECTIVITY_AUTHENTICATOR_ID); }
+inline IpAddressMenuItem& getMenuConnectivityIPAddress() { return getIpAddressItemById(MENU_CONNECTIVITY_IPADDRESS_ID); }
+inline TextMenuItem& getMenuConnectivitySSID() { return getTextItemById(MENU_CONNECTIVITY_SSID_ID); }
+inline TextMenuItem& getMenuConnectivityPasscode() { return getTextItemById(MENU_CONNECTIVITY_PASSCODE_ID); }
+inline RemoteMenuItem& getMenuConnectivityIoTMonitor() { return getIoTRemoteMenuById(MENU_CONNECTIVITY_IO_TMONITOR_ID); }
+inline EepromAuthenticationInfoMenuItem& getMenuConnectivityAuthenticator() { return getAuthenticationMenuById(MENU_CONNECTIVITY_AUTHENTICATOR_ID); }
 
 
 // Provide a wrapper to get hold of the root menu item and export setupMenu

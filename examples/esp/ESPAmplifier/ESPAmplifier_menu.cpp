@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for Arduino ESP32 by TcMenu 4.5.7 on 2026-05-16T09:53:47.737147Z.
+// Generated for Arduino ESP32 by TcMenu 4.5.7 on 2026-05-17T09:13:32.122582Z.
 
 #include <tcMenu.h>
 #include "ESPAmplifier_menu.h"
@@ -445,9 +445,9 @@ void setupMenu() {
         installCoolBlueModernTheme(renderer, MenuFontDef(nullptr, 4), MenuFontDef(nullptr, 4), false, BaseGraphicalRenderer::TITLE_ALWAYS, false);
 
     // We have an IoT monitor, register the server
-    getMenuIoTMonitor().setRemoteServer(remoteServer);
+    getMenuConnectivityIoTMonitor().setRemoteServer(remoteServer);
 
     // We have an EEPROM authenticator, it needs initialising
-    getMenuAuthenticator().init();
+    getMenuConnectivityAuthenticator().init();
 }
 

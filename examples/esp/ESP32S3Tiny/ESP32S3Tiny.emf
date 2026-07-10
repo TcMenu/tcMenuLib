@@ -1,7 +1,7 @@
 {
   "version": "1.00",
   "projectName": "ESP32 S3 example for S3 Tiny that uses card layout.",
-  "author": "root",
+  "author": "dave",
   "items": [
     {
       "parentId": 0,
@@ -248,7 +248,7 @@
     }
   ],
   "codeOptions": {
-    "embeddedPlatform": "ARDUINO32",
+    "embeddedPlatform": "ARDUINO_ESP32",
     "lastDisplayUuid": "4dcb12ec-13d8-4466-b8b6-bd575eae4612",
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
     "lastRemoteUuids": [

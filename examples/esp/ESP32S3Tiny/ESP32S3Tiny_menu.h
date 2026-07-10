@@ -262,9 +262,9 @@ void buildMenu(TcMenuBuilder& builder);
 #define MENU_NEW_SUB_MENU_COLOR_ID  7
 #define MENU_NEW_SUB_MENU_TEXT_ID  8
 #define MENU_NEW_SUB_MENU_DATE_ID  9
-#define MENU_PERCENT1_ID  10
-#define MENU_TENTHS1_ID  11
-#define MENU_LGE_NUM1_ID  12
+#define MENU_SETTINGS_PERCENT1_ID  10
+#define MENU_SETTINGS_TENTHS1_ID  11
+#define MENU_SETTINGS_LGE_NUM1_ID  12
 #define MENU_MUTE_ID  13
 #define MENU_BATTERY_ID  14
 #define MENU_BATTERY_CHARGE_ID  15
@@ -274,16 +274,16 @@ void buildMenu(TcMenuBuilder& builder);
 
 // Inline helper methods to access menu items
 inline SubMenuItem& getMenuSettings() { return getSubMenuById(MENU_SETTINGS_ID); }
-inline Rgb32MenuItem& getMenuColor() { return getRgb32ItemById(MENU_NEW_SUB_MENU_COLOR_ID); }
-inline TextMenuItem& getMenuText() { return getTextItemById(MENU_NEW_SUB_MENU_TEXT_ID); }
-inline DateFormattedMenuItem& getMenuDate() { return getDateItemById(MENU_NEW_SUB_MENU_DATE_ID); }
-inline AnalogMenuItem& getMenuPercent1() { return getAnalogItemById(MENU_PERCENT1_ID); }
-inline AnalogMenuItem& getMenuTenths1() { return getAnalogItemById(MENU_TENTHS1_ID); }
-inline EditableLargeNumberMenuItem& getMenuLgeNum1() { return getLargeNumberItemById(MENU_LGE_NUM1_ID); }
+inline Rgb32MenuItem& getMenuNewSubMenuColor() { return getRgb32ItemById(MENU_NEW_SUB_MENU_COLOR_ID); }
+inline TextMenuItem& getMenuNewSubMenuText() { return getTextItemById(MENU_NEW_SUB_MENU_TEXT_ID); }
+inline DateFormattedMenuItem& getMenuNewSubMenuDate() { return getDateItemById(MENU_NEW_SUB_MENU_DATE_ID); }
+inline AnalogMenuItem& getMenuSettingsPercent1() { return getAnalogItemById(MENU_SETTINGS_PERCENT1_ID); }
+inline AnalogMenuItem& getMenuSettingsTenths1() { return getAnalogItemById(MENU_SETTINGS_TENTHS1_ID); }
+inline EditableLargeNumberMenuItem& getMenuSettingsLgeNum1() { return getLargeNumberItemById(MENU_SETTINGS_LGE_NUM1_ID); }
 inline BooleanMenuItem& getMenuMute() { return getBooleanItemById(MENU_MUTE_ID); }
 inline SubMenuItem& getMenuBattery() { return getSubMenuById(MENU_BATTERY_ID); }
-inline AnalogMenuItem& getMenuCharge() { return getAnalogItemById(MENU_BATTERY_CHARGE_ID); }
-inline EnumMenuItem& getMenuCondition() { return getEnumItemById(MENU_BATTERY_CONDITION_ID); }
+inline AnalogMenuItem& getMenuBatteryCharge() { return getAnalogItemById(MENU_BATTERY_CHARGE_ID); }
+inline EnumMenuItem& getMenuBatteryCondition() { return getEnumItemById(MENU_BATTERY_CONDITION_ID); }
 inline EnumMenuItem& getMenuFoods() { return getEnumItemById(MENU_FOODS_ID); }
 inline BooleanMenuItem& getMenuToGo() { return getBooleanItemById(MENU_TO_GO_ID); }
 

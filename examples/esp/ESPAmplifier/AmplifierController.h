@@ -48,17 +48,17 @@ public:
     }
 
     uint8_t getChannelInt() {
-        uint8_t ch = getMenuChannel().getCurrentValue();
+        uint8_t ch = getMenuChannels().getCurrentValue();
         if(ch > NUM_CHANNELS) return 0;
         return ch;
     }
 
     void setAmpStatus(AmplifierStatus status) {
-        getMenuAmpStatus().setCurrentValue(status);
+        getMenuStatusAmpStatus().setCurrentValue(status);
     }
 
     AmplifierStatus getAmpStatus() {
-        return static_cast<AmplifierStatus>(getMenuAmpStatus().getCurrentValue());
+        return static_cast<AmplifierStatus>(getMenuStatusAmpStatus().getCurrentValue());
     }
 
     void onVolumeChanged() {

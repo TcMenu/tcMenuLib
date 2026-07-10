@@ -1,7 +1,7 @@
 {
   "version": "1.00",
   "projectName": "Uno R4 disco project that has buttons and TFT",
-  "author": "root",
+  "author": "dave",
   "items": [
     {
       "parentId": 0,

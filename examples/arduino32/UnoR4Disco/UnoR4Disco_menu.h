@@ -382,28 +382,28 @@ void buildMenu(TcMenuBuilder& builder);
 #define MENU_SHOW_XBMP_XBMP_ID  8
 #define MENU_SHOW_XBMP_SHOW_IMAGE_ID  11
 #define MENU_ANALOG_ID  12
-#define MENU_ANALOG_A0_D_A_C_ID  13
+#define MENU_ANALOG_A0_DAC_ID  13
 #define MENU_ANALOG_A1_VALUE_ID  14
 #define MENU_WI_FI_ID  15
-#define MENU_WI_FI_I_P_ADDRESS_ID  16
+#define MENU_WI_FI_IPADDRESS_ID  16
 #define MENU_WI_FI_CONNECTED_ID  17
 
 // Inline helper methods to access menu items
 inline SubMenuItem& getMenuDisco() { return getSubMenuById(MENU_DISCO_ID); }
-inline AnalogMenuItem& getMenuSpeed() { return getAnalogItemById(MENU_DISCO_SPEED_ID); }
-inline ActionMenuItem& getMenuStartDisco() { return getActionItemById(MENU_ZOOM_TEXT_START_ZOOM_ID); }
+inline AnalogMenuItem& getMenuDiscoSpeed() { return getAnalogItemById(MENU_DISCO_SPEED_ID); }
+inline ActionMenuItem& getMenuZoomTextStartZoom() { return getActionItemById(MENU_ZOOM_TEXT_START_ZOOM_ID); }
 inline SubMenuItem& getMenuScrollText() { return getSubMenuById(MENU_SCROLL_TEXT_ID); }
-inline TextMenuItem& getMenuText() { return getTextItemById(MENU_SCROLL_TEXT_TEXT_ID); }
-inline ActionMenuItem& getMenuStartScroll() { return getActionItemById(MENU_SCROLL_TEXT_START_SCROLL_ID); }
+inline TextMenuItem& getMenuScrollTextText() { return getTextItemById(MENU_SCROLL_TEXT_TEXT_ID); }
+inline ActionMenuItem& getMenuScrollTextStartScroll() { return getActionItemById(MENU_SCROLL_TEXT_START_SCROLL_ID); }
 inline SubMenuItem& getMenuShowXbmp() { return getSubMenuById(MENU_SHOW_XBMP_ID); }
-inline ScrollChoiceMenuItem& getMenuXbmp() { return getScrollChoiceItemById(MENU_SHOW_XBMP_XBMP_ID); }
-inline ActionMenuItem& getMenuShowImage() { return getActionItemById(MENU_SHOW_XBMP_SHOW_IMAGE_ID); }
+inline ScrollChoiceMenuItem& getMenuShowXbmpXbmp() { return getScrollChoiceItemById(MENU_SHOW_XBMP_XBMP_ID); }
+inline ActionMenuItem& getMenuShowXbmpShowImage() { return getActionItemById(MENU_SHOW_XBMP_SHOW_IMAGE_ID); }
 inline SubMenuItem& getMenuAnalog() { return getSubMenuById(MENU_ANALOG_ID); }
-inline AnalogMenuItem& getMenuA0DAC() { return getAnalogItemById(MENU_ANALOG_A0_D_A_C_ID); }
-inline FloatMenuItem& getMenuA1Value() { return getFloatItemById(MENU_ANALOG_A1_VALUE_ID); }
+inline AnalogMenuItem& getMenuAnalogA0DAC() { return getAnalogItemById(MENU_ANALOG_A0_DAC_ID); }
+inline FloatMenuItem& getMenuAnalogA1Value() { return getFloatItemById(MENU_ANALOG_A1_VALUE_ID); }
 inline SubMenuItem& getMenuWiFi() { return getSubMenuById(MENU_WI_FI_ID); }
-inline IpAddressMenuItem& getMenuIPAddress() { return getIpAddressItemById(MENU_WI_FI_I_P_ADDRESS_ID); }
-inline BooleanMenuItem& getMenuConnected() { return getBooleanItemById(MENU_WI_FI_CONNECTED_ID); }
+inline IpAddressMenuItem& getMenuWiFiIPAddress() { return getIpAddressItemById(MENU_WI_FI_IPADDRESS_ID); }
+inline BooleanMenuItem& getMenuWiFiConnected() { return getBooleanItemById(MENU_WI_FI_CONNECTED_ID); }
 
 
 // Provide a wrapper to get hold of the root menu item and export setupMenu

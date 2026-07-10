@@ -64,27 +64,27 @@ void setupGridLayoutForCardView() {
 
 
 // Declaring any arrays used by enum/list items
-const char* BatteryConditionEnumEntries[] = { "Bad", "Normal", "Good" };
-const char* FoodsEnumEntries[] = { "Pizza", "Pasta", "Salad" };
+const char* strBatteryConditionEnumEntries[] = { "Bad", "Normal", "Good" };
+const char* strFoodsEnumEntries[] = { "Pizza", "Pasta", "Salad" };
 
 void buildMenu(TcMenuBuilder& builder) {
     builder        .subMenu(MENU_SETTINGS_ID, "Settings", NoMenuFlags, nullptr)
             .rgb32Item(MENU_NEW_SUB_MENU_COLOR_ID, "Color", DONT_SAVE, false, NoMenuFlags, RgbColor32(0, 0, 0), nullptr)
             .textItem(MENU_NEW_SUB_MENU_TEXT_ID, "Text", DONT_SAVE, 5, NoMenuFlags, "", nullptr)
             .dateItem(MENU_NEW_SUB_MENU_DATE_ID, "Date", DONT_SAVE, NoMenuFlags, DateStorage(1, 1, 2020), nullptr)
-            .analogBuilder(MENU_PERCENT1_ID, "Percent1", DONT_SAVE, NoMenuFlags, 0, nullptr)
+            .analogBuilder(MENU_SETTINGS_PERCENT1_ID, "Percent1", DONT_SAVE, NoMenuFlags, 0, nullptr)
                 .offset(0).divisor(1).step(1).maxValue(100).unit("%").endItem()
-            .analogBuilder(MENU_TENTHS1_ID, "Tenths1", DONT_SAVE, NoMenuFlags, 0, nullptr)
+            .analogBuilder(MENU_SETTINGS_TENTHS1_ID, "Tenths1", DONT_SAVE, NoMenuFlags, 0, nullptr)
                 .offset(0).divisor(10).step(1).maxValue(1000).unit("").endItem()
-            .largeNumberItem(MENU_LGE_NUM1_ID, "Lge Num1", DONT_SAVE, LargeFixedNumber(6, 4, 0U, 0U, false), true, NoMenuFlags, nullptr)
+            .largeNumberItem(MENU_SETTINGS_LGE_NUM1_ID, "Lge Num1", DONT_SAVE, LargeFixedNumber(6, 4, 0U, 0U, false), true, NoMenuFlags, nullptr)
             .endSub()
         .boolItem(MENU_MUTE_ID, "Mute", DONT_SAVE, NAMING_TRUE_FALSE, NoMenuFlags, false, nullptr)
         .subMenu(MENU_BATTERY_ID, "Battery", NoMenuFlags, nullptr)
             .analogBuilder(MENU_BATTERY_CHARGE_ID, "Charge", DONT_SAVE, MenuFlags().readOnly(), 0, nullptr)
                 .offset(0).divisor(1).step(1).maxValue(100).unit("%").endItem()
-            .enumItem(MENU_BATTERY_CONDITION_ID, "Condition", DONT_SAVE, BatteryConditionEnumEntries, 3, MenuFlags().readOnly(), 0, nullptr)
+            .enumItem(MENU_BATTERY_CONDITION_ID, "Condition", DONT_SAVE, strBatteryConditionEnumEntries, 3, MenuFlags().readOnly(), 0, nullptr)
             .endSub()
-        .enumItem(MENU_FOODS_ID, "Foods", DONT_SAVE, FoodsEnumEntries, 3, NoMenuFlags, 0, nullptr)
+        .enumItem(MENU_FOODS_ID, "Foods", DONT_SAVE, strFoodsEnumEntries, 3, NoMenuFlags, 0, nullptr)
         .boolItem(MENU_TO_GO_ID, "To go", DONT_SAVE, NAMING_YES_NO, NoMenuFlags, false, nullptr);
 }
 
@@ -108,8 +108,8 @@ void setup() {
 
     // every second we simulate updating the battery condition indicators.
     taskManager.schedule(repeatSeconds(1), [] {
-        getMenuCharge().setCurrentValue(rand() % 100);
-        getMenuCondition().setCurrentValue(rand() % 3);
+        getMenuBatteryCharge().setCurrentValue(rand() % 100);
+        getMenuBatteryCondition().setCurrentValue(rand() % 3);
     });
 
     taskManager.schedule(repeatSeconds(30), [] {

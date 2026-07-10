@@ -613,7 +613,7 @@
         "subsystem": "DISPLAY"
       }
     ],
-    "namingRecursive": true,
+    "namingRecursive": false,
     "useCppMain": false,
     "saveLocation": "ONE_SINGLE_FILE_MENU_MAIN",
     "useDynamicMenus": true,

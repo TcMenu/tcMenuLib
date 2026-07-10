@@ -42,8 +42,8 @@ TitleWidget myWidgetWidget(myWidgetWidIcons, 2, 12, 12, nullptr);
 // END widgets
 
 // Declaring any arrays used by enum/list items
-const char* FoodsEnumEntries[] = { "Pizza", "Pasta", "Salad", "Pie" };
-const char* ConnectivityWiFiModeEnumEntries[] = { "Station", "Soft AP" };
+const char* strFoodsEnumEntries[] = { "Pizza", "Pasta", "Salad", "Pie" };
+const char* strConnectivityWiFiModeEnumEntries[] = { "Station", "Soft AP" };
 
 void buildMenu(TcMenuBuilder& builder) {
     builder        .actionItem(MENU_HIBERNATE_ID, "Hibernate", NoMenuFlags, onHibernate)
@@ -53,7 +53,7 @@ void buildMenu(TcMenuBuilder& builder) {
             .offset(0).divisor(10).step(1).maxValue(1000).unit("oC").endItem()
         .analogBuilder(MENU_HALVES_ID, "Halves", 6, NoMenuFlags, 0, nullptr)
             .offset(0).divisor(2).step(1).maxValue(200).unit("").endItem()
-        .enumItem(MENU_FOODS_ID, "Foods", 8, FoodsEnumEntries, 4, NoMenuFlags, 0, nullptr)
+        .enumItem(MENU_FOODS_ID, "Foods", 8, strFoodsEnumEntries, 4, NoMenuFlags, 0, nullptr)
         .boolItem(MENU_DOOR_OPEN_ID, "Door Open", 10, NAMING_YES_NO, NoMenuFlags, false, nullptr)
         .subMenu(MENU_EXTRAS_ID, "Extras", NoMenuFlags, nullptr)
             .textItem(MENU_EXTRAS_TEXT_ID, "Text", 11, 5, NoMenuFlags, "", nullptr)
@@ -61,16 +61,16 @@ void buildMenu(TcMenuBuilder& builder) {
             .listItemRtCustom(MENU_EXTRAS_MY_LIST_ID, "My List", 0, fnExtrasMyListRtCall, NoMenuFlags, onListSelected)
             .endSub()
         .subMenu(MENU_CONNECTIVITY_ID, "Connectivity", NoMenuFlags, nullptr)
-            .textItem(MENU_CONNECTIVITY_S_S_I_D_ID, "SSID", 20, 22, NoMenuFlags, "", nullptr)
+            .textItem(MENU_CONNECTIVITY_SSID_ID, "SSID", 20, 22, NoMenuFlags, "", nullptr)
             .textItem(MENU_CONNECTIVITY_PASSCODE_ID, "Passcode", 42, 22, NoMenuFlags, "", nullptr)
-            .enumItem(MENU_CONNECTIVITY_WI_FI_MODE_ID, "WiFi Mode", 64, ConnectivityWiFiModeEnumEntries, 2, NoMenuFlags, 0, nullptr)
-            .ipAddressItem(MENU_CONNECTIVITY_I_P_ADDRESS_ID, "IP Address", DONT_SAVE, NoMenuFlags, IpAddressStorage(127, 0, 0, 1), nullptr)
-            .remoteConnectivityMonitor(MENU_CONNECTIVITY_IO_T_MONITOR_ID, "IoT Monitor", MenuFlags().localOnly())
+            .enumItem(MENU_CONNECTIVITY_WI_FI_MODE_ID, "WiFi Mode", 64, strConnectivityWiFiModeEnumEntries, 2, NoMenuFlags, 0, nullptr)
+            .ipAddressItem(MENU_CONNECTIVITY_IPADDRESS_ID, "IP Address", DONT_SAVE, NoMenuFlags, IpAddressStorage(127, 0, 0, 1), nullptr)
+            .remoteConnectivityMonitor(MENU_CONNECTIVITY_IO_TMONITOR_ID, "IoT Monitor", MenuFlags().localOnly())
             .eepromAuthenticationItem(MENU_CONNECTIVITY_AUTHENTICATOR_ID, "Authenticator", MenuFlags().localOnly(), nullptr)
             .endSub()
-        .subMenu(MENU_IO_T_SETUP_ID, "IoT Setup", NoMenuFlags, nullptr)
-            .ipAddressItem(MENU_I_P_ADDR_ID, "IP Addr", DONT_SAVE, NoMenuFlags, IpAddressStorage(127, 0, 0, 1), nullptr)
-            .remoteConnectivityMonitor(MENU_IO_T_MONITOR1_ID, "IoT Monitor1", MenuFlags().localOnly())
+        .subMenu(MENU_IO_TSETUP_ID, "IoT Setup", NoMenuFlags, nullptr)
+            .ipAddressItem(MENU_IO_TSETUP_IPADDR_ID, "IP Addr", DONT_SAVE, NoMenuFlags, IpAddressStorage(127, 0, 0, 1), nullptr)
+            .remoteConnectivityMonitor(MENU_IO_TSETUP_IO_TMONITOR1_ID, "IoT Monitor1", MenuFlags().localOnly())
             .endSub();
 }
 
@@ -88,7 +88,7 @@ void setup() {
     menuMgr.load();
 
     // set the number of rows in the list.
-    getMenuMyList().setNumberOfRows(42);
+    getMenuExtrasMyList().setNumberOfRows(42);
 
     // next start WiFi and register our wifi widget
     startWiFiAndListener();
@@ -119,7 +119,7 @@ int CALLBACK_FUNCTION fnExtrasMyListRtCall(RuntimeMenuItem* item, uint8_t row, R
 }
 
 void CALLBACK_FUNCTION onListSelected(int id) {
-    Serial.print("List item select "); Serial.println(getMenuMyList().getActiveIndex());
+    Serial.print("List item select "); Serial.println(getMenuExtrasMyList().getActiveIndex());
 
 }
 
@@ -140,11 +140,11 @@ void saveToRom() {
 }
 
 void startWiFiAndListener() {
-    TextMenuItem& ssidMenuItem = getMenuSSID();
-    TextMenuItem& passphraseMenuItem = getMenuPasscode();
+    TextMenuItem& ssidMenuItem = getMenuConnectivitySSID();
+    TextMenuItem& passphraseMenuItem = getMenuConnectivityPasscode();
     // You can choose between station and access point mode by setting the connectivity/Wifi Mode option to your
     // own choice
-    if(getMenuWiFiMode().getCurrentValue() == MENU_WIFIMODE_STATION) {
+    if(getMenuConnectivityWiFiMode().getCurrentValue() == MENU_WIFIMODE_STATION) {
         // we are in station mode
         WiFi.begin(ssidMenuItem.getTextValue(), passphraseMenuItem.getTextValue());
         WiFi.mode(WIFI_STA);
@@ -174,7 +174,7 @@ void startWiFiAndListener() {
                 IPAddress localIp = WiFi.localIP();
                 Serial.print("Now connected to WiFi");
                 Serial.println(localIp);
-                getMenuIPAddr().setIpAddress(localIp[0], localIp[1], localIp[2], localIp[3]);
+                getMenuIoTSetupIPAddr().setIpAddress(localIp[0], localIp[1], localIp[2], localIp[3]);
                 connectedToWiFi = true;
             }
 

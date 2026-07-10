@@ -140,12 +140,12 @@ void buildMenu(TcMenuBuilder& builder);
 #define MENU_FROZEN_ID  3
 #define MENU_START_TOASTING_ID  4
 #define MENU_SETTINGS_ID  5
-#define MENU_SAFETY_LOCK_ID  6
+#define MENU_SETTINGS_SAFETY_LOCK_ID  6
 #define MENU_SETTINGS_USER_NAME_ID  7
 #define MENU_SETTINGS_SERIAL_NUMBER_ID  8
 #define MENU_SETTINGS_SAVE_SETTINGS_ID  9
 #define MENU_EXTRAS_ID  10
-#define MENU_EXTRAS_R_G_B_ID  11
+#define MENU_EXTRAS_RGB_ID  11
 #define MENU_EXTRAS_IP_ID  12
 #define MENU_EXTRAS_TIME_ID  13
 #define MENU_EXTRAS_DATE_ID  14
@@ -156,15 +156,15 @@ inline EnumMenuItem& getMenuType() { return getEnumItemById(MENU_TYPE_ID); }
 inline BooleanMenuItem& getMenuFrozen() { return getBooleanItemById(MENU_FROZEN_ID); }
 inline ActionMenuItem& getMenuStartToasting() { return getActionItemById(MENU_START_TOASTING_ID); }
 inline SubMenuItem& getMenuSettings() { return getSubMenuById(MENU_SETTINGS_ID); }
-inline BooleanMenuItem& getMenuSafetyLock() { return getBooleanItemById(MENU_SAFETY_LOCK_ID); }
-inline TextMenuItem& getMenuUserName() { return getTextItemById(MENU_SETTINGS_USER_NAME_ID); }
-inline EditableLargeNumberMenuItem& getMenuSerialNumber() { return getLargeNumberItemById(MENU_SETTINGS_SERIAL_NUMBER_ID); }
-inline ActionMenuItem& getMenuSaveSettings() { return getActionItemById(MENU_SETTINGS_SAVE_SETTINGS_ID); }
+inline BooleanMenuItem& getMenuSettingsSafetyLock() { return getBooleanItemById(MENU_SETTINGS_SAFETY_LOCK_ID); }
+inline TextMenuItem& getMenuSettingsUserName() { return getTextItemById(MENU_SETTINGS_USER_NAME_ID); }
+inline EditableLargeNumberMenuItem& getMenuSettingsSerialNumber() { return getLargeNumberItemById(MENU_SETTINGS_SERIAL_NUMBER_ID); }
+inline ActionMenuItem& getMenuSettingsSaveSettings() { return getActionItemById(MENU_SETTINGS_SAVE_SETTINGS_ID); }
 inline SubMenuItem& getMenuExtras() { return getSubMenuById(MENU_EXTRAS_ID); }
-inline Rgb32MenuItem& getMenuRGB() { return getRgb32ItemById(MENU_EXTRAS_R_G_B_ID); }
-inline IpAddressMenuItem& getMenuIp() { return getIpAddressItemById(MENU_EXTRAS_IP_ID); }
-inline DateFormattedMenuItem& getMenuTime() { return getDateItemById(MENU_EXTRAS_TIME_ID); }
-inline DateFormattedMenuItem& getMenuDate() { return getDateItemById(MENU_EXTRAS_DATE_ID); }
+inline Rgb32MenuItem& getMenuExtrasRGB() { return getRgb32ItemById(MENU_EXTRAS_RGB_ID); }
+inline IpAddressMenuItem& getMenuExtrasIp() { return getIpAddressItemById(MENU_EXTRAS_IP_ID); }
+inline DateFormattedMenuItem& getMenuExtrasTime() { return getDateItemById(MENU_EXTRAS_TIME_ID); }
+inline DateFormattedMenuItem& getMenuExtrasDate() { return getDateItemById(MENU_EXTRAS_DATE_ID); }
 
 
 // Provide a wrapper to get hold of the root menu item and export setupMenu

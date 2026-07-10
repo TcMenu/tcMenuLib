@@ -361,9 +361,9 @@ void setupMenu() {
         applyTheme(renderer);
 
     // We have an IoT monitor, register the server
-    getMenuIoTMonitor1().setRemoteServer(remoteServer);
+    getMenuConnectivityIoTMonitor().setRemoteServer(remoteServer);
 
     // We have an EEPROM authenticator, it needs initialising
-    getMenuAuthenticator().init();
+    getMenuConnectivityAuthenticator().init();
 }
 

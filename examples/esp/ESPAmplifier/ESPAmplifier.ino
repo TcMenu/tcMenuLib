@@ -43,7 +43,7 @@ const char* simFilesForList[] = { "SuperFile1.txt",  "CustomFile.cpp", "SuperDup
 void prepareWifiForUse() {
     // this sketch assumes you've successfully connected to the Wifi before, does not
     // call begin.. You can initialise the wifi whichever way you wish here.
-    if(strlen(getMenuSSID().getTextValue())==0) {
+    if(strlen(getMenuConnectivitySSID().getTextValue())==0) {
         // no SSID come up as an access point
         WiFi.mode(WIFI_AP);
         WiFi.softAP("tcmenu", "secret1234");
@@ -51,8 +51,8 @@ void prepareWifiForUse() {
     }
     else {
         WiFi.mode(WIFI_STA);
-        WiFi.begin(getMenuSSID().getTextValue(), getMenuPasscode().getTextValue());
-        serdebugF2("Connecting to Wifi using settings for ", getMenuSSID().getTextValue());
+        WiFi.begin(getMenuConnectivitySSID().getTextValue(), getMenuConnectivityPasscode().getTextValue());
+        serdebugF2("Connecting to Wifi using settings for ", getMenuConnectivitySSID().getTextValue());
     }
 
     // now monitor the wifi level every few seconds and report it in a widget.
@@ -62,7 +62,7 @@ void prepareWifiForUse() {
                 IPAddress localIp = WiFi.localIP();
                 Serial.print("Now connected to WiFi");
                 Serial.println(localIp);
-                getMenuIPAddress().setIpAddress(localIp[0], localIp[1], localIp[2], localIp[3]);
+                getMenuConnectivityIPAddress().setIpAddress(localIp[0], localIp[1], localIp[2], localIp[3]);
                 connectedToWifi = true;
             }
             wifiWidget.setCurrentState(fromWiFiRSSITo4StateIndicator(WiFi.RSSI()));
@@ -75,7 +75,7 @@ void prepareWifiForUse() {
 }
 
 // Declaring any arrays used by enum/list items
-const char* strAmpStatusEnumEntries[] = { "Warm up", "Warm Valves", "Ready", "DC Protection", "Overloaded", "Overheated" };
+const char* strStatusAmpStatusEnumEntries[] = { "Warm up", "Warm Valves", "Ready", "DC Protection", "Overloaded", "Overheated" };
 
 void buildMenu(TcMenuBuilder& builder) {
     builder        .analogBuilder(MENU_VOLUME_ID, "Volume", 2, NoMenuFlags, 0, onVolumeChanged)
@@ -84,7 +84,7 @@ void buildMenu(TcMenuBuilder& builder) {
         .boolItem(MENU_DIRECT_ID, "Direct", 6, NAMING_TRUE_FALSE, NoMenuFlags, false, onAudioDirect)
         .boolItem(MENU_MUTE_ID, "Mute", DONT_SAVE, NAMING_TRUE_FALSE, NoMenuFlags, false, onMuteSound)
         .subMenu(MENU_SETTINGS_ID, "Settings", NoMenuFlags, nullptr)
-            .subMenu(MENU_CHANNEL_SETTINGS_ID, "Channel Settings", NoMenuFlags, nullptr)
+            .subMenu(MENU_SETTINGS_CHANNEL_SETTINGS_ID, "Channel Settings", NoMenuFlags, nullptr)
                 .scrollChoiceBuilder(MENU_CHANNEL_SETTINGS_CHANNEL_ID, "Channel Num", DONT_SAVE, NoMenuFlags, 0, nullptr).ofCustomRtFunction(fnChannelSettingsChannelRtCall, 3).endItem()
                 .analogBuilder(MENU_CHANNEL_SETTINGS_LEVEL_TRIM_ID, "Level Trim", 9, NoMenuFlags, 0, nullptr)
                     .offset(-10).divisor(2).step(1).maxValue(20).unit("dB").endItem()
@@ -95,28 +95,27 @@ void buildMenu(TcMenuBuilder& builder) {
                 .offset(0).divisor(10).step(1).maxValue(300).unit("s").endItem()
             .analogBuilder(MENU_SETTINGS_VALVE_HEATING_ID, "Valve Heating", 15, NoMenuFlags, 0, valveHeatingChanged)
                 .offset(0).divisor(10).step(1).maxValue(600).unit("s").endItem()
-            .actionItem(MENU_SAVE_SETTINGS_ID, "Save settings", NoMenuFlags, onSaveSettings)
+            .actionItem(MENU_SETTINGS_SAVE_SETTINGS_ID, "Save settings", NoMenuFlags, onSaveSettings)
             .endSub()
         .subMenu(MENU_STATUS_ID, "Status", NoMenuFlags, nullptr)
-            .enumItem(MENU_AMP_STATUS_ID, "Amp Status", DONT_SAVE, strAmpStatusEnumEntries, 6, NoMenuFlags, 0, nullptr)
-            .analogBuilder(MENU_STATUS_LEFT_V_U_ID, "Left VU", DONT_SAVE, NoMenuFlags, 0, nullptr)
+            .enumItem(MENU_STATUS_AMP_STATUS_ID, "Amp Status", DONT_SAVE, strStatusAmpStatusEnumEntries, 6, NoMenuFlags, 0, nullptr)
+            .analogBuilder(MENU_STATUS_LEFT_VU_ID, "Left VU", DONT_SAVE, NoMenuFlags, 0, nullptr)
                 .offset(-20000).divisor(1000).step(1).maxValue(30000).unit("dB").endItem()
-            .analogBuilder(MENU_RIGHT_V_U_ID, "Right VU", DONT_SAVE, NoMenuFlags, 0, nullptr)
+            .analogBuilder(MENU_STATUS_RIGHT_VU_ID, "Right VU", DONT_SAVE, NoMenuFlags, 0, nullptr)
                 .offset(-20000).divisor(1000).step(1).maxValue(30000).unit("dB").endItem()
-            .actionItem(MENU_SHOW_DIALOGS_ID, "Show Dialogs", NoMenuFlags, onShowDialogs)
+            .actionItem(MENU_STATUS_SHOW_DIALOGS_ID, "Show Dialogs", NoMenuFlags, onShowDialogs)
             .listItemRtCustom(MENU_STATUS_DATA_LIST_ID, "Data List", 0, fnStatusDataListRtCall, NoMenuFlags, nullptr)
             .analogBuilder(MENU_STATUS_TEST_ID, "Test", DONT_SAVE, NoMenuFlags, 0, nullptr)
                 .offset(-5000).divisor(10).step(1).maxValue(65535).unit("U").endItem()
             .endSub()
         .subMenu(MENU_CONNECTIVITY_ID, "Connectivity", NoMenuFlags, nullptr)
-            .ipAddressItem(MENU_I_P_ADDRESS_ID, "IP address", DONT_SAVE, MenuFlags().readOnly(), IpAddressStorage(127, 0, 0, 1), nullptr)
-            .textItem(MENU_SSID_ID, "SSID", 17, 20, NoMenuFlags, "", nullptr)
-            .textItem(MENU_PASSCODE_ID, "Passcode", 37, 20, NoMenuFlags, "", nullptr)
-            .remoteConnectivityMonitor(MENU_CONNECTIVITY_IO_T_MONITOR_ID, "IoT Monitor", MenuFlags().localOnly())
+            .ipAddressItem(MENU_CONNECTIVITY_IPADDRESS_ID, "IP address", DONT_SAVE, MenuFlags().readOnly(), IpAddressStorage(127, 0, 0, 1), nullptr)
+            .textItem(MENU_CONNECTIVITY_SSID_ID, "SSID", 17, 20, NoMenuFlags, "", nullptr)
+            .textItem(MENU_CONNECTIVITY_PASSCODE_ID, "Passcode", 37, 20, NoMenuFlags, "", nullptr)
+            .remoteConnectivityMonitor(MENU_CONNECTIVITY_IO_TMONITOR_ID, "IoT Monitor", MenuFlags().localOnly())
             .eepromAuthenticationItem(MENU_CONNECTIVITY_AUTHENTICATOR_ID, "Authenticator", MenuFlags().localOnly(), nullptr)
             .endSub();
 }
-
 
 void performThemeAdjustments() {
     /**
@@ -232,6 +231,13 @@ void loop() {
 
 }
 
+// This is how to save the state on power down, it should not be done too frequently otherwise the
+// flash based rom could be damaged.
+void powerDownCapture() {
+    menuMgr.save(MENU_MAGIC_KEY);
+    EEPROM.commit();
+}
+
 // This callback needs to be implemented by you, see the below docs:
 //  1. List Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
 //  2. ScrollChoice Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/scrollchoice-menu-item/
@@ -242,47 +248,65 @@ int CALLBACK_FUNCTION fnStatusDataListRtCall(RuntimeMenuItem* item, uint8_t row,
     }
 }
 
-
-void CALLBACK_FUNCTION onMuteSound(int id) {
-    // TODO - your menu change code
-}
-
-
-void CALLBACK_FUNCTION onChannelSetttingsUpdate(int id) {
-    // TODO - your menu change code
-}
-
 // This callback needs to be implemented by you, see the below docs:
 //  1. List Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/list-menu-item/
 //  2. ScrollChoice Docs - https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/menu-item-types/scrollchoice-menu-item/
 int CALLBACK_FUNCTION fnChannelSettingsChannelRtCall(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize) {
     switch(mode) {
-    default:
-        return defaultRtListCallback(item, row, mode, buffer, bufferSize);
+    case RENDERFN_INVOKE: {
+            auto *eeprom = menuMgr.getEepromAbstraction();
+            auto romPos = getMenuChannels().getEepromStart() + (row * getMenuChannels().getItemWidth());
+            eeprom->readIntoMemArray((uint8_t *) getMenuChannelSettingsName().getTextValue(), romPos, getMenuChannelSettingsChannel().getItemWidth());
+            getMenuChannelSettingsLevelTrim().setCurrentValue(controller.getTrim(row));
+            return true;
+    }
+    case RENDERFN_NAME:
+        strcpy(buffer, "Channel");
+        return true;
+    case RENDERFN_VALUE:
+        strcpy(buffer, "Line");
+        fastltoa(buffer, row + 1, 2, NOT_PADDED, bufferSize);
+        return true;
+    case RENDERFN_EEPROM_POS: return 0xFFFF; // lists are generally not saved to EEPROM
+    default: return false;
     }
 }
 
 
 void CALLBACK_FUNCTION onAudioDirect(int id) {
-    // TODO - your menu change code
+    controller.onAudioDirect(getMenuDirect().getBoolean());
 }
 
+void CALLBACK_FUNCTION onMuteSound(int id) {
+    controller.onMute(getMenuMute().getBoolean());
+}
 
 void CALLBACK_FUNCTION onVolumeChanged(int id) {
-    // TODO - your menu change code
+    controller.onVolumeChanged();
 }
-
-
-void CALLBACK_FUNCTION onShowDialogs(int id) {
-    // TODO - your menu change code
-}
-
 
 void CALLBACK_FUNCTION onChannelChanged(int id) {
-    // TODO - your menu change code
+    controller.onChannelChanged();
 }
 
+void CALLBACK_FUNCTION onChannelSetttingsUpdate(int id) {
+        auto *eeprom = menuMgr.getEepromAbstraction();
+    auto romPos = getMenuChannelSettingsChannel().getEepromStart() + (getMenuChannelSettingsChannel().getCurrentValue() * getMenuChannelSettingsChannel().getItemWidth());
+    eeprom->writeArrayToRom(romPos, (uint8_t *) getMenuChannelSettingsName().getTextValue(), getMenuChannelSettingsChannel().getItemWidth());
+    controller.setTrim(getMenuChannelSettingsChannel().getCurrentValue(), getMenuChannelSettingsLevelTrim().getCurrentValue());
+    if(renderer.getDialog() && !renderer.getDialog()->isInUse()) {
+        renderer.getDialog()->setButtons(BTNTYPE_NONE, BTNTYPE_OK);
+        renderer.getDialog()->showRam("Channel setting saved", true);
+        char sz[5];
+        ltoaClrBuff(sz, getMenuChannelSettingsChannel().getCurrentValue(), 2, NOT_PADDED, sizeof sz);
+        renderer.getDialog()->copyIntoBuffer(sz);
+    }
+}
+
+void CALLBACK_FUNCTION onShowDialogs(int id) {
+    showDialogs();
+}
 
 void CALLBACK_FUNCTION onSaveSettings(int id) {
-    // TODO - your menu change code
+    powerDownCapture();
 }

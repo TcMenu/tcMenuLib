@@ -31,13 +31,13 @@ void buildMenu(TcMenuBuilder& builder) {
         .boolItem(MENU_FROZEN_ID, "Frozen", ROM_SAVE, NAMING_YES_NO, NoMenuFlags, false, nullptr)
         .actionItem(MENU_START_TOASTING_ID, "Start toasting", NoMenuFlags, onStartToasting)
         .subMenu(MENU_SETTINGS_ID, "Settings", NoMenuFlags, nullptr)
-            .boolItem(MENU_SAFETY_LOCK_ID, "Safety lock", ROM_SAVE, NAMING_TRUE_FALSE, NoMenuFlags, false, nullptr)
+            .boolItem(MENU_SETTINGS_SAFETY_LOCK_ID, "Safety lock", ROM_SAVE, NAMING_TRUE_FALSE, NoMenuFlags, false, nullptr)
             .textItem(MENU_SETTINGS_USER_NAME_ID, "User Name", ROM_SAVE, 5, NoMenuFlags, "", onNameChanged)
             .largeNumberItem(MENU_SETTINGS_SERIAL_NUMBER_ID, "Serial Number", ROM_SAVE, LargeFixedNumber(8, 0, 0U, 0U, false), true, NoMenuFlags, nullptr)
             .actionItem(MENU_SETTINGS_SAVE_SETTINGS_ID, "SaveSettings", NoMenuFlags, onSaveSettings)
             .endSub()
         .subMenu(MENU_EXTRAS_ID, "Extras", NoMenuFlags, nullptr)
-            .rgb32Item(MENU_EXTRAS_R_G_B_ID, "RGB", ROM_SAVE, false, NoMenuFlags, RgbColor32(221, 85, 238), nullptr)
+            .rgb32Item(MENU_EXTRAS_RGB_ID, "RGB", ROM_SAVE, false, NoMenuFlags, RgbColor32(221, 85, 238), nullptr)
             .ipAddressItem(MENU_EXTRAS_IP_ID, "Ip", ROM_SAVE, NoMenuFlags, IpAddressStorage(192, 168, 0, 0), nullptr)
             .timeItem(MENU_EXTRAS_TIME_ID, "Time", ROM_SAVE, NoMenuFlags, EDITMODE_TIME_24H, TimeStorage(14, 00, 00, 0), nullptr)
             .dateItem(MENU_EXTRAS_DATE_ID, "Date", ROM_SAVE, NoMenuFlags, DateStorage(1, 1, 2022), nullptr)
@@ -74,7 +74,7 @@ void loop() {
 //
 void CALLBACK_FUNCTION onNameChanged(int id) {
     Serial.print("Name changed to ");
-    Serial.println(getMenuUserName().getTextValue());
+    Serial.println(getMenuSettingsUserName().getTextValue());
 }
 
 //
