@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for Arduino ESP32 by TcMenu 4.5.0 on 2026-01-17T21:26:26.287434Z.
+// Generated for Arduino ESP32 by TcMenu 4.5.9-SNAPSHOT on 2026-07-12T15:03:09.181661Z.
 
 #include <tcMenu.h>
 #include "esp32SimHub_menu.h"
@@ -76,7 +76,7 @@ AnalogMenuItem menuSpeed(&minfoSpeed, 0, &menuRPM, INFO_LOCATION_PGM);
 
 void setupMenu() {
     // First we set up eeprom and authentication (if needed).
-    setSizeBasedEEPROMStorageEnabled(false);
+    setEepromStorageMode(TC_STORE_ROM_LEGACY);
     // Now add any readonly, non-remote and visible flags.
     menuSpeed.setReadOnly(true);
     menuTyreTemp.setReadOnly(true);

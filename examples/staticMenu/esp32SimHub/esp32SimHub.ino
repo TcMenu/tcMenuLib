@@ -71,8 +71,8 @@ void setup() {
     // events to do with taking over the display.
     setupDashboard();
     renderer.takeOverDisplay();
-
     menuGear.setTextValue("N");
+    serlogF(SER_DEBUG, "Taken over display at startup");
 
     //menuSettingsNewLargeNumber.setLargeNumberFromString("12.1");
     auto largeNum = menuSettingsNewLargeNumber.getLargeNumber();
