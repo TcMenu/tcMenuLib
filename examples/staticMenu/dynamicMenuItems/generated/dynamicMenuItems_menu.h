@@ -25,7 +25,6 @@
 // variables we declare that you may need to access
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
 extern Adafruit_ST7735 gfx;
-extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
 extern MatrixKeyboardManager keyboard;
 extern MenuEditingKeyListener tcMenuKeyListener;

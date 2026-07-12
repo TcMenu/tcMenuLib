@@ -33,6 +33,7 @@
 
 #define DISPLAY_HAS_MEMBUFFER false
 
+
 using namespace tcgfx;
 
 // some colour displays don't create this value
@@ -159,6 +160,7 @@ private:
     const GFXfont* computedFont = nullptr;
     int16_t computedBaseline = 0;
     int16_t computedHeight = 0;
+    
 protected:
     int spriteHeight = 0;
 public:
