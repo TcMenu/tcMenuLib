@@ -7,3 +7,7 @@
 #else
 #include "picoAdafruitDashboard_lang.h"
 #endif
+
+
+// Its always better to use getTcLocaleString(string_id) method.
+#define getTcLocaleString(x) (x)

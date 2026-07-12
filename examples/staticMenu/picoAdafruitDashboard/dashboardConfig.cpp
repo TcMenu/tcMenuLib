@@ -10,8 +10,7 @@
 #include "dashboardConfig.h"
 #include <graphics/TcDrawableButton.h>
 
-// START a title widget that was built using TcMenu Designers widget generator, see the "Code" menu for the widget
-// generator. This is added to both the main renderer and the dashboard.
+// START a title widget that was built using the TcMenu widget generator
 
 // YesNo icon=0, width=17, height=12, size=36
 const uint8_t YesNoWidIcon0[] PROGMEM = {
@@ -99,20 +98,21 @@ public:
 
         // we can still make native library calls here if we wish.
         gfx.fillScreen(RGB_COL_BLACK);
+        auto gfxDrawable = reinterpret_cast<GraphicsDeviceRenderer*>(renderer)->getDeviceDrawable();
 
         // here we draw two boxes that make what looks like a tab
-        gfxDrawable.setDrawColor(RGB_COL_LIGHT_BLUE);
-        gfxDrawable.drawBox(Coord(10, 10), Coord(80, 25), true);
-        gfxDrawable.drawBox(Coord(10, 35), Coord(300, 75), true);
+        gfxDrawable->setDrawColor(RGB_COL_LIGHT_BLUE);
+        gfxDrawable->drawBox(Coord(10, 10), Coord(80, 35), true);
+        gfxDrawable->drawBox(Coord(10, 35), Coord(300, 85), true);
 
         // and this is how we put some text into it, the text is off-screen buffered if the device supports it.
         // the wrapper takes care of the differences in different text implementations. We must call endDraw when
         // we've finished with the helper class, as if the display is double-buffered, it will push it at that point.
         color_t palette[2] = { RGB_COL_LIGHT_BLUE, RGB(0, 0, 0) };
-        DeviceDrawableHelper helper(&gfxDrawable, palette, 2, Coord(10, 10), Coord(80, 25));
+        DeviceDrawableHelper helper(gfxDrawable, palette, 2, Coord(10, 10), Coord(80, 35));
         helper.getDrawable()->setDrawColor(palette[0]);
         helper.setFont(DeviceFontDrawingMode(RobotoMedium24));
-        helper.getDrawable()->drawBox(helper.offsetLocation(Coord(10, 10)), Coord(80, 25), true);
+        helper.getDrawable()->drawBox(helper.offsetLocation(Coord(10, 10)), Coord(80, 35), true);
         helper.drawText(helper.offsetLocation(Coord(12, 10)), palette[1], "Test");
         helper.endDraw();
 
@@ -128,7 +128,7 @@ public:
         // here we store the last encoder position, and if it has changed from last time, we update all the buttons
         // with which one is now selected. Doing so will make the button repaint.
         if(lastEncoderTurn != encVal) {
-            lastEncoderTurn = encVal;
+            lastEncoderTurn = static_cast<int>(encVal);
             button1.setButtonDrawingMode(encVal == 0 ? TcDrawableButton::SELECTED : TcDrawableButton::NORMAL);
             button2.setButtonDrawingMode(encVal == 1 ? TcDrawableButton::SELECTED : TcDrawableButton::NORMAL);
             button3.setButtonDrawingMode(encVal == 2 ? TcDrawableButton::SELECTED : TcDrawableButton::NORMAL);
@@ -166,8 +166,8 @@ void setupDashboard() {
     // here we set up the entries on the dashboard, this is where we provide the menu item and position on the display
     // for each entry. A parameter object that we defined above is then associated with an item. Note that more than
     // one entry can share a parameter.
-    mainDashboard->addDrawingItem(&menuAnalog, Coord(20, 40), &drawAnalogValueWithIntRange, 10, nullptr, 10);
-    mainDashboard->addDrawingItem(&menuEnum, Coord(20, 68), &drawEnumWithIntRange, 10, nullptr, 10);
+    mainDashboard->addDrawingItem(&menuAnalog, Coord(20, 50), &drawAnalogValueWithIntRange, 6, nullptr, 10);
+    mainDashboard->addDrawingItem(&menuEnum, Coord(20, 78), &drawEnumWithIntRange, 6, nullptr, 10);
 
     // lastly, add the dashboard to the renderer, this is important, the dashboard implements CustomDrawing so it
     // handles taking over the display and reset notification.
