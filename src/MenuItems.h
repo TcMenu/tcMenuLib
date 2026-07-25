@@ -344,6 +344,14 @@ protected:
     RuntimeRenderingFn renderFn = nullptr;
 	MenuType menuType;
 public:
+    /**
+     * Never attempt to copy menu items using the copy constructor
+     */
+    MenuItem(const MenuItem&) = delete;
+    /**
+     * Never attempt to copy menu items using the equals operator
+     */
+    MenuItem& operator=(const MenuItem&) = delete;
 
     /**
      * Copies the name into the provided buffer starting at position 0.

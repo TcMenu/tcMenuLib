@@ -74,8 +74,8 @@ class DynamicEepromStore {
     static void loadItemFromRom(EepromAbstraction* eeprom, MenuItem* nextMenuItem, EepromPosition pos, size_t len);
     static size_t saveItemDynamically(EepromAbstraction * eeprom, MenuItem * next, uint16_t position);
 public:
-    bool loadMenuStructure(EepromAbstraction* eeprom, uint16_t magicKey = 0xf00d);
-    bool saveMenuStructure(EepromAbstraction* eeprom, uint16_t magicKey = 0xf00d);
+    static bool loadMenuStructure(EepromAbstraction* eeprom, uint16_t magicKey = 0xf00d);
+    static bool saveMenuStructure(EepromAbstraction* eeprom, uint16_t magicKey = 0xf00d);
 };
 
 #endif //_EEPROM_ITEM_STORAGE_H_

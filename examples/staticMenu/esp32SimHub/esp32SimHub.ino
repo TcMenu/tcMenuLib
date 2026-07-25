@@ -54,7 +54,6 @@ void setupTheme();
 
 void setup() {
     SPI.begin(18, 19, 23);
-    SPI.setFrequency(20000000);
 
     // we start the serial bus at 115200 so it's ready for our connector to use
     Serial.begin(115200);

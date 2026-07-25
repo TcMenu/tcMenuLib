@@ -15,6 +15,7 @@
  * Documentation: https://www.thecoderscorner.com/products/arduino-libraries/
  */
 
+#include <ArduinoEEPROMAbstraction.h>
 #include "UnoR4Disco_menu.h"
 #include "xbmpImages.h"
 #include "IoAbstraction.h"
@@ -24,6 +25,10 @@
 #include "DiscoTime.h"
 
 bool wifiFailed = false;
+constexpr menuid_t menuIdSaveRom = 200;
+constexpr uint16_t unoR4MagicKey = 0xF00D;
+
+void onSaveRom(int id);
 
 TitleWidget wifiWidget(iconsWifi, 5, 16, 12);
 TitleWidget connectedWidget(iconsConnection, 2, 16, 12);
@@ -52,13 +57,14 @@ void tryAndStartWifi() {
 
 
 void buildMenu(TcMenuBuilder& builder) {
-    builder        .subMenu(MENU_DISCO_ID, "Disco", NoMenuFlags, nullptr)
-            .analogBuilder(MENU_DISCO_SPEED_ID, "Speed", DONT_SAVE, NoMenuFlags, 2, nullptr)
+    builder.usingDynamicEEPROMStorage()
+        .subMenu(MENU_DISCO_ID, "Disco", NoMenuFlags, nullptr)
+            .analogBuilder(MENU_DISCO_SPEED_ID, "Speed", ROM_SAVE, NoMenuFlags, 2, nullptr)
                 .offset(0).divisor(1).step(1).maxValue(10).unit("").endItem()
             .actionItem(MENU_ZOOM_TEXT_START_ZOOM_ID, "Start Disco", NoMenuFlags, onStartDisco)
             .endSub()
         .subMenu(MENU_SCROLL_TEXT_ID, "Scroll Text", NoMenuFlags, nullptr)
-            .textItem(MENU_SCROLL_TEXT_TEXT_ID, "Text", DONT_SAVE, 16, NoMenuFlags, "TcMenu", nullptr)
+            .textItem(MENU_SCROLL_TEXT_TEXT_ID, "Text", ROM_SAVE, 16, NoMenuFlags, "TcMenu", nullptr)
             .actionItem(MENU_SCROLL_TEXT_START_SCROLL_ID, "Start Scroll", NoMenuFlags, onStartScroll)
             .endSub()
         .subMenu(MENU_SHOW_XBMP_ID, "Show Xbmp", NoMenuFlags, nullptr)
@@ -66,9 +72,10 @@ void buildMenu(TcMenuBuilder& builder) {
             .actionItem(MENU_SHOW_XBMP_SHOW_IMAGE_ID, "Show Image", NoMenuFlags, onShowXbmp)
             .endSub()
         .subMenu(MENU_ANALOG_ID, "Analog", NoMenuFlags, nullptr)
-            .analogBuilder(MENU_ANALOG_A0_DAC_ID, "A0 DAC", DONT_SAVE, NoMenuFlags, 0, onAnalogDacChange)
+             .analogBuilder(MENU_ANALOG_A0_DAC_ID, "A0 DAC", ROM_SAVE, NoMenuFlags, 0, onAnalogDacChange)
                 .offset(0).divisor(1).step(1).maxValue(100).unit("%").endItem()
-            .floatItem(MENU_ANALOG_A1_VALUE_ID, "A1 Value", DONT_SAVE, 1, NoMenuFlags, 0.0, nullptr)
+            .floatItem(MENU_ANALOG_A1_VALUE_ID, "A1 Value", DONT_SAVE, 1, MenuFlags().readOnly(), 0.0, nullptr)
+            .actionItem(menuIdSaveRom, "Save ROM", MenuFlags().localOnly(), onSaveRom)
             .endSub()
         .subMenu(MENU_WI_FI_ID, "WiFi", NoMenuFlags, nullptr)
             .ipAddressItem(MENU_WI_FI_IPADDRESS_ID, "IP Address", DONT_SAVE, NoMenuFlags, IpAddressStorage(127, 0, 0, 1), nullptr)
@@ -76,9 +83,8 @@ void buildMenu(TcMenuBuilder& builder) {
             .endSub();
 }
 
-
-
 void setup() {
+    menuMgr.setEepromRef(new ArduinoEEPROMAbstraction(&EEPROM));
     // start the serial port so that we can log
     Serial.begin(115200);
 
@@ -88,6 +94,8 @@ void setup() {
     internalAnalogDevice().setCurrentValue(DAC, 0);
 
     setupMenu();
+
+    loadMenuStructure(menuMgr.getEepromAbstraction(), unoR4MagicKey);
 
     getMenuShowXbmpXbmp().setNumberOfRows(2);
 
@@ -110,8 +118,8 @@ void setup() {
         taskManager.schedule(onceMillis(100), tryAndStartWifi);
     }
 
-    // The easiest way to adjust drawing parameters is using theme builder. Here we are going to add two title widgets
-    // to the display, these appear top right. We use the stock provided icons.
+    // The easiest way to adjust drawing parameters is using a theme builder. Here we are going to add two title widgets
+    // to the display, these appear top right. We use the stock-provided icons.
     // See https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/themes/rendering-with-themes-icons-grids/
     TcThemeBuilder themeBuilder(renderer);
     themeBuilder.addingTitleWidget(wifiWidget)
@@ -170,6 +178,15 @@ void CALLBACK_FUNCTION onAnalogDacChange(int id) {
 void CALLBACK_FUNCTION onStartScroll(int id) {
     // here we start scrolling through text a word at a time when the start scroll item is clicked
     char sz[20];
-    getMenuScrollText().copyValue(sz, sizeof sz);
+    getMenuScrollTextText().copyValue(sz, sizeof sz);
     discoTime.text(sz);
+}
+
+void CALLBACK_FUNCTION onSaveRom(int id) {
+    saveMenuStructure(menuMgr.getEepromAbstraction(), unoR4MagicKey);
+    withMenuDialogIfAvailable([](MenuBasedDialog* dlg) {
+        dlg->setButtons(BTNTYPE_CLOSE, BTNTYPE_NONE);
+        dlg->showRam("Saved ROM", false);
+        dlg->copyIntoBuffer("Success");
+    });
 }

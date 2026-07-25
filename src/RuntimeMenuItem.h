@@ -22,7 +22,7 @@
 /** For items that dont need to have the same id each time (such as back menu items), we just randomly give them an ID */
 menuid_t nextRandomId();
 
-/** This is the standard renderering function used for editable text items, for use with TextMenuItem */
+/** This is the standard rendering function used for editable text items, for use with TextMenuItem */
 int textItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
 
 /** This is the standard rendering function used for editable IP addresses, for use with IpAddressMenuItem */
@@ -36,9 +36,6 @@ int timeItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char
 
 /** The default rendering function for time menu items */
 int dateItemRenderFn(RuntimeMenuItem* item, uint8_t row, RenderFnMode mode, char* buffer, int bufferSize);
-
-/** helper function for text items that finds the position of a char in the allowable set of editable chars */
-int findPositionInEditorSet(char ch);
 
 /**
  * Defines the filter that should be applied to values of multi edit menu items on the UI
@@ -89,13 +86,13 @@ public:
 	}
 
 	void runCallback() const { renderFn((RuntimeMenuItem*)this, itemPosition, RENDERFN_INVOKE, nullptr, 0); }
-	int getRuntimeId() const { return int(id); }
-	int getRuntimeEeprom() const { return renderFn((RuntimeMenuItem*)this, itemPosition, RENDERFN_EEPROM_POS, nullptr, 0); }
-	uint8_t getNumberOfParts() const { return noOfParts; }
+	[[nodiscard]] int getRuntimeId() const { return int(id); }
+	[[nodiscard]] int getRuntimeEeprom() const { return renderFn((RuntimeMenuItem*)this, itemPosition, RENDERFN_EEPROM_POS, nullptr, 0); }
+	[[nodiscard]] uint8_t getNumberOfParts() const { return noOfParts; }
 	void copyRuntimeName(char* buffer, int bufferSize) const { renderFn((RuntimeMenuItem*)this, itemPosition, RENDERFN_NAME, buffer, bufferSize);}
 
-    uint8_t getNumberOfRows() const { return noOfParts; }
-    uint8_t getItemPosition() const { return itemPosition; }
+    [[nodiscard]] uint8_t getNumberOfRows() const { return noOfParts; }
+    [[nodiscard]] uint8_t getItemPosition() const { return itemPosition; }
 
     void setNumberOfRows(uint8_t rows) {
 		noOfParts = rows;
@@ -120,8 +117,8 @@ public:
 	/**
 	 * Create an instance of the class
 	 *
-	 * @param nextChild the next menu in the chain if there is one, or NULL.
 	 * @param renderFn the callback that provides the runtime information about the menu.
+	 * @param next the next menu in the chain if there is one, or NULL.
 	 */
 	BackMenuItem(RuntimeRenderingFn renderFn, MenuItem* next) 
 		: RuntimeMenuItem(MENUTYPE_BACK_VALUE, nextRandomId(), renderFn, 0, 1, next), namePtr(nullptr) { }
@@ -139,7 +136,7 @@ public:
     /**
      * @return the name pointer or null if not set, could be in progmem.
      */
-    const char* getNameUnsafe() const { return namePtr; }
+    [[nodiscard]] const char* getNameUnsafe() const { return namePtr; }
 };
 
 /**
@@ -155,9 +152,9 @@ public:
      * still support it as a means of working with the name.
      * @deprecated use the other constructor, this constructor will be removed in a future version
      * @param info a SubMenuInfo structure
-     * @param id the item ID
      * @param child the first child item - (normally a BackMenuItem)
      * @param next the next menu in the chain if there is one, or NULL.
+     * @param infoInPgm if the info block should be in program memory
      */
     SubMenuItem(const SubMenuInfo* info, MenuItem* child, MenuItem* next = nullptr, bool infoInPgm = INFO_LOCATION_PGM)
                 : RuntimeMenuItem(info, infoInPgm, MENUTYPE_SUB_VALUE, backSubItemRenderFn, 0, 1, next) {
@@ -180,7 +177,7 @@ public:
     /**
      * return the first child item
      */
-    MenuItem* getChild() const { return child; }
+    [[nodiscard]] MenuItem* getChild() const { return child; }
     void setChild(MenuItem* firstChildItem) { this->child = firstChildItem; }
 };
 
@@ -211,9 +208,9 @@ public:
 	RuntimeMenuItem* asParent();
 	RuntimeMenuItem* asBackMenu();
 
-    ListMode getListMode() const {return listMode;}
-    bool isActingAsParent() const { return itemPosition == LIST_PARENT_ITEM_POS; }
-    uint8_t getActiveIndex() const { return activeItem; }
+    [[nodiscard]] ListMode getListMode() const {return listMode;}
+    [[nodiscard]] bool isActingAsParent() const { return itemPosition == LIST_PARENT_ITEM_POS; }
+    [[nodiscard]] uint8_t getActiveIndex() const { return activeItem; }
     void setActiveIndex(uint8_t idx) {
         activeItem = idx;
         setChanged(true);
@@ -244,14 +241,14 @@ public:
 
 	int nextPart();
 
-	int getCurrentRange() const {
-		return renderFn((RuntimeMenuItem*)this, itemPosition, RENDERFN_GETRANGE, NULL, 0);
+	[[nodiscard]] int getCurrentRange() const {
+		return renderFn((RuntimeMenuItem*)this, itemPosition, RENDERFN_GETRANGE, nullptr, 0);
 	}
 	
 	void stopMultiEdit();
 
-	int getPartValueAsInt() const {
-		return renderFn((RuntimeMenuItem*)this, itemPosition, RENDERFN_GETPART, NULL, 0);
+	[[nodiscard]] int getPartValueAsInt() const {
+		return renderFn((RuntimeMenuItem*)this, itemPosition, RENDERFN_GETPART, nullptr, 0);
 	}
 
 	bool valueChanged(int newVal);
@@ -317,14 +314,14 @@ public:
     /**
      * @return true if the field is being masked for password entry, otherwise false
      */
-    bool isPasswordField() const {
+    [[nodiscard]] bool isPasswordField() const {
         return this->passwordField;
     }
 
-	~TextMenuItem() { delete data; }
+	~TextMenuItem() { delete[] data; }
 
 	/** @return the max length of the text storage */
-	uint8_t textLength() const { return noOfParts; }
+	[[nodiscard]] uint8_t textLength() const { return noOfParts; }
 
 	/**
 	 * Copies the text into the internal buffer.
@@ -334,7 +331,7 @@ public:
 	void setTextValue(const char* text, bool silent = false);
 
 	/** @return the text value in the internal buffer */
-	const char* getTextValue() const { return data; }
+	[[nodiscard]] const char* getTextValue() const { return data; }
 
 	/**
 	 * Called after the array has been changed to ensure that it is in a good
@@ -408,8 +405,8 @@ public:
     /**
      * Create an IP address that has an initial value, with a given ID and rendering function
      * @param renderFn the rendering function to use.
+     * @param initialIp a 4 digit IP address as a constant array
      * @param id the ID of this item
-     * @param ipParts a 4 digit IP address as a constant array
      * @param next optional pointer to next item
      */
     IpAddressMenuItem(RuntimeRenderingFn renderFn, const IpAddressStorage& initialIp, menuid_t id, MenuItem* next = nullptr)
@@ -419,8 +416,7 @@ public:
      * Create an IP address that has an initial value, with static data taken from an info block
      * @param info the info block to use for static data
      * @param renderFn the rendering function to use.
-     * @param id the ID of this item
-     * @param ipParts a 4 digit IP address as a constant array
+     * @param initialIp a 4 digit IP address as a constant array
      * @param next optional pointer to next item
      * @param isPgm optional, if the info block resides in PGM memory or RAM, default PGM.
      */
@@ -430,8 +426,7 @@ public:
     /**
      * Create an IP address that has an initial value, with a given ID and
      * @param info the info block to use for static data
-     * @param id the ID of this item
-     * @param ipParts a 4 digit IP address as a constant array
+     * @param initialIp a 4 digit IP address as a constant array
      * @param next optional pointer to next item
      * @param isPgm optional, if the info block resides in PGM memory or RAM, default PGM.
      */
@@ -518,7 +513,7 @@ public:
     TimeFormattedMenuItem(const AnyMenuInfo* info, const TimeStorage& initial, MultiEditWireType format, MenuItem* next = nullptr, bool isPgm = INFO_LOCATION_PGM);
 
 	/** gets the time as four separate bytes */
-	TimeStorage getTime() const { return data; }
+	[[nodiscard]] TimeStorage getTime() const { return data; }
     
     /** sets the time */
 	void setTime(TimeStorage newTime) { data = newTime; }
@@ -527,7 +522,7 @@ public:
     void setTimeFromString(const char* time);
 
     /** gets the formatting currently being used. */
-    MultiEditWireType  getFormat() const { return format; }
+    [[nodiscard]] MultiEditWireType  getFormat() const { return format; }
 
     TimeStorage* getUnderlyingData() {return &data;}
 };
@@ -587,7 +582,7 @@ public:
         return dateFormatMode;
     }
 
-    DateStorage getDate() const { return data; }
+    [[nodiscard]] DateStorage getDate() const { return data; }
 
     void setDate(DateStorage newDate) { data = newDate; }
 
@@ -607,7 +602,7 @@ long parseIntUntilSeparator(const char* ptr, int& offset, size_t maxDigits=10);
 /**
  * Invokes a menu callback if it is safe to do so
  * @param cb callback to make
- * @param id menuId
+ * @param pItem the menu item
  */
 inline void invokeIfSafe(MenuCallbackFn cb, MenuItem* pItem) { if(cb && pItem) cb(pItem->getId()); }
 

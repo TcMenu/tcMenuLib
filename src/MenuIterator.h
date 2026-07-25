@@ -91,6 +91,7 @@ uint8_t itemCount(MenuItem* item,  bool includeNonVisble = false);
  */
 class MenuItemPredicate {
 public:
+    virtual ~MenuItemPredicate() = default;
     /**
      * This method is used to determine if a given menuitem given by item matches the predicate
      * @param item the item to be checked for a match.

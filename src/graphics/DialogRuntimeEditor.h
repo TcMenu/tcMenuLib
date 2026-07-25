@@ -22,13 +22,15 @@ class DialogMultiPartEditor : BaseDialogController {
 private:
     MenuBasedDialog *dialog;
     EditableMultiPartMenuItem* menuItemBeingEdited;
-    AnalogMenuInfo scrollingInfo = {"Item Value", nextRandomId(), 0xffff, 1, onScrollingChanged, 0, 1, "" };
-    AnalogMenuItem scrollingEditor = AnalogMenuItem(&scrollingInfo, 0, nullptr, INFO_LOCATION_RAM);
+    AnalogMenuInfo scrollingInfo;
+    AnalogMenuItem scrollingEditor;
 
 public:
     static DialogMultiPartEditor* theInstance;
 
-    DialogMultiPartEditor() {
+    DialogMultiPartEditor() : 
+            scrollingInfo{"Item Value", nextRandomId(), 0xffff, 1, onScrollingChanged, 0, 1, "" },
+            scrollingEditor(&scrollingInfo, 0, nullptr, INFO_LOCATION_RAM) {
         theInstance = this;
         menuItemBeingEdited = nullptr;
         dialog = nullptr;
