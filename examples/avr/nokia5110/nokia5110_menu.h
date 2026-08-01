@@ -28,7 +28,6 @@
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
 extern TcMenuRemoteServer remoteServer;
 extern Adafruit_PCD8544 gfx;
-extern AdafruitDrawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
 extern EthernetServer server;
 extern EthernetInitialisation ethernetInitialisation;

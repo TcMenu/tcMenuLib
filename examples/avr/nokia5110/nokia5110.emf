@@ -79,6 +79,7 @@
         "variableName": "",
         "id": 4,
         "eepromAddress": 8,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -94,6 +95,7 @@
         "variableName": "",
         "id": 5,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -110,6 +112,7 @@
         "variableName": "",
         "id": 6,
         "eepromAddress": 10,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -130,6 +133,7 @@
         "variableName": "",
         "id": 7,
         "eepromAddress": 11,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -161,6 +165,7 @@
         "variableName": "RGB",
         "id": 17,
         "eepromAddress": 17,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -176,6 +181,7 @@
         "variableName": "",
         "id": 8,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -192,6 +198,7 @@
         "variableName": "VoltsIn",
         "id": 9,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -208,6 +215,7 @@
         "variableName": "",
         "id": 10,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -225,6 +233,7 @@
         "variableName": "",
         "id": 14,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -240,6 +249,7 @@
         "variableName": "",
         "id": 15,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": true,
         "visible": true,
@@ -257,6 +267,7 @@
         "variableName": "",
         "id": 16,
         "eepromAddress": 13,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -269,8 +280,10 @@
       "item": {
         "menuType": "REMOTE_IOT_MONITOR",
         "name": "IoT Monitor",
+        "variableName": "",
         "id": 18,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -283,8 +296,10 @@
       "item": {
         "menuType": "AUTHENTICATION",
         "name": "Authenticator",
+        "variableName": "",
         "id": 19,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -294,7 +309,7 @@
   ],
   "codeOptions": {
     "embeddedPlatform": "ARDUINO",
-    "lastDisplayUuid": "4dcb12ec-13d8-4466-b8b6-bd575eae4612",
+    "lastDisplayUuid": "40ce7734-15c7-49b3-a08e-46311c9b0b91",
     "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
     "lastRemoteUuids": [
       "0877131c-e03e-426b-8eaf-228e01f5e7f1"
@@ -467,12 +482,49 @@
         "name": "USE_TC_UNICODE",
         "latestValue": "false",
         "subsystem": "THEME"
+      },
+      {
+        "name": "DISPLAY_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "PINS_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "OTHER_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_SPI_SPEED",
+        "latestValue": "0",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CUSTOM_SPI_NAME",
+        "latestValue": "SPI",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISP_SETUP_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "CUSTOM_OPTS_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
       }
     ],
     "namingRecursive": false,
     "useCppMain": false,
     "saveLocation": "ALL_TO_CURRENT",
+    "useDynamicMenus": false,
     "usingSizedEEPROMStorage": false,
+    "eepromSaveMode": "LEGACY_WRITE_BY_POSITION",
     "eepromDefinition": "avr:",
     "authenticatorDefinition": "rom:100:6",
     "projectIoExpanders": [
@@ -480,9 +532,7 @@
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []
-    },
-    "packageNamespace": "",
-    "appIsModular": false
+    }
   },
   "stringLists": []
 }

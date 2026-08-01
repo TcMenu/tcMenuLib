@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for Arduino AVR/Uno/Mega by TcMenu 4.3.1 on 2024-10-12T11:00:32.353851500Z.
+// Generated for Arduino AVR/Uno/Mega by TcMenu 4.5.9-SNAPSHOT on 2026-08-01T10:57:13.816300Z.
 
 #include <tcMenu.h>
 #include "nokia5110_menu.h"
@@ -71,7 +71,7 @@ AnalogMenuItem menuHall(&minfoHall, 0, &menuLiving, INFO_LOCATION_PGM);
 
 void setupMenu() {
     // First we set up eeprom and authentication (if needed).
-    setSizeBasedEEPROMStorageEnabled(false);
+    setEepromStorageMode(TC_STORE_ROM_LEGACY);
     menuMgr.setEepromRef(&glAvrRom);
     authManager.initialise(menuMgr.getEepromAbstraction(), 100);
     menuMgr.setAuthenticator(&authManager);

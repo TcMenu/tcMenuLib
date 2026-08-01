@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for Arduino AVR/Uno/Mega by TcMenu 4.3.1 on 2024-10-12T10:53:14.650442600Z.
+// Generated for Arduino AVR/Uno/Mega by TcMenu 4.5.9-SNAPSHOT on 2026-08-01T11:03:55.473946Z.
 
 #include <tcMenu.h>
 #include "keyboardEthernetShield_menu.h"
@@ -111,13 +111,13 @@ TimeFormattedMenuItem menuTime(&minfoTime, TimeStorage(0, 0, 0, 0), (MultiEditWi
 
 void setupMenu() {
     // First we set up eeprom and authentication (if needed).
-    setSizeBasedEEPROMStorageEnabled(false);
+    setEepromStorageMode(TC_STORE_ROM_LEGACY);
     menuMgr.setEepromRef(&glAvrRom);
     authManager.initialise(menuMgr.getEepromAbstraction(), 100);
     menuMgr.setAuthenticator(&authManager);
     // Now add any readonly, non-remote and visible flags.
-    menuConnectivityIoTMonitor.setLocalOnly(true);
     menuConnectivityAuthenticator.setLocalOnly(true);
+    menuConnectivityIoTMonitor.setLocalOnly(true);
     menuConnectivity.setLocalOnly(true);
     menuConnectivity.setSecured(true);
     menuHiddenItem.setVisible(false);

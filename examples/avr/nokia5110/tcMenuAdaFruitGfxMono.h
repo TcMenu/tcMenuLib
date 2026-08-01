@@ -42,6 +42,8 @@ using namespace tcgfx;
 #define WHITE 0xffff
 #endif
 
+
+
 extern const ConnectorLocalInfo applicationInfo;
 
 /**
@@ -91,6 +93,7 @@ private:
     const GFXfont* computedFont = nullptr;
     int16_t computedBaseline = 0;
     int16_t computedHeight = 0;
+    
 public:
     explicit AdafruitDrawable() : graphics(nullptr) {}
     explicit AdafruitDrawable(Adafruit_GFX* graphics, int spriteHeight = 0) : graphics(graphics) {
