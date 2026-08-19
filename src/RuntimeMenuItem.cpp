@@ -8,6 +8,10 @@
 #include "RuntimeMenuItem.h"
 #include "tcMenu.h"
 
+#ifndef pgm_read_ptr
+#define pgm_read_ptr(x) (*(x))
+#endif
+
 static uint16_t nextAvailableRandomId = RANDOM_ID_START;
 
 constexpr char ALLOWABLE_EDIT_CHARACTERS[] PROGMEM = " .,0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!\"$%^&*()_-+=@';:#{/?\\|<>#{}~";

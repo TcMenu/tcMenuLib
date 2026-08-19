@@ -300,7 +300,7 @@ void DynamicEepromStore::loadItemFromRom(EepromAbstraction* eeprom, MenuItem* ne
     auto menuType = nextMenuItem->getMenuType();
     if (menuType == MENUTYPE_TEXT_VALUE) {
         auto& textItem = asTextItem(nextMenuItem);
-        const auto length = min(len, static_cast<size_t>(textItem.textLength()));
+        const auto length = internal_min(len, static_cast<size_t>(textItem.textLength()));
         eeprom->readCharArrIntoMemArray(const_cast<char *>(textItem.getTextValue()), pos, length);
         textItem.cleanUpArray();
         textItem.setChanged(true);

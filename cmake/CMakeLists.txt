@@ -18,6 +18,7 @@ add_library(tcMenu
         ../src/tcMenu.cpp
         ../src/tcMenuKeyboard.cpp
         ../src/tcUtil.cpp
+        ../src/TcMenuBuilder.cpp
         ../src/extras/DrawableDashboard.cpp
         ../src/extras/DrawableTouchCalibrator.cpp
         ../src/extras/MenuItemDelegate.cpp
@@ -37,12 +38,24 @@ add_library(tcMenu
         ../src/remote/BaseRemoteComponents.cpp
 )
 
-target_compile_definitions(tcMenu
-        PUBLIC BUILD_FOR_PICO_CMAKE=1 BUILD_PICO_FORCE_UART=1 IO_LOGGING_DEBUG=1
-)
+if (BUILD_FOR_STM32CUBE)
+    target_compile_definitions(tcMenu
+            PUBLIC BUILD_FOR_STM32CUBE_CMAKE=1 IO_LOGGING_DEBUG=1
+    )
+else ()
+    target_compile_definitions(tcMenu
+            PUBLIC BUILD_FOR_PICO_CMAKE=1 BUILD_PICO_FORCE_UART=1 IO_LOGGING_DEBUG=1
+    )
+endif ()
 
 target_include_directories(tcMenu PUBLIC
         ../src
 )
 
-target_link_libraries(tcMenu PUBLIC pico_stdlib pico_sync IoAbstraction TaskManagerIO tcUnicodeHelper)
+target_link_libraries(tcMenu PUBLIC IoAbstraction TaskManagerIO tcUnicodeHelper)
+
+# only bring in pico libs when compiling for PicoSDK
+if(TARGET pico_stdlib AND TARGET pico_sync)
+    message("Build is pico, adding libs")
+    target_link_libraries(TaskManagerIO PUBLIC pico_stdlib pico_sync)
+endif()
