@@ -130,6 +130,17 @@ namespace tcgfx {
         virtual color_t getUnderlyingColor(color_t col) { return col; }
 
         /**
+         * Draws a rounded rectangle onto the screen. Most drivers support this, but as this is a new
+         * feature it has a default empty implementation to ensure compilation with older drivers
+         * @param where the location to draw the rectangle
+         * @param size the size of the rectangle
+         * @param radius the radius of the corners
+         * @param filled whether the rectangle should be filled or not
+         */
+        virtual void drawRoundRect(const Coord& where, const Coord& size, int radius, bool filled) {}
+
+
+        /**
          * Indicates the start or end of a transaction, for core devices, it indicates the end of a rendering loop, for
          * sub devices it means that we have finished with the
          * @param isStarting

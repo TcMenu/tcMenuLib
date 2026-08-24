@@ -265,42 +265,42 @@ namespace tcgfx {
     private:
         uint32_t propsKey;
         color_t colors[SIZEOF_COLOR_ARRAY];
-        MenuPadding padding;
         const void* fontData;
+        MenuPadding padding;
         MenuBorder borderWidths;
-        uint8_t fontMagnification;
         GridPosition::GridJustification defaultJustification;
         uint8_t spaceAfter;
         uint8_t requiredHeight;
+        uint8_t fontMagnification;
     public:
-        ItemDisplayProperties() : propsKey(0), colors{}, padding(), fontData(nullptr), borderWidths(), fontMagnification(1),
-                        defaultJustification(GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT), spaceAfter(0), requiredHeight(0) {}
+        ItemDisplayProperties() : propsKey(0), colors{}, fontData(nullptr), borderWidths(), defaultJustification(GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT),
+                        spaceAfter(0), requiredHeight(0), fontMagnification(1) {}
         ItemDisplayProperties(uint32_t key, const color_t* palette, const MenuPadding& pad, const void* font, uint8_t mag, uint8_t spacing,
                               uint8_t height, GridPosition::GridJustification defaultJustification, MenuBorder borderWidths)
-                              : propsKey(key), padding{pad}, fontData(font), borderWidths(borderWidths), fontMagnification(mag), defaultJustification(defaultJustification),
-                                spaceAfter(spacing), requiredHeight(height) {
+                              : propsKey(key), fontData(font), padding{pad}, borderWidths(borderWidths), defaultJustification(defaultJustification), spaceAfter(spacing),
+                                requiredHeight(height), fontMagnification(mag) {
             memcpy(colors, palette, sizeof colors);
         }
         ItemDisplayProperties(const ItemDisplayProperties& other) = default;
         ItemDisplayProperties& operator=(const ItemDisplayProperties& other) = default;
 
-        uint32_t getKey() const { return propsKey; }
+        [[nodiscard]] uint32_t getKey() const { return propsKey; }
 
-        GridPosition::GridJustification getDefaultJustification() const {
+        [[nodiscard]] GridPosition::GridJustification getDefaultJustification() const {
             return defaultJustification;
         }
 
         void setDefaultJustification(GridPosition::GridJustification justification) { defaultJustification = justification; }
 
-        uint8_t getSpaceAfter() const {return spaceAfter; }
+        [[nodiscard]] uint8_t getSpaceAfter() const {return spaceAfter; }
 
         void setSpaceAfter(uint8_t space) { spaceAfter = space; }
 
-        uint8_t getRequiredHeight() const { return requiredHeight; }
+        [[nodiscard]] uint8_t getRequiredHeight() const { return requiredHeight; }
 
         void setRequiredHeight(uint8_t newHeight) { requiredHeight = newHeight; }
 
-        color_t getColor(ColorType color) const {
+        [[nodiscard]] color_t getColor(ColorType color) const {
             return (color < SIZEOF_COLOR_ARRAY) ? colors[color] : RGB(0,0,0);
         }
 
@@ -313,7 +313,7 @@ namespace tcgfx {
             memcpy(colors, palette, sizeof colors);
         }
 
-        const MenuPadding& getPadding() const {
+        [[nodiscard]] const MenuPadding& getPadding() const {
             return padding;
         }
 
@@ -321,7 +321,7 @@ namespace tcgfx {
             padding = pad;
         }
 
-        MenuBorder getBorder() const {
+        [[nodiscard]] MenuBorder getBorder() const {
             return borderWidths;
         }
 
@@ -329,7 +329,7 @@ namespace tcgfx {
             borderWidths = border;
         }
 
-        uint8_t getFontMagnification() const {
+        [[nodiscard]] uint8_t getFontMagnification() const {
             return fontMagnification;
         }
 
@@ -357,6 +357,7 @@ namespace tcgfx {
      */
     class ItemDisplayPropertiesFactory {
     public:
+        virtual ~ItemDisplayPropertiesFactory() = default;
         /**
          * Returns the configuration for the parameters below, it should never return nullptr.
          * @param pItem the item or null for default

@@ -87,32 +87,54 @@ namespace tcgfx {
     }
 
     /**
-     * Used to represent a border in terms of top, right, bottom and left widths.
+     * Indicates the type of border that needs to be drawn. It can be either an outline or part
+     * of a fill, if it is part of a fill, then it will be applied to the background.
+     */
+    enum BorderType {
+        /** the border represents an outline with 90 degree corners */
+        BORD_OUTLINE_SQUARE = 0,
+        /** the border represents a fill, which will be subtracted from the background */
+        BORD_FILL_ROUNDED = 1,
+        /** the border represents an outline with rounded corners, this is hardwired at 3x thickness,
+         * EG a 1 pixel border has 3 pixel rounding, and a 2 pixel border has 6 pixel rounding. */
+        BORD_OUTLINE_ROUNDED = 2
+    };
+
+    /**
+     * Used to represent a border in terms of top, right, bottom and left widths. The border type is a hint
+     * and on some hardware it may not be possible to apply the border in the way requested.
      */
     struct MenuBorder {
-        uint8_t top:2;
-        uint8_t left:2;
-        uint8_t bottom:2;
-        uint8_t right:2;
+        uint16_t top:3;
+        uint16_t left:3;
+        uint16_t bottom:3;
+        uint16_t right:3;
+        uint16_t borderType:3;
 
         MenuBorder() = default;
 
-        explicit MenuBorder(uint8_t equalSides) {
+        explicit MenuBorder(uint8_t equalSides, BorderType type = BORD_OUTLINE_SQUARE) {
             top = left = bottom = right = equalSides;
+            borderType = type;
         }
 
-        MenuBorder(uint8_t top_, uint8_t right_, uint8_t bottom_, uint8_t left_) {
+        MenuBorder(uint8_t top_, uint8_t right_, uint8_t bottom_, uint8_t left_, BorderType type = BORD_OUTLINE_SQUARE) {
             top = top_;
             right = right_;
             left = left_;
             bottom = bottom_;
+            borderType = type;
         }
 
-        bool areAllBordersEqual() const {
+        [[nodiscard]] BorderType getBorderType() const {
+            return static_cast<BorderType>(borderType);
+        }
+
+        [[nodiscard]] bool areAllBordersEqual() const {
             return (top == left) && (left == right) && (right == bottom);
         }
 
-        bool isBorderOff() const {
+        [[nodiscard]] bool isBorderOff() const {
             return areAllBordersEqual() && top == 0;
         }
     };
