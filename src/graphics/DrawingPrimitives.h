@@ -137,6 +137,10 @@ namespace tcgfx {
         [[nodiscard]] bool isBorderOff() const {
             return areAllBordersEqual() && top == 0;
         }
+
+        [[nodiscard]] uint16_t getBoxDim(uint16_t size) const {
+            return borderType == BORD_FILL_ROUNDED ? size /2 : size;
+        }
     };
 
 #ifndef TC_COORD_DEFINED

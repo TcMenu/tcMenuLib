@@ -62,6 +62,7 @@ namespace tcgfx {
         DeviceDrawableHelper helper;
         ConfigurableItemDisplayPropertiesFactory propertiesFactory;
         CardLayoutPane* cardLayoutPane = nullptr;
+        color_t overallScreenBgColor = RGB(0, 0, 0);
         bool redrawNeeded = false;
     public:
         GraphicsDeviceRenderer(int bufferSize, const char *appTitle, DeviceDrawable *drawable);
@@ -177,6 +178,8 @@ namespace tcgfx {
         void drawUpDownItem(GridPositionRowCacheEntry* entry, Coord& where, Coord& size, const DrawingFlags& drawingFlags);
         void drawIconItem(GridPositionRowCacheEntry *pEntry, Coord& where, Coord& size, const DrawingFlags& drawingFlags);
         void drawBorderAndAdjustSize(Coord &where, Coord &size, MenuBorder &border);
+        void roundCornerLeft(int16_t direction, int radius, Coord where);
+        void roundCornerRight(int16_t direction, int radius, Coord where);
 
         DrawableIcon *getStateIndicatorIcon(GridPositionRowCacheEntry *entry);
     };

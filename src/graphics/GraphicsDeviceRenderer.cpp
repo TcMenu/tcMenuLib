@@ -33,9 +33,12 @@ namespace tcgfx {
     }
 
     void GraphicsDeviceRenderer::drawingCommand(BaseGraphicalRenderer::RenderDrawingCommand command) {
+        const auto* overallCfg = propertiesFactory.configFor(nullptr, ItemDisplayProperties::COMPTYPE_ITEM);
+        overallScreenBgColor = overallCfg->getColor(ItemDisplayProperties::BACKGROUND);
+
         switch(command) {
             case DRAW_COMMAND_CLEAR: {
-                auto* cfg = propertiesFactory.configFor(nullptr, ItemDisplayProperties::COMPTYPE_ITEM);
+                const auto* cfg = propertiesFactory.configFor(nullptr, ItemDisplayProperties::COMPTYPE_ITEM);
                 helper.getDrawable()->setDrawColor(cfg->getColor(ItemDisplayProperties::BACKGROUND));
                 helper.getDrawable()->drawBox(Coord(0, 0), Coord(width, height), true);
                 break;
@@ -262,8 +265,9 @@ namespace tcgfx {
         // draw the border around the item (excluding the arrow)
         MenuBorder border = entry->getDisplayProperties()->getBorder();
         if(!border.isBorderOff() || forceBorder) {
-            if(forceBorder) border = MenuBorder(1);
-            helper.getDrawable()->setDrawColor(textColor);
+            bool filled = border.getBorderType() == BORD_FILL_ROUNDED;
+            if(forceBorder && !filled) border = MenuBorder(1);
+            helper.getDrawable()->setDrawColor(filled ? overallScreenBgColor : textColor);
             drawBorderAndAdjustSize(where, size, border);
         }
 
@@ -271,7 +275,7 @@ namespace tcgfx {
 
     void GraphicsDeviceRenderer::drawBorderAndAdjustSize(Coord &where, Coord &size, MenuBorder &border) {
         if(border.areAllBordersEqual()) {
-            for(int i=0; i<border.left;++i) {
+            for(int i=0; i<border.getBoxDim(border.left);++i) {
                 helper.getDrawable()->drawBox(where, size, false);
                 where.x++;
                 where.y++;
@@ -281,24 +285,127 @@ namespace tcgfx {
         }
         else {
             if(border.left) {
-                helper.getDrawable()->drawBox(Coord(where.x, where.y), Coord(border.left, size.y), true);
-                where.x -= border.left;
-                size.x -= border.left;
+                const auto boxDim = border.getBoxDim(border.left);
+                helper.getDrawable()->drawBox(Coord(where.x, where.y), Coord(boxDim, size.y), true);
+                where.x -= boxDim;
+                size.x -= boxDim;
             }
             if(border.right) {
-                helper.getDrawable()->drawBox(Coord(where.x + size.x - border.right, where.y), Coord(border.right, size.y), true);
-                where.x -= border.right;
-                size.x -= border.right;
+                const auto boxDim = border.getBoxDim(border.right);
+                helper.getDrawable()->drawBox(Coord(where.x + size.x - boxDim, where.y), Coord(boxDim, size.y), true);
+                where.x -= boxDim;
+                size.x -= boxDim;
             }
             if(border.bottom) {
-                helper.getDrawable()->drawBox(Coord(where.x, where.y + size.y - border.bottom), Coord(size.x, border.bottom), true);
-                where.y -= border.bottom;
-                size.y -= border.bottom;
+                const auto boxDim = border.getBoxDim(border.bottom);
+                helper.getDrawable()->drawBox(Coord(where.x, where.y + size.y - boxDim), Coord(size.x, boxDim), true);
+                where.y -= boxDim;
+                size.y -= boxDim;
             }
             if(border.top) {
-                helper.getDrawable()->drawBox(Coord(where.x, where.y), Coord(size.x, border.top), true);
-                where.y -= border.bottom;
-                size.y -= border.bottom;
+                const auto boxDim = border.getBoxDim(border.top);
+                helper.getDrawable()->drawBox(Coord(where.x, where.y), Coord(size.x, boxDim), true);
+                where.y -= boxDim;
+                size.y -= boxDim;
+            }
+        }
+        if (border.getBorderType() == BORD_FILL_ROUNDED) {
+            roundCornerLeft(1, border.left, where);
+            roundCornerLeft(-1, border.left, Coord(where.x, where.y + size.y));
+            roundCornerRight(1, border.right, Coord(where.x + size.x, where.y));
+            roundCornerRight(-1, border.right, Coord(where.x + size.x, where.y + size.y));
+        }
+    }
+
+    const uint8_t radius2[] = {
+        0b00000000,
+        0b00000001
+    };
+    const uint8_t radius3[] = {
+        0b00000000,
+        0b00000011,
+        0b00000011
+    };
+
+    const uint8_t radius4[] = {
+        0b00000000,
+        0b00000011,
+        0b00000111,
+        0b00000111
+    };
+
+    const uint8_t radius5[] = {
+        0b00000000,
+        0b00000011,
+        0b00000111,
+        0b00001111,
+        0b00001111
+    };
+
+    const uint8_t radius6[] = {
+        0b00000000,
+        0b00000011,
+        0b00000111,
+        0b00001111,
+        0b00011111,
+        0b00011111
+    };
+
+    const uint8_t radius7[] = {
+        0b00000000,
+        0b00000011,
+        0b00001111,
+        0b00011111,
+        0b00011111,
+        0b00111111,
+        0b00111111
+    };
+
+    const uint8_t* radiusArrays[] = {
+        radius2,
+        radius3,
+        radius4,
+        radius5,
+        radius6,
+        radius7
+    };
+
+    void GraphicsDeviceRenderer::roundCornerLeft(int16_t direction, int radius, Coord where) {
+        if (!radius) return;
+        if (radius == 1) {
+            helper.getDrawable()->drawPixel(where.x, where.y);
+        } else if (radius > 1 && radius < 8) {
+            const uint8_t* circleData = radiusArrays[radius - 2];
+            for (int i =0; i < radius; ++i) {
+                auto thisLine = circleData[i];
+                int counter = 0;
+                for (int j = radius - 1; j >= 0; --j) {
+                    if (!(thisLine & (1 << j))) {
+                        helper.getDrawable()->drawPixel(where.x + counter, where.y);
+                    }
+                    counter++;
+                }
+                where.y = where.y + direction;
+            }
+        }
+    }
+
+    void GraphicsDeviceRenderer::roundCornerRight(int16_t direction, int radius, Coord where) {
+        if (!radius) return;
+        if (radius == 1) {
+            helper.getDrawable()->drawPixel(where.x, where.y);
+        } else {
+            const uint8_t* circleData = radiusArrays[radius - 2];
+            for (int i =0; i < radius; ++i) {
+                auto thisLine = circleData[i];
+                int counter = radius;
+                for (int j = 0; j < radius; ++j) {
+                    if (!(thisLine & (1 << j))) {
+                        helper.getDrawable()->drawPixel(where.x - counter, where.y);
+                    }
+                    counter--;
+                }
+                where.y = where.y + direction;
             }
         }
     }
@@ -332,7 +439,9 @@ namespace tcgfx {
 
         drawCoreLineItem(entry, icon, where, size, drawingFlags, true);
 
-        if(isHasTouchInterface() && (drawingFlags.isActive() || drawingFlags.isEditing())) {
+        // Touch specific code. We must never put editing buttons on read only items, only drawing buttons on the left
+        // and right if item is active/editable.
+        if(isHasTouchInterface() && !entry->getMenuItem()->isReadOnly() && (drawingFlags.isActive() || drawingFlags.isEditing())) {
             int buttonSize = size.y - 1;
             int offset = (buttonSize - rendererXbmArrowSize.y) / 2;
             int downButtonLocation = where.x;
@@ -451,8 +560,7 @@ namespace tcgfx {
 
     void GraphicsDeviceRenderer::fillWithBackgroundTo(int endPoint) {
         if(endPoint >= height) return; // nothing to do when the display is already full.
-        auto* bgConfig = propertiesFactory.configFor(nullptr, ItemDisplayProperties::COMPTYPE_ITEM);
-        helper.getDrawable()->setDrawColor(bgConfig->getColor(ItemDisplayProperties::BACKGROUND));
+        helper.getDrawable()->setDrawColor(overallScreenBgColor);
         helper.getDrawable()->drawBox(Coord(0, endPoint), Coord(width, height-endPoint), true);
     }
 
