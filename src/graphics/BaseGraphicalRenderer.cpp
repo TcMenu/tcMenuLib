@@ -111,10 +111,12 @@ void BaseGraphicalRenderer::subMenuRender(MenuItem* rootItem, uint8_t& locRedraw
 }
 
 GridPositionRowCacheEntry* BaseGraphicalRenderer::findMenuEntryAndDimensions(const Coord& screenPos, Coord& localStart, Coord& localSize) {
+    // 1. Bail out if a modal dialog is active or display has been taken over
     if((dialog!=nullptr && dialog->isRenderNeeded()) || displayTakenMode != NOT_TAKEN_OVER) {
         return nullptr;
     }
 
+    // 2. Handle runtime list rendering mode (lists manage their own row/title coordinates)
     if(currentRootMenu && currentRootMenu->getMenuType() == MENUTYPE_RUNTIME_LIST) {
         auto* runList = reinterpret_cast<ListRuntimeMenuItem*>(currentRootMenu);
         auto* itemProps = getDisplayPropertiesFactory().configFor(runList, ItemDisplayProperties::COMPTYPE_ITEM);
@@ -122,10 +124,12 @@ GridPositionRowCacheEntry* BaseGraphicalRenderer::findMenuEntryAndDimensions(con
         int titleHeight = titleProps->getRequiredHeight() + titleProps->getSpaceAfter();
         int rowHeight = itemProps->getRequiredHeight() + + itemProps->getSpaceAfter();
         if(screenPos.y < titleHeight) {
+            // Touch landed within list title area
             cachedEntryItem = GridPositionRowCacheEntry(runList, GridPosition(GridPosition::DRAW_TITLE_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 0, titleHeight), titleProps);
             return &cachedEntryItem;
         }
         else {
+            // Touch landed within list items: calculate zero-based row index clamped to list size
             auto rowNum = internal_min(int((screenPos.y - titleHeight) / rowHeight), int(runList->getNumberOfRows() - 1));
             cachedEntryItem = GridPositionRowCacheEntry(runList, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, rowNum + 1, titleHeight), titleProps);
             return &cachedEntryItem;
@@ -136,7 +140,7 @@ GridPositionRowCacheEntry* BaseGraphicalRenderer::findMenuEntryAndDimensions(con
         return nullptr;
     }
 
-    // if we are in title always mode, then the title must always be calculated
+    // 3. If title is pinned at the top (TITLE_ALWAYS), calculate title height and check if touched
     int rowStartY = 0;
     if(titleMode == TITLE_ALWAYS) {
         auto* titleProps = getDisplayPropertiesFactory().configFor(nullptr, ItemDisplayProperties::COMPTYPE_TITLE);
@@ -146,34 +150,35 @@ GridPositionRowCacheEntry* BaseGraphicalRenderer::findMenuEntryAndDimensions(con
         }
     }
 
+    // 4a. Set up the iteration for the below, and get the width of the edit/select icon (if any)
     auto* icon = getDisplayPropertiesFactory().iconForMenuItem(SPECIAL_ID_ACTIVE_ICON);
     int iconWidth = icon ? icon->getDimensions().x : 0;
     uint8_t currentRow = -1;
 
-    for(bsize_t i=lastOffset; i<itemOrderByRow.count(); i++) {
+    // 4b. Iterate over items from drawingLocation offset to find which row contains screenPos.y
+    for(bsize_t i=drawingLocation.getCurrentOffset(); i<itemOrderByRow.count(); i++) {
         auto* pEntry = itemOrderByRow.itemAtIndex(i);
         int rowHeight = heightOfRow(pEntry->getPosition().getRow());
         int rowEndY = rowStartY + rowHeight;
 
-        // this seems odd but we are only doing this loop to find the heights, so we
-        // only check all the first entries in the row. There is code further down to
-        // deal with columns.
+        // Skip subsequent items on the same row when computing vertical geometry (only process first item per row)
         if(pEntry->getPosition().getRow() == currentRow) continue;
-        currentRow = i;
+        currentRow = pEntry->getPosition().getRow();
 
-        // if we are within the y bounds of of item
+        // 5. Check if screen touch Y position falls within the current row bounds [rowStartY, rowEndY]
         if(screenPos.y > rowStartY && screenPos.y < rowEndY) {
             localStart.y = rowStartY;
             localSize.y = rowHeight;
             if(pEntry->getPosition().getGridSize() == 1) {
-                // single column row, so we must be within the item
+                // Single column: entire row width belongs to this item (adjusted for active icon)
                 auto iconAdjust = iconWidth + pEntry->getDisplayProperties()->getPadding().left;
                 localStart.x = iconAdjust;
                 localSize.x = int(width) - iconAdjust;
                 return pEntry;
             }
             else {
-                // multi column row, so we must work out which column we are in.
+                // Multi column: divide total width into equal segments based on gridSize
+                // Calculate zero-based column index from screenPos.x, then lookup 1-based col key (column + 1)
                 int colWidth = int(width) / pEntry->getPosition().getGridSize();
                 int column = (screenPos.x / colWidth);
                 localStart.x = column * colWidth;
@@ -181,10 +186,11 @@ GridPositionRowCacheEntry* BaseGraphicalRenderer::findMenuEntryAndDimensions(con
                 return itemOrderByRow.getByKey(rowCol(pEntry->getPosition().getRow(), column + 1));
             }
         }
+        // Advance rowStartY past this row and its trailing margin
         rowStartY += rowHeight + pEntry->getDisplayProperties()->getSpaceAfter();
     }
 
-    // we did not find anything at that point.
+    // 6. No item matched at given screen coordinate
     return nullptr;
 }
 
