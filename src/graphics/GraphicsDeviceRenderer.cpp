@@ -214,6 +214,14 @@ namespace tcgfx {
         }
     }
 
+    static void adjustForIconPosition(DrawableIcon* icon, Coord& where, Coord& size, MenuPadding pad) {
+        if(icon) {
+            const auto adjust = icon->getDimensions().x + pad.left;
+            where.x += adjust;
+            size.x -= adjust;
+        }
+    }
+
     void GraphicsDeviceRenderer::drawCoreLineItem(GridPositionRowCacheEntry* entry, DrawableIcon* icon, Coord &where, Coord &size,
                                                   const DrawingFlags& drawingFlags, bool drawBg) {
         auto pad = entry->getDisplayProperties()->getPadding();
@@ -256,19 +264,24 @@ namespace tcgfx {
             helper.getDrawable()->drawBox(where, adjustedSize, true);
         }
 
-        if(icon) {
-            auto adjust = icon->getDimensions().x + pad.left;
-            where.x += adjust;
-            size.x -= adjust;
-        }
-
-        // draw the border around the item (excluding the arrow)
+        // draw the border (if filled mode it is removing pixels)
         MenuBorder border = entry->getDisplayProperties()->getBorder();
         if(!border.isBorderOff() || forceBorder) {
-            bool filled = border.getBorderType() == BORD_FILL_ROUNDED;
-            if(forceBorder && !filled) border = MenuBorder(1);
-            helper.getDrawable()->setDrawColor(filled ? overallScreenBgColor : textColor);
-            drawBorderAndAdjustSize(where, size, border);
+            if (border.getBorderType() == BORD_FILL_ROUNDED) {
+                // remove the elements of he border to make the previous fill look rounded
+                helper.getDrawable()->setDrawColor(overallScreenBgColor);
+                drawBorderAndAdjustSize(where, size, border);
+                adjustForIconPosition(icon, where, size, pad);
+            } else {
+                adjustForIconPosition(icon, where, size, pad);
+
+                // draw the border excluding the icon
+                if(forceBorder) border = MenuBorder(1);
+                helper.getDrawable()->setDrawColor(textColor);
+                drawBorderAndAdjustSize(where, size, border);
+            }
+        } else {
+            adjustForIconPosition(icon, where, size, pad);
         }
 
     }
