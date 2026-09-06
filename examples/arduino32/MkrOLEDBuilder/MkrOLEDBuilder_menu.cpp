@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for Arduino 32bit ARM by TcMenu 4.5.4 on 2026-04-18T09:06:57.733005100Z.
+// Generated for Arduino 32bit ARM by TcMenu 5.0.0-SNAPSHOT on 2026-09-06T06:48:09.244883Z.
 
 #include <tcMenu.h>
 #include "MkrOLEDBuilder_menu.h"
@@ -302,9 +302,9 @@ bool EthernetInitialisation::attemptNewConnection(BaseRemoteServerConnection *re
     return false;
 }
 
-#include "ThemeMonoBorderedBuilder.h"
 #include <Fonts/OpenSansRegular7pt.h>
 #include <Fonts/OpenSansRegular8pt.h>
+#include "ThemeMonoBorderedBuilder.h"
 
 // Global variable declarations
 const  ConnectorLocalInfo applicationInfo = { "Mkr OLED Builder", "2d36dbe4-4892-410f-b0d6-775ec3637f6f" };
@@ -319,39 +319,6 @@ EthernetServer server(3333);
 EthernetInitialisation ethernetInitialisation(&server);
 EthernetTagValTransport ethernetTransport;
 TagValueRemoteServerConnection ethernetConnection(ethernetTransport, ethernetInitialisation);
-
-// Declaring as extern any custom RtCalls and scroll variables
-extern char ScrollRam[];
-
-// Declaring any arrays used by enum/list items
-const char* SettingsModeEnumEntries[] = { "Fully ON", "Fully OFF", "Vacation" };
-
-void buildMenu(TcMenuBuilder& builder) {
-    builder.usingDynamicEEPROMStorage()
-        .analogBuilder(MENU_KITCHEN_ID, "Kitchen", DONT_SAVE, NoMenuFlags, 0, nullptr)
-            .offset(-55).divisor(1).step(1).maxValue(255).unit("oC").endItem()
-        .analogBuilder(MENU_LOUNGE_ID, "Lounge", DONT_SAVE, NoMenuFlags, 0, nullptr)
-            .offset(-55).divisor(1).step(1).maxValue(255).unit("oC").endItem()
-        .analogBuilder(MENU_HALLWAY_ID, "Hallway", DONT_SAVE, NoMenuFlags, 0, nullptr)
-            .offset(-55).divisor(1).step(1).maxValue(255).unit("oC").endItem()
-        .subMenu(MENU_SETTINGS_ID, "Settings", NoMenuFlags, nullptr)
-            .analogBuilder(MENU_SETTINGS_TEMP_DESIRED_ID, "Temp desired", ROM_SAVE, NoMenuFlags, 0, nullptr)
-                .offset(0).divisor(1).step(1).maxValue(255).unit("Unit").endItem()
-            .enumItem(MENU_SETTINGS_MODE_ID, "Mode", ROM_SAVE, SettingsModeEnumEntries, 3, NoMenuFlags, 0, nullptr)
-            .boolItem(MENU_SETTINGS_PROTECTION_ID, "Protection", ROM_SAVE, NAMING_ON_OFF, NoMenuFlags, false, nullptr)
-            .actionItem(MENU_SETTINGS_EMERGENCY_OFF_ID, "Emergency off", NoMenuFlags, nullptr)
-            .endSub()
-        .subMenu(MENU_OTHER_TYPES_ID, "Other Types", NoMenuFlags, nullptr)
-            .textItem(MENU_OTHER_TYPES_TEXT_ID, "Text", ROM_SAVE, 10, NoMenuFlags, "", nullptr)
-            .rgb32Item(MENU_OTHER_TYPES_R_G_B_ITEM_ID, "RGB Item", ROM_SAVE, false, NoMenuFlags, RgbColor32(0, 0, 0), nullptr)
-            .scrollChoiceBuilder(MENU_OTHER_TYPES_FOODS_ID, "Foods", ROM_SAVE, NoMenuFlags, 0, nullptr).fromRamChoices(ScrollRam, 5, 10).endItem()
-            .endSub()
-        .subMenu(MENU_IO_T_SETUP_ID, "IoT Setup", NoMenuFlags, nullptr)
-            .ipAddressItem(MENU_I_P_ADDRESS_ID, "IP Address", DONT_SAVE, NoMenuFlags, IpAddressStorage(127, 0, 0, 1), nullptr)
-            .remoteConnectivityMonitor(MENU_IO_T_MONITOR_ID, "IoT Monitor", MenuFlags().localOnly())
-            .eepromAuthenticationItem(MENU_AUTHENTICATOR_ID, "Authenticator", MenuFlags().localOnly(), nullptr)
-            .endSub();
-}
 
 void setupMenu() {
     // First we set up eeprom and authentication (if needed).
@@ -368,12 +335,12 @@ void setupMenu() {
         switches.init(ioexp_io8574, SWITCHES_NO_POLLING, true);
         menuMgr.initForEncoder(&renderer, &getMenuKitchen(), 1, 2, 0);
         remoteServer.addConnection(&ethernetConnection);
-        installMonoBorderTitleTheme(renderer, MenuFontDef(&OpenSansRegular7pt, 0), MenuFontDef(&OpenSansRegular8pt, 0), true, BaseGraphicalRenderer::TITLE_FIRST_ROW, true);
+        applyTheme(renderer);
 
     // We have an IoT monitor, register the server
-    getMenuIoTMonitor().setRemoteServer(remoteServer);
+    getMenuIoTSetupIoTMonitor().setRemoteServer(remoteServer);
 
     // We have an EEPROM authenticator, it needs initialising
-    getMenuAuthenticator().init();
+    getMenuIoTSetupAuthenticator().init();
 }
 

@@ -227,8 +227,8 @@ using namespace tcremote;
 #include <tcMenu.h>
 
 #include <tcMenuBuilder.h>
-#include <tcUnicodeHelper.h>
 #include <RemoteConnector.h>
+#include <tcUnicodeHelper.h>
 #include <ScrollChoiceMenuItem.h>
 #include <RemoteMenuItem.h>
 #include <IoAbstractionWire.h>
@@ -251,6 +251,9 @@ extern const UnicodeFont OpenSansRegular8pt[];
 // Any externals needed by IO expanders, EEPROMs etc
 extern IoAbstractionRef ioexp_io8574;
 
+// Forward define the menu builder function
+void buildMenu(TcMenuBuilder& builder);
+
 // The following defines all menu item IDs.
 #define MENU_KITCHEN_ID  1
 #define MENU_LOUNGE_ID  2
@@ -262,30 +265,30 @@ extern IoAbstractionRef ioexp_io8574;
 #define MENU_SETTINGS_EMERGENCY_OFF_ID  8
 #define MENU_OTHER_TYPES_ID  9
 #define MENU_OTHER_TYPES_TEXT_ID  10
-#define MENU_OTHER_TYPES_R_G_B_ITEM_ID  11
+#define MENU_OTHER_TYPES_RGBITEM_ID  11
 #define MENU_OTHER_TYPES_FOODS_ID  12
-#define MENU_IO_T_SETUP_ID  13
-#define MENU_I_P_ADDRESS_ID  16
-#define MENU_IO_T_MONITOR_ID  17
-#define MENU_AUTHENTICATOR_ID  18
+#define MENU_IO_TSETUP_ID  13
+#define MENU_IO_TSETUP_IPADDRESS_ID  16
+#define MENU_IO_TSETUP_IO_TMONITOR_ID  17
+#define MENU_IO_TSETUP_AUTHENTICATOR_ID  18
 
 // Inline helper methods to access menu items
 inline AnalogMenuItem& getMenuKitchen() { return getAnalogItemById(MENU_KITCHEN_ID); }
 inline AnalogMenuItem& getMenuLounge() { return getAnalogItemById(MENU_LOUNGE_ID); }
 inline AnalogMenuItem& getMenuHallway() { return getAnalogItemById(MENU_HALLWAY_ID); }
 inline SubMenuItem& getMenuSettings() { return getSubMenuById(MENU_SETTINGS_ID); }
-inline AnalogMenuItem& getMenuTempDesired() { return getAnalogItemById(MENU_SETTINGS_TEMP_DESIRED_ID); }
-inline EnumMenuItem& getMenuMode() { return getEnumItemById(MENU_SETTINGS_MODE_ID); }
-inline BooleanMenuItem& getMenuProtection() { return getBooleanItemById(MENU_SETTINGS_PROTECTION_ID); }
-inline ActionMenuItem& getMenuEmergencyOff() { return getActionItemById(MENU_SETTINGS_EMERGENCY_OFF_ID); }
+inline AnalogMenuItem& getMenuSettingsTempDesired() { return getAnalogItemById(MENU_SETTINGS_TEMP_DESIRED_ID); }
+inline EnumMenuItem& getMenuSettingsMode() { return getEnumItemById(MENU_SETTINGS_MODE_ID); }
+inline BooleanMenuItem& getMenuSettingsProtection() { return getBooleanItemById(MENU_SETTINGS_PROTECTION_ID); }
+inline ActionMenuItem& getMenuSettingsEmergencyOff() { return getActionItemById(MENU_SETTINGS_EMERGENCY_OFF_ID); }
 inline SubMenuItem& getMenuOtherTypes() { return getSubMenuById(MENU_OTHER_TYPES_ID); }
-inline TextMenuItem& getMenuText() { return getTextItemById(MENU_OTHER_TYPES_TEXT_ID); }
-inline Rgb32MenuItem& getMenuRGBItem() { return getRgb32ItemById(MENU_OTHER_TYPES_R_G_B_ITEM_ID); }
-inline ScrollChoiceMenuItem& getMenuFoods() { return getScrollChoiceItemById(MENU_OTHER_TYPES_FOODS_ID); }
-inline SubMenuItem& getMenuIoTSetup() { return getSubMenuById(MENU_IO_T_SETUP_ID); }
-inline IpAddressMenuItem& getMenuIPAddress() { return getIpAddressItemById(MENU_I_P_ADDRESS_ID); }
-inline RemoteMenuItem& getMenuIoTMonitor() { return getIoTRemoteMenuById(MENU_IO_T_MONITOR_ID); }
-inline EepromAuthenticationInfoMenuItem& getMenuAuthenticator() { return getAuthenticationMenuById(MENU_AUTHENTICATOR_ID); }
+inline TextMenuItem& getMenuOtherTypesText() { return getTextItemById(MENU_OTHER_TYPES_TEXT_ID); }
+inline Rgb32MenuItem& getMenuOtherTypesRGBItem() { return getRgb32ItemById(MENU_OTHER_TYPES_RGBITEM_ID); }
+inline ScrollChoiceMenuItem& getMenuOtherTypesFoods() { return getScrollChoiceItemById(MENU_OTHER_TYPES_FOODS_ID); }
+inline SubMenuItem& getMenuIoTSetup() { return getSubMenuById(MENU_IO_TSETUP_ID); }
+inline IpAddressMenuItem& getMenuIoTSetupIPAddress() { return getIpAddressItemById(MENU_IO_TSETUP_IPADDRESS_ID); }
+inline RemoteMenuItem& getMenuIoTSetupIoTMonitor() { return getIoTRemoteMenuById(MENU_IO_TSETUP_IO_TMONITOR_ID); }
+inline EepromAuthenticationInfoMenuItem& getMenuIoTSetupAuthenticator() { return getAuthenticationMenuById(MENU_IO_TSETUP_AUTHENTICATOR_ID); }
 
 
 // Provide a wrapper to get hold of the root menu item and export setupMenu

@@ -210,7 +210,7 @@
     {
       "parentId": 9,
       "type": "scrollItem",
-      "defaultValue": "0-",
+      "defaultValue": "0-Unknown",
       "item": {
         "itemWidth": 10,
         "eepromOffset": 0,
@@ -460,11 +460,51 @@
         "name": "ETH_LISTEN_PORT3",
         "latestValue": "3335",
         "subsystem": "REMOTE"
+      },
+      {
+        "name": "SPACING_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_PADDING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "ITEM_PADDING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_ROUND_CORNER",
+        "latestValue": "1",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_INVERSE_SELECT",
+        "latestValue": "false",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "FONT_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_ITEM_FONT",
+        "latestValue": "tca:OpenSansRegular7pt,0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_FONT",
+        "latestValue": "tca:OpenSansRegular8pt,0",
+        "subsystem": "THEME"
       }
     ],
     "namingRecursive": true,
     "useCppMain": false,
-    "saveLocation": "ONE_SINGLE_FILE",
+    "saveLocation": "ONE_SINGLE_FILE_MENU_MAIN",
     "useDynamicMenus": true,
     "usingSizedEEPROMStorage": false,
     "eepromSaveMode": "DYNAMIC_WRITE_BY_ID",

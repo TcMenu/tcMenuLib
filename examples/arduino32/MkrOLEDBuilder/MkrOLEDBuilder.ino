@@ -17,7 +17,6 @@
 
 #include "MkrOLEDBuilder_menu.h"
 #include <Ethernet.h>
-#include <AnalogDeviceAbstraction.h>
 
 // contains the tcMenu library included graphical widget title components.
 #include "graphics/TcThemeBuilder.h"
@@ -37,6 +36,41 @@ TitleWidget connectedWidget(iconsConnection, 2, 8, 8);
 byte mac[] = {
     0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
   };
+
+// Declaring as extern any custom RtCalls and scroll variables
+extern char ScrollRam[];
+
+// Declaring any arrays used by enum/list items
+const char* strSettingsModeEnumEntries[] = { "Fully ON", "Fully OFF", "Vacation" };
+
+void buildMenu(TcMenuBuilder& builder) {
+    builder.usingDynamicEEPROMStorage()
+        .analogBuilder(MENU_KITCHEN_ID, "Kitchen", DONT_SAVE, NoMenuFlags, 0, nullptr)
+            .offset(-55).divisor(1).step(1).maxValue(255).unit("oC").endItem()
+        .analogBuilder(MENU_LOUNGE_ID, "Lounge", DONT_SAVE, NoMenuFlags, 0, nullptr)
+            .offset(-55).divisor(1).step(1).maxValue(255).unit("oC").endItem()
+        .analogBuilder(MENU_HALLWAY_ID, "Hallway", DONT_SAVE, NoMenuFlags, 0, nullptr)
+            .offset(-55).divisor(1).step(1).maxValue(255).unit("oC").endItem()
+        .subMenu(MENU_SETTINGS_ID, "Settings", NoMenuFlags, nullptr)
+            .analogBuilder(MENU_SETTINGS_TEMP_DESIRED_ID, "Temp desired", ROM_SAVE, NoMenuFlags, 0, nullptr)
+                .offset(0).divisor(1).step(1).maxValue(255).unit("Unit").endItem()
+            .enumItem(MENU_SETTINGS_MODE_ID, "Mode", ROM_SAVE, strSettingsModeEnumEntries, 3, NoMenuFlags, 0, nullptr)
+            .boolItem(MENU_SETTINGS_PROTECTION_ID, "Protection", ROM_SAVE, NAMING_ON_OFF, NoMenuFlags, false, nullptr)
+            .actionItem(MENU_SETTINGS_EMERGENCY_OFF_ID, "Emergency off", NoMenuFlags, nullptr)
+            .endSub()
+        .subMenu(MENU_OTHER_TYPES_ID, "Other Types", NoMenuFlags, nullptr)
+            .textItem(MENU_OTHER_TYPES_TEXT_ID, "Text", ROM_SAVE, 10, NoMenuFlags, "", nullptr)
+            .rgb32Item(MENU_OTHER_TYPES_RGBITEM_ID, "RGB Item", ROM_SAVE, false, NoMenuFlags, RgbColor32(0, 0, 0), nullptr)
+            .scrollChoiceBuilder(MENU_OTHER_TYPES_FOODS_ID, "Foods", ROM_SAVE, NoMenuFlags, 0, nullptr).fromRamChoices(ScrollRam, 5, 10).endItem()
+            .endSub()
+        .subMenu(MENU_IO_TSETUP_ID, "IoT Setup", NoMenuFlags, nullptr)
+            .ipAddressItem(MENU_IO_TSETUP_IPADDRESS_ID, "IP Address", DONT_SAVE, NoMenuFlags, IpAddressStorage(127, 0, 0, 1), nullptr)
+            .remoteConnectivityMonitor(MENU_IO_TSETUP_IO_TMONITOR_ID, "IoT Monitor", MenuFlags().localOnly())
+            .eepromAuthenticationItem(MENU_IO_TSETUP_AUTHENTICATOR_ID, "Authenticator", MenuFlags().localOnly(), nullptr)
+            .endSub();
+}
+
+
 
 void setup() {
     // On SAMD/MKR it's best to wait for the serial port to start before proceeding.
@@ -63,7 +97,7 @@ void setup() {
     // Here we start up the Ethernet library using the standard static IP procedure.
     // We pull the IP address from the IoT menu item and then call Ethernet.begin. In a real
     // system you'd do more checking and exit if there was a failure.
-    byte* rawIp = getMenuIPAddress().getIpAddress();
+    byte* rawIp = getMenuIoTSetupIPAddress().getIpAddress();
     if (rawIp[0] == 127) {
         IPAddress ipAddr(192,168, 0, 200);
         Ethernet.begin(mac, ipAddr);
@@ -72,13 +106,13 @@ void setup() {
         IPAddress ipAddr(rawIp[0], rawIp[1], rawIp[2], rawIp[3]);
         Ethernet.begin(mac, ipAddr);
         char sz[20];
-        getMenuIPAddress().copyValue(sz, sizeof(sz));
+        getMenuIoTSetupIPAddress().copyValue(sz, sizeof(sz));
         serlogF2(SER_DEBUG, "Ethernet available on ", sz);
     }
 
     // here we attach an extra listener to the IoT remote monitor menu item
     // this allows us to update the callback
-    getMenuIoTMonitor().registerCommsNotification([](CommunicationInfo comms) {
+    getMenuIoTSetupIoTMonitor().registerCommsNotification([](CommunicationInfo comms) {
         connectedWidget.setCurrentState(comms.connected ? 1 : 0);
     });
 
