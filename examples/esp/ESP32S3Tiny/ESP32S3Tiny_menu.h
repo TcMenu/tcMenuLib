@@ -238,6 +238,7 @@ public:
 #include <tcMenu.h>
 
 #include <tcMenuBuilder.h>
+#include <StateMachineEncoder.h>
 #include <tcUnicodeHelper.h>
 #include <ScrollChoiceMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
@@ -248,8 +249,8 @@ public:
 extern const PROGMEM ConnectorLocalInfo applicationInfo;
 extern Adafruit_ST7735 gfx;
 extern GraphicsDeviceRenderer renderer;
-extern const UnicodeFont OpenSansRegular8pt[];
-extern const UnicodeFont OpenSansRegular10pt[];
+extern const UnicodeFont OpenSansRegular12pt[];
+extern const UnicodeFont RobotoRegular14pt[];
 
 // Any externals needed by IO expanders, EEPROMs etc
 

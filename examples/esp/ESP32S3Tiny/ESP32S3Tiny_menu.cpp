@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for Arduino ESP32 by TcMenu 4.5.7 on 2026-05-18T08:03:04.614232Z.
+// Generated for Arduino ESP32 by TcMenu 5.0.0-SNAPSHOT on 2026-09-06T11:27:38.995344Z.
 
 #include <tcMenu.h>
 #include "ESP32S3Tiny_menu.h"
@@ -109,9 +109,9 @@ void AdafruitDrawable::computeBaselineIfNeeded(const GFXfont* font) {
     computedHeight = height;
 }
 
-UnicodeFontHandler *AdafruitDrawable::createFontHandler() {
-    return new UnicodeFontHandler(newAdafruitTextPipeline(graphics), ENCMODE_UTF8);
-}
+        UnicodeFontHandler *AdafruitDrawable::createFontHandler() {
+            return new UnicodeFontHandler(newAdafruitTextPipeline(graphics), ENCMODE_UTF8);
+        }
 
 
 
@@ -641,9 +641,9 @@ void AdafruitCanvasDrawable2bpp::drawBitmapNbpp(const Coord& where, const uint8_
     }
 }
 
-#include "ThemeCoolBlueTraditionalBuilder.h"
-#include <Fonts/OpenSansRegular8pt.h>
-#include <Fonts/OpenSansRegular10pt.h>
+#include <Fonts/OpenSansRegular12pt.h>
+#include <Fonts/RobotoRegular14pt.h>
+#include "ThemeCoolBlueModern.h"
 
 // Global variable declarations
 const PROGMEM  ConnectorLocalInfo applicationInfo = { "ESP32 S3 Tiny", "c035e186-32cc-45e4-ac28-773f57e108ee" };
@@ -662,8 +662,14 @@ void setupMenu() {
         gfx.initR(INITR_GREENTAB);
         gfx.setRotation(0);
         renderer.setUpdatesPerSecond(15);
-        switches.init(internalDigitalIo(), SWITCHES_NO_POLLING, true);
-        menuMgr.initForEncoder(&renderer, &getMenuSettings(), 3, 4, 5);
-        installCoolBlueTraditionalTheme(renderer, MenuFontDef(&OpenSansRegular8pt, 0), MenuFontDef(&OpenSansRegular10pt, 0), true, BaseGraphicalRenderer::NO_TITLE, true);
+        StateRotaryEncoderBuilder encBuild;
+        encBuild.withEncoderPins(4, 3)
+           .interruptOnBothPins()
+           .withCallback([](const int value) {menuMgr.valueChanged(value); })
+           .withEncoderType(FULL_CYCLE)
+           .build();
+        switches.onRelease(5, [](pinid_t /*key*/, const bool held) { menuMgr.onMenuSelect(held); });
+        menuMgr.initWithoutInput(&renderer, &getMenuSettings());
+        applyTheme(renderer);
 }
 

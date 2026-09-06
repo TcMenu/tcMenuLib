@@ -250,11 +250,11 @@
   "codeOptions": {
     "embeddedPlatform": "ARDUINO_ESP32",
     "lastDisplayUuid": "4dcb12ec-13d8-4466-b8b6-bd575eae4612",
-    "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
+    "lastInputUuid": "6c2be130-bf74-42ad-834c-ac2edd7b3f90",
     "lastRemoteUuids": [
       "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
     ],
-    "lastThemeUuid": "57945787-0A04-447B-BBA2-6461FC505397",
+    "lastThemeUuid": "1947F585-9D36-448C-8A80-B425686107BD",
     "applicationUUID": "c035e186-32cc-45e4-ac28-773f57e108ee",
     "applicationName": "ESP32 S3 Tiny",
     "lastProperties": [
@@ -412,6 +412,106 @@
         "name": "DISPLAY_CUSTOM_SPI_NAME",
         "latestValue": "SPI",
         "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_SPI_SPEED",
+        "latestValue": "0",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "ENCODER_APIN",
+        "latestValue": "4",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_BPIN",
+        "latestValue": "3",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_SEL_PIN",
+        "latestValue": "5",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_INT_PIN",
+        "latestValue": "-1",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_INT_MODE",
+        "latestValue": "BOTH",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_TYPE",
+        "latestValue": "FULL_CYCLE",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "FONT_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_ITEM_FONT",
+        "latestValue": "tca:OpenSansRegular12pt,0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_FONT",
+        "latestValue": "tca:RobotoRegular14pt,0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "SPACING_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_PADDING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "ITEM_PADDING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_TO_ITEM_SPACING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_ACTION_ROUND_CORNER",
+        "latestValue": "0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_ROUND_CORNER",
+        "latestValue": "0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_EXTRA_DRAWING_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_EDIT_ICONS",
+        "latestValue": "LO_RES",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_BUTTON_ALIGNMENT",
+        "latestValue": "JUSTIFY_TITLE_LEFT_VALUE_RIGHT",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_USE_SLIDERS_ANALOG",
+        "latestValue": "false",
+        "subsystem": "THEME"
       }
     ],
     "namingRecursive": true,
