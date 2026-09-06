@@ -166,7 +166,7 @@ namespace tcgfx {
          * @param forceDrawWidgets reference to if the widgets are to be force drawn, may be updated
          */
         void subMenuRender(MenuItem* rootItem, uint8_t& locRedrawMode, bool& forceDrawWidgets) override;
-        bool isActiveOrEditing(MenuItem* pItem, const DrawingFlags& drawingFlags);
+        bool isActiveOrEditing(MenuItem* pItem, const DrawingFlags& drawingFlags) const;
     private:
         int calculateSpaceBetween(const void* font, uint8_t mag, const char* buffer, int start, int end);
         void internalDrawText(GridPositionRowCacheEntry* pEntry, const Coord& where, const Coord& size, const DrawingFlags& drawingFlags);

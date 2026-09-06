@@ -18,7 +18,10 @@ namespace tcgfx {
     static unsigned char rendererUpArrowXbm[] = { 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0x3f, 0x1f, 0x0f, 0x07, 0x03 };
     static unsigned char rendererDownArrowXbm[] = { 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0 };
 
-    bool GraphicsDeviceRenderer::isActiveOrEditing(MenuItem* pItem, const DrawingFlags& drawingFlags) {
+    bool GraphicsDeviceRenderer::isActiveOrEditing(MenuItem* pItem, const DrawingFlags& drawingFlags) const {
+        // in card layout we should not select.
+        if(cardLayoutPane != nullptr && cardLayoutPane->isSubMenuCardLayout(menuMgr.getCurrentSubMenu())) return false;
+
         auto mt = pItem->getMenuType();
         return (drawingFlags.isEditing() || drawingFlags.isActive()) && mt != MENUTYPE_TITLE_ITEM && mt != MENUTYPE_BACK_VALUE;
     }
@@ -506,7 +509,7 @@ namespace tcgfx {
         int outsideAreaX = maximumSliderArea - filledAreaX;
         helper.getDrawable()->setDrawColor(props->getColor(ItemDisplayProperties::HIGHLIGHT1));
         helper.getDrawable()->drawBox(Coord(where.x, where.y), Coord(filledAreaX, size.y), true);
-        auto mainBg = (drawingFlags.isActive() || drawingFlags.isEditing()) ? propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND) : props->getColor(ItemDisplayProperties::BACKGROUND);
+        auto mainBg = isActiveOrEditing(pItem, drawingFlags) ? propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND) : props->getColor(ItemDisplayProperties::BACKGROUND);
         helper.getDrawable()->setDrawColor(mainBg);
         helper.getDrawable()->drawBox(Coord(where.x + filledAreaX, where.y), Coord(outsideAreaX, size.y), true);
         internalDrawText(entry, Coord(where.x, where.y), Coord(size.x, size.y), drawingFlags);
