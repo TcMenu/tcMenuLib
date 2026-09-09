@@ -1,10 +1,10 @@
 
-#include <unity.h>
 #include <MockIoAbstraction.h>
 #include <BaseRenderers.h>
 #include <MockEepromAbstraction.h>
 #include "../tutils/fixtures_extern.h"
 #include "../tutils/TestCapturingRenderer.h"
+#include <unity.h>
 
 extern MockedIoAbstraction mockIo;
 extern NoRenderer noRenderer; 

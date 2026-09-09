@@ -1,8 +1,11 @@
-#include <unity.h>
 #include <tcMenu.h>
 #include "../tutils/fixtures_extern.h"
 #include "../tutils/tcMenuFixturesExtra.h"
 #include <tcm_test/testFixtures.h>
+#include <unity.h>
+
+void setUp() {}
+void tearDown() {}
 
 // dialog tests
 void testBaseDialogInfo();
@@ -19,9 +22,8 @@ void testBaseRendererWithDefaults();
 void testTakeOverDisplay();
 void testListRendering();
 
-void setup() {
+int main(int argc, char** argv) {
     menuMgr.initWithoutInput(&noRenderer, &menuVolume);
-    Serial.begin(115200);
 
     UNITY_BEGIN();
 
@@ -40,7 +42,7 @@ void setup() {
     RUN_TEST(testTakeOverDisplay);
     RUN_TEST(testListRendering);
 
-    UNITY_END();
+    return UNITY_END();
 }
 
 void loop() {

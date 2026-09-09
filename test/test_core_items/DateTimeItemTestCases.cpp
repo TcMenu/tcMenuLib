@@ -1,8 +1,8 @@
 
-#include <unity.h>
 #include <RuntimeMenuItem.h>
 #include "../tutils/fixtures_extern.h"
 #include <tcUtil.h>
+#include <unity.h>
 
 RENDERING_CALLBACK_NAME_INVOKE(timeMenuItemTestCb, timeItemRenderFn, "Time", 103, NULL)
 RENDERING_CALLBACK_NAME_INVOKE(dateFormattedTestCb, dateItemRenderFn, "Date", 999, NULL)

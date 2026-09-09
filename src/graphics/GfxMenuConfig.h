@@ -14,7 +14,7 @@
 #define _GFX_MENU_CONFIG_H_
 
 #include <tcUtil.h>
-#include <SimpleCollections.h>
+#include <BTreeList.h>
 #include "MenuItems.h"
 #include "DrawingPrimitives.h"
 #include <IoLogging.h>

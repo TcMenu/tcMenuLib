@@ -1,7 +1,7 @@
-#include <unity.h>
 #include <tcMenu.h>
 #include <BaseDialog.h>
 #include <RemoteConnector.h>
+#include <unity.h>
 
 //
 // test implementation of the dialog, just counts up the number of render calls.

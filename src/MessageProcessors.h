@@ -9,7 +9,7 @@
 #define _TCMENU_MESSAGEPROCESSORS_H_
 
 #include <PlatformDetermination.h>
-#include <SimpleCollections.h>
+#include <BTreeList.h>
 #include "tcMenu.h"
 
 /**

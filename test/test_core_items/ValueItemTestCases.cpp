@@ -1,7 +1,7 @@
 
-#include <unity.h>
 #include "../tutils/fixtures_extern.h"
 #include <tcUtil.h>
+#include <unity.h>
 
 void testCoreAndBooleanMenuItem() {
     // these may seem overkill but the setters are bitwise so quite complex.

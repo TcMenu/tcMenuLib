@@ -1,8 +1,8 @@
-#include <unity.h>
 #include <tcMenu.h>
 #include "../tutils/fixtures_extern.h"
 #include <tcm_test/testFixtures.h>
 #include "../tutils/tcMenuFixturesExtra.h"
+#include <unity.h>
 
 const char *uuid1 = "07cd8bc6-734d-43da-84e7-6084990becfc";
 const char *uuid2 = "07cd8bc6-734d-43da-84e7-6084990becfd";
@@ -10,6 +10,10 @@ const char *uuid3 = "07cd8bc6-734d-43da-84e7-6084990becfe";
 
 NoRenderer noRenderer;
 MockEepromAbstraction eeprom(400);
+
+void setUp() {}
+
+void tearDown() {}
 
 // core menu item tests
 void testIpAddressItem();
@@ -64,8 +68,7 @@ void testTextRuntimeItem();
 void testSubMenuItem();
 void testActionMenuItem();
 
-void setup() {
-    Serial.begin(115200);
+int main(int argc, char** argv) {
     menuMgr.initWithoutInput(&noRenderer, &menuVolume);
 
     UNITY_BEGIN();
@@ -121,8 +124,5 @@ void setup() {
     RUN_TEST(testFloatType);
     RUN_TEST(testAuthMenuItem);
 
-    UNITY_END();
-}
-
-void loop() {
+    return UNITY_END();
 }

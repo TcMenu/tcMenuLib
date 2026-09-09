@@ -1,8 +1,8 @@
 
-#include <unity.h>
 #include <MockEepromAbstraction.h>
 #include "RemoteAuthentication.h"
 #include "../tutils/fixtures_extern.h"
+#include <unity.h>
 
 
 void printAllAuthenticatorEntries(EepromAuthenticatorManager& authenticator, const char* why) {

@@ -1,8 +1,8 @@
-#include <unity.h>
 #include <graphics/GfxMenuConfig.h>
 #include <graphics/BaseGraphicalRenderer.h>
 #include "../tutils/fixtures_extern.h"
 #include "../tutils/TestCapturingRenderer.h"
+#include <unity.h>
 
 using namespace tcgfx;
 
@@ -70,7 +70,7 @@ void testEmptyItemPropertiesFactory() {
     TEST_ASSERT_EQUAL(4, (int)sizeof(GridPosition));
     TEST_ASSERT_EQUAL(4, (int)sizeof(Coord));
     TEST_ASSERT_EQUAL(2, (int)sizeof(MenuPadding));
-    TEST_ASSERT_EQUAL(1, (int)sizeof(MenuBorder));
+    TEST_ASSERT_EQUAL(2, (int)sizeof(MenuBorder));
 
     ConfigurableItemDisplayPropertiesFactory factory;
     auto *config = factory.configFor(nullptr, ItemDisplayProperties::COMPTYPE_TITLE);

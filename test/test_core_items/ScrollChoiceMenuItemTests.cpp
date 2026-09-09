@@ -1,10 +1,10 @@
 
-#include <unity.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 #include "../tutils/fixtures_extern.h"
 #include <tcMenu.h>
 #include <IoLogging.h>
+#include <unity.h>
 
 void testValueAtPositionAndGetters() {
     char ramStored[] = "item1item2item3";

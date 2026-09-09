@@ -98,7 +98,7 @@ void ScrollChoiceMenuItem::valueAtPosition(char *buffer, size_t bufferSize, int 
     auto safeSize = internal_min((size_t)itemSize, bufferSize - 1);
 
     if (rangeValues != nullptr) {
-        serlogF4(SER_TCMENU_DEBUG, "Start Cached ", idx, (int)rangeValues, itemSize);
+        serlogF3(SER_TCMENU_DEBUG, "Start Cached ", idx, itemSize);
         strncpy(buffer, &rangeValues[itemSize * idx], safeSize);
         buffer[safeSize] = 0;
         serlogF2(SER_TCMENU_DEBUG, "Cached ", idx);

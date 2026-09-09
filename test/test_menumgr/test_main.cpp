@@ -1,8 +1,11 @@
-#include <unity.h>
 #include <tcMenu.h>
 #include "../tutils/tcMenuFixturesExtra.h"
 #include <tcm_test/testFixtures.h>
 #include "../tutils/fixtures_extern.h"
+#include <unity.h>
+
+void setUp() {}
+void tearDown() {}
 
 // core tests
 void testTcUtilGetParentAndVisit();
@@ -26,9 +29,8 @@ void testCreatingAndInitialisation();
 void testNavigationPushAndPop();
 void testRebuildingNavigation();
 
-void setup() {
+int main(int argc, char** argv) {
     menuMgr.initWithoutInput(&noRenderer, &menuVolume);
-    Serial.begin(115200);
 
     UNITY_BEGIN();
 
@@ -54,7 +56,7 @@ void setup() {
     //IGNORED RUN_TEST(testNavigationPushAndPop);
     //IGNORED RUN_TEST(testRebuildingNavigation);
 
-    UNITY_END();
+    return UNITY_END();
 }
 
 void loop() {
