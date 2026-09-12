@@ -28,7 +28,7 @@ void tcnav::MenuNavigationStore::navigateTo(MenuItem *activeItem, MenuItem *newR
         navIdx++;
     }
     else {
-        serlogF(SER_ERROR, "Nav exceeded");
+        serlogF(SER_WARNING, "Nav exceeded");
     }
     currentRoot = newRoot;
     currentSub = getSubMenuFor(newRoot);

@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for Arduino AVR/Uno/Mega by TcMenu 4.5.9-SNAPSHOT on 2026-08-01T11:03:55.473946Z.
+// Generated for Arduino AVR/Uno/Mega by TcMenu 5.0.0-SNAPSHOT on 2026-09-10T15:35:51.903632Z.
 
 #include <tcMenu.h>
 #include "keyboardEthernetShield_menu.h"

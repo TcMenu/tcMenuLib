@@ -84,9 +84,9 @@ void AdafruitDrawable::computeBaselineIfNeeded(const GFXfont* font) {
     computedHeight = height;
 }
 
-UnicodeFontHandler *AdafruitDrawable::createFontHandler() {
-    return new UnicodeFontHandler(newAdafruitTextPipeline(graphics), ENCMODE_UTF8);
-}
+        UnicodeFontHandler *AdafruitDrawable::createFontHandler() {
+            return new UnicodeFontHandler(newAdafruitTextPipeline(graphics), ENCMODE_UTF8);
+        }
 
 
 

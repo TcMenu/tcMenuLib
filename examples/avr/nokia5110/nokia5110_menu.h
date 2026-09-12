@@ -14,6 +14,7 @@
 #include <Arduino.h>
 #include <tcMenu.h>
 #include "tcMenuAdaFruitGfxMono.h"
+#include <StateMachineEncoder.h>
 #include "EthernetTransport.h"
 #include <RemoteConnector.h>
 #include <RemoteMenuItem.h>

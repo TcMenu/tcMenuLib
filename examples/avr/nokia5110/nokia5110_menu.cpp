@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for Arduino AVR/Uno/Mega by TcMenu 4.5.9-SNAPSHOT on 2026-08-01T10:57:13.816300Z.
+// Generated for Arduino AVR/Uno/Mega by TcMenu 5.0.0-SNAPSHOT on 2026-09-12T07:09:49.725794Z.
 
 #include <tcMenu.h>
 #include "nokia5110_menu.h"
@@ -84,10 +84,16 @@ void setupMenu() {
     gfx.setRotation(0);
     renderer.setUpdatesPerSecond(4);
     renderer.setUseSliderForAnalog(false);
-    switches.init(internalDigitalIo(), SWITCHES_POLL_EVERYTHING, true);
-    menuMgr.initForEncoder(&renderer, &menuHall, 2, 3, 4);
+    StateRotaryEncoderBuilder encBuild;
+    encBuild.withEncoderPins(2, 3)
+       .interruptOnBothPins()
+       .withCallback([](const int value) {menuMgr.valueChanged(value); })
+       .withEncoderType(FULL_CYCLE)
+       .build();
+    switches.onRelease(4, [](pinid_t /*key*/, const bool held) { menuMgr.onMenuSelect(held); });
+    menuMgr.initWithoutInput(&renderer, &menuHall);
     remoteServer.addConnection(&ethernetConnection);
-    installMonoInverseTitleTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(nullptr, 1), true, BaseGraphicalRenderer::TITLE_FIRST_ROW, false);
+    applyTheme(renderer);
 
     // We have an IoT monitor, register the server
     menuIoTMonitor.setRemoteServer(remoteServer);

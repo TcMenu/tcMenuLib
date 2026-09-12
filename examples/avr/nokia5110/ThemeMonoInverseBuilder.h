@@ -1,53 +1,44 @@
-#ifndef TCMENU_THEME_MONO_INVERSE
-#define TCMENU_THEME_MONO_INVERSE
+#ifndef TCMENU_THEME_BLOCK
+#define TCMENU_THEME_BLOCK
 
 #include <graphics/TcThemeBuilder.h>
 
-color_t defaultItemPaletteMono[] = {1, 0, 1, 1};
-color_t defaultTitlePaletteMono[] = {0, 1, 0, 0};
 
-#define TITLE_PADDING 2
-#define TITLE_SPACING 2
+
+color_t defaultItemPalette[] = { BLACK, WHITE, BLACK, BLACK };
+color_t defaultActionPalette[] = { BLACK, WHITE, BLACK, BLACK };
+color_t defaultTitlePalette[] = { WHITE, BLACK, WHITE, WHITE };
 
 /**
  * This is one of the stock themes, you can modify it to meet your requirements, and it will not be updated by tcMenu
  * Designer unless you delete it. This sets up the fonts, spacing and padding for all items.
  * @param gr the graphical renderer
- * @param itemFont the font for items
- * @param titleFont the font for titles
- * @param needEditingIcons if editing icons are needed
  */
-void installMonoInverseTitleTheme(GraphicsDeviceRenderer& gr, const MenuFontDef& itemFont, const MenuFontDef& titleFont,
-                                  bool needEditingIcons, BaseGraphicalRenderer::TitleMode titleMode, bool useUnicode) {
+void applyTheme(GraphicsDeviceRenderer& gr) {
 
     // See https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/themes/rendering-with-themes-icons-grids/
     TcThemeBuilder themeBuilder(gr);
-    themeBuilder.withSelectedColors(0, 2)
+    themeBuilder.withSelectedColors(WHITE, BLACK)
             .dimensionsFromRenderer()
-            .withItemPadding(MenuPadding(1))
-            .withRenderingSettings(titleMode, false)
-            .withPalette(defaultItemPaletteMono)
-            .withNativeFont(itemFont.fontData, itemFont.fontMag)
-            .withSpacing(1);
-
-    if(needEditingIcons) {
-        themeBuilder.withStandardLowResCursorIcons();
-    }
-
-    if(useUnicode) {
-        themeBuilder.enableTcUnicode();
-    }
+            .withItemPadding(MenuPadding(2))
+            .withRenderingSettings(BaseGraphicalRenderer::TITLE_ALWAYS, false)
+            .withPalette(defaultItemPalette)
+            .withNativeFont(nullptr, 1)
+            .withSpacing(1)
+            .withStandardLowResCursorIcons();
 
     themeBuilder.defaultTitleProperties()
-            .withNativeFont(titleFont.fontData, titleFont.fontMag)
-            .withPalette(defaultTitlePaletteMono)
-            .withPadding(MenuPadding(TITLE_PADDING))
+            .withNativeFont(nullptr, 1)
+            .withPalette(defaultTitlePalette)
+            .withPadding(MenuPadding(2))
             .withJustification(tcgfx::GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE)
-            .withSpacing(TITLE_SPACING)
+            .withSpacing(1)
             .apply();
 
     themeBuilder.defaultActionProperties()
             .withJustification(tcgfx::GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE)
+            .withPadding(MenuPadding(2))
+            .withPalette(defaultActionPalette)
             .apply();
 
     themeBuilder.defaultItemProperties()
@@ -57,4 +48,5 @@ void installMonoInverseTitleTheme(GraphicsDeviceRenderer& gr, const MenuFontDef&
     themeBuilder.apply();
 }
 
-#endif //TCMENU_THEME_MONO_INVERSE
+#endif //TCMENU_THEME_BLOCK
+
