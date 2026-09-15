@@ -321,6 +321,9 @@ EthernetTagValTransport ethernetTransport;
 TagValueRemoteServerConnection ethernetConnection(ethernetTransport, ethernetInitialisation);
 
 void setupMenu() {
+    // always initialise the task manager atomics before anything else.
+    tmInitAtomics();
+
     // First we set up eeprom and authentication (if needed).
     setEepromStorageMode(TC_STORE_ROM_DYNAMIC);
     menuMgr.setEepromRef(&glI2cRom);

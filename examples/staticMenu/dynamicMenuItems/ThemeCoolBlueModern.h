@@ -3,11 +3,15 @@
 
 #include <graphics/TcThemeBuilder.h>
 
+#include <UnicodeFontDefs.h>
+extern const UnicodeFont OpenSansRegular10pt[];
+extern const UnicodeFont OpenSansRegular14pt[];
 
 
-color_t defaultItemPalette[] = { WHITE, BLACK, WHITE, WHITE };
-color_t defaultActionPalette[] = { WHITE, BLACK, WHITE, WHITE };
-color_t defaultTitlePalette[] = { WHITE, BLACK, WHITE, WHITE };
+
+color_t defaultItemPalette[] = { RGB(255, 255, 255), RGB(0, 64, 135), RGB(20, 133, 255), RGB(31, 100, 178) };
+color_t defaultActionPalette[] = { RGB(255, 255, 255), RGB(0, 45, 120), RGB(20, 133, 255), RGB(31, 100, 178) };
+color_t defaultTitlePalette[] = { RGB(0, 0, 0), RGB(20, 132, 255), RGB(192, 192, 192), RGB(64, 64, 64) };
 
 /**
  * This is one of the stock themes, you can modify it to meet your requirements, and it will not be updated by tcMenu
@@ -18,26 +22,27 @@ void applyTheme(GraphicsDeviceRenderer& gr) {
 
     // See https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/themes/rendering-with-themes-icons-grids/
     TcThemeBuilder themeBuilder(gr);
-    themeBuilder.withSelectedColors(BLACK, WHITE)
+    themeBuilder.withSelectedColors(RGB(31, 88, 100), RGB(255, 255, 255))
             .dimensionsFromRenderer()
             .withItemPadding(MenuPadding(2))
             .withRenderingSettings(BaseGraphicalRenderer::TITLE_FIRST_ROW, false)
             .withPalette(defaultItemPalette)
-            .withNativeFont(u8g2_font_6x10_tf, 1)
+            .withTcUnicodeFont(OpenSansRegular10pt)
             .withSpacing(1)
-            .withStandardLowResCursorIcons();
+            .withStandardLowResCursorIcons()
+            .enableTcUnicode();
 
     themeBuilder.defaultTitleProperties()
-            .withNativeFont(u8g2_font_7x14_tf, 1)
+            .withTcUnicodeFont(OpenSansRegular14pt)
             .withPalette(defaultTitlePalette)
             .withPadding(MenuPadding(2))
-            .withJustification(tcgfx::GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE)
+            .withJustification(tcgfx::GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT)
             .withSpacing(2)
-            .withBorder(MenuBorder(0, 0, 1, 0))
+            .withBorder(MenuBorder(4, BORD_FILL_ROUNDED))
             .apply();
 
     themeBuilder.defaultActionProperties()
-            .withJustification(tcgfx::GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE)
+            .withJustification(tcgfx::GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT)
             .withPadding(MenuPadding(2))
             .withPalette(defaultActionPalette)
             .apply();

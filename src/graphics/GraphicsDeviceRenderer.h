@@ -78,9 +78,10 @@ namespace tcgfx {
          * @param font the font to measure
          * @param mag any magnification to apply - if supported
          * @param padding the padding for the item, bottom will be adjusted
+         * @param border the border for the item
          * @return the height of the item.
          */
-        int heightForFontPadding(const void *font, int mag, MenuPadding &padding);
+        int heightForFontPadding(const void *font, int mag, MenuPadding &padding, const MenuBorder &border);
 
         /**
          * Set up the display based on the legacy graphics configuration. This is deprecated and you should move to

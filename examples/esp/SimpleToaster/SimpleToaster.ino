@@ -13,6 +13,7 @@
 #include "SimpleToaster_menu.h"
 #include <Wire.h>
 #include <IoAbstractionWire.h>
+#include <EEPROM.h>
 
 // this is the interrupt pin connection from the PCF8574 back to the ESP8266 board.
 #define IO_INTERRUPT_PIN 12

@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for Arduino ESP8266 by TcMenu 4.5.7 on 2026-05-15T18:03:34.599063636Z.
+// Generated for Arduino ESP8266 by TcMenu 5.0.0-SNAPSHOT on 2026-09-15T07:01:49.210692Z.
 
 #include <tcMenu.h>
 #include "SimpleToaster_menu.h"
@@ -186,6 +186,9 @@ U8g2Drawable gfxDrawable(&gfx, &Wire);
 GraphicsDeviceRenderer renderer(30, applicationInfo.name, &gfxDrawable);
 
 void setupMenu() {
+    // always initialise the task manager atomics before anything else.
+    tmInitAtomics();
+
     // First we set up eeprom and authentication (if needed).
     setEepromStorageMode(TC_STORE_ROM_DYNAMIC);
     menuMgr.setEepromRef(&glArduinoEeprom);
@@ -197,6 +200,5 @@ void setupMenu() {
         renderer.setUpdatesPerSecond(10);
         switches.init(internalDigitalIo(), SWITCHES_POLL_EVERYTHING, true);
         menuMgr.initForEncoder(&renderer, &getMenuToasterPower(), 13, 12, 14);
-        installMonoBorderTitleTheme(renderer, MenuFontDef(nullptr, 1), MenuFontDef(u8g2_font_finderskeepers_tf, 1), true, BaseGraphicalRenderer::TITLE_FIRST_ROW, false);
+        applyTheme(renderer);
 }
-

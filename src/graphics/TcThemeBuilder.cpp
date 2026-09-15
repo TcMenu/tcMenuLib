@@ -6,7 +6,7 @@
 #include "TcThemeBuilder.h"
 
 void ThemePropertiesBuilder::apply() {
-    auto autoHeight = themeBuilder->getRenderer().heightForFontPadding(fontData, fontMag, padding);
+    auto autoHeight = themeBuilder->getRenderer().heightForFontPadding(fontData, fontMag, padding, border);
     if(currentLevel == THEME_GLOBAL) {
         themeBuilder->getItemFactory().setDrawingPropertiesDefault(
                 componentType, palette, padding, fontData, fontMag, spacing, autoHeight, justification, border);
@@ -29,7 +29,7 @@ void ThemePropertiesBuilder::apply() {
                     if(drawingMode == GridPosition::DRAW_AS_ICON_ONLY) {
                         gridHeight = y + spacing + padding.top + padding.right + border.top + border.bottom;
                     } else {
-                        gridHeight = y + themeBuilder->getRenderer().heightForFontPadding(fontData, fontMag, padding);
+                        gridHeight = y + themeBuilder->getRenderer().heightForFontPadding(fontData, fontMag, padding, border);
                     }
                 } else {
                     gridHeight = -1;

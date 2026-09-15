@@ -33,6 +33,7 @@ class SecuredMenuPopup;
  */
 class MenuManagerObserver {
 public:
+    virtual ~MenuManagerObserver() = default;
     /**
      * Indicates that the menu structure has changed in a way that requires a new bootstrap and complete redraw. For
      * example when a new menu item is added, or when static values such as the name or info block data change.

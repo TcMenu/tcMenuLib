@@ -61,6 +61,16 @@ namespace tcgfx {
         getSubDeviceFor(const Coord &where, const Coord &size, const color_t *palette, int paletteSize) = 0;
 
         /**
+         * Sets a palette index to a new value, the value must be within the size of the palette.
+         * The default implementation does nothing, it is only implemented in palette based buffers.
+         * @param index The index within the palette - zero based
+         * @param col the new palette entry
+         */
+        virtual void setPaletteEntry(size_t index, color_t col) {
+        }
+
+
+        /**
          * Draw text at the location requested using the font and color information provided. If the TcUnicode flag is
          * enabled then all drawing will take place using TcUnicode, otherwise the native font support will be called,
          * as implemented by `internalDrawText`.

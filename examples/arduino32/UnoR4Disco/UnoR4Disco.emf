@@ -268,7 +268,7 @@
     "lastRemoteUuids": [
       "46c30011-cac6-4598-a7b8-b0630d55daab"
     ],
-    "lastThemeUuid": "57945787-0A04-447B-BBA2-6461FC505397",
+    "lastThemeUuid": "94D05CB2-952F-4E0C-A402-9F51CAFBD99E",
     "applicationUUID": "4f60a98f-ca51-4c80-acbd-78bfd1e90c8d",
     "applicationName": "Uno R4 Disco",
     "lastProperties": [
@@ -374,7 +374,7 @@
       },
       {
         "name": "ENC_KEY_REPEAT",
-        "latestValue": "20",
+        "latestValue": "2",
         "subsystem": "INPUT"
       },
       {
@@ -451,6 +451,86 @@
         "name": "DISPLAY_CUSTOM_SPI_NAME",
         "latestValue": "SPI",
         "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_SPI_SPEED",
+        "latestValue": "0",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_DOUBLE_BUFFER_SEP_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_DOUBLE_BUFFER",
+        "latestValue": "4BPP",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "FONT_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_ITEM_FONT",
+        "latestValue": "tca:RobotoRegular12pt,0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_FONT",
+        "latestValue": "tca:RobotoRegular14pt,0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "SPACING_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_PADDING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "ITEM_PADDING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_TO_ITEM_SPACING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_ACTION_ROUND_CORNER",
+        "latestValue": "0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_ROUND_CORNER",
+        "latestValue": "4",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_EXTRA_DRAWING_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_EDIT_ICONS",
+        "latestValue": "LO_RES",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_BUTTON_ALIGNMENT",
+        "latestValue": "JUSTIFY_TITLE_LEFT_WITH_VALUE",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_USE_SLIDERS_ANALOG",
+        "latestValue": "false",
+        "subsystem": "THEME"
       }
     ],
     "namingRecursive": true,

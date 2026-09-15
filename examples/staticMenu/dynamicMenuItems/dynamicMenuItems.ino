@@ -262,12 +262,15 @@ void CALLBACK_FUNCTION onDialogQuestion(int id) {
 class MyDialogController : public BaseDialogController {
 private:
     // create an extra button (buttonNum = 2)
-    LocalDialogButtonMenuItem menuExtraButton = LocalDialogButtonMenuItem(dialogButtonRenderFn, nextRandomId(), 2, nullptr);
+    LocalDialogButtonMenuItem menuExtraButton;
 
     // create an extra analog item to add.
     AnalogMenuInfo minfoAnalogController = { "Current", nextRandomId(), 0xffff, 100, NO_CALLBACK, 0, 1,"" };
-    AnalogMenuItem menuAnalogController = AnalogMenuItem(&minfoAnalogController, 0, nullptr, false);
+    AnalogMenuItem menuAnalogController;
 public:
+    MyDialogController() : menuExtraButton(dialogButtonRenderFn, nextRandomId(), 2, nullptr),
+           menuAnalogController(&minfoAnalogController, 0, nullptr, INFO_LOCATION_RAM) {}
+
     void initialiseAndGetHeader(BaseDialog *dialog, char *buffer, size_t bufferSize) override {
         // here we are responsible for setting the dialog title by copying the title text into the provided buffer,
         // and we can also add any extra items that we need here too.

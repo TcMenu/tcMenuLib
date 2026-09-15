@@ -597,6 +597,26 @@
         "name": "ENCODER_TYPE",
         "latestValue": "FULL_CYCLE",
         "subsystem": "INPUT"
+      },
+      {
+        "name": "SWITCHES_INIT_MODE",
+        "latestValue": "POLLING",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SWITCHES_BUTTON_PULLUP",
+        "latestValue": "true",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SEPARATOR_SWITCHES_INTENC_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SEPARATOR_INTENC_MAIN_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "INPUT"
       }
     ],
     "namingRecursive": false,

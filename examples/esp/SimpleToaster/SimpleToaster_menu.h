@@ -156,14 +156,14 @@ inline EnumMenuItem& getMenuType() { return getEnumItemById(MENU_TYPE_ID); }
 inline BooleanMenuItem& getMenuFrozen() { return getBooleanItemById(MENU_FROZEN_ID); }
 inline ActionMenuItem& getMenuStartToasting() { return getActionItemById(MENU_START_TOASTING_ID); }
 inline SubMenuItem& getMenuSettings() { return getSubMenuById(MENU_SETTINGS_ID); }
-inline BooleanMenuItem& getMenuSettingsSafetyLock() { return getBooleanItemById(MENU_SETTINGS_SAFETY_LOCK_ID); }
+inline BooleanMenuItem& getMenusettingsSafetyLock() { return getBooleanItemById(MENU_SETTINGS_SAFETY_LOCK_ID); }
 inline TextMenuItem& getMenuSettingsUserName() { return getTextItemById(MENU_SETTINGS_USER_NAME_ID); }
 inline EditableLargeNumberMenuItem& getMenuSettingsSerialNumber() { return getLargeNumberItemById(MENU_SETTINGS_SERIAL_NUMBER_ID); }
 inline ActionMenuItem& getMenuSettingsSaveSettings() { return getActionItemById(MENU_SETTINGS_SAVE_SETTINGS_ID); }
 inline SubMenuItem& getMenuExtras() { return getSubMenuById(MENU_EXTRAS_ID); }
 inline Rgb32MenuItem& getMenuExtrasRGB() { return getRgb32ItemById(MENU_EXTRAS_RGB_ID); }
 inline IpAddressMenuItem& getMenuExtrasIp() { return getIpAddressItemById(MENU_EXTRAS_IP_ID); }
-inline DateFormattedMenuItem& getMenuExtrasTime() { return getDateItemById(MENU_EXTRAS_TIME_ID); }
+inline TimeFormattedMenuItem& getMenuExtrasTime() { return getTimeItemById(MENU_EXTRAS_TIME_ID); }
 inline DateFormattedMenuItem& getMenuExtrasDate() { return getDateItemById(MENU_EXTRAS_DATE_ID); }
 
 

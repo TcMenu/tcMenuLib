@@ -61,6 +61,7 @@ class TagValueRemoteConnector; // forward reference
  */
 class BaseDialogController {
 public:
+    virtual ~BaseDialogController() = default;
     /**
      * Initialise the dialog and get the text for the header. It is called once during the dialog being shown. If you
      * need to add extra menu items or buttons, this is the place to add them.

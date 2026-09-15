@@ -13,6 +13,7 @@
         "variableName": "MainPower",
         "id": 1,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -28,6 +29,7 @@
         "variableName": "Oven",
         "id": 2,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -43,6 +45,7 @@
         "variableName": "PizzaMaker",
         "id": 3,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -63,6 +66,7 @@
         "variableName": "PizzaMakerOvenTemp",
         "id": 4,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -72,7 +76,7 @@
     {
       "parentId": 3,
       "type": "scrollItem",
-      "defaultValue": "0-",
+      "defaultValue": "0-Unknown",
       "item": {
         "itemWidth": 10,
         "eepromOffset": 0,
@@ -83,6 +87,7 @@
         "variableName": "PizzaMakerTopping1",
         "id": 5,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -92,7 +97,7 @@
     {
       "parentId": 3,
       "type": "scrollItem",
-      "defaultValue": "0-",
+      "defaultValue": "0-Unknown",
       "item": {
         "itemWidth": 10,
         "eepromOffset": 0,
@@ -103,6 +108,7 @@
         "variableName": "PizzaMakerTopping2",
         "id": 6,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -112,7 +118,7 @@
     {
       "parentId": 3,
       "type": "scrollItem",
-      "defaultValue": "0-",
+      "defaultValue": "0-Unknown",
       "item": {
         "itemWidth": 10,
         "eepromOffset": 0,
@@ -123,6 +129,7 @@
         "variableName": "PizzaMakerTopping3",
         "id": 7,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -153,6 +160,7 @@
         "variableName": "Dialogs",
         "id": 9,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -230,6 +238,7 @@
         "variableName": "DialogsBlockedSub",
         "id": 15,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -244,6 +253,7 @@
         "variableName": "DialogsBlockedAction",
         "id": 17,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -260,6 +270,7 @@
         "variableName": "DialogsBlockedBool",
         "id": 18,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -292,6 +303,7 @@
         "variableName": "Runtimes",
         "id": 19,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -309,6 +321,7 @@
         "variableName": "TextItem",
         "id": 20,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -326,6 +339,7 @@
         "variableName": "IpItem",
         "id": 21,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -358,7 +372,7 @@
     "lastRemoteUuids": [
       "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
     ],
-    "lastThemeUuid": "57945787-0A04-447B-BBA2-6461FC505397",
+    "lastThemeUuid": "1947F585-9D36-448C-8A80-B425686107BD",
     "applicationUUID": "5f22995e-8da2-49c4-9ec8-d055901003af",
     "applicationName": "Dynamic Menus",
     "lastProperties": [
@@ -581,23 +595,123 @@
         "name": "NEED_EDITING_ICONS",
         "latestValue": "true",
         "subsystem": "THEME"
+      },
+      {
+        "name": "DISPLAY_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "PINS_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "OTHER_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_SPI_SPEED",
+        "latestValue": "0",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_CUSTOM_SPI_NAME",
+        "latestValue": "SPI",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "FONT_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_ITEM_FONT",
+        "latestValue": "tca:OpenSansRegular10pt,0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_FONT",
+        "latestValue": "tca:OpenSansRegular14pt,0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "SPACING_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_PADDING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "ITEM_PADDING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_TO_ITEM_SPACING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_ACTION_ROUND_CORNER",
+        "latestValue": "0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_ROUND_CORNER",
+        "latestValue": "4",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_EXTRA_DRAWING_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_EDIT_ICONS",
+        "latestValue": "LO_RES",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_BUTTON_ALIGNMENT",
+        "latestValue": "JUSTIFY_TITLE_LEFT_VALUE_RIGHT",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_USE_SLIDERS_ANALOG",
+        "latestValue": "false",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "DISPLAY_DOUBLE_BUFFER",
+        "latestValue": "4BPP",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_DOUBLE_BUFFER_SEP_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
       }
     ],
     "namingRecursive": true,
     "useCppMain": false,
     "saveLocation": "PROJECT_TO_CURRENT_WITH_GENERATED",
+    "useDynamicMenus": false,
     "usingSizedEEPROMStorage": false,
+    "eepromSaveMode": "LEGACY_WRITE_BY_POSITION",
     "eepromDefinition": "",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
-      "mcp23017:io23017:32:10",
-      "deviceIO:"
+      "deviceIO:",
+      "mcp23017:io23017:32:10"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []
-    },
-    "packageNamespace": "",
-    "appIsModular": false
+    }
   },
   "stringLists": []
 }

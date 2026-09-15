@@ -62,7 +62,7 @@ public:
     /**
      * @return the size in bytes needed to store the pixels for this buffer
      */
-    size_t getByteCount() { return (((_width + 3) / 4) * _height) * 2; };
+    size_t getByteCount() const { return ((_width + 3) / 4) * _height; };
     void drawPixel(int16_t x, int16_t y, uint16_t color) override;
     void fillScreen(uint16_t color) override;
     void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color) override;

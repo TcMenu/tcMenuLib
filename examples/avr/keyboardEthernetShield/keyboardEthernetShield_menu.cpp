@@ -110,6 +110,9 @@ const PROGMEM AnyMenuInfo minfoTime = { "Time", 1, 8, 0, NO_CALLBACK };
 TimeFormattedMenuItem menuTime(&minfoTime, TimeStorage(0, 0, 0, 0), (MultiEditWireType)3, &menuAnalog1, INFO_LOCATION_PGM);
 
 void setupMenu() {
+    // always initialise the task manager atomics before anything else.
+    tmInitAtomics();
+
     // First we set up eeprom and authentication (if needed).
     setEepromStorageMode(TC_STORE_ROM_LEGACY);
     menuMgr.setEepromRef(&glAvrRom);

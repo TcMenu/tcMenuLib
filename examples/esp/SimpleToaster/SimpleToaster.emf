@@ -1,7 +1,7 @@
 {
   "version": "1.00",
   "projectName": "C:\\Users\\dave\\Documents\\Arduino\\tcLibraryDev\\lib\\tcMenu\\examples\\simpleU8g2\\simpleU8g2.emf",
-  "author": "root",
+  "author": "dave",
   "items": [
     {
       "parentId": 0,
@@ -100,7 +100,7 @@
       "item": {
         "naming": "TRUE_FALSE",
         "name": "Safety lock",
-        "variableName": "",
+        "variableName": "settingsSafetyLock",
         "id": 6,
         "eepromAddress": 32,
         "functionName": "",
@@ -389,6 +389,51 @@
       {
         "name": "USE_TC_UNICODE",
         "latestValue": "false",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "SPACING_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_PADDING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "ITEM_PADDING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_ROUND_CORNER",
+        "latestValue": "1",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_INVERSE_SELECT",
+        "latestValue": "false",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "DISPLAY_WHITE_TXT_BLACK_BG",
+        "latestValue": "true",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "FONT_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_ITEM_FONT",
+        "latestValue": "u8g2:u8g2_font_6x10_tf,1",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_FONT",
+        "latestValue": "u8g2:u8g2_font_7x14_tf,1",
         "subsystem": "THEME"
       }
     ],

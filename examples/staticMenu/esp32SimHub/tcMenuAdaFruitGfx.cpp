@@ -300,7 +300,7 @@ TcGFXcanvas2::~TcGFXcanvas2() {
 
 bool TcGFXcanvas2::reInitCanvas(int w, int h) {
     // first check we can allocate this buffer
-    size_t bytesNeededForThisBuffer = (((w + 3) / 4) * h) * 2;
+    size_t bytesNeededForThisBuffer = ((w + 3) / 4) * h;
     if(bytesNeededForThisBuffer >= maxBytesAvailable) {
         return false;
     }

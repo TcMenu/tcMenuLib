@@ -512,6 +512,36 @@
         "name": "THEME_USE_SLIDERS_ANALOG",
         "latestValue": "false",
         "subsystem": "THEME"
+      },
+      {
+        "name": "SEPARATOR_INTENC_MAIN_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SEPARATOR_SWITCHES_INTENC_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SWITCHES_INIT_MODE",
+        "latestValue": "POLLING",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SWITCHES_BUTTON_PULLUP",
+        "latestValue": "true",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "DISPLAY_DOUBLE_BUFFER_SEP_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_DOUBLE_BUFFER",
+        "latestValue": "4BPP",
+        "subsystem": "DISPLAY"
       }
     ],
     "namingRecursive": true,

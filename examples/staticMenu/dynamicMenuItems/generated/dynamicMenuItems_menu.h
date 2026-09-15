@@ -13,13 +13,13 @@
 
 #include <Arduino.h>
 #include <tcMenu.h>
-#include <tcUnicodeHelper.h>
 #include "tcMenuAdaFruitGfx.h"
 #include <tcMenuKeyboard.h>
+#include <tcUnicodeHelper.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
-#include <IoAbstractionWire.h>
 #include <IoAbstraction.h>
+#include <IoAbstractionWire.h>
 #include <EepromItemStorage.h>
 
 // variables we declare that you may need to access
@@ -28,8 +28,8 @@ extern Adafruit_ST7735 gfx;
 extern GraphicsDeviceRenderer renderer;
 extern MatrixKeyboardManager keyboard;
 extern MenuEditingKeyListener tcMenuKeyListener;
-extern const UnicodeFont OpenSansRegular8pt[];
-extern const UnicodeFont OpenSansCyrillicLatin12[];
+extern const UnicodeFont OpenSansRegular10pt[];
+extern const UnicodeFont OpenSansRegular14pt[];
 
 // Any externals needed by IO expanders, EEPROMs etc
 extern IoAbstractionRef ioexp_io23017;

@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for Arduino AVR/Uno/Mega by TcMenu 5.0.0-SNAPSHOT on 2026-09-12T07:09:49.725794Z.
+// Generated for Arduino AVR/Uno/Mega by TcMenu 5.0.0-SNAPSHOT on 2026-09-12T11:07:59.486561Z.
 
 #include <tcMenu.h>
 #include "nokia5110_menu.h"
@@ -70,6 +70,9 @@ const PROGMEM AnalogMenuInfo minfoHall = { "Hall", 1, 2, 100, onHallLight, 0, 1,
 AnalogMenuItem menuHall(&minfoHall, 0, &menuLiving, INFO_LOCATION_PGM);
 
 void setupMenu() {
+    // always initialise the task manager atomics before anything else.
+    tmInitAtomics();
+
     // First we set up eeprom and authentication (if needed).
     setEepromStorageMode(TC_STORE_ROM_LEGACY);
     menuMgr.setEepromRef(&glAvrRom);
@@ -84,6 +87,7 @@ void setupMenu() {
     gfx.setRotation(0);
     renderer.setUpdatesPerSecond(4);
     renderer.setUseSliderForAnalog(false);
+    switches.init(asIoRef(internalDigitalDevice()), SWITCHES_POLL_KEYS_ONLY, true);
     StateRotaryEncoderBuilder encBuild;
     encBuild.withEncoderPins(2, 3)
        .interruptOnBothPins()

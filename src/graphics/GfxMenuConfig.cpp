@@ -96,10 +96,8 @@ ItemDisplayProperties *ConfigurableItemDisplayPropertiesFactory::configForCurren
     uint32_t key = MakePropsKey(subId, true, compType);
 
     pConf = displayProperties.getByKey(key);
-    serlogF3(SER_TCMENU_DEBUG, "Find key sub: ", key, pConf != nullptr);
     if(pConf) return pConf;
 
-    serlogF(SER_TCMENU_DEBUG, "Find use def");
     pConf = displayProperties.getByKey(MakePropsKey(MENUID_NOTSET, false, compType));
     if(pConf) return pConf;
 

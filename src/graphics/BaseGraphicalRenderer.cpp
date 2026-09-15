@@ -417,7 +417,10 @@ void BaseGraphicalRenderer::redrawAllWidgets(bool forceRedraw) {
         widgetRight = widgetRight - (displayProps->getPadding().right + widget->getWidth());
         if(widget->isChanged() || forceRedraw) {
             widget->setChanged(false);
-            drawWidget(Coord(widgetRight, displayProps->getPadding().top), widget, widFg, widBg);
+            int topStart = displayProps->getPadding().top;
+            MenuBorder border = displayProps->getBorder();
+            topStart += border.getBoxDim(border.top);
+            drawWidget(Coord(widgetRight, topStart), widget, widFg, widBg);
         }
         widget = widget->getNext();
     }

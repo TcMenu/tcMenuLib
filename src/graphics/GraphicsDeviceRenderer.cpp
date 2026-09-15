@@ -41,8 +41,7 @@ namespace tcgfx {
 
         switch(command) {
             case DRAW_COMMAND_CLEAR: {
-                const auto* cfg = propertiesFactory.configFor(nullptr, ItemDisplayProperties::COMPTYPE_ITEM);
-                helper.getDrawable()->setDrawColor(cfg->getColor(ItemDisplayProperties::BACKGROUND));
+                helper.getDrawable()->setDrawColor(overallCfg->getColor(ItemDisplayProperties::BACKGROUND));
                 helper.getDrawable()->drawBox(Coord(0, 0), Coord(width, height), true);
                 break;
             }
@@ -87,13 +86,15 @@ namespace tcgfx {
             return;
         }
 
-        color_t palette[4];
+        color_t palette[5];
         bool selected = isActiveOrEditing(entry->getMenuItem(), drawingFlags);
         palette[ItemDisplayProperties::TEXT] = (selected) ? propertiesFactory.getSelectedColor(ItemDisplayProperties::TEXT) : entry->getDisplayProperties()->getPalette()[ItemDisplayProperties::TEXT];
         palette[ItemDisplayProperties::BACKGROUND] = (selected) ? propertiesFactory.getSelectedColor(ItemDisplayProperties::BACKGROUND) : entry->getDisplayProperties()->getPalette()[ItemDisplayProperties::BACKGROUND];
         palette[ItemDisplayProperties::HIGHLIGHT1] = entry->getDisplayProperties()->getPalette()[ItemDisplayProperties::HIGHLIGHT1];
         palette[ItemDisplayProperties::HIGHLIGHT2] = entry->getDisplayProperties()->getPalette()[ItemDisplayProperties::HIGHLIGHT2];
-        helper.reConfigure(palette, 4, where, areaSize);
+        palette[4] = overallScreenBgColor;
+        const int paletteSize = rootDrawable->getSubDeviceType() == DeviceDrawable::SUB_DEVICE_4BPP ? 5 : 4;
+        helper.reConfigure(palette, paletteSize, where, areaSize);
 
         Coord wh = helper.offsetLocation(where);
 
@@ -546,11 +547,15 @@ namespace tcgfx {
         }
     }
 
-    int GraphicsDeviceRenderer::heightForFontPadding(const void *font, int mag, MenuPadding &padding) {
+    int GraphicsDeviceRenderer::heightForFontPadding(const void *font, int mag, MenuPadding &padding, const MenuBorder& border) {
         int baseline=0;
         helper.setFontFromParameters(font, mag);
         Coord sizeInfo = helper.textExtents("();yg1", &baseline);
-        int hei = sizeInfo.y + padding.top + padding.bottom;
+        int borderHeight = border.top + border.bottom;
+        if (border.getBorderType() == BORD_FILL_ROUNDED) {
+            borderHeight = borderHeight / 2; // filled borders pad with half the border height.
+        }
+        int hei = sizeInfo.y + padding.top + padding.bottom + borderHeight;
         padding.bottom += baseline; // add the baseline to padding.
         return hei;
     }
@@ -566,8 +571,8 @@ namespace tcgfx {
 
         setUseSliderForAnalog(false);// the colour choices probably won't work well with this.
 
-        int titleHeight = heightForFontPadding(gfxConfig->titleFont, gfxConfig->titleFontMagnification, gfxConfig->titlePadding);
-        int itemHeight = heightForFontPadding(gfxConfig->itemFont, gfxConfig->itemFontMagnification, gfxConfig->itemPadding);
+        int titleHeight = heightForFontPadding(gfxConfig->titleFont, gfxConfig->titleFontMagnification, gfxConfig->titlePadding, MenuBorder(0));
+        int itemHeight = heightForFontPadding(gfxConfig->itemFont, gfxConfig->itemFontMagnification, gfxConfig->itemPadding, MenuBorder(0));
 
         preparePropertiesFromConfig(propertiesFactory, reinterpret_cast<const ColorGfxMenuConfig<const void *>*>(gfxConfig), titleHeight, itemHeight);
 
