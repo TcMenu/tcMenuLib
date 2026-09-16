@@ -242,7 +242,7 @@
   "codeOptions": {
     "embeddedPlatform": "ARDUINO32",
     "lastDisplayUuid": "fd998437-c4b2-4386-ba88-d0ae7c20620b",
-    "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
+    "lastInputUuid": "6c2be130-bf74-42ad-834c-ac2edd7b3f90",
     "lastRemoteUuids": [
       "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb"
     ],
@@ -379,6 +379,106 @@
         "name": "USE_TC_UNICODE",
         "latestValue": "false",
         "subsystem": "THEME"
+      },
+      {
+        "name": "SPACING_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_PADDING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "ITEM_PADDING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_ACTION_ROUND_CORNER",
+        "latestValue": "0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_ROUND_CORNER",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_INVERSE_SELECT",
+        "latestValue": "true",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "DISPLAY_WHITE_TXT_BLACK_BG",
+        "latestValue": "true",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "FONT_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_ITEM_FONT",
+        "latestValue": "def:,1",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_FONT",
+        "latestValue": "def:,1",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "SEPARATOR_INTENC_MAIN_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_APIN",
+        "latestValue": "6",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_BPIN",
+        "latestValue": "5",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_SEL_PIN",
+        "latestValue": "4",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_INT_PIN",
+        "latestValue": "-1",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_INT_MODE",
+        "latestValue": "BOTH",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_TYPE",
+        "latestValue": "FULL_CYCLE",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SEPARATOR_SWITCHES_INTENC_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SWITCHES_INIT_MODE",
+        "latestValue": "POLLING",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SWITCHES_BUTTON_PULLUP",
+        "latestValue": "true",
+        "subsystem": "INPUT"
       }
     ],
     "namingRecursive": true,

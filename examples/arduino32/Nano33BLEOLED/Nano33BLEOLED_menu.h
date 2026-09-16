@@ -116,6 +116,7 @@ protected:
 #include <tcMenu.h>
 
 #include <tcMenuBuilder.h>
+#include <StateMachineEncoder.h>
 #include <IoAbstraction.h>
 #include <EepromItemStorage.h>
 
@@ -134,32 +135,32 @@ void buildMenu(TcMenuBuilder& builder);
 // The following defines all menu item IDs.
 #define MENU_TEMP_ID  1
 #define MENU_HUMIDITY_ID  3
-#define MENU_B_PRESSURE_ID  2
+#define MENU_BPRESSURE_ID  2
 #define MENU_ACCELEROMETER_ID  4
-#define MENU_MAG_X_ID  5
-#define MENU_MAG_Y_ID  6
-#define MENU_MAG_Z_ID  7
-#define MENU_ACCEL_X_ID  8
-#define MENU_ACCEL_Y_ID  9
-#define MENU_ACCEL_Z_ID  10
+#define MENU_ACCELEROMETER_MAG_X_ID  5
+#define MENU_ACCELEROMETER_MAG_Y_ID  6
+#define MENU_ACCELEROMETER_MAG_Z_ID  7
+#define MENU_ACCELEROMETER_ACCEL_X_ID  8
+#define MENU_ACCELEROMETER_ACCEL_Y_ID  9
+#define MENU_ACCELEROMETER_ACCEL_Z_ID  10
 #define MENU_ANALOG_READINGS_ID  11
-#define MENU_IN_A0_ID  12
-#define MENU_OUTPUT_P_W_M_ID  13
+#define MENU_ANALOG_READINGS_IN_A0_ID  12
+#define MENU_ANALOG_READINGS_OUTPUT_PWM_ID  13
 
 // Inline helper methods to access menu items
 inline AnalogMenuItem& getMenuTemp() { return getAnalogItemById(MENU_TEMP_ID); }
 inline AnalogMenuItem& getMenuHumidity() { return getAnalogItemById(MENU_HUMIDITY_ID); }
-inline AnalogMenuItem& getMenuBPressure() { return getAnalogItemById(MENU_B_PRESSURE_ID); }
+inline AnalogMenuItem& getMenuBPressure() { return getAnalogItemById(MENU_BPRESSURE_ID); }
 inline SubMenuItem& getMenuAccelerometer() { return getSubMenuById(MENU_ACCELEROMETER_ID); }
-inline FloatMenuItem& getMenuMagX() { return getFloatItemById(MENU_MAG_X_ID); }
-inline FloatMenuItem& getMenuMagY() { return getFloatItemById(MENU_MAG_Y_ID); }
-inline FloatMenuItem& getMenuMagZ() { return getFloatItemById(MENU_MAG_Z_ID); }
-inline FloatMenuItem& getMenuAccelX() { return getFloatItemById(MENU_ACCEL_X_ID); }
-inline FloatMenuItem& getMenuAccelY() { return getFloatItemById(MENU_ACCEL_Y_ID); }
-inline FloatMenuItem& getMenuAccelZ() { return getFloatItemById(MENU_ACCEL_Z_ID); }
+inline FloatMenuItem& getMenuAccelerometerMagX() { return getFloatItemById(MENU_ACCELEROMETER_MAG_X_ID); }
+inline FloatMenuItem& getMenuAccelerometerMagY() { return getFloatItemById(MENU_ACCELEROMETER_MAG_Y_ID); }
+inline FloatMenuItem& getMenuAccelerometerMagZ() { return getFloatItemById(MENU_ACCELEROMETER_MAG_Z_ID); }
+inline FloatMenuItem& getMenuAccelerometerAccelX() { return getFloatItemById(MENU_ACCELEROMETER_ACCEL_X_ID); }
+inline FloatMenuItem& getMenuAccelerometerAccelY() { return getFloatItemById(MENU_ACCELEROMETER_ACCEL_Y_ID); }
+inline FloatMenuItem& getMenuAccelerometerAccelZ() { return getFloatItemById(MENU_ACCELEROMETER_ACCEL_Z_ID); }
 inline SubMenuItem& getMenuAnalogReadings() { return getSubMenuById(MENU_ANALOG_READINGS_ID); }
-inline FloatMenuItem& getMenuInA0() { return getFloatItemById(MENU_IN_A0_ID); }
-inline AnalogMenuItem& getMenuOutputPWM() { return getAnalogItemById(MENU_OUTPUT_P_W_M_ID); }
+inline FloatMenuItem& getMenuAnalogReadingsInA0() { return getFloatItemById(MENU_ANALOG_READINGS_IN_A0_ID); }
+inline AnalogMenuItem& getMenuAnalogReadingsOutputPWM() { return getAnalogItemById(MENU_ANALOG_READINGS_OUTPUT_PWM_ID); }
 
 
 // Provide a wrapper to get hold of the root menu item and export setupMenu

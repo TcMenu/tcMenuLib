@@ -4,14 +4,14 @@
 #include <graphics/TcThemeBuilder.h>
 
 #include <UnicodeFontDefs.h>
-extern const UnicodeFont OpenSansRegular12pt[];
-extern const UnicodeFont OpenSansRegular14pt[];
+extern const UnicodeFont RobotoRegular12pt[];
+extern const UnicodeFont RobotoRegular18pt[];
 
 
 
-color_t defaultItemPalette[] = { GxEPD_BLACK, GxEPD_WHITE, GxEPD_BLACK, GxEPD_BLACK };
-color_t defaultActionPalette[] = { GxEPD_BLACK, GxEPD_WHITE, GxEPD_BLACK, GxEPD_BLACK };
-color_t defaultTitlePalette[] = { GxEPD_WHITE, GxEPD_BLACK, GxEPD_WHITE, GxEPD_WHITE };
+color_t defaultItemPalette[] = { RGB(46, 58, 69), RGB(247, 249, 251), RGB(90, 160, 243), RGB(208, 232, 255) };
+color_t defaultActionPalette[] = { RGB(46, 58, 69), RGB(74, 144, 226), RGB(208, 232, 255), RGB(107, 122, 136) };
+color_t defaultTitlePalette[] = { RGB(46, 58, 69), RGB(74, 144, 226), RGB(107, 122, 136), RGB(208, 232, 255) };
 
 /**
  * This is one of the stock themes, you can modify it to meet your requirements, and it will not be updated by tcMenu
@@ -22,18 +22,18 @@ void applyTheme(GraphicsDeviceRenderer& gr) {
 
     // See https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/themes/rendering-with-themes-icons-grids/
     TcThemeBuilder themeBuilder(gr);
-    themeBuilder.withSelectedColors(GxEPD_BLACK, GxEPD_WHITE)
+    themeBuilder.withSelectedColors(RGB(208, 232, 255), RGB(107, 122, 136))
             .dimensionsFromRenderer()
             .withItemPadding(MenuPadding(2))
-            .withRenderingSettings(BaseGraphicalRenderer::TITLE_FIRST_ROW, false)
+            .withRenderingSettings(BaseGraphicalRenderer::TITLE_ALWAYS, false)
             .withPalette(defaultItemPalette)
-            .withTcUnicodeFont(OpenSansRegular12pt)
+            .withTcUnicodeFont(RobotoRegular12pt)
             .withSpacing(1)
-            .withStandardLowResCursorIcons()
+            .withStandardMedResCursorIcons()
             .enableTcUnicode();
 
     themeBuilder.defaultTitleProperties()
-            .withTcUnicodeFont(OpenSansRegular14pt)
+            .withTcUnicodeFont(RobotoRegular18pt)
             .withPalette(defaultTitlePalette)
             .withPadding(MenuPadding(2))
             .withJustification(tcgfx::GridPosition::JUSTIFY_TITLE_LEFT_WITH_VALUE)

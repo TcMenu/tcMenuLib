@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for Arduino ESP32 by TcMenu 4.5.7-SNAPSHOT on 2026-05-15T17:20:41.666659Z.
+// Generated for Arduino ESP32 by TcMenu 5.0.0-SNAPSHOT on 2026-09-15T08:47:33.296347Z.
 
 #include <tcMenu.h>
 #include "ESP32S2EInk_menu.h"
@@ -109,9 +109,9 @@ void AdafruitDrawable::computeBaselineIfNeeded(const GFXfont* font) {
     computedHeight = height;
 }
 
-UnicodeFontHandler *AdafruitDrawable::createFontHandler() {
-    return new UnicodeFontHandler(newAdafruitTextPipeline(graphics), ENCMODE_UTF8);
-}
+        UnicodeFontHandler *AdafruitDrawable::createFontHandler() {
+            return new UnicodeFontHandler(newAdafruitTextPipeline(graphics), ENCMODE_UTF8);
+        }
 
 
 
@@ -326,6 +326,8 @@ bool EthernetInitialisation::attemptNewConnection(BaseRemoteServerConnection *re
     return false;
 }
 
+#include <Fonts/OpenSansRegular12pt.h>
+#include <Fonts/OpenSansRegular14pt.h>
 #include "einkThemeBuilderBlock.h"
 
 // Global variable declarations
@@ -342,6 +344,9 @@ EthernetTagValTransport ethernetTransport;
 TagValueRemoteServerConnection ethernetConnection(ethernetTransport, ethernetInitialisation);
 
 void setupMenu() {
+    // always initialise the task manager atomics before anything else.
+    tmInitAtomics();
+
     // First we set up eeprom and authentication (if needed).
     setEepromStorageMode(TC_STORE_ROM_LEGACY);
     glEspRom.init();
@@ -361,9 +366,8 @@ void setupMenu() {
         applyTheme(renderer);
 
     // We have an IoT monitor, register the server
-    getMenuConnectivityIoTMonitor().setRemoteServer(remoteServer);
+    getMenuIoTMonitor1().setRemoteServer(remoteServer);
 
     // We have an EEPROM authenticator, it needs initialising
     getMenuConnectivityAuthenticator().init();
 }
-

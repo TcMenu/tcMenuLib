@@ -17,6 +17,7 @@
         "variableName": "",
         "id": 1,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": true,
         "localOnly": false,
         "visible": true,
@@ -37,6 +38,7 @@
         "variableName": "",
         "id": 2,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": true,
         "localOnly": false,
         "visible": true,
@@ -129,6 +131,7 @@
         "variableName": "SettingsTestItem1",
         "id": 5,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -160,6 +163,7 @@
         "variableName": "SettingsOverboost",
         "id": 12,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -178,6 +182,7 @@
         "variableName": "SettingsLargeTest",
         "id": 13,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -190,8 +195,10 @@
       "item": {
         "menuType": "REMOTE_IOT_MONITOR",
         "name": "IoT Monitor",
+        "variableName": "",
         "id": 14,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -210,6 +217,7 @@
         "variableName": "SettingsNewLargeNumber",
         "id": 15,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -251,6 +259,7 @@
         "variableName": "",
         "id": 10,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -281,6 +290,7 @@
         "variableName": "Engine",
         "id": 16,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -355,7 +365,7 @@
     "lastRemoteUuids": [
       "4123dfc3-5271-4727-81f0-1a21d06b666b"
     ],
-    "lastThemeUuid": "57945787-0A04-447B-BBA2-6461FC505397",
+    "lastThemeUuid": "adc2285a-cd2d-414a-b62e-26c7a48ae503",
     "applicationUUID": "4db9fbfe-9fab-4759-b8ff-3e0c6700f475",
     "applicationName": "SimHub Link",
     "lastProperties": [
@@ -538,12 +548,94 @@
         "name": "NEED_EDITING_ICONS",
         "latestValue": "true",
         "subsystem": "THEME"
+      },
+      {
+        "name": "DISPLAY_SPI_SPEED",
+        "latestValue": "0",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_DOUBLE_BUFFER_SEP_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_DOUBLE_BUFFER",
+        "latestValue": "4BPP",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "FONT_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_ITEM_FONT",
+        "latestValue": "tca:RobotoRegular12pt,0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_FONT",
+        "latestValue": "tca:RobotoRegular18pt,0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "SPACING_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_PADDING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "ITEM_PADDING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_TO_ITEM_SPACING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_ACTION_ROUND_CORNER",
+        "latestValue": "0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_ROUND_CORNER",
+        "latestValue": "4",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_EXTRA_DRAWING_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_EDIT_ICONS",
+        "latestValue": "MED_RES",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_BUTTON_ALIGNMENT",
+        "latestValue": "JUSTIFY_TITLE_LEFT_WITH_VALUE",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_USE_SLIDERS_ANALOG",
+        "latestValue": "false",
+        "subsystem": "THEME"
       }
     ],
     "namingRecursive": true,
     "useCppMain": false,
     "saveLocation": "ALL_TO_CURRENT",
+    "useDynamicMenus": false,
     "usingSizedEEPROMStorage": false,
+    "eepromSaveMode": "LEGACY_WRITE_BY_POSITION",
     "eepromDefinition": "",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
@@ -551,9 +643,7 @@
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []
-    },
-    "packageNamespace": "",
-    "appIsModular": false
+    }
   },
   "stringLists": []
 }

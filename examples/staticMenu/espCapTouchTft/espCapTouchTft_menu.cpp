@@ -8,11 +8,13 @@
     use elsewhere.
  */
 
-// Generated for Arduino ESP32 by TcMenu 4.5.9-SNAPSHOT on 2026-07-12T13:20:12.436814Z.
+// Generated for Arduino ESP32 by TcMenu 5.0.0-SNAPSHOT on 2026-09-15T09:08:55.434411Z.
 
 #include <tcMenu.h>
 #include "espCapTouchTft_menu.h"
-#include "ThemeCoolBlueModernBuilder.h"
+#include <Fonts/OpenSansRegular16pt.h>
+#include <Fonts/RobotoMedium24.h>
+#include "ThemeCoolBlueModern.h"
 
 // Global variable declarations
 const PROGMEM  ConnectorLocalInfo applicationInfo = { "espCapTouchTft", "a32450f4-91fc-4747-9e6f-6317dd9e2309" };
@@ -51,6 +53,9 @@ const PROGMEM AnalogMenuInfo minfoPercentage = { "Percentage", 1, 0xffff, 100, N
 AnalogMenuItem menuPercentage(&minfoPercentage, 0, &menuFoods, INFO_LOCATION_PGM);
 
 void setupMenu() {
+    // always initialise the task manager atomics before anything else.
+    tmInitAtomics();
+
     // First we set up eeprom and authentication (if needed).
     setEepromStorageMode(TC_STORE_ROM_LEGACY);
     menuMgr.setEepromRef(&glArduinoEeprom);
@@ -61,6 +66,6 @@ void setupMenu() {
         touchInterrogator.init();
         touchScreen.start();
         menuMgr.initWithoutInput(&renderer, &menuPercentage);
-        installCoolBlueModernTheme(renderer, MenuFontDef(nullptr, 2), MenuFontDef(nullptr, 4), true, BaseGraphicalRenderer::TITLE_ALWAYS, false);
+        applyTheme(renderer);
 }
 

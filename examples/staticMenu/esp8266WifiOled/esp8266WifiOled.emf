@@ -14,8 +14,10 @@
         "unitName": "C",
         "step": 1,
         "name": "Tomato Temp",
+        "variableName": "",
         "id": 1,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": true,
         "localOnly": false,
         "visible": true,
@@ -33,8 +35,10 @@
         "unitName": "C",
         "step": 1,
         "name": "Cucumber Temp",
+        "variableName": "",
         "id": 2,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": true,
         "localOnly": false,
         "visible": true,
@@ -48,6 +52,7 @@
       "item": {
         "naming": "ON_OFF",
         "name": "Electric Heater",
+        "variableName": "",
         "id": 4,
         "eepromAddress": 3,
         "functionName": "onElectricHeater",
@@ -64,6 +69,7 @@
       "item": {
         "naming": "YES_NO",
         "name": "Lock Door",
+        "variableName": "",
         "id": 16,
         "eepromAddress": 38,
         "functionName": "onLockDoor",
@@ -79,8 +85,10 @@
       "item": {
         "secured": false,
         "name": "Setup",
+        "variableName": "",
         "id": 5,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -98,6 +106,7 @@
           "HIGH"
         ],
         "name": "Heater Power",
+        "variableName": "",
         "id": 6,
         "eepromAddress": 4,
         "functionName": "onHeaterPower",
@@ -118,6 +127,7 @@
           "CLOSED"
         ],
         "name": "Win Opening",
+        "variableName": "",
         "id": 7,
         "eepromAddress": 6,
         "functionName": "onWindowOpening",
@@ -132,6 +142,7 @@
       "type": "actionMenu",
       "item": {
         "name": "Save All",
+        "variableName": "",
         "id": 8,
         "eepromAddress": -1,
         "functionName": "onSaveAll",
@@ -148,8 +159,10 @@
       "item": {
         "naming": "TRUE_FALSE",
         "name": "Secret Entry",
+        "variableName": "",
         "id": 13,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": false,
@@ -159,7 +172,7 @@
     {
       "parentId": 5,
       "type": "scrollItem",
-      "defaultValue": "0-",
+      "defaultValue": "0-Unknown",
       "item": {
         "itemWidth": 10,
         "eepromOffset": 200,
@@ -167,6 +180,7 @@
         "choiceMode": "ARRAY_IN_RAM",
         "variable": "fileChoicesArray",
         "name": "File",
+        "variableName": "",
         "id": 14,
         "eepromAddress": -1,
         "functionName": "onFileChoice",
@@ -181,6 +195,7 @@
       "type": "actionMenu",
       "item": {
         "name": "Load Files",
+        "variableName": "",
         "id": 15,
         "eepromAddress": -1,
         "functionName": "onLoadFiles",
@@ -196,8 +211,10 @@
       "item": {
         "secured": false,
         "name": "Connectivity",
+        "variableName": "",
         "id": 9,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -212,8 +229,10 @@
         "textLength": 15,
         "itemType": "PLAIN_TEXT",
         "name": "SSID",
+        "variableName": "",
         "id": 11,
         "eepromAddress": 8,
+        "functionName": "",
         "readOnly": false,
         "localOnly": true,
         "visible": true,
@@ -228,8 +247,10 @@
         "textLength": 15,
         "itemType": "PLAIN_TEXT",
         "name": "Pwd",
+        "variableName": "",
         "id": 12,
         "eepromAddress": 23,
+        "functionName": "",
         "readOnly": false,
         "localOnly": true,
         "visible": true,
@@ -244,8 +265,10 @@
         "textLength": 20,
         "itemType": "IP_ADDRESS",
         "name": "IpAddress",
+        "variableName": "",
         "id": 10,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": true,
         "localOnly": false,
         "visible": true,
@@ -261,6 +284,7 @@
         "variableName": "IoTMonitor",
         "id": 17,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": true,
         "visible": true,
@@ -276,6 +300,7 @@
         "variableName": "Authenticator",
         "id": 18,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": true,
         "visible": true,
@@ -295,6 +320,7 @@
         "variableName": "WiFiMode",
         "id": 19,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -467,23 +493,73 @@
         "name": "USE_TC_UNICODE",
         "latestValue": "false",
         "subsystem": "THEME"
+      },
+      {
+        "name": "SPACING_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_PADDING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "ITEM_PADDING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_ACTION_ROUND_CORNER",
+        "latestValue": "0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_ROUND_CORNER",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_INVERSE_SELECT",
+        "latestValue": "true",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "DISPLAY_WHITE_TXT_BLACK_BG",
+        "latestValue": "true",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "FONT_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_ITEM_FONT",
+        "latestValue": "def:,1",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_FONT",
+        "latestValue": "def:,1",
+        "subsystem": "THEME"
       }
     ],
     "namingRecursive": false,
     "useCppMain": false,
     "saveLocation": "ALL_TO_CURRENT",
+    "useDynamicMenus": false,
     "usingSizedEEPROMStorage": false,
+    "eepromSaveMode": "LEGACY_WRITE_BY_POSITION",
     "eepromDefinition": "eeprom:",
     "authenticatorDefinition": "rom:100:6",
     "projectIoExpanders": [
-      "deviceIO:",
-      "pcf8574:io8574:32:12:false"
+      "pcf8574:io8574:32:12:false",
+      "deviceIO:"
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []
-    },
-    "packageNamespace": "",
-    "appIsModular": false
+    }
   },
   "stringLists": []
 }

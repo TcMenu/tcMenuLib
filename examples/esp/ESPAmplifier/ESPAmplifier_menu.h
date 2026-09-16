@@ -245,6 +245,7 @@ using namespace tcremote;
 #include <graphics/MenuTouchScreenEncoder.h>
 #include <extras/DrawableTouchCalibrator.h>
 #include <RemoteConnector.h>
+#include <tcUnicodeHelper.h>
 #include <ScrollChoiceMenuItem.h>
 #include <RemoteMenuItem.h>
 #include <IoAbstraction.h>
@@ -263,6 +264,8 @@ extern MenuTouchScreenManager touchScreen;
 extern tcextras::IoaTouchScreenCalibrator touchCalibrator;
 extern WiFiServer server;
 extern EthernetInitialisation ethernetInitialisation;
+extern const UnicodeFont RobotoRegular14pt[];
+extern const UnicodeFont RobotoRegular18pt[];
 
 // Any externals needed by IO expanders, EEPROMs etc
 

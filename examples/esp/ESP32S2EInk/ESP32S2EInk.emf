@@ -1,7 +1,7 @@
 {
   "version": "1.00",
   "projectName": "eInk demonstration with digital joystick",
-  "author": "root",
+  "author": "dave",
   "items": [
     {
       "parentId": 0,
@@ -514,12 +514,12 @@
       },
       {
         "name": "THEME_ITEM_FONT",
-        "latestValue": "ada:OpenSansRegular12pt,0",
+        "latestValue": "tca:OpenSansRegular12pt,0",
         "subsystem": "THEME"
       },
       {
         "name": "THEME_TITLE_FONT",
-        "latestValue": "ada:OpenSansRegular14pt,0",
+        "latestValue": "tca:OpenSansRegular14pt,0",
         "subsystem": "THEME"
       },
       {
@@ -611,6 +611,16 @@
         "name": "UNO_OR_FULL",
         "latestValue": "unoLcd",
         "subsystem": "DISPLAY"
+      },
+      {
+        "name": "THEME_ACTION_ROUND_CORNER",
+        "latestValue": "0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_ROUND_CORNER",
+        "latestValue": "4",
+        "subsystem": "THEME"
       }
     ],
     "namingRecursive": false,

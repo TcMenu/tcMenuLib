@@ -227,6 +227,7 @@ using namespace tcremote;
 #include <tcMenu.h>
 
 #include <tcMenuBuilder.h>
+#include <StateMachineEncoder.h>
 #include <RemoteConnector.h>
 #include <ScrollChoiceMenuItem.h>
 #include <RemoteMenuItem.h>

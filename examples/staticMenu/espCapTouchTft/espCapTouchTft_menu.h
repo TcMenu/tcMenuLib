@@ -16,6 +16,7 @@
 #include "tcMenuTfteSpi.h"
 #include <graphics/MenuTouchScreenEncoder.h>
 #include "tcMenuAdaTouchDriver.h"
+#include <tcUnicodeHelper.h>
 #include <RuntimeMenuItem.h>
 #include <ScrollChoiceMenuItem.h>
 #include <IoAbstraction.h>
@@ -30,6 +31,8 @@ extern GraphicsDeviceRenderer renderer;
 extern Adafruit_FT6206 touchDevice;
 extern iotouch::AdaLibTouchInterrogator touchInterrogator;
 extern MenuTouchScreenManager touchScreen;
+extern const UnicodeFont OpenSansRegular16pt[];
+extern const UnicodeFont RobotoMedium24[];
 
 // Any externals needed by IO expanders, EEPROMs etc
 

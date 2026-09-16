@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for STM32Duino by TcMenu 4.5.7 on 2026-05-18T10:19:46.223421798Z.
+// Generated for STM32Duino by TcMenu 5.0.0-SNAPSHOT on 2026-09-15T17:06:23.283098Z.
 
 #include <tcMenu.h>
 #include "Stm32OneUserButton_menu.h"
@@ -242,8 +242,8 @@ int SerialTagValueTransport::writeStr(const char* str) {
     return i;
 }
 
+#include <Fonts/OpenSansRegular7pt.h>
 #include "ThemeMonoInverseBuilder.h"
-#include <Fonts/OpenSansRegular8pt.h>
 
 // Global variable declarations
 const  ConnectorLocalInfo applicationInfo = { "Stm32 One User Button", "4fe6e85d-2bbd-4d19-84e5-5d6746883028" };
@@ -258,6 +258,9 @@ SerialTagValueTransport serialTransport(&Serial);
 TagValueRemoteServerConnection serialConnection(serialTransport, serialInitializer);
 
 void setupMenu() {
+    // always initialise the task manager atomics before anything else.
+    tmInitAtomics();
+
     // First we set up eeprom and authentication (if needed).
     setEepromStorageMode(TC_STORE_ROM_DYNAMIC);
     glBspRom.initialise(0);
@@ -272,6 +275,5 @@ void setupMenu() {
         menuMgr.initWithoutInput(&renderer, &getMenuPressMe());
         oneButtonHandler.start();
         remoteServer.addConnection(&serialConnection);
-        installMonoInverseTitleTheme(renderer, MenuFontDef(&OpenSansRegular8pt, 0), MenuFontDef(&OpenSansRegular8pt, 0), true, BaseGraphicalRenderer::NO_TITLE, true);
+        applyTheme(renderer);
 }
-

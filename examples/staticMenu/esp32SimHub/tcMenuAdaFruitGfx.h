@@ -15,8 +15,8 @@
  */
 
 
-#ifndef _TCMENU_TCMENUADAFRUITGFX_H_
-#define _TCMENU_TCMENUADAFRUITGFX_H_
+#ifndef TCMENU_TCMENUADAFRUITGFX_H_
+#define TCMENU_TCMENUADAFRUITGFX_H_
 
 #include <tcMenu.h>
 #include <tcUtil.h>
@@ -57,16 +57,16 @@ class TcGFXcanvas2 : public Adafruit_GFX {
 public:
     TcGFXcanvas2(uint16_t w, uint16_t h);
     virtual ~TcGFXcanvas2();
-    bool reInitCanvas(int w, int h);
+    bool reInitCanvas(int16_t w, int16_t h);
 
     /**
      * @return the size in bytes needed to store the pixels for this buffer
      */
     size_t getByteCount() const { return ((_width + 3) / 4) * _height; };
-    void drawPixel(int16_t x, int16_t y, uint16_t color) override;
-    void fillScreen(uint16_t color) override;
-    void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color) override;
-    void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color) override;
+    void drawPixel(int16_t x, int16_t y, color_t color) override;
+    void fillScreen(color_t color) override;
+    void drawFastVLine(int16_t x, int16_t y, int16_t h, color_t color) override;
+    void drawFastHLine(int16_t x, int16_t y, int16_t w, color_t color) override;
     uint8_t getPixel(int16_t x, int16_t y) const;
     /**********************************************************************/
     /*!
@@ -78,8 +78,46 @@ public:
     size_t getMaxBufferSize() const { return maxBytesAvailable; }
 protected:
     uint8_t getRawPixel(int16_t x, int16_t y) const;
-    void drawFastRawVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
-    void drawFastRawHLine(int16_t x, int16_t y, int16_t w, uint16_t color);
+    void drawFastRawVLine(int16_t x, int16_t y, int16_t h, color_t color);
+    void drawFastRawHLine(int16_t x, int16_t y, int16_t w, color_t color);
+
+private:
+    uint8_t *buffer;
+    size_t maxBytesAvailable = 0;
+};
+
+/**
+ * A graphics canvas for drawing onto that can then be written to the screen using the optimized drawCookieCutBitmap4bpp
+ * function below. Each byte holds 2 pixels, so therefore, a 320 column display needs 160 bytes per line. All regular
+ * adafruit calls can be made onto this canvas.
+ */
+class TcGFXcanvas4 : public Adafruit_GFX {
+public:
+    TcGFXcanvas4(uint16_t w, uint16_t h);
+    virtual ~TcGFXcanvas4();
+    bool reInitCanvas(int16_t w, int16_t h);
+
+    /**
+     * @return the size in bytes needed to store the pixels for this buffer
+     */
+    size_t getByteCount() const { return ((_width + 1) / 2) * _height; };
+    void drawPixel(int16_t x, int16_t y, color_t color) override;
+    void fillScreen(color_t color) override;
+    void drawFastVLine(int16_t x, int16_t y, int16_t h, color_t color) override;
+    void drawFastHLine(int16_t x, int16_t y, int16_t w, color_t color) override;
+    uint8_t getPixel(int16_t x, int16_t y) const;
+    /**********************************************************************/
+    /*!
+     @brief    Get a pointer to the internal buffer memory
+     @returns  A pointer to the allocated buffer
+    */
+    /**********************************************************************/
+    uint8_t *getBuffer() const { return buffer; }
+    size_t getMaxBufferSize() const { return maxBytesAvailable; }
+protected:
+    uint8_t getRawPixel(int16_t x, int16_t y) const;
+    void drawFastRawVLine(int16_t x, int16_t y, int16_t h, color_t color);
+    void drawFastRawHLine(int16_t x, int16_t y, int16_t w, color_t color);
 
 private:
     uint8_t *buffer;
@@ -108,7 +146,7 @@ private:
 */
 void drawCookieCutBitmap(Adafruit_SPITFT* gfx, int16_t x, int16_t y, const uint8_t *bitmap, int16_t w,
                          int16_t h, int16_t totalWidth, int16_t xStart, int16_t yStart,
-                         uint16_t fgColor, uint16_t bgColor);
+                         color_t fgColor, color_t bgColor);
 
 /**
    @brief      Draw a RAM-resident 2-bit image at the specified (x,y) position,
@@ -131,7 +169,28 @@ void drawCookieCutBitmap(Adafruit_SPITFT* gfx, int16_t x, int16_t y, const uint8
 */
 void drawCookieCutBitmap2bpp(Adafruit_SPITFT* gfx, int16_t x, int16_t y, const uint8_t *bitmap, int16_t w,
                              int16_t h, int16_t totalWidth, int16_t xStart, int16_t yStart,
-                             const uint16_t* palette);
+                             const color_t* palette);
+
+/**
+   @brief      Draw a RAM-resident 4-bit image at the specified (x,y) position,
+   from image data that may be wider or taller than the desired width and height.
+   Imagine a cookie dough rolled out, where you can cut a rectangle out of it.
+   It maps colour settings 0..15 in the 4 bit pixel data to an entry in the palette.
+
+    @param    gfx The actual graphics object to draw onto
+    @param    x   Top left corner x coordinate
+    @param    y   Top left corner y coordinate
+    @param    bitmap  byte array with monochrome bitmap
+    @param    w   width of the portion you want to draw
+    @param    h   Height of the portion you want to draw
+    @param    totalWidth actual width of the bitmap
+    @param    xStart X position of the image in the data
+    @param    yStart Y position of the image in the data
+    @param    palette array of 16 16-bit 5-6-5 Colors that map to pixel settings 0..15
+*/
+void drawCookieCutBitmap4bpp(Adafruit_SPITFT* gfx, int16_t x, int16_t y, const uint8_t *bitmap, int16_t w,
+                             int16_t h, int16_t totalWidth, int16_t xStart, int16_t yStart,
+                             const color_t* palette);
 
 
 /**
@@ -140,7 +199,7 @@ void drawCookieCutBitmap2bpp(Adafruit_SPITFT* gfx, int16_t x, int16_t y, const u
  */
 typedef struct ColorGfxMenuConfig<const GFXfont*> AdaColorGfxMenuConfig;
 
-class AdafruitCanvasDrawable2bpp;
+template<typename CANVASTY, size_t BPP, size_t PSIZE> class AdafruitCanvasDrawableNbpp;
 
 /**
  * A basic renderer that can use the AdaFruit_GFX library to render information onto a suitable
@@ -156,16 +215,15 @@ class AdafruitCanvasDrawable2bpp;
 class AdafruitDrawable : public DeviceDrawable {
 private:
     Adafruit_GFX* graphics;
-    AdafruitCanvasDrawable2bpp* canvasDrawable;
     const GFXfont* computedFont = nullptr;
     int16_t computedBaseline = 0;
     int16_t computedHeight = 0;
-    
+    AdafruitCanvasDrawableNbpp<TcGFXcanvas4, 4, 16>* canvasDrawable = nullptr;
 protected:
     int spriteHeight = 0;
 public:
-    explicit AdafruitDrawable(Adafruit_GFX* graphics, int spriteHeight = 0) : graphics(graphics), canvasDrawable(nullptr), spriteHeight(spriteHeight) {
-        setSubDeviceType(SUB_DEVICE_2BPP);
+    explicit AdafruitDrawable(Adafruit_GFX* graphics, int spriteHeight = 0) : graphics(graphics), spriteHeight(spriteHeight) {
+        setSubDeviceType(SUB_DEVICE_4BPP);
     }
     ~AdafruitDrawable() override = default;
 
@@ -187,35 +245,145 @@ public:
     Adafruit_GFX* getGfx() { return graphics; }
 protected:
     void computeBaselineIfNeeded(const GFXfont* font);
-    explicit AdafruitDrawable() : graphics(nullptr), canvasDrawable(nullptr), spriteHeight(0) {}
+    explicit AdafruitDrawable() : graphics(nullptr) {}
     void setGraphics(Adafruit_GFX* gfx) { graphics = gfx; }
 
     UnicodeFontHandler *createFontHandler() override;
 };
 
+
+// In 16 color palette mode, tcMenu takes the first 5 for drawing (0..4) but after that the other 11 can be used for anything else.
+// When we render bitmaps or custom things into the buffer, we can use the remaining palette entries.
+#define UNLOCKED_PALETTE_ENTRIES_START 5
+
 /**
  * This class extends the basic AdafruitDrawable and provides a way for TFT based drawing to be done into a memory
  * buffer first then written onto the display using an optimized method that gets quite close to faster libraries.
  */
-class AdafruitCanvasDrawable2bpp : public AdafruitDrawable {
+template<typename CANVASTY, size_t BPP, size_t PSIZE>
+class AdafruitCanvasDrawableNbpp : public AdafruitDrawable {
 private:
     AdafruitDrawable* root;
-    TcGFXcanvas2* canvas;
+    CANVASTY* canvas;
     Coord sizeMax;
     Coord sizeCurrent;
     Coord where;
-    color_t palette[4];
+    color_t palette[PSIZE];
 public:
-    AdafruitCanvasDrawable2bpp(AdafruitDrawable *root,  int width, int height);
-    ~AdafruitCanvasDrawable2bpp() override {
+    AdafruitCanvasDrawableNbpp(AdafruitDrawable *root,  int width, int height) : root(root), sizeMax({width, height}), sizeCurrent(), palette{} {
+        canvas = new CANVASTY(width, height);
+        setGraphics(canvas);
+    }
+
+    ~AdafruitCanvasDrawableNbpp() override {
         delete canvas;
     }
 
     bool initSprite(const Coord& spriteWhere, const Coord& spriteSize, const color_t* colPalette, size_t paletteSize);
-    void transaction(bool isStarting, bool redrawNeeded) override;
-    color_t getUnderlyingColor(color_t col) override;
-    DeviceDrawable *getSubDeviceFor(const Coord &where, const Coord &size, const color_t *palette, int paletteSize) override;
+
+    void setPaletteEntry(size_t index, color_t col) override {
+        if (index >= PSIZE) return;
+        palette[index] = col;
+    }
+
+    void transaction(const bool isStarting, bool redrawNeeded) override {
+        if (!isStarting) {
+            if (BPP == 4) {
+                // if it's ending, we push the canvas onto the display.
+                drawCookieCutBitmap4bpp(reinterpret_cast<Adafruit_SPITFT*>(root->getGfx()), where.x, where.y, canvas->getBuffer(),
+                    sizeCurrent.x, sizeCurrent.y,canvas->width(), 0, 0, palette);
+
+            } else {
+                // if it's ending, we push the canvas onto the display.
+                drawCookieCutBitmap2bpp(reinterpret_cast<Adafruit_SPITFT*>(root->getGfx()), where.x, where.y, canvas->getBuffer(),
+                    sizeCurrent.x, sizeCurrent.y,canvas->width(), 0, 0, palette);
+            }
+        }
+    }
+
+    color_t getUnderlyingColor(color_t col) override {
+        for(size_t i=0; i<PSIZE; i++) {
+            if(palette[i] == col) return i;
+        }
+        return 0;
+    }
+    color_t containsUnderlyingColor(color_t col) {
+        for(size_t i=0; i<PSIZE; i++) {
+            if(palette[i] == col) return true;
+        }
+        return false;
+    }
+
+    DeviceDrawable *getSubDeviceFor(const Coord &where, const Coord &size, const color_t *palette, int paletteSize) override {
+        return nullptr; // don't allow further nesting.
+    }
+
+    /**
+     * Here we try to map as many colors as we can from the palette passed in into the current palette. In the case of
+     * 2bpp bitmaps we don't try and do this at all as TcMenu needs all the entries to map the display.
+     * @param newPalette the palette to try and map from
+     * @param palSize the size of the palette to try and map from
+     */
+    void tryToAddColorsToPalette(const color_t* newPalette, int palSize) {
+        size_t index = UNLOCKED_PALETTE_ENTRIES_START;
+        if (BPP != 4) return;
+        for (int i = 0; i < palSize; i++) {
+            if (containsUnderlyingColor(newPalette[i])) continue;
+            palette[index] = newPalette[i];
+            index++;
+            if (index >= 16) return;
+        }
+    }
     void drawBitmapNbpp(const Coord& where, const uint8_t* data, const Coord& size, int bpp, const color_t* palette) override;
 };
 
-#endif /* _TCMENU_TCMENUADAFRUITGFX_H_ */
+template<typename CANVASTY, size_t BPP, size_t PSIZE>
+bool AdafruitCanvasDrawableNbpp<CANVASTY, BPP, PSIZE>::initSprite(const Coord& spriteWhere, const Coord& spriteSize, const color_t* colPalette, size_t paletteSize) {
+    if(!canvas->reInitCanvas(spriteSize.x, spriteSize.y)) {
+        return false;
+    }
+    where = spriteWhere;
+    sizeCurrent = spriteSize;
+    if(paletteSize > PSIZE) paletteSize = PSIZE;
+    for(size_t i=0; i<paletteSize; i++) {
+        palette[i] = colPalette[i];
+    }
+
+    if(root->isTcUnicodeEnabled()) {
+        this->enableTcUnicode();
+    }
+    return true;
+}
+
+template<typename CANVASTY, size_t BPP, size_t PSIZE>
+void AdafruitCanvasDrawableNbpp<CANVASTY, BPP, PSIZE>::drawBitmapNbpp(const Coord& where, const uint8_t* data, const Coord& size, int bpp, const color_t* palette) {
+    // do not allow bpp > BPP as it may overflow the palette
+    if (static_cast<size_t>(bpp) > BPP) return;
+
+    tryToAddColorsToPalette(palette, bpp == 2 ? 4 : 15);
+
+    auto yTot = static_cast<int16_t>(where.y + size.y);
+    auto xTot = static_cast<int16_t>(where.x + size.x);
+    int bitsInByte = bpp == 2 ? 4 : 2;
+    uint8_t downShift = bpp == 2 ? 6 : 4;
+
+    uint8_t byteIteration = bitsInByte;
+    uint8_t current = 0;
+    for(int16_t y = where.y; y<yTot; y++) {
+        for(int16_t x = where.x; x<xTot; x++) {
+            if(byteIteration == bitsInByte) {
+                current = pgm_read_byte(data);
+                data += 1;
+                byteIteration = 0;
+            }
+            uint8_t idx = current >> downShift;
+            current = current << bitsInByte;
+            byteIteration++;
+            canvas->drawPixel(x, y, idx);
+        }
+        byteIteration = bitsInByte; // always need a new byte in this case
+    }
+}
+
+
+#endif

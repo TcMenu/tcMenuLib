@@ -1,7 +1,7 @@
 {
   "version": "1.00",
   "projectName": "Example One Button Menu",
-  "author": "root",
+  "author": "dave",
   "items": [
     {
       "parentId": 0,
@@ -228,17 +228,67 @@
       },
       {
         "name": "TITLE_TO_ITEM_SPACING",
-        "latestValue": "0",
+        "latestValue": "1",
         "subsystem": "THEME"
       },
       {
         "name": "TITLE_SHOW_MODE",
-        "latestValue": "NO_TITLE",
+        "latestValue": "TITLE_ALWAYS",
         "subsystem": "THEME"
       },
       {
         "name": "USE_TC_UNICODE",
         "latestValue": "true",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "SPACING_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_PADDING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "ITEM_PADDING",
+        "latestValue": "1",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_ACTION_ROUND_CORNER",
+        "latestValue": "0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_ROUND_CORNER",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_INVERSE_SELECT",
+        "latestValue": "true",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "DISPLAY_WHITE_TXT_BLACK_BG",
+        "latestValue": "true",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "FONT_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_ITEM_FONT",
+        "latestValue": "tca:OpenSansRegular7pt,0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_FONT",
+        "latestValue": "tca:OpenSansRegular7pt,0",
         "subsystem": "THEME"
       }
     ],

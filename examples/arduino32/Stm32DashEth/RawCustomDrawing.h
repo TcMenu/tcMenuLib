@@ -2,7 +2,7 @@
 #ifndef TCLIBRARYDEV_RAWCUSTOMDRAWING_H
 #define TCLIBRARYDEV_RAWCUSTOMDRAWING_H
 
-#include "../stm32DuinoDemo/generated/stm32DuinoDemo_menu.h"
+#include "Stm32DashEth_menu.h"
 
 // Here we implement the custom drawing capability of the renderer, it allows us to receive reset and custom drawing
 // requests. More info in the link below:

@@ -13,10 +13,10 @@
 
 #include <Arduino.h>
 #include <tcMenu.h>
-#include <tcUnicodeHelper.h>
 #include "tcMenuAdaFruitGfx.h"
 #include <esp32/ESP32TouchKeysAbstraction.h>
 #include "SimhubConnector.h"
+#include <tcUnicodeHelper.h>
 #include <RuntimeMenuItem.h>
 #include <EditableLargeNumberMenuItem.h>
 #include <RemoteMenuItem.h>
@@ -29,8 +29,8 @@ extern TcMenuRemoteServer remoteServer;
 extern Adafruit_ILI9341 gfx;
 extern GraphicsDeviceRenderer renderer;
 extern ESP32TouchKeysAbstraction esp32Touch;
-extern const UnicodeFont OpenSansCyrillicLatin14[];
-extern const UnicodeFont OpenSansCyrillicLatin18[];
+extern const UnicodeFont RobotoRegular12pt[];
+extern const UnicodeFont RobotoRegular18pt[];
 
 // Any externals needed by IO expanders, EEPROMs etc
 

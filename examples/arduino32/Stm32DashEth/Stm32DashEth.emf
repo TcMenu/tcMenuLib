@@ -1,7 +1,7 @@
 {
   "version": "1.00",
   "projectName": "Example of how a turntable PSU may look with some extra example types",
-  "author": "root",
+  "author": "dave",
   "items": [
     {
       "parentId": 0,
@@ -424,7 +424,7 @@
     {
       "parentId": 4,
       "type": "scrollItem",
-      "defaultValue": "0-",
+      "defaultValue": "0-Unknown",
       "item": {
         "itemWidth": 10,
         "eepromOffset": 0,
@@ -611,7 +611,7 @@
   "codeOptions": {
     "embeddedPlatform": "STM32DUINO",
     "lastDisplayUuid": "fd998437-c4b2-4386-ba88-d0ae7c20620b",
-    "lastInputUuid": "6dd87e7d-e751-4912-a70d-91793b1d3d87",
+    "lastInputUuid": "6c2be130-bf74-42ad-834c-ac2edd7b3f90",
     "lastRemoteUuids": [
       "0877131c-e03e-426b-8eaf-228e01f5e7f1"
     ],
@@ -761,7 +761,7 @@
       },
       {
         "name": "TITLE_TO_ITEM_SPACING",
-        "latestValue": "0",
+        "latestValue": "1",
         "subsystem": "THEME"
       },
       {
@@ -773,6 +773,106 @@
         "name": "USE_TC_UNICODE",
         "latestValue": "false",
         "subsystem": "THEME"
+      },
+      {
+        "name": "SPACING_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_PADDING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "ITEM_PADDING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_ACTION_ROUND_CORNER",
+        "latestValue": "0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_ROUND_CORNER",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_INVERSE_SELECT",
+        "latestValue": "false",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "DISPLAY_WHITE_TXT_BLACK_BG",
+        "latestValue": "true",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "FONT_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_ITEM_FONT",
+        "latestValue": "def:,1",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_FONT",
+        "latestValue": "def:,1",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "SEPARATOR_INTENC_MAIN_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_APIN",
+        "latestValue": "PC10",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_BPIN",
+        "latestValue": "PC8",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_SEL_PIN",
+        "latestValue": "PC9",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_INT_PIN",
+        "latestValue": "-1",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_INT_MODE",
+        "latestValue": "BOTH",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "ENCODER_TYPE",
+        "latestValue": "FULL_CYCLE",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SEPARATOR_SWITCHES_INTENC_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SWITCHES_INIT_MODE",
+        "latestValue": "POLLING",
+        "subsystem": "INPUT"
+      },
+      {
+        "name": "SWITCHES_BUTTON_PULLUP",
+        "latestValue": "true",
+        "subsystem": "INPUT"
       }
     ],
     "namingRecursive": true,

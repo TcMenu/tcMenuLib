@@ -172,9 +172,9 @@ using namespace tcremote;
 #include <tcMenu.h>
 
 #include <tcMenuBuilder.h>
-#include <tcUnicodeHelper.h>
 #include <extras/TcOneButtonHandler.h>
 #include <RemoteConnector.h>
+#include <tcUnicodeHelper.h>
 #include <IoAbstraction.h>
 #include <EepromItemStorage.h>
 #include <mbed/HalStm32EepromAbstraction.h>
@@ -186,7 +186,7 @@ extern U8G2_SSD1306_128X64_NONAME_F_4W_HW_SPI gfx;
 extern U8g2Drawable gfxDrawable;
 extern GraphicsDeviceRenderer renderer;
 extern TcOneButtonHandler oneButtonHandler;
-extern const UnicodeFont OpenSansRegular8pt[];
+extern const UnicodeFont OpenSansRegular7pt[];
 
 // Any externals needed by IO expanders, EEPROMs etc
 

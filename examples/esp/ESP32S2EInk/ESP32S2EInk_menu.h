@@ -273,6 +273,8 @@ extern TcGxEPD2 display;
 extern GraphicsDeviceRenderer renderer;
 extern WiFiServer server;
 extern EthernetInitialisation ethernetInitialisation;
+extern const UnicodeFont OpenSansRegular12pt[];
+extern const UnicodeFont OpenSansRegular14pt[];
 
 // Any externals needed by IO expanders, EEPROMs etc
 extern EspPreferencesEeprom glEspRom;
@@ -299,8 +301,8 @@ void buildMenu(TcMenuBuilder& builder);
 #define MENU_CONNECTIVITY_IO_TMONITOR_ID  19
 #define MENU_CONNECTIVITY_AUTHENTICATOR_ID  20
 #define MENU_IO_TSETUP_ID  22
-#define MENU_IO_TSETUP_IPADDR_ID  23
-#define MENU_IO_TSETUP_IO_TMONITOR1_ID  24
+#define MENU_IPADDR_ID  23
+#define MENU_IO_TMONITOR1_ID  24
 
 // Inline helper methods to access menu items
 inline ActionMenuItem& getMenuHibernate() { return getActionItemById(MENU_HIBERNATE_ID); }
@@ -321,8 +323,8 @@ inline IpAddressMenuItem& getMenuConnectivityIPAddress() { return getIpAddressIt
 inline RemoteMenuItem& getMenuConnectivityIoTMonitor() { return getIoTRemoteMenuById(MENU_CONNECTIVITY_IO_TMONITOR_ID); }
 inline EepromAuthenticationInfoMenuItem& getMenuConnectivityAuthenticator() { return getAuthenticationMenuById(MENU_CONNECTIVITY_AUTHENTICATOR_ID); }
 inline SubMenuItem& getMenuIoTSetup() { return getSubMenuById(MENU_IO_TSETUP_ID); }
-inline IpAddressMenuItem& getMenuIoTSetupIPAddr() { return getIpAddressItemById(MENU_IO_TSETUP_IPADDR_ID); }
-inline RemoteMenuItem& getMenuIoTSetupIoTMonitor1() { return getIoTRemoteMenuById(MENU_IO_TSETUP_IO_TMONITOR1_ID); }
+inline IpAddressMenuItem& getMenuIPAddr() { return getIpAddressItemById(MENU_IPADDR_ID); }
+inline RemoteMenuItem& getMenuIoTMonitor1() { return getIoTRemoteMenuById(MENU_IO_TMONITOR1_ID); }
 
 
 // Provide a wrapper to get hold of the root menu item and export setupMenu

@@ -27,7 +27,7 @@
     {
       "parentId": 0,
       "type": "scrollItem",
-      "defaultValue": "0-",
+      "defaultValue": "0-Unknown",
       "item": {
         "itemWidth": 16,
         "eepromOffset": 150,
@@ -113,7 +113,7 @@
     {
       "parentId": 7,
       "type": "scrollItem",
-      "defaultValue": "0-",
+      "defaultValue": "0-Unknown",
       "item": {
         "itemWidth": 10,
         "eepromOffset": 0,
@@ -667,7 +667,7 @@
       },
       {
         "name": "USE_TC_UNICODE",
-        "latestValue": "false",
+        "latestValue": "true",
         "subsystem": "THEME"
       },
       {
@@ -704,6 +704,71 @@
         "name": "ESPWIFI_BUFFERED",
         "latestValue": "true",
         "subsystem": "REMOTE"
+      },
+      {
+        "name": "FONT_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_ITEM_FONT",
+        "latestValue": "tca:RobotoRegular14pt,0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_FONT",
+        "latestValue": "tca:RobotoRegular18pt,0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "SPACING_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_PADDING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "ITEM_PADDING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_TO_ITEM_SPACING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_ACTION_ROUND_CORNER",
+        "latestValue": "0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_ROUND_CORNER",
+        "latestValue": "4",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_EXTRA_DRAWING_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_EDIT_ICONS",
+        "latestValue": "NONE",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_BUTTON_ALIGNMENT",
+        "latestValue": "JUSTIFY_TITLE_LEFT_WITH_VALUE",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_USE_SLIDERS_ANALOG",
+        "latestValue": "true",
+        "subsystem": "THEME"
       }
     ],
     "namingRecursive": true,

@@ -8,6 +8,7 @@
 #include <SPI.h>
 #include <BaseDialog.h>
 
+#include "../../arduino32/MkrOLEDBuilder/MkrOLEDBuilder_menu.h"
 #include "graphics/TcThemeBuilder.h"
 
 #define MENU_WIFIMODE_STATION 0
@@ -69,8 +70,8 @@ void buildMenu(TcMenuBuilder& builder) {
             .eepromAuthenticationItem(MENU_CONNECTIVITY_AUTHENTICATOR_ID, "Authenticator", MenuFlags().localOnly(), nullptr)
             .endSub()
         .subMenu(MENU_IO_TSETUP_ID, "IoT Setup", NoMenuFlags, nullptr)
-            .ipAddressItem(MENU_IO_TSETUP_IPADDR_ID, "IP Addr", DONT_SAVE, NoMenuFlags, IpAddressStorage(127, 0, 0, 1), nullptr)
-            .remoteConnectivityMonitor(MENU_IO_TSETUP_IO_TMONITOR1_ID, "IoT Monitor1", MenuFlags().localOnly())
+            .ipAddressItem(MENU_IPADDR_ID, "IP Addr", DONT_SAVE, NoMenuFlags, IpAddressStorage(127, 0, 0, 1), nullptr)
+            .remoteConnectivityMonitor(MENU_IO_TMONITOR1_ID, "IoT Monitor1", MenuFlags().localOnly())
             .endSub();
 }
 
@@ -174,7 +175,7 @@ void startWiFiAndListener() {
                 IPAddress localIp = WiFi.localIP();
                 Serial.print("Now connected to WiFi");
                 Serial.println(localIp);
-                getMenuIoTSetupIPAddr().setIpAddress(localIp[0], localIp[1], localIp[2], localIp[3]);
+                getMenuIPAddr().setIpAddress(localIp[0], localIp[1], localIp[2], localIp[3]);
                 connectedToWiFi = true;
             }
 

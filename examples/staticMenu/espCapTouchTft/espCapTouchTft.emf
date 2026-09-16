@@ -17,6 +17,7 @@
         "variableName": "Percentage",
         "id": 1,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -37,6 +38,7 @@
         "variableName": "Foods",
         "id": 2,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -53,6 +55,7 @@
         "variableName": "Check",
         "id": 3,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -68,6 +71,7 @@
         "variableName": "Runtimes",
         "id": 4,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -85,6 +89,7 @@
         "variableName": "RuntimesText",
         "id": 5,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -101,6 +106,7 @@
         "variableName": "RuntimesRGB",
         "id": 6,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -132,6 +138,7 @@
         "initialRows": 10,
         "listCreationMode": "CUSTOM_RTCALL",
         "name": "New Runtime List",
+        "variableName": "",
         "id": 8,
         "eepromAddress": -1,
         "functionName": "",
@@ -149,6 +156,7 @@
         "variableName": "PressMe",
         "id": 9,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -324,7 +332,7 @@
       },
       {
         "name": "USE_TC_UNICODE",
-        "latestValue": "false",
+        "latestValue": "true",
         "subsystem": "THEME"
       },
       {
@@ -336,12 +344,79 @@
         "name": "NEED_EDITING_ICONS",
         "latestValue": "true",
         "subsystem": "THEME"
+      },
+      {
+        "name": "FONT_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_ITEM_FONT",
+        "latestValue": "tca:OpenSansRegular16pt,0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_FONT",
+        "latestValue": "tca:RobotoMedium24,0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "SPACING_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_PADDING",
+        "latestValue": "4",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "ITEM_PADDING",
+        "latestValue": "8",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_TO_ITEM_SPACING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_ACTION_ROUND_CORNER",
+        "latestValue": "0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_ROUND_CORNER",
+        "latestValue": "4",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_EXTRA_DRAWING_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_EDIT_ICONS",
+        "latestValue": "MED_RES",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_BUTTON_ALIGNMENT",
+        "latestValue": "JUSTIFY_TITLE_LEFT_WITH_VALUE",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_USE_SLIDERS_ANALOG",
+        "latestValue": "false",
+        "subsystem": "THEME"
       }
     ],
     "namingRecursive": true,
     "useCppMain": false,
     "saveLocation": "ALL_TO_CURRENT",
+    "useDynamicMenus": false,
     "usingSizedEEPROMStorage": false,
+    "eepromSaveMode": "LEGACY_WRITE_BY_POSITION",
     "eepromDefinition": "eeprom:",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
@@ -349,10 +424,7 @@
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []
-    },
-    "packageNamespace": "",
-    "appIsModular": false,
-    "listOfEmbeddedForms": []
+    }
   },
   "stringLists": []
 }

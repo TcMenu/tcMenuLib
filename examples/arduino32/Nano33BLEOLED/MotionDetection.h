@@ -31,14 +31,14 @@ public:
     void exec() override {
         float x, y, z;
         IMU.readMagneticField(x, y, z);
-        getMenuMagX().setFloatValue(x);
-        getMenuMagY().setFloatValue(y);
-        getMenuMagZ().setFloatValue(z);
+        getMenuAccelerometerMagX().setFloatValue(x);
+        getMenuAccelerometerMagY().setFloatValue(y);
+        getMenuAccelerometerMagZ().setFloatValue(z);
 
         IMU.readAcceleration(x, y, z);
-        getMenuAccelX().setFloatValue(x);
-        getMenuAccelY().setFloatValue(y);
-        getMenuAccelZ().setFloatValue(z);
+        getMenuAccelerometerAccelX().setFloatValue(x);
+        getMenuAccelerometerAccelY().setFloatValue(y);
+        getMenuAccelerometerAccelZ().setFloatValue(z);
     }
 };
 

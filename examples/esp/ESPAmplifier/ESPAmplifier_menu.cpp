@@ -8,7 +8,7 @@
     use elsewhere.
  */
 
-// Generated for Arduino ESP32 by TcMenu 4.5.7 on 2026-05-17T09:13:32.122582Z.
+// Generated for Arduino ESP32 by TcMenu 5.0.0-SNAPSHOT on 2026-09-15T07:57:08.352155Z.
 
 #include <tcMenu.h>
 #include "ESPAmplifier_menu.h"
@@ -37,7 +37,9 @@
 using namespace iotouch;
 using namespace tcgfx;
 
-TfteSpiDrawable::TfteSpiDrawable(TFT_eSPI *tft, int spriteHeight) : tft(tft), spriteWithConfig(nullptr), spriteHeight(spriteHeight) {}
+TfteSpiDrawable::TfteSpiDrawable(TFT_eSPI *tft, int spriteHeight) : tft(tft), spriteWithConfig(nullptr), spriteHeight(spriteHeight) {
+    setSubDeviceType(SUB_DEVICE_4BPP);
+}
 
 DeviceDrawable *TfteSpiDrawable::getSubDeviceFor(const Coord &where, const Coord& size, const color_t *palette, int paletteSize) {
     if(paletteSize > SPRITE_PALETTE_SIZE) return nullptr; // cant exceed color palette size
@@ -407,7 +409,9 @@ bool EthernetInitialisation::attemptNewConnection(BaseRemoteServerConnection *re
     return false;
 }
 
-#include "ThemeCoolBlueModernBuilder.h"
+#include <Fonts/RobotoRegular14pt.h>
+#include <Fonts/RobotoRegular18pt.h>
+#include "ThemeCoolBlueModern.h"
 
 // Global variable declarations
 const PROGMEM  ConnectorLocalInfo applicationInfo = { "ESP Amplifier", "4656c798-10c6-4110-8e03-b9c51ed8fffb" };
@@ -427,6 +431,9 @@ EthernetTagValTransport ethernetTransport;
 TagValueRemoteServerConnection ethernetConnection(ethernetTransport, ethernetInitialisation);
 
 void setupMenu() {
+    // always initialise the task manager atomics before anything else.
+    tmInitAtomics();
+
     // First we set up eeprom and authentication (if needed).
     setEepromStorageMode(TC_STORE_ROM_LEGACY);
     menuMgr.setEepromRef(&glArduinoEeprom);
@@ -442,7 +449,7 @@ void setupMenu() {
         touchScreen.start();
         menuMgr.initWithoutInput(&renderer, &getMenuVolume());
         remoteServer.addConnection(&ethernetConnection);
-        installCoolBlueModernTheme(renderer, MenuFontDef(nullptr, 4), MenuFontDef(nullptr, 4), false, BaseGraphicalRenderer::TITLE_ALWAYS, false);
+        applyTheme(renderer);
 
     // We have an IoT monitor, register the server
     getMenuConnectivityIoTMonitor().setRemoteServer(remoteServer);
@@ -450,4 +457,3 @@ void setupMenu() {
     // We have an EEPROM authenticator, it needs initialising
     getMenuConnectivityAuthenticator().init();
 }
-
