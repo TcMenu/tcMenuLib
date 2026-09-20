@@ -17,6 +17,7 @@
         "variableName": "Analog",
         "id": 1,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -33,6 +34,7 @@
         "variableName": "Float",
         "id": 2,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -53,6 +55,7 @@
         "variableName": "Enum",
         "id": 3,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -69,6 +72,7 @@
         "variableName": "Power",
         "id": 4,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -84,6 +88,7 @@
         "variableName": "Settings",
         "id": 5,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -115,6 +120,7 @@
         "variableName": "SettingsRGB",
         "id": 7,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -131,6 +137,7 @@
         "variableName": "SettingsYesNo",
         "id": 8,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -147,6 +154,7 @@
         "variableName": "SettingsCheckBox",
         "id": 9,
         "eepromAddress": -1,
+        "functionName": "",
         "readOnly": false,
         "localOnly": false,
         "visible": true,
@@ -161,7 +169,7 @@
     "lastRemoteUuids": [
       "1e38dc42-672d-4c1c-a393-2c7632bf6c5c"
     ],
-    "lastThemeUuid": "57945787-0A04-447B-BBA2-6461FC505397",
+    "lastThemeUuid": "1947F585-9D36-448C-8A80-B425686107BD",
     "applicationUUID": "0ad4bdde-34a4-4507-912e-b495b0eac2c1",
     "applicationName": "%project.name",
     "lastProperties": [
@@ -394,12 +402,109 @@
         "name": "NEED_EDITING_ICONS",
         "latestValue": "false",
         "subsystem": "THEME"
+      },
+      {
+        "name": "DISPLAY_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "PINS_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "OTHER_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_SPI_SPEED",
+        "latestValue": "0",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_DOUBLE_BUFFER_SEP_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "DISPLAY_DOUBLE_BUFFER",
+        "latestValue": "4BPP",
+        "subsystem": "DISPLAY"
+      },
+      {
+        "name": "FONT_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_ITEM_FONT",
+        "latestValue": "tca:RobotoRegular16pt,0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_FONT",
+        "latestValue": "tca:RobotoMedium24,0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "SPACING_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_PADDING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "ITEM_PADDING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "TITLE_TO_ITEM_SPACING",
+        "latestValue": "2",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_ACTION_ROUND_CORNER",
+        "latestValue": "0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_TITLE_ROUND_CORNER",
+        "latestValue": "4",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_EXTRA_DRAWING_SEPARATOR_DISP",
+        "latestValue": "",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_EDIT_ICONS",
+        "latestValue": "MED_RES",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_BUTTON_ALIGNMENT",
+        "latestValue": "JUSTIFY_TITLE_LEFT_WITH_VALUE",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "THEME_USE_SLIDERS_ANALOG",
+        "latestValue": "false",
+        "subsystem": "THEME"
       }
     ],
     "namingRecursive": true,
     "useCppMain": false,
-    "saveLocation": "ALL_TO_CURRENT",
+    "saveLocation": "ONE_SINGLE_FILE",
+    "useDynamicMenus": false,
     "usingSizedEEPROMStorage": false,
+    "eepromSaveMode": "LEGACY_WRITE_BY_POSITION",
     "eepromDefinition": "",
     "authenticatorDefinition": "",
     "projectIoExpanders": [
@@ -407,9 +512,7 @@
     ],
     "menuInMenuCollection": {
       "menuDefinitions": []
-    },
-    "packageNamespace": "",
-    "appIsModular": false
+    }
   },
   "stringLists": []
 }
