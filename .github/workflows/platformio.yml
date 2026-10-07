@@ -11,7 +11,7 @@ jobs:
           - example: examples/avr/keyboardEthernetShield
             board: megaatmega2560
           # ESP
-          - example: examples/esp/ESP32S2EInk
+          - example: examples/esp/ESPAmplifier
             board: esp32dev
           - example: examples/esp/SimpleToaster
             board: esp32dev
