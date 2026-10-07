@@ -13,7 +13,7 @@ jobs:
           # ESP
           - example: examples/esp/ESP32S2EInk
             board: esp32dev
-          - example: examples/esp/ESPAmplifier
+          - example: examples/esp/SimpleToaster
             board: esp32dev
           - example: examples/staticMenu/esp32SimHub
             board: esp32dev
