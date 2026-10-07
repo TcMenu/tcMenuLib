@@ -15,10 +15,6 @@ jobs:
             board: esp32dev
           - example: examples/esp/ESPAmplifier
             board: esp32dev
-          - example: examples/esp/esp32s3TftEncoder
-            board: esp32dev
-          - example: examples/esp/esp32SimHub
-            board: esp32dev
           - example: examples/staticMenu/esp32SimHub
             board: esp32dev
           - example: examples/staticMenu/esp8266WifiOled
