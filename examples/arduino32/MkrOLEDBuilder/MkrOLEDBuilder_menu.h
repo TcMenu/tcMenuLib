@@ -226,7 +226,7 @@ using namespace tcremote;
 #include <Arduino.h>
 #include <tcMenu.h>
 
-#include <tcMenuBuilder.h>
+#include <TcMenuBuilder.h>
 #include <RemoteConnector.h>
 #include <tcUnicodeHelper.h>
 #include <ScrollChoiceMenuItem.h>

@@ -130,7 +130,7 @@ namespace iotouch {
 #include <Arduino.h>
 #include <tcMenu.h>
 
-#include <tcMenuBuilder.h>
+#include <TcMenuBuilder.h>
 #include <StateMachineEncoder.h>
 #include <tcUnicodeHelper.h>
 #include <IoAbstraction.h>

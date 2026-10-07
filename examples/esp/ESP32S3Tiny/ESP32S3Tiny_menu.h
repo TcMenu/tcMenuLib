@@ -405,7 +405,7 @@ void AdafruitCanvasDrawableNbpp<CANVASTY, BPP, PSIZE>::drawBitmapNbpp(const Coor
 #include <Arduino.h>
 #include <tcMenu.h>
 
-#include <tcMenuBuilder.h>
+#include <TcMenuBuilder.h>
 #include <StateMachineEncoder.h>
 #include <tcUnicodeHelper.h>
 #include <ScrollChoiceMenuItem.h>

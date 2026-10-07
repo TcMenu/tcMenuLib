@@ -171,7 +171,7 @@ using namespace tcremote;
 #include <Arduino.h>
 #include <tcMenu.h>
 
-#include <tcMenuBuilder.h>
+#include <TcMenuBuilder.h>
 #include <extras/TcOneButtonHandler.h>
 #include <RemoteConnector.h>
 #include <tcUnicodeHelper.h>

@@ -241,7 +241,7 @@ using namespace tcremote;
 #include <Arduino.h>
 #include <tcMenu.h>
 
-#include <tcMenuBuilder.h>
+#include <TcMenuBuilder.h>
 #include <graphics/MenuTouchScreenEncoder.h>
 #include <extras/DrawableTouchCalibrator.h>
 #include <RemoteConnector.h>

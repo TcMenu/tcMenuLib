@@ -115,7 +115,7 @@ protected:
 #include <Arduino.h>
 #include <tcMenu.h>
 
-#include <tcMenuBuilder.h>
+#include <TcMenuBuilder.h>
 #include <StateMachineEncoder.h>
 #include <IoAbstraction.h>
 #include <EepromItemStorage.h>

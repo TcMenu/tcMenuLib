@@ -255,7 +255,7 @@ using namespace tcremote;
 #include <Arduino.h>
 #include <tcMenu.h>
 
-#include <tcMenuBuilder.h>
+#include <TcMenuBuilder.h>
 #include <GxEPD2_BW.h>
 #include <RemoteConnector.h>
 #include <tcUnicodeHelper.h>
