@@ -1,7 +1,7 @@
 {
   "version": "1.00",
   "projectName": "Project description",
-  "author": "dave",
+  "author": "tcmenu",
   "items": [
     {
       "parentId": 0,
@@ -496,6 +496,16 @@
       {
         "name": "THEME_USE_SLIDERS_ANALOG",
         "latestValue": "false",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "BORDER_FOR_ACTIONS",
+        "latestValue": "0",
+        "subsystem": "THEME"
+      },
+      {
+        "name": "USE_SLIDER_ANALOG",
+        "latestValue": "true",
         "subsystem": "THEME"
       }
     ],
