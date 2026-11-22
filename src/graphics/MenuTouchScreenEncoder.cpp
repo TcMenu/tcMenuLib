@@ -5,8 +5,6 @@
 
 #include "MenuTouchScreenEncoder.h"
 
-#include <iterator>
-
 #include "ScrollChoiceMenuItem.h"
 #include "GraphicsDeviceRenderer.h"
 #include "TcTouchKeyboardController.h"
