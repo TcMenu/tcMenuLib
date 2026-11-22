@@ -30,7 +30,7 @@ namespace tcgfx {
  */
     class TcDrawableButton {
     public:
-        enum ButtonDrawingMode {
+        enum ButtonDrawingMode: uint8_t {
             NORMAL, SELECTED, PRESSED, NOT_SELECTABLE
         };
     private:
@@ -39,13 +39,13 @@ namespace tcgfx {
         color_t bgColor;
         color_t fgColor;
         color_t selectedColor;
+        uint8_t flags;
+        ButtonDrawingMode drawingMode = NORMAL;
         union {
             const char *text;
             const tcgfx::DrawableIcon *icon;
         };
         DeviceFontDrawingMode fontMode;
-        ButtonDrawingMode drawingMode = NORMAL;
-        uint8_t flags;
     public:
         /**
          * Create a button object that has only text at a particular point and size and color.
@@ -64,7 +64,7 @@ namespace tcgfx {
          * @param size the size of the button
          * @param bgCol the background color
          * @param fgCol the foreground color
-         * @param text the text to be presented or nullptr if there is no text.
+         * @param icon the icon to be drawn into the button
          */
         TcDrawableButton(const Coord &where, const Coord &size, color_t bgCol, color_t fgCol, color_t selCol,
                          const tcgfx::DrawableIcon *icon);
@@ -87,7 +87,7 @@ namespace tcgfx {
          * @param location the touch location
          * @return true if within the buttons bounds
          */
-        bool touchInBounds(const Coord &location) const;
+        [[nodiscard]] bool touchInBounds(const Coord &location) const;
 
         /**
          * On mono  OLED displays there is no in-between value that suits greying out, the easiest is to remove from view
@@ -99,11 +99,11 @@ namespace tcgfx {
         /**
          * @return true if the button hides when unselectable, otherwise false and the button will grey out instead.
          */
-        bool isButtonOnMonoDisplay() { return bitRead(flags, DRAW_BUTTON_MONO); }
+        [[nodiscard]] bool isButtonOnMonoDisplay() const { return bitRead(flags, DRAW_BUTTON_MONO); }
 
         /**
-         * Set the button mode
-         * @param pressed
+         * Every button can be a number of different states, these states are defined in ButtonDrawingMode.
+         * @param mode the current state of the button.
          */
         void setButtonDrawingMode(ButtonDrawingMode mode) {
             if(drawingMode != mode) setDirty(true);
@@ -122,18 +122,18 @@ namespace tcgfx {
          * If the button needs painting
          * @return true if needs painting, otherwise false
          */
-        bool isDirty() const { return bitRead(flags, DRAW_BUTTON_FLAG_IS_DIRTY); }
+        [[nodiscard]] bool isDirty() const { return bitRead(flags, DRAW_BUTTON_FLAG_IS_DIRTY); }
 
         /**
          * If the button is an icon button
          * @return true if icon, false if text
          */
-        bool isIconDrawn() const { return bitRead(flags, DRAW_BUTTON_FLAG_ICON_BOOL); }
+        [[nodiscard]] bool isIconDrawn() const { return bitRead(flags, DRAW_BUTTON_FLAG_ICON_BOOL); }
 
         /**
          * @return the current drawing mode of the button
          */
-        ButtonDrawingMode getButtonDrawingMode() { return drawingMode; }
+        [[nodiscard]] ButtonDrawingMode getButtonDrawingMode() const { return drawingMode; }
 
         /**
          * paint onto the drawable, using a sub-device if it is supported, will only draw when dirty flag is set.

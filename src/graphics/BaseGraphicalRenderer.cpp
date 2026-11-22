@@ -6,6 +6,7 @@
 #include "BaseGraphicalRenderer.h"
 #include "BaseDialog.h"
 #include "RuntimeTitleMenuItem.h"
+#include "TcTouchKeyboardController.h"
 
 namespace tcgfx {
 
@@ -110,96 +111,17 @@ void BaseGraphicalRenderer::subMenuRender(MenuItem* rootItem, uint8_t& locRedraw
 
 }
 
-GridPositionRowCacheEntry* BaseGraphicalRenderer::findMenuEntryAndDimensions(const Coord& screenPos, Coord& localStart, Coord& localSize) {
-    // 1. Bail out if a modal dialog is active or display has been taken over
-    if((dialog!=nullptr && dialog->isRenderNeeded()) || displayTakenMode != NOT_TAKEN_OVER) {
-        return nullptr;
-    }
-
-    // 2. Handle runtime list rendering mode (lists manage their own row/title coordinates)
-    if(currentRootMenu && currentRootMenu->getMenuType() == MENUTYPE_RUNTIME_LIST) {
-        auto* runList = reinterpret_cast<ListRuntimeMenuItem*>(currentRootMenu);
-        auto* itemProps = getDisplayPropertiesFactory().configFor(runList, ItemDisplayProperties::COMPTYPE_ITEM);
-        auto* titleProps = getDisplayPropertiesFactory().configFor(runList, ItemDisplayProperties::COMPTYPE_TITLE);
-        int titleHeight = titleProps->getRequiredHeight() + titleProps->getSpaceAfter();
-        int rowHeight = itemProps->getRequiredHeight() + + itemProps->getSpaceAfter();
-        if(screenPos.y < titleHeight) {
-            // Touch landed within list title area
-            cachedEntryItem = GridPositionRowCacheEntry(runList, GridPosition(GridPosition::DRAW_TITLE_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, 0, titleHeight), titleProps);
-            return &cachedEntryItem;
-        }
-        else {
-            // Touch landed within list items: calculate zero-based row index clamped to list size
-            auto rowNum = internal_min(int((screenPos.y - titleHeight) / rowHeight), int(runList->getNumberOfRows() - 1));
-            cachedEntryItem = GridPositionRowCacheEntry(runList, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, rowNum + 1, titleHeight), titleProps);
-            return &cachedEntryItem;
-        }
-    }
-
-    if((isRawTouchMode())) {
-        return nullptr;
-    }
-
-    // 3. If title is pinned at the top (TITLE_ALWAYS), calculate title height and check if touched
-    int rowStartY = 0;
-    if(titleMode == TITLE_ALWAYS) {
-        auto* titleProps = getDisplayPropertiesFactory().configFor(nullptr, ItemDisplayProperties::COMPTYPE_TITLE);
-        rowStartY = titleProps->getRequiredHeight() + titleProps->getSpaceAfter();
-        if(screenPos.y <= rowStartY) {
-            return itemOrderByRow.itemAtIndex(0);
-        }
-    }
-
-    // 4a. Set up the iteration for the below, and get the width of the edit/select icon (if any)
-    auto* icon = getDisplayPropertiesFactory().iconForMenuItem(SPECIAL_ID_ACTIVE_ICON);
-    int iconWidth = icon ? icon->getDimensions().x : 0;
-    uint8_t currentRow = -1;
-
-    // 4b. Iterate over items from drawingLocation offset to find which row contains screenPos.y
-    for(bsize_t i=drawingLocation.getCurrentOffset(); i<itemOrderByRow.count(); i++) {
-        auto* pEntry = itemOrderByRow.itemAtIndex(i);
-        int rowHeight = heightOfRow(pEntry->getPosition().getRow());
-        int rowEndY = rowStartY + rowHeight;
-
-        // Skip subsequent items on the same row when computing vertical geometry (only process first item per row)
-        if(pEntry->getPosition().getRow() == currentRow) continue;
-        currentRow = pEntry->getPosition().getRow();
-
-        // 5. Check if screen touch Y position falls within the current row bounds [rowStartY, rowEndY]
-        if(screenPos.y > rowStartY && screenPos.y < rowEndY) {
-            localStart.y = rowStartY;
-            localSize.y = rowHeight;
-            if(pEntry->getPosition().getGridSize() == 1) {
-                // Single column: entire row width belongs to this item (adjusted for active icon)
-                auto iconAdjust = iconWidth + pEntry->getDisplayProperties()->getPadding().left;
-                localStart.x = iconAdjust;
-                localSize.x = int(width) - iconAdjust;
-                return pEntry;
-            }
-            else {
-                // Multi column: divide total width into equal segments based on gridSize
-                // Calculate zero-based column index from screenPos.x, then lookup 1-based col key (column + 1)
-                int colWidth = int(width) / pEntry->getPosition().getGridSize();
-                int column = (screenPos.x / colWidth);
-                localStart.x = column * colWidth;
-                localSize.x = colWidth;
-                return itemOrderByRow.getByKey(rowCol(pEntry->getPosition().getRow(), column + 1));
-            }
-        }
-        // Advance rowStartY past this row and its trailing margin
-        rowStartY += rowHeight + pEntry->getDisplayProperties()->getSpaceAfter();
-    }
-
-    // 6. No item matched at given screen coordinate
-    return nullptr;
-}
-
 bool BaseGraphicalRenderer::drawTheMenuItems(int startRow, int startY, bool drawEveryLine) {
     int16_t ypos = startY;
     int lastRow = 0;
     int addAmount = 0;
     bool didDrawTitle = false;
     uint16_t totalHeight = 0;
+    uint16_t availWidth = width;
+
+    if (isHasTouchInterface() && (currentRootMenu->getMenuType() == MENUTYPE_RUNTIME_LIST || totalGridHeight() > height)) {
+        availWidth -= TC_KEYBOARD_BUTTON_SIZE;
+    }
 
     for(bsize_t i=startRow; i < itemOrderByRow.count(); i++) {
         auto* itemCfg = itemOrderByRow.itemAtIndex(i);
@@ -216,13 +138,13 @@ bool BaseGraphicalRenderer::drawTheMenuItems(int startRow, int startY, bool draw
                 item->setChanged(displayNumber, false);
                 taskManager.yieldForMicros(0);
                 if(itemCfg->getPosition().getGridSize() > 1) {
-                    int colWidth = int(width) / itemCfg->getPosition().getGridSize();
+                    int colWidth = int(availWidth) / itemCfg->getPosition().getGridSize();
                     int colOffset = colWidth * (itemCfg->getPosition().getGridPosition() - 1);
                     drawMenuItem(itemCfg, Coord(colOffset, int(ypos)), Coord(colWidth - 1, int(itemCfg->getHeight())),
                                  DrawingFlags(drawEveryLine, item == activeItem, item == menuMgr.getCurrentEditor()));
                 }
                 else {
-                    drawMenuItem(itemCfg, Coord(0, ypos), Coord(int(width), int(itemCfg->getHeight())), DrawingFlags(drawEveryLine, item == activeItem, item == menuMgr.getCurrentEditor()));
+                    drawMenuItem(itemCfg, Coord(0, ypos), Coord(int(availWidth), int(itemCfg->getHeight())), DrawingFlags(drawEveryLine, item == activeItem, item == menuMgr.getCurrentEditor()));
                 }
                 if(itemCfg->getPosition().getDrawingMode() == GridPosition::DRAW_TITLE_ITEM && itemCfg->getPosition().getRow() == 0) {
                     didDrawTitle = true;
@@ -258,17 +180,22 @@ void BaseGraphicalRenderer::renderList() {
     uint8_t offset = 0;
     while((currentActive - offset) > maxOnScreen) offset++;
 
+    uint16_t availWidth = width;
+    if (isHasTouchInterface()) {
+        availWidth -= TC_KEYBOARD_BUTTON_SIZE;
+    }
+
     cachedEntryItem = GridPositionRowCacheEntry(runList->asBackMenu(), GridPosition(GridPosition::DRAW_TITLE_ITEM,
                                                                              titleProps->getDefaultJustification(),
                                                                              0, titleHeight), titleProps);
-    drawMenuItem(&cachedEntryItem, Coord(0, 0), Coord((int)width, titleHeight), DrawingFlags(true, currentActive == 0, false));
+    drawMenuItem(&cachedEntryItem, Coord(0, 0), Coord(availWidth, titleHeight), DrawingFlags(true, currentActive == 0, false));
 
     for (int i = 0; i <= maxOnScreen; i++) {
         uint8_t current = offset + i;
         if(current >= runList->getNumberOfRows()) break;
         RuntimeMenuItem* toDraw = runList->getChildItem(current);
         cachedEntryItem = GridPositionRowCacheEntry(toDraw, GridPosition(GridPosition::DRAW_TEXTUAL_ITEM, GridPosition::JUSTIFY_TITLE_LEFT_VALUE_RIGHT, current + 1, rowHeight), itemProps);
-        drawMenuItem(&cachedEntryItem, Coord(0, totalTitleHeight), Coord((int)width, rowHeight), DrawingFlags(true, (currentActive-1) == (offset + i), false));
+        drawMenuItem(&cachedEntryItem, Coord(0, totalTitleHeight), Coord(availWidth, rowHeight), DrawingFlags(true, (currentActive-1) == (offset + i), false));
         taskManager.yieldForMicros(0);
         totalTitleHeight += totalRowHeight;
     }
@@ -436,6 +363,19 @@ GridPositionRowCacheEntry* BaseGraphicalRenderer::firstItemOnRow(int row) {
     return rowData;
 }
 
+int BaseGraphicalRenderer::totalGridHeight() const {
+    int totalItemHeights = 0;
+    for(int i=0; i<itemOrderByRow.count(); i++) {
+        auto rowEntry = itemOrderByRow.itemAtIndex(i);
+        if(rowEntry == nullptr || rowEntry->getPosition().getGridPosition() > 1) continue;
+        auto itemHeight = rowEntry->getPosition().getGridHeight();
+        auto actualHeight = itemHeight != 0 ? itemHeight : rowEntry->getDisplayProperties()->getRequiredHeight();
+        actualHeight += rowEntry->getDisplayProperties()->getSpaceAfter();
+        totalItemHeights += actualHeight;
+    }
+    return totalItemHeights;
+}
+
 int BaseGraphicalRenderer::heightOfRow(int row, bool includeSpace) {
     GridPositionRowCacheEntry *rowData = firstItemOnRow(row);
 
@@ -515,6 +455,10 @@ void BaseGraphicalRenderer::setTitleMode(BaseGraphicalRenderer::TitleMode mode) 
     titleMode = mode;
     displayPropertiesHaveChanged();
     menuMgr.changeMenu(menuMgr.getCurrentMenu());
+}
+
+void BaseGraphicalRenderer::setHasTouchInterface(bool hasTouch) {
+    bitWrite(flags, GFX_USING_TOUCH_INTERFACE, hasTouch);
 }
 
 BaseGraphicalRenderer::BaseGraphicalRenderer(int bufferSize, int wid, int hei, bool lastRowExact,const char *appTitle)

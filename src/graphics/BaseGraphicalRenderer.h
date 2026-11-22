@@ -159,12 +159,11 @@ namespace tcgfx {
          */
         MenuItem *getCurrentRendererRoot() { return currentRootMenu; }
 
-    private:
+    protected:
         RenderingNavigationListener navigationListener;
         MenuItem *currentRootMenu;
         const char *pgmTitle;
         GridPositionRowCacheEntry cachedEntryItem;
-    protected:
         BtreeList<uint16_t, GridPositionRowCacheEntry> itemOrderByRow;
         TitleMode titleMode = TITLE_FIRST_ROW;
         uint16_t width, height;
@@ -197,7 +196,7 @@ namespace tcgfx {
          * Enable touch support within the renderer
          * @param hasTouch true to enable touch
          */
-        void setHasTouchInterface(bool hasTouch) { bitWrite(flags, GFX_USING_TOUCH_INTERFACE, hasTouch); }
+        virtual void setHasTouchInterface(bool hasTouch);
         /**
          * Set the title as on, so it appears on the display, somewhat internal to the library, control from the theme
          * @param titleOn true to turn on
@@ -317,16 +316,6 @@ namespace tcgfx {
         uint8_t itemCount(MenuItem* root, bool) override;
 
         /**
-         * Provides the menu item grid position and dimensions of it, given a screen position. Usually used by touch screen
-         * implementations. Note that this will return nullptr if no entry is found.
-         * @param screenPos the raw screen position
-         * @param localStart the local menu item start position
-         * @param localSize the local menu item size
-         * @return the grid cache entry or nullptr if no item was found.
-         */
-        GridPositionRowCacheEntry* findMenuEntryAndDimensions(const Coord &screenPos, Coord &localStart, Coord &localSize);
-
-        /**
          * Gets the menu item at a given index, which may be different to the order in the tree.
          */
         MenuItem *getMenuItemAtIndex(MenuItem* currentRoot, uint8_t idx) override;
@@ -377,11 +366,29 @@ namespace tcgfx {
          * @param forceDrawWidgets reference to widgets force update flag, will be updated.
          */
         virtual void subMenuRender(MenuItem* rootItem, uint8_t& locRedrawMode, bool& forceDrawWidgets);
+
+        /**
+         * Calculates the height of a specific row in the grid, optionally including space after the item.
+         * @param row the index of the row to calculate the height for
+         * @param includeSpace whether to include the space after the item in the calculation
+         * @return the height of the row, including space if specified
+         */
         int heightOfRow(int row, bool includeSpace=false);
+
+        /**
+         * Calculates the total height of the grid, including space after each item.
+         * @return the total height of the grid
+         */
+        int totalGridHeight() const;
+
+        /**
+         * Used to render the list of menu items, you can override this method to customize the rendering behavior.
+         * Normally to provide some extra actions before or after the rendering process.
+         */
+        virtual void renderList();
     private:
         bool drawTheMenuItems(int startRow, int startY, bool drawEveryLine);
 
-        void renderList();
 
         void recalculateDisplayOrder(MenuItem *pItem, bool safeMode);
 

@@ -64,11 +64,13 @@ namespace tcgfx {
         virtual void touched(const TouchNotification& notification)=0;
     };
 
+    class GraphicsDeviceRenderer;
+
     class MenuTouchScreenEncoder : public TouchObserver {
     private:
-        BaseGraphicalRenderer *renderer;
+        GraphicsDeviceRenderer *renderer;
     public:
-        explicit MenuTouchScreenEncoder(BaseGraphicalRenderer* rend) {
+        explicit MenuTouchScreenEncoder(GraphicsDeviceRenderer* rend) {
             renderer = rend;
         }
 
@@ -87,9 +89,9 @@ namespace tcgfx {
         Coord localStart;
         Coord localSize;
         MenuTouchScreenEncoder encoder;
-        BaseGraphicalRenderer* renderer;
+        GraphicsDeviceRenderer* renderer;
         TouchObserver* observer;
-        TouchObserver* secondaryObserver;
+        TouchObserver* secondaryObserver = nullptr;
         float lastX, lastY;
         Coord lastCoord;
         iotouch::TouchState currentState;
@@ -106,7 +108,7 @@ namespace tcgfx {
          * @param renderer the graphics renderer that is in use
          * @param rotation the rotation of the touch interface
          */
-        MenuTouchScreenManager(iotouch::TouchInterrogator* interrogator, BaseGraphicalRenderer* renderer,
+        MenuTouchScreenManager(iotouch::TouchInterrogator* interrogator, GraphicsDeviceRenderer* renderer,
                                const iotouch::TouchOrientationSettings& rotation);
 
         void sendEvent(float locationX, float locationY, float touchPressure, iotouch::TouchState touched) override;

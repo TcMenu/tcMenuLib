@@ -33,6 +33,7 @@ add_library(tcMenu
         ../src/graphics/MenuTouchScreenEncoder.cpp
         ../src/graphics/RuntimeTitleMenuItem.cpp
         ../src/graphics/TcDrawableButton.cpp
+        ../src/graphics/TcTouchKeyboardController.cpp
         ../src/graphics/TcThemeBuilder.cpp
         ../src/remote/BaseBufferedRemoteTransport.cpp
         ../src/remote/BaseRemoteComponents.cpp

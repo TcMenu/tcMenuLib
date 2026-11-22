@@ -28,6 +28,8 @@ namespace tcgfx {
 
     class CardLayoutPane;
 
+    class TcTouchKeyboardController;
+
     /**
      * This class implements TcUnicode's plot pipeline for tcMenu renderers, as a last resort way of drawing when we
      * don't have a direct implementation for the hardware.
@@ -64,13 +66,21 @@ namespace tcgfx {
         CardLayoutPane* cardLayoutPane = nullptr;
         color_t overallScreenBgColor = RGB(0, 0, 0);
         bool redrawNeeded = false;
+        TcTouchKeyboardController* touchKeyboardController = nullptr;
+
     public:
         GraphicsDeviceRenderer(int bufferSize, const char *appTitle, DeviceDrawable *drawable);
 
         void drawWidget(Coord where, TitleWidget *widget, color_t colorFg, color_t colorBg) override;
         void drawMenuItem(GridPositionRowCacheEntry *entry, Coord where, Coord areaSize, const DrawingFlags& drawingFlags) override;
         void drawingCommand(RenderDrawingCommand command) override;
+        void setHasTouchInterface(bool hasTouch) override;
 
+        /**
+         * Sometimes drawing will not use all the space available. This will fill the remaining space with the
+         * background color.
+         * @param endPoint where drawing of items stopped.
+         */
         void fillWithBackgroundTo(int endPoint) override;
 
         /**
@@ -119,7 +129,7 @@ namespace tcgfx {
          * intensive of drawing operations.
          * @return the underlying device drawable.
          */
-        DeviceDrawable* getDeviceDrawable() { return rootDrawable; }
+        DeviceDrawable* getDeviceDrawable() const { return rootDrawable; }
 
         /**
          * Enables TcUnicode as the default font processor for all operations, and ensures that the unicode helper can
@@ -158,7 +168,32 @@ namespace tcgfx {
          */
         void setDrawable(DeviceDrawable* drawable);
 
+        /**
+         * Find the item that has just been touched. This method scans through the menu items to get the first item that
+         * is under the screen position.
+         * @param screenPos the raw screen position
+         * @param localStart the local menu item start position
+         * @param localSize the local menu item size
+         * @return an item that was found, or nullptr if no item was found.
+         */
+        GridPositionRowCacheEntry* findMenuEntryAndDimensions(const Coord &screenPos, Coord &localStart, Coord &localSize);
+        /**
+         * Returns the touch keyboard controller object if there is one.
+         * @return the touch keyboard controller if there is one, in non-touch mode it will be nullptr.
+         */
+        [[nodiscard]] TcTouchKeyboardController* getTouchKeyboardController() const { return touchKeyboardController; }
+
     protected:
+        /**
+         * Provides the menu item grid position and dimensions of it, given a screen position. Usually used by touch screen
+         * implementations. Note that this will return nullptr if no entry is found.
+         * @param screenPos the raw screen position
+         * @param localStart the local menu item start position
+         * @param localSize the local menu item size
+         * @return the grid cache entry or nullptr if no item was found.
+         */
+        void renderList() override;
+
         /**
          * Overrides the default implementation to allow for card based layouts, if this is not enabled for the submenu
          * then regular rendering is used instead.
