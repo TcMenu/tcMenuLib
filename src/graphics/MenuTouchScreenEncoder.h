@@ -11,6 +11,8 @@
 #ifndef TCMENU_MENUTOUCHSCREENENCODER_H
 #define TCMENU_MENUTOUCHSCREENENCODER_H
 
+#define NUM_SECONDARY_OBSERVER 4
+
 #include "PlatformDetermination.h"
 #include <IoAbstraction.h>
 #include "graphics/BaseGraphicalRenderer.h"
@@ -91,7 +93,7 @@ namespace tcgfx {
         MenuTouchScreenEncoder encoder;
         GraphicsDeviceRenderer* renderer;
         TouchObserver* observer;
-        TouchObserver* secondaryObserver = nullptr;
+        TouchObserver* secondaryObserver[NUM_SECONDARY_OBSERVER] = {};
         float lastX, lastY;
         Coord lastCoord;
         iotouch::TouchState currentState;
@@ -112,23 +114,25 @@ namespace tcgfx {
                                const iotouch::TouchOrientationSettings& rotation);
 
         void sendEvent(float locationX, float locationY, float touchPressure, iotouch::TouchState touched) override;
-        iotouch::TouchState getLastTouchState() const { return currentState; }
-        float getLastX() const { return lastX; }
-        float getLastY() const { return lastY; }
-        Coord getLastScreenCoord() { return lastCoord; }
+        [[nodiscard]] iotouch::TouchState getLastTouchState() const { return currentState; }
+        [[nodiscard]] float getLastX() const { return lastX; }
+        [[nodiscard]] float getLastY() const { return lastY; }
+        [[nodiscard]] Coord getLastScreenCoord() const { return lastCoord; }
 
         /**
          * You can register a second temporary observer to receive touch updates, the card layout does this, and any
          * other takeOverDisplay or other situation that needs such a temporary notification of touch can do so.
          * @param secondaryObs the secondary listener
          */
-        void setSecondaryObserver(TouchObserver* secondaryObs) { secondaryObserver = secondaryObs; }
+        void setSecondaryObserver(TouchObserver* secondaryObs) { secondaryObserver[0] = secondaryObs; }
+        void registerSecondaryObserver(TouchObserver* secondaryObs);
+        void unregisterSecondaryObserver(TouchObserver* secondaryObs);
 
         /**
          * Clear the secondary lister added by setSecondaryLister, note that if you are going to deallocate an object
          * that is a listener you must call this first.
          */
-        void clearSecondaryObserver() { secondaryObserver = nullptr; }
+        void clearSecondaryObserver() { secondaryObserver[0] = nullptr; }
 
         void sendToObservers(TouchNotification notification);
     };

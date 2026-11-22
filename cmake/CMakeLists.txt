@@ -27,7 +27,6 @@ add_library(tcMenu
         ../src/graphics/CardLayoutPanel.cpp
         ../src/graphics/DeviceDrawable.cpp
         ../src/graphics/DeviceDrawableHelper.cpp
-        ../src/graphics/DialogRuntimeEditor.cpp
         ../src/graphics/GfxMenuConfig.cpp
         ../src/graphics/GraphicsDeviceRenderer.cpp
         ../src/graphics/MenuTouchScreenEncoder.cpp

@@ -4,9 +4,10 @@
  */
 
 #include "MenuTouchScreenEncoder.h"
+
+#include <iterator>
+
 #include "ScrollChoiceMenuItem.h"
-#include "../BaseDialog.h"
-#include "DialogRuntimeEditor.h"
 #include "GraphicsDeviceRenderer.h"
 #include "TcTouchKeyboardController.h"
 
@@ -48,9 +49,31 @@ void MenuTouchScreenManager::sendEvent(float locationX, float locationY, float t
     }
 }
 
-    void MenuTouchScreenManager::sendToObservers(TouchNotification notification) {
+void MenuTouchScreenManager::registerSecondaryObserver(TouchObserver* secondaryObs) {
+    for (auto & i : secondaryObserver) {
+        if (i == nullptr) {
+            i = secondaryObs;
+            return;
+        }
+    }
+}
+
+void MenuTouchScreenManager::unregisterSecondaryObserver(TouchObserver* secondaryObs) {
+    for (auto & i : secondaryObserver) {
+        if (i == secondaryObs) {
+            i = nullptr;
+            return;
+        }
+    }
+}
+
+void MenuTouchScreenManager::sendToObservers(TouchNotification notification) {
         observer->touched(notification);
-        if(secondaryObserver) secondaryObserver->touched(notification);
+        for (auto & i : secondaryObserver) {
+            if (i != nullptr) {
+                i->touched(notification);
+            }
+        }
     }
 
     bool isTouchActionable(MenuItem* pItem) {

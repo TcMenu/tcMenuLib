@@ -631,7 +631,7 @@ namespace tcgfx {
             BaseGraphicalRenderer::subMenuRender(rootItem, locRedrawMode, forceDrawWidgets);
             // on touch screens let the keyboard controller be drawn if needed.
             if (isHasTouchInterface() && (currentRootMenu->getMenuType() == MENUTYPE_RUNTIME_LIST || totalGridHeight() > height)) {
-                touchKeyboardController->drawKeyboardController(rootDrawable, Coord(width, height), 63);
+                touchKeyboardController->drawScrollbar(rootDrawable, Coord(width, height), 63);
             }
         }
     }
@@ -669,7 +669,7 @@ namespace tcgfx {
     void GraphicsDeviceRenderer::renderList() {
         BaseGraphicalRenderer::renderList();
         if (isHasTouchInterface()) {
-            touchKeyboardController->drawKeyboardController(rootDrawable, Coord(width, height), 63);
+            touchKeyboardController->drawScrollbar(rootDrawable, Coord(width, height), 63);
         }
     }
 
@@ -682,7 +682,7 @@ namespace tcgfx {
         // 1a. when touch is enabled, the up down buttons are on the right and take the touch
         if (isHasTouchInterface() && (currentRootMenu->getMenuType() == MENUTYPE_RUNTIME_LIST || totalGridHeight() > height) &&
                 screenPos.x > (width - TC_KEYBOARD_BUTTON_SIZE)) {
-            touchKeyboardController->reportTouch(screenPos);
+            touchKeyboardController->reportTouchUpDown(screenPos);
             return nullptr;
         }
 
