@@ -52,15 +52,74 @@ void TouchKeyboardLayout::calculateKeyHeight(DeviceDrawableHelper& helper) {
     if (actualRows && eachKeyHeight > size.y / actualRows) eachKeyHeight = size.y / actualRows;
 }
 
-void SingleValuePerFieldTouchEditor::keypress(TcTouchKeyboardController* controller, char ch) {
-    if (menuItem->getMenuType() == MENUTYPE_TEXT_VALUE) {
-        const auto txtItem = reinterpret_cast<TextMenuItem*>(menuItem);
-        txtItem->valueChangedFromKeyboard(ch);
-    } else {
-        menuItem->valueChanged(ch);
+SingleValuePerFieldTouchEditor* SingleValuePerFieldTouchEditor::initSingle(MenuItem* item) {
+    initFor(item);
+    if (item->getMenuType() == MENUTYPE_LARGENUM_VALUE) {
+        if (auto numItem = reinterpret_cast<EditableLargeNumberMenuItem*>(item); numItem->isNegativeAllowed()) {
+            numItem->nextPart();
+        }
     }
-    bool moreToGo = menuItem->nextPart() != 0;
+
+    return this;
+}
+
+void SingleValuePerFieldTouchEditor::keypress(TcTouchKeyboardController* controller, char ch) {
+    bool moreToGo = true;
+    if (menuItem->getMenuType() == MENUTYPE_TEXT_VALUE) {
+        if (ch == 0xFE) {
+            capsLock = true;
+        } else {
+            const auto txtItem = reinterpret_cast<TextMenuItem*>(menuItem);
+            if (capsLock) {
+                ch = toupper(ch);
+            }
+            txtItem->valueChangedFromKeyboard(ch);
+            moreToGo = menuItem->nextPart() != 0;
+        }
+    } else if (menuItem->getMenuType() == MENUTYPE_LARGENUM_VALUE) {
+        const auto lgeItem = reinterpret_cast<EditableLargeNumberMenuItem*>(menuItem);
+        if (ch == '+' && lgeItem->isNegativeAllowed()) {
+            const auto neg = lgeItem->getLargeNumber()->isNegative() ? 0 : 1;
+            lgeItem->setNegativeFlagValue(neg);
+        } else if (ch == '>') {
+            moreToGo = menuItem->nextPart() != 0;
+        } else if (ch >= '0' && ch <= '9') {
+            menuItem->valueChanged(ch);
+            moreToGo = menuItem->nextPart() != 0;
+        }
+    }
     controller->needsRedraw(moreToGo);
+}
+
+SummingValueKeyboardTouchEditor* SummingValueKeyboardTouchEditor::initSumming(MenuItem* item) {
+    initFor(item);
+    currentValueBeingEdited = 0;
+    return this;
+}
+
+void SummingValueKeyboardTouchEditor::keypress(TcTouchKeyboardController* controller, char ch) {
+    const auto range = menuItem->getCurrentRange();
+    if (ch == '<') {
+        currentValueBeingEdited = 0;
+        menuItem->valueChanged(0);
+        controller->needsRedraw(true);
+        return;
+    } else if (ch == '>' || ch == '.') {
+        currentValueBeingEdited = 0;
+        const bool moreToGo = menuItem->nextPart() != 0;
+        controller->needsRedraw(moreToGo);
+        return;
+    } else if (ch < '0' || ch > '9') return;
+
+    const auto num = ch - '0';
+    currentValueBeingEdited = currentValueBeingEdited * 10 + num;
+    if (range < currentValueBeingEdited) {
+        currentValueBeingEdited = 0;
+        controller->needsRedraw(true);
+    } else {
+        menuItem->valueChanged(currentValueBeingEdited);
+        controller->needsRedraw(true);
+    }
 }
 
 void TouchKeyboardRow::drawRow(GraphicsDeviceRenderer& renderer, ItemDisplayProperties& properties, int yLocationStart, int height) {
@@ -82,9 +141,9 @@ void TouchKeyboardRow::drawRow(GraphicsDeviceRenderer& renderer, ItemDisplayProp
 }
 
 
-TcTouchKeyboardController::TcTouchKeyboardController(TouchKeyboardLayout* defKeyboard, GraphicsDeviceRenderer& renderer, ItemDisplayProperties& properties) :
+TcTouchKeyboardController::TcTouchKeyboardController(TouchKeyboardLayout* numKeyboard, TouchKeyboardLayout* txtKeyboard, GraphicsDeviceRenderer& renderer) :
     upButton(&drawUpArrowLgeBitmap), downButton(&drawDownArrowLgeBitmap), keyboardLayout(nullptr),
-    touchRenderer(renderer), properties(properties), defKeyboard(defKeyboard)  {
+    touchRenderer(renderer), defNumKeyboard(numKeyboard), defTxtKeyboard(txtKeyboard)  {
 }
 
 void TcTouchKeyboardController::started(BaseMenuRenderer* currentRenderer) {
@@ -100,6 +159,7 @@ void TcTouchKeyboardController::started(BaseMenuRenderer* currentRenderer) {
 }
 
 void TcTouchKeyboardController::reset() {
+    stopEditing();
 }
 
 void TcTouchKeyboardController::renderLoop(unsigned int currentValue, RenderPressMode userClick) {
@@ -113,16 +173,14 @@ void TcTouchKeyboardController::renderLoop(unsigned int currentValue, RenderPres
     }
 }
 
-void TcTouchKeyboardController::startEditing(MenuItem* menuItem, KeyboardTouchEditor* actEditor) {
+void TcTouchKeyboardController::startEditing(MenuItem* menuItem) {
     if (menuItem == nullptr) {
         serlogF(SER_WARNING, "TchEd-null");
         return;
-    } else if (actEditor) {
-        itemEditor = actEditor;
     } else if (menuItem->getMenuType() == MENUTYPE_TEXT_VALUE || menuItem->getMenuType() == MENUTYPE_LARGENUM_VALUE) {
-        itemEditor = perCharEditor.initFor(menuItem);
+        itemEditor = perCharEditor.initSingle(menuItem);
     } else if (menuItem->getMenuType() == MENUTYPE_DATE || menuItem->getMenuType() == MENUTYPE_IPADDRESS || menuItem->getMenuType() == MENUTYPE_COLOR_VALUE || menuItem->getMenuType() == MENUTYPE_TIME) {
-        itemEditor = summingEditor.initFor(menuItem);
+        itemEditor = summingEditor.initSumming(menuItem);
     } else {
         // it has been called with an unsupported menu type, only runtime editable items can use this path
         return;
@@ -133,7 +191,7 @@ void TcTouchKeyboardController::startEditing(MenuItem* menuItem, KeyboardTouchEd
     menuMgr.setEditorHintsLocked(false);
     menuMgr.setCurrentEditor(menuItem);
     itemBeingEdited = multi;
-    keyboardLayout = defKeyboard;
+    keyboardLayout = (menuItem->getMenuType() == MENUTYPE_TEXT_VALUE) ? defTxtKeyboard : defNumKeyboard;
 
     // here we take over the display to render a keyboard
     touchRenderer.setCustomDrawingHandler(this);
@@ -149,6 +207,9 @@ void TcTouchKeyboardController::renderItem() {
     DeviceDrawableHelper helper(touchRenderer.getDeviceDrawable());
     char buffer[64] = "Edit ";
     itemBeingEdited->copyNameToBuffer(buffer, 5, sizeof buffer);
+    if (itemEditor->isCapsDown()) {
+        appendChar(buffer, '^', sizeof buffer);
+    }
     helper.setFontFromParameters(titleProps->getFont(), titleProps->getFontMagnification());
     int baseline;
     int titleHeight = helper.textExtents(buffer, &baseline).y;
@@ -161,8 +222,8 @@ void TcTouchKeyboardController::renderItem() {
     auto& hints = menuMgr.getEditorHints();
     if (hints.getEditorRenderingType() == CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT) {
         auto length = strlen(buffer);
-        const int start = internal_min(length, internal_max(0, hints.getStartIndex()));
-        const int end = internal_min(length, internal_max(start, hints.getEndIndex()));
+        const int start = internal_min((int)length, internal_max(0, hints.getStartIndex()));
+        const int end = internal_min((int)length, internal_max(start, hints.getEndIndex()));
         char saved = buffer[start];
         buffer[start] = 0;
         int startX = helper.textExtents(buffer, &baseline).x;
@@ -200,24 +261,31 @@ void TcTouchKeyboardController::needsRedraw(bool moreToGo) {
     }
 }
 
-void TcTouchKeyboardController::renderKeyboard() {
-    auto* layout = keyboardLayout ? keyboardLayout : defKeyboard;
+void TcTouchKeyboardController::renderKeyboard() const {
+    auto* layout = keyboardLayout ? keyboardLayout : defNumKeyboard;
     if (layout && touchRenderer.getDeviceDrawable()) {
+        auto& factory = touchRenderer.getGraphicsPropertiesFactory();
+        const auto location = keyboardLayout->getKeysPerRow() > 5 ? ItemDisplayProperties::COMPTYPE_ITEM : ItemDisplayProperties::COMPTYPE_TITLE;
+        auto* properties = factory.configFor(itemBeingEdited, location);
+
         DeviceDrawableHelper helper(touchRenderer.getDeviceDrawable());
-        helper.setFontFromParameters(properties.getFont(), properties.getFontMagnification());
+        helper.setFontFromParameters(properties->getFont(), properties->getFontMagnification());
         layout->calculateKeyHeight(helper);
-        layout->drawRows(touchRenderer, properties, touchRenderer.getHeight() - layout->getRequiredHeight());
+        layout->drawRows(touchRenderer, *properties, touchRenderer.getHeight() - layout->getRequiredHeight());
     }
 }
 
 void TcTouchKeyboardController::drawScrollbar(DeviceDrawable* drawable, const Coord& displayDims, int titleHeight) {
+    auto& factory = touchRenderer.getGraphicsPropertiesFactory();
+    auto* properties = factory.configFor(nullptr, ItemDisplayProperties::COMPTYPE_TITLE);
+
     const auto yHei = displayDims.y - titleHeight;
     const auto xLoc = displayDims.x - TC_KEYBOARD_BUTTON_SIZE;
     upButton.setPositionAndSize(Coord(xLoc, titleHeight), Coord(TC_KEYBOARD_BUTTON_SIZE, yHei / 2));
-    upButton.setColors(properties.getColor(ItemDisplayProperties::TEXT), properties.getColor(ItemDisplayProperties::BACKGROUND), properties.getColor(ItemDisplayProperties::HIGHLIGHT1));
+    upButton.setColors(properties->getColor(ItemDisplayProperties::TEXT), properties->getColor(ItemDisplayProperties::BACKGROUND), properties->getColor(ItemDisplayProperties::HIGHLIGHT1));
     upButton.paintButton(drawable);
     downButton.setPositionAndSize(Coord(xLoc, titleHeight + yHei / 2), Coord(TC_KEYBOARD_BUTTON_SIZE, yHei / 2));
-    downButton.setColors(properties.getColor(ItemDisplayProperties::TEXT), properties.getColor(ItemDisplayProperties::BACKGROUND), properties.getColor(ItemDisplayProperties::HIGHLIGHT1));
+    downButton.setColors(properties->getColor(ItemDisplayProperties::TEXT), properties->getColor(ItemDisplayProperties::BACKGROUND), properties->getColor(ItemDisplayProperties::HIGHLIGHT1));
     downButton.paintButton(drawable);
 }
 
@@ -241,9 +309,19 @@ void TcTouchKeyboardController::stopEditing() {
     itemBeingEdited = nullptr;
 }
 
-TcTouchKeyboardController* tcgfx::defaultTouchKeyboardController(const Coord& size, GraphicsDeviceRenderer& renderer, ItemDisplayProperties& properties) {
+TcTouchKeyboardController* tcgfx::defaultTouchKeyboardController(const Coord& size, GraphicsDeviceRenderer& renderer) {
     auto* layout = new TouchKeyboardLayout(size);
-    layout->withRow("789>", 4)->withRow("456<", 4)->withRow("123X", 4)->withRow(".0+", 3);
-    auto* touchKeyboard = new TcTouchKeyboardController(layout, renderer, properties);
+    auto* layoutText = new TouchKeyboardLayout(size);
+    layout->withRow("789>", 4)
+        ->withRow("456<", 4)
+        ->withRow("123X", 4)
+        ->withRow(".0+", 3);
+    layoutText->withRow("1234567890", 10)
+              ->withRow("qwertyuiop", 10)
+              ->withRow("asdfghjkl!", 10)
+              ->withRow("zxcvbnm,.?", 10)
+              ->withRow(" *#@$\0xFE", 6);
+
+    auto* touchKeyboard = new TcTouchKeyboardController(layout, layoutText, renderer);
     return touchKeyboard;
 }

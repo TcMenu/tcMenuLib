@@ -58,8 +58,7 @@ namespace tcgfx {
     void GraphicsDeviceRenderer::setHasTouchInterface(bool hasTouch) {
         bitWrite(flags, GFX_USING_TOUCH_INTERFACE, hasTouch);
         if (!touchKeyboardController) {
-            const auto props = getGraphicsPropertiesFactory().configFor(nullptr,ItemDisplayProperties::COMPTYPE_ACTION);
-            touchKeyboardController = defaultTouchKeyboardController(rootDrawable->getDisplayDimensions(),*this, *props);
+            touchKeyboardController = defaultTouchKeyboardController(rootDrawable->getDisplayDimensions(),*this);
         }
     }
 

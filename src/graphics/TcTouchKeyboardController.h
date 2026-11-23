@@ -20,8 +20,11 @@
 namespace tcgfx {
     class TcTouchKeyboardController;
 
+    constexpr uint8_t noKeyPressed = 0xFF;
+    constexpr uint8_t capsKey = 0xFE;
+
     class TouchKeyboardRow {
-        char column[12] = {};
+        char column[10] = {};
         uint8_t actualColumns = 0;
         int eachKeySize = 0;
         uint8_t pressedKey = 0;
@@ -41,10 +44,11 @@ namespace tcgfx {
         int getTextHeight(DeviceDrawableHelper& helper) const;
 
         uint8_t touchInRow(const Coord& touch, bool touched);
+        [[nodiscard]] uint8_t getNumKeys() const { return actualColumns; }
     };
 
     class TouchKeyboardLayout {
-        TouchKeyboardRow rows[4];
+        TouchKeyboardRow rows[5];
         Coord size;
         int16_t eachKeyHeight;
         int16_t screenHeight;
@@ -53,7 +57,7 @@ namespace tcgfx {
         explicit TouchKeyboardLayout(const Coord& size) : rows{}, size(size), eachKeyHeight(), screenHeight(size.y),actualRows(0) {}
 
         TouchKeyboardLayout* withRow(const char* rowKeys, uint8_t keys) {
-            if (actualRows < 4 && keys > 0 && keys <= 12) {
+            if (actualRows < 5 && keys > 0 && keys <= 12) {
                 rows[actualRows] = TouchKeyboardRow(rowKeys, keys, size.x);
                 actualRows++;
             }
@@ -81,39 +85,39 @@ namespace tcgfx {
         [[nodiscard]] int getRequiredHeight() const {
             return actualRows * eachKeyHeight;
         }
+
+        [[nodiscard]] int getKeysPerRow() const {
+            return rows[0].getNumKeys();
+        }
     };
 
     class KeyboardTouchEditor {
     protected:
         EditableMultiPartMenuItem* menuItem = nullptr;
-        int editIndex = 0;
+        bool capsLock = false;
     public:
         virtual void keypress(TcTouchKeyboardController* controller, char ch) = 0;
-        KeyboardTouchEditor* initFor(MenuItem* m) {
+        void initFor(MenuItem* m) {
             menuItem = reinterpret_cast<EditableMultiPartMenuItem*>(m);
-            editIndex = 0;
             menuItem->beginMultiEdit();
             menuItem->nextPart();
-            return this;
         }
 
         virtual ~KeyboardTouchEditor() = default;
+        [[nodiscard]] bool isCapsDown() const { return capsLock; }
     };
 
     class SingleValuePerFieldTouchEditor : public KeyboardTouchEditor {
     public:
-        void initSingle(MenuItem* item) { initFor(item); }
+        SingleValuePerFieldTouchEditor* initSingle(MenuItem* item);
         void keypress(TcTouchKeyboardController* controller, char ch) override;
     };
 
     class SummingValueKeyboardTouchEditor : public KeyboardTouchEditor {
         int currentValueBeingEdited = 0;
     public:
-        void initSumming(MenuItem* item) {
-            initFor(item);
-            currentValueBeingEdited = 0;
-        }
-        void keypress(TcTouchKeyboardController* controller, char ch) override {}
+        SummingValueKeyboardTouchEditor* initSumming(MenuItem* item);
+        void keypress(TcTouchKeyboardController* controller, char ch) override;
     };
 
     class TcTouchKeyboardController : public CustomDrawing, public TouchObserver {
@@ -124,20 +128,19 @@ namespace tcgfx {
         KeyboardTouchEditor* itemEditor{};
         EditableMultiPartMenuItem* itemBeingEdited{};
         GraphicsDeviceRenderer& touchRenderer;
-        ItemDisplayProperties& properties;
 
         // these are the default keyboard and editor layouts that are built in
-        TouchKeyboardLayout* defKeyboard;
+        TouchKeyboardLayout *defNumKeyboard, *defTxtKeyboard;
         SingleValuePerFieldTouchEditor perCharEditor;
         SummingValueKeyboardTouchEditor summingEditor;
         bool dirty = false;
     public:
-        TcTouchKeyboardController(TouchKeyboardLayout* defKeyboard, GraphicsDeviceRenderer& renderer, ItemDisplayProperties& properties);
+        TcTouchKeyboardController(TouchKeyboardLayout* defKeyboard, TouchKeyboardLayout* txtKeyboard, GraphicsDeviceRenderer& renderer);
         void setTouchScreenManager(MenuTouchScreenManager* touchScreenManager) { this->touchScreenManager = touchScreenManager; }
         void started(BaseMenuRenderer* currentRenderer) override;
         void reset() override;
         void renderLoop(unsigned int currentValue, RenderPressMode userClick) override;
-        void startEditing(MenuItem* menuItem, KeyboardTouchEditor* actEditor);
+        void startEditing(MenuItem* menuItem);
         void drawScrollbar(DeviceDrawable* drawable, const Coord& displayDims, int titleHeight);
         void reportTouchUpDown(const Coord& touch) const;
         void stopEditing();
@@ -147,11 +150,11 @@ namespace tcgfx {
         void needsRedraw(bool moreToGo);
 
     protected:
-        void renderKeyboard();
+        void renderKeyboard() const;
         void renderItem();
     };
 
-    TcTouchKeyboardController* defaultTouchKeyboardController(const Coord& size, GraphicsDeviceRenderer& renderer, ItemDisplayProperties& properties);
+    TcTouchKeyboardController* defaultTouchKeyboardController(const Coord& size, GraphicsDeviceRenderer& renderer);
 
 }
 #endif

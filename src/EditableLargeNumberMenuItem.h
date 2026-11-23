@@ -221,6 +221,8 @@ public:
     void setLargeNumberFromString(const char* largeNum);
 
     bool isNegativeAllowed() const { return negativeAllowed; }
+    void setNegativeFlagValue(int neg);
+
 };
 
 #endif //_EDITABLE_LARGE_NUMBER_MENU_ITEM_H_

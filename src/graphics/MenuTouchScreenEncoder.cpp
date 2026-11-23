@@ -120,7 +120,7 @@ void MenuTouchScreenEncoder::touched(const TouchNotification &evt) {
         }
         else if(isMenuRuntimeMultiEdit(theItem) && !theItem->isReadOnly()) {
             serlogF(SER_TCMENU_DEBUG, "TMPart");
-            renderer->getTouchKeyboardController()->startEditing(theItem, nullptr);
+            renderer->getTouchKeyboardController()->startEditing(theItem);
         }
         else if(!theItem->isReadOnly()){
             GridPosition::GridDrawingMode drawingMode = evt.getEntry()->getPosition().getDrawingMode();

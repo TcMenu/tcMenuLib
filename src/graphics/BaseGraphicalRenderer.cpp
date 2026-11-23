@@ -365,7 +365,7 @@ GridPositionRowCacheEntry* BaseGraphicalRenderer::firstItemOnRow(int row) {
 
 int BaseGraphicalRenderer::totalGridHeight() const {
     int totalItemHeights = 0;
-    for(int i=0; i<itemOrderByRow.count(); i++) {
+    for(size_t i=0; i<itemOrderByRow.count(); i++) {
         auto rowEntry = itemOrderByRow.itemAtIndex(i);
         if(rowEntry == nullptr || rowEntry->getPosition().getGridPosition() > 1) continue;
         auto itemHeight = rowEntry->getPosition().getGridHeight();
@@ -492,7 +492,7 @@ int BaseGraphicalRenderer::skipRow(int idx) {
     while(currentRow == startingRow && toSkip < 5) {
         toSkip++;
         idx++;
-        if(idx >= itemOrderByRow.count()) break;
+        if(static_cast<size_t>(idx) >= itemOrderByRow.count()) break;
         currentRow = itemOrderByRow.itemAtIndex(idx)->getPosition().getRow();
     }
     return toSkip;

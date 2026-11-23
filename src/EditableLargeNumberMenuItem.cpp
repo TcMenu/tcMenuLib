@@ -109,6 +109,14 @@ void EditableLargeNumberMenuItem::setLargeNumberFromString(const char* val) {
 	setChanged(true);
 }
 
+void EditableLargeNumberMenuItem::setNegativeFlagValue(int neg) {
+    uint8_t sz[2];
+    sz[0] = lowByte(neg);
+    sz[1] = highByte(0);
+    renderFn(this, 1, RENDERFN_SET_VALUE, reinterpret_cast<char*>(sz), sizeof(sz));
+    changeOccurred(false);
+}
+
 void wrapEditor(bool editRow, uint8_t row, char val, char* buffer, int bufferSize) {
 	if (editRow) {
         menuMgr.setEditorHints(CurrentEditorRenderingHints::EDITOR_RUNTIME_TEXT, row, row+1);
